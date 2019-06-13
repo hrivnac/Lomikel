@@ -141,6 +141,7 @@
           description="Construct documentation">
  		<copy todir="../doc">
 			<fileset dir="../src" includes="*.html"/>
+			<fileset dir="../src" includes="*.jpeg"/>
       </copy>
  		<copy todir="../doc/docsrc">
 			<fileset dir="../docsrc" includes="*"/>
@@ -180,6 +181,8 @@
         <path refid="classpath.run"/>
         </classpath>
       </javadoc>
+    <replace file="../doc/index.html" token="@VERSION@" value="${version}"/>
+    <replace file="../doc/index.html" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
   </target>
 
   <!-- Post =================================================================-->
