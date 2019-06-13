@@ -12,11 +12,19 @@ public class Notifier {
   /** Connect to monitorring Web page.
     * @param message The message to be send. */
   public static void notify(String message) {
+    notify(message, "JHTools");
+    }
+
+  /** Connect to monitorring Web page.
+    * @param message The message to be send.
+    * @param source  The message source. */
+  public static void notify(String message,
+                            String source) {
     Thread thread = new Thread() {
       @Override
       public void run() {
         try {
-          URL url = new URL("http://cern.ch/hrivnac/cgi-bin/record.pl?page=JHTools_" + message + "_" + Info.release().replaceAll(" ", "_"));
+          URL url = new URL("http://cern.ch/hrivnac/cgi-bin/record.pl?page=" + source + "_" + message + "_" + Info.release().replaceAll(" ", "_"));
           HttpURLConnection conn = (HttpURLConnection)url.openConnection();
           conn.setRequestMethod("GET");
           conn.getInputStream();
