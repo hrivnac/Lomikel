@@ -1,0 +1,11 @@
+: 1552515394:0;cd ../..
+: 1556025402:0;ls
+: 1556025437:0;cd ..
+: 1560447463:0;ls
+: 1560447465:0;ls astrolabsoftware
+: 1560447467:0;ls astrolabsoftware/AstroLabNet
+: 1560447475:0;mv astrolabsoftware/AstroLabNet ./JHTools
+: 1560447478:0;rm -rf astrolabsoftware
+: 1560447479:0;ls
+: 1560447481:0;cd JHTools
+: 1560447901:0;cd ../..

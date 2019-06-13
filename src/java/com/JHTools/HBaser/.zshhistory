@@ -1,0 +1,14 @@
+: 1553018572:0;ls
+: 1553018587:0;mv CatalogRESTClient.java HBaseRESTClient.java
+: 1553018588:0;ls
+: 1553018591:0;cd ..
+: 1554576099:0;ls
+: 1554576106:0;cp HBaseRESTClient.java HBaseClient.java
+: 1554576108:0;popd
+: 1555352232:0;ls
+: 1555352245:0;cp HBaseTableView.java TableEntry.java
+: 1555352246:0;popd
+: 1556282172:0;ls
+: 1556282176:0;cd ..
+: 1560449141:0;ls
+: 1560449216:0;cd ..

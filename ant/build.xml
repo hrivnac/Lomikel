@@ -1,0 +1,304 @@
+<project name="JHTools"
+         default="compile"
+         basedir="../run">
+
+  <description>
+    JHTools
+    </description>
+
+  <!-- Setup ================================================================-->
+
+  <property environment="env"/>
+  <property file="../ant/build-global.properties"/>
+  <property file="../ant/build.properties"/>
+  <property name="site" value="Local"/>
+
+  <path id="classpath.build">
+    <pathelement path="${log4j.jar}"/>
+    <pathelement path="${bsh.jar}"/>
+    <pathelement path="${httpclient.jar}"/>
+    <pathelement path="${httpcore.jar}"/>
+    <pathelement path="${logging.jar}"/>
+    <pathelement path="${cli.jar}"/>
+    <pathelement path="${orgjson.jar}"/>
+    <pathelement path="${slf4j.jar}"/>
+    <fileset dir="../extlib">
+      <include name="*.jar"/>
+      </fileset>
+    </path>
+
+  <path id="classpath.run">
+    <fileset dir="../lib">
+      <include name="*.jar"/>
+      <exclude name="*.exe.jar"/>
+      </fileset>
+    <path refid="classpath.build"/>
+    </path>
+
+  <property name="classpath.build.content" refid="classpath.build"/>
+  <property name="classpath.run.content"   refid="classpath.run"/>
+
+  <!-- Info =================================================================-->
+    
+  <target name="info"
+          depends="init"
+          description="Create Info class">
+    <mkdir dir="../build/com/JHTools/Utils"/>
+    <copy file="../src/java/com/JHTools/Utils/Info.pre"
+          tofile="../build/com/JHTools/Utils/Info.java"/>
+    <replace file="../build/com/JHTools/Utils/Info.java" token="@version@"   value="${version}"/>
+    <replace file="../build/com/JHTools/Utils/Info.java" token="@TSTAMP@"    value="${TSTAMP}"/>
+    <replace file="../build/com/JHTools/Utils/Info.java" token="@user.name@" value="${user.name}"/>
+    </target>
+
+  <!-- Init =================================================================-->
+
+  <target name="init"
+          description="Initialise environment">
+    <tstamp>
+      <format property="TSTAMP" pattern="dd/MMM/yyyy 'at' kk:mm:ss z"/>
+      </tstamp>
+    <mkdir dir="../build"/>
+    <mkdir dir="../lib"/>
+    <mkdir dir="../extlib"/>
+    <mkdir dir="../run"/>
+    <mkdir dir="../doc/JavaDoc"/>
+    </target>
+    
+
+  <!-- Compile ==============================================================-->
+
+  <target name="compile"
+          depends="init,info"
+          description="Compile sources">
+    <echo message="Using Java version ${ant.java.version}(${java.version})."/>
+    <javac destdir="../build"
+           fork="yes"
+           debug="yes"
+           debuglevel="lines,vars,source"
+           optimize="yes"
+           source="8"
+           target="8">
+      <src path="../src/java"/>
+      <src path="../build"/>
+      <classpath>
+        <path refid="classpath.build"/>
+        </classpath>
+      </javac>
+    </target>
+    
+  <!-- Create JAR ===========================================================-->
+  
+  <target name="jar"
+          depends="compile"
+          description="Create JAR">
+    <path id="libs">
+      <fileset dir="../extlib">
+        <include name="*.jar"/>
+        <exclude name="*.exe.jar"/>
+        </fileset>
+      </path>
+    <property name="classpath.libs" refid="libs"/>
+    <jar jarfile="../lib/JHTools-${version}.jar" index="yes">
+      <fileset dir="../build"    includes="**/*.class"/>
+      <fileset dir="../src/java" includes="com/JHTools/**/*.properties"/>
+      <fileset dir="../src/java" includes="com/JHTools/**/*.bsh"/>
+      <fileset dir="../src/java" includes="com/JHTools/**/*.txt"/>
+      <fileset dir="../src/java" includes="com/JHTools/**/*.png"/>
+      <fileset dir="../src/java" includes="com/JHTools/**/*.gif"/>
+      <fileset dir="../src/java" includes="com/JHTools/**/*.css"/>
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="JHTools"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        </manifest>
+      </jar>
+    </target>
+    
+  <!-- Clean ================================================================-->
+
+  <target name="clean"
+          depends="init"
+          description="Clean up">
+    <delete includeEmptyDirs="true">
+      <fileset dir="../build" includes="**/*"/>
+      </delete>
+    <delete includeEmptyDirs="true">
+      <fileset dir="../lib" includes="**/*"/>
+      </delete>
+    <delete includeEmptyDirs="true">
+      <fileset dir="../doc" includes="**/*"/>
+      </delete>
+    <delete includeEmptyDirs="true">
+      <fileset dir="." includes="**/*"/>
+      </delete>
+   </target>
+ 
+  <!-- JavaDoc ==============================================================-->
+
+  <target name="doc"
+          depends="jar,j2h,viz,uml"
+          description="Construct documentation">
+ 		<copy todir="../doc">
+			<fileset dir="../src" includes="*.html"/>
+      </copy>
+ 		<copy todir="../doc/docsrc">
+			<fileset dir="../docsrc" includes="*"/>
+      </copy>
+    <copy todir="../doc/dist">
+			<fileset dir="../lib" includes="*.jar"/>
+      </copy>
+ 		<copy todir="../doc/JavaDoc">
+			<fileset dir="../src/java" includes="**/doc-files/*"/>
+      </copy>
+    <javadoc packagenames="*"
+             doclet="org.jboss.apiviz.APIviz"
+             docletpath="../extlib/apiviz-1.3.4.jar:../extlib/jdepend-2.9.5.jar:../extlib/tools-1.8.0.jar"
+             sourcepath="../src/java:../build"
+             destdir="../doc/JavaDoc"
+             author="true"
+             version="true"
+             use="true"
+             private="true"
+             additionalparam=" -linksource -breakiterator -keywords -author -version"
+             source="1.8"
+             Overview="../src/java/com/JHTools/Utils/overview.html"
+             windowtitle="JHtools">
+      <doctitle><![CDATA[<u>]]>JHTools<![CDATA[</u>]]></doctitle>
+      <Header><![CDATA[<center>]]>JHTools version: ${version}<![CDATA[</center>]]></Header>
+      <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
+      <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Packages/JHTools'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
+      <group title="HBaser" packages="com.JHTools.HBaser"/>
+      <group title="Utils"  packages="com.JHTools.Utils*"/>
+      <link href="http://docs.oracle.com/javase/8/docs/api"/>
+      <link href="http://www.beanshell.org/javadoc/"/>
+      <link href="https://logging.apache.org/log4j/1.2/apidocs"/>
+      <link href="https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs"/>
+      <link href="http://stleary.github.io/JSON-java"/>
+      <link href="https://commons.apache.org/proper/commons-cli/apidocs"/>
+      <classpath>
+        <path refid="classpath.run"/>
+        </classpath>
+      </javadoc>
+  </target>
+
+  <!-- Post =================================================================-->
+
+  <target name="post"
+          depends="init"
+          description="Post documentation">
+ 		<copy todir="${doc}">
+			<fileset dir="../doc" includes="**/*"/>
+      </copy>
+    </target>
+
+  <!-- JDepend ==============================================================-->
+
+  <target name="jdepend"
+          depends="init"
+          description="Analyse dependencies">
+    <java classname="jdepend.swingui.JDepend"
+          fork="true"
+          failonerror="true">
+      <arg value="../build"/>
+      <classpath>
+          <pathelement location="../extlib/jdepend-2.9.5.jar"/>
+          </classpath>
+      </java>
+    </target>
+
+  <!-- j2h ==================================================================-->
+
+  <target name="j2h"
+          depends="init"
+          description="Construct source documentation">
+    <taskdef name="java2html" classname="com.java2html.Java2HTMLTask"/>
+	  <java2html title="JHTools" 
+               simple="no"
+             	 tabsize="4"
+		           marginsize="2"
+		           header="true"
+		           footer="true"
+		           destination="../doc/Src">
+		  <fileset dir="../src"   includes="**/*.java"/>
+		  <fileset dir="../build" includes="**/*.java"/>
+		  <javadoc localRef="${javadoc}" httpRef="http://docs.oracle.com/javase/8/docs/api"/>
+	    </java2html>
+    </target>
+
+  <!-- Viz ==================================================================-->
+
+  <target name="viz"
+          depends="init"
+          description="Create flow of build file">
+    <taskdef name="vizant" classname="net.sourceforge.vizant.Vizant"/> 
+    <vizant antfile="../ant/build.xml" outfile="../doc/build.dot"/>
+    </target>
+    
+  <!-- UmlGraph =============================================================-->  
+
+  <target name="uml"
+          depends="init"
+          description="Create UML Graph">
+    <mkdir dir="../doc/UML"/>
+    <pathconvert targetos="unix" property="classpath.run" refid="classpath.run"/>
+	  <apply executable="javadoc" dest="../build" parallel="true">
+		  <arg value="-classpath"/>
+		  <arg value="${classpath.run}"/>
+		  <arg value="-source"/>
+		  <arg value="1.8"/>
+		  <arg value="-docletpath"/>
+		  <arg value="../extlib/UmlGraph.jar"/>
+		  <arg line="-doclet org.umlgraph.doclet.UmlGraph"/>
+		  <arg value="-all"/>
+		  <arg value="-noguillemot"/>
+		  <!--arg value="-horizontal"/-->
+		  <arg line="-output ../doc/index.dot"/>
+		  <fileset dir="../src"/>
+		  <fileset dir="../build/com"/>
+		  <mapper type="glob" from="*.java" to="*.dot"/>
+	    </apply>
+	  <apply executable="dot" dest="../doc" parallel="false">
+		  <arg value="-Tjpg"/>
+		  <arg value="-o"/>
+		  <targetfile/>
+		  <srcfile/>
+		  <fileset dir="../doc"/>
+		  <mapper type="glob" from="*.dot" to="*.jpg"/>
+      </apply>
+    </target>
+
+  <!-- Find Bugs ============================================================-->  
+
+  <target name="findbugs"
+          depends="jar"
+          description="FindBugs Check">
+    <property name="findbugs.home"
+              value="${findbugs}"/>
+    <taskdef name="findbugs"
+             classpath="${findbugs.home}/lib/findbugs-ant.jar"
+             classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+    <findbugs home="${findbugs.home}"
+              output="text"
+              outputFile="../run/FindBugs.out"
+              excludeFilter="../ant/FindBugs-ExcludeFilter.xml">
+      <auxClasspath>
+        <path refid="classpath.run"/>
+        </auxClasspath>
+      <sourcePath path="../src" />
+      <class location="../lib/JHTools-${version}.jar" />
+      </findbugs>   
+    </target>
+
+  <!-- Clean Imports ========================================================-->  
+
+  <target name="cleanimports"
+          description="Clean Unused Imports">
+    <exec executable="../src/python/remove-unused-imports.py">
+      <arg line="../src/java/com/JHTools"/>
+      </exec>
+    </target>
+ 
+  <!-- ======================================================================-->
+
+  </project>

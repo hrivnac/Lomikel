@@ -1,0 +1,8 @@
+<FindBugsFilter>
+  <Match>
+    <Class name="~bsh.*" />
+    </Match>
+  <Match>
+    <Class name="~org.*" />
+    </Match>
+  </FindBugsFilter>

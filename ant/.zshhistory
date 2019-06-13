@@ -1,0 +1,1185 @@
+: 1550498605:0;mkdir ../run
+: 1550498610:0;mkdir ../lib
+: 1550500418:0;nc a.bsh
+: 1550500680:0;java -jar lib/AstroLabNet.exe.jar -s a.bsh
+: 1550501044:0;java -jar ../lib/AstroLabNet.exe.jar -s a.bsh
+: 1550501200:0;java -jar ../lib/AstroLabNet.exe.jar -s a.bsh -c
+: 1550501302:0;java -jar ../lib/AstroLabNet.exe.jar -s a -c
+: 1550510335:0;mv ../src/java/com/astrolabsoftware/AstroLabNet/Browser/WindowAppender.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/ConsoleAppender.java
+: 1550511697:0;grep reportException ../src/**/*java
+: 1550516684:0;ant run-c
+: 1550518221:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Browser/WindowAppender.java
+: 1550518236:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Utils/log4j.properties ../src/**/*java
+: 1550518248:0;git commit -m "refactoring cli"
+: 1550519601:0;ant run-h
+: 1550519603:0;ant run-help
+: 1550524352:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/GroovyConsole.java
+: 1550527129:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/GroovyConsole.java~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/GroovyConsole.java
+: 1550568407:0;cd ../
+: 1550568974:0;git add ../src/index.html ../src/**/*java ../docsrc/2019.02.19-AstroLabNet.pdf
+: 1550570345:0;jshell
+: 1550570429:0;/bin/ant jar
+: 1550570575:0;ant -version
+: 1550570592:0;more /usr/bin/ant
+: 1550570914:0;javac --version
+: 1550570993:0;where java
+: 1550570999:0;/bin/java -version
+: 1550571006:0;/usr/bin/java -version
+: 1550571162:0;echo $JAVACMD
+: 1550571166:0;echo $JAVAHOME
+: 1550571169:0;echo $JAVA_HOME
+: 1550582905:0;mkdir ../Notes
+: 1550582923:0;cp ~/tmp/A.java ../Notes
+: 1550582935:0;mv Notes.txt ../Notes/000.txt
+: 1550585607:0;grep setProgress ../src/**/*java
+: 1550595043:0;mkdir ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps
+: 1550595064:0;mv ../src/java/com/astrolabsoftware/AstroLabNet/DB/*java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps
+: 1550596219:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/DB/*html ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps
+: 1550597673:0;git rm Notes.txt
+: 1550597709:0;rm -f ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/*~
+: 1550597712:0;ls ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps
+: 1550597722:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps
+: 1550597754:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/DB/Action.java
+: 1550597790:0;git commit -m "moving entities reps closer to Browser"
+: 1550597955:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/Server.java
+: 1550598577:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/Element.java
+: 1550599587:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/Session.java
+: 1550600925:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/Action.java
+: 1550601474:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/Task.java
+: 1550602841:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/Data.java
+: 1550602867:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/DataSource.java
+: 1550602921:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/Channel.java
+: 1550610569:0;git commit -m "Object-Rep separation"
+: 1550611667:0;grep 'new Session' ../src/**/*java
+: 1550612291:0;grep SessionRep.create ../src/**/*java
+: 1550612415:0;git commit -m "better synch"
+: 1550657628:0;grep TaskRep.create **/*java
+: 1550657649:0;grep 'TaskRep.create' **/*java
+: 1550657655:0;grep 'TaskRep.create' ../**/*java
+: 1550658451:0;ant jkar
+: 1550666966:0;mkdir ../src/java/com/astrolabsoftware/AstroLabNet/CLI
+: 1550666982:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/*html ../src/java/com/astrolabsoftware/AstroLabNet/CLI
+: 1550667026:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/CLI/CommandLine.java
+: 1550669007:0;ls ../src/java/com/astrolabsoftware/AstroLabNet/CLI/
+: 1550669017:0;rm ../src/java/com/astrolabsoftware/AstroLabNet/CLI/*~
+: 1550669024:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/CLI/
+: 1550669030:0;git add ../src/java/com/**/*java
+: 1550669032:0;git add ../src/java/com/**/*html
+: 1550669046:0;git commit -m "separated CLI"
+: 1550751559:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/Core/Interacter.java
+: 1550752226:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/Core/InteracterHelper.java
+: 1550753130:0;git commit -m "coomon interface between Browser and CLI"
+: 1550756955:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ChannelRep.java ./src/java/com/astrolabsoftware/AstroLabNet/DB/Channel.java
+: 1550759226:0;ls ../../Misc/Notes.txt
+: 1550759234:0;more ../../Misc/Notes.txt
+: 1550759247:0;cat ../../Misc/Notes.txt >> ../Notes/000.txt
+: 1550759252:0;more ../Notes/000.txt
+: 1550759261:0;rm -rf ../../Misc/Notes.txt
+: 1550759264:0;rm -rf ../../Misc/
+: 1550765750:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/BrowserWindow.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/BrowserCommand.java
+: 1550766705:0;grep readActions ../src/**/*java
+: 1550774597:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Core/InteracterHelper.java
+: 1550774621:0;git commit -m "separating browser command and window"
+: 1550774720:0;ant clean;ant jar;ant doc;ant post
+: 1550831559:0;more ../doc/Help.txt
+: 1550831573:0;nc ../doc/Help.txt
+: 1550831875:0;nc ../doc/Help.html
+: 1550831886:0;rm ../doc/Help.txt
+: 1550832543:0;more ../run/pre1.txt
+: 1550832547:0;more ../run/pre2.txt
+: 1550839542:0;git add build.xml ../src/index.html ../src/**/*java ../src/**/*py ../src/**/*txt ../src/**/*bsh
+: 1550839552:0;git commit -m "better help, LAL server accessible"
+: 1550842263:0;grep 'menuItems()' ../src/**/*java
+: 1550843076:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ActionEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ActionsEventHandler.java
+: 1550843398:0;rm ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/images/c.png
+: 1550843511:0;git -comment '...'
+: 1550843520:0;git -commit -m "..."
+: 1550843562:0;git commit -m "action creation"
+: 1550847746:0;git commit -m "creating of new Action via Popup menu"
+: 1550850325:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ActionsEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServersEventHandler.java
+: 1550850970:0;git commit -m "interactive server creation"
+: 1550852891:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/ExitHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/ReadScriptHandler.java
+: 1550854237:0;git commit -m "can source bsh files"
+: 1550860320:0;java -jar ../lib/AstroLabNet.exe.jar --cli
+: 1551030769:0;cd ../src/java
+: 1552990123:0;rm AstroLabNet.log
+: 1552990161:0;more ../run/AstroLabNet.log
+: 1552990331:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/images/HBase.png
+: 1552990357:0;git commit -m "connecting to Catalog HBase server"
+: 1552990363:0;more ~/include/hesla
+: 1552991207:0;ls ../src/java/com/astrolabsoftware/AstroLabNet/Catalog
+: 1552991215:0;rm ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/overview.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/package.html\~
+: 1552991240:0;git add build.xml ../src/index.html ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/Help.txt ../src/java/com/astrolabsoftware/AstroLabNet/Core/init.bsh ../src/java/com/astrolabsoftware/AstroLabNet/Catalog
+: 1552991257:0;git commit -m "starting Catalog client"
+: 1552993363:0;more setup.sh
+: 1552993372:0;more build-global.properties
+: 1553016567:0;mkdir ../src/ruby
+: 1553016640:0;mkdir ../src/ruby/createJournal.rb
+: 1553016663:0;rmdir ../src/ruby/createJournal.rb
+: 1553016669:0;touch ../src/ruby/createJournal.rb
+: 1553016755:0;hbase shell < ../src/ruby/createJournal.rb
+: 1553016766:0;/opt/hbase/bin/hbase shell < ../src/ruby/createJournal.rb
+: 1553017218:0;cp ../src/ruby/createJournal.rb ../src/ruby/createTopo.rb
+: 1553017968:0;/opt/hbase/bin/hbase shell < ../src/ruby/createTopology.rb
+: 1553018089:0;cp ../src/ruby/createJournal.rb ../src/ruby/createCatalog.rb
+: 1553018337:0;rm ../src/ruby/createCatalog.rb\~ ../src/ruby/createJournal.rb\~ ../src/ruby/createTopo.rb\~
+: 1553018345:0;git add ../src/ruby
+: 1553018360:0;git commit -m "HBase table initialisation"
+: 1553019104:0;git add build.xml ../src/**/*.html
+: 1553019107:0;git add build.xml ../src/**/*.java
+: 1553019118:0;git commit -m "HBaser"
+: 1553020623:0;git doc
+: 1553077489:0;cp ../src/ruby/createTopology.rb ../src/ruby/fillTopology.rb
+: 1553078000:0;/opt/hbase/bin/hbase shell < ../src/ruby/createCatalog.rb ../src/ruby/createJournal.rb ../src/ruby/createTopology.rb ../src/ruby/fillTopology.rb
+: 1553083794:0;more ../src/**/init.bsh
+: 1553083909:0;more ../src/**/*rb
+: 1553084730:0;grep init.bsh ../src/**/*java
+: 1553084892:0;grep SmallHtt ../src/**/*java
+: 1553085097:0;rm ../run/AstroLabNet.log
+: 1553085488:0;ant clean;ant jat
+: 1553086791:0;nedit /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Livyser/LivyRESTClient.java
+: 1553087645:0;/usr/bin/curl -vi -X GET -H "Accept: text/xml" -H "Content-Type: application/json" -d '<Scanner batch="1"/>' "http://localhost:8080/astrolabnet.topology.1/scanner/1553087601330589eff74"\
+
+: 1553087662:0;/usr/bin/curl -vi -X GET -H "Accept: application/json" -H "Content-Type: application/json" -d '<Scanner batch="1"/>' "http://localhost:8080/astrolabnet.topology.1/scanner/1553087601330589eff74"\
+
+: 1553087667:0;/usr/bin/curl -vi -X PUT -H "Accept: text/xml" -H "Content-Type: text/xml" -d '<Scanner batch="100"/>' "http://localhost:8080/astrolabnet.topology.1/scanner"\
+
+: 1553087689:0;/usr/bin/curl -vi -X GET -H "Accept: application/json" -H "Content-Type: application/json" -d '<Scanner batch="1"/>' "http://localhost:8080/astrolabnet.topology.1/scanner/15530876678322053120"\
+
+: 1553088111:0;grep checkProgress **/*java
+: 1553088117:0;grep checkProgress ../src/**/*java
+: 1553090306:0;ls /opt/hbase/lib
+: 1553091456:0;grep Bytes ~/work/Atlas/DB/Atlas-Event-Index-Core/src/**/*java
+: 1553098228:0;nt jar
+: 1553098345:0;git add ../src/index.html ../src/**/*java ../src/**/*bsh ../src/ruby/fillTopology.rb
+: 1553098356:0;git commit -m "reading topology table"
+: 1553101458:0;grep astrolabnet.topology.1 ../src/**/*java
+: 1553101865:0;commit -m "..."
+: 1553101905:0;git add build-global.properties build.xml ../src/index.html ../src/ruby/fillTopology.rb ../src/**/*pre ../src/**/*java
+: 1553101917:0;git commit -m "reading network topology from HBase"
+: 1553162729:0;git commit -m "better exception handling"
+: 1553163766:0;git commit -m "topology scanned recursively"
+: 1553176787:0;echo "System.out.println(w.servers());" | ant run-cli
+: 1553176822:0;echo "System.out.println(w.actions());" | ant run-cli
+: 1553250956:0;nc ../../fink-broker/NOTES.txt
+: 1553262620:0;ls ~/avro-1.8.2.jar
+: 1553262641:0;su
+: 1553262684:0;ls ../exelib
+: 1553262691:0;rm -rf ../exelib
+: 1553262777:0;java -jar /opt/Avro/avro-tools-1.8.2.jar schema
+: 1553262784:0;java -jar /opt/Avro/avro-tools-1.8.2.jar compile schema
+: 1553262900:0;jar tvf ../lib/AstroLabNet.exe.jar
+: 1553262962:0;jar tvf ../lib/AstroLabNet.exe.jar|grep ztf
+: 1553264138:0;cd ../src/avro/ztf
+: 1553265304:0;git add build-private.properties build.xml ../src/index.html
+: 1553265318:0;git commit -m "avro parsing functional"
+: 1553267037:0;ls ../doc
+: 1553267073:0;ls ../src/java/
+: 1553267139:0;ant umlgraph
+: 1553267164:0;ant uml
+: 1553267491:0;git add build.xml ../src/index.html
+: 1553277292:0;mkdir ../src/java/com/astrolabsoftware/AstroLabNet/Avro
+: 1553277384:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/Avro/Reader.java
+: 1553277756:0;ls ..
+: 1553277767:0;mkdir ../data
+: 1553277776:0;mkdir ../data/Avro
+: 1553277792:0;cp ../../fink-broker/datasim/697251920015010010.avro ../data/Avro
+: 1553277924:0;java -jar /opt/Avro/avro-tools-1.8.2.jar
+: 1553277939:0;java -jar /opt/Avro/avro-tools-1.8.2.jar cat ../data/Avro/697251920015010010.avro
+: 1553277950:0;java -jar /opt/Avro/avro-tools-1.8.2.jar cat ../data/Avro/697251920015010010.avro a
+: 1553277954:0;more a
+: 1553277975:0;rm a
+: 1553278031:0;mv ../data/Avro ../data/avro
+: 1553278142:0;ls ../src/avro/ztf
+: 1553278164:0;grep alert ../build/ztf/alert/*java
+: 1553279527:0;jar tvf ../lib/AstroLabNet.jar
+: 1553279647:0;ll /opt/spark/jars/slf4j-*
+: 1553279660:0;tar tvf /opt/spark/jars/slf4j-api-1.7.16.jar
+: 1553279670:0;jar tvf /opt/spark/jars/slf4j-api-1.7.16.jar
+: 1553282816:0;nedit a&
+: 1553292327:0;cd ../doc
+: 1553292558:0;popd
+: 1553292742:0;more ../build/ztf.avsc
+: 1553293002:0;grep alert ../build/ztf/**/*java
+: 1553293179:0;ls ../build/ztf/alert
+: 1553293183:0;ls ../build/ztf
+: 1553300372:0;git commit build-private.properties build.xml ../src/avro/ztf/alert.avsc ../src/**/*rb
+: 1553300385:0;git add build-private.properties build.xml ../src/avro/ztf/alert.avsc ../src/**/*rb
+: 1553300393:0;ls ../src/java/com/astrolabsoftware/AstroLabNet/Avro
+: 1553300400:0;rm ../src/java/com/astrolabsoftware/AstroLabNet/Avro/*~
+: 1553300412:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Avro
+: 1553300424:0;git commit -m "parsing Avro alerts"
+: 1553348432:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Avro/AvroReader.java
+: 1553348460:0;git commit -m "get fields automatically from Avro Schema"
+: 1553374540:0;grep Base64 ../src/**/*java
+: 1553377855:0;git commit -m "sending catalog entries to HBase"
+: 1553378523:0;df
+: 1553509848:0;grep args.length ../src/**/*java
+: 1553509857:0;grep args.size ../src/**/*java
+: 1553509872:0;grep args ../src/**/*java
+: 1553510464:0;java -jar ../lib/AstroLabNet.AvroReader.exe.jar
+: 1553510692:0;jar tvf ../lib/AstroLabNet.AvroReader.exe.jar|grep slf4j
+: 1553510807:0;ls /opt/spark/jars/
+: 1553510813:0;ls /opt/spark/jars/*slf4j*
+: 1553511348:0;ant info
+: 1553511358:0;ll /opt/apache-log4j-2.11.2-bin/log4j-core-2.11.2.jar
+: 1553511574:0;for X in ../../fink-broker/datasim/*avro;do\
+java -jar ../lib/AstroLabNet.AvroReader.exe.jar ${X}\
+done
+: 1553511611:0;git add build-private.properties build.xml ../src/java/com/astrolabsoftware/AstroLabNet/Avro/AvroReader.java
+: 1553511622:0;git commit -m "bulk loading of Avro files"
+: 1553516141:0;nedit a
+: 1553516385:0;/opt/hbase/bin/hbase shell < ../src/ruby/createCatalog.rb
+: 1553516395:0;java -jar ../lib/AstroLabNet.AvroReader.exe.jar ../data/avro/697251920015010010.avro
+: 1553521293:0;git add ../src/ruby/createCatalog.rb ../src/ruby/createJournal.rb ../src/ruby/createTopology.rb ../src/ruby/fillTopology.rb
+: 1553521302:0;git commit -m "gtable schema update"
+: 1553525648:0;git add build.xml../src/**/*java
+: 1553525663:0;git commit -m "encoding byte[]"
+: 1553596420:0;cd ../docsrc
+: 1553596519:0;git add ../src/index.html ../docsrc/2019.03.26-AstroLabNet.pdf
+: 1553596529:0;git commit -m "presentation added"
+: 1553604081:0;ant check-avro
+: 1553604170:0;for X in ../../fink-broker/datasim/*avro;do\
+java -jar ../lib/AstroLabNet.AvroReader.exe.jar $X\
+done
+: 1553605186:0;mv ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerSessionEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerSourceEventHandler.java
+: 1553605205:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerSourceEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerSessionEventHandler.java
+: 1553605673:0;ant avfro
+: 1553605709:0;nedit /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Browser/BrowserCommand.java
+: 1553605745:0;home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Core/*Interacter.java
+: 1553605752:0;nedit /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Core/*Interacter.java
+: 1553607429:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/DataChannelRep.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/DataSourceRep.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/DB/DataChannel.java ../src/java/com/astrolabsoftware/AstroLabNet/DB/DataSource.java
+: 1553607447:0;git commit -m "adding data sources"
+: 1553609560:0;grep updateSess ../src/**/*java
+: 1553609600:0;grep showSou ../src/**/*java
+: 1553612781:0;grep 'Prepare for e' ../src/**?*java
+: 1553612784:0;grep 'Prepare for e' ../src/**/*java
+: 1553612789:0;grep 'Prepare for E' ../src/**/*java
+: 1553613087:0;got commit -m "..."
+: 1553613115:0;git add ../src/java/**/*png
+: 1553613127:0;git commit -m "preparing source search"
+: 1553616602:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SessionEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SourceEventHandler.java
+: 1553616608:0;nedit ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SourceEventHandler.java
+: 1553616926:0;rm '#Notes.txt#'
+: 1553616937:0;rm AstroLabNet.log.1 a a.bsh
+: 1553616943:0;more .a.crc
+: 1553616946:0;rm .a.crc
+: 1553616950:0;git commit -m "search preparing"
+: 1553624096:0;git commit -m "hbase search works"
+: 1553624114:0;git commit -m "0.2.0"
+: 1553624307:0;git tag -a 'AstroLabNet/00.02.00' -m 'release 00.02.00'
+: 1553624318:0;git push origin --tags
+: 1553624478:0;git commit -m "00.02.00+"
+: 1553625574:0;git commit -m "cleaning imports"
+: 1553680547:0;bsh
+: 1553680897:0;grep 'Welcome to' ../src/java/**/*java
+: 1553681414:0;jar tvf /opt/lib/bsh-2.0b6.jar
+: 1553681430:0;jar tvf /opt/lib/bsh-2.0b6.jar|grep CommandLineR
+: 1553681600:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/CLI/CommandLine.java ../src/java/com/astrolabsoftware/AstroLabNet/CLI/CommandLineReader.java
+: 1553681842:0;more build.properties
+: 1553682088:0;jar tvf /opt/lib/bsh-2.0b6.jar|grep FileReader
+: 1553683184:0;java -jar ../lib/AstroLabNet.exe.jar -c -s a.bsh
+: 1553683354:0;grep 'source()' ../src/**/*java
+: 1553684374:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Utils/log4j-minimal.properties ../src/java/com/astrolabsoftware/AstroLabNet/Utils/log4j-minimalistic.properties
+: 1553684783:0;java -jar ../lib/AstroLabNet.exe.jar -c -s pokus.bsh -q
+: 1553684834:0;git add ../src/**/*java ../src/**/*properties
+: 1553684847:0;git commit -m "commandline and feedback"
+: 1553684896:0;java -jar ../lib/AstroLabNet.exe.jar -s pokus.bsh -q
+: 1553695541:0;java -jar ../lib/AstroLabNet.exe.jar -s pokus.bsh -q -c
+: 1553697985:0;java -jar ../lib/AstroLabNet.exe.jar -s
+: 1553710512:0;more /opt/hbase/bin/hbase-daemon.sh
+: 1553710547:0;/opt/hbase/bin/start-hbase.sh\
+
+: 1553718944:0;grep setupInterpreter ../src/java/**/*java
+: 1553719237:0;grep readActons ../src/java/**/*java
+: 1553720661:0;grep sendCommand ../src/java/**/*java
+: 1553721671:0;grep checkProgress ../src/java/**/*java
+: 1553722361:0;java -jar ../lib/AstroLabNet.exe.jar -s pokus.bsh -c -q
+: 1553723142:0;git add build.xml ../src/index.html ../src/**/*java ../src/ruby/fillTopology.rb
+: 1553723160:0;git commit -m "interacting sending of Spark jobs"
+: 1553728157:0;ant clean;ant jar
+: 1553728478:0;java -jar ../lib/AstroLabNet.exe.jar -s pokus.bsh -b
+: 1553728814:0;git commit -m "retries Livy"
+: 1553781304:0;java -jar ../lib/AstroLabNet.exe.jar -s pokus.bsh -c
+: 1553783424:0;ant check-livy
+: 1553783458:0;ls /opt/livy
+: 1553783598:0;java -jar ../lib/AstroLabNet.Livy.exe.jar
+: 1553783617:0;jar tvf ../lib/AstroLabNet.Livy.exe.jar|grep LivyClientFactory
+: 1553811644:0;jar tvf ../lib/PiJob.jar
+: 1553811716:0;nc test.sh&
+: 1553811871:0;/bin/curl -X POST --data '{"file": "local:/home/hrivnac/work/LSST/AstroLabNet/lib/PiJob.jar", "className": "com.astrolabsoftware.AstroLabNet.DB.Jobs.PiJob",}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1553811928:0;/bin/curl -X POST --data '{"file": "local:/home/hrivnac/work/LSST/AstroLabNet/lib/PiJob.jar", "className": "com.astrolabsoftware.AstroLabNet.DB.Jobs.PiJob"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1553851726:0;ls /opt/livy/jars
+: 1553851837:0;ls /opt/spark/
+: 1553851846:0;ls /opt/spark/examples
+: 1553851848:0;ls /opt/spark/examples/jars
+: 1553851928:0;jar tvf /opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar
+: 1553851956:0;ls /opt/spark
+: 1553852312:0;for X in /opt/spark/jars/*;do\
+echo $X\
+jar tvf $X|grep SparkSession\
+done
+: 1553852436:0;ant jart
+: 1553852476:0;/bin/curl -X POST --data '{"file":"local:/home/hrivnac/work/LSST/AstroLabNet/lib/PiJob.jar", "className":"com.astrolabsoftware.AstroLabNet.DB.Jobs.PiJob"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1553854294:0;grep 'new Action' ../src/**/*java
+: 1553870270:0;grep readActions ../src/java/**/*java
+: 1553870735:0;mv /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/DB/BatchHelp.java /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/DB/BatchHelp.txt
+: 1553870744:0;mv /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/DB/JobHelp.java /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/DB/JobHelp.txt
+: 1553871842:0;git add build-private.properties build.xml ../src/**/*java ../src/java/**/*txt
+: 1553871851:0;git commit -m "adding Job and Batch"
+: 1553878725:0;nedit ../src/java/**/*Batch*java
+: 1553878787:0;grep batch ../src/**/*java
+: 1553878820:0;nedit ../src/java/com/astrolabsoftware/AstroLabNet/Browser/BrowserCommand.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/BrowserWindow.java ../src/java/com/astrolabsoftware/AstroLabNet/Core/DefaultInteracter.java ../src/java/com/astrolabsoftware/AstroLabNet/Core/Interacter.java
+: 1553879045:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/DB
+: 1553881549:0;git commit -m "adding Mission = Batch + Job"
+: 1553882836:0;grep checkProg ../src/**/*java
+: 1553883658:0;java -jar ../lib/AstroLabNet.exe.jar -h -c -s pokus.bsh
+: 1553888927:0;ant cleean
+: 1553889715:0;git commit -m "cli sending batches work"
+: 1553890780:0;grep 'use for Session' ../src/**/*java
+: 1553890788:0;grep 'se for Session' ../src/**/*java
+: 1553890852:0;git commit -m "interactive batches"
+: 1553895975:0;grep updateBatch ../src/**/*java
+: 1553896698:0;tail -200 ../run/AstroLabNet.log
+: 1553969435:0;ant clesan;ant avro
+: 1553971343:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/ReadScriptHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/ReadJARHandler.java
+: 1553971476:0;nedit ../src/**/Images.java
+: 1553974783:0;nc
+: 1553975846:0;mv ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/MissionEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/MissionEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/MissionRep.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/MissionRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/MissionHelp.txt ../src/java/com/astrolabsoftware/AstroLabNet/DB/MissionHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Mission.java ../src/java/com/astrolabsoftware/AstroLabNet/DB/Mission.java\~ ~/tmp
+: 1553976340:0;mv ../src/java/**/*Batch* ~/tmp
+: 1553976366:0;ant clerimports
+: 1553976369:0;ant clearimports
+: 1553976479:0;ls ~/tmp
+: 1553976497:0;mv ~/tmp/Batch.java ../src/java/com/astrolabsoftware/AstroLabNet/DB
+: 1553976509:0;mv ~/tmp/BatchHelp.txt ../src/java/com/astrolabsoftware/AstroLabNet/DB
+: 1553976524:0;mv ~/tmp/BatchRep.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps
+: 1553976542:0;mv ~/tmp/BatchEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps
+: 1553978746:0;grep Platform ../src/**/*java
+: 1553979547:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/DB/Mission.java ../src/java/com/astrolabsoftware/AstroLabNet/DB/MissionHelp.txt ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/MissionEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/MissionRep.java
+: 1553979558:0;git add ../src/**/*tx
+: 1553979583:0;git commit -m "adding batch-job handling"
+: 1553979651:0;git rm src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/'#MissionEventHandler.java#'
+: 1553980728:0;grep 'new Task' ../src/java/**/*java
+: 1553981934:0;grep addTask ../src/**/*java
+: 1553982814:0;grep xxx ../src/java/**/*java
+: 1553984823:0;git add ../src/java/**/*java
+: 1553984827:0;git add ../src/java/**/*txt
+: 1553984837:0;git commit -m "sending jobs works"
+: 1554030506:0;grep addTab ../src/**/*java
+: 1554030993:0;grep registerSessionTab ../src/**/*java
+: 1554031565:0;grep 'new Job' ../src/**/*java
+: 1554032039:0;git commit -m "sending Jobs to Batch"
+: 1554034870:0;grep addBatch ../src/**/*java
+: 1554034918:0;grep addServer ../src/**/*java
+: 1554035198:0;java -jar ../lib/AstroLabNet.exe.jar -c -s pokus.bsh
+: 1554042918:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Browser
+: 1554042999:0;git add ../src/**/Architecture.jpg
+: 1554043016:0;git commit -m "new Arch design"
+: 1554043070:0;ant post
+: 1554052293:0;grep 'new Task' ../src/**/*java
+: 1554052539:0;grep 'new BatchRep' ../src/**/*java
+: 1554052579:0;grep 'new addBatchs' ../src/**/*java
+: 1554052583:0;grep 'new addBatch' ../src/**/*java
+: 1554053201:0;grep 'taskRep.addTab' ../src/**/*java
+: 1554053214:0;grep 'addTab' ../src/**/*java
+: 1554054444:0;grep xxx ../src/**/*java
+: 1554060954:0;grep setState ../src/**/*java
+: 1554061190:0;grep setResult ../src/**/*java
+: 1554061535:0;grep JarFile ../src/**/*java
+: 1554061678:0;mv /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerBatchEventHandler.java ~/tmp
+: 1554064012:0;grep sendJob ../src/**/*java
+: 1554065535:0;ant clan;ant avro;ant jar
+: 1554066190:0;kall akonadi
+: 1554066521:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/#ServerBatchEventHandler.java#
+: 1554066536:0;git add ../src/**/*txt
+: 1554066557:0;git commit -m "batch orchestration (uff)"
+: 1554069637:0;grep 'new Batch' ../src/**/*java
+: 1554069896:0;grep 'addBatch' ../src/**/*java
+: 1554069927:0;grep 'addTask' ../src/**/*java
+: 1554071467:0;git commit -m "cleaning, speeding"
+: 1554109615:0;grep TreeCellContextMenuEventHandler ../src/java/**/*java
+: 1554109768:0;which java
+: 1554109848:0;ssh -Y julius.hrivnac@vm-75222.lal.in2p3.fr\
+
+: 1554110932:0;git commit -m "batch sending...."
+: 1554120100:0;nedit pokus.bsh&
+: 1554304518:0;/opt/hbase/bin/hbase shell < ../src/ruby/create*
+: 1554306983:0;java -version
+: 1554308377:0;git commit n -m "..."
+: 1554308404:0;git commit -m "can store new Action or Job"
+: 1554309567:0;grep Exit ../src/java/**/*java
+: 1554311100:0;grep Encode ../src/**/*java
+: 1554311217:0;grep Decode ../src/**/*java
+: 1554312239:0;git commit -m "storing new Actions and Jobs to be re-loaded'
+: 1554312241:0;git commit -m "storing new Actions and Jobs to be re-loaded"
+: 1554317615:0;ls ../src/python
+: 1554317937:0;nedit ../run/.state.bsh
+: 1554318107:0;git add build.xml ../src/**/*java
+: 1554318109:0;git add build.xml ../src/**/*txt
+: 1554318112:0;git add build.xml ../src/**/*py
+: 1554318132:0;git commit -m "can send python jobs"
+: 1554367029:0;nedit pokus.bsh
+: 1554367300:0;/bin/curl -X POST --data '{"file":"local:/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://vm-75222.lal.in2p3.fr:21111/batches\
+
+: 1554367414:0;/bin/curl -X GET http://vm-75222.lal.in2p3.fr:21111/batches/7
+: 1554367461:0;/bin/curl -X POST --data '{"file":"spark-examples_2.11-2.3.1.jar", "jars":"/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://vm-75222.lal.in2p3.fr:21111/batches\
+
+: 1554367959:0;/bin/curl -X POST --data '{"file":"spark-examples_2.11-2.3.1.jar", "jars":"hdfs:/jars/spark-examples_2.11-2.0.0.jar", "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://vm-75222.lal.in2p3.fr:21111/batches\
+
+: 1554367979:0;/bin/curl -X POST --data '{"file":"hdfs:/jars/spark-examples_2.11-2.0.0.jar", "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://vm-75222.lal.in2p3.fr:21111/batches\
+
+: 1554367989:0;/bin/curl -X GET http://vm-75222.lal.in2p3.fr:21111/batches/8\
+
+: 1554369852:0;/bin/curl -X POST --data '{"file":"local:/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554369891:0;/bin/curl -X GET http://localhost:8998/batches/33\
+
+: 1554369923:0;/bin/curl -X POST --data '{"file":"local:/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "jars":"/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554370095:0;/bin/curl -X POST --data '{"file":"local:/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "jars":["/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar"], "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554370131:0;/bin/curl -X POST --data '{"file":"local:/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "jars":["../lib/PiJob.jar"], "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554370157:0;/bin/curl -X POST --data '{"file":"local:/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "jars":["/home/hrivnac/work/LSST/AstroLabNet/lib/PiJob.jar"], "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554370280:0;/bin/curl -X POST --data '{"file":"local:/opt/spark/examples/jars/spark-examples_2.11-2.3.1.jar", "jars":["PiJob.jar"], "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554371730:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/DB/Jobs/PiJob.scala
+: 1554376348:0;which ant
+: 1554376371:0;which scala
+: 1554376530:0;ls /opt/scala/lib
+: 1554376542:0;ls /opt/scala/
+: 1554376696:0;nedit scala-antlib.xml&
+: 1554376872:0;rm scala-antlib.xml
+: 1554377395:0;ls /home/hrivnac/work/LSST/AstroLabNet/src/java/**/*.scala
+: 1554378665:0;ant -d compile
+: 1554378885:0;ls /opt/spark/licenses
+: 1554378890:0;ls /opt/spark/jars
+: 1554378970:0;ant -v compile
+: 1554379186:0;for X in /opt/spark/jars/*jar;do\
+echo $X\
+jar tvf $X|grep RDD\
+done
+: 1554379225:0;for X in /opt/spark/jars/spark*jar;do\
+echo $X\
+jar tvf $X|grep RDD.class\
+done
+: 1554379240:0;for X in /opt/spark/jars/spark*jar;do\
+echo $X\
+jar tvf $X|grep '/RDD.class'\
+done
+: 1554379277:0;ant compile
+: 1554379952:0;ant runb
+: 1554382768:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/DB/Actions/pi.scala ../src/java/com/astrolabsoftware/AstroLabNet/DB/Jobs/PiJob.java ../src/java/com/astrolabsoftware/AstroLabNet/DB/Jobs/PiJob.py
+: 1554382789:0;git add build-private.properties build.xml ../src/**/*java
+: 1554382792:0;git add build-private.properties build.xml ../src/**/*py
+: 1554382794:0;git add build-private.properties build.xml ../src/**/*scala
+: 1554382797:0;git add build-private.properties build.xml ../src/**/*scalash
+: 1554382823:0;git commit -m "jobs in more languages"
+: 1554384782:0;env|grep Event
+: 1554384786:0;env|grep Index
+: 1554384942:0;ant jar;ant run
+: 1554386733:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/DB/Actions/pi.scalash\
+
+: 1554386764:0;git commit -m "batch consolidation"
+: 1554464034:0;ant patch
+: 1554464050:0;git add ../src/sys build.xml
+: 1554464060:0;git commit -m "adding Livy conf"
+: 1554467577:0;ll
+: 1554467600:0;mv build-private.properties build-Local.properties
+: 1554467617:0;rm build.properties
+: 1554467619:0;ln -s build-Local.properties ./build.properties
+: 1554467670:0;cp build-Local.properties build-LAL.properties
+: 1554471008:0;cd ..
+: 1554479216:0;ls ../run
+: 1554479219:0;rm ../run/init.bsh
+: 1554490197:0;nedit ../run/init.bsh&
+: 1554490348:0;ls ../data/test/alarms/697251920015010010.avro
+: 1554490350:0;pwd
+: 1554490416:0;ant run-cli
+: 1554490544:0;mv ../run/init.bsh ./readAvro.bsh
+: 1554490579:0;nedit readAvro.bsh&
+: 1554491236:0;java -jar ../lib/AstroLabNet.exe.jar -c -s readAvro.bsh
+: 1554491289:0;mkdir ../src/beanshell
+: 1554491308:0;mv readAvro.bsh ../src/beanshell/readAvroAlerts.bsh
+: 1554491860:0;touch ../src/beanshell/scanCatalog.bsh
+: 1554491963:0;touch ../src/beanshell/scanTopology.bsh
+: 1554492044:0;touch ../src/beanshell/SendSparkAction.bsh
+: 1554492048:0;touch ../src/beanshell/SendSparkJob.bsh
+: 1554492787:0;more ../run
+: 1554492815:0;ls /home/hrivnac/work/LSST/AstroLabNet/src/beanshell/*.bsh
+: 1554492908:0;ant doc
+: 1554492947:0;nedit ../doc/index.html
+: 1554493023:0;git rm build-private.properties
+: 1554493097:0;git add build.xml ../src/index.html ./src/java/com/astrolabsoftware/AstroLabNet/Avro/AvroReader.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/Help.txt ../src/java/com/astrolabsoftware/AstroLabNet/Core/DefaultInteracter.java ../src/ruby/fillTopology.rb build-LAL.properties build-Local.properties ../src/sys/livy/conf/livy.conf-LAL ../src/sys/livy/conf/livy.conf-Local
+: 1554493108:0;git add build.xml ../src/index.html ../src/java/com/astrolabsoftware/AstroLabNet/Avro/AvroReader.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/Help.txt ../src/java/com/astrolabsoftware/AstroLabNet/Core/DefaultInteracter.java ../src/ruby/fillTopology.rb build-LAL.properties build-Local.properties ../src/sys/livy/conf/livy.conf-LAL ../src/sys/livy/conf/livy.conf-Local
+: 1554493116:0;git rm ../src/sys/livy/conf/livy.conf
+: 1554493127:0;rm -f ../src/beanshell/*~
+: 1554493136:0;git add ../src/beanshell
+: 1554493145:0;git commit -m "example scripts"
+: 1554493448:0;rm -rf /home/hrivnac/WWW/Activities/Packages/AstroLabNet/*
+: 1554493457:0;ant clean
+: 1554493467:0;ant avro
+: 1554496098:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Livyser
+: 1554497118:0;grep RESTLivy ../src/**/*
+: 1554497128:0;grep RESTLivy ../src/**/*java
+: 1554497137:0;grep LivyREST ../src/**/*
+: 1554497152:0;grep LivyREST ../src/**/* 2>/dev/null
+: 1554498283:0;grep json ../src/**/*java
+: 1554499093:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/DB/Actions/pi.py~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Actions/pi.scala
+: 1554499102:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/DB/Actions/pi.py ../src/java/com/astrolabsoftware/AstroLabNet/DB/Actions/pi.scala
+: 1554499115:0;git add ../src/**/*py
+: 1554499118:0;git add ../src/**/*scala
+: 1554499129:0;git add ../src/**/*bsh
+: 1554499145:0;git commit -m "bette CLI"
+: 1554500045:0;git add ../src/**/*.java
+: 1554500048:0;git add ../src/**/*.bsh
+: 1554500080:0;ant doc;ant post;~/bin/backupCERN.expect
+: 1554544786:0;cd ../src/beanshell
+: 1554544916:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/sendNewSparkAction.bsh
+: 1554545035:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/sendNewSparkJob.bsh
+: 1554545090:0;git add build.properties ../src/index.html ../src/beanshell/*bsh
+: 1554545099:0;git commit -m "more cli examples"
+: 1554545123:0;ant clean;ant avro;ant jar;ant doc;ant post
+: 1554576278:0;grep HBaseRESTClient ../src/java/**/*java
+: 1554640718:0;cp ../src/beanshell/importAvroAlerts.bsh ./
+: 1554711613:0;touch ../src/java/com/astrolabsoftware/AstroLabNet/Utils/Network.java
+: 1554713407:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ./importAvroAlerts.bsh
+: 1554714592:0;git commit -m "connection checking"
+: 1554715343:0;ls ../src/beanshell
+: 1554715736:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/scanCatalog.bsh|more
+: 1554722494:0;mkdir ../src/java/com/astrolabsoftware/AstroLabNet/Journal
+: 1554722502:0;cd ../src/java/com/astrolabsoftware/AstroLabNet
+: 1554724747:0;grep 'new LivyClient' ../src/**/*java
+: 1554724886:0;grep 'executeAction()' ../src/**/*java
+: 1554724892:0;grep 'executeAction' ../src/**/*java
+: 1554724905:0;grep 'executeAction' ../src/**/*
+: 1554724989:0;git add build-LAL.properties build.xml ../src/index.html ../src/java/**/*java
+: 1554724994:0;git commit -m "adding Journal"
+: 1554726949:0;/opt/hbase/bin/hbase shell < ../src/ruby/fill*rb
+: 1554727852:0;cp ../src/beanshell/scanTopology.bsh ../src/beanshell/scanJournal.bsh
+: 1554728640:0;grep getJSONArray ../src/**/*java
+: 1554728693:0;nedit ../src/java/com/astrolabsoftware/AstroLabNet/Livyser/LivyRESTClient.jav
+: 1554728695:0;nedit ../src/java/com/astrolabsoftware/AstroLabNet/Livyser/LivyRESTClient.java&
+: 1554728982:0;grep decode ../src/**/*java
+: 1554729700:0;nedit ../src/beanshell/scanTopology.bsh&
+: 1554730767:0;grep getResults ../src/**/*java
+: 1554730794:0;grep 'scan(' ../src/**/*java
+: 1554730812:0;nedit ../src/java/com/astrolabsoftware/AstroLabNet/Core/DefaultInteracter.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SourceRep.java&
+: 1554731393:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/scanTopology.bsh
+: 1554731399:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/scanJournal.bsh
+: 1554731736:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/scanCatalog.bsh
+: 1554731830:0;git add ../src/beanshell/scanJournal.bsh ../src/java/com/astrolabsoftware/AstroLabNet/Journal/overview.html ../src/java/com/astrolabsoftware/AstroLabNet/Journal/package.html ../src/**/*java
+: 1554731843:0;git commit -m "better hbase scanning"
+: 1554741484:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps
+: 1554742292:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/*EventHandler.java
+: 1554742321:0;git rm '../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/#ServerBatchEventHandler.java#'
+: 1554742379:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ActionEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ActionsEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/BatchEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/JobEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/JobsEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SearchEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SenderEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerSenderEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerSessionEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerSourceEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServersEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SessionEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SourceEventHandler.java ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/TaskEventHandler.java
+: 1554742422:0;rm -f ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/*~
+: 1554742424:0;ls ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers
+: 1554742431:0;rm -f ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/\#ServerBatchEventHandler.java\#
+: 1554742439:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers
+: 1554742449:0;git add ../src/**/*html
+: 1554742482:0;git commit -m "Topology, Catalog, Journal searching in GUI, CLI"
+: 1554756024:0;ls ../extlib
+: 1554756086:0;ll ../extlib
+: 1554756112:0;jar tvf ../extlib/j2h.jar
+: 1554756125:0;jar tvf ~/tmp/j2h.jar
+: 1554756150:0;ant j2h
+: 1554756169:0;cd ../extlib
+: 1554796647:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Core
+: 1554797744:0;java -jar ../lib/AstroLabNet.exe.jar --profile LAL
+: 1554797953:0;jar tvf ../lib/AstroLabNet.exe.jar|grep bsh
+: 1554797960:0;jar tvf ../lib/AstroLabNet.exe.jar|grep '.bsh'
+: 1554797971:0;jar tvf ../lib/AstroLabNet.exe.jar|grep '.bsh'|grep com
+: 1554798047:0;jar tvf ../lib/AstroLabNet.exe.jar|grep '.bsh'|grep Astro
+: 1554798198:0;git rm deleted
+: 1554798209:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Core/init.bsh
+: 1554798216:0;nedit ../.gitignore&
+: 1554798254:0;git add build.xml ../src/index.html ../src/**/*java ../src/**/*.bsh
+: 1554798275:0;git commit -m "adding site profiles"
+: 1554798293:0;git add ../.gitignore
+: 1554798324:0;nedit ~/work/Atlas/DB/Atlas-Event-Index-Core/.gitignore
+: 1554798337:0;nedit ~/work/Atlas/GraphDB/.gitignore
+: 1554809871:0;more ../run/tmp.bsh
+: 1554809893:0;more ../doc/index.html
+: 1554818023:0;grep 'record(' ../src/**/*java
+: 1554823980:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Core/'#'*
+: 1554824011:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Core/'#init.bsh#'
+: 1554824032:0;git add ../src/index.html ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerJournalEventHandler.java\
+
+: 1554824042:0;git commit -m "add Journal searching"
+: 1554824712:0;cd ../src/**/Journal
+: 1554825327:0;nedit ../src/**/JournalEntry.java&
+: 1554825595:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Journal/JournalEntry.java ../src/java/com/astrolabsoftware/AstroLabNet/Journal/JournalTableView.java
+: 1554828449:0;git commit -m "Journal searching"
+: 1554831247:0;ls ../**/*jpg
+: 1554831264:0;gqview
+: 1554831274:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Browser/doc-files/Architecture.jpg
+: 1554831580:0;git add ../src/index.html ../src/java/com/astrolabsoftware/AstroLabNet/Browser/doc-files/Job.jpg ../src/java/com/astrolabsoftware/AstroLabNet/Browser/doc-files/Journal.jpg
+: 1554831615:0;ls ../**/Browser
+: 1554831631:0;ls ../src/**/Job.jpg
+: 1554831635:0;ls ../doc/**/Job.jpg
+: 1554832266:0;ls ../src/**/*png
+: 1554832282:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Browser/doc-files/
+: 1554832602:0;git add ../src/index.html ../src/java/com/astrolabsoftware/AstroLabNet/Browser/doc-files/Browser.png
+: 1554832608:0;git commit -m "doc"
+: 1554846075:0;java -jar ../lib/AstroLabNet.exe.jar
+: 1554846238:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/sendSparkAction.bsh
+: 1554846466:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerRep.java
+: 1554846473:0;git commit -m "oops"
+: 1554846541:0;java -jar ../lib/AstroLabNet.exe.jar -p LAL
+: 1554846571:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/sendSparkJob.bsh -q
+: 1554846585:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/sendSparkAction.bsh -q
+: 1554883817:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/sendSparkJob.bsh
+: 1554883833:0;java -jar ../lib/AstroLabNet.exe.jar -c
+: 1554883865:0;java -jar ../lib/AstroLabNet.exe.jar -b
+: 1554890364:0;java -jar ../lib/AstroLabNet.exe.jar -h
+: 1554902192:0;grep 'encode(' ../src/**/*java
+: 1554903440:0;git commit -m "journal searching"
+: 1554912439:0;jar tvf /opt/jfxtras/jfxtras-all-10.0-r1.jar|grep Calendar
+: 1554912480:0;ant -v jar
+: 1554912593:0;jar tvf /opt/jfxtras/jfxtras-all-10.0-r1.jar
+: 1554912594:0;ls /opt/jfxtras/jfxtras-all-10.0-r1.jar:
+: 1554912599:0;ls /opt/jfxtras/jfxtras-all-10.0-r1.jar
+: 1554912610:0;source setup.sh
+: 1554915087:0;git add build-Local.properties build.xml ../src/index.html ../src/**/*java
+: 1554916219:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components
+: 1554916571:0;grep Label ../src/**/*java
+: 1554917307:0;grep JAR ../src/**/*java
+: 1554917823:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/images/*png
+: 1554917834:0;git commit -m "nicer graphics"
+: 1554918401:0;ls ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/images
+: 1554918431:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/images
+: 1554918475:0;git add ../src/**/*png
+: 1554918479:0;git add ../src/**/*jpg
+: 1554918489:0;git commit -m "better doc"
+: 1554918516:0;ant clean;ant avrp;ant jar
+: 1554925480:0;/opt/jdk10/bin/java -jar ../lib/AstroLabNet.exe.jar
+: 1554926011:0;bc
+: 1554929489:0;ant clean;ant avro
+: 1554929571:0;git commit -m "cleaning"
+: 1554939023:0;git add build.xml ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerTopologyEventHandler.java
+: 1554939029:0;ls ../src/java/com/astrolabsoftware/AstroLabNet/Topology/\
+
+: 1554939038:0;rm ../src/java/com/astrolabsoftware/AstroLabNet/Topology/*~
+: 1554939048:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Topology/\
+
+: 1554939052:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Topology/*java\
+
+: 1554939056:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Topology/*html
+: 1554939066:0;git commit -m "adding Topology search"
+: 1554973414:0;ssh -Y centos@134.158.74.54\
+
+: 1554989663:0;/bin/curl -X POST --data '{"file":"local:/home/hrivnac/work/LSST/AstroLabNet/lib/PythonPiJob.py"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554989691:0;/bin/curl -X GET http://localhost:8998/batches/39
+: 1554989721:0;/bin/curl -X POST --data '{"file":"/home/hrivnac/work/LSST/AstroLabNet/lib/PythonPiJob.py"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554989726:0;/bin/curl -X GET http://localhost:8998/batches/40
+: 1554989766:0;grep 'local:' ../src/**/*java
+: 1554990323:0;scp ../lib/PythonPiJob.py julius.hrivnac@vm-75222:/home/julius.hrivnac
+: 1554991043:0;/bin/curl -X POST --data '{"file":"/opt/spark-2/examples/jars/spark-examples_2.11-2.4.0.jar", "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554991050:0;/bin/curl -X GET http://localhost:8998/batches/44\
+
+: 1554991102:0;bin/curl -X POST --data '{"file":"/opt/spark-2/examples/jars/spark-examples_2.11-2.4.0.jar", "className":"org.apache.spark.examples.SparkPi","args": [2000]}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554991108:0;/bin/curl -X POST --data '{"file":"/opt/spark-2/examples/jars/spark-examples_2.11-2.4.0.jar", "className":"org.apache.spark.examples.SparkPi","args": [2000]}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554991114:0;/bin/curl -X GET http://localhost:8998/batches/45
+: 1554991132:0;bin/curl -X POST --data '{"file":"/opt/spark-2/examples/jars/spark-examples_2.11-2.4.0.jar", "className":"org.apache.spark.examples.SparkPi","args": ["2000"]}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554991137:0;/bin/curl -X POST --data '{"file":"/opt/spark-2/examples/jars/spark-examples_2.11-2.4.0.jar", "className":"org.apache.spark.examples.SparkPi","args": ["2000"]}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554991142:0;/bin/curl -X GET http://localhost:8998/batches/46
+: 1554991167:0;/bin/curl -X POST --data '{"file":"/opt/spark-2/examples/jars/spark-examples_2.11-2.4.0.jar", "className":"org.apache.spark.examples.SparkPi","args": "[2000]"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554991190:0;/bin/curl -X POST --data '{"file":"local:/opt/spark-2/examples/jars/spark-examples_2.11-2.4.0.jar", "className":"org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" http://localhost:8998/batches\
+
+: 1554991196:0;/bin/curl -X GET http://localhost:8998/batches/47
+: 1554991582:0;git commit 'fixing Py job submission'
+: 1554991587:0;git -commit 'fixing Py job submission'
+: 1554991593:0;git commit -m 'fixing Py job submission'
+: 1554995858:0;grep 'Action Execution' ../src/**/*java
+: 1554996826:0;git commit -m "better info"
+: 1555003879:0;ls ../build/ztf/alert/
+: 1555003886:0;ls ../build/ztf/alert/candidate.java
+: 1555003892:0;nedit ../build/ztf/alert/candidate.java
+: 1555007509:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | while read L; do echo $L; done
+: 1555007550:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | while read L; do echo $L | awk '{print $2}' | awk -F, '{print $1}'; done
+: 1555007591:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | while read L; do echo $L | awk '{print $2}' ; done
+: 1555007633:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | while read L; do echo $L | awk '{print $1}' ; done
+: 1555007662:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | while read L; do echo $L ; done
+: 1555007672:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | while read L; do echo x$L ; done
+: 1555007699:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L ; done
+: 1555007724:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $1}'; done
+: 1555007735:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $2}'; done
+: 1555007759:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $2}' | sed 's/column=//g' | sed 's/,//g'; done
+: 1555007780:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $2}' | sed 's/column=//g' | sed 's/,//g'; done > x
+: 1555007787:0;more x
+: 1555007811:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $2}' | sed 's/column=//g' | sed 's/,//g'; done | sort
+: 1555007818:0;man sort
+: 1555007872:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $2}' | sed 's/column=//g' | sed 's/,//g'; done | sort |unique
+: 1555007879:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $2}' | sed 's/column=//g' | sed 's/,//g'; done | sort |uniq
+: 1555021431:0;git add build-Local.properties build.xml ../src/index.html ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerCatalogEventHandler.java
+: 1555021440:0;git commit -m "added GraphStream"
+: 1555060169:0;more test.sh
+: 1555060172:0;nedit test.sh&
+: 1555062930:0;scp ../*PiJob.jar julius.hrivnac@vm-75222://home/julius.hrivnac
+: 1555062935:0;scp ../*PiJob.jar julius.hrivnac@vm-75222/home/julius.hrivnac
+: 1555062941:0;scp ../*PiJob.jar julius.hrivnac@vm-75222:/home/julius.hrivnac
+: 1555062972:0;scp ../*PiJob.jar julius.hrivnac@vm-75222in2p3.fr:/home/julius.hrivnac
+: 1555062986:0;scp ../lib/*PiJob.jar julius.hrivnac@vm-75222in2p3.fr:/home/julius.hrivnac
+: 1555062992:0;scp ../lib/*PiJob.jar julius.hrivnac@vm-75222.in2p3.fr:/home/julius.hrivnac
+: 1555062998:0;scp ../lib/*PiJob.jar julius.hrivnac@vm-75222:/home/julius.hrivnac
+: 1555067968:0;more ../src/ruby/fillTopology.rb
+: 1555071623:0;git commit -m "better remote job submission"
+: 1555071628:0;git push'
+: 1555076799:0;git add ../src/index.html ../src/**/*java
+: 1555076810:0;git commit -m "better job sending"
+: 1555188979:0;gedit
+: 1555264109:0;git add build.xml ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerCatalogEventHandler.java
+: 1555264119:0;rm ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/Catalog.css\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/HBase2Graph.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/overview.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/package.html\~
+: 1555264129:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Catalog
+: 1555264147:0;git commit -m "Catalog via GraphStream"
+: 1555264580:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Journal/JournalEntry.java ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/CatalogNode.java
+: 1555266236:0;tail -f ../run/AstroLabNet.log
+: 1555267511:0;more importAvroAlerts.bsh
+: 1555267530:0;nedit importAvroAlerts.bsh&
+: 1555272307:0;rm -rf ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream
+: 1555274398:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/HBase2Graph.java ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/CatalogNodeFactory.java
+: 1555319175:0;git commit -m "Graph of Catalog"
+: 1555320741:0;grep KeyCode ../src/**/*java
+: 1555320760:0;grep EventHandler ../src/**/*java
+: 1555321515:0;git commit -m "Catalog graph introspection"
+: 1555328659:0;ant clean;ant avro;ant jar
+: 1555328964:0;rm ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/Catalog.css\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/CatalogEntry.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/CatalogNodeFactory.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/CatalogNode.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/Click.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/ClickManager.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/Graph.css\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/HBase2Graph.java\~
+: 1555328993:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/Catalog.css ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/CatalogEntry.java ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/ClickManager.java ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/HBase2Graph.java
+: 1555329013:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/
+: 1555329032:0;git commit -m "gtable or graph presentation"
+: 1555329579:0;ant jaar
+: 1555329694:0;git commit -m "adding Catalog table view"
+: 1555341517:0;echo 'scan "astrolabnet.topology.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $2}' | sed 's/column=//g' | sed 's/,//g'; done | sort |uniq\
+
+: 1555341550:0;echo 'scan "astrolabnet.catalog.1"' | /opt/hbase/bin/hbase shell | grep 'column=' | while read L; do echo $L | awk '{print $2}' | sed 's/column=//g' | sed 's/,//g'; done | sort |uniq\
+
+: 1555341772:0;touch generateTableRep.sh
+: 1555341778:0;chmod a+x generateTableRep.sh
+: 1555341782:0;nedit generateTableRep.sh&
+: 1555341831:0;more ~/bin/videorename
+: 1555341895:0;./generateTableRep.sh astrolabnet.catalog.1
+: 1555342252:0;more Columns_astrolabnet.topology.1.lst
+: 1555345844:0;ls
+: 1555345853:0;nedit TopologyEntry.java&
+: 1555345993:0;./generateTableRep.sh astrolabnet.topology.1
+: 1555346105:0;./generateTableRep.sh astrolabnet.topology.1 ../build
+: 1555346163:0;more ../build/TopologyEntry.java
+: 1555346337:0;more ../build/**/*java
+: 1555346348:0;rm ../build/TopologyEntry.java
+: 1555346382:0;./generateTableRep.sh astrolabnet.topology.1 com.astrolabsoftware.AstroLabNet ../build
+: 1555346441:0;nedit ../build/com/astrolabsoftware/AstroLabNet/TopologyEntry.java
+: 1555346479:0;mkdir ../src/sh
+: 1555346489:0;mv generateTableRep.sh ../src/sh
+: 1555346740:0;ant tables
+: 1555347842:0;mv ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/HBaseTableView.java ../src/java/com/astrolabsoftware/AstroLabNet/HBaser
+: 1555348800:0;nedit ../build/com/astrolabsoftware/AstroLabNet/Topology/TopologyEntry.java&
+: 1555348824:0;grep 'new String' ../src/**/*java
+: 1555350344:0;rm /home/hrivnac/work/LSST/AstroLabNet/build/com/astrolabsoftware/AstroLabNet/Catalog/CatalogEntry.java
+: 1555350700:0;ls ../build/com/astrolabsoftware/AstroLabNet/Journal
+: 1555350704:0;ls ../build/com/astrolabsoftware/AstroLabNet/Catalog
+: 1555350755:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Catalog
+: 1555350768:0;ls ../**/CatalogEntry*
+: 1555355118:0;nedit ../src/beanshell/importAvroAlerts.bsh&
+: 1555362271:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Journal/JournalTableView.java ../src/java/com/astrolabsoftware/AstroLabNet/Topology/TopologyEntry.java ../src/java/com/astrolabsoftware/AstroLabNet/Topology/TopologyTableView.java
+: 1555362286:0;git add build.xml
+: 1555362316:0;rm ../src/sh/generateTableRep.sh\~
+: 1555362321:0;git add ../src/sh
+: 1555362332:0;git commit -m "automatic table creation"
+: 1555364464:0;git commit -m "better graph"
+: 1555401722:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/
+: 1555406274:0;ant cleanimports
+: 1555406311:0;git add ../src/index.html
+: 1555406375:0;git add build-global.properties
+: 1555406393:0;git commit -m "00.03.00"
+: 1555406438:0;nedit ~/work/Atlas/DB/Atlas-Event-Index-Core/ant/Notes.txt&
+: 1555406531:0;git tag -a 'AstroLabNet/00.03.00' -m 'release 00.03.00'\
+
+: 1555406536:0;git push origin --tags\
+
+: 1555407596:0;git add build-global.properties ../src/index.html
+: 1555407604:0;git commit -m "00.03.00+"
+: 1555417943:0;java -jar ../lib/AstroLabNet.exe.jar -c -s importAvroAlerts.bsh
+: 1555427526:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream
+: 1555433090:0;grep 'new Thread' ../src/**/*java
+: 1555433102:0;nedit ../src/java/com/astrolabsoftware/AstroLabNet/Utils/Notifier.java
+: 1555435783:0;git commit -m "better searching"
+: 1555439235:0;git commit -m "Node collapsing/expanding works"
+: 1555494386:0;cd ../src/ruby
+: 1555494767:0;tail -f AstroLabNet.log
+: 1555494814:0;/opt/hbase/bin/hbase shell < ../src/ruby//removeCatalog.rb
+: 1555494826:0;/opt/hbase/bin/hbase shell < ../src/ruby//createCatalog.rb
+: 1555494838:0;ant -p
+: 1555495227:0;java -jar ../lib/AstroLabNet.exe.jar -c -s ../src/beanshell/importAvroAlerts.bsh
+: 1555501262:0;mv ~/Catalog.jpg ../src/java/com/astrolabsoftware/AstroLabNet/Browser/doc-files/
+: 1555501368:0;ant doc;ant post
+: 1555675016:0;grep JobsEventHandler ../src/java/**/*java
+: 1555679054:0;nedit ../src/**/SenderRep.java&
+: 1555681798:0;nedit .state.bsh&
+: 1555681824:0;nc ../run/.state.bsh&
+: 1555681835:0;ll .state.bsh
+: 1555681839:0;ll ../run/.state.bsh
+: 1555682343:0;rm ../run/.state.bsh
+: 1555682344:0;y
+: 1555682607:0;more ../run/.state.bsh
+: 1555696339:0;grep setSenderFile ../src/**/*java
+: 1555698083:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Browser/doc-files/Catalog.jpg
+: 1555698091:0;git add ../src/**/*java
+: 1555698094:0;git add ../src/**/*rb
+: 1555698103:0;git add ../src/**/*css
+: 1555698121:0;git commit -m "sendinmg batch with oprions"
+: 1556025966:0;rm -f ../build/**/*java
+: 1556026246:0;ls ../src/java
+: 1556026248:0;ls ../src/java/com
+: 1556026344:0;ll ../lib
+: 1556026374:0;jar tvf ../lib/AstroLabNet.export.jar
+: 1556052382:0;cd ../..
+: 1556108793:0;ls ../build
+: 1556108808:0;ls ../build/com/astrolabsoftware/AstroLabNet/HBaser
+: 1556108914:0;nedit /home/hrivnac/work/LSST/AstroLabNet/build/com/astrolabsoftware/AstroLabNet/Catalog/CatalogEntry.java&
+: 1556109092:0;ant regenerate
+: 1556109483:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Utils
+: 1556109980:0;grep SimpleButton ../src/**/*java
+: 1556181814:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar
+: 1556181819:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar --help
+: 1556181825:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar -p LAL
+: 1556182745:0;cd ../src/sh
+: 1556184837:0;ls ../lib
+: 1556184951:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Utils/CommonException.java ../src/sh/startServers.sh ../src/sh/stopServers.sh ../src/sh/generateTableRep.sh ../src/sys/livy/conf/livy.conf-LAL ../src/sys/livy/conf/livy.conf-Local ../src/index.html build.xml build.xmlbuild-Local.properties ./src/java/com/astrolabsoftware/AstroLabNet/Utils/Info.pre ../src/**/*java
+: 1556184959:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Utils/CommonException.java ../src/sh/startServers.sh ../src/sh/stopServers.sh ../src/sh/generateTableRep.sh ../src/sys/livy/conf/livy.conf-LAL ../src/sys/livy/conf/livy.conf-Local ../src/index.html build.xml build.xml build-Local.properties ./src/java/com/astrolabsoftware/AstroLabNet/Utils/Info.pre ../src/**/*java
+: 1556184968:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Utils/CommonException.java ../src/sh/startServers.sh ../src/sh/stopServers.sh ../src/sh/generateTableRep.sh ../src/sys/livy/conf/livy.conf-LAL ../src/sys/livy/conf/livy.conf-Local ../src/index.html build.xml build.xml build-Local.properties ../src/java/com/astrolabsoftware/AstroLabNet/Utils/Info.pre ../src/**/*java
+: 1556184984:0;git rm ../src/java/com/astrolabsoftware/AstroLabNet/Utils/AstroLabNetException.java
+: 1556184996:0;git push
+: 1556185004:0;git commit -m "..."
+: 1556185047:0;/opt/livy/bin/livy-server stop\
+
+: 1556185061:0;nedit /opt/livy/conf/livy.conf
+: 1556185103:0;more /opt/livy/conf/livy.conf.template
+: 1556185140:0;/opt/livy/bin/livy-server start\
+
+: 1556185148:0;ant run
+: 1556282172:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/HBaser
+: 1556283030:0;rm -f ../build/**/*class
+: 1556283048:0;nedit /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Utils/Init.java
+: 1556283077:0;nedit /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Utils/Init.java&
+: 1556283090:0;nedit /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Utils/Notifier.java\~
+: 1556283112:0;mv /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Utils/Notifier.java\~ ~/tmop
+: 1556283120:0;git pull
+: 1556283130:0;mv ~/tmop /home/hrivnac/work/LSST/AstroLabNet/src/java/com/astrolabsoftware/AstroLabNet/Utils/Notifier.java
+: 1556283225:0;javac -version
+: 1556283240:0;nedit build.xml&
+: 1556284420:0;ls ../src
+: 1556284436:0;chmod a+x ../src/sh/*
+: 1556284853:0;nedit build-Local.properties&
+: 1556285083:0;/opt/hbase/bin/hbase shell < ../src/ruby/create*rb
+: 1556285097:0;/opt/hbase/bin/hbase shell < ../src/ruby/fillTopology.rb
+: 1556285182:0;/opt/hbase/bin/hbase shell
+: 1556285526:0;ant jar
+: 1556540070:0;ls ../src/sh
+: 1556540079:0;../src/sh/startServers.sh
+: 1557329438:0;cd
+: 1558080999:0;../src/sh/startServers.sh
+: 1558091877:0;cd
+: 1558352032:0;source setup.sh
+: 1558352060:0;more ../src/sh/generateTableRep.sh
+: 1558352076:0;ant -p
+: 1558352101:0;more ../src/beanshell/importAvroAlerts.bsh
+: 1558352121:0;ant -p
+: 1558352138:0;java -jar ../lib/AstroLabNet-00.03.00+.jar
+: 1558352144:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar
+: 1558352167:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar -h
+: 1558352180:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar -h -c -s ../src/beanshell/importAvroAlerts.bsh
+: 1558352187:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar -c -s ../src/beanshell/importAvroAlerts.bsh
+: 1558352211:0;ls ../src/sh
+: 1558352252:0;hbase
+: 1558352281:0;/opt/hbase/bin/hbase shell ../src/ruby/create*rb
+: 1558352305:0;/opt/hbase/bin/hbase shell ../src/ruby/createTopology.rb
+: 1558352389:0;/opt/hbase/bin/hbase shell ../src/ruby/create*rb
+: 1558352410:0;/opt/hbase/bin/hbase shell ../src/ruby/createCatalog.rb
+: 1558352422:0;/opt/hbase/bin/hbase shell ../src/ruby/createJournal.rb
+: 1558352435:0;/opt/hbase/bin/hbase shell ../src/ruby/fillTopology.rb
+: 1558352450:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar -c -s ../src/beanshell/importAvroAlerts.bsh
+: 1558352456:0;ls
+: 1558352461:0;nedit pokus.bsh
+: 1558352480:0;nedit importAvroAlerts.bsh&;2~
+: 1558352485:0;nedit importAvroAlerts.bsh
+: 1558352498:0;nedit importAvroAlerts.bsh&
+: 1558352519:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar -c -s importAvroAlerts.bsh
+: 1558352913:0;more ../src/beanshell/importAvroAlerts.bsh
+: 1558374448:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar -c
+: 1558374459:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar
+: 1558374523:0;ant jar
+: 1558374534:0;java -jar ../lib/AstroLabNet-00.03.00+.exe.jar
+: 1558374991:0;grep AvroReader ../src/**/*java
+: 1558375571:0;ant jar
+: 1558375871:0;ls -l ../lib
+: 1558375876:0;ant jar
+: 1558375887:0;ll ../lib
+: 1558375898:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar
+: 1558375941:0;ant jar
+: 1558375950:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar
+: 1558375989:0;ant jar
+: 1558375999:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar
+: 1558376033:0;ant jar
+: 1558376044:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar
+: 1558376071:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://localhost:8080 ../data/test/alarms/697251920015010010.avro
+: 1558376075:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://localhost:8080 ../data/test/alarms/
+: 1558376113:0;more importAvroAlerts.bsh
+: 1558376131:0;cat ../src/beanshell/importAvroAlerts.bsh
+: 1558376143:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://localhost:8080 ../data/test/alarms
+: 1558376194:0;ls ../data/test/alarms
+: 1558376201:0;more importAvroAlerts.bsh
+: 1558376212:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://localhost:8080 ../../fink-broker/datasim
+: 1558376223:0;cp ../lib/AvroReader-00.03.00+.exe.jar ~/tmp
+: 1558376546:0;ant post
+: 1558376551:0;ant -p
+: 1558376560:0;ant doc
+: 1558376610:0;ll ../doc
+: 1558376614:0;ll ../doc/dist
+: 1558376621:0;ant post
+: 1558381254:0;git -m commit
+: 1558381258:0;git -m commit "..."
+: 1558381272:0;git commit -m "..."
+: 1558381330:0;git add build.xml ../src/java/com/astrolabsoftware/AstroLabNet/**/*java ../src/ruby/*rb ../src/sh/*sh ../src/sys/livy/conf/livy.conf-LAL ../src/sys/livy/conf/livy.conf-Local
+: 1558381347:0;git commit -m "standalone Avro importer"
+: 1558381355:0;git push
+: 1558515772:0;ant jar
+: 1558515804:0;../src/sh/startServers.sh
+: 1558515810:0;ant -p
+: 1558515816:0;ant run
+: 1558517274:0;export JAVA_HOME=/opt/jdk
+: 1558517278:0;source setup.sh
+: 1558517288:0;../src/sh/startServers.sh
+: 1558517297:0;ant run
+: 1558517342:0;/opt/hbase/bin/hbase shell ../src/ruby/createCatalog.rb ../src/ruby/createJournal.rb ../src/ruby/createTopology.rb
+: 1558517359:0;/opt/hbase/bin/hbase shell ../src/ruby/createJournal.rb
+: 1558517367:0;/opt/hbase/bin/hbase shell ../src/ruby/createTopology.rb
+: 1558517377:0;/opt/hbase/bin/hbase shell ../src/ruby/fillTopology.rb
+: 1558517383:0;ant run
+: 1558517621:0;ant -p
+: 1558517729:0;ant run
+: 1558524850:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar ../data/test/alarms/697251920015010010.avro
+: 1558524863:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://localhost:8000 ../data/test/alarms/697251920015010010.avro
+: 1558524869:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://localhost:8080 ../data/test/alarms/697251920015010010.avro
+: 1558524890:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://localhost:8080 ../../fink-broker/datasim
+: 1558525367:0;ant avro
+: 1558525384:0;ant tables
+: 1558525608:0;ls ../build/**/*java
+: 1558525621:0;ant jar
+: 1558525633:0;ant run
+: 1558525675:0;tail -f AstroLabNet.log
+: 1558525681:0;ant run
+: 1558525759:0;ssh -Y centos@134.158.74.54\
+
+: 1558525839:0;more importAvroAlerts.bsh
+: 1558525845:0;nedit importAvroAlerts.bsh&
+: 1558525879:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://134.158.74.54:8080 ../data/test/alarms/697251920015010010.avro
+: 1558526066:0;java -jar ../lib/AvroReader-00.03.00+.exe.jar http://134.158.74.54:8080 ../../fink-broker/datasim
+: 1558526731:0;ant run
+: 1558529638:0;catalog -query dataset:data12_8TeV.00204474.physics_Bphysics.merge.AOD.r10952_p3635
+: 1558555464:0;cd ../src
+: 1558599943:0;ls
+: 1558599950:0;../src/sh/startServers.sh
+: 1558600295:0;ant war
+: 1558600308:0;ant deploy-prod
+: 1558600414:0;ls /usr/share/tomcat/webapps
+: 1558600428:0;su
+: 1558600515:0;ant deploy-prod
+: 1558600805:0;git commit -m "..."
+: 1558600816:0;rm -rf ../src/ws/Actions.js\~ ../src/ws/ExceptionHandler.jsp\~ ../src/ws/index.jsp\~ ../src/ws/PostProc.js\~ ../src/ws/Result.jsp\~ ../src/ws/Right.jsp\~ ../src/ws/web.xml\~
+: 1558600861:0;git add ../src/ws build-Local.properties build.xml\
+ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/Init.java
+: 1558600881:0;git commit -m "starting Web Service client"
+: 1558600888:0;git push
+: 1558600982:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/
+: 1558601492:0;ant -p
+: 1558601498:0;ant cleanimports
+: 1558602249:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Graph
+: 1558602652:0;ant jar
+: 1558602665:0;ant cleanimports
+: 1558602667:0;ant jar
+: 1558603298:0;ant deploy-prod
+: 1558603935:0;ant jar
+: 1558603985:0;ant deploy-prod
+: 1558604041:0;ant jar
+: 1558604121:0;ant deploy-prod
+: 1558604542:0;git commit -m "..."
+: 1558604579:0;git add build.xml ../src/index.html ../src/ws/*jsp
+: 1558604596:0;rm -f ../src/java/com/astrolabsoftware/AstroLabNet/Avro/AvroReader.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/ExitHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/ReadJARHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/ReadScriptHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/TreeCellCallback.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/TreeCellContextMenuEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Actions/TreeCellEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/BrowserCommand.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/BrowserWindow.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/Console.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/SimpleButton.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ActionRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/BatchRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ChannelRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/DataChannelRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/DataRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/DataSourceRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ElementRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ActionEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ActionsEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/BatchEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/JobEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/JobsEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/SearchEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/SenderEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerCatalogEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerJournalEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerSenderEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerSessionEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServersEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerSourceEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/ServerTopologyEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/SessionEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/SourceEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/EventHandlers/TaskEventHandler.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/JobRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SearchRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SenderRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/ServerRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SessionRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/SourceRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Reps/TaskRep.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Browser/WindowAppender.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/Catalog.css\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/CatalogEntry.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/CatalogNodeFactory.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/CatalogNode.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/CatalogTableView.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/Click.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Catalog/ClickManager.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/CLI/CommandLine.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/CLI/CommandLineReader.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Core/DefaultInteracter.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Core/init.bsh\~ ../src/java/com/astrolabsoftware/AstroLabNet/Core/InteracterHelper.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Core/Interacter.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Core/LAL.bsh\~ ../src/java/com/astrolabsoftware/AstroLabNet/Core/Local.bsh\~ ../src/java/com/astrolabsoftware/AstroLabNet/Core/This.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/ActionHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Action.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Actions/pi.py\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/BatchHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Batch.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Channel.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/DataChannel.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Data.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/DataSource.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Element.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/JobHelp.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/JobHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Job.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Jobs/JavaPiJob.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Jobs/PiJob.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Jobs/PiJob.scala\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Jobs/PythonPiJob.py\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Jobs/ScalaPiJob.scala\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/SearchHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Search.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/SenderHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Sender.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/ServerHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Server.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/SessionHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Session.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Source.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/TaskHelp.txt\~ ../src/java/com/astrolabsoftware/AstroLabNet/DB/Task.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Graph/Edge.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Graph/Edges.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Graph/Node.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Graph/Nodes.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Graph/overview.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/Graph/package.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/ClickManager.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/Graph.css\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/GraphEntry.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/HBase2Graph.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/HBGraphView.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/HBGraphViewPanel.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/HBaser/HBaseClient.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/HBaser/HBaseRESTClient.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/HBaser/HBaseTableView.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/HBaser/overview.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/HBaser/package.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/HBaser/TableEntry.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Journal/Graph.css\~ ../src/java/com/astrolabsoftware/AstroLabNet/Journal/JournalEntry.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Journal/JournalTableView.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Journal/overview.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/Journal/package.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/Journal/Record.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Livyser/LivyAPIClient.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Livyser/LivyClient.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Livyser/LivyRESTClient.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Topology/TopologyEntry.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Topology/TopologyTableView.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/AstroLabNetException.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/Coding.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/DateTime.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/IInfo.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/Info.pre\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/Init.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/log4j-minimalistic.properties\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/log4j-minimal.properties\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/log4j.properties\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/Network.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/Utils/SmallHttpClient.java\~ ../src/java/com/astrolabsoftware/AstroLabNet/WebService/overview.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/WebService/package.html\~ ../src/java/com/astrolabsoftware/AstroLabNet/WebService/WSCommand.java\~
+: 1558604616:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/Graph ../src/java/com/astrolabsoftware/AstroLabNet/WebService
+: 1558604627:0;git commit -m "WS can show servers"
+: 1558604630:0;git push
+: 1558611638:0;ant deploy-prod
+: 1558611817:0;ant run
+: 1558611939:0;ant deploy-prod
+: 1558612418:0;cp ~/work/Atlas/DB/Atlas-Event-Index-Core/src/ws/Info.jsp ../src/ws
+: 1558612642:0;nc ~/work/Atlas/DB/Atlas-Event-Index-Core/src/ws/Info.jsp
+: 1558612742:0;ant deploy-prod
+: 1558615455:0;ant run
+: 1558615527:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/images/*png ../src/ws
+: 1558615532:0;cd ../src/ws
+: 1558615600:0;cd ../src/java/com/astrolabsoftware/AstroLabNet/Browser/Components/images
+: 1558617171:0;cd ../src/ws
+: 1558617561:0;ant deploy-prod
+: 1558617825:0;jar tvf ../lib/*war
+: 1558617934:0;ant deploy-prod
+: 1558626386:0;../src/sh/startServers.sh
+: 1558626427:0;ant deploy-prod
+: 1558627104:0;ant run
+: 1558627256:0;ant deploy-prod
+: 1558628354:0;ant run
+: 1558628649:0;ant deploy-prod
+: 1558628825:0;ant run
+: 1558629161:0;ant deploy-prod
+: 1558635003:0;git commit -m "..."
+: 1558635021:0;git add ../src/ws/images
+: 1558635024:0;git add ../src/ws/*js
+: 1558635025:0;git add ../src/ws/*jsp
+: 1558635040:0;git add build.xml
+: 1558635047:0;git add ../src/src/**/*java
+: 1558635054:0;git add ../src/**/*java
+: 1558635065:0;git commit -m "Web Service works"
+: 1558635068:0;git push
+: 1558636708:0;ls /opt/hbase/hbase-webapps/master
+: 1558636749:0;ls /opt/hbase/hbase-webapps/static
+: 1558636877:0;ant run
+: 1558637036:0;ant deploy-prod
+: 1558638251:0;../src/sh/startServers.sh
+: 1558638261:0;more ../src/sh/startServers.sh
+: 1558638373:0;ant deploy-prod
+: 1558639241:0;git commit -m "..."
+: 1558639264:0;git rm ../src/ws/Right.css ../src/ws/Right.jsp
+: 1558639296:0;git add ../src/java/com/astrolabsoftware/AstroLabNet/WebService/WSCommand.java ../src/ws/Actions.js ../src/ws/index.jsp ../src/ws/CommandCenter.css ../src/ws/CommandCenter.jsp
+: 1558639309:0;git commit "WS rearranged"
+: 1558639316:0;git commit -m "WS rearranged"
+: 1558639320:0;git push
+: 1558640494:0;ant deploy-prod
+: 1558686980:0;../src/sh/startServers.sh
+: 1558687193:0;ant deploy-prod
+: 1558690211:0;ant run
+: 1558690296:0;ant deploy-prod
+: 1558696874:0;cp ../src/ws/CommandCenter.jsp ../src/ws/Session.jsp
+: 1558697081:0;ant deploy-prod
+: 1558698319:0;grep Language ../src/**/*java
+: 1558699132:0;ant deploy-prod
+: 1558700089:0;ant run
+: 1558700202:0;ant deploy-prod
+: 1558700299:0;grep replace ../src/**/*java
+: 1558700423:0;ant deploy-prod
+: 1558703126:0;../src/sh/stopServers.sh
+: 1558703162:0;../src/sh/startServers.sh
+: 1558703573:0;ant deploy-prod
+: 1558704217:0;ant run
+: 1558704475:0;ant deploy-prod
+: 1558705242:0;git commit -m "..."
+: 1558705285:0;git add ../src/ws/Session.jsp build.xml ../src/java/com/astrolabsoftware/AstroLabNet/WebService/WSCommand.java ../src/ws/Actions.js ../src/ws/CommandCenter.jsp\
+ ../src/ws/GraphView.js
+: 1558705300:0;git commit "Actions can be run"
+: 1558705305:0;git commit -m "Actions can be run"
+: 1558705308:0;git push
+: 1558812575:0;cp ../src/java/com/astrolabsoftware/AstroLabNet/GraphStream/HBase2Graph.java ../src/java/com/astrolabsoftware/AstroLabNet/WebService/HBase2Table.java
+: 1558813320:0;grep Set ../src/**/*java
+: 1558813997:0;ant jar
+: 1558815356:0;../src/sh/startServers.sh
+: 1558815364:0;ant deploy-prod
+: 1558815496:0;cd ../src/ws
+: 1558815812:0;grep Topology ../src/**/*java
+: 1558816193:0;ant deploy-prod
+: 1558820429:0;git commit -m "..."
+: 1558820483:0;git add ../src/index.html ../src/ws/Actions.js ../src/java/com/astrolabsoftware/AstroLabNet/WebService/HBase2Table.java ../src/ws/HBaseTable.jsp ../src/ws/sortable.css ../src/ws/sortable.js
+: 1558820493:0;git commit -m "Can show HBase tables"
+: 1558820496:0;git push
+: 1558945940:0;ant deploy-prod
+: 1558945991:0;../src/sh/startServers.sh
+: 1558946642:0;ant deploy-prod
+: 1558949530:0;git commit -m "..."
+: 1558949554:0;git add ../src/ws/CommandCenter.jsp ../src/ws/index.jsp ../src/java/com/astrolabsoftware/AstroLabNet/WebService/WSCommand.java ../src/java/com/astrolabsoftware/AstroLabNet/WebService/HBase2Table.java
+: 1558949572:0;git commit -m "WS can take special server args"
+: 1558949575:0;git puish
+: 1558949578:0;git push
+: 1558952294:0;ant deploy-prod
+: 1559026093:0;../src/sh/startServers.sh
+: 1559026990:0;ant run
+: 1559029089:0;../src/sh/startServers.sh
+: 1559030704:0;ant deploy-prod
+: 1559031049:0;ls ../build/com/astrolabsoftware/AstroLabNet/
+: 1559031053:0;ls ../build/com/astrolabsoftware/AstroLabNet/*
+: 1559031211:0;ant deploy-prod
+: 1559031668:0;cp ../src/ws/index.jsp ../src/ws/indexLAL.jsp
+: 1559031974:0;ant deploy-prod
+: 1559031999:0;ant deploy-prod -Dsite=LAL
+: 1559032086:0;ant deploy-prod
+: 1559032126:0;mv ../src/ws/index.jsp ../src/ws/indexLocal.jsp
+: 1559032130:0;ant deploy-prod
+: 1559032309:0;ls /usr/share/tomcat/webapps
+: 1559032324:0;ls /usr/share/tomcat/webapps/AstroLabNet
+: 1559032354:0;ls ../build
+: 1559032370:0;ant deploy-prod
+: 1559032394:0;ant deploy-prod -Dsite=LAL
+: 1559032405:0;ant war -Dsite=LAL
+: 1559032417:0;ll ../lib
+: 1559032652:0;ant war -Dsite=LAL
+: 1559032758:0;ssh -Y centos@http://134.158.74.221
+: 1559032777:0;ssh -Y centos@134.158.74.221
+: 1559032976:0;ant war -Dsite=LAL
+: 1559032990:0;more ../build/index.jsp
+: 1559033000:0;rm ../build/index.jsp
+: 1559033003:0;ant war -Dsite=LAL
+: 1559033013:0;more ../build/index.jsp
+: 1559033096:0;ant cdceploy-prod
+: 1559033101:0;ant deploy-prod
+: 1560443438:0;source setup.sh
+: 1560443442:0;ls ../src/sh
+: 1560443461:0;../src/sh/startServers.sh
+: 1560445988:0;cd ../..
+: 1560446294:0;ls
+: 1560446296:0;rm 254
+: 1560446307:0;rm -f AstroLabNet.log*
+: 1560446309:0;ls
+: 1560446313:0;cd ..
+: 1560446320:0;ls
+: 1560446336:0;rm Columns_astrolabnet.topology.1.lst hs_err_pid20293.log importAvroAlerts.bsh pokus.bsh test.sh TopologyEntry.java x
+: 1560446341:0;ls
+: 1560446342:0;ll
+: 1560446345:0;nedit setup.sh
+: 1560446362:0;more build*
+: 1560446374:0;ls
+: 1560446376:0;ll
+: 1560446387:0;nedit build-global.properties
+: 1560446401:0;ls
+: 1560446403:0;ll
+: 1560446410:0;nedit build-Local.properties&
+: 1560446468:0;ll
+: 1560446475:0;nedit build-LAL.properties&
+: 1560446531:0;more FindBugs-ExcludeFilter.xml
+: 1560446537:0;ls
+: 1560446549:0;nedit build.xml&
+: 1560446639:0;more FindBugs-ExcludeFilter.xml
+: 1560447292:0;grep AstroLab *
+: 1560447325:0;cd ../src
+: 1560449661:0;source setup.sh
+: 1560449663:0;ant jar
+: 1560450202:0;ls ../lib
+: 1560450208:0;ant doc
+: 1560450298:0;ls
+: 1560450302:0;cd ..
+: 1560450401:0;ant clean
+: 1560450404:0;ls build
+: 1560450407:0;ls ../build
+: 1560450410:0;ls ../lib
+: 1560450412:0;ls ../doc
+: 1560450414:0;ls ..
+: 1560450419:0;cd ..
