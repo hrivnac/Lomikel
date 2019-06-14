@@ -170,6 +170,7 @@
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
       <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Packages/JHTools'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
       <group title="HBaser" packages="com.JHTools.HBaser"/>
+      <group title="Graph"  packages="com.JHTools.Graph"/>
       <group title="Utils"  packages="com.JHTools.Utils*"/>
       <link href="http://docs.oracle.com/javase/8/docs/api"/>
       <link href="http://www.beanshell.org/javadoc/"/>
