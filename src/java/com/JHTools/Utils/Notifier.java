@@ -27,7 +27,7 @@ public class Notifier {
       @Override
       public void run() {
         try {
-          URL url = new URL("http://cern.ch/hrivnac/cgi-bin/record.pl?page=" + source + "_" + message + "_" + Info.release().replaceAll(" ", "_"));
+          URL url = new URL("http://cern.ch/hrivnac/cgi-bin/record.pl?page=" + (source + "_" + message + "_" + Info.release()).replaceAll(" ", "_"));
           HttpURLConnection conn = (HttpURLConnection)url.openConnection();
           conn.setRequestMethod("GET");
           conn.getInputStream();
