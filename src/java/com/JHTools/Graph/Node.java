@@ -49,7 +49,18 @@ public class Node extends JSONObject
     put("color",    colorO);
     }
     
-  /** TBD */
+  /** Create and add to {@link Nodes} and {@Edges}.
+    * @param id       The Node id.
+    * @param type     The Node type.
+    * @param label    The Node label.
+    * @param title    The Node title.
+    * @param subtitle The Node subtitle.
+    * @param group    The group, to which this Node belongs.
+    * @param shape    The Node shape.
+    * @param value    The Node value.
+    * @param parent   The parent Node.
+    * @param nodes    The {@link Nodes} to be added to.
+    * @param edges    The {@link Edges} to to be added to. */
   public Node(String id,
               String type,
               String label,
