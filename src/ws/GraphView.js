@@ -24,11 +24,15 @@ function show(nodesS, edgesS) {
   groups = [];
   for (var i = 0; i < nodes.length; i++) {
     nodes[i] = postProcNode(nodes[i]);
-    groups.push(nodes[i].group);
+    for (g of nodes[i].group.split(" ")) {
+      groups.push(g);
+      }
     }
   for (var i = 0; i < edges.length; i++) {
     edges[i] = postProcEdge(edges[i]);
-    groups.push(edges[i].group);
+    for (g of edges[i].group.split(" ")) {
+      groups.push(g);
+      }
     }
   data = {
     nodes:nodes,
@@ -74,8 +78,9 @@ function show(nodesS, edgesS) {
         }
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
-        var group = selectedNode.group;
-        clusterGroup(group);
+        for (g of selectedNode.group.split(" ")) {
+          clusterGroup(g);
+          }
         // TBD: put into button
         //selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
         //document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
@@ -118,8 +123,7 @@ function clusterByGroups() {
   network.setData(data);
   var clusterOptionsByData;
   for (var i = 0; i < groups.length; i++) {
-    var group = groups[i];
-    clusterGroup(group);
+    clusterGroup(groups[i]);
     }
   }
     

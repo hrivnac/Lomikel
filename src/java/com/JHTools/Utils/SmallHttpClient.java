@@ -10,6 +10,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.entity.StringEntity;
@@ -88,6 +89,52 @@ public class SmallHttpClient {
       }
     finally {
       get.releaseConnection();
+      }  
+    return answer;
+    }
+    
+  // DELETE --------------------------------------------------------------------
+    
+  /** Make http delete call.
+    * @param question The http request.
+    * @return         The answer.
+    * @throws CommonException If anything goes wrong. */
+  public static String delete(String question) throws CommonException {
+    return delete(question, null);
+    }
+   
+  /** Make http delete call. It accepts gzipped results.
+    * @param question The http request.
+    * @param headers  The additional headers.
+    * @return         The answer.
+    * @throws CommonException If anything goes wrong. */
+  public static String delete(String              question,
+                              Map<String, String> headers) throws CommonException {
+    String answer = "";
+    DefaultHttpClient client = new DefaultHttpClient();
+    HttpDelete delete = new HttpDelete(question);
+    delete.addHeader("Accept-Encoding", "gzip");
+    if (headers != null) {
+      for (Map.Entry<String, String> entry : headers.entrySet()) {
+        delete.addHeader(entry.getKey(), entry.getValue());
+        }
+      }
+    try {
+      HttpResponse response = client.execute(delete);
+      StatusLine statusLine = response.getStatusLine();
+      int statusCode = statusLine.getStatusCode();
+      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
+        throw new CommonException("Call to " + question + " failed: " + statusLine.getReasonPhrase());
+        }
+      else {
+        answer = getResponseBody(response);   
+        }
+      }
+    catch (Exception e) {
+      throw new CommonException("Call to " + question + " failed", e);
+      }
+    finally {
+      delete.releaseConnection();
       }  
     return answer;
     }
