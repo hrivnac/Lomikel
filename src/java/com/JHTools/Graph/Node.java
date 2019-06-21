@@ -49,6 +49,41 @@ public class Node extends JSONObject
     put("color",    colorO);
     }
     
+  /** TBD */
+  public Node(String id,
+              String type,
+              String label,
+              String title,
+              String subtitle,
+              String group,
+              String shape,
+              String value,
+              Node   parent,
+              Nodes  nodes,
+              Edges  edges) {
+    this(id,
+         type,
+         label,
+         title,
+         subtitle,
+         group,
+         shape,
+         value);
+    nodes.add(this);
+    if (parent != null) {
+      edges.add(new Edge(parent, 
+                         this,
+                         " ",
+                         " ",
+                         " ",
+                         " ",
+                         "to",
+                         " ",
+                         "0"));
+      }
+    }
+  
+    
   @Override
   public int compareTo(Node other) {
     return toString().compareTo(other.toString());

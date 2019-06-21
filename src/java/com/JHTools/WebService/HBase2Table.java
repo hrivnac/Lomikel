@@ -89,7 +89,7 @@ public class HBase2Table {
     for (Map.Entry<String, Map<String, String>> entry : table.entrySet()) {
       html += "<tr><td><b>" + entry.getKey() + "</b></td>";
       for (String column : columns) {
-        html += "<td>" + entry.getValue().get(column) + "</td>";
+        html += "<td><pre>" + entry.getValue().get(column) + "</pre></td>";
         }
       html += "</tr>";
       }

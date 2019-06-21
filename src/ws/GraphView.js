@@ -74,13 +74,17 @@ function show(nodesS, edgesS) {
         }
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
-        document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
-        if (document.querySelector('.removeOld').checked) {
-          nodes.length = 0;
-          edges.length = 0;
-          nodes.push(selectedNode);
-          }
-        expand(selectedNode.id);
+        var group = selectedNode.group;
+        clusterGroup(group);
+        // TBD: put into button
+        //selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
+        //document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
+        //if (document.querySelector('.removeOld').checked) {
+        //  nodes.length = 0;
+        //  edges.length = 0;
+        //  nodes.push(selectedNode);
+        //  }
+        //expand(selectedNode.id);
         }
       }
     });
@@ -115,26 +119,31 @@ function clusterByGroups() {
   var clusterOptionsByData;
   for (var i = 0; i < groups.length; i++) {
     var group = groups[i];
-    if (group.trim() != '') {
-      clusterOptionsByData = {
-        joinCondition: function(childOptions) {
-          return childOptions.group == group;
-          },
-        processProperties: function(clusterOptions, childNodes, childEdges) {
-          var totalMass = 0;
-          for (var i = 0; i < childNodes.length; i++) {
-            totalMass += childNodes[i].mass;
-            }
-          clusterOptions.mass = totalMass;
-          clusterOptions.value = totalMass;
-          clusterOptions.color = childNodes[0].color;
-          clusterOptions.title = 'contains ' + childNodes.length;
-          return clusterOptions;
-          },
-        clusterNodeProperties: postProcNode({id:('cluster:' + group), borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)})
-         };
-      network.cluster(clusterOptionsByData);
-      }
+    clusterGroup(group);
+    }
+  }
+    
+// Cluser Group
+function clusterGroup(group) {
+  if (group.trim() != '') {
+    clusterOptionsByData = {
+      joinCondition: function(childOptions) {
+        return childOptions.group == group;
+        },
+      processProperties: function(clusterOptions, childNodes, childEdges) {
+        var totalMass = 0;
+        for (var i = 0; i < childNodes.length; i++) {
+          totalMass += childNodes[i].mass;
+          }
+        clusterOptions.mass = totalMass;
+        clusterOptions.value = totalMass;
+        clusterOptions.color = childNodes[0].color;
+        clusterOptions.title = 'contains ' + childNodes.length;
+        return clusterOptions;
+        },
+      clusterNodeProperties: postProcNode({id:('cluster:' + group), borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)})
+       };
+    network.cluster(clusterOptionsByData);
     }
   }
 
