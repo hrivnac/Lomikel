@@ -37,7 +37,7 @@ public class Node extends JSONObject
     super();
     put("id",       id);
     put("label",    label);
-    put("title",    type + ":</br>" + title + "</br>" + subtitle);
+    put("title",    type + ":<br/>" + title + "<br/>" + subtitle);
     put("group",    group);
     put("shape",    shape);
     put("value",    value);

@@ -131,8 +131,8 @@ function clusterByGroups() {
           clusterOptions.title = 'contains ' + childNodes.length;
           return clusterOptions;
           },
-        clusterNodeProperties: {id:('cluster:' + group), borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)}
-        };
+        clusterNodeProperties: postProcNode({id:('cluster:' + group), borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)})
+         };
       network.cluster(clusterOptionsByData);
       }
     }
