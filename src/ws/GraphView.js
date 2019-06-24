@@ -43,6 +43,8 @@ function show(nodesS, edgesS) {
     clusterByGroups();
     }
   network.on("click", function(params) {
+   });
+  network.on("oncontextclick", function(params) {
     var type;
     if (params.nodes.length == 1) {
       if (network.isCluster(params.nodes[0]) == true) {
@@ -179,6 +181,26 @@ function clusterExpand() {
 function switchPhysics() {
   options.physics.enabled = document.querySelector('.physics').checked;
   network.setOptions(options);
+  }
+  
+// Switch layout on/off
+function switchLayout() {
+  if (document.querySelector('.layout').checked) {
+    options.layout = {
+      improvedLayout:true,
+      hierarchical: {
+        direction:"LR",
+        sortMethod:"directed"
+        }
+      }
+    }
+  else {
+    options.layout = {
+      improvedLayout:true
+      }
+    }
+  network.setOptions(options);
+  show(null, null);
   }
  
 // Find in array
