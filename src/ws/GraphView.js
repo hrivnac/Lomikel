@@ -5,6 +5,10 @@ var edges  = [];
 var groups = [];
 var selectedNode;
 var selectedEdge;
+var clusterIndex = 0;
+var clusters = [];
+var lastClusterZoomLevel = 0;
+var clusterFactor = 0.9;
 var data = {
     nodes:nodes,
     edges:edges,
@@ -43,8 +47,6 @@ function show(nodesS, edgesS) {
     clusterByGroups();
     }
   network.on("click", function(params) {
-   });
-  network.on("oncontextclick", function(params) {
     var type;
     if (params.nodes.length == 1) {
       if (network.isCluster(params.nodes[0]) == true) {
@@ -93,6 +95,22 @@ function show(nodesS, edgesS) {
         //  }
         //expand(selectedNode.id);
         }
+      }
+    });
+  network.once('initRedraw', function() {
+    if (lastClusterZoomLevel === 0) {
+      lastClusterZoomLevel = network.getScale();
+      }
+    });
+  network.on('zoom', function (params) {
+    if (document.querySelector('.zoom').checked && params.direction == '-') {
+      if (params.scale < lastClusterZoomLevel*clusterFactor) {
+        makeClusters(params.scale);
+        lastClusterZoomLevel = params.scale;
+        }
+      }
+    else {
+      openClusters(params.scale);
       }
     });
   }
@@ -175,6 +193,55 @@ function clusterExpand() {
       },
     };
   network.cluster(clusterOptionsByData);
+  }
+  
+// Cluster by Zoom
+function makeClusters(scale) {
+  var clusterOptionsByData = {
+    processProperties: function (clusterOptions, childNodes) {
+      clusterIndex = clusterIndex + 1;
+      var childrenCount = 0;
+      for (var i = 0; i < childNodes.length; i++) {
+        childrenCount += childNodes[i].childrenCount || 1;
+        }
+      clusterOptions.childrenCount = childrenCount;
+      clusterOptions.label = "# " + childrenCount + "";
+      clusterOptions.color = "white";
+      clusterOptions.font = {size: childrenCount*5+30}
+      clusterOptions.id = 'cluster:' + clusterIndex;
+      clusters.push({id:'cluster:' + clusterIndex, scale:scale});
+      return clusterOptions;
+      },
+    clusterNodeProperties: {borderWidth: 3, shape: 'database', font: {size: 30}}
+    }
+  network.clusterOutliers(clusterOptionsByData);
+  if (document.getElementById('stabilizeCheckbox').checked === true) {
+    // since we use the scale as a unique identifier, we do NOT want to fit after the stabilization
+    network.setOptions({physics:{stabilization:{fit: false}}});
+    network.stabilize();
+    }
+  }
+
+// Open clusterd by Zoom
+function openClusters(scale) {
+  var newClusters = [];
+  var declustered = false;
+  for (var i = 0; i < clusters.length; i++) {
+    if (clusters[i].scale < scale) {
+      network.openCluster(clusters[i].id);
+      lastClusterZoomLevel = scale;
+      declustered = true;
+     }
+    else {
+      newClusters.push(clusters[i])
+      }
+    }
+  clusters = newClusters;
+  if (declustered === true && document.getElementById('stabilizeCheckbox').checked === true) {
+    // since we use the scale as a unique identifier, we do NOT want to fit after the stabilization
+    network.setOptions({physics:{stabilization:{fit: false}}});
+    network.stabilize();
+    }
   }
   
 // Switch physics on/off
