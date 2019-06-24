@@ -88,7 +88,7 @@ function show(nodesS, edgesS) {
         // TBD: put into button
         //selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
         //document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
-        //if (document.querySelector('.removeOld').checked) {
+        //if (document.getElementById('removeOld').checked) {
         //  nodes.length = 0;
         //  edges.length = 0;
         //  nodes.push(selectedNode);
@@ -103,7 +103,7 @@ function show(nodesS, edgesS) {
       }
     });
   network.on('zoom', function (params) {
-    if (document.querySelector('.zoom').checked && params.direction == '-') {
+    if (document.getElementById('zoom').checked && params.direction == '-') {
       if (params.scale < lastClusterZoomLevel*clusterFactor) {
         makeClusters(params.scale);
         lastClusterZoomLevel = params.scale;
@@ -215,7 +215,7 @@ function makeClusters(scale) {
     clusterNodeProperties: {borderWidth: 3, shape: 'database', font: {size: 30}}
     }
   network.clusterOutliers(clusterOptionsByData);
-  if (document.getElementById('stabilizeCheckbox').checked === true) {
+  if (document.getElementById('stabilize').checked === true) {
     // since we use the scale as a unique identifier, we do NOT want to fit after the stabilization
     network.setOptions({physics:{stabilization:{fit: false}}});
     network.stabilize();
@@ -237,7 +237,7 @@ function openClusters(scale) {
       }
     }
   clusters = newClusters;
-  if (declustered === true && document.getElementById('stabilizeCheckbox').checked === true) {
+  if (declustered === true && document.getElementById('stabilize').checked === true) {
     // since we use the scale as a unique identifier, we do NOT want to fit after the stabilization
     network.setOptions({physics:{stabilization:{fit: false}}});
     network.stabilize();
@@ -246,13 +246,13 @@ function openClusters(scale) {
   
 // Switch physics on/off
 function switchPhysics() {
-  options.physics.enabled = document.querySelector('.physics').checked;
+  options.physics.enabled = document.getElementById('physics').checked;
   network.setOptions(options);
   }
   
 // Switch layout on/off
 function switchLayout() {
-  if (document.querySelector('.layout').checked) {
+  if (document.getElementById('layout').checked) {
     options.layout = {
       improvedLayout:true,
       hierarchical: {
