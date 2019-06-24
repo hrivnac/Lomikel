@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -25,6 +26,13 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBase2Table {
+    
+  /** Set prefered sequence of columns.
+    * All other columns will be shoun after, in alphabetic order.
+    * @param columns The prefered sequence of columns. */
+  public void setColumns(String[] columns) {
+    _columns = Arrays.asList(columns);
+    }  
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
     * @param json The {@link JSONObject} representation of the HBader table.
@@ -67,18 +75,30 @@ public class HBase2Table {
     }
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
-    * @param json The {@link JSONObject} representation of the HBader table.
+    * @param json The {@link JSONObject} representation of the HBase table.
     * @return     The table as html string. */
   public String htmlTable(JSONObject json) {
     Map<String, Map<String, String>> table = table(json);
     if (table == null) {
       return "";
       }
-    Set<String> columns = new TreeSet<>();
+    Set<String> columnsSet = new TreeSet<>();
     for (Map<String, String> entry : table.values()) {
       for (String column : entry.keySet()) {
-        columns.add(column);
+        columnsSet.add(column);
         }
+      }
+    List<String> columns = new ArrayList<>();
+    if (_columns != null) {
+      for (String column : _columns) {
+        if (columnsSet.contains(column)) {
+          columns.add(column);
+          columnsSet.remove(column);
+          }
+        }
+      }
+    for (String column : columnsSet) {
+      columns.add(column);
       }
     String html = "<table class='sortable'>";
     html += "<thead><tr><td></td>";
@@ -87,15 +107,17 @@ public class HBase2Table {
       }
     html += "</tr></thead>";
     for (Map.Entry<String, Map<String, String>> entry : table.entrySet()) {
-      html += "<tr><td><b>" + entry.getKey() + "</b></td>";
+      html += "<tr><td valign='top'><b>" + entry.getKey() + "</b></td>";
       for (String column : columns) {
-        html += "<td><pre>" + entry.getValue().get(column) + "</pre></td>";
+        html += "<td valign='top' height='100'><div style='height:100px; overflow:auto'><pre>" + entry.getValue().get(column) + "</pre></div></td>";
         }
       html += "</tr>";
       }
     html += "</table>";
     return html;
     } 
+    
+  private List<String> _columns;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(HBase2Table.class);
