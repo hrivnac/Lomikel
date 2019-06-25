@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Edges extends TreeSet<Edge> {
   
-  /** Create */
+  /** Create. */
   public Edges() {
     super();
     }

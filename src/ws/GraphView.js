@@ -16,11 +16,21 @@ var data = {
 var container = document.getElementById('visnetwork');
 var network;
   
-// filter = document.getElementById('filter').value.trim();
+// filter = document.getElementById('filter').value.trim();  
   
 function show(nodesS, edgesS) {
+  var ids = [];
   if (nodesS != null && nodesS.trim() != "") {
-    nodes = nodes.concat(JSON.parse(nodesS));
+    //nodes = nodes.concat(JSON.parse(nodesS));
+    for (n of nodes) {
+      ids.push(n.id);
+      }
+    for (n of JSON.parse(nodesS)) {
+      if (ids.indexOf(n.id) === -1) {
+        nodes.push(n);
+        ids.push(n.id);
+        }
+      }
     }
   if (edgesS != null && edgesS.trim() != "") {
     edges = edges.concat(JSON.parse(edgesS));
@@ -60,14 +70,18 @@ function show(nodesS, edgesS) {
         else {
           document.getElementById("commands").innerHTML = "<b><u>" + type + ": " + selectedNode.label + "</u></u>"
                                                         + "&nbsp;<input type='button' onclick='removeNode(\"" + selectedNode.id + "\", \"" + type + "\")' value='Remove'>"
-                                                        + "&nbsp;<input type='button' onclick='describe(\""   + selectedNode.id + "\", \"" + type + "\")' value='Describe'><br/>"
+                                                        + "&nbsp;<input type='button' onclick='describe(\""   + selectedNode.id + "\", \"" + type + "\")' value='Describe'>"
+                                                        + "&nbsp;<input type='button' onclick='expand(\""     + selectedNode.id + "\", \"" + type + "\")' value='Expand'><br/>"
                                                         + formNodeAction(selectedNode);
           }
         }
       }
     else if (params.edges.length == 1) {
       selectedEdge = findObjectByKey(edges, 'id', params.edges[0]);
-      if (selectedEdge) { // TBD: should test on cluster, should do executeEdgeAction
+      if (executeEdgeAction(selectedEdge) != null) {
+        eval(executeEdgeAction(selectedEdge));
+        }
+      else {
         document.getElementById("commands").innerHTML = "<b><u>" + selectedEdge.label + "</u></u>"
                                                       + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")' value='Remove'>"
                                                       + "&nbsp;<input type='button' onclick='describe(\""   + selectedEdge.id + "\")' value='Describe'><br/>"
@@ -77,23 +91,16 @@ function show(nodesS, edgesS) {
     });
   network.on("doubleClick", function(params) {
     if (params.nodes.length == 1) {
+      // is cluster
       if (network.isCluster(params.nodes[0]) == true) {
         network.openCluster(params.nodes[0]);
         }
+      // is not cluster
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
         for (g of selectedNode.group.split(" ")) {
           clusterGroup(g);
           }
-        // TBD: put into button
-        //selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
-        //document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
-        //if (document.getElementById('removeOld').checked) {
-        //  nodes.length = 0;
-        //  edges.length = 0;
-        //  nodes.push(selectedNode);
-        //  }
-        //expand(selectedNode.id);
         }
       }
     });
@@ -116,8 +123,16 @@ function show(nodesS, edgesS) {
   }
   
 // Expand from database
-function expand(id) {
-  console.log(id);
+function expand(id, type) {
+  var selectedNode = findObjectByKey(nodes, 'id', id);
+  document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label;
+  if (document.getElementById('removeOld').checked) {
+    nodes.length = 0;
+    edges.length = 0;
+    nodes.push(selectedNode);
+    }
+  eval(expandNode(type, id));
+  show(null, null);
   }
     
 // Remove selected node

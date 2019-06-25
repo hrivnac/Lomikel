@@ -1,5 +1,8 @@
 // Graph options
 var options = {
+  autoResize:true,
+  height:"100%",
+  width:"100%",
   physics: {
     forceAtlas2Based: {
       gravitationalConstant:-500,

@@ -34,6 +34,12 @@ public class HBase2Table {
     _columns = Arrays.asList(columns);
     }  
     
+  /** Set a height of table columns.AstroLabNet/
+    * @param height The heigh of table columns. */
+  public void setColumnHeight(int height) {
+    _height = height;
+    }  
+    
   /** Convert <em>HBase</em> {@link JSONObject} into table.
     * @param json The {@link JSONObject} representation of the HBader table.
     * @return     The table as {@link Map}. */
@@ -106,10 +112,15 @@ public class HBase2Table {
       html += "<td><b><u>" + column + "</u></b></td>";
       }
     html += "</tr></thead>";
+    String prefix = "<td><pre>";
+    String suffix = "</pre></td>";
+    if (_height > 0) {
+      prefix = "<td valign='top' height='" + _height + "'><div style='height:" + _height + "px; overflow:auto'><pre>";
+      }
     for (Map.Entry<String, Map<String, String>> entry : table.entrySet()) {
       html += "<tr><td valign='top'><b>" + entry.getKey() + "</b></td>";
       for (String column : columns) {
-        html += "<td valign='top' height='100'><div style='height:100px; overflow:auto'><pre>" + entry.getValue().get(column) + "</pre></div></td>";
+        html += prefix + entry.getValue().get(column) + suffix;
         }
       html += "</tr>";
       }
@@ -118,6 +129,8 @@ public class HBase2Table {
     } 
     
   private List<String> _columns;
+  
+  private int _height = 0;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(HBase2Table.class);
