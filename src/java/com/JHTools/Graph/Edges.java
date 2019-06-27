@@ -67,6 +67,39 @@ public class Edges extends TreeSet<Edge> {
                    value));
       }
     }
+    
+  /** Create {@link Edge}s to a {@link Node}.
+    * @param froms    The staring {@link Node}s.
+    * @param to       The ending {@link Node}.
+    * @param label    The Edge label.
+    * @param title    The Edge title.
+    * @param subtitle The Edge subtitle.
+    * @param group    The group, to which this Edge belongs.
+    * @param arrows   The Edge arrows. Blank separated list of <tt>middle to from</tt>.
+    * @param color    The Edge color. If <tt>null</tt>, color willbe inheriten from the {@link Node}.
+    * @param value    The Node value. */
+  public Edges(String[] froms,
+               String   to,
+               String   label,
+               String   title,
+               String   subtitle,
+               String   group,
+               String   arrows,
+               String   color,
+               String   value) {
+    super();
+    for (String from : froms) {
+      add(new Edge(from,
+                   to,
+                   label,
+                   title,
+                   subtitle,
+                   group,
+                   arrows,
+                   color,
+                   value));
+      }
+    }
       
   /** Logging . */
   private static Logger log = Logger.getLogger(Edges.class);

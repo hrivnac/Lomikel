@@ -32,8 +32,18 @@ function show(nodesS, edgesS) {
         }
       }
     }
+  var fts = [];
   if (edgesS != null && edgesS.trim() != "") {
-    edges = edges.concat(JSON.parse(edgesS));
+    //edges = edges.concat(JSON.parse(edgesS));
+    for (e of edges) {
+      fts.push(e.from + "#" + e.to);
+      }
+    for (e of JSON.parse(edgesS)) {
+      if (fts.indexOf(e.from + "#" + e.to) === -1) {
+        edges.push(e);
+        fts.push(e.from + "#" + e.to);
+        }
+      }
     }
   groups = [];
   for (var i = 0; i < nodes.length; i++) {
