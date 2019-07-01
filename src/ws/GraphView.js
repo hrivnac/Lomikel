@@ -79,9 +79,9 @@ function show(nodesS, edgesS) {
           }
         else {
           document.getElementById("commands").innerHTML = "<b><u>" + type + ": " + selectedNode.label + "</u></u>"
-                                                        + "&nbsp;<input type='button' onclick='removeNode(\"" + selectedNode.id + "\", \"" + type + "\")' value='Remove'>"
-                                                        + "&nbsp;<input type='button' onclick='describe(\""   + selectedNode.id + "\", \"" + type + "\")' value='Describe'>"
-                                                        + "&nbsp;<input type='button' onclick='expand(\""     + selectedNode.id + "\", \"" + type + "\")' value='Expand'><br/>"
+                                                        + "&nbsp;<input type='button' onclick='removeNode(\"" + selectedNode.id + "\", \"" + type + "\")' value='Remove Node'>"
+                                                        + "&nbsp;<input type='button' onclick='describe(\""   + selectedNode.id + "\", \"" + type + "\")' value='Describe Node'>"
+                                                        + "&nbsp;<input type='button' onclick='expand(\""     + selectedNode.id + "\", \"" + type + "\")' value='Expand Node'><br/>"
                                                         + formNodeAction(selectedNode);
           if (executeNodePostAction(selectedNode) != null) {
             eval(executeNodePostAction(selectedNode));
@@ -196,7 +196,7 @@ function clusterGroup(group) {
         clusterOptions.title = 'contains ' + childNodes.length;
         return clusterOptions;
         },
-      clusterNodeProperties: postProcNode({id:('cluster:' + group), borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)})
+      clusterNodeProperties: postProcNode({id:('cluster:' + group), type:'cluster', borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)})
        };
     network.cluster(clusterOptionsByData);
     }

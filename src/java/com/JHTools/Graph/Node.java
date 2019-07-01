@@ -22,7 +22,6 @@ public class Node extends JSONObject
     * @param type     The Node type.
     * @param label    The Node label.
     * @param title    The Node title.
-    * @param subtitle The Node subtitle.
     * @param group    The group, to which this Node belongs.
     * @param shape    The Node shape.
     * @param value    The Node value. */
@@ -30,17 +29,17 @@ public class Node extends JSONObject
               String type,
               String label,
               String title,
-              String subtitle,
               String group,
               String shape,
               String value) {
     super();
     put("id",       id);
     put("label",    label);
-    put("title",    type + ":<br/>" + title + "<br/>" + subtitle);
+    put("title",    title);
     put("group",    group);
     put("shape",    shape);
     put("value",    value);
+    put("type",     type);
     JSONObject colorO = new JSONObject();
     colorO.put("background", "white");
     colorO.put("border",     "black");
@@ -54,7 +53,6 @@ public class Node extends JSONObject
     * @param type     The Node type.
     * @param label    The Node label.
     * @param title    The Node title.
-    * @param subtitle The Node subtitle.
     * @param group    The group, to which this Node belongs.
     * @param shape    The Node shape.
     * @param value    The Node value.
@@ -65,7 +63,6 @@ public class Node extends JSONObject
               String type,
               String label,
               String title,
-              String subtitle,
               String group,
               String shape,
               String value,
@@ -76,7 +73,6 @@ public class Node extends JSONObject
          type,
          label,
          title,
-         subtitle,
          group,
          shape,
          value);
