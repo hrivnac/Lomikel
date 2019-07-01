@@ -151,7 +151,7 @@
       </copy>
     <mkdir dir="../doc/dist/ws"/>
     <copy todir="../doc/dist/ws">
-			<fileset dir="../src/ws" includes="*"/>
+			<fileset dir="../src/ws" includes="*/**"/>
       </copy>
  		<copy todir="../doc/JavaDoc">
 			<fileset dir="../src/java" includes="**/doc-files/*"/>

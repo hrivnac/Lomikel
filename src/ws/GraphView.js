@@ -83,6 +83,9 @@ function show(nodesS, edgesS) {
                                                         + "&nbsp;<input type='button' onclick='describe(\""   + selectedNode.id + "\", \"" + type + "\")' value='Describe'>"
                                                         + "&nbsp;<input type='button' onclick='expand(\""     + selectedNode.id + "\", \"" + type + "\")' value='Expand'><br/>"
                                                         + formNodeAction(selectedNode);
+          if (executeNodePostAction(selectedNode) != null) {
+            eval(executeNodePostAction(selectedNode));
+            }                                                        
           }
         }
       }
@@ -96,6 +99,9 @@ function show(nodesS, edgesS) {
                                                       + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")' value='Remove'>"
                                                       + "&nbsp;<input type='button' onclick='describe(\""   + selectedEdge.id + "\")' value='Describe'><br/>"
                                                       + formEdgeAction(selectedEdge);
+        if (executeEdgePostAction(selectedEdge) != null) {
+          eval(executeEdgePostAction(selectedEdge));
+          }                                                        
         }
       }
     });
