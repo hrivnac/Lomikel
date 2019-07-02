@@ -48,7 +48,7 @@ public class Node extends JSONObject
     put("color",    colorO);
     }
     
-  /** Create and add to {@link Nodes} and {@Edges}.
+  /** Create and add to {@link Nodes} and {@link Edges}.
     * @param id       The Node id.
     * @param type     The Node type.
     * @param label    The Node label.
@@ -80,7 +80,6 @@ public class Node extends JSONObject
     if (parent != null) {
       edges.add(new Edge(parent, 
                          this,
-                         " ",
                          " ",
                          " ",
                          " ",

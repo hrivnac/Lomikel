@@ -22,7 +22,6 @@ public class Edge extends JSONObject
     * @param to       The {@link Node} represented by this Edge end.
     * @param label    The Edge label.
     * @param title    The Edge title.
-    * @param subtitle The Edge subtitle.
     * @param group    The group, to which this Edge belongs.
     * @param arrows   The Edge arrows. Blank separated list of <tt>middle to from</tt>.
     * @param color    The Edge color. If <tt>null</tt>, color willbe inheriten from the {@link Node}.
@@ -31,7 +30,6 @@ public class Edge extends JSONObject
               Node   to,
               String label,
               String title,
-              String subtitle,
               String group,
               String arrows,
               String color,
@@ -40,7 +38,6 @@ public class Edge extends JSONObject
          to.getString("id"),
          label,
          title,
-         subtitle,
          group,
          arrows,
          color,
@@ -52,7 +49,6 @@ public class Edge extends JSONObject
     * @param to       The id of {@link Node} represented by this Edge end.
     * @param label    The Edge label.
     * @param title    The Edge title.
-    * @param subtitle The Edge subtitle.
     * @param group    The group, to which this Edge belongs.
     * @param arrows   The Edge arrows. Blank separated list of <tt>middle to from</tt>.
     * @param color    The Edge color. If <tt>null</tt>, color willbe inheriten from the {@link Node}.
@@ -61,7 +57,6 @@ public class Edge extends JSONObject
               String to,
               String label,
               String title,
-              String subtitle,
               String group,
               String arrows,
               String color,
@@ -71,7 +66,6 @@ public class Edge extends JSONObject
     put("to",       to);
     put("label",    label);
     put("title",    title);
-    put("subtitle", subtitle);
     put("group",    group);
     put("arrows",   arrows);
     put("value",    value);

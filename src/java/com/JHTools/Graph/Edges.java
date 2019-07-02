@@ -40,7 +40,6 @@ public class Edges extends TreeSet<Edge> {
     * @param tos      The ending {@link Node}s.
     * @param label    The Edge label.
     * @param title    The Edge title.
-    * @param subtitle The Edge subtitle.
     * @param group    The group, to which this Edge belongs.
     * @param arrows   The Edge arrows. Blank separated list of <tt>middle to from</tt>.
     * @param color    The Edge color. If <tt>null</tt>, color willbe inheriten from the {@link Node}.
@@ -49,7 +48,6 @@ public class Edges extends TreeSet<Edge> {
                String[] tos,
                String   label,
                String   title,
-               String   subtitle,
                String   group,
                String   arrows,
                String   color,
@@ -60,7 +58,6 @@ public class Edges extends TreeSet<Edge> {
                    to,
                    label,
                    title,
-                   subtitle,
                    group,
                    arrows,
                    color,
@@ -73,7 +70,6 @@ public class Edges extends TreeSet<Edge> {
     * @param to       The ending {@link Node}.
     * @param label    The Edge label.
     * @param title    The Edge title.
-    * @param subtitle The Edge subtitle.
     * @param group    The group, to which this Edge belongs.
     * @param arrows   The Edge arrows. Blank separated list of <tt>middle to from</tt>.
     * @param color    The Edge color. If <tt>null</tt>, color willbe inheriten from the {@link Node}.
@@ -82,7 +78,6 @@ public class Edges extends TreeSet<Edge> {
                String   to,
                String   label,
                String   title,
-               String   subtitle,
                String   group,
                String   arrows,
                String   color,
@@ -93,7 +88,6 @@ public class Edges extends TreeSet<Edge> {
                    to,
                    label,
                    title,
-                   subtitle,
                    group,
                    arrows,
                    color,
