@@ -34,12 +34,6 @@ public class HBase2Table {
     _columns = Arrays.asList(columns);
     }  
     
-  /** Set a height of table columns.AstroLabNet/
-    * @param height The heigh of table columns. */
-  public void setColumnHeight(int height) {
-    _height = height;
-    }  
-    
   /** Convert <em>HBase</em> {@link JSONObject} into table.
     * @param json The {@link JSONObject} representation of the HBader table.
     * @return     The table as {@link Map}. */
@@ -112,22 +106,29 @@ public class HBase2Table {
       html += "<td><b><u>" + column + "</u></b></td>";
       }
     html += "</tr></thead>";
-    String prefix = "<td><pre>";
-    String suffix = "</pre></td>";
-    if (_height > 0) {
-      prefix = "<td valign='top' height='" + _height + "'><div style='height:" + _height + "px; overflow:auto'><pre>";
-      }
+    String content;
+    String id;
     for (Map.Entry<String, Map<String, String>> entry : table.entrySet()) {
       html += "<tr><td valign='top'><b>" + entry.getKey() + "</b></td>";
       for (String column : columns) {
-        html += prefix + entry.getValue().get(column) + suffix;
+        content = entry.getValue().get(column);
+        html += "<td>";
+        if (content.length() > 100) {
+          id = entry.getKey().replaceAll("\\.", "").replaceAll("\\/", "") + column;
+          content = "<pre>" + content.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">","&gt;").replaceAll("\"","&quot;").replaceAll("\n", "<br/>") + "</pre>";
+          html += content.substring(0, 20) + "...&nbsp<button onclick=\"" + id + "()\">full</button><script>function " + id + "() {var myWindow = window.open(\"\", \"\", \"width=500,height=500\");myWindow.document.write(\"" + content + "\");}</script>";
+          }
+        else {
+          html += "<pre>" + content + "</pre>";
+          }
+        html += "</td>";
         }
       html += "</tr>";
       }
     html += "</table>";
     return html;
     } 
-    
+
   private List<String> _columns;
   
   private int _height = 0;

@@ -26,7 +26,6 @@
   <%  
     String hbaseS    = request.getParameter("hbase");
     String table     = request.getParameter("table");
-    String height    = request.getParameter("height");
     String columns   = request.getParameter("columns");
     String filters   = request.getParameter("filters");
     String periodS   = request.getParameter("period");
@@ -68,9 +67,6 @@
     HBase2Table h2table = new HBase2Table();
     if (columns != null) {
       h2table.setColumns(columns.split(","));
-      }
-    if (height != null) {
-      h2table.setColumnHeight(new Integer(height));
       }
     String html = h2table.htmlTable(json);
     out.println(html);

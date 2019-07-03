@@ -78,7 +78,7 @@ function show(nodesS, edgesS) {
           eval(executeNodeAction(selectedNode));
           }
         else {
-          document.getElementById("commands").innerHTML = "<b><u>" + type + ": " + selectedNode.label + "</u></u>"
+          document.getElementById("commands").innerHTML = "<b><u>" + selectedNode.label + "</u></b>"
                                                         + "&nbsp;<input type='button' onclick='removeNode(\"" + selectedNode.id + "\", \"" + type + "\")' value='Remove Node'>"
                                                         + "&nbsp;<input type='button' onclick='describe(\""   + selectedNode.id + "\", \"" + type + "\")' value='Describe Node'>"
                                                         + "&nbsp;<input type='button' onclick='expand(\""     + selectedNode.id + "\", \"" + type + "\")' value='Expand Node'><br/>"
@@ -95,7 +95,7 @@ function show(nodesS, edgesS) {
         eval(executeEdgeAction(selectedEdge));
         }
       else {
-        document.getElementById("commands").innerHTML = "<b><u>" + selectedEdge.label + "</u></u>"
+        document.getElementById("commands").innerHTML = "<b><u>" + selectedEdge.label + "</u></b>"
                                                       + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")' value='Remove'>"
                                                       + "&nbsp;<input type='button' onclick='describe(\""   + selectedEdge.id + "\")' value='Describe'><br/>"
                                                       + formEdgeAction(selectedEdge);
