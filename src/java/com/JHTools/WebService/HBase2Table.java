@@ -113,7 +113,10 @@ public class HBase2Table {
       for (String column : columns) {
         content = entry.getValue().get(column);
         html += "<td>";
-        if (content.length() > 100) {
+        if (content == null) {
+          html += "";
+          }
+        else if (content.length() > 100) {
           id = entry.getKey().replaceAll("\\.", "").replaceAll("\\/", "") + column;
           content = "<pre>" + content.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">","&gt;").replaceAll("\"","&quot;").replaceAll("\n", "<br/>") + "</pre>";
           html += content.substring(0, 20) + "...&nbsp<button onclick=\"" + id + "()\">full</button><script>function " + id + "() {var myWindow = window.open(\"\", \"\", \"width=500,height=500\");myWindow.document.write(\"" + content + "\");}</script>";

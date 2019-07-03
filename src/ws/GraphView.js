@@ -73,12 +73,12 @@ function show(nodesS, edgesS) {
         }
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
-        type = selectedNode.title.split(":")[0];
+        type = selectedNode.type;
         if (executeNodeAction(selectedNode) != null) {
           eval(executeNodeAction(selectedNode));
           }
         else {
-          document.getElementById("commands").innerHTML = "<b><u>" + selectedNode.label + "</u></b>"
+          document.getElementById("commands").innerHTML = "<b><u>" + type + ":</u>" + selectedNode.label + "</b>"
                                                         + "&nbsp;<input type='button' onclick='removeNode(\"" + selectedNode.id + "\", \"" + type + "\")' value='Remove Node'>"
                                                         + "&nbsp;<input type='button' onclick='describe(\""   + selectedNode.id + "\", \"" + type + "\")' value='Describe Node'>"
                                                         + "&nbsp;<input type='button' onclick='expand(\""     + selectedNode.id + "\", \"" + type + "\")' value='Expand Node'><br/>"
@@ -95,7 +95,7 @@ function show(nodesS, edgesS) {
         eval(executeEdgeAction(selectedEdge));
         }
       else {
-        document.getElementById("commands").innerHTML = "<b><u>" + selectedEdge.label + "</u></b>"
+        document.getElementById("commands").innerHTML = "<b>" + selectedEdge.label + "</b>"
                                                       + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")' value='Remove'>"
                                                       + "&nbsp;<input type='button' onclick='describe(\""   + selectedEdge.id + "\")' value='Describe'><br/>"
                                                       + formEdgeAction(selectedEdge);
@@ -152,7 +152,7 @@ function expand(id, type) {
   }
     
 // Remove selected node
-function removeNode(id) {
+function removeNode(id, type) {
   removeObjectByKey(nodes, 'id', id);
   show(null, null);
   }
@@ -284,11 +284,19 @@ function switchPhysics() {
 // Switch layout on/off
 function switchLayout() {
   if (document.getElementById('layout').checked) {
+    var direction = "LR";
+    if (document.getElementById('layout_direction').checked) {
+      direction = "UD";
+      }
+    var method = "directed";
+    if (document.getElementById('layout_method').checked) {
+      method = "hubsize";
+      }     
     options.layout = {
       improvedLayout:true,
       hierarchical: {
-        direction:"LR",
-        sortMethod:"directed"
+        direction:direction,
+        sortMethod:method
         }
       }
     }

@@ -142,3 +142,8 @@
 : 1560449219:0;rm -rf Core CLI
 : 1560449220:0;ls
 : 1560449655:0;cd ../..
+: 1560499707:0;ls
+: 1560499733:0;cp -R ~/work/Atlas/DB/Atlas-Event-Index-Core/src/net/hep/atlas/Database/EventIndex/Graph ./
+: 1560499735:0;cd Graph
+: 1560500678:0;cd ant
+: 1560500683:0;cd ../../../..
