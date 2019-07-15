@@ -165,7 +165,8 @@ function removeEdge(id) {
   
 // Describe selected node or edge
 function describe(id, type) {
-  var txt = callInfo(type, id);
+  var selectedNode = findObjectByKey(nodes, 'id', id);
+  var txt = JSON.stringify(selectedNode, null, 2) + "<hr/>" + callInfo(type, id);
   popup(id, txt);
   }
     
@@ -292,21 +293,11 @@ function switchLayout() {
     if (document.getElementById('layout_method').checked) {
       method = "hubsize";
       }     
-    options.layout = {
-      improvedLayout:true,
-      hierarchical: {
-        direction:direction,
-        sortMethod:method
-        }
-      }
+    network.setOptions({layout:{improvedLayout:true, hierarchical:{direction:direction, sortMethod:method}}});
     }
   else {
-    options.layout = {
-      improvedLayout:true
-      }
+    network.setOptions({layout:{improvedLayout:true, hierarchical:false}});
     }
-  network.setOptions(options);
-  show(null, null);
   }
  
 // Find in array
@@ -349,11 +340,12 @@ function removeObjectByKey(array, key, value) {
 function popup(name, txt) {
 	w = window.open('', name, 'height=600, width=600, menubar=no, status=no, toolbar=no, titlebar=no');
 	var doc = w.document;
-	doc.write('<html><title>' + name + "</title><body><pre>");
-	doc.write("<hr>");
+	doc.write('<html><title>' + name + "</title><body>");
+  doc.write("<h1>" + name + "</h1>");
+	doc.write("<hr/><pre>");
 	doc.write(txt);
-	doc.write("<hr>");
-  doc.write('</pre><br/><center><a href="javascript:self.close()">close</a>.</center>');
+	doc.write("</pre><hr/>");
+  doc.write("<input type='button' value='close' onclick='self.close()'>");
 	doc.write('</body></html>');
 	doc.close();
 	if (window.focus) {

@@ -185,16 +185,16 @@ public class HBaseRESTClient {
   private String filter(Map<String, String> filterMap) {
     String filter = "";
     String[] column;
-    String[] value;
+    String value;
     boolean first = true;
     filter = "{\"type\":\"FilterList\","
            + "\"op\":\"MUST_PASS_ALL\","
            + "\"filters\":[";
     for (Map.Entry<String, String> entry : filterMap.entrySet()) {
       column = entry.getKey().split(":");
-      value  = entry.getValue().split(":");
-      if (value[1].equals("BinaryComparator")) {
-        value[0] = Coding.encode(value[0]);
+      value  = entry.getValue();
+      if (column[2].equals("BinaryComparator")) {
+        value = Coding.encode(value);
         }
       if (!first) {
         filter += ",";
@@ -210,8 +210,8 @@ public class HBaseRESTClient {
              +  "\"latestVersion\":true,"
              +  "\"ifMissing\":true,"
              +  "\"comparator\":{"
-             +  "\"type\":\"" + value[1] + "\","
-             +  "\"value\":\"" + value[0] + "\""
+             +  "\"type\":\"" + column[2] + "\","
+             +  "\"value\":\"" + value + "\""
              +  "}"
              +  "}";
       

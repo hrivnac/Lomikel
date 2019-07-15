@@ -20,6 +20,7 @@
 
 <head>
   <link href="sortable.css" rel="stylesheet" type="text/css"/>
+  <script type="text/javascript" src="sortable.js"></script>
   </head>
   
 <body bgcolor="#ddddff">
@@ -54,7 +55,7 @@
         term = request.getParameter(f.split(":")[1]);
         if (!term.equals("*") && !term.trim().equals("")) {
           out.println("<b>" + f + "</b> = " + term + "</br>");
-          filterMap.put(f, term + ":SubstringComparator");
+          filterMap.put(f + ":SubstringComparator", term);
           }
         }
       }
