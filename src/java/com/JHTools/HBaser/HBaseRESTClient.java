@@ -89,6 +89,9 @@ public class HBaseRESTClient {
     JSONObject result = null;
     try {
       resultString = SmallHttpClient.putXML(_url + "/" + table + "/scanner", scanner, null, "Location");
+      if (resultString != null) {
+        resultString = resultString.split("\\\\n")[0].split("=")[0].trim();
+        }
       }
     catch (CommonException e) {
       log.info(e);

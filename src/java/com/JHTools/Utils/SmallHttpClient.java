@@ -14,6 +14,8 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 
 // Java
 import java.io.InputStreamReader;
@@ -206,7 +208,6 @@ public class SmallHttpClient {
     * @param header  The requested header (instead of answer body). May be <code>null</code>.
     * @return        The answer.
     * @throws CommonException If anything goes wrong. */
-  // TBD: header should be more generic
   public static String postJSON(String              url,
                                 String              json,
                                 Map<String, String> headers,
@@ -237,7 +238,12 @@ public class SmallHttpClient {
         }
       else {
         if (header != null) {
-          answer = response.getHeaders(header)[0].getElements()[0].getName();
+          for (Header h : response.getHeaders(header)) {
+            for (HeaderElement helement : h.getElements()) {
+              answer += helement.getName() + " = " + helement.getValue() + "\n";
+              }
+            }
+          //answer = response.getHeaders(header)[0].getElements()[0].getName();
           }
         else {
           answer = getResponseBody(response);   
@@ -260,7 +266,6 @@ public class SmallHttpClient {
     * @param header  The requested header (instead of answer body). May be <code>null</code>.
     * @return        The answer.
     * @throws CommonException If anything goes wrong. */
-  // TBD: header should be more generic
   public static String postXML(String              url,
                                String              json,
                                Map<String, String> headers,
@@ -291,7 +296,12 @@ public class SmallHttpClient {
         }
       else {
         if (header != null) {
-          answer = response.getHeaders(header)[0].getElements()[0].getName();
+          for (Header h : response.getHeaders(header)) {
+            for (HeaderElement helement : h.getElements()) {
+              answer += helement.getName() + " = " + helement.getValue() + "\n";
+              }
+            }
+          //answer = response.getHeaders(header)[0].getElements()[0].getName();
           }
         else {
           answer = getResponseBody(response);
@@ -374,7 +384,6 @@ public class SmallHttpClient {
     * @param header  The requested header (instead of answer body). May be <code>null</code>.
     * @return        The answer.
     * @throws CommonException If anything goes wrong. */
-  // TBD: header should be more generic
   public static String putJSON(String              url,
                                String              json,
                                Map<String, String> headers,
@@ -405,7 +414,12 @@ public class SmallHttpClient {
         }
       else {
         if (header != null) {
-          answer = response.getHeaders(header)[0].getElements()[0].getName();
+          for (Header h : response.getHeaders(header)) {
+            for (HeaderElement helement : h.getElements()) {
+              answer += helement.getName() + " = " + helement.getValue() + "\n";
+              }
+            }
+          //answer = response.getHeaders(header)[0].getElements()[0].getName();
           }
         else {
           answer = getResponseBody(response);   
@@ -428,7 +442,6 @@ public class SmallHttpClient {
     * @param header  The requested header (instead of answer body). May be <code>null</code>.
     * @return        The answer.
     * @throws CommonException If anything goes wrong. */
-  // TBD: header should be more generic
   public static String putXML(String              url,
                               String              json,
                               Map<String, String> headers,
@@ -459,7 +472,12 @@ public class SmallHttpClient {
         }
       else {
         if (header != null) {
-          answer = response.getHeaders(header)[0].getElements()[0].getName();
+          for (Header h : response.getHeaders(header)) {
+            for (HeaderElement helement : h.getElements()) {
+              answer += helement.getName() + " = " + helement.getValue() + "\n";
+              }
+            }
+          //answer = response.getHeaders(header)[0].getElements()[0].getName();
           }
         else {
           answer = getResponseBody(response);

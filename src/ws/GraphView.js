@@ -16,12 +16,10 @@ var data = {
 var container = document.getElementById('visnetwork');
 var network;
   
-// filter = document.getElementById('filter').value.trim();  
-  
 function show(nodesS, edgesS) {
+  var filter = document.getElementById('filter').value.trim();  
   var ids = [];
   if (nodesS != null && nodesS.trim() != "") {
-    //nodes = nodes.concat(JSON.parse(nodesS));
     for (n of nodes) {
       ids.push(n.id);
       }
@@ -34,7 +32,6 @@ function show(nodesS, edgesS) {
     }
   var fts = [];
   if (edgesS != null && edgesS.trim() != "") {
-    //edges = edges.concat(JSON.parse(edgesS));
     for (e of edges) {
       fts.push(e.from + "#" + e.to);
       }
@@ -148,6 +145,7 @@ function expand(id, type) {
     nodes.push(selectedNode);
     }
   eval(expandNode(type, id));
+  applyFilter();
   show(null, null);
   }
     
@@ -170,6 +168,15 @@ function describe(id, type) {
   popup(id, txt);
   }
     
+// Apply Filter
+function applyFilter() {
+  var filter = document.getElementById('filter').value.trim();
+  if (filter) {
+    filterObjectByKey(nodes, 'label', filter);
+    show(null, null);
+    }
+  }
+  
 // Cluser by Groups
 function clusterByGroups() {
   network.setData(data);
@@ -327,6 +334,22 @@ function removeObjectByKey(array, key, value) {
   var j = 0;
   for (var i = 0; i < array.length; i++) {
     if (array[i][key] != value) {
+      newArray[j++] = array[i];
+      }
+    }
+  array.length = 0;
+  for (var i = 0; i < newArray.length; i++) {
+    array.push(newArray[i]);
+    }
+  }
+  
+// Remove from array
+// TBD: should be possible without redrawing
+function filterObjectByKey(array, key, value) {
+  var newArray = [];
+  var j = 0;
+  for (var i = 0; i < array.length; i++) {
+    if (array[i][key].includes(value)) {
       newArray[j++] = array[i];
       }
     }

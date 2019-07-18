@@ -13,6 +13,7 @@ Customize the interactions with the <b>graph</b>.
  <input type="checkbox" name="removeOld"  id="removeOld"                           value="false" title="activate removal of old nodes"               >remove old</input>
 <br/>
 filter: <input type="text" name="filter" value="" id="filter" title="show only nodes with a string in their label"/>
+        <input type="button" onclick="applyFilter()" value="Apply">
 
  
  

@@ -59,7 +59,6 @@ public class HBase2Table {
         column = Coding.decode(cells.getJSONObject(j).getString("column"));
         value  = Coding.decode(cells.getJSONObject(j).getString("$"));
         if (column.startsWith("r:")) {
-          //TBD: entry.put(column.substring(2), entry.id() + ":" + value);
           entry.put(column.substring(2), value);
           }  
         else if (column.startsWith("b")) {
