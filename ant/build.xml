@@ -220,7 +220,11 @@
   <target name="j2h"
           depends="init"
           description="Construct source documentation">
-    <taskdef name="java2html" classname="com.java2html.Java2HTMLTask"/>
+    <taskdef name="java2html" classname="com.java2html.Java2HTMLTask">
+      <classpath>
+        <pathelement location="../extlib/j2h.jar"/>
+        </classpath>
+      </taskdef>
 	  <java2html title="JHTools" 
                simple="no"
              	 tabsize="4"
