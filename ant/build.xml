@@ -227,11 +227,11 @@
       </taskdef>
 	  <java2html title="JHTools" 
                simple="no"
-             	 tabsize="4"
-		           marginsize="2"
-		           header="true"
-		           footer="true"
-		           destination="../doc/Src">
+             	  tabsize="4"
+		            marginsize="2"
+		            header="true"
+		            footer="true"
+		            destination="../doc/Src">
 		  <fileset dir="../src"   includes="**/*.java"/>
 		  <fileset dir="../build" includes="**/*.java"/>
 		  <javadoc localRef="${javadoc}" httpRef="http://docs.oracle.com/javase/8/docs/api"/>
@@ -243,7 +243,11 @@
   <target name="viz"
           depends="init"
           description="Create flow of build file">
-    <taskdef name="vizant" classname="net.sourceforge.vizant.Vizant"/> 
+    <taskdef name="vizant" classname="net.sourceforge.vizant.Vizant"> 
+      <classpath>
+        <pathelement location="../extlib/vizant.jar"/>
+        </classpath>
+      </taskdef>
     <vizant antfile="../ant/build.xml" outfile="../doc/build.dot"/>
     </target>
     
