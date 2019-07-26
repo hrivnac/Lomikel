@@ -10,18 +10,18 @@
 
   <property environment="env"/>
   <property file="../ant/build-global.properties"/>
-  <property file="../ant/build.properties"/>
-  <property name="site" value="Local"/>
+  <property file="../ant/build-local.properties"/>
+  <property name="site" value="${env.site}"/>
 
   <path id="classpath.build">
-    <pathelement path="${log4j.jar}"/>
-    <pathelement path="${bsh.jar}"/>
-    <pathelement path="${httpclient.jar}"/>
-    <pathelement path="${httpcore.jar}"/>
-    <pathelement path="${logging.jar}"/>
-    <pathelement path="${cli.jar}"/>
-    <pathelement path="${orgjson.jar}"/>
-    <pathelement path="${slf4j.jar}"/>
+    <pathelement path="${log4j_jar}"/>
+    <pathelement path="${bsh_jar}"/>
+    <pathelement path="${httpclient_jar}"/>
+    <pathelement path="${httpcore_jar}"/>
+    <pathelement path="${logging_jar}"/>
+    <pathelement path="${cli_jar}"/>
+    <pathelement path="${orgjson_jar}"/>
+    <pathelement path="${slf4j_jar}"/>
     <fileset dir="../extlib">
       <include name="*.jar"/>
       </fileset>
