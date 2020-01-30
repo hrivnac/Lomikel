@@ -115,6 +115,65 @@
       </jar>
     </target>
     
+  <!-- WAR ==================================================================-->
+
+  <target name="war"
+          depends="jar"
+          description="Create WAR">
+ 		<copy file="../src/ws/index.jsp"  tofile="../build/index.jsp"         overwrite="true"/>
+ 		<copy file="../src/ws/CommandCenter.jsp" tofile="../build/CommandCenter.jsp" overwrite="true"/>
+    <replace file="../build/CommandCenter.jsp" token="@VERSION@" value="${version}"/>
+    <replace file="../build/CommandCenter.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
+    <war destfile="../lib/JHTools.war" webxml="../src/ws/web.xml">
+      <fileset dir="../src/ws">
+        <include name="*.jsp"/>
+        <exclude name="index*.jsp"/>
+        <exclude name="CommandCenter.jsp"/>
+        <include name="**/*.html"/>
+        <include name="**/*.js"/>
+	    	<include name="**/*.css"/>
+	    	<include name="**/*.json"/>
+	    	<include name="**/*.jpeg"/>
+	    	<include name="**/*.gif"/>
+	    	<include name="**/*.png"/>
+	    	<include name="images/*.png"/>
+        </fileset>
+      <fileset dir="../build">
+        <include name="index.jsp"/>
+        <include name="CommandCenter.jsp"/>
+        </fileset>
+      <lib file="../lib/JHTools-${version}.jar"/>
+      <lib file="${log4j_jar}"/>
+      <lib file="${orgjson_jar}"/>
+      <lib file="${httpcore_jar}"/>
+      <lib file="${httpclient_jar}"/>
+      <lib file="${slf4j_jar}"/>
+      <lib file="${slf4jlog4j_jar}"/>
+      <lib file="${logging_jar}"/>
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="JHTools"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        </manifest>
+      </war>
+    </target>
+
+  <!-- Tomcat ===============================================================-->
+    
+  <target name="deploy"
+          depends="war"
+          description="Deploy Development WS">
+    <copy file="../lib/JHTools.war"
+          tofile="${server_dir}/${user.name}-JHTools.war"/>
+    </target>
+    
+  <target name="deploy-prod"
+          depends="war"
+          description="Deploy Production WS">
+    <copy file="../lib/JHTools.war"
+          tofile="${server_dir}/JHTools.war"/>
+    </target>
+     
   <!-- Clean ================================================================-->
 
   <target name="clean"
