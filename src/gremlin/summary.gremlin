@@ -1,0 +1,5 @@
+// Summary
+// =======
+
+g.V().values('lbl').groupCount().unfold()
+g.E().values('lbl').groupCount().unfold()

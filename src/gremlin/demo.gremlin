@@ -1,0 +1,12 @@
+aln = g.addV('AstroLabNet').property('lbl', 'project').next();
+lal = g.addV('LAL').property('lbl', 'site',
+                   'title', 'LAL',
+                   'id', 'site:LAL',
+                   'livy', 'http://vm-75222.lal.in2p3.fr:21111',
+                   'spark', 'http://vm-75222.lal.in2p3.fr:20001',
+                   'ganglia', 'http://vm-75222.lal.in2p3.fr/ganglia',
+                   'hadoop', 'http://vm-74078.lal.in2p3.fr:8188/cluster',
+                   'hbase', 'http://134.158.74.54:8080',
+                   'sparkHistory', 'http://vm-75222.lal.in2p3.fr:20008').next();
+g.V(aln).addE('has').to(lal).iterate();
+graph.traversal().tx().commit();
