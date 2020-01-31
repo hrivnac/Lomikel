@@ -7,7 +7,7 @@
 
 <body bgcolor="#ddddff">
   <div title="command result">
-  <h1><u>JHTools Home:</u></h1>
-    <a href="http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/JHTools"><img src="http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/JHTools/JHTools.jpeg"></a>
+    <center><h1><u>Gremlin Browser</u></h1></center>
+    <center><h2>from <a href="http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/JHTools">JHTools</a></h2></center>
     </div>
   </body>

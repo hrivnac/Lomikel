@@ -19,40 +19,6 @@ var stylesheet = {
       actions:[
         {name:"info", url:""}
         ]
-      },
-    "LAL": {
-      graphics: {
-        label:{gremlin:"label()"}, 
-        title:" ",        
-        subtitle:" ",     
-        group:" ",        
-        shape:"dot",      
-        image:" ",        
-        borderRadius:"0", 
-        borderWidth:"1",  
-        borderDashes:[1,0],
-        value:"0"         
-        },
-      actions:[
-        {name:"info", url:""}
-        ]
-      },
-    "AstroLabNet": {
-      graphics: {
-        label:{gremlin:"label()"}, 
-        title:" ",        
-        subtitle:" ",     
-        group:" ",        
-        shape:"dot",      
-        image:" ",        
-        borderRadius:"0", 
-        borderWidth:"1",  
-        borderDashes:[1,0],
-        value:"0"         
-        },
-      actions:[
-        {name:"info", url:""}
-        ]
       }
     },
   edges: {

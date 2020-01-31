@@ -133,6 +133,7 @@
         <include name="**/*.js"/>
 	    	<include name="**/*.css"/>
 	    	<include name="**/*.json"/>
+	    	<include name="**/*.jpg"/>
 	    	<include name="**/*.jpeg"/>
 	    	<include name="**/*.gif"/>
 	    	<include name="**/*.png"/>
@@ -185,8 +186,8 @@
  		<copy todir="${janusgraph_dir}/conf/gremlin-server">
 			<fileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="*"/>
       </copy>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/ei.properties" token="@STORAGE.HOSTNAME@" value="${zookeeper}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/ei.properties" token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.properties" token="@STORAGE.HOSTNAME@" value="${zookeeper}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.properties" token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
     </target>
      
   <!-- Clean ================================================================-->

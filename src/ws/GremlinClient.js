@@ -148,28 +148,28 @@ function show(graph) {
           }
         title        = stylesheetValue(stylesheetNode.graphics.title,        id, eMap);
         title = (title === '') ? '' : l + ":" + title;                       
-        subtitle     = stylesheetValue(stylesheetNode.graphics.subtitle,     id, eMap, title);
-        label        = stylesheetValue(stylesheetNode.graphics.label,        id, eMap, title);
-        group        = stylesheetValue(stylesheetNode.graphics.group,        id, eMap, title);
-        value        = stylesheetValue(stylesheetNode.graphics.value,        id, eMap, title);
-        shape        = stylesheetValue(stylesheetNode.graphics.shape,        id, eMap, title);
-        borderDashes = stylesheetValue(stylesheetNode.graphics.borderDashes, id, eMap, title);
-        borderWidth  = stylesheetValue(stylesheetNode.graphics.borderWidth,  id, eMap, title);
+        subtitle     = stylesheetValue(stylesheetNode.graphics.subtitle,     id, eMap);
+        label        = stylesheetValue(stylesheetNode.graphics.label,        id, eMap);
+        group        = stylesheetValue(stylesheetNode.graphics.group,        id, eMap);
+        value        = stylesheetValue(stylesheetNode.graphics.value,        id, eMap);
+        shape        = stylesheetValue(stylesheetNode.graphics.shape,        id, eMap);
+        borderDashes = stylesheetValue(stylesheetNode.graphics.borderDashes, id, eMap);
+        borderWidth  = stylesheetValue(stylesheetNode.graphics.borderWidth,  id, eMap);
         borderWidth  = parseInt(borderWidth);
         if (shape === 'image') {
-          image        = stylesheetValue(stylesheetNode.graphics.image, id, eMap, title);
+          image        = stylesheetValue(stylesheetNode.graphics.image, id, eMap);
           image = (image === '') ? '' : 'images/' + image;
           }
         else if (shape === 'box') {
-          borderRadius = stylesheetValue(stylesheetNode.graphics.borderRadius, id, eMap, title);
+          borderRadius = stylesheetValue(stylesheetNode.graphics.borderRadius, id, eMap);
           borderRadius = parseInt(borderRadius);
           }
-        actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap, title);
+        actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          actions += "<a href= '" + actionsArray[k].url + label + "' target='RIGHT'>" + actionsArray[k].name + "</a> - ";
+          url = stylesheetValue(actionsArray[k].url, id, eMap);
+          actions += "<a href= '" + url + "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
           }
-        //console.log("title = " + title + ", subtitle = " + subtitle + ", label = " + label + ", group = " + group + ", value = " + value + ", shape = " + shape + ", image = " + image + ", borderRadius = " + borderRadius + ", actions = " + actions);
         if ((filter === '' || label.includes(filter)) && !findObjectByKey(nodes, 'id', id)) {
           nodes.push({id:id, value:value, label:label, title:(title + "<br/>" + subtitle), group:group, actions:actions, shape:shape, image:image, shapeProperties:{borderRadius:borderRadius, borderDashes:borderDashes}, borderWidth:borderWidth, color:color});
           }
@@ -177,43 +177,24 @@ function show(graph) {
         }
       // edge
       else if (graph[i].type === 'edge') {
+        stylesheetEdge = stylesheet.edges[l];
+        if (!stylesheetEdge) {
+          stylesheetEdge = stylesheet.edges["default"];
+          }
         inVid = graph[i].inVid;
         outVid = graph[i].outVid;
-        title        = stylesheetValue(stylesheet.edges[l].graphics.title,        stylesheet.edges["default"].graphics.title,        id, eMap, null,  true);
-        title = (title === '') ? '' : l + ":" + title;
-        label        = stylesheetValue(stylesheet.edges[l].graphics.label,        stylesheet.edges["default"].graphics.label,        id, eMap, title, true);
-        group        = stylesheetValue(stylesheet.edges[l].graphics.group,        stylesheet.edges["default"].graphics.group,        id, eMap, title, true);
-        subtitle     = stylesheetValue(stylesheet.edges[l].graphics.subtitle,     stylesheet.edges["default"].graphics.subtitle,     id, eMap, title, true);
-        value        = stylesheetValue(stylesheet.edges[l].graphics.value,        stylesheet.edges["default"].graphics.value,        id, eMap, title, true);
-        if (label === 'overlap') { // BUG: this should be in stylesheet
-          subtitleArray = subtitle.split(' ');
-          o = subtitleArray[0];
-          b = subtitleArray[1];
-          c = subtitleArray[2];
-          u = parseInt(findObjectByKey(nodes, 'id', outVid ).value) + parseInt(findObjectByKey(nodes, 'id', inVid).value) - parseInt(o);
-          subtitle = 'overlap: ' + o + ', union: ' + u + ', overlap/n: ' + b + '%, ' + c + '%';
-          value = o / u;
-          }
-        actionsArray = stylesheetValue(stylesheet.edges[l].actions,               stylesheet.edges["default"].actions,               id, eMap, title, true);
+        title        = stylesheetValue(stylesheetEdge.graphics.title,        id, eMap, true);
+        title = (title === '') ? '' : l + ":" + title;                                 
+        label        = stylesheetValue(stylesheetEdge.graphics.label,        id, eMap, true);
+        group        = stylesheetValue(stylesheetEdge.graphics.group,        id, eMap, true);
+        subtitle     = stylesheetValue(stylesheetEdge.graphics.subtitle,     id, eMap, true);
+        value        = stylesheetValue(stylesheetEdge.graphics.value,        id, eMap, true);
+        actionsArray = stylesheetValue(stylesheetEdge.actions,               id, eMap, true);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          actions += "<a href= '" + actionsArray[k].url + label + "' target='RIGHT'>" + actionsArray[k].name + "</a> - ";
+          actions += "<a href= '" + actionsArray[k].url + "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
           }
         arrows = 'middle';
-        if (label === 'overlap') { // BUG: this should be in stylesheet
-          if (subtitleArray[1] == '100.0' && subtitleArray[2] == '100.0') {
-            arrows = 'to, from';
-            }
-          else if (subtitleArray[1] == '100.0' && subtitleArray[2] != '100.0') {
-            arrows = 'to';
-            }
-          else if (subtitleArray[1] != '100.0' && subtitleArray[2] == '100.0') {
-            arrows = 'from';
-            }
-          else {
-            arrows = '';
-            }
-          }
         if (!findObjectByKey(edges, 'id', id) && !findObjectByKey(edges, 'from', inVid, 'to', outVid)) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {
             color = 'grey';
@@ -237,20 +218,20 @@ function show(graph) {
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("context_sensitive_menu").innerHTML = "<b><u>" + selectedNode.label + "</u></u>"
-                                                                    + "&nbsp;<input type='button' onclick='removeNode(" + selectedNode.id + ")'   value='Remove'>"
-                                                                    + "&nbsp;<input type='button' onclick='describeNode(" + selectedNode.id + ")' value='Describe'><br/>"
-                                                                    + selectedNode.actions;
+        document.getElementById("commands").innerHTML = "<b><u>" + selectedNode.label + "</u></u>"
+                                                                 + "&nbsp;<input type='button' onclick='removeNode(" + selectedNode.id + ")'   value='Remove'>"
+                                                                 + "&nbsp;<input type='button' onclick='describeNode(" + selectedNode.id + ")' value='Describe'><br/>"
+                                                                 + selectedNode.actions;
         }
       }
     else if (params.edges.length == 1) {
       selectedEdge = findObjectByKey(edges, 'id', params.edges[0]);
       if (selectedEdge) { // TBD: should test on cluster
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("context_sensitive_menu").innerHTML = "<b><u>" + selectedEdge.label + "</u></u>"
-                                                                    + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")'   value='Remove'>"
-                                                                    + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' value='Describe'><br/>"
-                                                                    + selectedEdge.actions;
+        document.getElementById("cpmmands").innerHTML = "<b><u>" + selectedEdge.label + "</u></u>"
+                                                                 + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")'   value='Remove'>"
+                                                                 + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' value='Describe'><br/>"
+                                                                 + selectedEdge.actions;
         }
       }
     });
@@ -262,21 +243,21 @@ function show(graph) {
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
         document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
-        if (document.querySelector('.removeOld').checked) {
+        if (document.getElementById('removeOld').checked) {
           nodes.length = 0;
           //edges.length = 0;
           nodes.push(selectedNode);
           }
-        if (document.querySelector('.expandTo').checked) {
+        if (document.getElementById('expandTo').checked) {
           callGremlinGraph("g.V(" + selectedNode.id + ").out().limit(10)");
            }
-        if (document.querySelector('.expandFrom').checked) {
+        if (document.getElementById('expandFrom').checked) {
           callGremlinGraph("g.V(" + selectedNode.id + ").in().limit(10)");
           }
-        if (document.querySelector('.expandTo').checked) {
+        if (document.getElementById('expandTo').checked) {
            callGremlinGraph("g.V(" + selectedNode.id + ").outE().limit(10)");
           }
-        if (document.querySelector('.expandFrom').checked) {
+        if (document.getElementById('expandFrom').checked) {
            callGremlinGraph("g.V(" + selectedNode.id + ").inE().limit(10)");
           }
         }
@@ -295,24 +276,19 @@ function describeEdge(id) {
   }
     
 // Get stylesheet value
-function stylesheetValue(nam, id, eMap, title, ifEdge) {
+function stylesheetValue(nam, id, eMap, ifEdge) {
   var set = ifEdge ? 'E' : 'V';
-  if (nam) {
-    if (nam.gremlin) {
-      val = callGremlinValues('g.' + set + '("' + id + '").' + nam.gremlin)[0];
-      }
-    else if (nam.js) {
-      val = eval(nam.js);
-      }
-    else {
-      val = eMap.get(nam);
-      if (!val) {
-        val = nam;
-        }
-      }
+  if (nam.gremlin) {
+    val = callGremlinValues('g.' + set + '("' + id + '").' + nam.gremlin)[0];
     }
-  else if (nam != def) {
-    val = stylesheetValue(def, def, id, eMap, title);
+  else if (nam.js) {
+    val = eval(nam.js);
+    }
+  else {
+    val = eMap.get(nam);
+    if (!val) {
+      val = nam;
+      }
     }
   if (typeof val == 'number') {
     val = val.toString();

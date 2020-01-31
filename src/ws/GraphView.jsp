@@ -10,7 +10,9 @@ Customize the interactions with the <b>graph</b>.
  <input type="checkbox" name="zoom"       id="zoom"                                value="true"  title="cluster by zoom"                       checked>zoom cluster</input>
 (<input type="checkbox" name="stabilize"  id="stabilize"                           value="false" title="stabilize when clustering by zoom"            >stabilize</input>)
  <input type="checkbox" name="physics"    id="physics"   onclick="switchPhysics()" value="true"  title="activate animation"                    checked>live</input>
- <input type="checkbox" name="removeOld"  id="removeOld"                           value="false" title="activate removal of old nodes"               >remove old</input>
+ <input type="checkbox" name="expandFrom" id="expandFrom"                          value="true"  title="activate children node expansion"      checked>expand from</input>
+ <input type="checkbox" name="expandTo"   id="expandTo"                            value="false" title="activate parent node expansuion"              >expand to</input>
+ <input type="checkbox" name="removeOld"  id="removeOld"                           value="false" title="activate removal of old nodes"                >remove old</input>
 <br/>
 filter: <input type="text" name="filter" value="" id="filter" title="show only nodes with a string in their label"/>
         <input type="button" onclick="applyFilter()" value="Apply">

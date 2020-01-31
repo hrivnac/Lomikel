@@ -16,7 +16,7 @@ export hbase_table
 
 export home=`pwd`/..
 
-alias gremlin='${janusgraph}/bin/gremlin.sh -i "../src/gremlin/start.gremlin"'
-alias gremlin_local='${janusgraph}/bin/gremlin.sh -i "../src/gremlin/start_local.gremlin ${zookeeper} ${hbase_table} ${home}" -i "../src/gremlin/functions.gremlin" -i "../src/gremlin/describe.gremlin"'
+alias gremlin='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start.gremlin"'
+alias gremlin_local='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_local.gremlin ${zookeeper} ${hbase_table} ${home}" -i "../src/gremlin/functions.gremlin" -i "../src/gremlin/describe.gremlin"'
 
 echo "commands: gremlin, gremlin_local"
