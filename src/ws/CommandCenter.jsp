@@ -23,7 +23,7 @@
         <div id="commands" title="context-sensitive commands">
           <table>
             <tr>
-              <td><img src="images/GremlinBrowser.jpg" width="100"/></td>
+              <td><img src="images/JHTools.png" width="100"/></td>
               <td><h1><u>Gremlin Browser</u></h1>
                   <h2>@VERSION@ <small>[@BUILD@]</small></h2>
                   </td>
