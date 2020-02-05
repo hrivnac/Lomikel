@@ -3,7 +3,7 @@ var stylesheet = {
   nodes: {
     "default": {
       graphics: {
-        label:" ",         // can be "", can be {gremlin:...}
+        label:{gremlin:"properties('lbl').value()"},         // can be "", can be {gremlin:...}
         title:" ",         // can be "", can be {gremlin:...}
         subtitle:" ",      // can be "", can be {gremlin:...}
         group:" ",         // specifies graphics properties, can be "", can be {gremlin:...}
@@ -27,6 +27,7 @@ var stylesheet = {
         label:" ",
         title:" ",
         subtitle:" ",
+        arrows:"middle",
         value:"0",
         group:" "
         },

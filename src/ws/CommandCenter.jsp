@@ -65,6 +65,5 @@
     </div>
   <script type="text/javascript" src="Stylesheet.js"></script>
   <script type="text/javascript" src="GraphView.js"></script>
-  <script type="text/javascript" src="GremlinClient.js"></script>
   <script type="text/javascript" src="resizableTable.js"></script>
   </body>
