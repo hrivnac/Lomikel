@@ -9,6 +9,9 @@ if [[ ! "x" = "x${java_home}" ]]; then
   export JAVA_HOME="${java_home}"
   export PATH="${JAVA_HOME}/bin:${PATH}"
   fi
+if [[ ! "x" = "x${hbase_classpath}" ]]; then
+  export CLASSPATH="${hbase_classpath}"
+  fi
   
 export janusgraph_dir
 export zookeeper
