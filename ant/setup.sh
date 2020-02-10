@@ -10,7 +10,7 @@ if [[ ! "x" = "x${java_home}" ]]; then
   export PATH="${JAVA_HOME}/bin:${PATH}"
   fi
   
-export janusgraph
+export janusgraph_dir
 export zookeeper
 export hbase_table
 
