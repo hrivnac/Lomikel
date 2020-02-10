@@ -23,8 +23,8 @@
         <div id="commands" title="context-sensitive commands">
           <table>
             <tr>
-              <td><img src="images/JHTools.png" width="100"/></td>
-              <td><h1><u>Gremlin Browser</u></h1>
+              <td><img src="@LOGO@" width="100"/></td>
+              <td><h1><u>@NAME@</u></h1>
                   <h2>@VERSION@ <small>[@BUILD@]</small></h2>
                   </td>
               <td><a href="https://hrivnac.web.cern.ch/hrivnac/Activities/Packages/JHTools" target="RESULT">JHTools Home</a>

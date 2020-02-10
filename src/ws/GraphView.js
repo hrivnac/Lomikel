@@ -211,7 +211,8 @@ function show(graph) {
         actionsArray = stylesheetValue(stylesheetEdge.actions,               id, eMap, true);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          actions += "<a href= '" + actionsArray[k].url + "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
+          url = stylesheetValue(actionsArray[k].url, id, eMap);
+          actions += "<a href= '" + url + "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
           }
         if (!findObjectByKey(edges, 'id', id) && !findObjectByKey(edges, 'from', inVid, 'to', outVid)) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {

@@ -7,7 +7,7 @@
 
 <!DOCTYPE html>
 <html>
-  <head><title>JHTools JSP</title></head>
+  <head><title>JHTools Browser</title></head>
   <frameset cols="40%,60%">
     <frame src="CommandCenter.jsp" name="COMMAND">
     <frame src="Result.jsp"        name="RESULT">

@@ -1,23 +1,25 @@
 // Graph stylesheet
+// can use gremlin/js:
+//   nodes: label, title, subtitle, group, shape, value, borderDashes, borderRadius, borderWidth, actions, actions.url
+//   edges: label, title, subtitle, group, arrows, value, actions, actions.url
 var stylesheet = {
   nodes: {
     "default": {
       graphics: {
-        label:{gremlin:"properties('lbl').value()"},         // can be "", can be {gremlin:...}
-        title:" ",         // can be "", can be {gremlin:...}
-        subtitle:" ",      // can be "", can be {gremlin:...}
-        group:" ",         // specifies graphics properties, can be "", can be {gremlin:...}
+        label:{gremlin:"properties('lbl').value()"},        
+        title:{gremlin:"properties('title').value()"},      
+        subtitle:{gremlin:"properties('subtitle').value()"},
+        group:" ",         // specifies graphics properties
         shape:"dot",       // in text:  ellipse, circle, database, box, text
                            // out text: image, circularImage, diamond, dot, star, triangle, triangleDown, hexagon, square, icon
-                           // can be {js:...}
         image:" ",         // should be present only if shape:"image"
         borderRadius:"0",  // should be present only if shape:"box"
         borderWidth:"1",
         borderDashes:[1,0],
-        value:"0"          // can be {gremlin:...}
+        value:"0"
         },
       actions:[
-        {name:"info", url:""}
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/JHTools"}
         ]
       }
     },
@@ -32,7 +34,7 @@ var stylesheet = {
         group:" "
         },
       actions: [
-        {name:"info", url:""}
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/JHTools"}
         ]
       }
     }

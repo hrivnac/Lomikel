@@ -1,4 +1,6 @@
-top = g.addV('Top').property('lbl', 'top').next();
+top = g.addV('Top').property('lbl', 'top').
+                    property('title', 'titleTop').
+                    property('subtitle', 'subtitleTop').next();
 a = g.addV('A').property('lbl', 'labelA').
                 property('title', 'titleA').
                 property('subtitle', 'subtitleA').next();

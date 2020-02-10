@@ -124,6 +124,8 @@
  		<copy file="../src/ws/CommandCenter.jsp" tofile="../build/CommandCenter.jsp" overwrite="true"/>
     <replace file="../build/CommandCenter.jsp" token="@VERSION@" value="${version}"/>
     <replace file="../build/CommandCenter.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
+    <replace file="../build/CommandCenter.jsp" token="@NAME@"   value="${browsername}"/>
+    <replace file="../build/CommandCenter.jsp" token="@LOGO@"   value="${browserlogo}"/>
     <war destfile="../lib/JHTools.war" webxml="../src/ws/web.xml">
       <fileset dir="../src/ws">
         <include name="*.jsp"/>
