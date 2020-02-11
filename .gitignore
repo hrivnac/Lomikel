@@ -1,3 +1,4 @@
+ant/build-local.properties
 /lib/*
 /build/*
 /run/*
