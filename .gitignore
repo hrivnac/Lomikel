@@ -3,7 +3,7 @@
 /run/*
 /doc/*
 /dosrc/*
-*~
-*.log
-.zshhistory
-#*
+**/*~
+**/*.log
+**/.zshhistory
+**/#*
