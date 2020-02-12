@@ -230,6 +230,14 @@
     <copy todir="../doc/dist/ws">
 			<fileset dir="../src/ws" includes="*/**"/>
       </copy>
+    <mkdir dir="../doc/dist/src/gremlin"/>
+    <copy todir="../doc/dist/src/gremlin">
+			<fileset dir="../src/gremlin" includes="*/**"/>
+      </copy>
+    <mkdir dir="../doc/dist/src/sh"/>
+    <copy todir="../doc/dist/src/sh">
+			<fileset dir="../src/sh" includes="*/**"/>
+      </copy>
  		<copy todir="../doc/JavaDoc">
 			<fileset dir="../src/java" includes="**/doc-files/*"/>
       </copy>
