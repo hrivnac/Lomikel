@@ -183,7 +183,6 @@
           description="Patch JanusGraph">
  		<copy todir="${janusgraph_dir}/scripts">
 			<fileset dir="../src/gremlin" includes="functions.gremlin"/>
-			<fileset dir="../src/gremlin" includes="describe.gremlin"/>
       </copy>
  		<copy todir="${janusgraph_dir}/conf/gremlin-server">
 			<fileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="*"/>
