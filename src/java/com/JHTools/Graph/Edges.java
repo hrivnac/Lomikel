@@ -1,11 +1,9 @@
 package com.JHTools.Graph;
 
 // org.json
-import org.json.JSONObject;
 import org.json.JSONArray;
 
 // Java
-import java.util.Set;
 import java.util.TreeSet;
 
 // Log4J
