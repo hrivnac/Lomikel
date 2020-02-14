@@ -16,11 +16,12 @@ if [[ ! "x" = "x${hbase_classpath}" ]]; then
 export janusgraph_dir
 export zookeeper
 export hbase_table
+export hbase_dir
 
 export home=`pwd`/..
 
 alias gremlin='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start.gremlin"'
-alias gremlin_local='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_local.gremlin ${zookeeper} ${hbase_table} ${home}" -i "../src/gremlin/functions.gremlin" -i "../src/gremlin/describe.gremlin"'
+alias gremlin_local='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_local.gremlin ${zookeeper} ${hbase_table} ${home}"'
 
 echo "commands: gremlin, gremlin_local"
 
