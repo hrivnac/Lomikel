@@ -27,4 +27,5 @@ globals << [hook : [
 ] as LifeCycleHook]
 
 // define the default TraversalSource to bind queries to - this one will be named "g".
-//globals << [g : graph.traversal()]
+globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "localhost").set("storage.hbase.table", "janusgraph").open()]
+globals << [g : graph.traversal()]
