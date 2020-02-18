@@ -1,4 +1,4 @@
-:record start ../run/MyGremlin.log
+//:record start MyGremlin.log
 zookeeper   = args[0]
 hbase_table = args[1]
 home        = args[2]
