@@ -34,6 +34,7 @@
               <td>Connect to the <b>graph server</b><br/> and request the initial <b>graph</b></td>
               <td colspan="2">
                 <select name="gremlin_server" id="gremlin_server" title="database server url">
+                  <option value="http://134.158.74.85:24444">http://134.158.74.85:24444</option>
                   <option value="http://localhost:8182">http://localhost:8182</option>
                   </select>
                 <br/>
