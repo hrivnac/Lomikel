@@ -1,4 +1,5 @@
 ant/build-local.properties
+ant/Notes.txt
 /lib/*
 /build/*
 /run/*
