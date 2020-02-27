@@ -3,6 +3,7 @@ Customize the interactions with the <b>graph</b>.
 <input type="button" onclick="clusterByGroups()"  value="Cluster by group type">
 <input type="button" onclick="clusterByHubsize()" value="Cluster by group size">
 <input type="button" onclick="clusterExpand()"    value="Expand all clusters">
+<input type="button" onclick="fillEdges()"        value="Show all edges">
 </br>
  <input type="checkbox" name="layout"     id="layout"           onclick="switchLayout()"  value="false" title="hierarchical layout"            >hierarchical</input>
 (<input type="checkbox" name="layout"     id="layout_direction" onclick="switchLayout()"  value="false" title="up-down or left-right"          >up/lr</input>

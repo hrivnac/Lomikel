@@ -293,7 +293,7 @@ function show(graph) {
            callGremlinGraph("g.V(" + selectedNode.id + ").outE()");
           }
         if (document.getElementById('expandFrom').checked) {
-           callGremlinGraph("g.V(" + selectedNode.id + ").inE())");
+           callGremlinGraph("g.V(" + selectedNode.id + ").inE()");
           }
         }
       }
@@ -400,6 +400,21 @@ function clusterExpand() {
       },
     };
   network.cluster(clusterOptionsByData);
+  }
+
+// Fill Edges
+// TBD: limit to visible nodes
+function fillEdges() {
+  for (var i = 0; i < nodes.length; i++) {
+    var selectedNode = nodes[i];
+    document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
+    if (document.getElementById('expandTo').checked) {
+       callGremlinGraph("g.V(" + selectedNode.id + ").outE()");
+      }
+    if (document.getElementById('expandFrom').checked) {
+       callGremlinGraph("g.V(" + selectedNode.id + ").inE()");
+      }  
+    }
   }
   
 // Cluster by Zoom
