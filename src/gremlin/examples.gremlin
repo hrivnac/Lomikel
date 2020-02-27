@@ -112,6 +112,9 @@ g.V().has('dataset', 'name', 'data18_13TeV.00358031.physics_Main.deriv.DAOD_HIGG
 // Tricks
 // ======
 
+// prevent auto-iteration (in console)
+g.V();null
+
 // supress output
 g.V().limit(10);[]
 

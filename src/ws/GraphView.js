@@ -164,28 +164,28 @@ function show(graph) {
         if (!stylesheetNode) {
           stylesheetNode = stylesheet.nodes["default"];
           }
-        title        = stylesheetValue(stylesheetNode.graphics.title,        id, eMap);
+        title        = stylesheetValue(stylesheetNode.graphics.title,        id, eMap, false);
         title = (title === '') ? '' : l + ":" + title;                       
-        subtitle     = stylesheetValue(stylesheetNode.graphics.subtitle,     id, eMap);
-        label        = stylesheetValue(stylesheetNode.graphics.label,        id, eMap);
-        group        = stylesheetValue(stylesheetNode.graphics.group,        id, eMap);
-        value        = stylesheetValue(stylesheetNode.graphics.value,        id, eMap);
-        shape        = stylesheetValue(stylesheetNode.graphics.shape,        id, eMap);
-        borderDashes = stylesheetValue(stylesheetNode.graphics.borderDashes, id, eMap);
-        borderWidth  = stylesheetValue(stylesheetNode.graphics.borderWidth,  id, eMap);
+        subtitle     = stylesheetValue(stylesheetNode.graphics.subtitle,     id, eMap, false, title);
+        label        = stylesheetValue(stylesheetNode.graphics.label,        id, eMap, false, title);
+        group        = stylesheetValue(stylesheetNode.graphics.group,        id, eMap, false, title);
+        value        = stylesheetValue(stylesheetNode.graphics.value,        id, eMap, false, title);
+        shape        = stylesheetValue(stylesheetNode.graphics.shape,        id, eMap, false, title);
+        borderDashes = stylesheetValue(stylesheetNode.graphics.borderDashes, id, eMap, false, title);
+        borderWidth  = stylesheetValue(stylesheetNode.graphics.borderWidth,  id, eMap, false, title);
         borderWidth  = parseInt(borderWidth);
         if (shape === 'image') {
-          image        = stylesheetValue(stylesheetNode.graphics.image, id, eMap);
+          image        = stylesheetValue(stylesheetNode.graphics.image, id, eMap, false, title);
           image = (image === '') ? '' : 'images/' + image;
           }
         else if (shape === 'box') {
-          borderRadius = stylesheetValue(stylesheetNode.graphics.borderRadius, id, eMap);
+          borderRadius = stylesheetValue(stylesheetNode.graphics.borderRadius, id, eMap, false, title);
           borderRadius = parseInt(borderRadius);
           }
-        actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap);
+        actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap, false, title);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          url = stylesheetValue(actionsArray[k].url, id, eMap);
+          url = stylesheetValue(actionsArray[k].url, id, eMap, false, title);
           actions += "<a href= '" + url + "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
           }
         if ((filter === '' || label.includes(filter)) && !findObjectByKey(nodes, 'id', id)) {
@@ -203,15 +203,15 @@ function show(graph) {
         outVid = graph[i].outVid;
         title        = stylesheetValue(stylesheetEdge.graphics.title,        id, eMap, true);
         title = (title === '') ? '' : l + ":" + title;                                 
-        label        = stylesheetValue(stylesheetEdge.graphics.label,        id, eMap, true);
-        group        = stylesheetValue(stylesheetEdge.graphics.group,        id, eMap, true);
-        subtitle     = stylesheetValue(stylesheetEdge.graphics.subtitle,     id, eMap, true);
-        arrows       = stylesheetValue(stylesheetEdge.graphics.arrows,       id, eMap, true);
-        value        = stylesheetValue(stylesheetEdge.graphics.value,        id, eMap, true);
-        actionsArray = stylesheetValue(stylesheetEdge.actions,               id, eMap, true);
+        label        = stylesheetValue(stylesheetEdge.graphics.label,        id, eMap, true, title);
+        group        = stylesheetValue(stylesheetEdge.graphics.group,        id, eMap, true, title);
+        subtitle     = stylesheetValue(stylesheetEdge.graphics.subtitle,     id, eMap, true, title);
+        arrows       = stylesheetValue(stylesheetEdge.graphics.arrows,       id, eMap, true, title);
+        value        = stylesheetValue(stylesheetEdge.graphics.value,        id, eMap, true, title);
+        actionsArray = stylesheetValue(stylesheetEdge.actions,               id, eMap, true, title);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          url = stylesheetValue(actionsArray[k].url, id, eMap);
+          url = stylesheetValue(actionsArray[k].url, id, eMap, true, title);
           actions += "<a href= '" + url + "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
           }
         if (!findObjectByKey(edges, 'id', id) && !findObjectByKey(edges, 'from', inVid, 'to', outVid)) {
@@ -263,7 +263,7 @@ function show(graph) {
       selectedEdge = findObjectByKey(edges, 'id', params.edges[0]);
       if (selectedEdge) { // TBD: should test on cluster
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("cpmmands").innerHTML = "<b><u>" + selectedEdge.label + "</u></u>"
+        document.getElementById("commands").innerHTML = "<b><u>" + selectedEdge.label + "</u></u>"
                                                                  + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")'   value='Remove'>"
                                                                  + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' value='Describe'><br/>"
                                                                  + selectedEdge.actions;
@@ -284,16 +284,16 @@ function show(graph) {
           nodes.push(selectedNode);
           }
         if (document.getElementById('expandTo').checked) {
-          callGremlinGraph("g.V(" + selectedNode.id + ").out().limit(10)");
+          callGremlinGraph("g.V(" + selectedNode.id + ").out()");
            }
         if (document.getElementById('expandFrom').checked) {
-          callGremlinGraph("g.V(" + selectedNode.id + ").in().limit(10)");
+          callGremlinGraph("g.V(" + selectedNode.id + ").in()");
           }
         if (document.getElementById('expandTo').checked) {
-           callGremlinGraph("g.V(" + selectedNode.id + ").outE().limit(10)");
+           callGremlinGraph("g.V(" + selectedNode.id + ").outE()");
           }
         if (document.getElementById('expandFrom').checked) {
-           callGremlinGraph("g.V(" + selectedNode.id + ").inE().limit(10)");
+           callGremlinGraph("g.V(" + selectedNode.id + ").inE())");
           }
         }
       }
@@ -372,8 +372,8 @@ function clusterGroup(group) {
         clusterOptions.title = 'contains ' + childNodes.length;
         return clusterOptions;
         },
-      clusterNodeProperties: postProcNode({id:('cluster:' + group), type:'cluster', borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)})
-       };
+      clusterNodeProperties: {id:('cluster:' + group), type:'cluster', borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)}
+      };
     network.cluster(clusterOptionsByData);
     }
   }
@@ -554,7 +554,8 @@ function callInfo(element, key) {
   }
   
 // Get stylesheet value
-function stylesheetValue(nam, id, eMap, ifEdge) {
+// TBD: handle default if undefined
+function stylesheetValue(nam, id, eMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
   if (nam.gremlin) {
     val = callGremlinValues('g.' + set + '("' + id + '").' + nam.gremlin)[0];

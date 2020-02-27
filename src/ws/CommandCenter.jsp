@@ -34,8 +34,7 @@
               <td>Connect to the <b>graph server</b><br/> and request the initial <b>graph</b></td>
               <td colspan="2">
                 <select name="gremlin_server" id="gremlin_server" title="database server url">
-                  <option value="http://134.158.74.85:24444">http://134.158.74.85:24444</option>
-                  <option value="http://localhost:8182">http://localhost:8182</option>
+                  <%@include file="Servers.jsp" %>
                   </select>
                 <br/>
                 <input type="text" name="bootstrap_command" value="g.V()" size="40" id="bootstrap_command" title="bootstrap gremlin command"/>
@@ -64,6 +63,7 @@
   <div id="visnetwork" height="70%">
     --- graph network ---
     </div>
+  <script type="text/javascript" src="StylesheetDefault.js"></script>
   <script type="text/javascript" src="Stylesheet.js"></script>
   <script type="text/javascript" src="GraphView.js"></script>
   <script type="text/javascript" src="resizableTable.js"></script>
