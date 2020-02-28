@@ -62,6 +62,7 @@
     <mkdir dir="../lib"/>
     <mkdir dir="../extlib"/>
     <mkdir dir="../run"/>
+    <mkdir dir="../dist"/>
     <mkdir dir="../doc/JavaDoc"/>
     </target>
     
@@ -126,6 +127,7 @@
     <replace file="../build/CommandCenter.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
     <replace file="../build/CommandCenter.jsp" token="@NAME@"   value="${browsername}"/>
     <replace file="../build/CommandCenter.jsp" token="@LOGO@"   value="${browserlogo}"/>
+    <replace file="../build/CommandCenter.jsp" token="@BOOT@"   value="${bootgremlin}"/>
     <war destfile="../lib/JHTools.war" webxml="../src/ws/web.xml">
       <fileset dir="../src/ws">
         <include name="*.jsp"/>
@@ -220,6 +222,28 @@
       </delete>
    </target>
  
+  <!-- Dist =================================================================-->
+
+  <target name="dist"
+          depends="jar"
+          description="Construct distribution">
+    <copy todir="../dist">
+			<fileset dir="../lib" includes="*.jar"/>
+      </copy>
+    <mkdir dir="../dist/ws"/>
+    <copy todir="../dist/ws">
+			<fileset dir="../src/ws" includes="*/**"/>
+      </copy>
+    <mkdir dir="../dist/src/gremlin"/>
+    <copy todir="../dist/src/gremlin">
+			<fileset dir="../src/gremlin" includes="*/**"/>
+      </copy>
+    <mkdir dir="../dist/src/sh"/>
+    <copy todir="../dist/src/sh">
+			<fileset dir="../src/sh" includes="*/**"/>
+      </copy>
+  </target>
+
   <!-- JavaDoc ==============================================================-->
 
   <target name="doc"
@@ -231,21 +255,6 @@
       </copy>
  		<copy todir="../doc/docsrc">
 			<fileset dir="../docsrc" includes="*"/>
-      </copy>
-    <copy todir="../doc/dist">
-			<fileset dir="../lib" includes="*.jar"/>
-      </copy>
-    <mkdir dir="../doc/dist/ws"/>
-    <copy todir="../doc/dist/ws">
-			<fileset dir="../src/ws" includes="*/**"/>
-      </copy>
-    <mkdir dir="../doc/dist/src/gremlin"/>
-    <copy todir="../doc/dist/src/gremlin">
-			<fileset dir="../src/gremlin" includes="*/**"/>
-      </copy>
-    <mkdir dir="../doc/dist/src/sh"/>
-    <copy todir="../doc/dist/src/sh">
-			<fileset dir="../src/sh" includes="*/**"/>
       </copy>
  		<copy todir="../doc/JavaDoc">
 			<fileset dir="../src/java" includes="**/doc-files/*"/>
@@ -276,6 +285,8 @@
       <link href="https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs"/>
       <link href="http://stleary.github.io/JSON-java"/>
       <link href="https://commons.apache.org/proper/commons-cli/apidocs"/>
+      <link href="https://javadoc.io/doc/org.janusgraph/janusgraph-core/latest"/>
+      <link href="https://tinkerpop.apache.org/javadocs/current/full"/>
       <classpath>
         <path refid="classpath.run"/>
         </classpath>

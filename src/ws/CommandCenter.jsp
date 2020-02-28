@@ -37,7 +37,7 @@
                   <%@include file="Servers.jsp" %>
                   </select>
                 <br/>
-                <input type="text" name="bootstrap_command" value="g.V()" size="40" id="bootstrap_command" title="bootstrap gremlin command"/>
+                <input type="text" name="bootstrap_command" value="@BOOT@" size="40" id="bootstrap_command" title="bootstrap gremlin command"/>
                 <input type="button" onclick="bootstrap()"  value="Start" title="execute command on the server"/>
                 </td>
               </tr>

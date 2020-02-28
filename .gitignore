@@ -5,6 +5,7 @@ ant/Notes.txt
 /run/*
 /doc/*
 /dosrc/*
+/dist/*
 **/*~
 **/*.log
 **/.zshhistory

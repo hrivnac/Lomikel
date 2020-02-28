@@ -227,7 +227,7 @@ function show(graph) {
       }
     }
   network = new vis.Network(container, data, options);
-  if (graph != null) {
+  if (graph != null && document.getElementById('clusterize').checked === true) {
     clusterByGroups();   
     }
   network.once('initRedraw', function() {
