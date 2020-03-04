@@ -186,7 +186,8 @@ function show(graph) {
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, false, title);
-          actions += "<a href= '" + url + "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
+          actions += "<a href= '" + url + "' target='RESULT'>" + actionsArray[k].name + "</a>";
+          actions += "(<a href= '" + url + "' target='_blank'>*</a>) - ";
           }
         if ((filter === '' || label.includes(filter)) && !findObjectByKey(nodes, 'id', id)) {
           nodes.push({id:id, value:value, label:label, title:(title + "<br/>" + subtitle), group:group, actions:actions, shape:shape, image:image, shapeProperties:{borderRadius:borderRadius, borderDashes:borderDashes}, borderWidth:borderWidth, color:color});
@@ -212,7 +213,7 @@ function show(graph) {
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, true, title);
-          actions += "<a href= '" + url + "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
+          actions += "<a href= '" + url+ "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
           }
         if (!findObjectByKey(edges, 'id', id) && !findObjectByKey(edges, 'from', inVid, 'to', outVid)) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {
