@@ -6,11 +6,10 @@
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
 <head>
-  <script type="text/javascript" src="vis-4.21.0/dist/vis.js"></script>
+  <script type="text/javascript" src="vis-network-7.3.6/standalone/umd/vis-network.min.js"></script> 
   <script type="text/javascript" src="Options.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
-  <link href="vis-4.21.0/dist/vis-network.min.css" rel="stylesheet" type="text/css"/>  
   <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/start/jquery-ui.css" rel="stylesheet"  type="text/css"/>
   <link href="CommandCenter.css"                   rel="stylesheet" type="text/css"/>
   <link href="GraphView.css"                       rel="stylesheet" type="text/css"/>

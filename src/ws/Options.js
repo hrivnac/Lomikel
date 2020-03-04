@@ -21,7 +21,8 @@ var options = {
     adaptiveTimestep:true
     },
   layout: {
-    improvedLayout:true
+    improvedLayout:true,
+    hierarchical:false
     },
   interaction: {
     dragNodes:true
@@ -50,7 +51,7 @@ var options = {
       }
     },
   groups: {
-    " ":{color:{border:"black", background:"white"}}
+    " ":{color:{background:"white", border:"black" }}
     }
   };
   

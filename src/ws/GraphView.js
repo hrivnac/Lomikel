@@ -317,12 +317,16 @@ function expand(id, type) {
     
 // Describe selected node
 function describeNode(id) {
-  popup(id, callGremlinValues("g.V('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')"));
+  popup(id, callGremlinValues("g.V('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") + 
+            "<hr/>" +
+            JSON.stringify(findObjectByKey(nodes, 'id', id)));
   }
     
 // Describe selected edge
 function describeEdge(id) {
-  popup(id, callGremlinValues("g.E('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')"));
+  popup(id, callGremlinValues("g.E('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") +
+            "<hr/>" +
+            JSON.stringify(findObjectByKey(edges, 'id', id)));
   }
     
 // Remove selected node
