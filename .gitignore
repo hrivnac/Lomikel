@@ -6,7 +6,7 @@
 /doc/*
 /dosrc/*
 /dist/*
-/**/*~
-/**/*.log
-/**/.zshhistory
-/**/#*
+**/*~
+**/*.log
+**/.zshhistory
+**/#*
