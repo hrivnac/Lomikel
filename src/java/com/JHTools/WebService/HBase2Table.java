@@ -6,6 +6,9 @@ import com.JHTools.Utils.Coding;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+// HBase
+import org.apache.hadoop.hbase.util.Bytes;
+
 // Java
 import java.util.Map;
 import java.util.HashMap;
@@ -28,16 +31,18 @@ import org.apache.log4j.Logger;
 public class HBase2Table {
     
   /** Set prefered sequence of columns.
-    * All other columns will be shoun after, in alphabetic order.
+    * All other columns will be shown after, in alphabetic order.
     * @param columns The prefered sequence of columns. */
   public void setColumns(String[] columns) {
     _columns = Arrays.asList(columns);
     }  
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
-    * @param json The {@link JSONObject} representation of the HBader table.
+    * @param json  The {@link JSONObject} representation of the HBader table.
+    * @param limit Max number of rows.
     * @return     The table as {@link Map}. */
-  public Map<String, Map<String, String>> table(JSONObject json) {
+  public Map<String, Map<String, String>> table(JSONObject json,
+                                                int        limit) {
     if (json == null || json.equals("")) {
       return null;
       }
@@ -48,36 +53,59 @@ public class HBase2Table {
     String value;
     Map<String, Map<String, String>> entries = new HashMap<>();
     Map<String, String> entry;
+    String type;
+    String value0;
     int n = 0;
     for (int i = 0; i < rows.length(); i++) {
-      if (n++ > 100) {
+      if (limit != 0 && n++ > limit) {
         break;
-        } // TBD: better
+        }
+      key = Coding.decode(rows.getJSONObject(i).getString("key"));
       entry = new HashMap<>();
       cells = rows.getJSONObject(i).getJSONArray("Cell");
       for (int j = 0; j < cells.length(); j++) {
         column = Coding.decode(cells.getJSONObject(j).getString("column"));
-        value  = Coding.decode(cells.getJSONObject(j).getString("$"));
-        if (column.startsWith("r:")) {
-          entry.put(column.substring(2), value);
-          }  
-        else if (column.startsWith("b")) {
-          entry.put(column.substring(2), "*binary*"); // TBD: process
+        type = "unknown";
+        if (key.startsWith("schema")) {
+          type = "string";
           }
-        else {
-          entry.put(column.substring(2), value);
+        else if (_schema != null && _schema.containsKey(column.substring(2))) {
+          type = _schema.get(column.substring(2));
           }
-        }
-      entries.put(Coding.decode(rows.getJSONObject(i).getString("key")), entry);
+        value0  = Coding.decode(cells.getJSONObject(j).getString("$"));
+        switch (type) {
+          case "float": 
+            value  = String.valueOf(Bytes.toFloat(Bytes.toBytes(value0)));
+            break;
+          case "double": 
+            value  = String.valueOf(Bytes.toDouble(Bytes.toBytes(value0)));
+            break;
+          case "integer": 
+            value  = String.valueOf(Bytes.toInt(Bytes.toBytes(value0)));
+            break;
+          case "long": 
+            value  = String.valueOf(Bytes.toLong(Bytes.toBytes(value0)));
+            break;
+          case "binary": 
+            value  = "*binary*";
+            break;
+          default: // includes "string"
+            value  = value0;
+          }
+        entry.put(column.substring(2), value);
+         }
+      entries.put(key, entry);
       }
     return entries;
     }
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
-    * @param json The {@link JSONObject} representation of the HBase table.
+    * @param json  The {@link JSONObject} representation of the HBase table.
+    * @param limit Max number of rows.
     * @return     The table as html string. */
-  public String htmlTable(JSONObject json) {
-    Map<String, Map<String, String>> table = table(json);
+  public String htmlTable(JSONObject json,
+                          int        limit) {
+    Map<String, Map<String, String>> table = table(json, limit);
     if (table == null) {
       return "";
       }
@@ -102,12 +130,19 @@ public class HBase2Table {
     String html = "<table class='sortable'>";
     html += "<thead><tr><td></td>";
     for (String column : columns) {
-      html += "<td><b><u>" + column + "</u></b></td>";
+      html += "<td><b><u>" + column + "</u></b>";
+      if (_schema != null && _schema.containsKey(column)) {
+        html += "<br/>" + _schema.get(column);
+        }     
+      html += "</td>";
       }
     html += "</tr></thead>";
     String content;
     String id;
     for (Map.Entry<String, Map<String, String>> entry : table.entrySet()) {
+      if (entry.getKey().startsWith("schema")) {
+        continue;
+        }
       html += "<tr><td valign='top'><b>" + entry.getKey() + "</b></td>";
       for (String column : columns) {
         content = entry.getValue().get(column);
@@ -131,6 +166,15 @@ public class HBase2Table {
     return html;
     } 
 
+  /** Set overall schema.
+    * @param schema The schema to set. */
+  // TBD: handle schema per row
+  public void setSchema(Map<String, String> schema) {
+    _schema = schema;
+    }
+    
+  private Map<String, String> _schema;
+    
   private List<String> _columns;
   
   private int _height = 0;

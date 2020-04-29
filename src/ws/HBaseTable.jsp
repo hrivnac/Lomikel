@@ -27,10 +27,26 @@
   <%  
     String hbaseS    = request.getParameter("hbase");
     String table     = request.getParameter("table");
-    String columns   = request.getParameter("columns");
-    String filters   = request.getParameter("filters");
+    String columns   = request.getParameter("columns"); // TBD: out.print
+    String filters   = request.getParameter("filters"); // TBD: out.print
     String periodS   = request.getParameter("period");
+    String sizeS     = request.getParameter("size");
+    String limitS    = request.getParameter("limit");
+    String version   = request.getParameter("version");
     out.println("<h1><u>" + table + " table at " + hbaseS + "</u></h1>");
+    if (version != null) {
+      out.println("<b>schema version:</b> "  + version + "<br/>");
+      }
+    int size = 0;
+    if (sizeS != null) {
+      out.println("<b>size:</b> "  + sizeS + "<br/>");
+      size = Integer.parseInt(sizeS);
+      }
+    int limit = 0;
+    if (limitS != null) {
+      out.println("<b>limit:</b> "  + limitS + "<br/>");
+      limit = Integer.parseInt(limitS);
+      }
     long startL = 0;
     long stopL  = 0;
     if (periodS != null) {
@@ -60,16 +76,29 @@
         }
       }
     HBaseClient hbase = new HBaseClient(hbaseS);
-    JSONObject json = hbase.scan2JSON(table,
-                                      filterMap,
-                                      0,
-                                      startL,
-                                      stopL);
     HBase2Table h2table = new HBase2Table();
+    JSONObject json = hbase.get2JSON(table,
+                                     "schema_*");
+    Map<String, Map<String, String>> schemas = h2table.table(json, 0);
+    if (!schemas.isEmpty()) {
+      Map<String, String> schema = null;
+      if (version != null) {
+        schema = schemas.get("schema_" + version);
+        }
+      if (schema == null) {
+        schema = schemas.entrySet().iterator().next().getValue();
+        }
+      h2table.setSchema(schema);
+      }
+    json = hbase.scan2JSON(table,
+                           filterMap,
+                           size,
+                           startL,
+                           stopL);
     if (columns != null) {
       h2table.setColumns(columns.split(","));
       }
-    String html = h2table.htmlTable(json);
+    String html = h2table.htmlTable(json, limit);
     out.println(html);
     %>
   </body>

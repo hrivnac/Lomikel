@@ -1,0 +1,36 @@
+    .grid-stack-item {
+      border: 0;
+    }
+
+
+    .card {
+      background: none;
+    }
+
+    section {
+      padding: 0 15px 0 15px;
+    }
+
+    .grid-stack-item-removing {
+      opacity: 0.8;
+      filter: blur(5px);
+    }
+
+    @media all and (max-width: 575px) {
+      #hero {
+        margin-top: 32px;
+      }
+    }
+
+    .logo {
+      display: inline;
+      margin-right: 15px;
+    }
+
+    #trash {
+      background-color: #cc6857;
+    }
+
+    .newWidget {
+      background-color: #6cad84;
+    }

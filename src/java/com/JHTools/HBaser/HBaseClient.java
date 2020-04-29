@@ -51,7 +51,7 @@ public class HBaseClient extends HBaseRESTClient {
     putEncoded(table, Coding.encode(key), entries);
     }
     
-  /** Get results.
+  /** Get results (from scanner).
     * <pre>
     * GET /-table-/scanner/-scannerId-
     * </pre>
@@ -74,7 +74,8 @@ public class HBaseClient extends HBaseRESTClient {
       }
     return answer;
     }
-  /** Get results.
+    
+  /** Get results (from scanner).
     * <pre>
     * GET /-table-/scanner/-scannerId-
     * </pre>
@@ -124,6 +125,46 @@ public class HBaseClient extends HBaseRESTClient {
                               long                end) {
     String scannerId = initScanner(table, filter, size, start, end);
     return getJSONResults(table, scannerId);
+    }
+    
+  /** Get result (from get).
+    * <pre>
+    * GET /-table-/-row-
+    * </pre>
+    * @param table The requested table name.
+    * @param key   The row key.
+    * @return      The command result. */
+  public String get(String table,
+                    String key) {
+    JSONObject result = new JSONObject(getEncoded(table, key));
+    JSONArray rows = result.getJSONArray("Row");
+    JSONArray cells;
+    String answer = "";
+    for (int i = 0; i < rows.length(); i++) {
+      answer += Coding.decode(rows.getJSONObject(i).getString("key")) + ":\n";
+      cells = rows.getJSONObject(i).getJSONArray("Cell");
+      for (int j = 0; j < cells.length(); j++) {
+         answer += "\t" + Coding.decode(cells.getJSONObject(j).getString("column"))
+                + " = " + Coding.decode(cells.getJSONObject(j).getString("$")) + "\n";
+        }
+      }
+    return answer;
+    }
+    
+  /** Get result (from get).
+    * <pre>
+    * GET /-table-/-row-
+    * </pre>
+    * @param table  The requested table name.
+    * @param key    The row key.
+    * @return       The command result. May be <tt>null</tt>*/
+  public JSONObject get2JSON(String table,
+                             String key) {
+    String results = getEncoded(table, key);
+    if (results.equals("")) {
+      return null;
+      }
+    return new JSONObject(results);
     }
        
   @Override

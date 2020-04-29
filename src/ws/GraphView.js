@@ -186,8 +186,8 @@ function show(graph) {
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, false, title);
-          actions += "<a href= '" + url + "' target='RESULT'>" + actionsArray[k].name + "</a>";
-          actions += "(<a href= '" + url + "' target='_blank'>*</a>) - ";
+          actions += "<a href='#' onclick='loadResult(\"" + url + "\")'>" + actionsArray[k].name + "</a>";
+          actions += "(<a href='" + url + "' target='_blank'>*</a>) - ";
           }
         if ((filter === '' || label.includes(filter)) && !findObjectByKey(nodes, 'id', id)) {
           nodes.push({id:id, value:value, label:label, title:(title + "<br/>" + subtitle), group:group, actions:actions, shape:shape, image:image, shapeProperties:{borderRadius:borderRadius, borderDashes:borderDashes}, borderWidth:borderWidth, color:color});
@@ -213,7 +213,8 @@ function show(graph) {
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, true, title);
-          actions += "<a href= '" + url+ "' target='RESULT'>" + actionsArray[k].name + "</a> - ";
+          actions += "<a href='#' onclick='loadResult(\"" + url + "\")'>" + actionsArray[k].name + "</a>";
+          actions += "(<a href='" + url + "' target='_blank'>*</a>) - ";
           }
         if (!findObjectByKey(edges, 'id', id) && !findObjectByKey(edges, 'from', inVid, 'to', outVid)) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {
@@ -238,10 +239,10 @@ function show(graph) {
     });
   network.on('zoom', function (params) {
     if (params.direction == '-') {
-      if (params.scale < lastClusterZoomLevel*clusterFactor) {
-          makeClusters(params.scale);
-          lastClusterZoomLevel = params.scale;
-        }
+       if (params.scale < lastClusterZoomLevel * clusterFactor) {
+         makeClusters(params.scale);
+         lastClusterZoomLevel = params.scale;
+         }
       }
     else {
       openClusters(params.scale);
@@ -434,17 +435,17 @@ function makeClusters(scale) {
       clusterOptions.childrenCount = childrenCount;
       clusterOptions.label = "# " + childrenCount + "";
       clusterOptions.color = "white";
-      clusterOptions.font = {size: childrenCount*5+30}
+      clusterOptions.font = {size: childrenCount * 5 + 30}
       clusterOptions.id = 'cluster:' + clusterIndex;
       clusters.push({id:'cluster:' + clusterIndex, scale:scale});
       return clusterOptions;
       },
-    clusterNodeProperties: {borderWidth: 3, shape: 'database', font: {size: 30}}
+    clusterNodeProperties:{borderWidth:3, shape:'database', font:{size:30}}
     }
   network.clusterOutliers(clusterOptionsByData);
   if (document.getElementById('stabilize').checked === true) {
     // since we use the scale as a unique identifier, we do NOT want to fit after the stabilization
-    network.setOptions({physics:{stabilization:{fit: false}}});
+    network.setOptions({physics:{stabilization:{fit:false}}});
     network.stabilize();
     }
   }
@@ -494,7 +495,7 @@ function switchLayout() {
     network.setOptions({layout:{improvedLayout:true, hierarchical:false}});
     }
   }
- 
+
 // Find in array
 function findObjectByKey(array, key, value) {
   for (var i = 0; i < array.length; i++) {
@@ -593,4 +594,9 @@ function stylesheetValue(nam, id, eMap, ifEdge, title) {
     val = val.toString();
     }
   return val;
+  }
+  
+// Load page into Result pane
+async function loadResult(url) {
+  document.getElementById('result').innerHTML = await(await fetch(url)).text();
   }

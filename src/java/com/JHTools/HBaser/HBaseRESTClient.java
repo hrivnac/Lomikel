@@ -150,7 +150,7 @@ public class HBaseRESTClient {
     return getResultsEncoded(table, scannerId);
     }
     
-  /** Initiate <em>scanner</em> on the server.
+  /** Put row into table.
     * <pre>
     * PUT /-table-/fakerow
     * </pre>
@@ -173,6 +173,36 @@ public class HBaseRESTClient {
       CommonException.reportException("Request has failed", e, log);
       return;
       }
+    }
+  /** Get row from table.
+    * <pre>
+    * GET /-table-/-row-
+    * </pre>
+    * @param table  The requested table name.
+    * @param key    The row key (byte-encoded).
+    * @return       The command result, in <em>json</em>, values byte-encoded.
+    *               May be empty. */
+  // TBD: allow selected columns  
+  public String getEncoded(String table,
+                           String key) {
+    Map<String, String> headers = new HashMap<>();
+    headers.put("Accept", "application/json");
+    headers.put("Content-Type", "application/json");
+    String resultString = "";
+    JSONObject result = null;
+    try {
+      resultString = SmallHttpClient.get(_url + "/" + table + "/" + key, headers);
+      result = new JSONObject(resultString);
+      }
+    catch (CommonException e) {
+      log.info(e);
+      CommonException.reportException("Request has failed", e, log);
+      }
+    if (result == null) {
+      return "";
+      }
+    log.debug("Result:\n" + result.toString(2));
+    return result.toString(2);
     }
     
   /** Give <em>HBase</em> url.
