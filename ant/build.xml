@@ -22,6 +22,8 @@
     <pathelement path="${cli_jar}"/>
     <pathelement path="${orgjson_jar}"/>
     <pathelement path="${slf4j_jar}"/>
+    <pathelement path="${hbasecommon_jar}"/>
+    <pathelement path="${hadoopcommon_jar}"/>
     <fileset dir="../extlib">
       <include name="*.jar"/>
       </fileset>
@@ -121,18 +123,24 @@
   <target name="war"
           depends="jar"
           description="Create WAR">
- 		<copy file="../src/ws/index.jsp"  tofile="../build/index.jsp"         overwrite="true"/>
- 		<copy file="../src/ws/CommandCenter.jsp" tofile="../build/CommandCenter.jsp" overwrite="true"/>
-    <replace file="../build/CommandCenter.jsp" token="@VERSION@" value="${version}"/>
-    <replace file="../build/CommandCenter.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
-    <replace file="../build/CommandCenter.jsp" token="@NAME@"   value="${browsername}"/>
-    <replace file="../build/CommandCenter.jsp" token="@LOGO@"   value="${browserlogo}"/>
-    <replace file="../build/CommandCenter.jsp" token="@BOOT@"   value="${bootgremlin}"/>
+ 		<copy file="../src/ws/index.jsp"   tofile="../build/index.jsp" overwrite="true"/>
+ 		<copy file="../src/ws/Top.jsp"     tofile="../build/Top.jsp"   overwrite="true"/>
+ 		<copy file="../src/ws/TopMini.jsp" tofile="../build/TopMini.jsp"   overwrite="true"/>
+    <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
+    <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
+    <replace file="../build/Top.jsp"     token="@NAME@"    value="${browsername}"/>
+    <replace file="../build/Top.jsp"     token="@LOGO@"    value="${browserlogo}"/>
+    <replace file="../build/Top.jsp"     token="@BOOT@"    value="${bootgremlin}"/>
+    <replace file="../build/TopMini.jsp" token="@VERSION@" value="${version}"/>
+    <replace file="../build/TopMini.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
+    <replace file="../build/TopMini.jsp" token="@NAME@"    value="${browsername}"/>
+    <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${browserlogo}"/>
+    <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${bootgremlin}"/>
     <war destfile="../lib/JHTools.war" webxml="../src/ws/web.xml">
       <fileset dir="../src/ws">
         <include name="*.jsp"/>
         <exclude name="index*.jsp"/>
-        <exclude name="CommandCenter.jsp"/>
+        <exclude name="Top.jsp"/>
         <include name="**/*.html"/>
         <include name="**/*.js"/>
 	    	<include name="**/*.css"/>
@@ -145,7 +153,8 @@
         </fileset>
       <fileset dir="../build">
         <include name="index.jsp"/>
-        <include name="CommandCenter.jsp"/>
+        <include name="Top.jsp"/>
+        <include name="TopMini.jsp"/>
         </fileset>
       <lib file="../lib/JHTools-${version}.jar"/>
       <lib file="${log4j_jar}"/>
@@ -155,6 +164,8 @@
       <lib file="${slf4j_jar}"/>
       <lib file="${slf4jlog4j_jar}"/>
       <lib file="${logging_jar}"/>
+      <lib file="${hbasecommon_jar}"/>
+      <lib file="${hadoopcommon_jar}"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="JHTools"/>
