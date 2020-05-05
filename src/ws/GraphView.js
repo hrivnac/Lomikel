@@ -255,7 +255,7 @@ function show(graph) {
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("commands").innerHTML = "<b><u>" + selectedNode.label + "</u></u>"
+        document.getElementById("commands").innerHTML = "<b><u><h1>" + selectedNode.label + "</h1></u></u>"
                                                                  + "&nbsp;<input type='button' onclick='removeNode(" + selectedNode.id + ")'   value='Remove'>"
                                                                  + "&nbsp;<input type='button' onclick='describeNode(" + selectedNode.id + ")' value='Describe'><br/>"
                                                                  + selectedNode.actions;
@@ -265,7 +265,7 @@ function show(graph) {
       selectedEdge = findObjectByKey(edges, 'id', params.edges[0]);
       if (selectedEdge) { // TBD: should test on cluster
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("commands").innerHTML = "<b><u>" + selectedEdge.label + "</u></u>"
+        document.getElementById("commands").innerHTML = "<b><u><h1>" + selectedEdge.label + "</h1></u></u>"
                                                                  + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")'   value='Remove'>"
                                                                  + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' value='Describe'><br/>"
                                                                  + selectedEdge.actions;

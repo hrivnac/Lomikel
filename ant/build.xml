@@ -156,6 +156,9 @@
         <include name="Top.jsp"/>
         <include name="TopMini.jsp"/>
         </fileset>
+      <classes dir="../src/ws">
+        <include name="log4j.properties"/>
+        </classes>
       <lib file="../lib/JHTools-${version}.jar"/>
       <lib file="${log4j_jar}"/>
       <lib file="${orgjson_jar}"/>

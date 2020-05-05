@@ -213,21 +213,34 @@ public class HBaseRESTClient {
     
   /** Create <em>REST</em> filter from filter {@link Map}.
     * @param filterMap The {@link Map} of column values to filter,
-    *                  in the form <tt>family:column-value:comparator</tt>.
+    *                  in the form <tt>family:column-value:comparator</tt> or
+    *                  <tt>key-value:comparator</tt>.
+    * @param schema    TBD
     * @return          The JSON filter. */
   private String filter(Map<String, String> filterMap) {
+    log.info(filterMap);
     String filter = "";
     String[] column;
-    String value;
+    String[] value;
     boolean first = true;
+    boolean keyFilter;
     filter = "{\"type\":\"FilterList\","
            + "\"op\":\"MUST_PASS_ALL\","
            + "\"filters\":[";
     for (Map.Entry<String, String> entry : filterMap.entrySet()) {
       column = entry.getKey().split(":");
-      value  = entry.getValue();
-      if (column[2].equals("BinaryComparator")) {
-        value = Coding.encode(value);
+      value  = entry.getValue().split(":");
+      keyFilter = false;
+      if (entry.getKey().equals(":")) {
+        keyFilter = true;
+        }
+      if (keyFilter || !value[1].equals("BinaryComparator")) {
+        if (keyFilter || _schema == null) {
+          value[0] = Coding.encode(value[0]);
+          }
+        else {
+          value[0] = _schema.encode(entry.getKey(), value[0]);
+          }
         }
       if (!first) {
         filter += ",";
@@ -235,29 +248,44 @@ public class HBaseRESTClient {
       else {
         first = false;
         }
-      filter += "{"
-             +  "\"type\":\"SingleColumnValueFilter\","
-             +  "\"op\":\"EQUAL\","
-             +  "\"family\":\"" + Coding.encode(column[0]) + "\","
-             +  "\"qualifier\":\"" + Coding.encode(column[1]) + "\","
-             +  "\"latestVersion\":true,"
-             +  "\"ifMissing\":true,"
-             +  "\"comparator\":{"
-             +  "\"type\":\"" + column[2] + "\","
-             +  "\"value\":\"" + value + "\""
-             +  "}"
-             +  "}";
-      
+      if (keyFilter) {
+        filter += "{"
+               +  "\"type\":\"PrefixFilter\","
+               +  "\"value\":\"" + value[0] + "\""
+               +  "}";
+        }
+      else {
+        filter += "{"
+               +  "\"type\":\"SingleColumnValueFilter\","
+               +  "\"op\":\"EQUAL\","
+               +  "\"family\":\"" + Coding.encode(column[0]) + "\","
+               +  "\"qualifier\":\"" + Coding.encode(column[1]) + "\","
+               +  "\"comparator\":{"
+               +  "\"type\":\"" + value[1] + "\","
+               +  "\"value\":\"" + value[0] + "\""
+               +  "}"
+               +  "}";
+        }
       }
     filter += "]";
     filter += "}";
+    log.info(filter);
     return filter; 
+    }
+
+  /** Set overall {@link Schema}.
+    * @param schema The {@link Schema} to set. */
+  // TBD: handle schema per row
+  public void setSchema(Schema schema) {
+    _schema = schema;
     }
 
   @Override
   public String toString() {
     return "HBaseRESTClient(" + _url + ")";
     }
+    
+  private Schema _schema;
     
   private String _url;
 

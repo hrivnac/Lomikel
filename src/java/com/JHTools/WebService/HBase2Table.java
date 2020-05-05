@@ -1,6 +1,7 @@
 package com.JHTools.WebService;
 
 import com.JHTools.Utils.Coding;
+import com.JHTools.HBaser.Schema;
 
 // org.json
 import org.json.JSONObject;
@@ -39,7 +40,7 @@ public class HBase2Table {
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
     * @param json  The {@link JSONObject} representation of the HBader table.
-    * @param limit Max number of rows.
+    * @param limit Max number of rows. <tt>0</tt> means no limit.
     * @return     The table as {@link Map}. */
   public Map<String, Map<String, String>> table(JSONObject json,
                                                 int        limit) {
@@ -53,9 +54,7 @@ public class HBase2Table {
     String value;
     Map<String, Map<String, String>> entries = new HashMap<>();
     Map<String, String> entry;
-    String type;
-    String value0;
-    int n = 0;
+    int n = 1;
     for (int i = 0; i < rows.length(); i++) {
       if (limit != 0 && n++ > limit) {
         break;
@@ -65,35 +64,12 @@ public class HBase2Table {
       cells = rows.getJSONObject(i).getJSONArray("Cell");
       for (int j = 0; j < cells.length(); j++) {
         column = Coding.decode(cells.getJSONObject(j).getString("column"));
-        type = "unknown";
-        if (key.startsWith("schema")) {
-          type = "string";
+        value  = Coding.decode(cells.getJSONObject(j).getString("$"));
+        if (!key.startsWith("schema")) {
+          value = _schema.decode(column, value);
           }
-        else if (_schema != null && _schema.containsKey(column.substring(2))) {
-          type = _schema.get(column.substring(2));
-          }
-        value0  = Coding.decode(cells.getJSONObject(j).getString("$"));
-        switch (type) {
-          case "float": 
-            value  = String.valueOf(Bytes.toFloat(Bytes.toBytes(value0)));
-            break;
-          case "double": 
-            value  = String.valueOf(Bytes.toDouble(Bytes.toBytes(value0)));
-            break;
-          case "integer": 
-            value  = String.valueOf(Bytes.toInt(Bytes.toBytes(value0)));
-            break;
-          case "long": 
-            value  = String.valueOf(Bytes.toLong(Bytes.toBytes(value0)));
-            break;
-          case "binary": 
-            value  = "*binary*";
-            break;
-          default: // includes "string"
-            value  = value0;
-          }
-        entry.put(column.substring(2), value);
-         }
+        entry.put(column, value);
+        }
       entries.put(key, entry);
       }
     return entries;
@@ -127,13 +103,11 @@ public class HBase2Table {
     for (String column : columnsSet) {
       columns.add(column);
       }
-    String html = "<table class='sortable'>";
+    String html = "<div id='hbasetable'><table class='sortable'>";
     html += "<thead><tr><td></td>";
     for (String column : columns) {
       html += "<td><b><u>" + column + "</u></b>";
-      if (_schema != null && _schema.containsKey(column)) {
-        html += "<br/>" + _schema.get(column);
-        }     
+      html += "<br/>" + _schema.type(column);
       html += "</td>";
       }
     html += "</tr></thead>";
@@ -162,18 +136,18 @@ public class HBase2Table {
         }
       html += "</tr>";
       }
-    html += "</table>";
+    html += "</table></div>";
     return html;
     } 
 
-  /** Set overall schema.
-    * @param schema The schema to set. */
+  /** Set overall {@link Schema}.
+    * @param schema The {@link Schema} to set. */
   // TBD: handle schema per row
-  public void setSchema(Map<String, String> schema) {
+  public void setSchema(Schema schema) {
     _schema = schema;
     }
     
-  private Map<String, String> _schema;
+  private Schema _schema;
     
   private List<String> _columns;
   

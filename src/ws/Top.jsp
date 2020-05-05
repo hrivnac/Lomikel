@@ -1,8 +1,8 @@
 <table>
   <tr>
     <td><img src="@LOGO@" width="100"/></td>
-    <td><h1><u>@NAME@</u></h1>
-        <h2>@VERSION@ <small>[@BUILD@]</small></h2>
+    <td><h2><u>@NAME@</u></h2>
+        <h3>@VERSION@ <small>[@BUILD@]</small></h3>
         </td>
     <td><a href="https://hrivnac.web.cern.ch/hrivnac/Activities/Packages/JHTools" target="RESULT">JHTools Home</a>
         </td>
