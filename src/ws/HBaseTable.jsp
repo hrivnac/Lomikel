@@ -20,18 +20,20 @@
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
 <head>
-  <link href="sortable.css" rel="stylesheet" type="text/css"/>
-  <script type="text/javascript" src="sortable.js"></script>
-  <script type="text/javascript" src="HBaseTable.js"></script>
   </head>
   
 <body bgcolor="#ddddff">
-  <div id="hbasetable">
+  <link href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script> 
+  <script type="text/javascript" src="bootstrap-table-1.16.0/dist/bootstrap-table.min.js"></script>
+  <script type="text/javascript" src="HBaseTable.js"></script>
+  <div id='hbasetable'>
     <%  
       // TBD: make period time type
       // TBD: make list of shown columns selectable
       String hbase     = request.getParameter("hbase");
-      String table     = request.getParameter("table");
+      String htable    = request.getParameter("htable");
       String key       = request.getParameter("key");
       String krefix    = request.getParameter("krefix");
       String columns   = request.getParameter("columns");
@@ -40,11 +42,11 @@
       String sizeS     = request.getParameter("size");
       String limitS    = request.getParameter("limit");
       String periodS   = request.getParameter("period");
-      if (hbase == null || hbase.trim().equals("") ||
-          table == null || table.trim().equals("")) {
+      if (hbase  == null || hbase.trim( ).equals("") ||
+          htable == null || htable.trim().equals("")) {
         // TBD: make it error
         }
-      out.println("<b><u>" + table + "@" + hbase + "</u></b>");
+      out.println("<b><u>" + htable + "@" + hbase + "</u></b>");
       key       = (key     == null                            ) ? "" : key;
       krefix    = (krefix  == null                            ) ? "" : krefix;
       columns   = (columns == null                            ) ? "" : columns;
@@ -71,8 +73,8 @@
         stopL  = stopC.getTimeInMillis();
         }
       %>
-    <input type="hidden" id="hbase" value="<%=hbase%>">
-    <input type="hidden" id="table" value="<%=table%>">
+    <input type="hidden" id="hbase"  value="<%=hbase%>">
+    <input type="hidden" id="htable" value="<%=htable%>">
     <!-- TBD: add size,version -->
     <table>
       <tr><td><b>Exact Key:</b> </td>
@@ -122,7 +124,7 @@
       // TBD: show also version, size, period
       HBaseClient h = new HBaseClient(hbase);
       HBase2Table h2table = new HBase2Table();
-      JSONObject json = h.get2JSON(table,
+      JSONObject json = h.get2JSON(htable,
                                    "schema_*");
       Map<String, Map<String, String>> schemas = h2table.table(json, 0);
       if (schemas != null && !schemas.isEmpty()) {
@@ -138,11 +140,11 @@
         h2table.setSchema(schema);
         }
       if (!key.equals("")) {
-        json = h.get2JSON(table,
+        json = h.get2JSON(htable,
                           key);
         }
       else {
-        json = h.scan2JSON(table,
+        json = h.scan2JSON(htable,
                            filterMap,
                            size,
                            startL,
@@ -152,7 +154,7 @@
         h2table.setColumns(columns.split(","));
         }
       String html = h2table.htmlTable(json, limit);
-      out.println(html);
       %>
+    <%=html%>
     </div>
   </body>

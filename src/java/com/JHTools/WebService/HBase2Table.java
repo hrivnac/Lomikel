@@ -103,43 +103,38 @@ public class HBase2Table {
     for (String column : columnsSet) {
       columns.add(column);
       }
-    String html = "<div id='hbasetable'><table class='sortable'>";
-    html += "<thead><tr><td></td>";
+    String html = "<table id='table'><thead><tr><td></td>";
     for (String column : columns) {
-      html += "<td><b><u>" + column + "</u></b>";
+      html += "<th data-field='" + column + "'><b><u>" + column + "</u></b>";
       if (_schema != null) {
         html += "<br/>" + _schema.type(column);
         }
-      html += "</td>";
+      html += "</th>";
       }
-    html += "</tr></thead>";
+    html += "</tr></thead></table></div>";
+    html += "<script>\n";
+    html += "var $table = $('#table')\n";
+    html += "$(function(){\n";
+    html += "var data = [\n";
     String content;
     String id;
     for (Map.Entry<String, Map<String, String>> entry : table.entrySet()) {
       if (entry.getKey().startsWith("schema")) {
         continue;
         }
-      html += "<tr><td valign='top'><b>" + entry.getKey() + "</b></td>";
+      html += "{\n";
+      html += "'key':'" + entry.getKey() + "',\n";
       for (String column : columns) {
         content = entry.getValue().get(column);
-        html += "<td>";
-        if (content == null) {
-          html += "";
-          }
-        else if (content.length() > 100) {
-          id = entry.getKey().replaceAll("\\.", "").replaceAll("\\/", "") + column;
-          content = "<pre>" + content.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">","&gt;").replaceAll("\"","&quot;").replaceAll("\n", "<br/>") + "</pre>";
-          html += content.substring(0, 20) + "...&nbsp<button onclick=\"" + id + "()\">full</button><script>function " + id + "() {var myWindow = window.open(\"\", \"\", \"width=500,height=500\");myWindow.document.write(\"" + content + "\");}</script>";
-          }
-        else {
-          html += "<pre>" + content + "</pre>";
-          }
-        html += "</td>";
+        html += "'" + column + "':'" + entry.getValue().get(column) + "',\n";
         }
-      html += "</tr>";
+      html += "},\n";
       }
-    html += "</table></div>";
-    return html;
+    html += "]\n";
+    html += "$table.bootstrapTable({data: data})\n";
+    html += "})\n";
+    html += "</script>";
+    return html.replaceAll(",\n}", "\n}").replaceAll(",\n]", "\n]");
     } 
 
   /** Set overall {@link Schema}.

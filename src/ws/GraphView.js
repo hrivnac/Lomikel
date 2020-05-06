@@ -602,5 +602,5 @@ function stylesheetValue(nam, id, eMap, ifEdge, title) {
   
 // Load page into Result pane
 async function loadResult(url) {
-  document.getElementById('result').innerHTML = await(await fetch(url)).text();
+  $("#result").load(url);
   }
