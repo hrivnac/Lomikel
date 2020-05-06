@@ -244,16 +244,16 @@
     <copy todir="../dist">
 			<fileset dir="../lib" includes="*.jar"/>
       </copy>
-    <mkdir dir="../dist/ws"/>
-    <copy todir="../dist/ws">
+    <mkdir dir="../dist/ws-${version}"/>
+    <copy todir="../dist/ws-${version}">
 			<fileset dir="../src/ws" includes="*/**"/>
       </copy>
-    <mkdir dir="../dist/src/gremlin"/>
-    <copy todir="../dist/src/gremlin">
+    <mkdir dir="../dist/src-${version}/gremlin"/>
+    <copy todir="../dist/src-${version}/gremlin">
 			<fileset dir="../src/gremlin" includes="*/**"/>
       </copy>
-    <mkdir dir="../dist/src/sh"/>
-    <copy todir="../dist/src/sh">
+    <mkdir dir="../dist/src-${version}/sh"/>
+    <copy todir="../dist/src-${version}/sh">
 			<fileset dir="../src/sh" includes="*/**"/>
       </copy>
   </target>
@@ -375,7 +375,6 @@
   <target name="uml"
           depends="init"
           description="Create UML Graph">
-    <!-- TBDmkdir dir="../doc/UML"/>
     <pathconvert targetos="unix" property="classpath.run" refid="classpath.run"/>
 	  <apply executable="javadoc" dest="../build" parallel="true">
 		  <arg value="-classpath"/>
@@ -399,7 +398,7 @@
 		  <srcfile/>
 		  <fileset dir="../doc"/>
 		  <mapper type="glob" from="*.dot" to="*.jpg"/>
-      </apply-->
+      </apply>
     </target>
 
   <!-- Find Bugs ============================================================-->  
