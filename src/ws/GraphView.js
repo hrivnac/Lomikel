@@ -17,12 +17,16 @@ var container = document.getElementById('visnetwork');
 var network;
 
 // Initial Gremlin call
-function bootstrap() {
+function bootstrap(button) {
+  var server  =  document.getElementById('gremlin_server').value;
+  var command =  document.getElementById('bootstrap_command').value;
+  if (button == 'selection') {
+    command = document.getElementById('bootstrap_graph').value;
+    }
   nodes.length = 0;
   // edges.length = 0;
-  document.getElementById("feedback").innerHTML = "";
-  callGremlinGraph(document.getElementById('bootstrap_command').value,
-                   document.getElementById('gremlin_server').value);
+  callGremlinGraph(command,
+                   server);
   }
   
 // Send request to Gremlin server giving Graphson graph
@@ -60,7 +64,7 @@ function callGremlinValues(request, newServer) {
 // Parse Graphson graph
 function parseGraph(graphson) {
   var g = JSON.parse(graphson).result.data['@value'];
-  document.getElementById("feedback").innerHTML += "Showing " + g.length + " new elements # ";
+  document.getElementById("feedback").innerHTML += "Showing " + g.length + " new elements<br/>";
   var label;
   var id;
   var properties;
@@ -279,7 +283,7 @@ function show(graph) {
         }
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
-        document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
+        document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + "<br/>";
         if (document.getElementById('removeOld').checked) {
           nodes.length = 0;
           //edges.length = 0;
@@ -305,7 +309,7 @@ function show(graph) {
 // Expand from database
 function expand(id, type) {
   var selectedNode = findObjectByKey(nodes, 'id', id);
-  document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label;
+  document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + "<br/>";
   if (document.getElementById('removeOld').checked) {
     nodes.length = 0;
     edges.length = 0;
@@ -413,7 +417,7 @@ function clusterExpand() {
 function fillEdges() {
   for (var i = 0; i < nodes.length; i++) {
     var selectedNode = nodes[i];
-    document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + " # ";
+    document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + "<br/>";
     if (document.getElementById('expandTo').checked) {
        callGremlinGraph("g.V(" + selectedNode.id + ").outE()");
       }

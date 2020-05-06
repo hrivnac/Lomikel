@@ -65,7 +65,7 @@ public class HBase2Table {
       for (int j = 0; j < cells.length(); j++) {
         column = Coding.decode(cells.getJSONObject(j).getString("column"));
         value  = Coding.decode(cells.getJSONObject(j).getString("$"));
-        if (!key.startsWith("schema")) {
+        if (!key.startsWith("schema") && _schema != null) {
           value = _schema.decode(column, value);
           }
         entry.put(column, value);
@@ -107,7 +107,9 @@ public class HBase2Table {
     html += "<thead><tr><td></td>";
     for (String column : columns) {
       html += "<td><b><u>" + column + "</u></b>";
-      html += "<br/>" + _schema.type(column);
+      if (_schema != null) {
+        html += "<br/>" + _schema.type(column);
+        }
       html += "</td>";
       }
     html += "</tr></thead>";

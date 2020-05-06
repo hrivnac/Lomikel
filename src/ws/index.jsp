@@ -43,7 +43,8 @@
 
       <div class="grid-stack-item" data-gs-x="0" data-gs-y="3" data-gs-width="4" data-gs-height="1">
         <div class="grid-stack-item-content" id="feedback" title="operation feedback" style="background-color:#ddddff">
-          --- operation feedback ---
+          <p style="color:red;font-size:15px">Select <b>graph server</b> and initial <b>graph</b>,<br/>
+                                              then select an <b>element</b> to see possible actions.</p>
           </div>
         </div>
       

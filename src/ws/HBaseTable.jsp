@@ -125,7 +125,7 @@
       JSONObject json = h.get2JSON(table,
                                    "schema_*");
       Map<String, Map<String, String>> schemas = h2table.table(json, 0);
-      if (!schemas.isEmpty()) {
+      if (schemas != null && !schemas.isEmpty()) {
         Map<String, String> schemaMap = null;
         if (version != null && !version.trim().equals("")) {
           schemaMap = schemas.get("schema_" + version);
@@ -148,7 +148,7 @@
                            startL,
                            stopL);
         }
-      if (columns != null) {
+      if (!columns.equals("")) {
         h2table.setColumns(columns.split(","));
         }
       String html = h2table.htmlTable(json, limit);

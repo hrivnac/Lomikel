@@ -1,0 +1,4 @@
+#feedback {
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  }
