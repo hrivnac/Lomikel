@@ -77,13 +77,12 @@ public class HBase2Table {
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
     * @param json  The {@link JSONObject} representation of the HBase table.
-    * @param limit Max number of rows.
-    * @return     The table as html string. */
-  public String htmlTable(JSONObject json,
+    * @param limit Max number of rows. */
+  public void process(JSONObject json,
                           int        limit) {
     Map<String, Map<String, String>> table = table(json, limit);
     if (table == null) {
-      return "";
+      return;
       }
     Set<String> columnsSet = new TreeSet<>();
     for (Map<String, String> entry : table.values()) {
@@ -103,38 +102,36 @@ public class HBase2Table {
     for (String column : columnsSet) {
       columns.add(column);
       }
-    String html = "<table id='table'><thead><tr><td></td>";
+    _thead = "";
     for (String column : columns) {
-      html += "<th data-field='" + column + "'><b><u>" + column + "</u></b>";
+      _thead += "<th data-field='" + column + "' data-sortable='true' data-visible='false'><b><u>" + column + "</u></b>";
       if (_schema != null) {
-        html += "<br/>" + _schema.type(column);
+        _thead += "<br/>" + _schema.type(column);
         }
-      html += "</th>";
+      _thead += "</th>";
       }
-    html += "</tr></thead></table></div>";
-    html += "<script>\n";
-    html += "var $table = $('#table')\n";
-    html += "$(function(){\n";
-    html += "var data = [\n";
     String content;
     String id;
+    _data = "";
+    boolean firstEntry = true;
     for (Map.Entry<String, Map<String, String>> entry : table.entrySet()) {
       if (entry.getKey().startsWith("schema")) {
         continue;
         }
-      html += "{\n";
-      html += "'key':'" + entry.getKey() + "',\n";
+      if (!firstEntry) {
+        _data += ",";
+        }
+      else {
+        firstEntry = false;
+        }
+      _data += "{\n";
+      _data += "'key':'" + entry.getKey() + "'\n";
       for (String column : columns) {
         content = entry.getValue().get(column);
-        html += "'" + column + "':'" + entry.getValue().get(column) + "',\n";
+        _data += ",'" + column + "':'" + entry.getValue().get(column) + "'\n";
         }
-      html += "},\n";
+      _data += "}\n";
       }
-    html += "]\n";
-    html += "$table.bootstrapTable({data: data})\n";
-    html += "})\n";
-    html += "</script>";
-    return html.replaceAll(",\n}", "\n}").replaceAll(",\n]", "\n]");
     } 
 
   /** Set overall {@link Schema}.
@@ -144,9 +141,23 @@ public class HBase2Table {
     _schema = schema;
     }
     
+  /** TBD */
+  public String thead() {
+    return _thead;
+    }
+    
+  /** TBD */
+  public String data() {
+    return _data;
+    }
+    
   private Schema _schema;
     
   private List<String> _columns;
+  
+  private String _thead;
+  
+  private String _data;
   
   private int _height = 0;
 

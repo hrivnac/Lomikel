@@ -11,3 +11,4 @@ async function search() {
   var query = "hbase=" + hbase + "&htable=" + htable + "&key=" + key + "&krefix=" + krefix + "&filters=" + filters + "&columns=" + columns + "&limit=" + limit + "&period=" + period;
   $("#hbasetable").load("HBaseTable.jsp?" + query);
   }
+  
