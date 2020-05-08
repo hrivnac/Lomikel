@@ -1,26 +1,24 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
+<!DOCTYPE html>
+<html lang='en'>
+
 <!-- JHTools JSP -->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
-<%@ page import="com.JHTools.Utils.Info"%>
-
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
-<!DOCTYPE html>
-<html>
-
   <head>
-    <title>JHTools Browser</title>
+  <title>JHTools Browser</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link href="index.css"                                           rel="stylesheet" type="text/css"/>
   <link href="GraphView.css"                                       rel="stylesheet" type="text/css"/>
   <link href="HBaseTable.css"                                      rel="stylesheet" type="text/css"/>
   <link href="gridstack-1.1.1/dist/gridstack.min.css"              rel="stylesheet" type="text/css"/>
   <link rel="stylesheet" href="bootstrap-4.4.1/css/bootstrap.min.css" type="text/css">
   <link rel="stylesheet" href="fontawesome-free-5.13.0-web/css/all.css" type="text/css">
   <link rel="stylesheet" href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css" type="text/css">
+  <link rel="stylesheet" href="index.css"                                           type="text/css"/>
     </head>
     
   <body>    

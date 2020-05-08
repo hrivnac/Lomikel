@@ -158,8 +158,6 @@ public class HBase2Table {
   private String _thead;
   
   private String _data;
-  
-  private int _height = 0;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(HBase2Table.class);
