@@ -31,11 +31,18 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBase2Table {
     
-  /** Set prefered sequence of columns.
-    * All other columns will be shown after, in alphabetic order.
-    * @param columns The prefered sequence of columns. */
-  public void setColumns(String[] columns) {
-    _columns = Arrays.asList(columns);
+  /** Set columns to show.
+    * @param showColumns  The columns to be shown.
+    *                     All columns will be shown if <tt>null</tt> or empty. */  
+   public void setShowColumns(String[] showColumns) {
+    _showColumns = Arrays.asList(showColumns);
+    }  
+    
+  /** Set first colums to show.
+    * @param firstColumns The columns to be shown first.
+    *                     All other columns will be shown after, in alphabetic order. */
+  public void setFirstColumns(String[] firstColumns) {
+    _firstColumns = Arrays.asList(firstColumns);
     }  
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
@@ -79,7 +86,7 @@ public class HBase2Table {
     * @param json  The {@link JSONObject} representation of the HBase table.
     * @param limit Max number of rows. */
   public void process(JSONObject json,
-                          int        limit) {
+                          int    limit) {
     Map<String, Map<String, String>> table = table(json, limit);
     if (table == null) {
       return;
@@ -87,12 +94,14 @@ public class HBase2Table {
     Set<String> columnsSet = new TreeSet<>();
     for (Map<String, String> entry : table.values()) {
       for (String column : entry.keySet()) {
-        columnsSet.add(column);
+        if (_showColumns == null || _showColumns.isEmpty() || _showColumns.contains(column)) {  
+          columnsSet.add(column);
+          }
         }
       }
     List<String> columns = new ArrayList<>();
-    if (_columns != null) {
-      for (String column : _columns) {
+    if (_firstColumns != null && !_firstColumns.isEmpty()) {
+      for (String column : _firstColumns) {
         if (columnsSet.contains(column)) {
           columns.add(column);
           columnsSet.remove(column);
@@ -153,7 +162,9 @@ public class HBase2Table {
     
   private Schema _schema;
     
-  private List<String> _columns;
+  private List<String> _showColumns;
+    
+  private List<String> _firstColumns;
   
   private String _thead;
   

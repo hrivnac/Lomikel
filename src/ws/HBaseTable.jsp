@@ -22,12 +22,12 @@
 <div id='hbasetable'>
   <%  
     // TBD: make period time type
-    // TBD: make list of shown columns selectable
     String hbase     = request.getParameter("hbase");
     String htable    = request.getParameter("htable");
     String key       = request.getParameter("key");
     String krefix    = request.getParameter("krefix");
     String columns   = request.getParameter("columns");
+    String selects   = request.getParameter("selects");
     String filters   = request.getParameter("filters");
     String version   = request.getParameter("version");
     String sizeS     = request.getParameter("size");
@@ -42,27 +42,11 @@
     krefix    = (krefix  == null                            ) ? "" : krefix;
     columns   = (columns == null                            ) ? "" : columns;
     filters   = (filters == null                            ) ? "" : filters;
+    selects   = (selects == null                            ) ? "" : selects;
     version   = (version == null                            ) ? "" : version;
     periodS   = (periodS == null                            ) ? "" : periodS;
     int size  = (sizeS   == null || sizeS.trim( ).equals("")) ? 0  : Integer.parseInt(sizeS);
     int limit = (limitS  == null || limitS.trim().equals("")) ? 0  : Integer.parseInt(limitS);
-    long startL = 0;
-    long stopL  = 0;
-    if (periodS != null && !periodS.trim().equals("")) {
-      out.println("<b>period:</b> "  + periodS + "<br/>");
-      String[] period  = periodS.split("-");
-      String start = period[0].trim();
-      String stop  = period[1].trim();
-      DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-      Date startD = formatter.parse(start);
-      Date stopD  = formatter.parse(stop);
-      Calendar startC = GregorianCalendar.getInstance();
-      Calendar stopC  = GregorianCalendar.getInstance();
-      startC.setTime(startD);
-      stopC.setTime(stopD);
-      startL = startC.getTimeInMillis();
-      stopL  = stopC.getTimeInMillis();
-      }
     %>
   <input type="hidden" id="hbase"  value="<%=hbase%>">
   <input type="hidden" id="htable" value="<%=htable%>">
@@ -77,6 +61,9 @@
     <tr><td><b>Columns Search:</b></td>
         <td><input type="text" id="filters" size="40" value="<%=filters%>"></td>
         <td>family:column:value,family:column:value,...(substring search)</td></tr>
+    <tr><td><b>Columns Show:</b></td>
+        <td><input type="text" id="selects" size="40" value="<%=selects%>"></td>
+        <td>family:column:value,family:column:value,...</td></tr>
     <tr><td><b>Columns Show First:</b></td>
         <td><input type="text" id="columns" size="40" value="<%=columns%>"></td>
         <td>family:column,family:column,...</td></tr>
@@ -84,12 +71,29 @@
         <td><input type="number" id="limit" size="5" value="<%=limit%>"></td>
         <td>int</td></tr>
     <tr><td><b>Period:</b></td>
-        <td><input type="text" id="period" size="40" value="<%=periodS%>"></td>
-        <td>dd/MM/yyyy HH:mm-dd/MM/yyyy HH:mm</td></tr>
+        <td><input type="text" id="period" size="40"></td>
+        <td></td></tr>
     <tr><td colspan="3"><button onclick="search()">Search</button></td></tr>
     </table>
   <hr/>
   <%
+    long startL = 0;
+    long stopL  = 0;
+    if (periodS != null && !periodS.trim().equals("")) {
+      out.println("<b>period:</b> "  + periodS + "<br/>");
+      /*String[] period  = periodS.split("-");
+      String start = period[0].trim();
+      String stop  = period[1].trim();
+      DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+      Date startD = formatter.parse(start);
+      Date stopD  = formatter.parse(stop);
+      Calendar startC = GregorianCalendar.getInstance();
+      Calendar stopC  = GregorianCalendar.getInstance();
+      startC.setTime(startD);
+      stopC.setTime(stopD);
+      startL = startC.getTimeInMillis();
+      stopL  = stopC.getTimeInMillis();*/
+      }
     Map<String, String> filterMap = new HashMap<>();
     if (!key.equals("")) {
       out.println("<b>key</b> is <b>" + key + "</b><br/>");
@@ -106,13 +110,19 @@
         filterMap.put(term[0] + ":" + term[1], term[2] + ":SubstringComparator");
         }
       }
+    if (!selects.equals("")) {
+      out.println("showing only columns <b>" + selects + "</b><br/>");
+      }
     if (!columns.equals("")) {
       out.println("showing first columns <b>" + columns + "</b><br/>");
       }
     if (limit > 0) {
-      out.println("showing only <b>" + limit + "</b> results<br/>");
+      out.println("showing only <b>" + limit + "</b> rows<br/>");
       }
-    // TBD: show also version, size, period
+    if (size > 0) {
+      out.println("showing only <b>" + size + "</b> cells<br/>");
+      }
+    // TBD: show also version, period
     HBaseClient h = new HBaseClient(hbase);
     HBase2Table h2table = new HBase2Table();
     JSONObject json = h.get2JSON(htable,
@@ -141,8 +151,11 @@
                          startL,
                          stopL);
       }
-    if (!columns.equals("")) {
-      h2table.setColumns(columns.split(","));
+    if (! selects.equals("")) {
+      h2table.setShowColumns(selects.split(","));
+      }
+    if (! columns.equals("")) {
+      h2table.setFirstColumns(columns.split(","));
       }
     h2table.process(json, limit);
     %>
@@ -168,23 +181,62 @@
   <thead><tr><th data-field='key' data-sortable='true'>key</th>
     <%=h2table.thead()%>
     </tr></thead></table></div>
+    
   <script>
     var $table = $('#table')
     $(function() { 
-    var data = [
-    <%=h2table.data()%>
-    ]    
-    $table.bootstrapTable({data: data})
-    $table.bootstrapTable('refreshOptions', {classes: 'table table-bordered table-hover table-striped table-sm'})
-    $table.bootstrapTable('refreshOptions', {theadClasses: 'thead-light'})
-    $table.bootstrapTable('refreshOptions', {sortable: 'true'})
-    })
-  function detailFormatter(index, row) {
-    var html = []
-    $.each(row, function (key, value) {
-      html.push('<b>' + key + ':</b> ' + value + '<br/>')
+      var data = [
+        <%=h2table.data()%>
+        ]    
+      $table.bootstrapTable({data: data})
+      $table.bootstrapTable('refreshOptions', {classes: 'table table-bordered table-hover table-striped table-sm'})
+      $table.bootstrapTable('refreshOptions', {theadClasses: 'thead-light'})
+      $table.bootstrapTable('refreshOptions', {sortable: 'true'})
       })
-    return html.join('')
-    }
+    function detailFormatter(index, row) {
+      var html = []
+      $.each(row, function (key, value) {
+        html.push('<b>' + key + ':</b> ' + value + '<br/>')
+        })
+      return html.join('')
+      }
     </script>
+    
+  <script>
+    $('#period').daterangepicker({
+        singleDatePicker: false,    
+        showDropdowns: true,
+        showWeekNumbers: false,
+        showISOWeekNumbers: false,
+        timePicker: true,
+        timePicker24Hour: true,
+        timePickerIncrement: 10,
+        timePickerSeconds: false,    
+        autoApply: true,
+        ranges: {
+          'Today': [moment(), moment()],
+          'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month': [moment().startOf('month'), moment().endOf('month')],
+          'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+          },
+        locale: {
+          format: 'DD/MM/YYYY HH:mm'
+          },
+        linkedCalendars: false,
+        autoUpdateInput: true,
+        showCustomRangeLabel: true,
+        alwaysShowCalendars: true,
+        startDate: moment().subtract(6, 'days'),
+        endDate: moment(),
+        opens: "right",
+        drops: "down"
+        },
+      function(start, end, label) {
+        $(this).val(start.format('DD/MM/YYYY HH:mm') + ' – ' + end.format('DD/MM/YYYY HH:mm'));
+        }
+      );
+    </script>
+    
   </div>

@@ -1,7 +1,21 @@
-.select,
-#locale {
+.select, #locale {
   width: 100%;
   }
+  
 .like {
   margin-right: 10px;
   }
+  
+.date-range-picker {
+  position: relative;
+  }
+  
+.date-range-picker i {
+  position: absolute;
+  bottom: 10px;
+  right: 24px;
+  top: auto;
+  cursor: pointer;
+  }
+      
+  

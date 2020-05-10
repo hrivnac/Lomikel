@@ -1,0 +1,44 @@
+{
+  "name": "knockout-daterangepicker",
+  "description": "Date range selector with support for day, week, month, quarter & year selection",
+  "main": [
+    "dist/daterangepicker.js",
+    "dist/daterangepicker.css"
+  ],
+  "moduleType": "globals",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "/website",
+    "/test",
+    "/gulpfile.babel.js",
+    "/package.json"
+  ],
+  "keywords": [
+    "daterangepicker",
+    "date",
+    "range",
+    "picker",
+    "sensortower",
+    "sensor",
+    "tower"
+  ],
+  "authors": "Sensor Tower team",
+  "homepage": "https://sensortower.github.io/daterangepicker",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sensortower/daterangepicker"
+  },
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "moment": "~2.10.6",
+    "knockout": "~3.4.0",
+    "moment-timezone": "~0.4.1"
+  },
+  "devDependencies": {
+    "chai": "~3.4.0",
+    "mocha": "~2.3.3",
+    "highlightjs": "~8.9.1"
+  },
+  "private": false
+}

@@ -9,29 +9,35 @@
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
   <head>
-  <title>JHTools Browser</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link href="GraphView.css"                                       rel="stylesheet" type="text/css"/>
-  <link href="HBaseTable.css"                                      rel="stylesheet" type="text/css"/>
-  <link href="gridstack-1.1.1/dist/gridstack.min.css"              rel="stylesheet" type="text/css"/>
-  <link rel="stylesheet" href="bootstrap-4.4.1/css/bootstrap.min.css" type="text/css">
-  <link rel="stylesheet" href="fontawesome-free-5.13.0-web/css/all.css" type="text/css">
-  <link rel="stylesheet" href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css" type="text/css">
-  <link rel="stylesheet" href="index.css"                                           type="text/css"/>
+    <title>JHTools Browser</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="GraphView.css"                                       rel="stylesheet" type="text/css"/>
+    <link href="HBaseTable.css"                                      rel="stylesheet" type="text/css"/>
+    <link href="gridstack-1.1.1/dist/gridstack.min.css"              rel="stylesheet" type="text/css"/>
+    <link href="bootstrap-4.4.1/css/bootstrap.min.css"               rel="stylesheet" type="text/css">
+    <link href="fontawesome-free-5.13.0-web/css/all.css"             rel="stylesheet" type="text/css">
+    <link href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css" rel="stylesheet" type="text/css">
+    <link href="jquery-ui-1.12.1/jquery-ui.min.css"                  rel="stylesheet" type="text/css"/>
+    <link href="daterangepicker-0.1.0/dist/daterangepicker.css"      rel="stylesheet" type="text/css"/>
+    <link href="index.css"                                           rel="stylesheet" type="text/css"/>
     </head>
     
   <body>    
     <script type="text/javascript" src="vis-network-7.3.6/standalone/umd/vis-network.min.js"></script> 
     <script type="text/javascript" src="OptionsDefault.js"></script>
     <script type="text/javascript" src="Options.js"></script>
-    <script type="text/javascript" src="HBaseTable.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script type="text/javascript" src="gridstack-1.1.1/dist/gridstack.all.js"></script>
     <script type="text/javascript" src="bootstrap-4.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="bootstrap-table-1.16.0/dist/bootstrap-table.min.js"></script>
-   
+    <script type="text/javascript" src="knockout-3.2.0.js"></script>
+    <script type="text/javascript" src="moment-2.25.2.js"></script>
+    <script type="text/javascript" src="daterangepicker-0.1.0/dist/daterangepicker.js"></script>
+    <script type="text/javascript" src="HBaseTable.js"></script>
+  
     <div class="row">
       <div class="col-sm-12" style="padding-bottom: 25px;">
         <div style="padding: 15px; border: 1px grey">

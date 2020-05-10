@@ -191,7 +191,6 @@ function show(graph) {
         for (var k = 0; k < actionsArray.length; k++) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, false, title);
           actions += "<a href='#' onclick='loadResult(\"" + url + "\")'>" + actionsArray[k].name + "</a>";
-          console.log(actionsArray[k].embedded);
           if (!actionsArray[k].embedded) {
             actions += "(<a href='" + url + "' target='_blank'>*</a>)";
             }

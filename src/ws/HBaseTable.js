@@ -5,10 +5,11 @@ async function search() {
   var key     = document.getElementById("key"    ).value;
   var krefix  = document.getElementById("krefix" ).value;
   var columns = document.getElementById("columns").value;
+  var selects = document.getElementById("selects").value;
   var filters = document.getElementById("filters").value;
   var limit   = document.getElementById("limit"  ).value;
   var period  = document.getElementById("period" ).value;
-  var query = "hbase=" + hbase + "&htable=" + htable + "&key=" + key + "&krefix=" + krefix + "&filters=" + filters + "&columns=" + columns + "&limit=" + limit + "&period=" + period;
+  var query = "hbase=" + hbase + "&htable=" + htable + "&key=" + key + "&krefix=" + krefix + "&filters=" + filters + "&selects=" + selects + "&columns=" + columns + "&limit=" + limit + "&period=" + encodeURIComponent(period);
   $("#hbasetable").load("HBaseTable.jsp?" + query);
   }
   

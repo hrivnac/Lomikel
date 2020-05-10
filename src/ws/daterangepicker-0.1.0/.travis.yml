@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - "node"
+before_script:
+  - npm install -g bower gulp
+  - bower install
+  - gulp clean
+script: gulp travis-ci
