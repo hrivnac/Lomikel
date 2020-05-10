@@ -71,7 +71,7 @@
         <td><input type="number" id="limit" size="5" value="<%=limit%>"></td>
         <td>int</td></tr>
     <tr><td><b>Period:</b></td>
-        <td><input type="text" id="period" size="40"></td>
+        <td><input type="text" id="period" size="40" value="<%=periodS%>"></td>
         <td></td></tr>
     <tr><td colspan="3"><button onclick="search()">Search</button></td></tr>
     </table>
@@ -81,7 +81,7 @@
     long stopL  = 0;
     if (periodS != null && !periodS.trim().equals("")) {
       out.println("<b>period:</b> "  + periodS + "<br/>");
-      /*String[] period  = periodS.split("-");
+      String[] period  = periodS.split("-");
       String start = period[0].trim();
       String stop  = period[1].trim();
       DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -92,7 +92,7 @@
       startC.setTime(startD);
       stopC.setTime(stopD);
       startL = startC.getTimeInMillis();
-      stopL  = stopC.getTimeInMillis();*/
+      stopL  = stopC.getTimeInMillis();
       }
     Map<String, String> filterMap = new HashMap<>();
     if (!key.equals("")) {
@@ -234,7 +234,7 @@
         drops: "down"
         },
       function(start, end, label) {
-        $(this).val(start.format('DD/MM/YYYY HH:mm') + ' – ' + end.format('DD/MM/YYYY HH:mm'));
+        $(this).val(start.format('DD/MM/YYYY HH:mm') + ' - ' + end.format('DD/MM/YYYY HH:mm'));
         }
       );
     </script>
