@@ -6,6 +6,7 @@
 <%@ page import="com.JHTools.HBaser.HBaseClient" %>
 <%@ page import="com.JHTools.HBaser.Schema" %>
 <%@ page import="com.JHTools.WebService.HBase2Table" %>
+<%@ page import="com.JHTools.WebService.BinaryDataRepository" %>
 
 <%@ page import="org.json.JSONObject" %>
 
@@ -18,6 +19,11 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
+
+<!--%
+  session.removeAttribute("bdr");
+  %-->
+<jsp:useBean id="bdr" class="com.JHTools.WebService.BinaryDataRepository" scope="session" />
 
 <div id='hbasetable'>
   <%  
@@ -158,6 +164,7 @@
       h2table.setFirstColumns(columns.split(","));
       }
     h2table.process(json, limit);
+    //bdr = h2table.repository();
     %>
   <table id='table'
          data-sortable='true'
@@ -196,7 +203,12 @@
     function detailFormatter(index, row) {
       var html = []
       $.each(row, function (key, value) {
-        html.push('<b>' + key + ':</b> ' + value + '<br/>')
+        if (value.startsWith('url:')) { // TBD: whould work also for other types
+          html.push('<b><a href="FITSView.jsp?id=' + value + '" target="_blank">' + key + '</a></b></br/>');
+          }
+        else {
+          html.push('<b>' + key + ':</b> ' + value + '<br/>')
+          }
         })
       return html.join('')
       }

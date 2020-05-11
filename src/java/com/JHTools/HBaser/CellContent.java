@@ -19,9 +19,10 @@ public class CellContent {
 	  }
 	  
   /** TBD */
-	public CellContent(byte[] content) {
+	public CellContent(byte[] content,
+	                   Type   type) {
 	  _bContent = content;
-	  _type = Type.BYTES;
+	  _type = type;
 	  }
 	  
   /** TBD */
@@ -33,7 +34,7 @@ public class CellContent {
 	public byte[] asBytes() {
 	  return _bContent;
 	  }
-
+	  
   /** TBD */
 	public boolean isString() {
 	  return _type == Type.STRING;
@@ -41,7 +42,7 @@ public class CellContent {
 	  
   /** TBD */
 	public boolean isBytes() {
-	  return _type == Type.BYTES;
+	  return !isString();
 	  }
 	  
 	/** TBD */
@@ -49,10 +50,9 @@ public class CellContent {
     if (isString()) {
       return "CellContent(String : " + _sContent + ")";
       }
-    else if (isBytes()) {
-      return "CellContent(bytes[] : " + _bContent + ")";
+    else {
+      return "CellContent(" + _type + " : " + _bContent + ")";
       }
-    return "CellContent()";
     }
 	  
 	private Type _type;  
@@ -61,7 +61,7 @@ public class CellContent {
   
 	private byte[] _bContent;
 	  
-  public static enum Type {STRING, BYTES};
+  public static enum Type {STRING, FITS};
   
   /** Logging . */
   private static Logger log = Logger.getLogger(CellContent.class);

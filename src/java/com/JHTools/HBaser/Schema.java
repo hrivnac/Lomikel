@@ -79,8 +79,8 @@ public class Schema {
       case "long": 
         value = new CellContent(String.valueOf(Bytes.toLong(Bytes.toBytes(encodedValue))));
         break;
-      case "binary": 
-        value = new CellContent(Bytes.toBytes(encodedValue));
+      case "binary":
+        value = new CellContent(Bytes.toBytes(encodedValue), CellContent.Type.FITS); // TBD: should be from schema
         break;
       default: // includes "string"
         value = new CellContent(encodedValue);

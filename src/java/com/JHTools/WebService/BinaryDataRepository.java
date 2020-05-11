@@ -3,6 +3,7 @@ package com.JHTools.WebService;
 // Java
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Base64;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -29,6 +30,21 @@ public class BinaryDataRepository {
   /** TBD */
 	public byte[] get(String id) {
 	  return _data.get(id);
+	  }
+	  
+  /** TBD */
+	public String get64(String id) {
+	  return Base64.getEncoder().encodeToString(_data.get(id));
+	  }
+	  
+	/** TBD */
+	public String toString() {
+	  String result = "BinaryDataRepository(" + _data.size() + ") = {";
+	  for (Map.Entry entry : _data.entrySet()) {
+      result += entry.getKey() + ",";
+      }
+	  result += "}";
+	  return result;
 	  }
 	  
   /** TBD */

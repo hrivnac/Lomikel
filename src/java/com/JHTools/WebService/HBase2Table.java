@@ -86,7 +86,7 @@ public class HBase2Table {
             entry.put(column, cc.asString());
             }
           else {
-            id = key + ":" + column;
+            id = "url:" + key + ":" + column;
             entry.put(column, id);
             _repository.put(id, cc.asBytes());
            }          
@@ -175,7 +175,6 @@ public class HBase2Table {
     
   /** TBD */
   public String data() {
-    log.info(_data);
     return _data;
     }
     
