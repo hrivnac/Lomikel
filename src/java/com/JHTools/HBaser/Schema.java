@@ -63,6 +63,32 @@ public class Schema {
     }
     
   /** TBD */
+  public CellContent decode2Content(String column,
+                                    String encodedValue) {
+    CellContent value;
+    switch (_schemaMap.get(column)) {
+      case "float": 
+        value = new CellContent(String.valueOf(Bytes.toFloat(Bytes.toBytes(encodedValue))));
+        break;
+      case "double": 
+        value = new CellContent(String.valueOf(Bytes.toDouble(Bytes.toBytes(encodedValue))));
+        break;
+      case "integer": 
+        value = new CellContent(String.valueOf(Bytes.toInt(Bytes.toBytes(encodedValue))));
+        break;
+      case "long": 
+        value = new CellContent(String.valueOf(Bytes.toLong(Bytes.toBytes(encodedValue))));
+        break;
+      case "binary": 
+        value = new CellContent(Bytes.toBytes(encodedValue));
+        break;
+      default: // includes "string"
+        value = new CellContent(encodedValue);
+      }
+    return value;
+    }
+    
+  /** TBD */
   public String encode(String column,
                        String decodedValue) {
     String value;

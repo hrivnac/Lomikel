@@ -2,6 +2,7 @@ package com.JHTools.WebService;
 
 import com.JHTools.Utils.Coding;
 import com.JHTools.HBaser.Schema;
+import com.JHTools.HBaser.CellContent;
 
 // org.json
 import org.json.JSONObject;
@@ -31,6 +32,11 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBase2Table {
     
+  /** TBD */
+  public HBase2Table() {
+    _repository = new BinaryDataRepository();
+    }
+  
   /** Set columns to show.
     * @param showColumns  The columns to be shown.
     *                     All columns will be shown if <tt>null</tt> or empty. */  
@@ -59,6 +65,8 @@ public class HBase2Table {
     String key;
     String column;
     String value;
+    CellContent cc;
+    String id;
     Map<String, Map<String, String>> entries = new HashMap<>();
     Map<String, String> entry;
     int n = 1;
@@ -73,12 +81,22 @@ public class HBase2Table {
         column = Coding.decode(cells.getJSONObject(j).getString("column"));
         value  = Coding.decode(cells.getJSONObject(j).getString("$"));
         if (!key.startsWith("schema") && _schema != null) {
-          value = _schema.decode(column, value);
+          cc = _schema.decode2Content(column, value);
+          if (cc.isString()) {
+            entry.put(column, cc.asString());
+            }
+          else {
+            id = key + ":" + column;
+            entry.put(column, id);
+            _repository.put(id, cc.asBytes());
+           }          
           }
-        entry.put(column, value);
+        else {
+          entry.put(column, value);
+          }
         }
       entries.put(key, entry);
-      }
+     }
     return entries;
     }
     
@@ -157,8 +175,16 @@ public class HBase2Table {
     
   /** TBD */
   public String data() {
+    log.info(_data);
     return _data;
     }
+    
+  /** TBD */
+  public BinaryDataRepository repository() {
+    return _repository;
+    }
+    
+  private BinaryDataRepository _repository;  
     
   private Schema _schema;
     
