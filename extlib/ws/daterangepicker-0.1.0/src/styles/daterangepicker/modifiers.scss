@@ -1,0 +1,91 @@
+.daterangepicker {
+  &.opened {
+    display: inline-flex;
+  }
+
+  &.expanded .calendar {
+    display: block;
+  }
+
+  &.hide-periods {
+    .periods {
+      display: none;
+    }
+
+    .calendar .calendar-title {
+      display: none;
+    }
+  }
+
+  &.standalone {
+    position: static;
+
+    .custom-range-buttons {
+      display: none;
+    }
+  }
+
+  &.hide-weekdays {
+    .weekdays {
+      display: none;
+    }
+  }
+
+  &.single {
+    flex-direction: column;
+
+    .ranges,
+    .custom-range-inputs,
+    .custom-range-buttons,
+    .calendar .calendar-title {
+      display: none;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+
+      .periods {
+        margin-bottom: 0;
+      }
+    }
+
+    .calendar .calendar-header {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .calendar .calendar-table {
+      border: none;
+      padding: 0;
+    }
+  }
+
+  &.single.hide-periods .controls {
+    display: none;
+  }
+
+  &.month-period .table-col {
+    font-size: 1.25em;
+  }
+
+  &.year-period .table-col {
+    font-size: 1.25em;
+  }
+
+  &.quarter-period .table-col {
+    flex-direction: column;
+    font-size: 2em;
+
+    .months {
+      font-size: 0.5em;
+      opacity: 0.75;
+    }
+  }
+
+  &.orientation-left:not(.single) {
+    .controls {
+      order: 2;
+    }
+  }
+}

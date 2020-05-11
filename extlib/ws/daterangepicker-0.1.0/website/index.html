@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <title>daterangepicker</title>
+    @@include('partials/_styles.html')
+
+  </head>
+  <body>
+    @@include('partials/_header.html', {"name": "index"})
+
+    <div class="top-padding"></div>
+
+    <section class="main-section">
+      <div class="container">
+        <div class="daterangepicker-container" data-bind="daterangepicker: dateRange, daterangepickerOptions: {standalone: true}"></div>
+      </div>
+    </section>
+
+    <section class="secondary-section">
+      <div class="container">
+        @@include(markdown('../README.md'))
+      </div>
+    </section>
+
+    @@include('partials/_footer.html')
+    @@include('partials/_scripts.html')
+    @@include('partials/_ga.html')
+  </body>
+</html>

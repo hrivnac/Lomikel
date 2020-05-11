@@ -1,0 +1,26 @@
+@mixin arrow($size, $color, $alignment) {
+  position: absolute;
+  top: - $size;
+  #{$alignment}: 16px - $size;
+  display: inline-block;
+  border-right: $size solid transparent;
+  border-bottom: $size solid $color;
+  border-left: $size solid transparent;
+  content: '';
+}
+
+.daterangepicker.orientation-right:not(.standalone):before {
+  @include arrow(7px, rgba(0,0,0,0.2), 'left')
+}
+
+.daterangepicker.orientation-left:not(.standalone):before {
+  @include arrow(7px, rgba(0,0,0,0.2), 'right')
+}
+
+.daterangepicker.orientation-right:not(.standalone):after {
+  @include arrow(6px, #fff, 'left')
+}
+
+.daterangepicker.orientation-left:not(.standalone):after {
+  @include arrow(6px, #fff, 'right')
+}
