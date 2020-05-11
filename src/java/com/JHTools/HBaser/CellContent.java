@@ -12,40 +12,47 @@ import org.apache.log4j.Logger;
 // TBD: better !
 public class CellContent {
 
-  /** TBD */
+  /** Create from {@link String}.
+    * @param content The content itself. */
 	public CellContent(String content) {
 	  _sContent = content;
 	  _type = Type.STRING;
 	  }
 	  
-  /** TBD */
+  /** Create from <tt>byte[]</tt>.
+    * @param content The content itself.
+    * @param         The content {@link Type}. */
 	public CellContent(byte[] content,
 	                   Type   type) {
 	  _bContent = content;
 	  _type = type;
 	  }
 	  
-  /** TBD */
+  /** Give {@link String} content.
+    * @return The {@link String} content. */
 	public String asString() {
 	  return _sContent;
 	  }
 	  
-  /** TBD */
+  /** Give <tt>byte[]</tt> content.
+    * @return The <tt>byte[]</tt> content. */  
 	public byte[] asBytes() {
 	  return _bContent;
 	  }
 	  
-  /** TBD */
+  /** Whether the content is a {@link String}.
+    * @return Whether the content is a {@link String}. */
 	public boolean isString() {
 	  return _type == Type.STRING;
 	  }
 	  
-  /** TBD */
+  /** Whether the content is a <tt>byte[]</tt>.
+    * @return Whether the content is a <tt>byte[]</tt>. */
 	public boolean isBytes() {
 	  return !isString();
 	  }
 	  
-	/** TBD */
+  @Override
   public String toString() {
     if (isString()) {
       return "CellContent(String : " + _sContent + ")";

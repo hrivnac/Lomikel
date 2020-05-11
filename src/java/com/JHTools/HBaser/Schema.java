@@ -36,7 +36,10 @@ public class Schema {
     _schemaMap = schemaMap;
     }
     
-  /** TBD */
+  /** Decode the column value.
+    * @param  column       The column to decode.
+    * @param  encodedValue The encoded value.
+    * @return              The decoded value. */
   public String decode(String column,
                        String encodedValue) {
     String value;
@@ -62,7 +65,10 @@ public class Schema {
     return value;
     }
     
-  /** TBD */
+  /** Decode the column value to {@link CellContent}..
+    * @param  column       The column to decode.
+    * @param  encodedValue The encoded value.
+    * @return              The decoded value. */
   public CellContent decode2Content(String column,
                                     String encodedValue) {
     CellContent value;
@@ -88,7 +94,10 @@ public class Schema {
     return value;
     }
     
-  /** TBD */
+  /** Encode the column value.
+    * @param  column       The column to encode.
+    * @param  decodedValue The decoded value.
+    * @return              The encoded value. */
   public String encode(String column,
                        String decodedValue) {
     String value;
@@ -114,7 +123,9 @@ public class Schema {
     return value;
     }
 
-  /** TBD */
+  /** Give the colun type (from {@link Schema}).
+    * @param column The column.
+    * @return       The column type. */
   public String type(String column) {
     return _schemaMap.get(column);
     }

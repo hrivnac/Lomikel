@@ -16,28 +16,34 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class BinaryDataRepository {
 
-  /** TBD */
+  /** Create. */
 	public BinaryDataRepository() {
 	  _data = new HashMap<>();
 	  }
 	  
-  /** TBD */
+  /** Put in a <tt>byte[]</tt> entry.
+    * @param id       The entry id.
+    * @param content  The entry content. */
 	public void put(String id,
 	                byte[] content) {
 	  _data.put(id, content);
 	  }
 	  
-  /** TBD */
+	/** Get a <tt>byte[]</tt> entry.
+	  * @param  id      The entry id.
+    * @return content The entry content. */
 	public byte[] get(String id) {
 	  return _data.get(id);
 	  }
 	  
-  /** TBD */
+	/** Get a <tt>byte[]</tt> entry, encoded in {@link Base64}.
+	  * @param  id      The entry id.
+    * @return content The entry content, encoded in {@link Base64}. */
 	public String get64(String id) {
 	  return Base64.getEncoder().encodeToString(_data.get(id));
 	  }
 	  
-	/** TBD */
+	@Override
 	public String toString() {
 	  String result = "BinaryDataRepository(" + _data.size() + ") = {";
 	  for (Map.Entry entry : _data.entrySet()) {
@@ -47,7 +53,6 @@ public class BinaryDataRepository {
 	  return result;
 	  }
 	  
-  /** TBD */
 	private static Map<String, byte[]> _data;
 
   /** Logging . */

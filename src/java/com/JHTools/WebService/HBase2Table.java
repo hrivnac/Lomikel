@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBase2Table {
     
-  /** TBD */
+  /** Create. */
   public HBase2Table() {
     _repository = new BinaryDataRepository();
     }
@@ -168,17 +168,20 @@ public class HBase2Table {
     _schema = schema;
     }
     
-  /** TBD */
+  /** Give the table header.
+    * @return The table header. */
   public String thead() {
     return _thead;
     }
     
-  /** TBD */
+  /** Give the table content.
+    * @return The table content. */
   public String data() {
     return _data;
     }
     
-  /** TBD */
+  /** Give the {@link BinaryDataRepository} with binary content.
+    * @return The {@link BinaryDataRepository} with binary content. */
   public BinaryDataRepository repository() {
     return _repository;
     }
