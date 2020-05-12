@@ -129,7 +129,6 @@ public class HBase2Table {
     for (String column : columnsSet) {
       columns0.add(column);
       }
-    // TBD: faster counting
     // TBD: support non-default columns
     List<String> columns = new ArrayList<>();
     for (String family : new String[]{"b", "i", "d"}) {
@@ -148,7 +147,7 @@ public class HBase2Table {
       if (column.startsWith("b:")) {
         formatter = "data-formatter='binaryFormatter'";
         }
-      _thead += "<th data-field='" + column + "' data-sortable='true' data-visible='false'" + formatter + "><b><u>" + column + "</u></b>";
+      _thead += "<th data-field='" + column + "' data-sortable='true' data-visible='false' " + formatter + "><b><u>" + column + "</u></b>";
       if (_schema != null) {
         _thead += "<br/>" + _schema.type(column);
         }

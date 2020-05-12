@@ -28,10 +28,6 @@ public class BinaryDataRepository {
     * @param content  The entry content. */
 	public void put(String id,
 	                byte[] content) {
-	   try {
-	     Files.write(new File("/tmp/" + id).toPath(), content);
-	     }
-	   catch (Exception e) {}
 	  _data.put(id, content);
 	  }
 	  

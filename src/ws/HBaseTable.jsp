@@ -58,28 +58,60 @@
   <input type="hidden" id="htable" value="<%=htable%>">
   <!-- TBD: add size,version -->
   <table>
-    <tr><td><b>Exact Key:</b> </td>
-        <td><input type="text" id="key" size="40" value="<%=key%>"></td>
-        <td>(exact search)</td></tr>
-    <tr><td><b>Prefix Key:</b> </td>
-        <td><input type="text" id="krefix" size="40" value="<%=krefix%>"></td>
-        <td>(prefix search)</td></tr>
-    <tr><td><b>Columns Search:</b></td>
-        <td><input type="text" id="filters" size="40" value="<%=filters%>"></td>
-        <td>family:column:value,family:column:value,...(substring search)</td></tr>
-    <tr><td><b>Columns Show:</b></td>
-        <td><input type="text" id="selects" size="40" value="<%=selects%>"></td>
-        <td>family:column:value,family:column:value,...</td></tr>
-    <tr><td><b>Columns Show First:</b></td>
-        <td><input type="text" id="columns" size="40" value="<%=columns%>"></td>
-        <td>family:column,family:column,...</td></tr>
-    <tr><td><b>Limit:</b></td>
-        <td><input type="number" id="limit" size="5" value="<%=limit%>"></td>
-        <td>int</td></tr>
-    <tr><td><b>Period:</b></td>
-        <td><input type="text" id="period" size="40" value="<%=periodS%>"></td>
-        <td></td></tr>
-    <tr><td colspan="3"><button onclick="search()">Search</button></td></tr>
+    <tr>
+      <td width="50%">
+        <table>
+          <tr><td><b>Exact Key:</b> </td>
+              <td><input type="text" id="key" size="40" value="<%=key%>"></td>
+              <td><small>(exact search)</small></td></tr>
+          <tr><td><b>Prefix Key:</b> </td>
+              <td><input type="text" id="krefix" size="40" value="<%=krefix%>"></td>
+              <td><small>(prefix search)</small></td></tr>
+          <tr><td><b>Columns Search:</b></td>
+              <td><input type="text" id="filters" size="40" value="<%=filters%>"></td>
+              <td><small>family:column:value,...(substring search)</small></td></tr>
+          <tr><td><b>Columns Show:</b></td>
+              <td><input type="text" id="selects" size="40" value="<%=selects%>"></td>
+              <td><small>family:column:value,...</small></td></tr>
+          <tr><td><b>Columns Show First:</b></td>
+              <td><input type="text" id="columns" size="40" value="<%=columns%>"></td>
+              <td><small>family:column,family:column,...</small></td></tr>
+          <tr><td><b>Limit:</b></td>
+              <td><input type="number" id="limit" size="5" value="<%=limit%>"></td>
+              <td><small>int</small></td></tr>
+          <tr><td><b>Period:</b></td>
+              <td><input type="text" id="period" size="40" value="<%=periodS%>"></td>
+              <td></td></tr>
+          <tr><td colspan="3"><button onclick="search()">Search</button></td></tr>
+          </table>
+        </td>
+      <td width="50%">
+        <table>
+          <tr><td><b>Exact Key:</b> </td>
+              <td><input type="text" id="key" size="40" value="<%=key%>"></td>
+              <td><small>(exact search)</small></td></tr>
+          <tr><td><b>Prefix Key:</b> </td>
+              <td><input type="text" id="krefix" size="40" value="<%=krefix%>"></td>
+              <td><small>(prefix search)</small></td></tr>
+          <tr><td><b>Columns Search:</b></td>
+              <td><input type="text" id="filters" size="40" value="<%=filters%>"></td>
+              <td><small>family:column:value,...(substring search)</small></td></tr>
+          <tr><td><b>Columns Show:</b></td>
+              <td><input type="text" id="selects" size="40" value="<%=selects%>"></td>
+              <td><small>family:column:value,...</small></td></tr>
+          <tr><td><b>Columns Show First:</b></td>
+              <td><input type="text" id="columns" size="40" value="<%=columns%>"></td>
+              <td><small>family:column,family:column,...</small></td></tr>
+          <tr><td><b>Limit:</b></td>
+              <td><input type="number" id="limit" size="5" value="<%=limit%>"></td>
+              <td><small>int</small></td></tr>
+          <tr><td><b>Period:</b></td>
+              <td><input type="text" id="period" size="40" value="<%=periodS%>"></td>
+              <td></td></tr>
+          <tr><td colspan="3"><button onclick="search()">Generic Search</button></td></tr>
+          </table>
+        </td>
+      </tr>
     </table>
   <hr/>
   <%
@@ -176,82 +208,85 @@
          data-show-button-icons='true'
          data-show-pagination-switch='true'
          data-page-number='1'
-         data-page-size='25'
+         data-page-size='15'
          data-pagination-pre-text='Previous'
          data-pagination-next-text='Next'
          data-show-columns='true'
          data-show-columns-toggle-all='true'
          data-show-columns-search='true'
-         data-height='800'
+         data-height='600'
          data-resizable='true'
          data-pagination='true'>
-  <thead><tr><th data-field='key' data-sortable='true'>key</th>
-    <%=h2table.thead()%>
-    </tr></thead></table></div>
-    
-  <script>
-    var $table = $('#table')
-    $(function() { 
-      var data = [
-        <%=h2table.data()%>
-        ]    
-      $table.bootstrapTable({data: data})
-      $table.bootstrapTable('refreshOptions', {classes: 'table table-bordered table-hover table-striped table-sm'})
-      $table.bootstrapTable('refreshOptions', {theadClasses: 'thead-light'})
-      $table.bootstrapTable('refreshOptions', {sortable: 'true'})
-      })
-    function detailFormatter(index, row) {
-      var html = []
-      $.each(row, function (key, value) {
-        if (value.startsWith('url:')) { // TBD: whould work also for other types
-          html.push('<b><a href="FITSView.jsp?id=' + value + '" target="_blank">' + key + '</a></b></br/>');
-          }
-        else {
-          html.push('<b>' + key + ':</b> ' + value + '<br/>')
-          }
-        })
-      return html.join('')
-      }
-    function binaryFormatter(value, row) {
-      return '<b><a href="FITSView.jsp?id=' + value + '" target="_blank">*binary*</a></b>'
-      }
-    </script>
-    
-  <script>
-    $('#period').daterangepicker({
-        singleDatePicker: false,    
-        showDropdowns: true,
-        showWeekNumbers: false,
-        showISOWeekNumbers: false,
-        timePicker: true,
-        timePicker24Hour: true,
-        timePickerIncrement: 10,
-        timePickerSeconds: false,    
-        autoApply: true,
-        ranges: {
-          'Today': [moment(), moment()],
-          'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-          'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-          'This Month': [moment().startOf('month'), moment().endOf('month')],
-          'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-          },
-        locale: {
-          format: 'DD/MM/YYYY HH:mm'
-          },
-        linkedCalendars: false,
-        autoUpdateInput: true,
-        showCustomRangeLabel: true,
-        alwaysShowCalendars: true,
-        startDate: moment().subtract(6, 'days'),
-        endDate: moment(),
-        opens: "right",
-        drops: "down"
-        },
-      function(start, end, label) {
-        $(this).val(start.format('DD/MM/YYYY HH:mm') + ' - ' + end.format('DD/MM/YYYY HH:mm'));
-        }
-      );
-    </script>
-    
+    <thead>
+      <tr>
+        <th data-field='key' data-sortable='true'>row key</th>
+        <%=h2table.thead()%>
+        </tr>
+      </thead>
+    </table>
   </div>
+    
+<script>
+  var $table = $('#table')
+  $(function() { 
+    var data = [
+      <%=h2table.data()%>
+      ]    
+    $table.bootstrapTable({data: data})
+    $table.bootstrapTable('refreshOptions', {classes: 'table table-bordered table-hover table-striped table-sm'})
+    $table.bootstrapTable('refreshOptions', {theadClasses: 'thead-light'})
+    $table.bootstrapTable('refreshOptions', {sortable: 'true'})
+    })
+  function detailFormatter(index, row) {
+    var html = []
+    $.each(row, function (key, value) {
+      if (value.startsWith('url:')) { // TBD: whould work also for other types
+        html.push('<b><a href="FITSView.jsp?id=' + value + '" target="_blank">' + key + '</a></b></br/>');
+        }
+      else {
+        html.push('<b>' + key + ':</b> ' + value + '<br/>')
+        }
+      })
+    return html.join('')
+    }
+  function binaryFormatter(value, row) {
+    return '<b><a href="FITSView.jsp?id=' + value + '" target="_blank">*binary*</a></b>'
+    }
+  </script>
+  
+<script>
+  $('#period').daterangepicker({
+      singleDatePicker: false,    
+      showDropdowns: true,
+      showWeekNumbers: false,
+      showISOWeekNumbers: false,
+      timePicker: true,
+      timePicker24Hour: true,
+      timePickerIncrement: 10,
+      timePickerSeconds: false,    
+      autoApply: true,
+      ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+      locale: {
+        format: 'DD/MM/YYYY HH:mm'
+        },
+      linkedCalendars: false,
+      autoUpdateInput: true,
+      showCustomRangeLabel: true,
+      alwaysShowCalendars: true,
+      startDate: moment().subtract(6, 'days'),
+      endDate: moment(),
+      opens: "right",
+      drops: "down"
+      },
+    function(start, end, label) {
+      $(this).val(start.format('DD/MM/YYYY HH:mm') + ' - ' + end.format('DD/MM/YYYY HH:mm'));
+      }
+    );
+  </script>

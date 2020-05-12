@@ -39,42 +39,39 @@
     <script type="text/javascript" src="HBaseTable.js"></script>
   
     <div class="row">
-      <div class="col-sm-12" style="padding-bottom: 25px;">
-        <div style="padding: 15px; border: 1px grey">
+      <div class="col-sm-12" style="padding-bottom: 1px;">
+        <div style="padding: 1px; border: 1px grey">
           <div class="grid-stack" style="background-color:lightgrey">
           
-            <div class="grid-stack-item" data-gs-x="0" data-gs-y="0" data-gs-width="4" data-gs-height="3">
+            <div class="grid-stack-item" data-gs-x="0" data-gs-y="0" data-gs-width="6" data-gs-height="3">
               <div class="grid-stack-item-content" id="commands" title="context-sensitive commands" style="background-color:#ddffdd">
                 <%@ include file="Top.jsp"%>
                 </div>    
               </div>
        
-            <div class="grid-stack-item" data-gs-x="0" data-gs-y="3" data-gs-width="4" data-gs-height="1">
+            <div class="grid-stack-item" data-gs-x="0" data-gs-y="3" data-gs-width="6" data-gs-height="1">
               <div class="grid-stack-item-content" id="feedback" title="operation feedback" style="background-color:#ddddff">
                 <p style="color:red;font-size:15px">Select <b>graph server</b> and initial <b>graph</b>,<br/>
                                                     then select an <b>element</b> to see possible actions.</p>
                 </div>
               </div>
             
-            <div class="grid-stack-item" data-gs-x="0" data-gs-y="4" data-gs-width="4" data-gs-height="2">
-              <div class="grid-stack-item-content" id="manip" title="graph manipulations" style="background-color:#ddffdd">
+            <div class="grid-stack-item" data-gs-x="0" data-gs-y="4" data-gs-width="6" data-gs-height="12">
+              <div class="grid-stack-item-content" style="background-color:#ddffdd">
                 <%@ include file="GraphView.jsp"%>
-                </div>
-              </div>
-         
-            <div class="grid-stack-item" data-gs-x="0" data-gs-y="6" data-gs-width="4" data-gs-height="9">
-              <div class="grid-stack-item-content" id="visnetwork" title="graph network" style="background-color:white">
-                --- graph network ---
+                <div id="visnetwork" title="graph network" style="background-color:white">
+                  --- graph network ---
+                  </div>
                 </div>
               </div>
         
-            <div class="grid-stack-item" data-gs-x="4" data-gs-y="1" data-gs-width="8" data-gs-height="1">
+            <div class="grid-stack-item" data-gs-x="6" data-gs-y="1" data-gs-width="6" data-gs-height="1">
               <div class="grid-stack-item-content" id="mini" title="main top" style="background-color:#ddffdd">
                 <%@include file="TopMini.jsp"%>
                 </div>
               </div>
         
-            <div class="grid-stack-item" data-gs-x="4" data-gs-y="0" data-gs-width="8" data-gs-height="14">
+            <div class="grid-stack-item" data-gs-x="6" data-gs-y="0" data-gs-width="6" data-gs-height="15">
               <div class="grid-stack-item-content" id="result" title="results" style="background-color:#ddddff">
                 <%@include file="Result.jsp"%>
                 </div>
