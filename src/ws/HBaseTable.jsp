@@ -212,6 +212,9 @@
         })
       return html.join('')
       }
+    function binaryFormatter(value, row) {
+      return '<b><a href="FITSView.jsp?id=' + value + '" target="_blank">*binary*</a></b>'
+      }
     </script>
     
   <script>

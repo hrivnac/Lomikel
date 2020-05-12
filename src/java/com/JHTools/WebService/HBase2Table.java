@@ -130,8 +130,13 @@ public class HBase2Table {
       columns.add(column);
       }
     _thead = "";
+    String formatter;
     for (String column : columns) {
-      _thead += "<th data-field='" + column + "' data-sortable='true' data-visible='false'><b><u>" + column + "</u></b>";
+      formatter = "";
+      if (column.startsWith("b:")) {
+        formatter = "data-formatter='binaryFormatter'";
+        }
+      _thead += "<th data-field='" + column + "' data-sortable='true' data-visible='false'" + formatter + "><b><u>" + column + "</u></b>";
       if (_schema != null) {
         _thead += "<br/>" + _schema.type(column);
         }

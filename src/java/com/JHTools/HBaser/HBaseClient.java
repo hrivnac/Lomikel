@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: add logs
 public class HBaseClient extends HBaseRESTClient {
   
   /** Connect to the server.
@@ -136,6 +137,7 @@ public class HBaseClient extends HBaseRESTClient {
     * @return      The command result. */
   public String get(String table,
                     String key) {
+    log.info("Getting " + key + " on " + table);
     JSONObject result = new JSONObject(getEncoded(table, key));
     JSONArray rows = result.getJSONArray("Row");
     JSONArray cells;
@@ -160,6 +162,7 @@ public class HBaseClient extends HBaseRESTClient {
     * @return       The command result. May be <tt>null</tt>*/
   public JSONObject get2JSON(String table,
                              String key) {
+    log.info("Getting " + key + " on " + table + " as JSON");
     String results = getEncoded(table, key);
     if (results.equals("")) {
       return null;
