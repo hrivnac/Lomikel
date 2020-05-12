@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: js9
+Description: Node helper for js9.js
+Version: 3.0
+Libs: -L${libdir} -lfuntools  -lm
+Cflags: -I${includedir}
