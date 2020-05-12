@@ -4,6 +4,8 @@ package com.JHTools.WebService;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Base64;
+import java.io.File;
+import java.nio.file.Files;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -26,6 +28,10 @@ public class BinaryDataRepository {
     * @param content  The entry content. */
 	public void put(String id,
 	                byte[] content) {
+	   try {
+	     Files.write(new File("/tmp/" + id).toPath(), content);
+	     }
+	   catch (Exception e) {}
 	  _data.put(id, content);
 	  }
 	  

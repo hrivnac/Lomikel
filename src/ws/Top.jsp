@@ -1,10 +1,8 @@
 <table>
   <tr>
     <td><img src="@LOGO@" width="100"/></td>
-    <td><h2><u>@NAME@</u></h2>
+    <td><h2><u><a href="@HOME@" target="RESULT">@NAME@</a></u></h2>
         <h3>@VERSION@ <small>[@BUILD@]</small></h3>
-        </td>
-    <td><a href="https://hrivnac.web.cern.ch/hrivnac/Activities/Packages/JHTools" target="RESULT">JHTools Home</a>
         </td>
     </tr>
   <tr>

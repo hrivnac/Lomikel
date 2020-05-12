@@ -57,17 +57,38 @@ public class HBaseRESTClient {
     * <pre>
     * PUT /-table-/scanner
     * </pre>
+    * @param table     The requested table name.
+    * @param filterMap The scanner filter (as family:column-value:comparator).
+    *                  May be <tt>null</tt>.
+    * @param size      The number of requested results.
+    *                  <tt>0</tt> means no limit.
+    * @param start     The start search time in ms.
+    * @param end       The end search time in ms.
+    * @return          The assigned <em>scanner</em> id. */
+  // TBD: parametrise batch size
+  public String initScanner(String              table,
+                            Map<String, String> filterMap,
+                            int                 size,
+                            long                start,
+                            long                end) {
+    return initScanner(table, filter(filterMap), size, start, end);
+    }
+    
+    
+  /** Initiate <em>scanner</em> on the server.
+    * <pre>
+    * PUT /-table-/scanner
+    * </pre>
     * @param table  The requested table name.
-    * @param filter The scanner filter (as family:column-value:comparator).
-    *               May be <tt>null</tt>.
+    * @param filter The scanner filter.
     * @param size   The number of requested results.
     *               <tt>0</tt> means no limit.
     * @param start  The start search time in ms.
     * @param end    The end search time in ms.
-    * @return The assigned <em>scanner</em> id. */
+    * @return       The assigned <em>scanner</em> id. */
   // TBD: parametrise batch size
   public String initScanner(String              table,
-                            Map<String, String> filter,
+                            String              filter,
                             int                 size,
                             long                start,
                             long                end) {
@@ -82,7 +103,7 @@ public class HBaseRESTClient {
       }
     scanner += ">";
     if (filter != null) {
-      scanner += "<filter>" + filter(filter) + "</filter>";
+      scanner += "<filter>" + filter + "</filter>";
       }
     scanner += "</Scanner>";
     String resultString = "";
@@ -133,19 +154,36 @@ public class HBaseRESTClient {
     }
     
   /** Scan table.
+    * @param table     The requested table name.
+    * @param filterMap The scanner filter (as family:column-value:comparator).
+    *                  May be <tt>null</tt>.
+    * @param size      The number of requested results.
+    *                  <tt>0</tt> means no limit.
+    * @param start     The start search time in ms.
+    * @param end       The end search time in ms.
+    * @return          The command result, in <em>json</em>, values byte-encoded. */
+  public String scanEncoded(String              table,
+                            Map<String, String> filterMap,
+                            int                 size,
+                            long                start,
+                            long                end) {
+    
+    return scanEncoded(table, filter(filterMap), size, start, end);
+    }
+    
+  /** Scan table.
     * @param table The requested table name.
-    * @param filter The scanner filter (as family:column-value:comparator).
-    *               May be <tt>null</tt>.
+    * @param filter The scanner filter.
     * @param size   The number of requested results.
     *               <tt>0</tt> means no limit.
     * @param start  The start search time in ms.
     * @param end    The end search time in ms.
     * @return      The command result, in <em>json</em>, values byte-encoded. */
-  public String scanEncoded(String              table,
-                            Map<String, String> filter,
-                            int                 size,
-                            long                start,
-                            long                end) {
+  public String scanEncoded(String table,
+                            String filter,
+                            int    size,
+                            long   start,
+                            long   end) {
     String scannerId = initScanner(table, filter, size, start, end);
     return getResultsEncoded(table, scannerId);
     }

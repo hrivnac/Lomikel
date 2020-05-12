@@ -117,17 +117,29 @@ public class HBase2Table {
           }
         }
       }
-    List<String> columns = new ArrayList<>();
+    List<String> columns0 = new ArrayList<>();
     if (_firstColumns != null && !_firstColumns.isEmpty()) {
       for (String column : _firstColumns) {
         if (columnsSet.contains(column)) {
-          columns.add(column);
+          columns0.add(column);
           columnsSet.remove(column);
           }
         }
       }
     for (String column : columnsSet) {
-      columns.add(column);
+      columns0.add(column);
+      }
+    // TBD: faster counting
+    // TBD: support non-default columns
+    List<String> columns = new ArrayList<>();
+    for (String family : new String[]{"b", "i", "d"}) {
+      _fLengths.put(family, 0);
+      for (String column : columns0) {
+        if (column.startsWith(family + ":")) {
+          _fLengths.put(family, _fLengths.get(family) + 1);
+          columns.add(column);
+          }
+        }
       }
     _thead = "";
     String formatter;
@@ -185,6 +197,13 @@ public class HBase2Table {
     return _data;
     }
     
+  /** Give number of columns for a  column family.
+    * @param  The column family name.
+    * @return The number of columns for a column family*/
+  public int familyLength(String family) {
+    return _fLengths.get(family);
+    }
+    
   /** Give the {@link BinaryDataRepository} with binary content.
     * @return The {@link BinaryDataRepository} with binary content. */
   public BinaryDataRepository repository() {
@@ -202,6 +221,8 @@ public class HBase2Table {
   private String _thead;
   
   private String _data;
+  
+  Map<String, Integer> _fLengths = new HashMap<>();
 
   /** Logging . */
   private static Logger log = Logger.getLogger(HBase2Table.class);

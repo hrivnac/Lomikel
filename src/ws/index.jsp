@@ -9,7 +9,7 @@
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
   <head>
-    <title>JHTools Browser</title>
+    <title>@NAME@</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="GraphView.css"                                       rel="stylesheet" type="text/css"/>

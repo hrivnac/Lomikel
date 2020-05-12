@@ -126,15 +126,18 @@
  		<copy file="../src/ws/index.jsp"   tofile="../build/index.jsp" overwrite="true"/>
  		<copy file="../src/ws/Top.jsp"     tofile="../build/Top.jsp"   overwrite="true"/>
  		<copy file="../src/ws/TopMini.jsp" tofile="../build/TopMini.jsp"   overwrite="true"/>
+    <replace file="../build/index.jsp"   token="@NAME@"    value="${browsername}"/>
     <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
     <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
     <replace file="../build/Top.jsp"     token="@NAME@"    value="${browsername}"/>
     <replace file="../build/Top.jsp"     token="@LOGO@"    value="${browserlogo}"/>
+    <replace file="../build/Top.jsp"     token="@HOME@"    value="${browserurl}"/>
     <replace file="../build/Top.jsp"     token="@BOOT@"    value="${bootgremlin}"/>
     <replace file="../build/TopMini.jsp" token="@VERSION@" value="${version}"/>
     <replace file="../build/TopMini.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
     <replace file="../build/TopMini.jsp" token="@NAME@"    value="${browsername}"/>
     <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${browserlogo}"/>
+    <replace file="../build/TopMini.jsp" token="@HOME@"    value="${browserurl}"/>
     <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${bootgremlin}"/>
     <war destfile="../lib/JHTools.war" webxml="../src/ws/web.xml">
       <fileset dir="../src/ws">
