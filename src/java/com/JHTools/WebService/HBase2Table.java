@@ -81,6 +81,21 @@ public class HBase2Table {
         column = Coding.decode(cells.getJSONObject(j).getString("column"));
         value  = Coding.decode(cells.getJSONObject(j).getString("$"));
         if (!key.startsWith("schema") && _schema != null) {
+          if (column.startsWith("b:")) {
+            try {
+              String v = cells.getJSONObject(j).getString("$");
+              byte[] x = java.util.Base64.getDecoder().decode(v);
+              //java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter("/tmp/" + column));
+              //writer.write(x);     
+              //writer.close();
+              java.io.FileOutputStream fos = new java.io.FileOutputStream("/tmp/" + column);
+              fos.write(x);
+              fos.close();
+              }
+            catch (Exception e) {
+              log.error(e);
+              }
+            }
           cc = _schema.decode2Content(column, value);
           if (cc.isString()) {
             entry.put(column, cc.asString());

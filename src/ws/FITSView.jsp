@@ -34,7 +34,7 @@
   <body>
     <%
       String id = request.getParameter("id");
-      byte[] content = bdr.get(id);
+      String content = bdr.get64(id);
       String name = id.substring(4);
       %>
     <div id="centerdiv">
@@ -42,7 +42,7 @@
     <div class="JS9"></div>
     <div style="margin-top: 2px;"><div class="JS9Colorbar"></div></div>
       <p><a href='javascript:JS9.Load("stamp.fits");'>test</a></p>
-      <p><a href='javascript:JS9.Load("<%=content%>");'><%=id%></a></p>
+      <p><a href='javascript:JS9.Load("<%=content%>");'><%=name%></a></p>
       </div>
     <script type="text/javascript">
       $(document).ready(function() {
