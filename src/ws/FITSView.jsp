@@ -35,15 +35,36 @@
     <%
       String id = request.getParameter("id");
       String content = bdr.get64(id);
+      /*
+      byte[] content = bdr.get(id);
       String name = id.substring(4);
+      name = "/tmp/aaa.fits";
+      //java.io.File file = java.io.File.createTempFile(name, ".fits");
+      java.io.File file = new java.io.File(name);
+      file.deleteOnExit();      
+      java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+              fos.write(content);
+              fos.close();
+      String fn = file.getPath();  
+      */
+              
       %>
     <div id="centerdiv">
     <div class="JS9Menubar"></div>
     <div class="JS9"></div>
     <div style="margin-top: 2px;"><div class="JS9Colorbar"></div></div>
-      <p><a href='javascript:JS9.Load("stamp.fits");'>test</a></p>
-      <p><a href='javascript:JS9.Load("<%=content%>");'><%=name%></a></p>
-      </div>
+      
+     <script type="text/javascript">
+      function init(){
+        var content = "<%=content%>";
+        JS9.Preload(content);
+      }
+      $(document).ready(function(){
+        init();
+      });
+    </script>
+     
+      
     <script type="text/javascript">
       $(document).ready(function() {
         $("#centerdiv").draggable({

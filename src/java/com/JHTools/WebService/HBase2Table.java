@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -79,35 +80,19 @@ public class HBase2Table {
       cells = rows.getJSONObject(i).getJSONArray("Cell");
       for (int j = 0; j < cells.length(); j++) {
         column = Coding.decode(cells.getJSONObject(j).getString("column"));
-        value  = Coding.decode(cells.getJSONObject(j).getString("$"));
+        value  = cells.getJSONObject(j).getString("$");
         if (!key.startsWith("schema") && _schema != null) {
           if (column.startsWith("b:")) {
-            try {
-              String v = cells.getJSONObject(j).getString("$");
-              byte[] x = java.util.Base64.getDecoder().decode(v);
-              //java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter("/tmp/" + column));
-              //writer.write(x);     
-              //writer.close();
-              java.io.FileOutputStream fos = new java.io.FileOutputStream("/tmp/" + column);
-              fos.write(x);
-              fos.close();
-              }
-            catch (Exception e) {
-              log.error(e);
-              }
-            }
-          cc = _schema.decode2Content(column, value);
-          if (cc.isString()) {
-            entry.put(column, cc.asString());
-            }
-          else {
             id = "url:" + key + ":" + column;
             entry.put(column, id);
-            _repository.put(id, cc.asBytes());
-           }          
+            _repository.put(id, Base64.getDecoder().decode(value));
+            }
+          else {
+            entry.put(column, _schema.decode2Content(column, Coding.decode(value)).asString());
+            }
           }
         else {
-          entry.put(column, value);
+          entry.put(column, Coding.decode(value));
           }
         }
       entries.put(key, entry);
