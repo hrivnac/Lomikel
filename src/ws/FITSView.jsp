@@ -32,6 +32,7 @@
     </head>
     
   <body>
+  
     <%
       String id = request.getParameter("id");
       String content = bdr.get64(id);
@@ -46,24 +47,25 @@
               fos.write(content);
               fos.close();
       String fn = file.getPath();  
-      */
-              
+      */              
       %>
+      
     <div id="centerdiv">
     <div class="JS9Menubar"></div>
-    <div class="JS9"></div>
-    <div style="margin-top: 2px;"><div class="JS9Colorbar"></div></div>
+    <div class="JS9" data-width="512px" data-height="512px"></div>
+    <div style="margin-top: 2px;">
+      <div class="JS9Colorbar"></div>
+      </div>
       
-     <script type="text/javascript">
+    <script type="text/javascript">
       function init(){
         var content = "<%=content%>";
         JS9.Preload(content);
-      }
-      $(document).ready(function(){
+        }
+      $(document).ready(function() {
         init();
-      });
-    </script>
-     
+        });
+      </script>    
       
     <script type="text/javascript">
       $(document).ready(function() {
@@ -72,7 +74,8 @@
           opacity: 0.35
           });
         });
-      </script>      
+      </script>  
+      
     </body>
   
   </html>

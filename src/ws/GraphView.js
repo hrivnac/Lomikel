@@ -614,3 +614,8 @@ function stylesheetValue(nam, id, eMap, ifEdge, title) {
 async function loadResult(url) {
   $("#result").load(url);
   }
+  
+// Load page into Graph pane
+async function loadGraph(url) {
+  $("#graph").load(url);
+  }

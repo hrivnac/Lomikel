@@ -226,7 +226,7 @@
     var html = []
     $.each(row, function (key, value) {
       if (value.startsWith('url:')) { // TBD: whould work also for other types
-        html.push('<b><a href="FITSView.jsp?id=' + value + '" target="_blank">' + key + '</a></b></br/>');
+        html.push("<b><a href='#' onclick='loadGraph(\"FITSView.jsp?id=" + value + "\")'>" + key + "</a></b></br/>");
         }
       else {
         html.push('<b>' + key + ':</b> ' + value + '<br/>')
@@ -235,9 +235,11 @@
     return html.join('')
     }
   function binaryFormatter(value, row) {
-    return '<b><a href="FITSView.jsp?id=' + value + '" target="_blank">*binary*</a></b>'
+    return "<b><a href='#' onclick='loadGraph(\"FITSView.jsp?id=" + value + "\")'>*binary*</a></b>"
     }
   </script>
+  
+" 
   
 <script>
   $('#period').daterangepicker({
