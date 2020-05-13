@@ -21,6 +21,10 @@
           <input type="button" onclick="applyFilter()" value="Apply">
   </div>
   
+<div id="visnetwork" title="graph network" style="background-color:white">
+  --- graph network ---
+  </div>
+
  
  
  

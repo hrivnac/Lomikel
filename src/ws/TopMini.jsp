@@ -9,7 +9,9 @@
  
 <script>
 async function reset() {
-  document.getElementById('commands').innerHTML = await(await fetch("Top.jsp")).text();
+  document.getElementById('commands').innerHTML = await(await fetch("Top.jsp"      )).text();
+  document.getElementById('graph'   ).innerHTML = await(await fetch("GraphView.jsp")).text();
+  container = document.getElementById('visnetwork');
   }
 function switchPanesInteractivity() {
   var button = document.getElementById('switchPaneInteractivityButton');

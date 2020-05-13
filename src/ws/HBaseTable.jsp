@@ -26,66 +26,47 @@
 <jsp:useBean id="bdr" class="com.JHTools.WebService.BinaryDataRepository" scope="session" />
 
 <div id='hbasetable'>
-  <%  
-    // TBD: make period time type
-    String hbase     = request.getParameter("hbase");
-    String htable    = request.getParameter("htable");
-    String key       = request.getParameter("key");
-    String krefix    = request.getParameter("krefix");
-    String columns   = request.getParameter("columns");
-    String selects   = request.getParameter("selects");
-    String filters   = request.getParameter("filters");
-    String version   = request.getParameter("version");
-    String sizeS     = request.getParameter("size");
-    String limitS    = request.getParameter("limit");
-    String periodS   = request.getParameter("period");
-    if (hbase  == null || hbase.trim( ).equals("") ||
-        htable == null || htable.trim().equals("")) {
-      // TBD: make it error
-      }
-    out.println("<b><u>" + htable + "@" + hbase + "</u></b>");
-    key       = (key     == null                            ) ? "" : key;
-    krefix    = (krefix  == null                            ) ? "" : krefix;
-    columns   = (columns == null                            ) ? "" : columns;
-    filters   = (filters == null                            ) ? "" : filters;
-    selects   = (selects == null                            ) ? "" : selects;
-    version   = (version == null                            ) ? "" : version;
-    periodS   = (periodS == null                            ) ? "" : periodS;
-    int size  = (sizeS   == null || sizeS.trim( ).equals("")) ? 0  : Integer.parseInt(sizeS);
-    int limit = (limitS  == null || limitS.trim().equals("")) ? 0  : Integer.parseInt(limitS);
-    %>
-  <input type="hidden" id="hbase"  value="<%=hbase%>">
-  <input type="hidden" id="htable" value="<%=htable%>">
-  <!-- TBD: add size,version -->
   <table>
     <tr>
-      <td width="50%">
-        <table>
-          <tr><td><b>Exact Key:</b> </td>
-              <td><input type="text" id="key" size="40" value="<%=key%>"></td>
-              <td><small>(exact search)</small></td></tr>
-          <tr><td><b>Prefix Key:</b> </td>
-              <td><input type="text" id="krefix" size="40" value="<%=krefix%>"></td>
-              <td><small>(prefix search)</small></td></tr>
-          <tr><td><b>Columns Search:</b></td>
-              <td><input type="text" id="filters" size="40" value="<%=filters%>"></td>
-              <td><small>family:column:value,...(substring search)</small></td></tr>
-          <tr><td><b>Columns Show:</b></td>
-              <td><input type="text" id="selects" size="40" value="<%=selects%>"></td>
-              <td><small>family:column:value,...</small></td></tr>
-          <tr><td><b>Columns Show First:</b></td>
-              <td><input type="text" id="columns" size="40" value="<%=columns%>"></td>
-              <td><small>family:column,family:column,...</small></td></tr>
-          <tr><td><b>Limit:</b></td>
-              <td><input type="number" id="limit" size="5" value="<%=limit%>"></td>
-              <td><small>int</small></td></tr>
-          <tr><td><b>Period:</b></td>
-              <td><input type="text" id="period" size="40" value="<%=periodS%>"></td>
-              <td></td></tr>
-          <tr><td colspan="3"><button onclick="search()">Search</button></td></tr>
-          </table>
+      <td width="50%" valign='bottom'>
+        <%
+          String filterSpecific = null;
+          String msg = null;
+          %>
+        <%@ include file="HBaseTable-Specific.jsp"%>
         </td>
       <td width="50%">
+        <%  
+          // TBD: make period time type
+          String hbase     = request.getParameter("hbase");
+          String htable    = request.getParameter("htable");
+          String key       = request.getParameter("key");
+          String krefix    = request.getParameter("krefix");
+          String columns   = request.getParameter("columns");
+          String selects   = request.getParameter("selects");
+          String filters   = request.getParameter("filters");
+          String version   = request.getParameter("version");
+          String sizeS     = request.getParameter("size");
+          String limitS    = request.getParameter("limit");
+          String periodS   = request.getParameter("period");
+          if (hbase  == null || hbase.trim( ).equals("") ||
+              htable == null || htable.trim().equals("")) {
+            // TBD: make it error
+            }
+          out.println("<b><u>" + htable + "@" + hbase + "</u></b>");
+          key       = (key     == null                            ) ? "" : key;
+          krefix    = (krefix  == null                            ) ? "" : krefix;
+          columns   = (columns == null                            ) ? "" : columns;
+          filters   = (filters == null                            ) ? "" : filters;
+          selects   = (selects == null                            ) ? "" : selects;
+          version   = (version == null                            ) ? "" : version;
+          periodS   = (periodS == null                            ) ? "" : periodS;
+          int size  = (sizeS   == null || sizeS.trim( ).equals("")) ? 0  : Integer.parseInt(sizeS);
+          int limit = (limitS  == null || limitS.trim().equals("")) ? 0  : Integer.parseInt(limitS);
+          %>
+        <input type="hidden" id="hbase"  value="<%=hbase%>">
+        <input type="hidden" id="htable" value="<%=htable%>">
+        <!-- TBD: add size,version -->
         <table>
           <tr><td><b>Exact Key:</b> </td>
               <td><input type="text" id="key" size="40" value="<%=key%>"></td>
@@ -160,6 +141,9 @@
     if (size > 0) {
       out.println("showing only <b>" + size + "</b> cells<br/>");
       }
+    if (msg != null) {
+      out.println(msg);
+      }
     // TBD: show also version, period
     HBaseClient h = new HBaseClient(hbase);
     HBase2Table h2table = new HBase2Table();
@@ -183,8 +167,9 @@
                         key);
       }
     else {
+      String filter = h.filter(filterMap, filterSpecific);
       json = h.scan2JSON(htable,
-                         filterMap,
+                         filter,
                          size,
                          startL,
                          stopL);

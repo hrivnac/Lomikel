@@ -1,6 +1,7 @@
 package com.JHTools.HBaser;
 
 import com.JHTools.Utils.Coding;
+import com.JHTools.Utils.Gzipper;
 
 // org.json
 import org.json.JSONObject;

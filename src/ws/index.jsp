@@ -57,11 +57,8 @@
               </div>
             
             <div class="grid-stack-item" data-gs-x="0" data-gs-y="4" data-gs-width="6" data-gs-height="12">
-              <div class="grid-stack-item-content" style="background-color:#ddffdd">
+              <div class="grid-stack-item-content" id="graph" style="background-color:#ddffdd">
                 <%@ include file="GraphView.jsp"%>
-                <div id="visnetwork" title="graph network" style="background-color:white">
-                  --- graph network ---
-                  </div>
                 </div>
               </div>
         

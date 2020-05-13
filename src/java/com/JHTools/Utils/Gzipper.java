@@ -10,6 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
  
+// Log4J
+import org.apache.log4j.Logger;
+
 // TBD
 public class Gzipper {
   
@@ -24,7 +27,7 @@ public class Gzipper {
       return bos.toByteArray();   
       }
     catch (IOException e) {
-      e.printStackTrace();
+      log.error("Cannot zip", e);
       }
     finally {
       try {
@@ -54,7 +57,7 @@ public class Gzipper {
       return bos.toByteArray();
       }
     catch (IOException e) {
-      e.printStackTrace();
+      log.error("Cannot unzip", e);
       }
     finally {
       try {
@@ -63,8 +66,7 @@ public class Gzipper {
         bos.close();
         bis.close();
         }
-      catch (Exception e) {
-        e.printStackTrace();
+      catch (Exception ignored) {
         }
       }
     return new byte[]{};
@@ -73,5 +75,8 @@ public class Gzipper {
   public static boolean isZipped(final byte[] compressed) {
     return (compressed[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
     }
+
+  /** Logging . */
+  private static Logger log = Logger.getLogger(Gzipper.class);
     
   }

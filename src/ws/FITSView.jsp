@@ -34,7 +34,7 @@
   <body>
     <%
       String id = request.getParameter("id");
-      String content = bdr.get64(id);
+      byte[] content = bdr.get(id);
       String name = id.substring(4);
       %>
     <div id="centerdiv">

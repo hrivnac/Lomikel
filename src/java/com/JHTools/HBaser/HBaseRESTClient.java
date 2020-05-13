@@ -253,10 +253,19 @@ public class HBaseRESTClient {
     * @param filterMap The {@link Map} of column values to filter,
     *                  in the form <tt>family:column-value:comparator</tt> or
     *                  <tt>key-value:comparator</tt>.
-    * @param schema    TBD
     * @return          The JSON filter. */
-  private String filter(Map<String, String> filterMap) {
-    log.info(filterMap);
+  public String filter(Map<String, String> filterMap) {
+    return filter(filterMap, null);
+    }
+    
+  /** Create <em>REST</em> filter from filter {@link Map}.
+    * @param filterMap The {@link Map} of column values to filter,
+    *                  in the form <tt>family:column-value:comparator</tt> or
+    *                  <tt>key-value:comparator</tt>.
+    * @param oldFilter The filter to merge with. Can be <tt>null<tt>.
+    * @return          The JSON filter. */
+  public String filter(Map<String, String> filterMap,
+                       String               oldFilter) {
     String filter = "";
     String[] column;
     String[] value;
