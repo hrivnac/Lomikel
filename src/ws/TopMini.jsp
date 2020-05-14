@@ -11,6 +11,7 @@
 async function reset() {
   document.getElementById('commands').innerHTML = await(await fetch("Top.jsp"      )).text();
   document.getElementById('graph'   ).innerHTML = await(await fetch("GraphView.jsp")).text();
+  document.getElementById('result'  ).innerHTML = await(await fetch("Result.jsp"   )).text();
   container = document.getElementById('visnetwork');
   }
 function switchPanesInteractivity() {
