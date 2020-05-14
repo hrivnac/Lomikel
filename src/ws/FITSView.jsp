@@ -2,6 +2,9 @@
 
 <%@ page import="com.JHTools.WebService.BinaryDataRepository" %>
 
+<%@ page import="java.io.File"%>
+<%@ page import="java.io.FileOutputStream"%>
+
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -34,20 +37,18 @@
   <body>
   
     <%
+      // TBD: should be realy deleted
       String id = request.getParameter("id");
-      String content = bdr.get64(id);
-      /*
       byte[] content = bdr.get(id);
       String name = id.substring(4);
-      name = "/tmp/aaa.fits";
-      //java.io.File file = java.io.File.createTempFile(name, ".fits");
-      java.io.File file = new java.io.File(name);
+      new File("/tmp/FinkBrowser/FITS").mkdirs();
+      String fn = "/tmp/FinkBrowser/FITS/" + name + ".fits";
+      File file = new File(fn);
       file.deleteOnExit();      
-      java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-              fos.write(content);
-              fos.close();
-      String fn = file.getPath();  
-      */              
+      FileOutputStream fos = new FileOutputStream(file);
+      fos.write(content);
+      fos.close();
+      String url = "FITSFile.jsp?fn=" + fn;                    
       %>
       
     <div id="centerdiv">
@@ -59,8 +60,7 @@
       
     <script type="text/javascript">
       function init(){
-        var content = "<%=content%>";
-        JS9.Preload(content);
+        JS9.Preload("<%=url%>");
         }
       $(document).ready(function() {
         init();
