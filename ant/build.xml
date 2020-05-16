@@ -51,6 +51,7 @@
     <replace file="../build/com/JHTools/Utils/Info.java" token="@version@"   value="${version}"/>
     <replace file="../build/com/JHTools/Utils/Info.java" token="@TSTAMP@"    value="${TSTAMP}"/>
     <replace file="../build/com/JHTools/Utils/Info.java" token="@user.name@" value="${user.name}"/>
+    <replace file="../build/com/JHTools/Utils/Info.java" token="@TMP"        value="${tmp_dir}"/>
     </target>
 
   <!-- Init =================================================================-->

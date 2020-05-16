@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%@ page import="com.JHTools.WebService.BinaryDataRepository" %>
+<%@ page import="com.JHTools.Utils.Info" %>
 
 <%@ page import="java.io.File"%>
 <%@ page import="java.io.FileOutputStream"%>
@@ -27,12 +28,11 @@
   
     <%
       // TBD: should be realy deleted
-      // TBD: parametrise file place
       String id = request.getParameter("id");
       byte[] content = bdr.get(id);
       String name = id.substring(4);
-      new File("/tmp/FinkBrowser/FITS").mkdirs();
-      String fn = "/tmp/FinkBrowser/FITS/" + name + ".fits";
+      new File(Info.tmp() +"/FITS").mkdirs();
+      String fn = Info.tmp() + "/FITS/" + name + ".fits";
       File file = new File(fn);
       file.deleteOnExit();      
       FileOutputStream fos = new FileOutputStream(file);

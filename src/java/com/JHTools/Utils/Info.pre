@@ -21,10 +21,17 @@ public class Info {
   public final static String name() {
     return _name;
     }
+
+  /** Give temporary directory (available to Tomcat).
+    * @return The temporary directory. */
+  public final static String tmp() {
+    return _tmp;
+    }
         
   private static final String _name     = "JHTools";
   private static final String _version  = "@version@";
   private static final String _build    = "@TSTAMP@";
   private static final String _builder  = "@user.name@";
+  private static final String _tmp      = "@TMP@";
 
   }
