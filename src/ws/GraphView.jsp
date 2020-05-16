@@ -1,29 +1,40 @@
-<div id="manip" title="graph manipulations">
-  Customize the interactions with the <b>graph</b>.
-   <br/>
-   <input type="button" onclick="clusterByGroups()"  value="Cluster by group type">
-   <input type="button" onclick="clusterByHubsize()" value="Cluster by group size">
-   <input type="button" onclick="clusterExpand()"    value="Expand all clusters">
-   <input type="button" onclick="fillEdges()"        value="Show all edges">
-   <input type="checkbox" name="layout"     id="layout"           onclick="switchLayout()"  value="false" title="hierarchical layout"                   >hierarchical</input>
-  (<input type="checkbox" name="layout"     id="layout_direction" onclick="switchLayout()"  value="false" title="up-down or left-right"                 >up/lr</input>
-   <input type="checkbox" name="layout"     id="layout_method"    onclick="switchLayout()"  value="false" title="ordered by size or hierarchy"          >size/hierarchy</input>)
-   <input type="checkbox" name="physics"    id="physics"          onclick="switchPhysics()" value="true"  title="activate animation"             checked>live</input>
-   <br/>
-   <input type="checkbox" name="clusterize" id="clusterize"                          value="true"  title="clusterize after change"               checked>clusterize</input>
-   <input type="checkbox" name="zoom"       id="zoom"                                value="true"  title="cluster by zoom"                       checked>zoom cluster</input>
-  (<input type="checkbox" name="stabilize"  id="stabilize"                           value="false" title="stabilize when clustering by zoom"            >stabilize</input>)
-   <input type="checkbox" name="expandTo"   id="expandTo"                            value="true"  title="activate children node expansion"      checked>get children</input>
-   <input type="checkbox" name="expandFrom" id="expandFrom"                          value="false" title="activate parent node expansion"               >get parents</input>
-   <input type="checkbox" name="removeOld"  id="removeOld"                           value="false" title="activate removal of old nodes"                >remove old</input>
-  <br/>
-  filter: <input type="text" name="filter" value="" id="filter" title="show only nodes with a string in their label"/>
-          <input type="button" onclick="applyFilter()" value="Apply">
+<link href="GraphView.css" rel="stylesheet" type="text/css"/>
+
+<div id="graph">
+  <div id="manip" title="graph manipulations" style="background-color:#ddffdd">
+    Customize the interactions with the <b>graph</b>.
+     <br/>
+     <input type="button" onclick="clusterByGroups()"  value="Cluster by group type">
+     <input type="button" onclick="clusterByHubsize()" value="Cluster by group size">
+     <input type="button" onclick="clusterExpand()"    value="Expand all clusters">
+     <input type="button" onclick="fillEdges()"        value="Show all edges">
+     <input type="checkbox" name="layout"     id="layout"           onclick="switchLayout()"  value="false" title="hierarchical layout"                   >hierarchical</input>
+    (<input type="checkbox" name="layout"     id="layout_direction" onclick="switchLayout()"  value="false" title="up-down or left-right"                 >up/lr</input>
+     <input type="checkbox" name="layout"     id="layout_method"    onclick="switchLayout()"  value="false" title="ordered by size or hierarchy"          >size/hierarchy</input>)
+     <input type="checkbox" name="physics"    id="physics"          onclick="switchPhysics()" value="true"  title="activate animation"             checked>live</input>
+     <br/>
+     <input type="checkbox" name="clusterize" id="clusterize"                          value="true"  title="clusterize after change"               checked>clusterize</input>
+     <input type="checkbox" name="zoom"       id="zoom"                                value="true"  title="cluster by zoom"                       checked>zoom cluster</input>
+    (<input type="checkbox" name="stabilize"  id="stabilize"                           value="false" title="stabilize when clustering by zoom"            >stabilize</input>)
+     <input type="checkbox" name="expandTo"   id="expandTo"                            value="true"  title="activate children node expansion"      checked>get children</input>
+     <input type="checkbox" name="expandFrom" id="expandFrom"                          value="false" title="activate parent node expansion"               >get parents</input>
+     <input type="checkbox" name="removeOld"  id="removeOld"                           value="false" title="activate removal of old nodes"                >remove old</input>
+    <br/>
+    filter: <input type="text" name="filter" value="" id="filter" title="show only nodes with a string in their label"/>
+            <input type="button" onclick="applyFilter()" value="Apply">
+    </div>  
+  <script>
+    var div = document.createElement("div");
+    div.style.width = "100%";
+    div.style.height = (window.innerHeight * 0.7) + "px";
+    div.id = "visnetwork";
+    document.getElementById("graph").appendChild(div);
+    </script>
   </div>
   
-<div id="visnetwork" title="graph network" style="background-color:white">
-  --- graph network ---
-  </div>
+<script type="text/javascript" src="StylesheetDefault.js"></script>
+<script type="text/javascript" src="Stylesheet.js"></script>
+<script type="text/javascript" src="GraphView.js"></script>
 
  
  

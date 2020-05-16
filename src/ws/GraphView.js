@@ -614,6 +614,8 @@ function stylesheetValue(nam, id, eMap, ifEdge, title) {
   
 // Load page into Result pane
 async function loadResult(url) {
+  console.log(url);
+  console.log(document.getElementById('result'));
   $("#result").load(url);
   }
   
