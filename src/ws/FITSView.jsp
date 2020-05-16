@@ -20,13 +20,14 @@
     <script type="text/javascript" src="js9-3.0/js9.min.js"></script>
     <script type="text/javascript" src="js9-3.0/js9plugins.js"></script>
     <title>JS9-Viewer</title>
-    <jsp:useBean id="bdr" class="com.JHTools.WebService.BinaryDataRepository" scope="session" />
+    <jsp:useBean id="bdr" class="com.JHTools.WebService.BinaryDataRepository" scope="session"/>
     </head>
     
   <body>
   
     <%
       // TBD: should be realy deleted
+      // TBD: parametrise file place
       String id = request.getParameter("id");
       byte[] content = bdr.get(id);
       String name = id.substring(4);
@@ -41,13 +42,15 @@
       %>
       
     <div id="centerdiv">
-    <div class="JS9Menubar"  data-width="768px" data-height="54px"></div>
-    <div class="JS9Toolbar"  data-width="768px" data-height="54px"></div>
-    <div class="JS9"         data-width="768px" data-height="768px"></div>
-    <div class="JS9Colorbar" data-width="768px" data-height="54px"></div>
+      <!--a href='javascript:JS9.Load("<%=url%>");'><%=name%></a-->
+      <div class="JS9Menubar"  data-width="768px" data-height="54px"></div>
+      <div class="JS9Toolbar"  data-width="768px" data-height="54px"></div>
+      <div class="JS9"         data-width="768px" data-height="768px"></div>
+      <div class="JS9Colorbar" data-width="768px" data-height="54px"></div>
+      </div>
       
     <script type="text/javascript">
-      function init(){
+      function init() {
         JS9.Preload("<%=url%>", {colormap:"heat"});
         }
       $(document).ready(function() {
@@ -67,7 +70,6 @@
     </body>
   
   </html>
-
 
 
 

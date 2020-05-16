@@ -610,12 +610,24 @@ function stylesheetValue(nam, id, eMap, ifEdge, title) {
   return val;
   }
   
+// TBD: unify  
+  
 // Load page into Result pane
 async function loadResult(url) {
   $("#result").load(url);
   }
   
 // Load page into Graph pane
-async function loadGraph(url) {
-  $("#graph").load(url);
+async function loadGraph(url, iframe) {
+  if (iframe) {
+    document.getElementById('graph').innerHTML='<iframe height="100%" width="100%" src="' + url + '">'
+    }
+  else {
+    $("#graph").load(url);
+    }
+  }
+  
+// Load page into Commands pane
+async function loadCommands(url) {
+  $("#commands").load(url);
   }
