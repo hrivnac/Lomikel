@@ -7,10 +7,10 @@ import java.net.HttpURLConnection;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>Notifier</code> connects to Web page
+/** <code>NotifierURL</code> connects to Web page
   * to reqister call.
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class Notifier {
+public class NotifierURL {
 
   /** Connect to monitorring Web page.
     * @param message The message to be send. */
@@ -51,6 +51,6 @@ public class Notifier {
     }
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(Notifier.class);
+  private static Logger log = Logger.getLogger(NotifierURL.class);
     
   }

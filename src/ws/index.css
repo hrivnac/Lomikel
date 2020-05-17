@@ -1,9 +1,8 @@
-#feedback {
-  overflow-y: scroll;
-  scroll-behavior: smooth;
-  }
-  
-h1 {
+html, body {
+  height: 100%;
+  }  
+
+.h1, h1 {
   display: block;
   font-size: 2em;
   margin-top: 0.67em;

@@ -45,13 +45,15 @@
   <target name="info"
           depends="init"
           description="Create Info class">
+    <!-- TBD: allow in clients !-->
     <mkdir dir="../build/com/JHTools/Utils"/>
     <copy file="../src/java/com/JHTools/Utils/Info.pre"
           tofile="../build/com/JHTools/Utils/Info.java"/>
     <replace file="../build/com/JHTools/Utils/Info.java" token="@version@"   value="${version}"/>
     <replace file="../build/com/JHTools/Utils/Info.java" token="@TSTAMP@"    value="${TSTAMP}"/>
     <replace file="../build/com/JHTools/Utils/Info.java" token="@user.name@" value="${user.name}"/>
-    <replace file="../build/com/JHTools/Utils/Info.java" token="@TMP"        value="${tmp_dir}"/>
+    <replace file="../build/com/JHTools/Utils/Info.java" token="@TMP@"       value="${tmp_dir}"/>
+    <replace file="../build/com/JHTools/Utils/Info.java" token="@MANAGER@"   value="${manager}"/>
     </target>
 
   <!-- Init =================================================================-->

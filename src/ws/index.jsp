@@ -5,8 +5,6 @@
     <title>@NAME@</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="GraphView.css"                                       rel="stylesheet" type="text/css"/>
-    <link href="HBaseTable.css"                                      rel="stylesheet" type="text/css"/>
     <link href="bootstrap-4.4.1/css/bootstrap.min.css"               rel="stylesheet" type="text/css">
     <link href="fontawesome-free-5.13.0-web/css/all.css"             rel="stylesheet" type="text/css">
     <link href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css" rel="stylesheet" type="text/css">
@@ -54,8 +52,8 @@
         $().w2layout({
           name: 'layoutLeft',
           panels: [
-            {type:'top',  size:'30%', resizable:true, style:greenstyle},
-            {type:'main', size:'70%', resizable:true, style:greenstyle}
+            {type:'top',  size:'20%', resizable:true, style:greenstyle},
+            {type:'main', size:'80%', resizable:true, style:greenstyle}
             ]
           });
         $().w2layout({

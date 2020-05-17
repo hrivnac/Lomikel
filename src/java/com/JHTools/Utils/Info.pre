@@ -27,11 +27,18 @@ public class Info {
   public final static String tmp() {
     return _tmp;
     }
+
+  /** Give email of the package manager.
+    * @return The email of the package manager. */
+  public final static String manager() {
+    return _manager;
+    }
         
   private static final String _name     = "JHTools";
   private static final String _version  = "@version@";
   private static final String _build    = "@TSTAMP@";
   private static final String _builder  = "@user.name@";
   private static final String _tmp      = "@TMP@";
+  private static final String _manager  = "@MANAGER@";
 
   }

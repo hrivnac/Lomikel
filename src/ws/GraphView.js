@@ -614,15 +614,16 @@ function stylesheetValue(nam, id, eMap, ifEdge, title) {
   
 // Load page into Result pane
 async function loadResult(url) {
-  console.log(url);
-  console.log(document.getElementById('result'));
   $("#result").load(url);
   }
   
 // Load page into Graph pane
-async function loadGraph(url, iframe) {
+async function loadGraph(url, iframe, height) {
+  if (!height) {
+    height = "100%";
+    }
   if (iframe) {
-    document.getElementById('graph').innerHTML='<iframe height="100%" width="100%" src="' + url + '">'
+    document.getElementById('graph').innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
     }
   else {
     $("#graph").load(url);

@@ -18,12 +18,14 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 
-<!--%@ page errorPage="ExceptionHandler.jsp" %-->
+<%@ page errorPage="ExceptionHandler.jsp" %>
 
 <!--%
   session.removeAttribute("bdr");
   %-->
 <jsp:useBean id="bdr" class="com.JHTools.WebService.BinaryDataRepository" scope="session" />
+
+<link href="HBaseTable.css" rel="stylesheet" type="text/css"/>
 
 <div id='hbasetable'>
   <table>
@@ -226,7 +228,7 @@
     var html = []
     $.each(row, function (key, value) {
       if (value.startsWith('url:')) { // TBD: whould work also for other types
-        html.push("<b><a href='#' onclick='loadGraph(\"FITSView.jsp?id=" + value + "\", true)'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
+        html.push("<b><a href='#' onclick='loadGraph(\"FITSView.jsp?id=" + value + "\", true, \"800px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
         }
       else {
         html.push('<b>' + key + ':</b> ' + value + '<br/>')
@@ -235,7 +237,7 @@
     return html.join('')
     }
   function binaryFormatter(value, row) {
-    return "<b><a href='#' onclick='loadGraph(\"FITSView.jsp?id=" + value + "\", true)'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
+    return "<b><a href='#' onclick='loadGraph(\"FITSView.jsp?id=" + value + "\", true, \"800px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
     }
   </script>
   
