@@ -8,7 +8,7 @@
 <%@ page import="java.net.InetAddress" %>
 <%@ page import="java.lang.StackTraceElement" %>
 
-<%@ page import="com.JHTools.Utils.Notifier" %>
+<%@ page import="com.JHTools.Utils.NotifierMail" %>
 <%@ page import="com.JHTools.Utils.Info" %>
 
 <html>
@@ -50,7 +50,7 @@
           }
         catch (Exception e) {}                                    
         try {
-          Notifier.postMail("ERROR: " + exception.toString(), host + "[" + addr + "]\n\n==================================================\n\n" + message);
+          NotifierMail.postMail("ERROR: " + exception.toString(), host + "[" + addr + "]\n\n==================================================\n\n" + message);
           }
         catch (Exception e) {}
         %>

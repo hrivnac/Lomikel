@@ -9,7 +9,6 @@
     <link href="fontawesome-free-5.13.0-web/css/all.css"             rel="stylesheet" type="text/css">
     <link href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css" rel="stylesheet" type="text/css">
     <link href="jquery-ui-1.12.1/jquery-ui.min.css"                  rel="stylesheet" type="text/css"/>
-    <link href="daterangepicker-0.1.0/dist/daterangepicker.css"      rel="stylesheet" type="text/css"/>
     <link href="index.css"                                           rel="stylesheet" type="text/css"/>
     <link href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css"                   rel="stylesheet" type="text/css" />
     </head>
@@ -34,7 +33,6 @@
     <script type="text/javascript" src="bootstrap-table-1.16.0/dist/bootstrap-table.min.js"></script>
     <script type="text/javascript" src="knockout-3.2.0.js"></script>
     <script type="text/javascript" src="moment-2.25.2.js"></script>
-    <script type="text/javascript" src="daterangepicker-0.1.0/dist/daterangepicker.js"></script>
     <script type="text/javascript" src="HBaseTable.js"></script>
     <script type="text/javascript" src="w2ui-1.5.rc1/w2ui-1.5.rc1.min.js"></script>
     
