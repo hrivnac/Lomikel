@@ -10,9 +10,9 @@
   
 <script>
   async function reset() {
-    document.getElementById('commands').innerHTML = await(await fetch("Top.jsp"      )).text();// TBD:unify with GraphView.js
-    document.getElementById('graph'   ).innerHTML = await(await fetch("GraphView.jsp")).text();
-    document.getElementById('result'  ).innerHTML = await(await fetch("Result.jsp"   )).text();
-    container = document.getElementById('visnetwork');
+    loadPane("commands", "Top.jsp");
+    loadPane("graph", "GraphView.jsp");
+    loadPane("result", "Result.jsp");
+    //container = document.getElementById('visnetwork');
     }
   </script>
