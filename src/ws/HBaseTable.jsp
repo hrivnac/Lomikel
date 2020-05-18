@@ -187,6 +187,9 @@
   
   <script>  
     $(function () {
+      if (w2ui.hbaseTableForm) {
+        w2ui['hbaseTableForm'].destroy();
+        }
       w2utils.settings.dateFormat ='dd/MM/yyyy|h24:mm';
       $('#hbaseTableForm').w2form( { 
         name   : 'hbaseTableForm',
