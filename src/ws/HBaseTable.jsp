@@ -229,7 +229,8 @@
     </script>
 
   <script>
-    var $table = $('#table')
+    var height = document.getElementById("visnetwork").style.height;
+    var $table = $('#table');
     $(function() { 
       var data = [
         <%=h2table.data()%>
@@ -240,7 +241,6 @@
       $table.bootstrapTable('refreshOptions', {sortable: 'true'})
       })
     function detailFormatter(index, row) {
-      var height = document.getElementById("visnetwork").style.height;
       var html = []
       $.each(row, function (key, value) {
         if (value.startsWith('url:')) { // TBD: whould work also for other types
@@ -253,7 +253,7 @@
       return html.join('')
       }
     function binaryFormatter(value, row) {
-      return "<b><a href='#' onclick='loadGraph(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
+      return "<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
       }
     </script>
     
