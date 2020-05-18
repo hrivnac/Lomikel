@@ -24,6 +24,7 @@
     <pathelement path="${slf4j_jar}"/>
     <pathelement path="${hbasecommon_jar}"/>
     <pathelement path="${hadoopcommon_jar}"/>
+    <pathelement path="${javaxmail_jar}"/>
     <fileset dir="../extlib">
       <include name="*.jar"/>
       </fileset>
@@ -167,6 +168,7 @@
       <lib file="${logging_jar}"/>
       <lib file="${hbasecommon_jar}"/>
       <lib file="${hadoopcommon_jar}"/>
+      <lib file="${javaxmail_jar}"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="JHTools"/>

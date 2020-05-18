@@ -45,19 +45,13 @@ public class HBase2Table {
     _showColumns = Arrays.asList(showColumns);
     }  
     
-  /** Set first colums to show.
-    * @param firstColumns The columns to be shown first.
-    *                     All other columns will be shown after, in alphabetic order. */
-  public void setFirstColumns(String[] firstColumns) {
-    _firstColumns = Arrays.asList(firstColumns);
-    }  
-    
   /** Convert <em>HBase</em> {@link JSONObject} into table.
     * @param json  The {@link JSONObject} representation of the HBader table.
     * @param limit Max number of rows. <tt>0</tt> means no limit.
     * @return     The table as {@link Map}. */
   public Map<String, Map<String, String>> table(JSONObject json,
                                                 int        limit) {
+    log.info("Creating HBase table");
     if (json == null || json.equals("")) {
       return null;
       }
@@ -105,29 +99,18 @@ public class HBase2Table {
     * @param limit Max number of rows. */
   public void process(JSONObject json,
                           int    limit) {
+    log.info("Processing HBase table");
     Map<String, Map<String, String>> table = table(json, limit);
     if (table == null) {
       return;
       }
-    Set<String> columnsSet = new TreeSet<>();
+    Set<String> columns0 = new TreeSet<>();
     for (Map<String, String> entry : table.values()) {
       for (String column : entry.keySet()) {
         if (_showColumns == null || _showColumns.isEmpty() || _showColumns.contains(column)) {  
-          columnsSet.add(column);
-          }
-        }
-      }
-    List<String> columns0 = new ArrayList<>();
-    if (_firstColumns != null && !_firstColumns.isEmpty()) {
-      for (String column : _firstColumns) {
-        if (columnsSet.contains(column)) {
           columns0.add(column);
-          columnsSet.remove(column);
           }
         }
-      }
-    for (String column : columnsSet) {
-      columns0.add(column);
       }
     // TBD: support non-default columns
     List<String> columns = new ArrayList<>();
@@ -214,8 +197,6 @@ public class HBase2Table {
   private Schema _schema;
     
   private List<String> _showColumns;
-    
-  private List<String> _firstColumns;
   
   private String _thead;
   

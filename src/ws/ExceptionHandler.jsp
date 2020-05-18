@@ -11,6 +11,10 @@
 <%@ page import="com.JHTools.Utils.NotifierMail" %>
 <%@ page import="com.JHTools.Utils.Info" %>
 
+<%@ page import="org.apache.log4j.Logger" %>
+
+<%! static Logger log = Logger.getLogger(ExceptionHandler_jsp.class); %>
+
 <html>
   <head><title>JHTools Exception Handler</title></head>
     <body bgcolor="#ffdddd">
@@ -53,6 +57,7 @@
           NotifierMail.postMail("ERROR: " + exception.toString(), host + "[" + addr + "]\n\n==================================================\n\n" + message);
           }
         catch (Exception e) {}
+        log.error("Handled ERROR: " + exception.toString() + "\n\n" + host + "[" + addr + "]\n\n==================================================\n\n" + message
         %>
 
       </body>
