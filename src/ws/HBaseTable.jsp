@@ -178,12 +178,6 @@
       </div>
     
     </div>
-      
-  <script>
-    async function loadHBaseTable(url) {
-      $("#hbaseTable").load(url);
-      }
-    </script>
   
   <script>  
     $(function () {
@@ -227,7 +221,7 @@
                                                   + "&limit="   + w2ui.hbaseTableForm.record.limit
                                                   + "&start="   + encodeURIComponent(w2ui.hbaseTableForm.record.start)
                                                   + "&stop="    + encodeURIComponent(w2ui.hbaseTableForm.record.stop);
-            loadHBaseTable(request);
+            loadPane("hbasetable", request);
             }
           }
         });
@@ -249,7 +243,8 @@
       var html = []
       $.each(row, function (key, value) {
         if (value.startsWith('url:')) { // TBD: whould work also for other types
-          html.push("<b><a href='#' onclick='loadGraph(\"FITSView.jsp?id=" + value + "\", true, \"800px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
+          // TBD: 800px => 100%
+          html.push("<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"800px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
           }
         else {
           html.push('<b>' + key + ':</b> ' + value + '<br/>')
@@ -258,7 +253,7 @@
       return html.join('')
       }
     function binaryFormatter(value, row) {
-      return "<b><a href='#' onclick='loadGraph(\"FITSView.jsp?id=" + value + "\", true, \"800px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
+      return "<b><a href='#' onclick='loadGraph(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"800px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
       }
     </script>
     

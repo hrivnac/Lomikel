@@ -24,7 +24,7 @@
             <input type="button" onclick="applyFilter()" value="Apply">
     </div>  
   <script>
-    var div = document.createElement("div");
+    div = document.createElement("div");
     div.style.width = "100%";
     div.style.height = (window.innerHeight * 0.8) + "px";
     div.id = "visnetwork";

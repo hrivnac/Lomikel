@@ -191,7 +191,7 @@ function show(graph) {
         for (var k = 0; k < actionsArray.length; k++) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, false, title);
           if (url) {
-            actions += "<a href='#' onclick='loadResult(\"" + url + "\")'>" + actionsArray[k].name + "</a>";
+            actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
             if (!actionsArray[k].embedded) {
               actions += "(<a href='" + url + "' target='_blank'>*</a>)";
               }
@@ -223,7 +223,7 @@ function show(graph) {
         for (var k = 0; k < actionsArray.length; k++) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, true, title);
           if (url) {
-            actions += "<a href='#' onclick='loadResult(\"" + url + "\")'>" + actionsArray[k].name + "</a>";
+            actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
             if (!actionsArray[k].embedded) {
               actions += "(<a href='" + url + "' target='_blank'>*</a>)";
               }
@@ -610,27 +610,3 @@ function stylesheetValue(nam, id, eMap, ifEdge, title) {
   return val;
   }
   
-// TBD: unify  
-  
-// Load page into Result pane
-async function loadResult(url) {
-  $("#result").load(url);
-  }
-  
-// Load page into Graph pane
-async function loadGraph(url, iframe, height) {
-  if (!height) {
-    height = "100%";
-    }
-  if (iframe) {
-    document.getElementById('graph').innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
-    }
-  else {
-    $("#graph").load(url);
-    }
-  }
-  
-// Load page into Commands pane
-async function loadCommands(url) {
-  $("#commands").load(url);
-  }
