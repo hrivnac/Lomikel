@@ -26,7 +26,7 @@
   <script>
     div = document.createElement("div");
     div.style.width = "100%";
-    div.style.height = (window.innerHeight * 0.8) + "px";
+    div.style.height = (window.innerHeight * 0.7) + "px";
     div.id = "visnetwork";
     document.getElementById("graph").appendChild(div);
     </script>

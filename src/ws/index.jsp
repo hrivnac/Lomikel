@@ -38,8 +38,10 @@
     
     <script type="text/javascript">
       $(function () {
-        var greenstyle = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ddffdd';
-        var bluestyle  = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ddddff';
+        var greenstyle     = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ddffdd';
+        var darkgreenstyle = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ccffcc';
+        var bluestyle      = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ddddff';
+        var darkbluestyle  = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ccccff';
         $('#layout').w2layout({
           name:'layout',
           panels:[
@@ -50,25 +52,25 @@
         $().w2layout({
           name: 'layoutLeft',
           panels: [
-            {type:'top',  size:'20%', resizable:true, style:greenstyle},
+            {type:'top',  size:'20%', resizable:true, style:darkgreenstyle},
             {type:'main', size:'80%', resizable:true, style:greenstyle}
             ]
           });
         $().w2layout({
           name: 'layoutMain',
           panels: [
-            {type:'top',    size:'05%', resizable:true, style:greenstyle},
+            {type:'top',    size:'05%', resizable:true, style:darkgreenstyle},
             {type:'main',   size:'75%', resizable:true, style:bluestyle},
-            {type:'bottom', size:'10%', resizable:true, style:bluestyle}
+            {type:'bottom', size:'10%', resizable:true, style:darkbluestyle}
             ]
           });
         
         w2ui['layout'].html('left', w2ui['layoutLeft']);
         w2ui['layout'].html('main', w2ui['layoutMain']);
-        w2ui['layoutLeft'].load('top', 'Top.jsp');
-        w2ui['layoutLeft'].load('main', 'GraphView.jsp');
-        w2ui['layoutMain'].load('top', 'TopMini.jsp');
-        w2ui['layoutMain'].load('main', 'Result.jsp');
+        w2ui['layoutLeft'].load('top',    'Top.jsp');
+        w2ui['layoutLeft'].load('main',   'GraphView.jsp');
+        w2ui['layoutMain'].load('top',    'TopMini.jsp');
+        w2ui['layoutMain'].load('main',   'Result.jsp');
         w2ui['layoutMain'].load('bottom', 'Feedback.jsp');
     
         });

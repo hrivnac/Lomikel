@@ -41,10 +41,10 @@
   %>
    
 <div id="fitsview">
-  <div class="JS9Menubar"  data-width="768px" data-height="54px"></div>
-  <div class="JS9Toolbar"  data-width="768px" data-height="54px"></div>
-  <div class="JS9"         data-width="768px" data-height="768px"></div>
-  <div class="JS9Colorbar" data-width="768px" data-height="54px"></div>
+  <div class="JS9Menubar" ></div>
+  <div class="JS9Toolbar" ></div>
+  <div class="JS9"        ></div>
+  <div class="JS9Colorbar"></div>
   </div>
   
 <script type="text/javascript">

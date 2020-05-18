@@ -240,11 +240,11 @@
       $table.bootstrapTable('refreshOptions', {sortable: 'true'})
       })
     function detailFormatter(index, row) {
+      var height = document.getElementById("visnetwork").style.height;
       var html = []
       $.each(row, function (key, value) {
         if (value.startsWith('url:')) { // TBD: whould work also for other types
-          // TBD: 800px => 100%
-          html.push("<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"800px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
+          html.push("<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
           }
         else {
           html.push('<b>' + key + ':</b> ' + value + '<br/>')
@@ -253,7 +253,7 @@
       return html.join('')
       }
     function binaryFormatter(value, row) {
-      return "<b><a href='#' onclick='loadGraph(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"800px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
+      return "<b><a href='#' onclick='loadGraph(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
       }
     </script>
     
