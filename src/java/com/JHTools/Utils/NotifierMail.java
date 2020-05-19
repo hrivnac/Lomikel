@@ -23,6 +23,12 @@ import org.apache.log4j.Logger;
 // TBD: refactor
 public class NotifierMail {
 
+  /** Set special <em>manager</em> email.
+    * @param manager The <em>manager</em> email. */
+  public static void setManager(String manager) {
+    _manager = manager;
+    }
+
   /** Selftest. */
   public static void main(String[] args) throws Exception {
     new NotifierMail().postMail("Notifier test", "testing");
@@ -34,7 +40,7 @@ public class NotifierMail {
     * @throws MessaginException if mail can't be sent. */
   public static void postMail(String subject, 
                               String message) throws MessagingException {
-    postMail(Info.manager(), subject, message, Info.manager(), "cernmx.cern.ch", "text/plain");
+    postMail(manager(), subject, message, manager(), "cernmx.cern.ch", "text/plain");
     }
 
   /** Sent E-mail using default values.
@@ -45,7 +51,7 @@ public class NotifierMail {
   public static void postMail(String[] recipients,
                               String   subject, 
                               String   message) throws MessagingException {
-    postMail(recipients, subject, message, Info.manager(), "cernmx.cern.ch", "text/plain");
+    postMail(recipients, subject, message, manager(), "cernmx.cern.ch", "text/plain");
     }
 
   /** Sent E-mail using default values.
@@ -67,7 +73,7 @@ public class NotifierMail {
   public static void postHTMLMail(String[] recipients,
                                   String   subject, 
                                   String   message) throws MessagingException {
-    postMail(recipients, subject, message, Info.manager(), "cernmx.cern.ch", "text/html");
+    postMail(recipients, subject, message, manager(), "cernmx.cern.ch", "text/html");
     }
  
   /** Sent HTML E-mail using default values.
@@ -147,6 +153,14 @@ public class NotifierMail {
     Transport.send(msg);
     
     }
+    
+  /** Give the current <em>manager</em> email.
+    * @return The current <em>manager</em> email. */
+  private static String manager() {
+    return _manager == null ? Info.manager() : _manager;
+    }
+    
+  private static String _manager;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(NotifierMail.class);
