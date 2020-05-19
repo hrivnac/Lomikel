@@ -33,7 +33,6 @@
     <script type="text/javascript" src="bootstrap-table-1.16.0/dist/bootstrap-table.min.js"></script>
     <script type="text/javascript" src="knockout-3.2.0.js"></script>
     <script type="text/javascript" src="moment-2.25.2.js"></script>
-    <script type="text/javascript" src="HBaseTable.js"></script>
     <script type="text/javascript" src="w2ui-1.5.rc1/w2ui-1.5.rc1.min.js"></script>
     
     <script type="text/javascript">

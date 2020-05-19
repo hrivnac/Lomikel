@@ -494,13 +494,14 @@ function switchPhysics() {
   
 // Switch layout on/off
 function switchLayout() {
-  if (document.getElementById('layout').checked) {
+  console.log(document.getElementById('glayout').checked);
+  if (document.getElementById('glayout').checked) {
     var direction = "LR";
-    if (document.getElementById('layout_direction').checked) {
+    if (document.getElementById('glayout_direction').checked) {
       direction = "UD";
       }
     var method = "directed";
-    if (document.getElementById('layout_method').checked) {
+    if (document.getElementById('glayout_method').checked) {
       method = "hubsize";
       }     
     network.setOptions({layout:{improvedLayout:true, hierarchical:{direction:direction, sortMethod:method}}});
