@@ -29,8 +29,6 @@
   %-->
 <jsp:useBean id="bdr" class="com.JHTools.WebService.BinaryDataRepository" scope="session" />
 
-<link href="HBaseTable.css" rel="stylesheet" type="text/css"/>
-
 <div id='hbasetable'>
 
   <div id="hbaseTableForm" style="width: 100%"></div>
@@ -174,7 +172,7 @@
           </tr>
         </thead>
       </table>
-      
+      <input type="button" onclick="showHist()" value="Plot">      
       </div>
     
     </div>
@@ -247,13 +245,21 @@
           html.push("<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
           }
         else {
-          html.push('<b>' + key + ':</b> ' + value + '<br/>')
+          html.push(histSelector(key) + '<b>' + key + ':</b> ' + value + '<br/>')
           }
         })
       return html.join('')
       }
     function binaryFormatter(value, row) {
       return "<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
+      }
+    function histSelector(key) {
+      return "<input type='radio' name ='x' id='x_" + key + "'>x</input>" +
+             "<input type='radio' name ='y' id='y_" + key + "'>y</input>&nbsp;";
+      }
+    function showHist() {
+    var height = document.getElementById("visnetwork").style.height;
+      loadPane("graph", "HistView.jsp", true, height);
       }
     </script>
     

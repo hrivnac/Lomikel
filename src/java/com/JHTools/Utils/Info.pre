@@ -22,7 +22,7 @@ public class Info {
 
   /** Get run-time Configuration. 
     * @return The run-time Configuration. */
-  public final static String configuration() {
+  public static String configuration() {
     return release();
     }
 

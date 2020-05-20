@@ -5,12 +5,14 @@
     <title>@NAME@</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="bootstrap-4.4.1/css/bootstrap.min.css"               rel="stylesheet" type="text/css">
-    <link href="fontawesome-free-5.13.0-web/css/all.css"             rel="stylesheet" type="text/css">
-    <link href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css" rel="stylesheet" type="text/css">
-    <link href="jquery-ui-1.12.1/jquery-ui.min.css"                  rel="stylesheet" type="text/css"/>
-    <link href="index.css"                                           rel="stylesheet" type="text/css"/>
-    <link href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css"                   rel="stylesheet" type="text/css" />
+    <link href="vis-network-7.6.8/styles/vis-network.min.css"           rel="stylesheet" type="text/css" />
+    <link href="vis-timeline-7.6.8/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+    <link href="bootstrap-4.4.1/css/bootstrap.min.css"                  rel="stylesheet" type="text/css">
+    <link href="fontawesome-free-5.13.0-web/css/all.css"                rel="stylesheet" type="text/css">
+    <link href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css"    rel="stylesheet" type="text/css">
+    <link href="jquery-ui-1.12.1/jquery-ui.min.css"                     rel="stylesheet" type="text/css"/>
+    <link href="index.css"                                              rel="stylesheet" type="text/css"/>
+    <link href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css"                      rel="stylesheet" type="text/css" />
     </head>
   
   <body>
@@ -23,7 +25,8 @@
       document.body.appendChild(div);
       </script>
   
-    <script type="text/javascript" src="vis-network-7.3.6/standalone/umd/vis-network.min.js"></script> 
+    <script type="text/javascript" src="vis-network-7.6.8/standalone/umd/vis-network.min.js"></script> 
+    <script type="text/javascript" src="vis-timeline-7.6.8/standalone/umd/vis-timeline-graph2d.min.js"></script> 
     <script type="text/javascript" src="OptionsDefault.js"></script>
     <script type="text/javascript" src="Options.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
