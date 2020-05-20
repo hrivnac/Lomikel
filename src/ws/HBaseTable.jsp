@@ -24,10 +24,7 @@
 
 <%! static Logger log = Logger.getLogger(HBaseTable_jsp.class); %>
 
-<!--%
-  session.removeAttribute("bdr");
-  %-->
-<jsp:useBean id="bdr" class="com.JHTools.WebService.BinaryDataRepository" scope="session" />
+<jsp:useBean id="h2table" class="com.JHTools.WebService.HBase2Table" scope="session"/>
 
 <div id='hbasetable'>
 
@@ -112,7 +109,6 @@
         out.println("showing only version <b>" + version + "</b><br/>");
         }
       HBaseClient h = new HBaseClient(hbase);
-      HBase2Table h2table = new HBase2Table();
       JSONObject json = h.get2JSON(htable,
                                    "schema_*");
       Map<String, Map<String, String>> schemas = h2table.table(json, 0);
@@ -144,7 +140,6 @@
         h2table.setShowColumns(selects.split(","));
         }
       h2table.process(json, limit);
-      //bdr = h2table.repository();
       %>
     <table id='table'
            data-sortable='true'
@@ -172,7 +167,7 @@
           </tr>
         </thead>
       </table>
-      <input type="button" onclick="showHist()" value="Plot">      
+      <input type="button" onclick="showHist()" value="Plot" style="background-color:#ddffdd">      
       </div>
     
     </div>
@@ -245,7 +240,12 @@
           html.push("<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
           }
         else {
-          html.push(histSelector(key) + '<b>' + key + ':</b> ' + value + '<br/>')
+          if (key == "key") {
+            html.push('<b>' + key + ':</b> ' + value + '<br/>');
+            }
+          else {
+            html.push(histSelector(key) + '<b>' + key + ':</b> ' + value + '<br/>');
+            }
           }
         })
       return html.join('')
@@ -254,12 +254,18 @@
       return "<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
       }
     function histSelector(key) {
-      return "<input type='radio' name ='x' id='x_" + key + "'>x</input>" +
-             "<input type='radio' name ='y' id='y_" + key + "'>y</input>&nbsp;";
+      return "<input type='checkbox' name='y' class='y' id='y_" + key + "'></input>&nbsp;";
       }
     function showHist() {
-    var height = document.getElementById("visnetwork").style.height;
-      loadPane("graph", "HistView.jsp", true, height);
+      var height = document.getElementById("visnetwork").style.height;
+      var ys = document.getElementsByClassName('y');
+      var y = "";
+      for (i = 0; i < ys.length; i++) {
+        if (ys[i].checked) {
+          y += ys[i].id.substring(2) + " ";
+          }
+        }
+      loadPane("graph", "HistView.jsp?y=" + y.trim(), true, height);
       }
     </script>
     

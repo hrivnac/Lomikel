@@ -1,5 +1,5 @@
 // Graph options
-var options = {
+var options4Graph = {
   autoResize:true,
   height:"100%",
   width:"100%",
@@ -58,3 +58,15 @@ var options = {
     }
   };
   
+// Hist Options
+var options4Hist = {
+  dataAxis: {
+    showMinorLabels: true,
+    icons: false,
+    },
+  legend: {
+    left: {
+      position: "bottom-left"
+      }
+    },
+  };

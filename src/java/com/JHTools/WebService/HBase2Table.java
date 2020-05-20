@@ -35,6 +35,11 @@ public class HBase2Table {
     
   /** Create. */
   public HBase2Table() {
+   reset();
+   }
+   
+  /** TBD */
+  public void reset() {
     _repository = new BinaryDataRepository();
     }
   
@@ -48,7 +53,7 @@ public class HBase2Table {
   /** Convert <em>HBase</em> {@link JSONObject} into table.
     * @param json  The {@link JSONObject} representation of the HBader table.
     * @param limit Max number of rows. <tt>0</tt> means no limit.
-    * @return     The table as {@link Map}. */
+    * @return     The table as {@link Map}: key:{column:value,...}. */
   public Map<String, Map<String, String>> table(JSONObject json,
                                                 int        limit) {
     log.info("Creating HBase table");
@@ -62,7 +67,7 @@ public class HBase2Table {
     String value;
     CellContent cc;
     String id;
-    Map<String, Map<String, String>> entries = new HashMap<>();
+    _table = new HashMap<>();
     Map<String, String> entry;
     int n = 1;
     for (int i = 0; i < rows.length(); i++) {
@@ -89,9 +94,9 @@ public class HBase2Table {
           entry.put(column, Coding.decode(value));
           }
         }
-      entries.put(key, entry);
+      _table.put(key, entry);
      }
-    return entries;
+    return _table;
     }
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
@@ -179,6 +184,12 @@ public class HBase2Table {
     return _data;
     }
     
+  /** TBD */
+  // TBD: _data should be creatd from _table
+  public Map<String, Map<String, String>> table() {
+    return _table;
+    }
+     
   /** Give number of columns for a  column family.
     * @param  The column family name.
     * @return The number of columns for a column family*/
@@ -201,6 +212,8 @@ public class HBase2Table {
   private String _thead;
   
   private String _data;
+  
+  private Map<String, Map<String, String>> _table;
   
   Map<String, Integer> _fLengths = new HashMap<>();
 

@@ -242,7 +242,7 @@ function show(graph) {
         }
       }
     }
-  network = new vis.Network(container, data, options);
+  network = new vis.Network(container, data, options4Graph);
   if (graph != null && document.getElementById('clusterize').checked === true) {
     clusterByGroups();   
     }
@@ -489,12 +489,11 @@ function openClusters(scale) {
 // Switch physics on/off
 function switchPhysics() {
   options.physics.enabled = document.getElementById('physics').checked;
-  network.setOptions(options);
+  network.setOptions(options4Graph);
   }
   
 // Switch layout on/off
 function switchLayout() {
-  console.log(document.getElementById('glayout').checked);
   if (document.getElementById('glayout').checked) {
     var direction = "LR";
     if (document.getElementById('glayout_direction').checked) {

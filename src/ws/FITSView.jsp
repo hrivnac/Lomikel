@@ -23,12 +23,13 @@
 <script type="text/javascript" src="js9-3.0/js9support.min.js"></script>
 <script type="text/javascript" src="js9-3.0/js9.min.js"></script>
 <script type="text/javascript" src="js9-3.0/js9plugins.js"></script>
-<jsp:useBean id="bdr" class="com.JHTools.WebService.BinaryDataRepository" scope="session"/>
+
+<jsp:useBean id="h2table" class="com.JHTools.WebService.HBase2Table" scope="session"/>
 
 <%
   // TBD: should be realy deleted
   String id = request.getParameter("id");
-  byte[] content = bdr.get(id);
+  byte[] content = h2table.repository().get(id);
   String name = id.substring(4);
   new File(Info.tmp() +"/FITS").mkdirs();
   String fn = Info.tmp() + "/FITS/" + name + ".fits";
