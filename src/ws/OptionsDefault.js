@@ -60,6 +60,9 @@ var options4Graph = {
   
 // Hist Options
 var options4Hist = {
+  //sort: false,
+  //sampling:false,
+  //style:'points',
   dataAxis: {
     showMinorLabels: true,
     icons: false,

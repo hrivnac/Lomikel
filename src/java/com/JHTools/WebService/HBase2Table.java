@@ -40,7 +40,7 @@ public class HBase2Table {
    
   /** TBD */
   public void reset() {
-    _repository = new BinaryDataRepository();
+    _repository.clear();
     _schema = null;
     _showColumns = null;
     _thead = null;
@@ -58,13 +58,12 @@ public class HBase2Table {
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
     * @param json  The {@link JSONObject} representation of the HBader table.
-    * @param limit Max number of rows. <tt>0</tt> means no limit.
-    * @return     The table as {@link Map}: key:{column:value,...}. */
-  public Map<String, Map<String, String>> table(JSONObject json,
-                                                int        limit) {
-    log.info("Creating HBase table");
+    * @param limit Max number of rows. <tt>0</tt> means no limit. */
+  public void setTable(JSONObject json,
+                       int        limit) {
+    log.info("Creating HBase table representation");
     if (json == null || json.equals("")) {
-      return null;
+      return;
       }
     JSONArray rows = json.getJSONArray("Row");
     JSONArray cells;
@@ -101,8 +100,7 @@ public class HBase2Table {
           }
         }
       _table.put(key, entry);
-     }
-    return _table;
+      }
     }
     
   /** Convert <em>HBase</em> {@link JSONObject} into table.
@@ -110,13 +108,13 @@ public class HBase2Table {
     * @param limit Max number of rows. */
   public void process(JSONObject json,
                           int    limit) {
-    log.info("Processing HBase table");
-    Map<String, Map<String, String>> table = table(json, limit);
-    if (table == null) {
+    log.info("Processing HBase table representation");
+    setTable(json, limit);
+    if (_table == null) {
       return;
       }
     Set<String> columns0 = new TreeSet<>();
-    for (Map<String, String> entry : table.values()) {
+    for (Map<String, String> entry : _table.values()) {
       for (String column : entry.keySet()) {
         if (_showColumns == null || _showColumns.isEmpty() || _showColumns.contains(column)) {  
           columns0.add(column);
@@ -151,7 +149,7 @@ public class HBase2Table {
     String id;
     _data = "";
     boolean firstEntry = true;
-    for (Map.Entry<String, Map<String, String>> entry : table.entrySet()) {
+    for (Map.Entry<String, Map<String, String>> entry : _table.entrySet()) {
       if (entry.getKey().startsWith("schema")) {
         continue;
         }
@@ -209,7 +207,7 @@ public class HBase2Table {
     return _repository;
     }
     
-  private BinaryDataRepository _repository;  
+  private BinaryDataRepository _repository = new BinaryDataRepository();  
     
   private Schema _schema;
     

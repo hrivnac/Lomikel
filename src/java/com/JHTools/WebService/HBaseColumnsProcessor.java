@@ -1,5 +1,7 @@
 package com.JHTools.WebService;
 
+import com.JHTools.Utils.DateTimeManagement;
+
 // Java
 import java.util.Map;
 import java.util.Calendar;
@@ -28,12 +30,8 @@ public class HBaseColumnsProcessor {
   /** TBD */
   public static String getXDate(Map.Entry<String, Map<String, String>> entry0) {
     String days = getX(entry0);
-    long ms = Math.round(Double.parseDouble(days) * 86400);
-    Date date = new Date(ms);
-    return _formatter.format(date);
+    return DateTimeManagement.julianDate2String(Double.valueOf(days));
     }
-    
-  private static DateFormat _formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
   /** Logging . */
   private static Logger log = Logger.getLogger(HBaseColumnsProcessor.class);

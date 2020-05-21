@@ -23,6 +23,11 @@ public class BinaryDataRepository {
 	  _data = new HashMap<>();
 	  }
 	  
+	/** TBD */
+  public void clear() {
+    _data.clear();
+    }
+	  
   /** Put in a <tt>byte[]</tt> entry.
     * @param id       The entry id.
     * @param content  The entry content. */

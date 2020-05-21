@@ -111,8 +111,8 @@
       HBaseClient h = new HBaseClient(hbase);
       JSONObject json = h.get2JSON(htable,
                                    "schema_*");
-      h2table.reset();                             
-      Map<String, Map<String, String>> schemas = h2table.table(json, 0);
+      h2table.setTable(json, 0);
+      Map<String, Map<String, String>> schemas = h2table.table();
       if (schemas != null && !schemas.isEmpty()) {
         Map<String, String> schemaMap = null;
         if (version != null && !version.trim().equals("")) {
@@ -213,8 +213,8 @@
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters
                                                   + "&selects=" + w2ui.hbaseTableForm.record.selects
                                                   + "&limit="   + w2ui.hbaseTableForm.record.limit
-                                                  + "&start="   + encodeURIComponent(w2ui.hbaseTableForm.record.start)
-                                                  + "&stop="    + encodeURIComponent(w2ui.hbaseTableForm.record.stop);
+                                                  + "&start="   + w2ui.hbaseTableForm.record.start
+                                                  + "&stop="    + w2ui.hbaseTableForm.record.stop;
             loadPane("hbasetable", request);
             }
           }
