@@ -1,4 +1,4 @@
-var container = document.getElementById('visnetwork');
+var container = document.getElementById('vis');
 var timeline;
 
 // Construct VIS hist
@@ -8,11 +8,10 @@ function showHist(itemsS, yS) {
   
   var groups = new vis.DataSet();
   
-  for (y in yS.split(" ")) {
-    console.log(y);
+  for (i in yS.split(" ")) {
     groups.add({
-      id: y,
-      content: y,
+      id: yS[i],
+      content: yS[i],
       options: {
         drawPoints: {
           style: "circle", 

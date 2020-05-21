@@ -40,7 +40,7 @@
   fos.close();
   String url = "FITSFile.jsp?fn=" + fn;                    
   %>
-   
+
 <div id="fitsview">
   <div class="JS9Menubar" ></div>
   <div class="JS9Toolbar" ></div>

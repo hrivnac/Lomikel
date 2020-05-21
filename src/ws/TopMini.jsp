@@ -20,6 +20,6 @@
     loadPane("commands", "Top.jsp");
     loadPane("graph", "GraphView.jsp");
     loadPane("result", "Result.jsp");
-    //container = document.getElementById('visnetwork');
+    //container = document.getElementById('vis');
     }
   </script>

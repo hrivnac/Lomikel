@@ -72,17 +72,16 @@
             {type:'main',   size:'75%', resizable:true, style:bluestyle},
             {type:'bottom', size:'10%', resizable:true, style:darkbluestyle}
             ]
-          });
-        
+          });        
         w2ui['layout'].html('left', w2ui['layoutLeft']);
         w2ui['layout'].html('main', w2ui['layoutMain']);
         w2ui['layoutLeft'].load('top',    'Top.jsp');
         w2ui['layoutLeft'].load('main',   'GraphView.jsp');
         w2ui['layoutMain'].load('top',    'TopMini.jsp');
         w2ui['layoutMain'].load('main',   'Result.jsp');
-        w2ui['layoutMain'].load('bottom', 'Feedback.jsp');
-    
+        w2ui['layoutMain'].load('bottom', 'Feedback.jsp');    
         });
+      var visheight;
       </script>
       
     <script>

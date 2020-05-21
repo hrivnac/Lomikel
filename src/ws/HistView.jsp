@@ -22,7 +22,7 @@
     div = document.createElement("div");
     div.style.width = "100%";
     div.style.height = (window.innerHeight * 1.0) + "px";
-    div.id = "visnetwork";
+    div.id = "vis";
     document.getElementById("graph").appendChild(div);
     </script>
   </div>

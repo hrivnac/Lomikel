@@ -13,7 +13,7 @@ var data = {
     nodes:nodes,
     edges:edges,
     };
-var container = document.getElementById('visnetwork');
+var container = document.getElementById('vis');
 var network;
 
 // Initial Gremlin call

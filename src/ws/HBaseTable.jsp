@@ -111,6 +111,7 @@
       HBaseClient h = new HBaseClient(hbase);
       JSONObject json = h.get2JSON(htable,
                                    "schema_*");
+      h2table.reset();                             
       Map<String, Map<String, String>> schemas = h2table.table(json, 0);
       if (schemas != null && !schemas.isEmpty()) {
         Map<String, String> schemaMap = null;
@@ -222,7 +223,6 @@
     </script>
 
   <script>
-    var height = document.getElementById("visnetwork").style.height;
     var $table = $('#table');
     $(function() { 
       var data = [
@@ -237,7 +237,7 @@
       var html = []
       $.each(row, function (key, value) {
         if (value.startsWith('url:')) { // TBD: whould work also for other types
-          html.push("<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
+          html.push("<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
           }
         else {
           if (key == "key") {
@@ -251,13 +251,12 @@
       return html.join('')
       }
     function binaryFormatter(value, row) {
-      return "<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + height + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
+      return "<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
       }
     function histSelector(key) {
       return "<input type='checkbox' name='y' class='y' id='y_" + key + "'></input>&nbsp;";
       }
     function showHist() {
-      var height = document.getElementById("visnetwork").style.height;
       var ys = document.getElementsByClassName('y');
       var y = "";
       for (i = 0; i < ys.length; i++) {
@@ -265,7 +264,7 @@
           y += ys[i].id.substring(2) + " ";
           }
         }
-      loadPane("graph", "HistView.jsp?y=" + y.trim(), true, height);
+      loadPane("graph", "HistView.jsp?y=" + y.trim(), true, visheight);
       }
     </script>
     

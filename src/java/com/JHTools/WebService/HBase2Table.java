@@ -41,6 +41,12 @@ public class HBase2Table {
   /** TBD */
   public void reset() {
     _repository = new BinaryDataRepository();
+    _schema = null;
+    _showColumns = null;
+    _thead = null;
+    _data = null;
+    _table = null;
+    _fLengths = new HashMap<>();
     }
   
   /** Set columns to show.
@@ -215,7 +221,7 @@ public class HBase2Table {
   
   private Map<String, Map<String, String>> _table;
   
-  Map<String, Integer> _fLengths = new HashMap<>();
+  Map<String, Integer> _fLengths;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(HBase2Table.class);
