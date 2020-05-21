@@ -86,17 +86,18 @@ public class HBaseRESTClient {
     * @param start  The start search time in ms.
     * @param end    The end search time in ms.
     * @return       The assigned <em>scanner</em> id. */
-  // TBD: parametrise batch size
   public String initScanner(String              table,
                             String              filter,
                             int                 size,
                             long                start,
                             long                end) {
-    log.info("Creating Scanner for " + table);
+    log.info("Creating Scanner for " + table + "@" + _url);
     log.info("  with filter: " + filter);
+    log.info("  with size: " + size);
+    log.info("  with interval: " + start + " - " + end);
     String scanner ="<Scanner";
     if (size > 0) {
-      scanner += " batch='" + size +"'";
+      scanner += " batch=\"" + size +"\"";
       }
     if (start != 0 && end != 0) {
       scanner += " startTime=\"" + String.valueOf(start) + "\" endTime=\"" + String.valueOf(end) + "\"";

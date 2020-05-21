@@ -44,7 +44,11 @@ public class Schema {
   public String decode(String column,
                        String encodedValue) {
     String value;
-    switch (_schemaMap.get(column)) {
+    String type = _schemaMap.get(column);
+    if (type == null) {
+      return encodedValue;
+      }
+    switch (type) {
       case "float": 
         value = String.valueOf(Bytes.toFloat(Bytes.toBytes(encodedValue)));
         break;
@@ -73,7 +77,11 @@ public class Schema {
   public CellContent decode2Content(String column,
                                     String encodedValue) {
     CellContent value;
-    switch (_schemaMap.get(column)) {
+    String type = _schemaMap.get(column);
+    if (type == null) {
+      return new CellContent(encodedValue);
+      }
+    switch (type) {
       case "float": 
         value = new CellContent(String.valueOf(Bytes.toFloat(Bytes.toBytes(encodedValue))));
         break;
@@ -102,7 +110,11 @@ public class Schema {
   public String encode(String column,
                        String decodedValue) {
     String value;
-    switch (_schemaMap.get(column)) {
+    String type = _schemaMap.get(column);
+    if (type == null) {
+      return decodedValue;
+      }
+    switch (type) {
       case "float": 
         value = String.valueOf(Bytes.toBytes(Float.valueOf(decodedValue)));
         break;

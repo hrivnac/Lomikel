@@ -3,6 +3,8 @@
 <!-- JHTools Top Mini -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
+<%@ page import="com.JHTools.WebService.HBase2Table" %>
+
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
 <div id="mini" title="stable top">
@@ -20,6 +22,5 @@
     loadPane("commands", "Top.jsp");
     loadPane("graph", "GraphView.jsp");
     loadPane("result", "Result.jsp");
-    //container = document.getElementById('vis');
     }
   </script>

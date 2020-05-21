@@ -3,6 +3,8 @@
 <!-- JHTools Hist View -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
+<%@ page import="com.JHTools.WebService.HBaseColumnsProcessor" %>
+
 <%@ page import="java.util.Map" %>
 
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
@@ -14,8 +16,7 @@
 <script type="text/javascript" src="OptionsDefault.js"></script>
 <script type="text/javascript" src="Options.js"></script>
 
-<jsp:useBean id="h2table" class="com.JHTools.WebService.HBase2Table"           scope="session" />
-<jsp:useBean id="hcp"     class="com.JHTools.WebService.HBaseColumnsProcessor" scope="session" />
+<jsp:useBean id="h2table" class="com.JHTools.WebService.HBase2Table" scope="session"/>
 
 <div id="graph">
   <script>
@@ -40,7 +41,7 @@
     xVal = null;
     yVal = null;
     if (!entry0.getKey().startsWith("schema")) {
-      xVal = hcp.getXDate(entry0);
+      xVal = HBaseColumnsProcessor.getXDate(entry0);
       entry = entry0.getValue();
       for (String yi : ys) {
         yVal = null;

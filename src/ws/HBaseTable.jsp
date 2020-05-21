@@ -30,7 +30,7 @@
 
   <div id="hbaseTableForm" style="width: 100%"></div>
   
-  <div id="hbaseTable" style="width: 100%">
+  <div id="hbaseResult" style="width: 100%">
     <%
       String hbase   = request.getParameter("hbase");
       String htable  = request.getParameter("htable");
@@ -39,24 +39,24 @@
       String selects = request.getParameter("selects");
       String filters = request.getParameter("filters");
       String version = request.getParameter("version");
-      String sizeS   = request.getParameter("size");
       String limitS  = request.getParameter("limit");
       String start   = request.getParameter("start");
       String stop    = request.getParameter("stop");
       if (hbase  == null || hbase.trim( ).equals("") ||
           htable == null || htable.trim().equals("")) {
-        log.fatal("cannot connect to " + htable + "@" + hbase);
+        log.fatal("Cannot connect to " + htable + "@" + hbase);
         }
       out.println("<b><u>" + htable + "@" + hbase + "</u></b><br/>");
-      key       = (key     == null                            ) ? "" : key.trim();
-      krefix    = (krefix  == null                            ) ? "" : krefix.trim();
-      filters   = (filters == null                            ) ? "" : filters.trim();
-      selects   = (selects == null                            ) ? "" : selects.trim();
-      version   = (version == null                            ) ? "" : version.trim();
-      start     = (start   == null                            ) ? "" : start.trim();
-      stop      = (stop    == null                            ) ? "" : stop.trim();
-      int size  = (sizeS   == null || sizeS.trim( ).equals("")) ? 0  : Integer.parseInt(sizeS);
+      log.info("Connection to " + htable + "@" + hbase);
+      key       = (key     == null || key.equals(    "null")  ) ? "" : key.trim();
+      krefix    = (krefix  == null || krefix.equals( "null")  ) ? "" : krefix.trim();
+      filters   = (filters == null || filters.equals("null")  ) ? "" : filters.trim();
+      selects   = (selects == null || selects.equals("null")  ) ? "" : selects.trim();
+      version   = (version == null || version.equals("null")  ) ? "" : version.trim();
+      start     = (start   == null || start.equals(  "null")  ) ? "" : start.trim();
+      stop      = (stop    == null || stop.equals(   "null")  ) ? "" : stop.trim();
       int limit = (limitS  == null || limitS.trim().equals("")) ? 0  : Integer.parseInt(limitS);
+      int size = 0;
       long startL;
       long stopL;
       DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -102,15 +102,13 @@
       if (limit > 0) {
         out.println("showing only <b>" + limit + "</b> rows<br/>");
         }
-      if (size > 0) {
-        out.println("showing only <b>" + size + "</b> cells<br/>");
-        }
       if (!version.equals("")) {
         out.println("showing only version <b>" + version + "</b><br/>");
         }
       HBaseClient h = new HBaseClient(hbase);
       JSONObject json = h.get2JSON(htable,
                                    "schema_*");
+      h2table.setup(hbase, htable);
       h2table.setTable(json, 0);
       Map<String, Map<String, String>> schemas = h2table.table();
       if (schemas != null && !schemas.isEmpty()) {
@@ -130,6 +128,9 @@
                           key);
         }
       else {
+        if (limit > 0 && h2table.length() > 0) {
+          size = limit * h2table.length();
+          }
         String filter = h.filter(filterMap, null);
         json = h.scan2JSON(htable,
                            filter,
@@ -140,7 +141,7 @@
       if (! selects.equals("")) {
         h2table.setShowColumns(selects.split(","));
         }
-      h2table.process(json, limit);
+      h2table.processTable(json, limit);
       %>
     <table id='table'
            data-sortable='true'
@@ -206,7 +207,7 @@
             this.clear();
             },
           Search: function () {
-            this.save();
+            //this.save();
             var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&size=<%=size%>"
                                                   + "&key="     + w2ui.hbaseTableForm.record.key
                                                   + "&krefix="  + w2ui.hbaseTableForm.record.krefix
@@ -215,7 +216,7 @@
                                                   + "&limit="   + w2ui.hbaseTableForm.record.limit
                                                   + "&start="   + w2ui.hbaseTableForm.record.start
                                                   + "&stop="    + w2ui.hbaseTableForm.record.stop;
-            loadPane("hbasetable", request);
+            loadPane("result", request);
             }
           }
         });
