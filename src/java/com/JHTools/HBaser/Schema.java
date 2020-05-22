@@ -40,7 +40,9 @@ public class Schema {
   /** Decode the column value.
     * @param  column       The column to decode.
     * @param  encodedValue The encoded value.
-    * @return              The decoded value. */
+    * @return              The decoded value.
+    *                      Binary values are decoded as <tt>*binary*</tt>,
+    *                      or showing their MIME-type, when known. */
   public String decode(String column,
                        String encodedValue) {
     String value;
@@ -60,6 +62,9 @@ public class Schema {
         break;
       case "long": 
         value = String.valueOf(Bytes.toLong(Bytes.toBytes(encodedValue)));
+        break;
+      case "image/fits": 
+        value = "*image/fits*";
         break;
       case "binary": 
         value = "*binary*";
@@ -94,8 +99,11 @@ public class Schema {
       case "long": 
         value = new CellContent(String.valueOf(Bytes.toLong(Bytes.toBytes(encodedValue))));
         break;
+      case "image/fits":
+        value = new CellContent(Bytes.toBytes(encodedValue), CellContent.Type.FITS);
+        break;
       case "binary":
-        value = new CellContent(Bytes.toBytes(encodedValue), CellContent.Type.FITS); // TBD: should be from schema
+        value = new CellContent(Bytes.toBytes(encodedValue), CellContent.Type.FITS); // TBD: should disappear
         break;
       default: // includes "string"
         value = new CellContent(encodedValue);
@@ -107,6 +115,7 @@ public class Schema {
     * @param  column       The column to encode.
     * @param  decodedValue The decoded value.
     * @return              The encoded value. */
+  // TBD: How to encode *binary* ?
   public String encode(String column,
                        String decodedValue) {
     String value;
@@ -127,8 +136,11 @@ public class Schema {
       case "long": 
         value = String.valueOf(Bytes.toBytes(Long.valueOf(decodedValue)));
         break;
+      case "image/fits": 
+        value  = "*fits*";
+        break;
       case "binary": 
-        value  = "*binary*";
+        value  = "*binary*"; // TBD: should disappear
         break;
       default: // includes "string"
         value  = decodedValue;

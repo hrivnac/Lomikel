@@ -222,7 +222,7 @@
             this.clear();
             },
           Search: function () {
-            var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&size=<%=size%>"
+            var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&size=<%=size%>&group=<%=group%>"
                                                   + "&key="     + w2ui.hbaseTableForm.record.key
                                                   + "&krefix="  + w2ui.hbaseTableForm.record.krefix
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters

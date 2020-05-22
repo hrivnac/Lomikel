@@ -9,7 +9,9 @@
 <%@ page import="java.lang.StackTraceElement" %>
 
 <%@ page import="com.JHTools.Utils.NotifierMail" %>
+<%@ page import="com.JHTools.Utils.NotifierURL" %>
 <%@ page import="com.JHTools.Utils.Info" %>
+<%@ page import="com.JHTools.Utils.CommonException" %>
 
 <%@ page import="org.apache.log4j.Logger" %>
 
@@ -30,6 +32,9 @@
       <%
         String message = "";
         boolean more = true;
+        if (exception == null) {
+          exception = new CommonException("No known Exception");
+          }
         do {
           message += "<p><u><pre>" + exception + "</pre></u><br>";
           StackTraceElement[] stackTrace = exception.getStackTrace();
@@ -52,12 +57,17 @@
         try {
           host = InetAddress.getByName(addr).getCanonicalHostName();
           }
-        catch (Exception e) {}                                    
-        try {
-          NotifierMail.postMail("ERROR: " + exception.toString(), host + "[" + addr + "]\n\n==================================================\n\n" + message);
-          }
-        catch (Exception e) {}
-        log.error("Handled ERROR: " + exception.toString() + "\n\n" + host + "[" + addr + "]\n\n==================================================\n\n" + message
+        catch (Exception e) {
+          log.error("Cannot find host", e);
+          }                                    
+        //try {
+        //  NotifierMail.postMail("ERROR: " + exception.toString(), host + "[" + addr + "]\n\n==================================================\n\n" + message);
+        //  }
+        //catch (Exception e) {
+        //  log.error("Cannot send mail", e);
+        //  }
+        NotifierURL.notify(message);
+        log.error("Handled ERROR: " + exception.toString() + "\n\n" + host + "[" + addr + "]\n\n==================================================\n\n" + message);
         %>
 
       </body>
