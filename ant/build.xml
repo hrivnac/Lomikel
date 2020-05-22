@@ -209,8 +209,8 @@
       </copy>                                                                
     <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
     <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
-    <replace file="${janusgraph_dir}/conf/remote.yaml"                       token="@SERVER.HOST@"         value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/remote.yaml"                       token="@SERVER.PORT@"         value="${gremlin_port}"/>
+    <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.HOST@"         value="${gremlin_host}"/>
+    <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.PORT@"         value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.yaml"       token="@SERVER.HOST@"         value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.yaml"       token="@SERVER.PORT@"         value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.properties" token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>

@@ -20,8 +20,9 @@ export hbase_dir
 
 export home=`pwd`/..
 
-alias gremlin='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start.gremlin"'
-alias gremlin_local='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_local.gremlin ${zookeeper} ${hbase_table} ${home}"'
+alias gremlin_Local='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
+alias gremlin_IJCLab='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
+alias gremlin_console='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_local.gremlin ${zookeeper} ${hbase_table} ${home}"'
 
-echo "commands: gremlin, gremlin_local"
+echo "commands: gremlin_console, gremlin_Local, gremlin_IJCLab"
 
