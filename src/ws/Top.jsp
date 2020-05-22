@@ -20,12 +20,12 @@
           <%@include file="Servers.jsp"%>
           </select>
         <br/>
-        <input type="button" onclick="bootstrap('selection')"  value="Start" title="execute command on the server"/>
+        <input type="button" onclick="bootstrap('selection')"  value="Start" title="execute command on the server" style="background-color:#eeffee;"/>
         <select name="bootstrap_graph" id="bootstrap_graph" title="bootstrap gremlin graph">
           <%@include file="Graphs.jsp"%>
           </select>
         <br/>
-        <input type="button" onclick="bootstrap('text')"  value="Start" title="execute command on the server"/>
+        <input type="button" onclick="bootstrap('text')"  value="Start" title="execute command on the server" style="background-color:#eeffee;"/>
         <input type="text" name="bootstrap_command" value="@BOOT@" size="40" id="bootstrap_command" title="bootstrap gremlin command"/>
         </td>
       </tr>

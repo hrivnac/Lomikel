@@ -42,6 +42,7 @@
       String limitS  = request.getParameter("limit");
       String start   = request.getParameter("start");
       String stop    = request.getParameter("stop");
+      String group   = request.getParameter("group");
       if (hbase  == null || hbase.trim( ).equals("") ||
           htable == null || htable.trim().equals("")) {
         log.fatal("Cannot connect to " + htable + "@" + hbase);
@@ -55,6 +56,7 @@
       version   = (version == null || version.equals("null")  ) ? "" : version.trim();
       start     = (start   == null || start.equals(  "null")  ) ? "" : start.trim();
       stop      = (stop    == null || stop.equals(   "null")  ) ? "" : stop.trim();
+      group     = (group   == null || group.equals(   "null") ) ? "" : group.trim();
       int limit = (limitS  == null || limitS.trim().equals("")) ? 0  : Integer.parseInt(limitS);
       int size = 0;
       long startL;
@@ -143,6 +145,16 @@
         h2table.setShowColumns(selects.split(","));
         }
       h2table.processTable(json, limit);
+      String toHide = "";
+      if (!group.equals("")) {
+        toHide = h2table.toHide("i:objectId");
+      %>
+    <div id="toolbar">
+      <button id="buttonHide" class="btn btn-secondary">latest alerts</button>
+      <button id="buttonShow" class="btn btn-secondary">all alerts</button>
+      </div>
+    <%
+      }
       %>
     <table id='table'
            data-sortable='true'
@@ -162,6 +174,8 @@
            data-show-columns-search='true'
            data-height='600'
            data-resizable='true'
+           data-id-field='key'
+           data-unique-id='key' 
            data-pagination='true'>
       <thead>
         <tr>
@@ -208,7 +222,6 @@
             this.clear();
             },
           Search: function () {
-            //this.save();
             var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&size=<%=size%>"
                                                   + "&key="     + w2ui.hbaseTableForm.record.key
                                                   + "&krefix="  + w2ui.hbaseTableForm.record.krefix
@@ -226,6 +239,9 @@
 
   <script>
     var $table = $('#table');
+    var $buttonShow = $('#buttonShow')
+    var $buttonHide = $('#buttonHide')
+    var toHide = <%=toHide%>
     $(function() { 
       var data = [
         <%=h2table.data()%>
@@ -234,6 +250,16 @@
       $table.bootstrapTable('refreshOptions', {classes: 'table table-bordered table-hover table-striped table-sm'})
       $table.bootstrapTable('refreshOptions', {theadClasses: 'thead-light'})
       $table.bootstrapTable('refreshOptions', {sortable: 'true'})
+      $buttonShow.click(function() {
+        for (var i = 0; i < toHide.length; i++) {
+          $table.bootstrapTable('showRow', {uniqueId: toHide[i]})
+          }
+        })
+      $buttonHide.click(function() {
+        for (var i = 0; i < toHide.length; i++) {
+          $table.bootstrapTable('hideRow', {uniqueId: toHide[i]})
+          }
+        })
       })
     function detailFormatter(index, row) {
       var html = []

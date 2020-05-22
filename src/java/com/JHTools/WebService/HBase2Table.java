@@ -147,11 +147,11 @@ public class HBase2Table {
     for (String column : columns) {
       formatter = "";
       if (column.startsWith("b:")) {
-        formatter = "data-formatter='binaryFormatter'";
+        formatter += "data-formatter='binaryFormatter' ";
         }
       _thead += "<th data-field='" + column + "' data-sortable='true' data-visible='false' " + formatter + "><b><u>" + column + "</u></b>";
       if (_schema != null) {
-        _thead += "<br/>" + _schema.type(column);
+        _thead += "<br/><small>" + _schema.type(column) + "</small>";
         }
       _thead += "</th>";
       }
@@ -223,6 +223,38 @@ public class HBase2Table {
     * @return The {@link BinaryDataRepository} with binary content. */
   public BinaryDataRepository repository() {
     return _repository;
+    }
+    
+  /** TBD */
+  public String toHide(String idCol) {
+    String id;
+    Map<String, TreeSet<String>> id2key = new HashMap<>();
+    for (Map.Entry<String, Map<String, String>> entry : _table.entrySet()) {
+      if (entry.getKey().startsWith("schema")) {
+        continue;
+        };
+      id = entry.getValue().get(idCol);
+      if (!id2key.containsKey(id)) {
+        id2key.put(id, new TreeSet<String>());
+        }
+      id2key.get(id).add(entry.getKey());
+      }
+    String hidden = "[";
+    boolean firstEntry = true;
+    for (Map.Entry<String, TreeSet<String>> e : id2key.entrySet()) {
+      e.getValue().remove(e.getValue().last());
+      for (String s : e.getValue()) {
+        if (!firstEntry) {
+          hidden += ",";
+          }
+        else {
+          firstEntry = false;
+          }
+        hidden += "'" + s + "'";
+        }
+      }
+    hidden += "]";
+    return hidden;
     }
     
   /** TBD */
