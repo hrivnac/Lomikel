@@ -19,16 +19,16 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-// TBD: should be implemented in clients
+// TBD: use timestamp
 public class HBaseColumnsProcessor {
   
   /** TBD */
-  public static String getX(Map.Entry<String, Map<String, String>> entry0) {
+  public String getX(Map.Entry<String, Map<String, String>> entry0) {
     return entry0.getKey().split("_")[1];
     }
   
   /** TBD */
-  public static String getXDate(Map.Entry<String, Map<String, String>> entry0) {
+  public String getXDate(Map.Entry<String, Map<String, String>> entry0) {
     String days = getX(entry0);
     return DateTimeManagement.julianDate2String(Double.valueOf(days));
     }

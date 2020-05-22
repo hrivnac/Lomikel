@@ -37,11 +37,14 @@
   Map<String, String> entry;
   String items = "";
   boolean first = true;
+  %>
+<%@include file="HBaseColumnsProcessor.jsp" %>
+<%
   for (Map.Entry<String, Map<String, String>> entry0 : table.entrySet()) {
     xVal = null;
     yVal = null;
     if (!entry0.getKey().startsWith("schema")) {
-      xVal = HBaseColumnsProcessor.getXDate(entry0);
+      xVal = processor.getXDate(entry0);
       entry = entry0.getValue();
       for (String yi : ys) {
         yVal = null;
