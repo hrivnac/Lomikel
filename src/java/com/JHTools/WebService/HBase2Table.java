@@ -56,7 +56,6 @@ public class HBase2Table {
     _data = null;
     _table.clear();
     _fLengths.clear();
-    _length = 0;
     }
   
   /** Set columns to show.
@@ -134,13 +133,11 @@ public class HBase2Table {
     // TBD: support non-default columns
     List<String> columns = new ArrayList<>();
     _fLengths.clear();
-    _length = 0;
     for (String family : new String[]{"b", "i", "d"}) {
       _fLengths.put(family, 0);
       for (String column : columns0) {
         if (column.startsWith(family + ":")) {
           _fLengths.put(family, _fLengths.get(family) + 1);
-          _length++;
           columns.add(column);
           }
         }
@@ -215,8 +212,11 @@ public class HBase2Table {
     }
     
   /** TBD */
-  public int length() {
-    return _length;
+  public int width() {
+    if (_schema != null) {
+      return _schema.size();
+      }
+    return 0;
     }
     
   /** Give the {@link BinaryDataRepository} with binary content.
@@ -227,7 +227,7 @@ public class HBase2Table {
     
   /** TBD */
   public String toString() {
-    return _htable + "@" + _hbase + "(" + _length + ")";
+    return _htable + "@" + _hbase + "(" + width() + ")";
     }
     
   private String _hbase;
@@ -247,8 +247,6 @@ public class HBase2Table {
   private Map<String, Map<String, String>> _table = new HashMap<>();
   
   private Map<String, Integer> _fLengths = new HashMap<>();
-  
-  private int _length;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(HBase2Table.class);

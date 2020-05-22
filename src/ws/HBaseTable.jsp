@@ -128,8 +128,9 @@
                           key);
         }
       else {
-        if (limit > 0 && h2table.length() > 0) {
-          size = limit * h2table.length();
+        if (limit > 0 && h2table.width() > 0) {
+          size = limit * h2table.width();
+          out.println("getting only <b>" + size + "</b> cells<br/>");
           }
         String filter = h.filter(filterMap, null);
         json = h.scan2JSON(htable,

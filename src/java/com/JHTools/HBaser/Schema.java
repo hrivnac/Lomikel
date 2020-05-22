@@ -143,6 +143,14 @@ public class Schema {
     return _schemaMap.get(column);
     }
     
+  /** TBD */
+  public int size() {
+    if (_schemaMap != null) {
+      return _schemaMap.size();
+      }
+    return 0;
+    }
+    
   private Map<String, String> _schemaMap;
 
   /** Logging . */
