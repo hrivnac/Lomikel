@@ -4,7 +4,7 @@ package com.JHTools.Utils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/** <code>DateTimeManagement</code> manipilates date and time.
+/** <code>DateTimeManagement</code> manipulates date and time.
   * @opt attributes
   * @opt operations
   * @opt types

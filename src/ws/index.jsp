@@ -99,6 +99,13 @@
           }
         }        
       </script>
+
+    <script type="text/javascript">
+      function help(url) {
+        console.log(url);
+        w2popup.load({url: url});
+        }
+      </script>
         
     </body>
     

@@ -1,39 +1,25 @@
 package com.JHTools.WebService;
 
-import com.JHTools.Utils.DateTimeManagement;
-
 // Java
 import java.util.Map;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
-// Log4J
-import org.apache.log4j.Logger;
-
-/** <code>HBaseColumnsProcessor</code> TBD.
+/** <code>HBaseColumnsProcessor</code> extracts X-axes from rows for graphs.
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // TBD: use timestamp
-public class HBaseColumnsProcessor {
+public interface HBaseColumnsProcessor {
   
-  /** TBD */
-  public String getX(Map.Entry<String, Map<String, String>> entry0) {
-    return entry0.getKey().split("_")[1];
-    }
+  /** Give the value of the X-axes corresponding to one table row.
+    * @param entry0 One row of the table.
+    * @return       The derived value of x-axes. */
+  public String getX(Map.Entry<String, Map<String, String>> entry0);
   
-  /** TBD */
-  public String getXDate(Map.Entry<String, Map<String, String>> entry0) {
-    String days = getX(entry0);
-    return DateTimeManagement.julianDate2String(Double.valueOf(days));
-    }
-
-  /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseColumnsProcessor.class);
+  /** Give the date corresponding to one table row.
+    * @param entry0 One row of the table.
+    * @return       The date (may not correspond to the row timestamp). */
+  public String getXDate(Map.Entry<String, Map<String, String>> entry0);
 
   }

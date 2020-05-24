@@ -149,9 +149,12 @@
       if (!group.equals("")) {
         toHide = h2table.toHide("i:objectId");
       %>
+    <button onClick="w2popup.load({url:'Help-HBaseTable.html', showMax: true})" style="position:absolute; top:0; right:0">
+      <img src="images/Help.png" width="10"/>
+      </button>
     <div id="toolbar">
-      <button id="buttonHide" class="btn btn-secondary">latest alerts</button>
-      <button id="buttonShow" class="btn btn-secondary">all alerts</button>
+      <button id="buttonHide" class="btn btn-secondary">latest objects</button>
+      <button id="buttonShow" class="btn btn-secondary">all objects</button>
       </div>
     <%
       }
@@ -203,7 +206,7 @@
           {field:'key',     type: 'text',     html: {caption: 'Exact Key',      text : ' (exact search on row key)' ,                               attr: 'style="width: 500px"'}},
           {field:'krefix',  type: 'text',     html: {caption: 'Prefix Key',     text : ' (prefix search on row key)',                               attr: 'style="width: 500px"'}},
           {field:'filters', type: 'text',     html: {caption: 'Search Columns', text : ' (columns substring search: family:column:value,...)',      attr: 'style="width: 500px"'}},
-          {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column:value,...)',                attr: 'style="width: 500px"'}},
+          {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,...)',                      attr: 'style="width: 500px"'}},
           {field:'limit',   type: 'int' ,     html: {caption: 'Limit',          text : ' (max number of results)',                                  attr: 'style="width: 50px"' }},
           {field:'start',   type: 'datetime', html: {caption: 'From',           text : ' (start time)',                                             attr: 'style="width: 150px"'}},
           {field:'stop',    type: 'datetime', html: {caption: 'Till',           text : ' (end time)',                                               attr: 'style="width: 150px"'}}

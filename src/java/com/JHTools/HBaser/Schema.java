@@ -148,14 +148,15 @@ public class Schema {
     return value;
     }
 
-  /** Give the colun type (from {@link Schema}).
+  /** Give the column type (from {@link Schema}).
     * @param column The column.
     * @return       The column type. */
   public String type(String column) {
     return _schemaMap.get(column);
     }
     
-  /** TBD */
+  /** Give the current number of columns.
+    * @return The current number of known columns. */
   public int size() {
     if (_schemaMap != null) {
       return _schemaMap.size();

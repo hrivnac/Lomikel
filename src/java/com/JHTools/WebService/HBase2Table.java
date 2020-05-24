@@ -38,7 +38,9 @@ public class HBase2Table {
    reset();
    }
    
-  /** TBD */
+  /** Set the <em>HBase</em> properties.
+    * @param hbase  The <em>HBase</em> url.
+    * @param htable The name of the <em>HBase</em> table. */
   public void setup(String hbase,
                     String htable) {
     log.info("Setting " + htable + "@" + hbase);
@@ -47,7 +49,7 @@ public class HBase2Table {
     _htable = htable;
     }
    
-  /** TBD */
+  /** Reset all data. */
   public void reset() {
     _repository.clear();
     _schema = null;
@@ -198,7 +200,8 @@ public class HBase2Table {
     return _data;
     }
     
-  /** TBD */
+  /** Give the content as a multi{@link Map}.
+    * @return The content as a multi{@link Map} <code>key-{column-value,...}</code>. */
   // TBD: _data should be creatd from _table
   public Map<String, Map<String, String>> table() {
     return _table;
@@ -211,7 +214,8 @@ public class HBase2Table {
     return _fLengths.get(family);
     }
     
-  /** TBD */
+  /** Give the number of known columns.
+    * @return The number of known columns. */
   public int width() {
     if (_schema != null) {
       return _schema.size();
@@ -257,7 +261,7 @@ public class HBase2Table {
     return hidden;
     }
     
-  /** TBD */
+  @Override
   public String toString() {
     return _htable + "@" + _hbase + "(" + width() + ")";
     }

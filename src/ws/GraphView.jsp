@@ -9,6 +9,9 @@
 
 <div id="graph">
   <div id="manip" title="graph manipulations" style="background-color:#ddffdd">
+    <button onClick="w2popup.load({url:'Help-GraphView.html', showMax: true})" style="position:absolute; top:0; right:0">
+      <img src="images/Help.png" width="10"/>
+      </button>
     Customize the interactions with the <b>graph</b>.
      <br/>
      <input type="button" onclick="clusterByGroups()"  value="Cluster by group type" style="background-color:#bbffbb;">

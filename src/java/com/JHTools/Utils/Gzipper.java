@@ -13,9 +13,17 @@ import java.util.zip.GZIPOutputStream;
 // Log4J
 import org.apache.log4j.Logger;
 
-// TBD
+/** <code>Gzipper</code> handles <em>gzip</em> compression and decompression.
+  * @opt attributes
+  * @opt operations
+  * @opt types
+  * @opt visibility
+  * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Gzipper {
   
+  /** Compress.
+    * @param uncompressedData The uncompressed <tt>byte[]</tt>.
+    * @return                 The compressed <tt>byte[]</tt>. */
   public static byte[] zip(byte[] uncompressedData) {
     ByteArrayOutputStream bos = null;
     GZIPOutputStream gzipOS = null;
@@ -41,6 +49,9 @@ public class Gzipper {
     return new byte[]{};
     }
   
+  /** Uncompress.
+    * @param uncompressedData The compressed <tt>byte[]</tt>.
+    * @return                 The uncompressed <tt>byte[]</tt>. */
   public static byte[] unzip(byte[] compressedData) {
     ByteArrayInputStream bis = null;
     ByteArrayOutputStream bos = null;
@@ -72,6 +83,9 @@ public class Gzipper {
     return new byte[]{};
     }
       
+  /** Is <tt>byte[]</tt> compressed ?
+    * @param compressed The <tt>byte[]</tt> to test.
+    * @return           Whether the <tt>byte[]</tt> is compressed. */
   public static boolean isZipped(final byte[] compressed) {
     return (compressed[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
     }

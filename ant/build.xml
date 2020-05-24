@@ -12,6 +12,8 @@
   <property file="../ant/build-global.properties"/>
   <property file="../ant/build-local.properties"/>
   <property name="site" value="${env.site}"/>
+  
+  <echo>Building for site ${target}</echo>
 
   <path id="classpath.build">
     <pathelement path="${log4j_jar}"/>
@@ -55,6 +57,7 @@
     <replace file="../build/com/JHTools/Utils/Info.java" token="@user.name@" value="${user.name}"/>
     <replace file="../build/com/JHTools/Utils/Info.java" token="@TMP@"       value="${tmp_dir}"/>
     <replace file="../build/com/JHTools/Utils/Info.java" token="@MANAGER@"   value="${manager}"/>
+    <replace file="../build/com/JHTools/Utils/Info.java" token="@TARGET@"    value="${target}"/>
     </target>
 
   <!-- Init =================================================================-->
@@ -132,13 +135,13 @@
  		<copy file="../src/ws/TopMini.jsp" tofile="../build/TopMini.jsp"   overwrite="true"/>
     <replace file="../build/index.jsp"   token="@NAME@"    value="${browsername}"/>
     <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
-    <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
+    <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
     <replace file="../build/Top.jsp"     token="@NAME@"    value="${browsername}"/>
     <replace file="../build/Top.jsp"     token="@LOGO@"    value="${browserlogo}"/>
     <replace file="../build/Top.jsp"     token="@HOME@"    value="${browserurl}"/>
     <replace file="../build/Top.jsp"     token="@BOOT@"    value="${bootgremlin}"/>
     <replace file="../build/TopMini.jsp" token="@VERSION@" value="${version}"/>
-    <replace file="../build/TopMini.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
+    <replace file="../build/TopMini.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
     <replace file="../build/TopMini.jsp" token="@NAME@"    value="${browsername}"/>
     <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${browserlogo}"/>
     <replace file="../build/TopMini.jsp" token="@HOME@"    value="${browserurl}"/>

@@ -16,6 +16,10 @@ var data = {
 var container = document.getElementById('vis');
 var network;
 
+var helpButton  = "<button onClick=\"w2popup.load({url:'Help-Top.html', showMax: true})\" style=\"position:absolute; top:0; right:0\">";
+    helpButton += "<img src=\"images/Help.png\" width=\"10\"/>";
+    helpButton += "</button>";
+
 // Initial Gremlin call
 function bootstrap(button) {
   var server  =  document.getElementById('gremlin_server').value;
@@ -269,7 +273,7 @@ function show(graph) {
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("commands").innerHTML = "<b><u><h1>" + selectedNode.label + "</h1></u></u>"
+        document.getElementById("commands").innerHTML = "<b><u><h1>" + selectedNode.label + "</h1></u></u>" + helpButton
                                                                  + "&nbsp;<input type='button' onclick='removeNode(" + selectedNode.id + ")'   value='Remove'>"
                                                                  + "&nbsp;<input type='button' onclick='describeNode(" + selectedNode.id + ")' value='Describe'><br/>"
                                                                  + selectedNode.actions;
@@ -279,7 +283,7 @@ function show(graph) {
       selectedEdge = findObjectByKey(edges, 'id', params.edges[0]);
       if (selectedEdge) { // TBD: should test on cluster
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("commands").innerHTML = "<b><u><h1>" + selectedEdge.label + "</h1></u></u>"
+        document.getElementById("commands").innerHTML = "<b><u><h1>" + selectedEdge.label + "</h1></u></u>" + helpButton
                                                                  + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")'   value='Remove'>"
                                                                  + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' value='Describe'><br/>"
                                                                  + selectedEdge.actions;
@@ -293,7 +297,7 @@ function show(graph) {
         }
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
-        document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + "<br/>";
+        document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
         if (document.getElementById('removeOld').checked) {
           nodes.length = 0;
           //edges.length = 0;
@@ -319,7 +323,7 @@ function show(graph) {
 // Expand from database
 function expand(id, type) {
   var selectedNode = findObjectByKey(nodes, 'id', id);
-  document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + "<br/>";
+  document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
   if (document.getElementById('removeOld').checked) {
     nodes.length = 0;
     edges.length = 0;
@@ -427,7 +431,7 @@ function clusterExpand() {
 function fillEdges() {
   for (var i = 0; i < nodes.length; i++) {
     var selectedNode = nodes[i];
-    document.getElementById("feedback").innerHTML = "Expanding " + selectedNode.label + "<br/>";
+    document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
     if (document.getElementById('expandTo').checked) {
        callGremlinGraph("g.V(" + selectedNode.id + ").outE()");
       }

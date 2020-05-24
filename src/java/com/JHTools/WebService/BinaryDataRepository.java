@@ -23,7 +23,7 @@ public class BinaryDataRepository {
 	  _data = new HashMap<>();
 	  }
 	  
-	/** TBD */
+	/** Cler the repository. */
   public void clear() {
     _data.clear();
     }

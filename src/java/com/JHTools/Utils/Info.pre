@@ -17,7 +17,7 @@ public class Info {
   /** Give builder release. 
     * @return The version and build time of the package. */
   public static String release() {
-    return _version + " [" + _build + " by " + _builder + "]";
+    return _version + " [" + _build + " by " + _builder + " for " + _target + "]";
     }
 
   /** Get run-time Configuration. 
@@ -57,6 +57,13 @@ public class Info {
     log.info("Setting manager " + manager);
     _manager = manager;
     }
+    
+  /** Set the target fir built.
+    * @param manager The target for built. */
+  public static void setTarget(String target) {
+    log.info("Setting target " + target);
+    _target = target;
+    }
        
   private static String _name    = "JHTools";
   private static String _version = "@version@";
@@ -64,6 +71,7 @@ public class Info {
   private static String _builder = "@user.name@";
   private static String _tmp     = "@TMP@";
   private static String _manager = "@MANAGER@";
+  private static String _target  = "@TARGET@";
 
   /** Logging . */
   private static Logger log = Logger.getLogger(Info.class);

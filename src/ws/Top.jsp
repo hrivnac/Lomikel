@@ -6,11 +6,14 @@
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
 <div id="commands" title="context sensitive commands">
+  <button onClick="w2popup.load({url:'Help-Top.html', showMax: true})" style="position:absolute; top:0; right:0">
+    <img src="images/Help.png" width="10"/>
+    </button>
   <table>
     <tr>
       <td><img src="@LOGO@" width="100"/></td>
       <td><h2><u><a href="@HOME@" target="RESULT">@NAME@</a></u></h2>
-          <h3>@VERSION@ <small>[@BUILD@]</small></h3>
+          @VERSION@ <small>[@BUILD@]</small>
           </td>
       </tr>
     <tr>
@@ -31,4 +34,3 @@
       </tr>
     </table>
   </div>
-
