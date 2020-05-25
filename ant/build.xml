@@ -39,6 +39,15 @@
       <include name="*.jar"/>
       <exclude name="*.exe.jar"/>
       </fileset>
+    <fileset dir="${hadoop_dir}/share/hadoop/client">
+      <include name="*.jar"/>
+      </fileset>
+    <fileset dir="${hadoop_dir}/share/hadoop/common">
+      <include name="*.jar"/>
+      </fileset>
+     <fileset dir="${hbase_dir}/lib">
+      <include name="*.jar"/>
+      </fileset>
     <path refid="classpath.build"/>
     </path>
 
@@ -223,7 +232,20 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.properties" token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.properties" token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
     </target>
-     
+ 
+  <!-- Check ================================================================-->
+
+  <target name="check-hbase"
+          description="Check HBase">
+    <echo>Check JanusGraph</echo>
+    <java classname="com.JHTools.HBaser.HBaseDirectClient"
+          fork="true">
+      <classpath>
+        <path refid="classpath.run"/>
+        </classpath>
+      </java>
+    </target>
+    
   <!-- Clean ================================================================-->
 
   <target name="clean"

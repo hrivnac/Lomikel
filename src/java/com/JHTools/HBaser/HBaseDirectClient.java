@@ -24,31 +24,58 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBaseDirectClient {
     
+ /** Selftest.
+   * @throws IOException If anything goes wrong. */
+ public static void main(String[] args) throws IOException {
+   //String zookeepers = "localhost";
+   //String clientPort = "2181";
+   String zookeepers = "134.158.74.54";
+   String clientPort = "24444";
+   HBaseDirectClient client = new HBaseDirectClient(zookeepers, clientPort);
+   System.out.println(client.connect("janusgraph"));
+   }
+   
+ /** Create.
+   * @param zookeepers The coma-separated list of zookeper ids.
+   * @param clientPort The client port. 
+   * @throws IOException If anything goes wrong. */
+ public HBaseDirectClient(String zookeepers,
+                          String clientPort) throws IOException {
+   _conf = HBaseConfiguration.create();
+   _conf.set("hbase.zookeeper.quorum", zookeepers);
+   _conf.set("hbase.zookeeper.property.clientPort", clientPort);
+   _connection = ConnectionFactory.createConnection(_conf); 
+   }
+   
+ /** Create local.
+   * @throws IOException If anything goes wrong. */
+ public HBaseDirectClient() throws IOException {
+   Configuration conf = HBaseConfiguration.create();
+   _connection = ConnectionFactory.createConnection(_conf); 
+   }
+    
  /** Connect the table.
-   * @param tableName The table name.
-   * @return          The assigned id. */
+   * @param tableName  The table name.
+   * @return           The assigned id. 
+   * @throws IOException If anything goes wrong. */
   public Table connect(String tableName) throws IOException {
-    _tableName = tableName;
-    Configuration conf = HBaseConfiguration.create();
-    _connection = ConnectionFactory.createConnection(conf);
-    _table = _connection.getTable(TableName.valueOf(_tableName));
-    return _table;
+    return connect(tableName, 0);
     }
     
  /** Connect the table.
-   * Set custom timeoute.
-   * @param tableName The table name.
-   * @param timeout   The timeout in ms.
-   * @return          The assigned id. */
+   * @param tableName  The table name.
+   * @param timeout    The timeout in ms (may be <tt>0</tt>).
+   * @return           The assigned id.
+   * @throws IOException If anything goes wrong. */
   public Table connect(String tableName,
-                        int    timeout) throws IOException {
+                       int    timeout) throws IOException {
     _tableName = tableName;
-    Configuration conf = HBaseConfiguration.create();
-    Connection connection = ConnectionFactory.createConnection(conf);
-    String tout = String.valueOf(timeout);
-    conf.set("hbase.rpc.timeout",                   tout);
-    conf.set("hbase.client.scanner.timeout.period", tout);
-    _table = connection.getTable(TableName.valueOf(_tableName));
+    if (timeout > 0) {
+      String tout = String.valueOf(timeout);
+      _conf.set("hbase.rpc.timeout",                   tout);
+      _conf.set("hbase.client.scanner.timeout.period", tout);
+      }
+    _table = _connection.getTable(TableName.valueOf(_tableName));
     return _table;
     }
 
@@ -69,16 +96,6 @@ public class HBaseDirectClient {
       }
     _table = null;
     }               
-    
-  /** Check, if user is allowed to modify the table.
-    * Only very naive check is made, based on table id and user name.
-    * @return     Whether the user name is compatible with table name. */
-  // TBD: refactor with Catalog
-  public boolean writable() {
-    String juser = System.getProperty("user.name");
-    String huser = _tableName.substring(_tableName.indexOf(".") + 1, _tableName.lastIndexOf("."));
-    return juser.equals(huser) || juser.equals("tomcat");
-    }  
 
   /** Give {@link Table}.
     * @return The {@link Table}. */
@@ -87,6 +104,8 @@ public class HBaseDirectClient {
     }
 
   private Table _table;
+  
+  private Configuration _conf;
   
   private Connection _connection;
   
