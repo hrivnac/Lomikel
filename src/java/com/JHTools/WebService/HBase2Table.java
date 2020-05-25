@@ -103,7 +103,7 @@ public class HBase2Table {
             _repository.put(id, Base64.getDecoder().decode(value));
             }
           else {
-            entry.put(column, _schema.decode2Content(column, Coding.decode(value)).asString());
+            entry.put(column, _schema.decode2Content(column, Base64.getDecoder().decode(value)).asString());
             }
           }
         else {

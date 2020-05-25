@@ -42,26 +42,27 @@ public class Schema {
     * @param  encodedValue The encoded value.
     * @return              The decoded value.
     *                      Binary values are decoded as <tt>*binary*</tt>,
-    *                      or showing their MIME-type, when known. */
+    *                      or showing their MIME-type, when known.
+    *                      Unknown types are decoded as strings. */
   public String decode(String column,
-                       String encodedValue) {
+                       byte[] encodedValue) {
     String value;
     String type = _schemaMap.get(column);
     if (type == null) {
-      return encodedValue;
+      type = "string";
       }
     switch (type) {
       case "float": 
-        value = String.valueOf(Bytes.toFloat(Bytes.toBytes(encodedValue)));
+        value = String.valueOf(Bytes.toFloat(encodedValue));
         break;
       case "double": 
-        value = String.valueOf(Bytes.toDouble(Bytes.toBytes(encodedValue)));
+        value = String.valueOf(Bytes.toDouble(encodedValue));
         break;
       case "integer": 
-        value = String.valueOf(Bytes.toInt(Bytes.toBytes(encodedValue)));
+        value = String.valueOf(Bytes.toInt(encodedValue));
         break;
       case "long": 
-        value = String.valueOf(Bytes.toLong(Bytes.toBytes(encodedValue)));
+        value = String.valueOf(Bytes.toLong(encodedValue));
         break;
       case "image/fits": 
         value = "*image/fits*";
@@ -70,43 +71,45 @@ public class Schema {
         value = "*binary*";
         break;
       default: // includes "string"
-        value = encodedValue;
+        value = Bytes.toString(encodedValue);
       }
     return value;
     }
     
+    
   /** Decode the column value to {@link CellContent}..
     * @param  column       The column to decode.
     * @param  encodedValue The encoded value.
-    * @return              The decoded value. */
+    * @return              The decoded value.
+    *                      Unknown types are decoded as strings. */
   public CellContent decode2Content(String column,
-                                    String encodedValue) {
+                                    byte[] encodedValue) {
     CellContent value;
     String type = _schemaMap.get(column);
     if (type == null) {
-      return new CellContent(encodedValue);
+      type = "string";
       }
     switch (type) {
       case "float": 
-        value = new CellContent(String.valueOf(Bytes.toFloat(Bytes.toBytes(encodedValue))));
+        value = new CellContent(String.valueOf(Bytes.toFloat(encodedValue)));
         break;
       case "double": 
-        value = new CellContent(String.valueOf(Bytes.toDouble(Bytes.toBytes(encodedValue))));
+        value = new CellContent(String.valueOf(Bytes.toDouble(encodedValue)));
         break;
       case "integer": 
-        value = new CellContent(String.valueOf(Bytes.toInt(Bytes.toBytes(encodedValue))));
+        value = new CellContent(String.valueOf(Bytes.toInt(encodedValue)));
         break;
       case "long": 
-        value = new CellContent(String.valueOf(Bytes.toLong(Bytes.toBytes(encodedValue))));
+        value = new CellContent(String.valueOf(Bytes.toLong(encodedValue)));
         break;
       case "image/fits":
-        value = new CellContent(Bytes.toBytes(encodedValue), CellContent.Type.FITS);
+        value = new CellContent(encodedValue, CellContent.Type.FITS);
         break;
       case "binary":
-        value = new CellContent(Bytes.toBytes(encodedValue), CellContent.Type.FITS); // TBD: should disappear
+        value = new CellContent(encodedValue, CellContent.Type.FITS); // TBD: should disappear
         break;
       default: // includes "string"
-        value = new CellContent(encodedValue);
+        value = new CellContent(Bytes.toString(encodedValue));
       }
     return value;
     }
@@ -114,36 +117,37 @@ public class Schema {
   /** Encode the column value.
     * @param  column       The column to encode.
     * @param  decodedValue The decoded value.
-    * @return              The encoded value. */
+    * @return              The encoded value.
+    *                      Unknown types are decoded as strings. */
   // TBD: How to encode *binary* ?
-  public String encode(String column,
+  public byte[] encode(String column,
                        String decodedValue) {
-    String value;
+    byte[] value;
     String type = _schemaMap.get(column);
     if (type == null) {
-      return decodedValue;
+      type = "string";
       }
     switch (type) {
       case "float": 
-        value = String.valueOf(Bytes.toBytes(Float.valueOf(decodedValue)));
+        value = Bytes.toBytes(Float.valueOf(decodedValue));
         break;
       case "double": 
-        value = String.valueOf(Bytes.toBytes(Double.valueOf(decodedValue)));
+        value = Bytes.toBytes(Double.valueOf(decodedValue));
         break;
       case "integer": 
-        value = String.valueOf(Bytes.toBytes(Integer.valueOf(decodedValue)));
+        value = Bytes.toBytes(Integer.valueOf(decodedValue));
         break;
       case "long": 
-        value = String.valueOf(Bytes.toBytes(Long.valueOf(decodedValue)));
+        value = Bytes.toBytes(Long.valueOf(decodedValue));
         break;
       case "image/fits": 
-        value  = "*fits*";
+        value  = new byte[0]; // BUG
         break;
       case "binary": 
-        value  = "*binary*"; // TBD: should disappear
+        value  = new byte[0]; // TBD: should disappear
         break;
       default: // includes "string"
-        value  = decodedValue;
+        value  = Bytes.toBytes(String.valueOf(decodedValue));
       }
     return value;
     }
