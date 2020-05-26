@@ -88,14 +88,14 @@
         }
       else if (!krefix.equals("")) {
         out.println("<b>key</b> starts with <b>" + krefix + "</b></br>");
-        filterMap.put(":", krefix + ":");
+        filterMap.put("key:key", krefix);
         }
       else if (!filters.equals("")) {
         String[] term;
         for (String f : filters.split(",")) {
           term = f.split(":");
           out.println("<b>" + term[0] + ":" + term[1] + "</b> contains <b>" + term[2] + "</b></br>");
-          filterMap.put(term[0] + ":" + term[1], term[2] + ":SubstringComparator");
+          filterMap.put(term[0] + ":" + term[1], term[2]);
           }
         }
       if (!selects.equals("")) {

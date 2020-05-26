@@ -24,6 +24,7 @@ import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.filter.RowFilter;  
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.BinaryPrefixComparator;
+import org.apache.hadoop.hbase.filter.SubstringComparator;
 
 // Hadoop
 import org.apache.hadoop.conf.Configuration;
@@ -51,15 +52,15 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBaseClient {
     
- /** Selftest.
+ /** Selftest.https://vm-75109.lal.in2p3.fr:8443
    * @throws IOException If anything goes wrong. */
  public static void main(String[] args) throws IOException {
-   String zookeepers = "localhost";
+   //String zookeepers = "localhost";
+   //String clientPort = "2181";
+   String zookeepers = "134.158.74.54";
    String clientPort = "2181";
-   //String zookeepers = "134.158.74.54";
-   //String clientPort = "24444";
-   //HBaseClient client = new HBaseClient(zookeepers, clientPort);
-   HBaseClient client = new HBaseClient("http://localhost:2181");
+   HBaseClient client = new HBaseClient(zookeepers, clientPort);
+   //HBaseClient client = new HBaseClient("http://localhost:2181");
    client.connect("test_portal_tiny.1");
    Map<String, String> search = new HashMap<>();
    //search.put("key:key", "ZTF19");
@@ -169,21 +170,21 @@ public class HBaseClient {
     * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
     *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
-    * @param find     The names of required values as array of <tt>family:column</tt>. It can be null.
+    * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
     * @param interval The time period specified as start,end in the format <tt>HH:mm:ss.SSS dd/MMM/yyyy</tt>.
     * @param ifkey    Whether give also entries keys.
     * @param iftime   Whether give also entries timestamps.
     * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, String>> scan(String              key,
                                                Map<String, String> search,
-                                               String[]            find,
+                                               String[]            filter,
                                                String[]            interval,
                                                boolean             ifkey,
                                                boolean             iftime) {
-    // TBD: report find, interval
+    // TBD: report filter, interval
     log.info("Searching for key: " + key + ", search: " + search + ", id-time: " + ifkey + "-" + iftime);
-    if (find == null) {
-      find = new String[0];
+    if (filter == null) {
+      filter = new String[0];
       }
     Map<String, Map<String, String>> results = new HashMap<>();
     Map<String, String> result;
@@ -193,7 +194,7 @@ public class HBaseClient {
       try {
         Result r = table().get(get);
         log.info("" + r.size() + " entries found");
-        addResult(r, result, find, ifkey, iftime);
+        addResult(r, result, filter, ifkey, iftime);
         results.put(key, result);
         }
       catch (IOException e) {
@@ -242,12 +243,12 @@ public class HBaseClient {
           scan.setStopRow( Bytes.toBytes(id1)); // TBD: correct ?
           }
         else {
-          filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(value))));
+          filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
           }
         }
       FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL, filters);  
       scan.setFilter(filterList);
-      /*for (String f : find) {
+      /*for (String f : filter) {
         fc = f.split(":");
         family = fc[0];
         column = fc[1];
@@ -258,7 +259,7 @@ public class HBaseClient {
         int i = 0;
         for (Result r : rs) {
           result = new HashMap<>();
-          addResult(r, result, find, ifkey, iftime);
+          addResult(r, result, filter, ifkey, iftime);
           results.put(Bytes.toString(r.getRow()), result);
           i++;
           }
@@ -275,12 +276,12 @@ public class HBaseClient {
   /** Add {@link Result} into result {@link Map}.
     * @param r      The {@link Result} to add.
     * @param result The {@link Map} of results <tt>familty:column-&gt;value</tt>.
-    * @param find   The names of required values as array of <tt>family:column</tt>.
+    * @param filter  The names of required values as array of <tt>family:column</tt>.
     * @param ifkey  Whether add also entries keys.
     * @param iftime Whether add also entries timestamps. */
   private void addResult(Result r,
                          Map<String, String> result,
-                         String[] find,
+                         String[] filter,
                          boolean ifkey,
                          boolean iftime) {
     String key = Bytes.toString(r.getRow());
@@ -289,8 +290,8 @@ public class HBaseClient {
       if (ifkey) {
         result.put("key:key", key);
         }
-      if (find != null && find.length > 0) {
-        for (String f : find) {
+      if (filter != null && filter.length > 0) {
+        for (String f : filter) {
           ff = f.split(":");
           result.put(f, Bytes.toString(r.getValue(Bytes.toBytes(ff[0]), Bytes.toBytes(ff[1]))));
           }
