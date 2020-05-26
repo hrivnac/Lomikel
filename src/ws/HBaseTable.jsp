@@ -3,7 +3,7 @@
 <!-- JHTools HBase Table-->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
-<%@ page import="com.JHTools.HBaser.HBaseDirectClient" %>
+<%@ page import="com.JHTools.HBaser.HBaseClient" %>
 <%@ page import="com.JHTools.HBaser.Schema" %>
 <%@ page import="com.JHTools.WebService.HBase2Table" %>
 <%@ page import="com.JHTools.HBaser.BinaryDataRepository" %>
@@ -107,7 +107,7 @@
       if (!version.equals("")) {
         out.println("showing only version <b>" + version + "</b><br/>");
         }
-      HBaseDirectClient h = new HBaseDirectClient(hbase);
+      HBaseClient h = new HBaseClient(hbase);
       h.connect(htable);
       Map<String, Map<String, String>> results = h.scan(key.equals("") ? null : key,
                                                         filterMap,
