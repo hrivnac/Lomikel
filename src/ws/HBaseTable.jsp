@@ -3,13 +3,14 @@
 <!-- JHTools HBase Table-->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
-<%@ page import="com.JHTools.HBaser.HBaseClient" %>
+<%@ page import="com.JHTools.HBaser.HBaseDirectClient" %>
 <%@ page import="com.JHTools.HBaser.Schema" %>
 <%@ page import="com.JHTools.WebService.HBase2Table" %>
-<%@ page import="com.JHTools.WebService.BinaryDataRepository" %>
+<%@ page import="com.JHTools.HBaser.BinaryDataRepository" %>
 
 <%@ page import="org.json.JSONObject" %>
 
+<%@ page import="java.util.Set" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Calendar" %>
@@ -58,7 +59,6 @@
       stop      = (stop    == null || stop.equals(   "null")  ) ? "" : stop.trim();
       group     = (group   == null || group.equals(   "null") ) ? "" : group.trim();
       int limit = (limitS  == null || limitS.trim().equals("")) ? 0  : Integer.parseInt(limitS);
-      int size = 0;
       long startL;
       long stopL;
       DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -107,44 +107,15 @@
       if (!version.equals("")) {
         out.println("showing only version <b>" + version + "</b><br/>");
         }
-      HBaseClient h = new HBaseClient(hbase);
-      JSONObject json = h.get2JSON(htable,
-                                   "schema_*");
-      h2table.setup(hbase, htable);
-      h2table.setTable(json, 0);
-      Map<String, Map<String, String>> schemas = h2table.table();
-      if (schemas != null && !schemas.isEmpty()) {
-        Map<String, String> schemaMap = null;
-        if (version != null && !version.trim().equals("")) {
-          schemaMap = schemas.get("schema_" + version);
-          }
-        if (schemaMap == null) {
-          schemaMap = schemas.entrySet().iterator().next().getValue();
-          }
-        Schema schema = new Schema(schemaMap);
-        h.setSchema(schema);
-        h2table.setSchema(schema);
-        }
-      if (!key.equals("")) {
-        json = h.get2JSON(htable,
-                          key);
-        }
-      else {
-        if (limit > 0 && h2table.width() > 0) {
-          size = limit * h2table.width();
-          out.println("getting only <b>" + size + "</b> cells<br/>");
-          }
-        String filter = h.filter(filterMap, null);
-        json = h.scan2JSON(htable,
-                           filter,
-                           size,
-                           startL,
-                           stopL);
-        }
-      if (! selects.equals("")) {
-        h2table.setShowColumns(selects.split(","));
-        }
-      h2table.processTable(json, limit);
+      HBaseDirectClient h = new HBaseDirectClient(hbase);
+      h.connect(htable);
+      Map<String, Map<String, String>> results = h.scan(key.equals("") ? null : key,
+                                                        filterMap,
+                                                        null,
+                                                        null,
+                                                        false,
+                                                        false);
+      h2table.processTable(results, h.schema(), h.repository());
       String toHide = "";
       if (!group.equals("")) {
         toHide = h2table.toHide("i:objectId");
@@ -225,7 +196,7 @@
             this.clear();
             },
           Search: function () {
-            var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&size=<%=size%>&group=<%=group%>"
+            var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&group=<%=group%>"
                                                   + "&key="     + w2ui.hbaseTableForm.record.key
                                                   + "&krefix="  + w2ui.hbaseTableForm.record.krefix
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters
@@ -267,7 +238,7 @@
     function detailFormatter(index, row) {
       var html = []
       $.each(row, function (key, value) {
-        if (value.startsWith('url:')) { // TBD: whould work also for other types
+        if (value.startsWith('binary:')) {
           html.push("<b><a href='#' onclick='loadPane(\"graph\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
           }
         else {

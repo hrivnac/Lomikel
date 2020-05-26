@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 public class Schema {
   
   /** Set overall schema.
-    * @param schema The schema to set. */
+    * @param schemaMap The schema to set. */
   // TBD: handle schema per version
   public Schema(Map<String, String> schemaMap) {
     _schemaMap = schemaMap;

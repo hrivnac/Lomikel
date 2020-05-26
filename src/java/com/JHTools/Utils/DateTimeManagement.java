@@ -3,6 +3,9 @@ package com.JHTools.Utils;
 // Java
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /** <code>DateTimeManagement</code> manipulates date and time.
   * @opt attributes
@@ -10,6 +13,7 @@ import java.time.format.DateTimeFormatter;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: clean
 public class DateTimeManagement {
   
   /** Convert Julian data to {@link String}.
@@ -37,6 +41,44 @@ public class DateTimeManagement {
     LocalDateTime ldt = LocalDateTime.of(y, m + 1, d + 1, h, mi, s, (int)ns);
     return  ldt.format(FORMATTER);        
     }
+  /** Give the time in human readable form.
+    * @param timestamp The timestamp in ms.
+    * @param format    The time format.
+    * @return          The time derived from timestamp. */
+  public static String time2String(long timestamp,
+                                   String format) {
+    Date date;
+    if (timestamp == 0) {
+      date = new Date();
+      }
+    else {
+      date = new Date(timestamp);
+      }
+    DateFormat formatter = new SimpleDateFormat(format);
+    return formatter.format(date);
+    }
+    
+  /** Give the current time in human readable form.
+    * @param format    The time format.
+    * @return          The time derived from timestamp. */
+  public static String time2String(String format) {
+    return time2String(0, format);
+    }
+    
+  /** Give the time in human readable form.
+    * @param timestamp The timestamp in ms.
+    * @return          The time derived from timestamp. */
+  public static String time2String(long timestamp) {
+    return time2String(timestamp, FORMAT);
+    }
+    
+  /** Give the current time in human readable form.
+     * @return          The time derived from timestamp. */
+  public static String time2String() {
+    return time2String(0, FORMAT);
+    }
+
+  private static String FORMAT = "HH:mm:ss.SSS dd/MMM/yyyy";
 
   private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy MM dd HH:mm:ss.nnnnnnnnn");
   

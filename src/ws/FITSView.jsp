@@ -3,7 +3,7 @@
 <!-- JHTools FITS View-->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
-<%@ page import="com.JHTools.WebService.BinaryDataRepository" %>
+<%@ page import="com.JHTools.HBaser.BinaryDataRepository" %>
 <%@ page import="com.JHTools.Utils.Info" %>
 
 <%@ page import="java.io.File"%>
@@ -30,7 +30,7 @@
   // TBD: should be realy deleted
   String id = request.getParameter("id");
   byte[] content = h2table.repository().get(id);
-  String name = id.substring(4);
+  String name = id.substring(7);
   new File(Info.tmp() +"/FITS").mkdirs();
   String fn = Info.tmp() + "/FITS/" + name + ".fits";
   File file = new File(fn);

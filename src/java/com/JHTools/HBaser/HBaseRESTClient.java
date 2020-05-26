@@ -287,7 +287,7 @@ public class HBaseRESTClient {
           value[0] = Coding.encode(value[0]);
           }
         else {
-          value[0] = _schema.encode(entry.getKey(), value[0]);
+          //value[0] = Bytes.toString(_schema.encode(entry.getKey(), value[0])); // BUG
           }
         }
       if (!first) {

@@ -3,6 +3,7 @@ package com.JHTools.WebService;
 import com.JHTools.Utils.Coding;
 import com.JHTools.HBaser.Schema;
 import com.JHTools.HBaser.CellContent;
+import com.JHTools.HBaser.BinaryDataRepository;
 
 // org.json
 import org.json.JSONObject;
@@ -38,98 +39,34 @@ public class HBase2Table {
    reset();
    }
    
-  /** Set the <em>HBase</em> properties.
-    * @param hbase  The <em>HBase</em> url.
-    * @param htable The name of the <em>HBase</em> table. */
-  public void setup(String hbase,
-                    String htable) {
-    log.info("Setting " + htable + "@" + hbase);
-    reset();
-    _hbase  = hbase;
-    _htable = htable;
-    }
-   
   /** Reset all data. */
   public void reset() {
     _repository.clear();
     _schema = null;
-    _showColumns = null;
     _thead = null;
     _data = null;
     _table.clear();
     _fLengths.clear();
     }
-  
-  /** Set columns to show.
-    * @param showColumns  The columns to be shown.
-    *                     All columns will be shown if <tt>null</tt> or empty. */  
-   public void setShowColumns(String[] showColumns) {
-    _showColumns = Arrays.asList(showColumns);
-    }  
     
-  /** Convert <em>HBase</em> {@link JSONObject} into table.
-    * @param json  The {@link JSONObject} representation of the HBase table.
-    * @param limit Max number of rows. <tt>0</tt> means no limit. */
-  public void setTable(JSONObject json,
-                       int        limit) {
-    log.info("Setting HBase table " + toString());
-    if (json == null || json.equals("")) {
-      return;
-      }
-    JSONArray rows = json.getJSONArray("Row");
-    JSONArray cells;
-    String key;
-    String column;
-    String value;
-    CellContent cc;
-    String id;
-    _table.clear();
-    Map<String, String> entry;
-    int n = 1;
-    for (int i = 0; i < rows.length(); i++) {
-      if (limit != 0 && n++ > limit) {
-        break;
-        }
-      key = Coding.decode(rows.getJSONObject(i).getString("key"));
-      entry = new HashMap<>();
-      cells = rows.getJSONObject(i).getJSONArray("Cell");
-      for (int j = 0; j < cells.length(); j++) {
-        column = Coding.decode(cells.getJSONObject(j).getString("column"));
-        value  = cells.getJSONObject(j).getString("$");
-        if (!key.startsWith("schema") && _schema != null) {
-          if (column.startsWith("b:")) {
-            id = "url:" + key + ":" + column;
-            entry.put(column, id);
-            _repository.put(id, Base64.getDecoder().decode(value));
-            }
-          else {
-            entry.put(column, _schema.decode2Content(column, Base64.getDecoder().decode(value)).asString());
-            }
-          }
-        else {
-          entry.put(column, Coding.decode(value));
-          }
-        }
-      _table.put(key, entry);
-      }
-    }
-    
-  /** Convert <em>HBase</em> {@link JSONObject} into table and create its Web representation..
-    * @param json  The {@link JSONObject} representation of the HBase table.
-    * @param limit Max number of rows. */
-  public void processTable(JSONObject json,
-                           int        limit) {
-    log.info("Processing HBase table " + toString());
-    setTable(json, limit);
+  /** Convert <em>HBase</em> table into its Web representation..
+    * @param table      The {@link Map} of {@link Map}s as <tt>key-&t;{family:column-&gt;value}</tt>. 
+    * @param schema     The {@link Schema} to use (may be <tt>null</tt>).
+    * @param repository The {@link BinaryDataRepository} with related binary data. */
+  public void processTable(Map<String, Map<String, String>> table,
+                           Schema                           schema,
+                           BinaryDataRepository             repository) {
+    log.info("Processing HBase table");
     if (_table == null) {
       return;
       }
+    _table      = table;
+    _schema     = schema;
+    _repository = repository;
     Set<String> columns0 = new TreeSet<>();
     for (Map<String, String> entry : _table.values()) {
       for (String column : entry.keySet()) {
-        if (_showColumns == null || _showColumns.isEmpty() || _showColumns.contains(column)) {  
-          columns0.add(column);
-          }
+        columns0.add(column);
         }
       }
     // TBD: support non-default columns
@@ -180,13 +117,6 @@ public class HBase2Table {
       _data += "}\n";
       }
     } 
-
-  /** Set overall {@link Schema}.
-    * @param schema The {@link Schema} to set. */
-  // TBD: handle schema per row
-  public void setSchema(Schema schema) {
-    _schema = schema;
-    }
     
   /** Give the table header.
     * @return The table header. */
@@ -261,20 +191,9 @@ public class HBase2Table {
     return hidden;
     }
     
-  @Override
-  public String toString() {
-    return _htable + "@" + _hbase + "(" + width() + ")";
-    }
-    
-  private String _hbase;
-  
-  private String _htable;
-    
   private BinaryDataRepository _repository = new BinaryDataRepository();  
     
   private Schema _schema;
-    
-  private List<String> _showColumns;
   
   private String _thead;
   
