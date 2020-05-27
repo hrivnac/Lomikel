@@ -338,6 +338,9 @@ public class HBaseClient {
         column = fc[1];
         scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
         }
+      if (_limit > 0) {
+        scan.setLimit(_limit);
+        }
       try {
         ResultScanner rs = table().getScanner(scan);
         int i = 0;
@@ -415,6 +418,13 @@ public class HBaseClient {
     _schema = schema;
     }
     
+  /** Set the limit for the number of results.
+    * @param limit The  limit for the number of results. */
+  public void setLimit(int limit) {
+    log.info("Setting limit " + limit);
+    _limit = limit;
+    }
+    
   /** Give the table {@link Schema}.
     * @param schema The used {@link Schema}. */
   public Schema schema() {
@@ -460,6 +470,8 @@ public class HBaseClient {
   private String _tableName;
   
   private Schema _schema;
+  
+  private int _limit = 0;
     
   private BinaryDataRepository _repository = new BinaryDataRepository();  
 

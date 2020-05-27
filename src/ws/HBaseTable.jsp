@@ -43,20 +43,22 @@
       String start   = request.getParameter("start");
       String stop    = request.getParameter("stop");
       String group   = request.getParameter("group");
+      String limitS  = request.getParameter("limit");
       if (hbase  == null || hbase.trim( ).equals("") ||
           htable == null || htable.trim().equals("")) {
         log.fatal("Cannot connect to " + htable + "@" + hbase);
         }
       out.println("<b><u>" + htable + "@" + hbase + "</u></b><br/>");
       log.info("Connection to " + htable + "@" + hbase);
-      key       = (key     == null || key.equals(    "null")  ) ? "" : key.trim();
-      krefix    = (krefix  == null || krefix.equals( "null")  ) ? "" : krefix.trim();
-      filters   = (filters == null || filters.equals("null")  ) ? "" : filters.trim();
-      selects   = (selects == null || selects.equals("null")  ) ? "" : selects.trim();
-      version   = (version == null || version.equals("null")  ) ? "" : version.trim();
-      start     = (start   == null || start.equals(  "null")  ) ? "" : start.trim();
-      stop      = (stop    == null || stop.equals(   "null")  ) ? "" : stop.trim();
-      group     = (group   == null || group.equals(   "null") ) ? "" : group.trim();
+      key       = (key     == null || key.equals(    "null")) ? "" : key.trim();
+      krefix    = (krefix  == null || krefix.equals( "null")) ? "" : krefix.trim();
+      filters   = (filters == null || filters.equals("null")) ? "" : filters.trim();
+      selects   = (selects == null || selects.equals("null")) ? "" : selects.trim();
+      version   = (version == null || version.equals("null")) ? "" : version.trim();
+      start     = (start   == null || start.equals(  "null")) ? "" : start.trim();
+      stop      = (stop    == null || stop.equals(   "null")) ? "" : stop.trim();
+      group     = (group   == null || group.equals(  "null")) ? "" : group.trim();
+      limitS    = (limitS  == null || limitS.equals("null" )) ? "" : limitS.trim();
       Map<String, String> filterMap = new HashMap<>();
       if (!key.equals("")) {
         out.println("<b>key</b> is <b>" + key + "</b><br/>");
@@ -75,6 +77,11 @@
             }
           }
         }
+      int limit = 0;
+      if (!limitS.equals("")) {
+        out.println("showing max <b>" + limitS + "</b> results<br/>");
+        limit = Integer.valueOf(limitS);
+        }
       if (!selects.equals("")) {
         out.println("showing only columns <b>" + selects + "</b><br/>");
         }
@@ -82,6 +89,7 @@
         out.println("showing only version <b>" + version + "</b><br/>");
         }
       HBaseClient h = new HBaseClient(hbase);
+      h.setLimit(limit);
       h.connect(htable);
       Map<String, Map<String, String>> results = h.scan(key.equals("") ? null : key,
                                                         filterMap,
@@ -155,7 +163,8 @@
           {field:'filters', type: 'text',     html: {caption: 'Search Columns', text : ' (columns substring search: family:column:value,...)',      attr: 'style="width: 500px"'}},
           {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,...)',                      attr: 'style="width: 500px"'}},
           {field:'start',   type: 'datetime', html: {caption: 'From',           text : ' (start time)',                                             attr: 'style="width: 150px"'}},
-          {field:'stop',    type: 'datetime', html: {caption: 'Till',           text : ' (end time)',                                               attr: 'style="width: 150px"'}}
+          {field:'stop',    type: 'datetime', html: {caption: 'Till',           text : ' (end time)',                                               attr: 'style="width: 150px"'}},
+          {field:'limit',   type: 'int',      html: {caption: 'Limit',          text : ' (max number of rows)',                                     attr: 'style="width: 100px"'}}
           ], 
         record : { 
           key     : '<%=key%>',
@@ -163,7 +172,8 @@
           filters : '<%=filters%>',
           selects : '<%=selects%>',
           start   : '<%=start%>',
-          stop    : '<%=stop%>'
+          stop    : '<%=stop%>',
+          limit   : <%=limit%>
           },
         actions: {
           Reset: function () {
@@ -176,7 +186,8 @@
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters
                                                   + "&selects=" + w2ui.hbaseTableForm.record.selects
                                                   + "&start="   + w2ui.hbaseTableForm.record.start
-                                                  + "&stop="    + w2ui.hbaseTableForm.record.stop;
+                                                  + "&stop="    + w2ui.hbaseTableForm.record.stop
+                                                  + "&limit="   + w2ui.hbaseTableForm.record.limit;
             loadPane("result", request);
             }
           }
