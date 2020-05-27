@@ -168,6 +168,12 @@ public class Schema {
     return 0;
     }
     
+  /** Give all column names.
+    * @return The {@link Set} of column names. */
+  public Set<String> columnNames() {
+    return _schemaMap.keySet();
+    }
+    
   private Map<String, String> _schemaMap;
 
   /** Logging . */
