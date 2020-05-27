@@ -40,7 +40,6 @@
       String selects = request.getParameter("selects");
       String filters = request.getParameter("filters");
       String version = request.getParameter("version");
-      String limitS  = request.getParameter("limit");
       String start   = request.getParameter("start");
       String stop    = request.getParameter("stop");
       String group   = request.getParameter("group");
@@ -58,51 +57,26 @@
       start     = (start   == null || start.equals(  "null")  ) ? "" : start.trim();
       stop      = (stop    == null || stop.equals(   "null")  ) ? "" : stop.trim();
       group     = (group   == null || group.equals(   "null") ) ? "" : group.trim();
-      int limit = (limitS  == null || limitS.trim().equals("")) ? 0  : Integer.parseInt(limitS);
-      long startL;
-      long stopL;
-      DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-      try {
-        Date startD = formatter.parse(start);
-        Date stopD = formatter.parse(stop);
-        Calendar startC = GregorianCalendar.getInstance();
-        Calendar stopC  = GregorianCalendar.getInstance();
-        startC.setTime(startD);
-        stopC.setTime(stopD);
-        startL = startC.getTimeInMillis();
-        stopL  = stopC.getTimeInMillis(); 
-        start = formatter.format(startD);
-        stop = formatter.format(stopD);
-        out.println("<b>period:</b> "  + start + " - " + stop + "<br/>");
-        }
-      catch (Exception e) {
-        log.info("Cannot parse period " + start + " - " + stop);
-        start = "";
-        stop  = "";
-        startL = 0;
-        stopL  = 0;
-        }
       Map<String, String> filterMap = new HashMap<>();
       if (!key.equals("")) {
         out.println("<b>key</b> is <b>" + key + "</b><br/>");
         }
-      else if (!krefix.equals("")) {
-        out.println("<b>key</b> starts with <b>" + krefix + "</b></br>");
-        filterMap.put("key:key", krefix);
-        }
-      else if (!filters.equals("")) {
-        String[] term;
-        for (String f : filters.split(",")) {
-          term = f.split(":");
-          out.println("<b>" + term[0] + ":" + term[1] + "</b> contains <b>" + term[2] + "</b></br>");
-          filterMap.put(term[0] + ":" + term[1], term[2]);
+      else {
+        if (!krefix.equals("")) {
+          out.println("<b>key</b> starts with <b>" + krefix + "</b></br>");
+          filterMap.put("key:key", krefix);
+          }
+        if (!filters.equals("")) {
+          String[] term;
+          for (String f : filters.split(",")) {
+            term = f.split(":");
+            out.println("<b>" + term[0] + ":" + term[1] + "</b> contains <b>" + term[2] + "</b></br>");
+            filterMap.put(term[0] + ":" + term[1], term[2]);
+            }
           }
         }
       if (!selects.equals("")) {
         out.println("showing only columns <b>" + selects + "</b><br/>");
-        }
-      if (limit > 0) {
-        out.println("showing only <b>" + limit + "</b> rows<br/>");
         }
       if (!version.equals("")) {
         out.println("showing only version <b>" + version + "</b><br/>");
@@ -111,8 +85,10 @@
       h.connect(htable);
       Map<String, Map<String, String>> results = h.scan(key.equals("") ? null : key,
                                                         filterMap,
-                                                        null,
-                                                        null,
+                                                        selects.equals("") ? null : selects.split(","),
+                                                        start,
+                                                        stop,
+                                                        "dd/MM/yyy HH:mm",
                                                         false,
                                                         false);
       h2table.processTable(results, h.schema(), h.repository());
@@ -178,7 +154,6 @@
           {field:'krefix',  type: 'text',     html: {caption: 'Prefix Key',     text : ' (prefix search on row key)',                               attr: 'style="width: 500px"'}},
           {field:'filters', type: 'text',     html: {caption: 'Search Columns', text : ' (columns substring search: family:column:value,...)',      attr: 'style="width: 500px"'}},
           {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,...)',                      attr: 'style="width: 500px"'}},
-          {field:'limit',   type: 'int' ,     html: {caption: 'Limit',          text : ' (max number of results)',                                  attr: 'style="width: 50px"' }},
           {field:'start',   type: 'datetime', html: {caption: 'From',           text : ' (start time)',                                             attr: 'style="width: 150px"'}},
           {field:'stop',    type: 'datetime', html: {caption: 'Till',           text : ' (end time)',                                               attr: 'style="width: 150px"'}}
           ], 
@@ -187,7 +162,6 @@
           krefix  : '<%=krefix%>',
           filters : '<%=filters%>',
           selects : '<%=selects%>',
-          limit   : '<%=limit%>',
           start   : '<%=start%>',
           stop    : '<%=stop%>'
           },
@@ -201,7 +175,6 @@
                                                   + "&krefix="  + w2ui.hbaseTableForm.record.krefix
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters
                                                   + "&selects=" + w2ui.hbaseTableForm.record.selects
-                                                  + "&limit="   + w2ui.hbaseTableForm.record.limit
                                                   + "&start="   + w2ui.hbaseTableForm.record.start
                                                   + "&stop="    + w2ui.hbaseTableForm.record.stop;
             loadPane("result", request);

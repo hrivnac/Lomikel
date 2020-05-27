@@ -40,6 +40,12 @@ import java.util.HashMap;
 import java.util.NavigableMap;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -178,13 +184,98 @@ public class HBaseClient {
   public Map<String, Map<String, String>> scan(String              key,
                                                Map<String, String> search,
                                                String[]            filter,
-                                               String[]            interval,
+                                               long[]              p,
                                                boolean             ifkey,
                                                boolean             iftime) {
-    // TBD: report filter, interval
-    log.info("Searching for key: " + key + ", search: " + search + ", id-time: " + ifkey + "-" + iftime);
+     if (p == null || p.length != 2) {
+       p = new long[]{0, 0};
+       }
+     long start = p[0];
+     long stop  = p[1];
+     long now   = System.currentTimeMillis(); 
+     if (start != 0) {
+       start  = now - (long)(start * 1000 * 60);
+       }
+     if (stop != 0) {
+       stop   = now - (long)(stop  * 1000 * 60);
+       }
+     return scan(key, search, filter, start, stop, ifkey, iftime);
+     }
+                    
+  /** Get entry or entries from the {@link Catalog}.
+    * @param key      The row key. Disables other search terms.
+    * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
+    *                 Key can be searched with key:key "pseudo-name".
+    *                 All searches are executed as prefix searches.
+    * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
+    * @param interval The time period specified as start,end in the format <tt>HH:mm:ss.SSS dd/MMM/yyyy</tt>.
+    * @param ifkey    Whether give also entries keys.
+    * @param iftime   Whether give also entries timestamps.
+    * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, String>> scan(String              key,
+                                               Map<String, String> search,
+                                               String[]            filter,
+                                               String              startS,
+                                               String              stopS,
+                                               String              format,
+                                               boolean             ifkey,
+                                               boolean             iftime) {
+     long start = 0;
+     long stop  = 0;
+     if (format == null || !format.trim().equals("")) {
+       format = "dd/MM/yyyy HH:mm:ss:SSS";
+       }
+     DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+     try {
+       if (startS != null && !startS.trim().equals("")) {       
+         Date startD = formatter.parse(startS);
+         Calendar startC = GregorianCalendar.getInstance();
+         startC.setTime(startD);
+         start = startC.getTimeInMillis();
+         }
+       }
+     catch (ParseException e) {
+       }
+     try {
+       if (stopS != null && !stopS.trim().equals("")) {       
+         Date stopD = formatter.parse(stopS);
+         Calendar stopC  = GregorianCalendar.getInstance();
+         stopC.setTime(stopD);
+         stop = stopC.getTimeInMillis(); 
+         }
+       }
+     catch (ParseException e) {
+       }
+     return scan(key, search, filter, start, stop, ifkey, iftime);
+     }
+                     
+  /** Get entry or entries from the {@link Catalog}.
+    * @param key      The row key. Disables other search terms.
+    * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
+    *                 Key can be searched with key:key "pseudo-name".
+    *                 All searches are executed as prefix searches.
+    * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
+    * @param interval The time period specified as start,end in the format <tt>HH:mm:ss.SSS dd/MMM/yyyy</tt>.
+    * @param ifkey    Whether give also entries keys.
+    * @param iftime   Whether give also entries timestamps.
+    * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, String>> scan(String              key,
+                                               Map<String, String> search,
+                                               String[]            filter,
+                                               long                start,
+                                               long                stop,
+                                               boolean             ifkey,
+                                               boolean             iftime) {
+    log.info("Searching for key: " + key + 
+             ", search: " + search + 
+             ", filter: " + (filter == null ? null : String.join(",", filter)) +
+             ", interval: " + start + "-" + stop +
+             ", id-time: " + ifkey + "-" + iftime);
     if (filter == null) {
       filter = new String[0];
+      }
+    if (stop == 0) {
+      stop = Long.MAX_VALUE;
       }
     Map<String, Map<String, String>> results = new HashMap<>();
     Map<String, String> result;
@@ -194,7 +285,7 @@ public class HBaseClient {
       try {
         Result r = table().get(get);
         log.info("" + r.size() + " entries found");
-        addResult(r, result, filter, ifkey, iftime);
+        addResult(r, result, ifkey, iftime);
         results.put(key, result);
         }
       catch (IOException e) {
@@ -203,26 +294,11 @@ public class HBaseClient {
       }
     else {
       Scan scan = new Scan();
-      if (interval != null && interval.length == 2) {
-        if (interval[0].equals("")) {
-          interval[0]= "0";
-          }
-        if (interval[1].equals("")) {
-          interval[1]= "0";
-          }
-        long p1 = Long.parseLong(interval[0]);
-        long p2 = Long.parseLong(interval[1]);
-        long start = Math.max(p1, p2);
-        long stop  = Math.min(p1, p2);
-        long now   = System.currentTimeMillis(); 
-        start  = now - (long)(start * 1000 * 60);
-        stop   = now - (long)(stop  * 1000 * 60);
-        try {
-          scan.setTimeRange(start, stop);
-          }
-        catch (IOException e) {
-          log.error("Cannot set time range " + start + " - " + stop);
-          }
+      try {
+        scan.setTimeRange(start, stop);
+        }
+      catch (IOException e) {
+        log.error("Cannot set time range " + start + " - " + stop);
         }
       String[] fc;
       String family; 
@@ -248,18 +324,18 @@ public class HBaseClient {
         }
       FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL, filters);  
       scan.setFilter(filterList);
-      /*for (String f : filter) {
+      for (String f : filter) {
         fc = f.split(":");
         family = fc[0];
         column = fc[1];
         scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
-        }*/
+        }
       try {
         ResultScanner rs = table().getScanner(scan);
         int i = 0;
         for (Result r : rs) {
           result = new HashMap<>();
-          addResult(r, result, filter, ifkey, iftime);
+          addResult(r, result, ifkey, iftime);
           results.put(Bytes.toString(r.getRow()), result);
           i++;
           }
@@ -274,61 +350,51 @@ public class HBaseClient {
     }
     
   /** Add {@link Result} into result {@link Map}.
-    * @param r      The {@link Result} to add.
-    * @param result The {@link Map} of results <tt>familty:column-&gt;value</tt>.
-    * @param filter  The names of required values as array of <tt>family:column</tt>.
-    * @param ifkey  Whether add also entries keys.
-    * @param iftime Whether add also entries timestamps. */
+    * @param r       The {@link Result} to add.
+    * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
+    * @param ifkey   Whether add also entries keys.
+    * @param iftime  Whether add also entries timestamps. */
   private void addResult(Result r,
                          Map<String, String> result,
-                         String[] filter,
-                         boolean ifkey,
-                         boolean iftime) {
+                         boolean             ifkey,
+                         boolean             iftime) {
     String key = Bytes.toString(r.getRow());
     String[] ff;
+    String ref;
     if (r != null && r.getRow() != null) {
       if (ifkey) {
         result.put("key:key", key);
         }
-      if (filter != null && filter.length > 0) {
-        for (String f : filter) {
-          ff = f.split(":");
-          result.put(f, Bytes.toString(r.getValue(Bytes.toBytes(ff[0]), Bytes.toBytes(ff[1]))));
-          }
-        }
-      else {
-        String family;
-        String column;
-        String ref;
-        NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
-        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
-          family = Bytes.toString(entry.getKey());
-          for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
-            column = family + ":" + Bytes.toString(e.getKey());
-            // searching for schema
-            if (key.startsWith("schema")) {
-              result.put(column, Bytes.toString(e.getValue()));
+      String family;
+      String column;
+      NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
+      for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+        family = Bytes.toString(entry.getKey());
+        for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+          column = family + ":" + Bytes.toString(e.getKey());
+          // searching for schema
+          if (key.startsWith("schema")) {
+            result.put(column, Bytes.toString(e.getValue()));
+            }
+          // known schema
+          else if (_schema != null && _schema.type(column) != null) {
+            // binary
+            if (family.equals("b")) {
+              ref = "binary:" + key + ":" + Bytes.toString(e.getKey());
+              result.put(column, ref);
+              _repository.put(ref, _schema.decode2Content(column, e.getValue()).asBytes());
               }
-            // known schema
-            else if (_schema != null && _schema.type(column) != null) {
-              // binary
-              if (family.equals("b")) {
-                ref = "binary:" + key + ":" + Bytes.toString(e.getKey());
-                result.put(column, ref);
-                _repository.put(ref, _schema.decode2Content(column, e.getValue()).asBytes());
-                }
-              // not binary
-              else {
-                result.put(column, _schema.decode(column, e.getValue()));
-                }
-              }
-            // no schema
+            // not binary
             else {
-              result.put(column, Bytes.toString(e.getValue()));
+              result.put(column, _schema.decode(column, e.getValue()));
               }
             }
-          }        
-        }
+          // no schema
+          else {
+            result.put(column, Bytes.toString(e.getValue()));
+            }
+          }
+        }              
       if (iftime) {
         result.put("key:time", DateTimeManagement.time2String(r.rawCells()[0].getTimestamp()));
         }
