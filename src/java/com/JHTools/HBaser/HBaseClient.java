@@ -177,21 +177,22 @@ public class HBaseClient {
     *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
-    * @param interval The time period specified as start,end in the format <tt>HH:mm:ss.SSS dd/MMM/yyyy</tt>.
+    * @param period   The time period specified in <tt>min</tt>s back from now.
+    *                 <tt>0</tt> means no restriction.
     * @param ifkey    Whether give also entries keys.
     * @param iftime   Whether give also entries timestamps.
     * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, String>> scan(String              key,
                                                Map<String, String> search,
                                                String[]            filter,
-                                               long[]              p,
+                                               long[]              period,
                                                boolean             ifkey,
                                                boolean             iftime) {
-     if (p == null || p.length != 2) {
-       p = new long[]{0, 0};
+     if (period == null || period.length != 2) {
+       period = new long[]{0, 0};
        }
-     long start = p[0];
-     long stop  = p[1];
+     long start = period[0];
+     long stop  = period[1];
      long now   = System.currentTimeMillis(); 
      if (start != 0) {
        start  = now - (long)(start * 1000 * 60);
@@ -208,7 +209,11 @@ public class HBaseClient {
     *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
-    * @param interval The time period specified as start,end in the format <tt>HH:mm:ss.SSS dd/MMM/yyyy</tt>.
+    * @param startS   The time period start.
+    *                 <tt>null</tt> or <tt>blank</tt> means minus infinity.
+    * @param stopS    The time period stop.
+    *                 <tt>null</tt> or <tt>blank</tt> means plus infinity.
+    * @param format   The time period format, the default is <tt>HH:mm:ss.SSS dd/MMM/yyyy</tt>.
     * @param ifkey    Whether give also entries keys.
     * @param iftime   Whether give also entries timestamps.
     * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
@@ -225,7 +230,7 @@ public class HBaseClient {
      if (format == null || !format.trim().equals("")) {
        format = "dd/MM/yyyy HH:mm:ss:SSS";
        }
-     DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+     DateFormat formatter = new SimpleDateFormat(format);
      try {
        if (startS != null && !startS.trim().equals("")) {       
          Date startD = formatter.parse(startS);
@@ -255,7 +260,10 @@ public class HBaseClient {
     *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
-    * @param interval The time period specified as start,end in the format <tt>HH:mm:ss.SSS dd/MMM/yyyy</tt>.
+    * @param start    The time period start timestamp in <tt>ms</tt>.
+    *                 <tt>0</tt> means minus inifinity.
+    * @param stop     The time period stop timestamp in <tt>ms</tt>.
+    *                 <tt>0</tt> means plus inifinity.
     * @param ifkey    Whether give also entries keys.
     * @param iftime   Whether give also entries timestamps.
     * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
