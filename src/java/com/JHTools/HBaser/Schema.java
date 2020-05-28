@@ -12,7 +12,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 // Java
 import java.util.Map;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.List;

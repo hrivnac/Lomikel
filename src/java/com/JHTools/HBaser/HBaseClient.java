@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.HashSet;  
 import java.util.TreeSet;  
 import java.util.Map;  
-import java.util.HashMap;  
+import java.util.TreeMap;  
 import java.util.NavigableMap;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -61,21 +61,23 @@ public class HBaseClient {
  /** Selftest.https://vm-75109.lal.in2p3.fr:8443
    * @throws IOException If anything goes wrong. */
  public static void main(String[] args) throws IOException {
-   //String zookeepers = "localhost";
-   //String clientPort = "2181";
-   String zookeepers = "134.158.74.54";
+   String zookeepers = "localhost";
    String clientPort = "2181";
+   //String zookeepers = "134.158.74.54";
+   //String clientPort = "2181";
    HBaseClient client = new HBaseClient(zookeepers, clientPort);
    //HBaseClient client = new HBaseClient("http://localhost:2181");
    client.connect("test_portal_tiny.1");
-   Map<String, String> search = new HashMap<>();
+   Map<String, String> search = new TreeMap<>();
    //search.put("key:key", "ZTF19");
-   Map<String, Map<String, String>> results = client.scan(null,
-                                                          search,
-                                                          null,
-                                                          null,
-                                                          false,
-                                                          false);   
+   //Map<String, Map<String, String>> results = client.scan(null,
+   //                                                       search,
+   //                                                       null,
+   //                                                       null,
+   //                                                       false,
+   //                                                       false); 
+   //log.info(client.timeline("i:jd"));
+   log.info(client.latests("i:objectId", null, 0));
    }
    
  /** Create.
@@ -141,7 +143,7 @@ public class HBaseClient {
       }
     _table = _connection.getTable(TableName.valueOf(_tableName));
     // Schema search
-    Map<String, String> search = new HashMap<>();
+    Map<String, String> search = new TreeMap<>();
     if (schemaName != null) {
       if (schemaName.equals("")) {
         log.info("Using the most recent schema");
@@ -173,10 +175,13 @@ public class HBaseClient {
                     
   /** Get entry or entries from the {@link Catalog}.
     * @param key      The row key. Disables other search terms.
+    *                 It can be <tt>null</tt>.
     * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
+    *                 It can be <tt>null</tt>.
     *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
-    * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
+    * @param filter   The names of required values as array of <tt>family:column</tt>.
+    *                 It can be <tt>null</tt>.
     * @param period   The time period specified in <tt>min</tt>s back from now.
     *                 <tt>0</tt> means no restriction.
     * @param ifkey    Whether give also entries keys.
@@ -205,10 +210,13 @@ public class HBaseClient {
                     
   /** Get entry or entries from the {@link Catalog}.
     * @param key      The row key. Disables other search terms.
+    *                 It can be <tt>null</tt>.
     * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
+    *                 It can be <tt>null</tt>.
     *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
-    * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
+    * @param filter   The names of required values as array of <tt>family:column</tt>.
+    *                 It can be <tt>null</tt>.
     * @param startS   The time period start.
     *                 <tt>null</tt> or <tt>blank</tt> means minus infinity.
     * @param stopS    The time period stop.
@@ -256,10 +264,13 @@ public class HBaseClient {
                      
   /** Get entry or entries from the {@link Catalog}.
     * @param key      The row key. Disables other search terms.
+    *                 It can be <tt>null</tt>.
     * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
+    *                 It can be <tt>null</tt>.
     *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
-    * @param filter   The names of required values as array of <tt>family:column</tt>. It can be null.
+    * @param filter   The names of required values as array of <tt>family:column</tt>.
+    *                 It can be <tt>null</tt>.
     * @param start    The time period start timestamp in <tt>ms</tt>.
     *                 <tt>0</tt> means minus inifinity.
     * @param stop     The time period stop timestamp in <tt>ms</tt>.
@@ -279,29 +290,29 @@ public class HBaseClient {
              ", filter: " + (filter == null ? null : String.join(",", filter)) +
              ", interval: " + start + "-" + stop +
              ", id-time: " + ifkey + "-" + iftime);
-    if (filter == null) {
-      filter = new String[0];
-      }
-    if (stop == 0) {
-      stop = Long.MAX_VALUE;
-      }
-    Map<String, Map<String, String>> results = new HashMap<>();
+    Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;
+    // Get
     if (key != null && !key.trim().equals("")) {
       Get get = new Get(Bytes.toBytes(key));
-      result = new HashMap<>();
+      result = new TreeMap<>();
       try {
         Result r = table().get(get);
         log.info("" + r.size() + " entries found");
-        addResult(r, result, ifkey, iftime);
+        addResult(r, result, filter, ifkey, iftime);
         results.put(key, result);
         }
       catch (IOException e) {
         log.error("Cannot search", e);
         }
       }
+    // Scan
     else {
       Scan scan = new Scan();
+      // Time range
+      if (stop == 0) {
+        stop = Long.MAX_VALUE;
+        }
       try {
         scan.setTimeRange(start, stop);
         }
@@ -312,41 +323,50 @@ public class HBaseClient {
       String family; 
       String column; 
       String value;
-      List<Filter> filters = new ArrayList<>();
-      for (Map.Entry<String, String> entry : search.entrySet()) {
-        fc = entry.getKey().split(":");
-        family = fc[0];
-        column = fc[1];
-        value  = entry.getValue();
-        if (family.equals("key") && column.equals("key")) {
-          filters.add(new RowFilter(CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(value))));
-          char[] idc = value.toCharArray();
-          char last = idc[idc.length - 1];
-          String id1 = value.substring(0, value.length() - 1) + ++last;  
-          scan.setStartRow(Bytes.toBytes(value));
-          scan.setStopRow( Bytes.toBytes(id1)); // TBD: correct ?
+      // Search
+      log.info(search);
+      if (search != null && !search.isEmpty()) {
+        List<Filter> filters = new ArrayList<>();
+        for (Map.Entry<String, String> entry : search.entrySet()) {
+          fc = entry.getKey().split(":");
+          family = fc[0];
+          column = fc[1];
+          value  = entry.getValue();
+          if (family.equals("key") && column.equals("key")) {
+            filters.add(new RowFilter(CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(value))));
+            char[] idc = value.toCharArray();
+            char last = idc[idc.length - 1];
+            String id1 = value.substring(0, value.length() - 1) + ++last;  
+            scan.setStartRow(Bytes.toBytes(value));
+            scan.setStopRow( Bytes.toBytes(id1)); // TBD: correct ?
+            }
+          else {
+            filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
+            }
           }
-        else {
-          filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
+        FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL, filters);  
+        scan.setFilter(filterList);
+        }
+      // Filter
+      if (filter != null && filter.length > 0) {
+        for (String f : filter) {
+          fc = f.split(":");
+          family = fc[0];
+          column = fc[1];
+          scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
           }
         }
-      FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL, filters);  
-      scan.setFilter(filterList);
-      for (String f : filter) {
-        fc = f.split(":");
-        family = fc[0];
-        column = fc[1];
-        scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
-        }
+      // Limit
       if (_limit > 0) {
         scan.setLimit(_limit);
         }
+      // Results
       try {
         ResultScanner rs = table().getScanner(scan);
         int i = 0;
         for (Result r : rs) {
-          result = new HashMap<>();
-          addResult(r, result, ifkey, iftime);
+          result = new TreeMap<>();
+          addResult(r, result, filter, ifkey, iftime);
           results.put(Bytes.toString(r.getRow()), result);
           i++;
           }
@@ -363,10 +383,13 @@ public class HBaseClient {
   /** Add {@link Result} into result {@link Map}.
     * @param r       The {@link Result} to add.
     * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
+    * @param filter   The names of required values as array of <tt>family:column</tt>.
+    *                 It can be <tt>null</tt>.
     * @param ifkey   Whether add also entries keys.
     * @param iftime  Whether add also entries timestamps. */
   private void addResult(Result r,
                          Map<String, String> result,
+                         String[]            filter,
                          boolean             ifkey,
                          boolean             iftime) {
     String key = Bytes.toString(r.getRow());
@@ -376,42 +399,81 @@ public class HBaseClient {
       if (ifkey) {
         result.put("key:key", key);
         }
-      String family;
-      String column;
-      NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
-      for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
-        family = Bytes.toString(entry.getKey());
-        for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
-          column = family + ":" + Bytes.toString(e.getKey());
-          // searching for schema
-          if (key.startsWith("schema")) {
-            result.put(column, Bytes.toString(e.getValue()));
-            }
-          // known schema
-          else if (_schema != null && _schema.type(column) != null) {
-            // binary
-            if (family.equals("b")) {
-              ref = "binary:" + key + ":" + Bytes.toString(e.getKey());
-              result.put(column, ref);
-              _repository.put(ref, _schema.decode2Content(column, e.getValue()).asBytes());
+      if (filter == null || filter.length > 0) {
+        String family;
+        String column;
+        NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
+        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+          family = Bytes.toString(entry.getKey());
+          for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+            column = family + ":" + Bytes.toString(e.getKey());
+            // searching for schema
+            if (key.startsWith("schema")) {
+              result.put(column, Bytes.toString(e.getValue()));
               }
-            // not binary
+            // known schema
+            else if (_schema != null && _schema.type(column) != null) {
+              // binary
+              if (family.equals("b")) {
+                ref = "binary:" + key + ":" + Bytes.toString(e.getKey());
+                result.put(column, ref);
+                _repository.put(ref, _schema.decode2Content(column, e.getValue()).asBytes());
+                }
+              // not binary
+              else {
+                result.put(column, _schema.decode(column, e.getValue()));
+                }
+              }
+            // no schema
             else {
-              result.put(column, _schema.decode(column, e.getValue()));
+              result.put(column, Bytes.toString(e.getValue()));
               }
-            }
-          // no schema
-          else {
-            result.put(column, Bytes.toString(e.getValue()));
             }
           }
-        }              
+        }
       if (iftime) {
-        result.put("key:time", DateTimeManagement.time2String(r.rawCells()[0].getTimestamp()));
+        if (_dateFormat == null) {
+          result.put("key:time", String.valueOf(r.rawCells()[0].getTimestamp()));
+          }
+        else {
+          result.put("key:time", DateTimeManagement.time2String(r.rawCells()[0].getTimestamp()));
+          }
         }
       }
     }
     
+  /** Give the timeline for the column.
+    * @param columnName The name of the column.
+    * @return           The {@link Map} value-timestamp. */
+  public Map<String, Long> timeline(String columnName) {
+    Map<String, Long> tl = new TreeMap<>();
+    Map<String, Map<String, String>> results = scan(null, null, new String[]{columnName}, 0, 0, false, true);
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      tl.put(entry.getValue().get(columnName), Long.parseLong(entry.getValue().get("key:time")));
+      }
+    return tl;
+    }
+    
+  /** Give all recent values of the column.
+    * @param columnName     The name of the column.
+    * @param substringValue The column value substring to search for.
+    * @param minutes        How far into the past it should search. 
+    * @return               The {@link Set} of different values of that column. */
+  public Set<String> latests(String columnName,
+                             String substringValue,
+                             int minutes) {
+    Set<String> l = new TreeSet<>();
+    Map<String, String> search = new TreeMap<>();
+    if (substringValue != null) {
+      search.put(columnName, substringValue);
+      }
+    Map<String, Map<String, String>> results = scan(null, search, new String[]{}, new long[]{minutes, 0}, false, false);
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      l.add(entry.getKey());
+      }
+    return l;
+    }
+        
   /** Set the table {@link Schema}.
     * @param schema The {@link Schema} to set. */
   public void setSchema(Schema schema) {
@@ -419,10 +481,18 @@ public class HBaseClient {
     }
     
   /** Set the limit for the number of results.
-    * @param limit The  limit for the number of results. */
+    * @param limit The limit for the number of results. */
   public void setLimit(int limit) {
     log.info("Setting limit " + limit);
     _limit = limit;
+    }
+    
+  /** Set result timestamp format.
+    * @param format The result timestamp format.
+    *               The default is the native HBase format (ms). */
+  public void setDateFormat(String dateFormat) {
+    log.info("Setting Date format " + dateFormat);
+    _dateFormat = dateFormat;
     }
     
   /** Give the table {@link Schema}.
@@ -455,6 +525,15 @@ public class HBaseClient {
     _table = null;
     }               
 
+  /** TBD */
+  public static String results2String(Map<String, Map<String, String>> results) {
+    String report = "";
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      report += entry.getKey() + " = " + entry.getValue() + "\n";
+      }
+    return report;
+    }
+    
   /** Give {@link Table}.
     * @return The {@link Table}. */
   public Table table() {
@@ -472,6 +551,8 @@ public class HBaseClient {
   private Schema _schema;
   
   private int _limit = 0;
+  
+  private String _dateFormat = null;
     
   private BinaryDataRepository _repository = new BinaryDataRepository();  
 
