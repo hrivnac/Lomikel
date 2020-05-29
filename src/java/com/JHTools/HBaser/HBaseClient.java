@@ -77,7 +77,8 @@ public class HBaseClient {
    //                                                       false,
    //                                                       false); 
    //log.info(client.timeline("i:jd"));
-   log.info(client.latests("i:objectId", null, 0));
+   System.out.println(client.latests("i:objectId", null, 0, false));
+   System.out.println(client.latests("i:objectId", null, 0, true));
    }
    
  /** Create.
@@ -458,18 +459,23 @@ public class HBaseClient {
     * @param columnName     The name of the column.
     * @param substringValue The column value substring to search for.
     * @param minutes        How far into the past it should search. 
+    * @param getValues      Whether get colun values or row keys.
     * @return               The {@link Set} of different values of that column. */
   public Set<String> latests(String columnName,
                              String substringValue,
-                             int minutes) {
+                             int minutes,
+                             boolean getValues) {
     Set<String> l = new TreeSet<>();
     Map<String, String> search = new TreeMap<>();
     if (substringValue != null) {
       search.put(columnName, substringValue);
       }
-    Map<String, Map<String, String>> results = scan(null, search, new String[]{}, new long[]{minutes, 0}, false, false);
+    String[] filter = (getValues ? new String[]{columnName} : new String[]{});
+    Map<String, Map<String, String>> results = scan(null, search, filter, new long[]{minutes, 0}, false, false);
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      l.add(entry.getKey());
+      if (!entry.getKey().startsWith("schema")) {
+        l.add(getValues ? entry.getValue().get(columnName) : entry.getKey());
+        }
       }
     return l;
     }

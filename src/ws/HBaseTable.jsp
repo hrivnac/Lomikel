@@ -58,7 +58,7 @@
       start     = (start   == null || start.equals(  "null")) ? "" : start.trim();
       stop      = (stop    == null || stop.equals(   "null")) ? "" : stop.trim();
       group     = (group   == null || group.equals(  "null")) ? "" : group.trim();
-      limitS    = (limitS  == null || limitS.equals("null" )) ? "" : limitS.trim();
+      limitS    = (limitS  == null || limitS.equals( "null")) ? "" : limitS.trim();
       Map<String, String> filterMap = new HashMap<>();
       if (!key.equals("")) {
         out.println("<b>key</b> is <b>" + key + "</b><br/>");
@@ -91,14 +91,20 @@
       HBaseClient h = new HBaseClient(hbase);
       h.setLimit(limit);
       h.connect(htable);
-      Map<String, Map<String, String>> results = h.scan(key.equals("") ? null : key,
-                                                        filterMap,
-                                                        selects.equals("") ? null : selects.split(","),
-                                                        start,
-                                                        stop,
-                                                        "dd/MM/yyy HH:mm",
-                                                        false,
-                                                        false);
+      Map<String, Map<String, String>> results = null;
+      %>
+    <%@include file="CustomQuery.jsp"%>
+    <%
+      if (results == null) { // not performed in CustomQuery.jsp
+        results = h.scan(key.equals("") ? null : key,
+                         filterMap,
+                        selects.equals("") ? null : selects.split(","),
+                        start,
+                        stop,
+                        "dd/MM/yyy HH:mm",
+                        false,
+                        false);
+        }
       h2table.processTable(results, h.schema(), h.repository());
       String toHide = "";
       if (!group.equals("")) {
@@ -146,14 +152,16 @@
       </div>
     
     </div>
+
+  <script type="text/javascript" src="CustomQuery.js"></script> 
   
   <script>  
-    $(function () {
+    $(function() {
       if (w2ui.hbaseTableForm) {
         w2ui['hbaseTableForm'].destroy();
         }
       w2utils.settings.dateFormat ='dd/MM/yyyy|h24:mm';
-      $('#hbaseTableForm').w2form( { 
+      var hform = { 
         name   : 'hbaseTableForm',
         header : 'HBase Search',
         url    : 'HBaseTable.jsp',
@@ -187,14 +195,17 @@
                                                   + "&selects=" + w2ui.hbaseTableForm.record.selects
                                                   + "&start="   + w2ui.hbaseTableForm.record.start
                                                   + "&stop="    + w2ui.hbaseTableForm.record.stop
-                                                  + "&limit="   + w2ui.hbaseTableForm.record.limit;
+                                                  + "&limit="   + w2ui.hbaseTableForm.record.limit
+                                                  + modifyRequest(hform);
             loadPane("result", request);
             }
           }
-        });
+        };
+      modifyMenu(hform);
+      $('#hbaseTableForm').w2form(hform);
       });
     </script>
-
+    
   <script>
     var $table = $('#table');
     var $buttonShow = $('#buttonShow')
