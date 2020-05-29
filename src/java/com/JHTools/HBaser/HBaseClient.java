@@ -70,15 +70,15 @@ public class HBaseClient {
    client.connect("test_portal_tiny.1");
    Map<String, String> search = new TreeMap<>();
    //search.put("key:key", "ZTF19");
-   //Map<String, Map<String, String>> results = client.scan(null,
-   //                                                       search,
-   //                                                       null,
-   //                                                       null,
-   //                                                       false,
-   //                                                       false); 
+   Map<String, Map<String, String>> results = client.scan(null,
+                                                          search,
+                                                          null,
+                                                          new long[]{1000000, 0},
+                                                          false,
+                                                          false); 
    //log.info(client.timeline("i:jd"));
-   System.out.println(client.latests("i:objectId", null, 0, false));
-   System.out.println(client.latests("i:objectId", null, 0, true));
+   //System.out.println(client.latests("i:objectId", null, 0, false));
+   //System.out.println(client.latests("i:objectId", null, 0, true));
    }
    
  /** Create.
@@ -295,16 +295,20 @@ public class HBaseClient {
     Map<String, String> result;
     // Get
     if (key != null && !key.trim().equals("")) {
-      Get get = new Get(Bytes.toBytes(key));
-      result = new TreeMap<>();
-      try {
-        Result r = table().get(get);
-        log.info("" + r.size() + " entries found");
-        addResult(r, result, filter, ifkey, iftime);
-        results.put(key, result);
-        }
-      catch (IOException e) {
-        log.error("Cannot search", e);
+      Get get;
+      Result r;
+      for (String k : key.split(",")) {
+        get = new Get(Bytes.toBytes(k.trim()));
+        result = new TreeMap<>();
+        try {
+          r = table().get(get);
+          log.info("" + r.size() + " entries found");
+          addResult(r, result, filter, ifkey, iftime);
+          results.put(k, result);
+          }
+        catch (IOException e) {
+          log.error("Cannot search", e);
+          }
         }
       }
     // Scan
@@ -325,7 +329,6 @@ public class HBaseClient {
       String column; 
       String value;
       // Search
-      log.info(search);
       if (search != null && !search.isEmpty()) {
         List<Filter> filters = new ArrayList<>();
         for (Map.Entry<String, String> entry : search.entrySet()) {
@@ -334,18 +337,15 @@ public class HBaseClient {
           column = fc[1];
           value  = entry.getValue();
           if (family.equals("key") && column.equals("key")) {
-            filters.add(new RowFilter(CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(value))));
-            char[] idc = value.toCharArray();
-            char last = idc[idc.length - 1];
-            String id1 = value.substring(0, value.length() - 1) + ++last;  
-            scan.setStartRow(Bytes.toBytes(value));
-            scan.setStopRow( Bytes.toBytes(id1)); // TBD: correct ?
+            for (String k : value.split(",")) { // BUG: it only works if OR operator is set
+              filters.add(new RowFilter(CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(k))));
+              }
             }
           else {
             filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
             }
           }
-        FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL, filters);  
+        FilterList filterList = new FilterList(_operator, filters);  
         scan.setFilter(filterList);
         }
       // Filter
@@ -493,6 +493,18 @@ public class HBaseClient {
     _limit = limit;
     }
     
+  /** Set the AND/OR operator for prefix column search.
+    * @param operator OR when contains OR, AND otherwise. */
+  public void setSearchOperator(String operator) {
+    log.info("Setting search operator to " + operator);
+    if (operator.contains("OR")) {
+       _operator = FilterList.Operator.MUST_PASS_ONE;
+       }
+    else {
+      _operator = FilterList.Operator.MUST_PASS_ALL;
+      }
+    }
+    
   /** Set result timestamp format.
     * @param format The result timestamp format.
     *               The default is the native HBase format (ms). */
@@ -559,6 +571,8 @@ public class HBaseClient {
   private int _limit = 0;
   
   private String _dateFormat = null;
+  
+  private FilterList.Operator _operator = FilterList.Operator.MUST_PASS_ALL;
     
   private BinaryDataRepository _repository = new BinaryDataRepository();  
 

@@ -33,32 +33,34 @@
   
   <div id="hbaseResult" style="width: 100%">
     <%
-      String hbase   = request.getParameter("hbase");
-      String htable  = request.getParameter("htable");
-      String key     = request.getParameter("key");
-      String krefix  = request.getParameter("krefix");
-      String selects = request.getParameter("selects");
-      String filters = request.getParameter("filters");
-      String version = request.getParameter("version");
-      String start   = request.getParameter("start");
-      String stop    = request.getParameter("stop");
-      String group   = request.getParameter("group");
-      String limitS  = request.getParameter("limit");
+      String hbase    = request.getParameter("hbase");
+      String htable   = request.getParameter("htable");
+      String key      = request.getParameter("key");
+      String krefix   = request.getParameter("krefix");
+      String selects  = request.getParameter("selects");
+      String filters  = request.getParameter("filters");
+      String version  = request.getParameter("version");
+      String start    = request.getParameter("start");
+      String stop     = request.getParameter("stop");
+      String group    = request.getParameter("group");
+      String limitS   = request.getParameter("limit");
+      String operator = request.getParameter("operator");
       if (hbase  == null || hbase.trim( ).equals("") ||
           htable == null || htable.trim().equals("")) {
         log.fatal("Cannot connect to " + htable + "@" + hbase);
         }
       out.println("<b><u>" + htable + "@" + hbase + "</u></b><br/>");
       log.info("Connection to " + htable + "@" + hbase);
-      key       = (key     == null || key.equals(    "null")) ? "" : key.trim();
-      krefix    = (krefix  == null || krefix.equals( "null")) ? "" : krefix.trim();
-      filters   = (filters == null || filters.equals("null")) ? "" : filters.trim();
-      selects   = (selects == null || selects.equals("null")) ? "" : selects.trim();
-      version   = (version == null || version.equals("null")) ? "" : version.trim();
-      start     = (start   == null || start.equals(  "null")) ? "" : start.trim();
-      stop      = (stop    == null || stop.equals(   "null")) ? "" : stop.trim();
-      group     = (group   == null || group.equals(  "null")) ? "" : group.trim();
-      limitS    = (limitS  == null || limitS.equals( "null")) ? "" : limitS.trim();
+      key       = (key      == null || key.equals(     "null")) ? "" : key.trim();
+      krefix    = (krefix   == null || krefix.equals(  "null")) ? "" : krefix.trim();
+      filters   = (filters  == null || filters.equals( "null")) ? "" : filters.trim();
+      selects   = (selects  == null || selects.equals( "null")) ? "" : selects.trim();
+      version   = (version  == null || version.equals( "null")) ? "" : version.trim();
+      start     = (start    == null || start.equals(   "null")) ? "" : start.trim();
+      stop      = (stop     == null || stop.equals(    "null")) ? "" : stop.trim();
+      group     = (group    == null || group.equals(   "null")) ? "" : group.trim();
+      limitS    = (limitS   == null || limitS.equals(  "null")) ? "" : limitS.trim();
+      operator  = (operator == null || operator.equals("null")) ? "" : operator.trim();
       Map<String, String> filterMap = new HashMap<>();
       if (!key.equals("")) {
         out.println("<b>key</b> is <b>" + key + "</b><br/>");
@@ -78,7 +80,7 @@
           }
         }
       int limit = 0;
-      if (!limitS.equals("")) {
+      if (!limitS.equals("") && !limitS.equals("0")) {
         out.println("showing max <b>" + limitS + "</b> results<br/>");
         limit = Integer.valueOf(limitS);
         }
@@ -90,36 +92,40 @@
         }
       HBaseClient h = new HBaseClient(hbase);
       h.setLimit(limit);
+      h.setSearchOperator(operator);
       h.connect(htable);
       Map<String, Map<String, String>> results = null;
+      boolean showTable = true;
       %>
     <%@include file="CustomQuery.jsp"%>
     <%
       if (results == null) { // not performed in CustomQuery.jsp
         results = h.scan(key.equals("") ? null : key,
                          filterMap,
-                        selects.equals("") ? null : selects.split(","),
-                        start,
-                        stop,
-                        "dd/MM/yyy HH:mm",
-                        false,
-                        false);
+                         selects.equals("") ? null : selects.split(","),
+                         start,
+                         stop,
+                         "dd/MM/yyy HH:mm",
+                         false,
+                         false);
         }
       h2table.processTable(results, h.schema(), h.repository());
+      h.close();
       String toHide = "";
-      if (!group.equals("")) {
+      if (showTable && !group.equals("")) {
         toHide = h2table.toHide("i:objectId");
       %>
-    <button onClick="w2popup.load({url:'Help-HBaseTable.html', showMax: true})" style="position:absolute; top:0; right:0">
-      <img src="images/Help.png" width="10"/>
-      </button>
     <div id="toolbar">
       <button id="buttonHide" class="btn btn-secondary">latest objects</button>
       <button id="buttonShow" class="btn btn-secondary">all objects</button>
       </div>
     <%
       }
+    if (showTable) {
       %>
+    <button onClick="w2popup.load({url:'Help-HBaseTable.html', showMax: true})" style="position:absolute; top:0; right:0">
+      <img src="images/Help.png" width="10"/>
+      </button>
     <table id='table'
            data-sortable='true'
            data-search='true'
@@ -150,6 +156,9 @@
       </table>
       <input type="button" onclick="showHist()" value="Plot" style="background-color:#ddffdd">      
       </div>
+    <%
+      }
+      %>
     
     </div>
 
@@ -166,8 +175,8 @@
         header : 'HBase Search',
         url    : 'HBaseTable.jsp',
         fields : [
-          {field:'key',     type: 'text',     html: {caption: 'Exact Key',      text : ' (exact search on row key)' ,                               attr: 'style="width: 500px"'}},
-          {field:'krefix',  type: 'text',     html: {caption: 'Prefix Key',     text : ' (prefix search on row key)',                               attr: 'style="width: 500px"'}},
+          {field:'key',     type: 'text',     html: {caption: 'Exact Key',      text : ' (exact search on row keys: key,key,...)',                  attr: 'style="width: 500px"'}},
+          {field:'krefix',  type: 'text',     html: {caption: 'Prefix Key',     text : ' (prefix search on row keys)',                              attr: 'style="width: 500px"'}},
           {field:'filters', type: 'text',     html: {caption: 'Search Columns', text : ' (columns substring search: family:column:value,...)',      attr: 'style="width: 500px"'}},
           {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,...)',                      attr: 'style="width: 500px"'}},
           {field:'start',   type: 'datetime', html: {caption: 'From',           text : ' (start time)',                                             attr: 'style="width: 150px"'}},
@@ -196,7 +205,7 @@
                                                   + "&start="   + w2ui.hbaseTableForm.record.start
                                                   + "&stop="    + w2ui.hbaseTableForm.record.stop
                                                   + "&limit="   + w2ui.hbaseTableForm.record.limit
-                                                  + modifyRequest(hform);
+                                                  + modifyRequest(w2ui.hbaseTableForm);
             loadPane("result", request);
             }
           }
