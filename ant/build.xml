@@ -324,9 +324,11 @@
       <Header><![CDATA[<center>]]>JHTools version: ${version}<![CDATA[</center>]]></Header>
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
       <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Packages/JHTools'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
-      <group title="HBaser" packages="com.JHTools.HBaser"/>
-      <group title="Graph"  packages="com.JHTools.Graph"/>
-      <group title="Utils"  packages="com.JHTools.Utils*"/>
+      <group title="Apps"       packages="com.JHTools.Apps"/>
+      <group title="HBaser"     packages="com.JHTools.HBaser"/>
+      <group title="Graph"      packages="com.JHTools.Graph"/>
+      <group title="Utils"      packages="com.JHTools.Utils*"/>
+      <group title="WebService" packages="com.JHTools.WebService*"/>
       <link href="http://docs.oracle.com/javase/8/docs/api"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>

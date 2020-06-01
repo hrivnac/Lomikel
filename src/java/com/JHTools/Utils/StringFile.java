@@ -31,27 +31,29 @@ public class StringFile {
     * @param file The file.
     * @throws CommonException If file can't be read. */      
   public StringFile(File file) throws CommonException {
-    FileInputStream     fis = null;
-    BufferedInputStream bis = null;
-    DataInputStream     dis = null;
-    StringBuffer buffer = new StringBuffer();
-    try {
-      fis = new FileInputStream(file);
-      bis = new BufferedInputStream(fis);
-      dis = new DataInputStream(bis);
-      while (dis.available() != 0) {
-        buffer.append(dis.readLine() + "\n");
+    if (file.exists()) {
+      FileInputStream     fis = null;
+      BufferedInputStream bis = null;
+      DataInputStream     dis = null;
+      StringBuffer buffer = new StringBuffer();
+      try {
+        fis = new FileInputStream(file);
+        bis = new BufferedInputStream(fis);
+        dis = new DataInputStream(bis);
+        while (dis.available() != 0) {
+          buffer.append(dis.readLine() + "\n");
+          }
+        fis.close();
+        bis.close();
+        dis.close();
+        _content = buffer.toString();
         }
-      fis.close();
-      bis.close();
-      dis.close();
-      _content = buffer.toString();
-      }
-    catch (FileNotFoundException e) {
-      throw new CommonException("File " + file.getPath() + " not found !", e);
-      }
-    catch (IOException e) {
-      throw new CommonException("File " + file.getPath() + " cannot be read !", e);
+      catch (FileNotFoundException e) {
+        throw new CommonException("File " + file.getPath() + " not found !", e);
+        }
+      catch (IOException e) {
+        throw new CommonException("File " + file.getPath() + " cannot be read !", e);
+        }
       }
     }
 

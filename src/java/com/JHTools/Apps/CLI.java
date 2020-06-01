@@ -24,35 +24,28 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class CLI {
 
-  /** Start {@link Interpreter} and run forever.
-    * @param args The command arguments. Ignored. */
-  public CLI(String[] args) {
-    Interpreter interpreter = new Interpreter(new InputStreamReader(System.in), System.out, System.err, true);
-    interpreter.print("Welcome to Fink Browser CLI " + Info.release() + "\n");
-    interpreter.print("https://astrolabsoftware.github.io\n");
-    setupInterpreter(interpreter);
-    new Thread(interpreter).start();
+  /** Start {@link Interpreter} and run forever. */
+  public CLI() {
+    _interpreter = new Interpreter(new InputStreamReader(System.in), System.out, System.err, true);
+    setupInterpreter();
+    new Thread(_interpreter).start();
     }
     
-  /** Load standard init files and setup standard environment.
-    * @param interpreter The embedded {@link Interpreter}. */
-  public void setupInterpreter(Interpreter interpreter) {
-    _interpreter = interpreter;
+  /** Load standard init files and setup standard environment. */
+  public void setupInterpreter() {
     // Set global reference and imports
     try {
-      interpreter.eval("import com.astrolabsoftware.AstroLabNet.DB.*");
-      interpreter.eval("import com.astrolabsoftware.AstroLabNet.Livyser.Language");
-      interpreter.set("fb", this);
+      _interpreter.set("fb", this);
       }
     catch (EvalError e) {
       log.error("Can't set CommandLine references", e);
       }
     String init = "";
     // Source init.bsh
-    log.info("Sourcing init.bsh");
+    log.debug("Sourcing init.bsh");
     try {
       init = new StringFile("init.bsh").toString();
-      interpreter.eval(init);
+      _interpreter.eval(init);
       }
     catch (CommonException e) {
       log.warn("init.bsh file cannot be read.");
@@ -63,24 +56,24 @@ public class CLI {
       }
     // Load site profile
     if (_profile != null) {
-      log.info("Loading site profile: " + _profile);  
+      log.info("Loading profile: " + _profile);  
       try {
         init = new StringResource(_profile + ".bsh").toString();
-        interpreter.eval(init);
+        _interpreter.eval(init);
         }
       catch (CommonException e) {
-        log.warn("Site profile " + _profile + " cannot be loaded.");
-        log.debug("Site profile " + _profile + " cannot be loaded.", e);
+        log.warn("Profile " + _profile + " cannot be loaded.");
+        log.debug("Profile " + _profile + " cannot be loaded.", e);
         }
       catch (EvalError e) {
         log.error("Can't evaluate standard BeanShell expression", e);
         }
       }
     // Loading state
-    log.info("Sourcing .state.bsh");
+    log.debug("Sourcing .state.bsh");
     try {
       init = new StringFile(".state.bsh").toString();
-      interpreter.eval(init);
+      _interpreter.eval(init);
       }
     catch (CommonException e) {
       log.warn(".state.bsh file cannot be read.");
@@ -94,7 +87,7 @@ public class CLI {
       log.info("Sourcing " + _source);
       try {
         init = new StringFile(_source).toString();
-        interpreter.eval(init);
+        _interpreter.eval(init);
         }
       catch (CommonException e) {
         log.warn(_source + " file cannot be read.");
@@ -117,6 +110,12 @@ public class CLI {
   public void setSource(String source) {
     _source = source;
     }
+    
+  /** Give {@link Interpreter}.
+    * @return The {@link Interprer}. */
+  public Interpreter interpreter() {
+    return _interpreter;
+    }  
     
   private String _profile;
   
