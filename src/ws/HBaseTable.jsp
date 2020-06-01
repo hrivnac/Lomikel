@@ -43,6 +43,7 @@
       String start    = request.getParameter("start");
       String stop     = request.getParameter("stop");
       String group    = request.getParameter("group");
+      String schema   = request.getParameter("schema");
       String limitS   = request.getParameter("limit");
       String operator = request.getParameter("operator");
       if (hbase  == null || hbase.trim( ).equals("") ||
@@ -59,6 +60,7 @@
       start     = (start    == null || start.equals(   "null")) ? "" : start.trim();
       stop      = (stop     == null || stop.equals(    "null")) ? "" : stop.trim();
       group     = (group    == null || group.equals(   "null")) ? "" : group.trim();
+      schema    = (schema   == null || schema.equals(  "null")) ? "" : schema.trim();
       limitS    = (limitS   == null || limitS.equals(  "null")) ? "" : limitS.trim();
       operator  = (operator == null || operator.equals("null")) ? "" : operator.trim();
       Map<String, String> filterMap = new HashMap<>();
@@ -93,7 +95,12 @@
       HBaseClient h = new HBaseClient(hbase);
       h.setLimit(limit);
       h.setSearchOperator(operator);
-      h.connect(htable);
+      if (schema.equals("")) {
+        h.connect(htable);
+        }
+      else {
+        h.connect(htable, schema, 0);
+        }
       Map<String, Map<String, String>> results = null;
       boolean showTable = true;
       %>
@@ -197,7 +204,7 @@
             this.clear();
             },
           Search: function () {
-            var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&group=<%=group%>"
+            var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&schema=<%=schema%>&group=<%=group%>"
                                                   + "&key="     + w2ui.hbaseTableForm.record.key
                                                   + "&krefix="  + w2ui.hbaseTableForm.record.krefix
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters
