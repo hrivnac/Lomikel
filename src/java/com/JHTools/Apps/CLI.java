@@ -7,6 +7,7 @@ import com.JHTools.Utils.CommonException;
 
 // Bean Shell
 import bsh.Interpreter;
+import bsh.util.JConsole;
 import bsh.EvalError;
 
 // Java

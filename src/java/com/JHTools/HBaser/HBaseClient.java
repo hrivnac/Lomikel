@@ -144,17 +144,15 @@ public class HBaseClient {
       }
     _table = _connection.getTable(TableName.valueOf(_tableName));
     // Schema search
-    Map<String, String> search = new TreeMap<>();
     if (schemaName != null) {
       if (schemaName.equals("")) {
         log.info("Using the most recent schema");
         }
       else {
         log.info("Searching for schema " + schemaName);
-        search.put("key:key", schemaName);
         }
-      Map<String, Map<String, String>> schemas = scan(null,
-                                                      search,
+      Map<String, Map<String, String>> schemas = scan(schemaName,
+                                                      null,
                                                       null,
                                                       null,
                                                       false,
