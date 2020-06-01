@@ -29,6 +29,8 @@
     <pathelement path="${hadoopcommon_jar}"/>
     <pathelement path="${javaxmail_jar}"/>
     <pathelement path="${javaxservlet_jar}"/>
+    <pathelement path="${bsh_jar}"/>
+    <pathelement path="${cli_jar}"/>
     <fileset dir="../extlib">
       <include name="*.jar"/>
       </fileset>
@@ -333,6 +335,8 @@
       <link href="https://commons.apache.org/proper/commons-cli/apidocs"/>
       <link href="https://javadoc.io/doc/org.janusgraph/janusgraph-core/latest"/>
       <link href="https://tinkerpop.apache.org/javadocs/current/full"/>
+      <link href="http://www.beanshell.org/javadoc"/>
+      <link href="https://commons.apache.org/proper/commons-cli/apidocs"/>
       <classpath>
         <path refid="classpath.run"/>
         </classpath>

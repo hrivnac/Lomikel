@@ -2,6 +2,7 @@ package com.JHTools.Utils;
 
 // Java
 import java.io.File;
+import java.nio.file.Files;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -54,6 +55,10 @@ public class StringFile {
       }
     }
 
+  /** Give the contained {@link String}.
+    * @return The contained {@link String}.
+    *         Empty, if non-existent file. */
+  @Override
   public String toString() {
     return _content;
     }

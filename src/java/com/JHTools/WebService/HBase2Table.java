@@ -78,7 +78,7 @@ public class HBase2Table {
     // TBD: support non-default columns
     List<String> columns = new ArrayList<>();
     _fLengths.clear();
-    for (String family : new String[]{"b", "i", "d"}) {
+    for (String family : new String[]{"b", "i", "d", "c", "a", "r"}) {
       _fLengths.put(family, 0);
       for (String column : columns0) {
         if (column.startsWith(family + ":")) {

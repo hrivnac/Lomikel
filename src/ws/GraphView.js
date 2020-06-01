@@ -492,7 +492,7 @@ function openClusters(scale) {
   
 // Switch physics on/off
 function switchPhysics() {
-  options.physics.enabled = document.getElementById('physics').checked;
+  options4Graph.physics.enabled = document.getElementById('physics').checked;
   network.setOptions(options4Graph);
   }
   

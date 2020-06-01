@@ -388,7 +388,7 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     * @param ifkey   Whether add also entries keys.
     * @param iftime  Whether add also entries timestamps. */
-  private void addResult(Result r,
+  private void addResult(Result              r,
                          Map<String, String> result,
                          String[]            filter,
                          boolean             ifkey,

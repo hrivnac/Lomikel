@@ -44,6 +44,7 @@ public class StringResource {
 
   /** Give the contained {@link String}.
     * @return The contained {@link String}. */
+  @Override
   public String toString() {
     return _content;
     }
