@@ -46,6 +46,7 @@ import java.util.GregorianCalendar;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -79,6 +80,15 @@ public class HBaseClient {
    //log.info(client.timeline("i:jd"));
    //System.out.println(client.latests("i:objectId", null, 0, false));
    //System.out.println(client.latests("i:objectId", null, 0, true));
+   }
+   
+ /** Create.
+   * @param zookeepers The coma-separated list of zookeper ids.
+   * @param clientPort The client port. 
+   * @throws IOException If anything goes wrong. */
+ public HBaseClient(String zookeepers,
+                    int    clientPort) throws IOException {
+   this(zookeepers, String.valueOf(clientPort));
    }
    
  /** Create.
@@ -120,7 +130,19 @@ public class HBaseClient {
    * @return           The assigned id. 
    * @throws IOException If anything goes wrong. */
   public Table connect(String tableName) throws IOException {
-    return connect(tableName, "schema", 0);
+    return connect(tableName, "schema");
+    }
+    
+ /** Connect the table.
+   * @param tableName  The table name.
+   * @param schemaName The name of the {@link Schema} row.
+   *                   <tt>null</tt> means to ignore schema,
+   *                   empty {@link String} will take the latest one. 
+   * @return           The assigned id.
+   * @throws IOException If anything goes wrong. */
+  public Table connect(String tableName,
+                       String schemaName) throws IOException {
+    return connect(tableName, schemaName, 0);
     }
     
  /** Connect the table.
@@ -169,6 +191,48 @@ public class HBaseClient {
         }
       }
     return _table;
+    }
+                    
+  /** Get entry or entries from the {@link Catalog}.
+    * @param key      The row key. Disables other search terms.
+    *                 It can be <tt>null</tt>.
+    * @param search   The search terms:  <tt>family:column:value,...</tt>.
+    *                 It can be <tt>null</tt>.
+    *                 Key can be searched with key:key "pseudo-name".
+    *                 All searches are executed as prefix searches.
+    * @param filter   The names of required values as <tt>family:column,...</tt>.
+    *                 It can be <tt>null</tt>.
+    * @param period   The time period specified in <tt>min</tt>s back from now as <tt>start-stop</tt> or <tt>start</tt>.
+    *                 <tt>0</tt> means no restriction.
+    * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public String scan(String   key,
+                     String   search,
+                     String   filter,
+                     String   period) {
+    Map<String, String> searchMap = new TreeMap<>();
+    String[] ss;
+    if (search != null && !search.trim().equals("")) {
+      for (String s : search.trim().split(",")) {
+        ss = s.trim().split(":");
+        searchMap.put(ss[0] + ":" + ss[1], ss[2]);
+        }
+      }
+    String[] filterA = null;
+    if (filter != null && !filter.trim().equals("")) {
+      filterA = filter.trim().split(",");
+      }
+    String[] periodS = new String[]{"0", "0"};
+    if (period != null) {
+      if (period.contains("-")) {
+        periodS = period.trim().split("-");
+        }
+      else {
+        periodS = new String[]{"0", period.trim()};
+        }
+      }
+    long[] periodA = new long[]{Integer.parseInt(periodS[0]), Integer.parseInt(periodS[1])}; // TBD: allow inverse
+    Arrays.sort(periodA);
+    return results2String(scan(key, searchMap, filterA, periodA, false, false)); 
     }
 
                     
@@ -291,12 +355,25 @@ public class HBaseClient {
              ", id-time: " + ifkey + "-" + iftime);
     Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;
+    String[] fc;
+    String family; 
+    String column; 
+    String value;
     // Get
     if (key != null && !key.trim().equals("")) {
       Get get;
       Result r;
       for (String k : key.split(",")) {
         get = new Get(Bytes.toBytes(k.trim()));
+        // Filter
+        if (filter != null && filter.length > 0) {
+          for (String f : filter) {
+            fc = f.split(":");
+            family = fc[0];
+            column = fc[1];
+            get.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+            }
+          }
         result = new TreeMap<>();
         try {
           r = table().get(get);
@@ -322,10 +399,6 @@ public class HBaseClient {
       catch (IOException e) {
         log.error("Cannot set time range " + start + " - " + stop);
         }
-      String[] fc;
-      String family; 
-      String column; 
-      String value;
       // Search
       if (search != null && !search.isEmpty()) {
         List<Filter> filters = new ArrayList<>();
@@ -358,6 +431,9 @@ public class HBaseClient {
       // Limit
       if (_limit > 0) {
         scan.setLimit(_limit);
+        if (_schema != null) {
+          scan.setMaxResultSize(_limit * _schema.size());
+          }
         }
       // Results
       try {
