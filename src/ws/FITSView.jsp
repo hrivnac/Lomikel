@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!-- JHTools FITS View-->
+<!-- Lomikel FITS View-->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
-<%@ page import="com.JHTools.HBaser.BinaryDataRepository" %>
-<%@ page import="com.JHTools.Utils.Info" %>
+<%@ page import="com.Lomikel.HBaser.BinaryDataRepository" %>
+<%@ page import="com.Lomikel.Utils.Info" %>
 
 <%@ page import="java.io.File"%>
 <%@ page import="java.io.FileOutputStream"%>
@@ -24,7 +24,7 @@
 <script type="text/javascript" src="js9-3.0/js9.min.js"></script>
 <script type="text/javascript" src="js9-3.0/js9plugins.js"></script>
 
-<jsp:useBean id="h2table" class="com.JHTools.WebService.HBase2Table" scope="session"/>
+<jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
 <%
   // TBD: should be realy deleted

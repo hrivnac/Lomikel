@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!-- JHTools Top Mini -->
+<!-- Lomikel Top Mini -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
-<%@ page import="com.JHTools.WebService.HBase2Table" %>
+<%@ page import="com.Lomikel.WebService.HBase2Table" %>
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 

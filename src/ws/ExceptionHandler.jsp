@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!-- JHTools Exception Handler -->
+<!-- Lomikel Exception Handler -->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
 <%@ page isErrorPage="true" %>
@@ -8,17 +8,17 @@
 <%@ page import="java.net.InetAddress" %>
 <%@ page import="java.lang.StackTraceElement" %>
 
-<%@ page import="com.JHTools.Utils.NotifierMail" %>
-<%@ page import="com.JHTools.Utils.NotifierURL" %>
-<%@ page import="com.JHTools.Utils.Info" %>
-<%@ page import="com.JHTools.Utils.CommonException" %>
+<%@ page import="com.Lomikel.Utils.NotifierMail" %>
+<%@ page import="com.Lomikel.Utils.NotifierURL" %>
+<%@ page import="com.Lomikel.Utils.Info" %>
+<%@ page import="com.Lomikel.Utils.CommonException" %>
 
 <%@ page import="org.apache.log4j.Logger" %>
 
 <%! static Logger log = Logger.getLogger(ExceptionHandler_jsp.class); %>
 
 <html>
-  <head><title>JHTools Exception Handler</title></head>
+  <head><title>Lomikel Exception Handler</title></head>
     <body bgcolor="#ffdddd">
 
       <font color="red">

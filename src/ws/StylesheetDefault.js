@@ -19,7 +19,7 @@ var stylesheet = {
         value:"0"
         },
       actions:[
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/JHTools"}
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel"}
         ]
       }
     },
@@ -34,7 +34,7 @@ var stylesheet = {
         group:" "
         },
       actions: [
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/JHTools"}
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel"}
         ]
       }
     }

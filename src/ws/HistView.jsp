@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!-- JHTools Hist View -->
+<!-- Lomikel Hist View -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
-<%@ page import="com.JHTools.WebService.HBaseColumnsProcessor" %>
+<%@ page import="com.Lomikel.WebService.HBaseColumnsProcessor" %>
 
 <%@ page import="java.util.Map" %>
 
@@ -16,7 +16,7 @@
 <script type="text/javascript" src="OptionsDefault.js"></script>
 <script type="text/javascript" src="Options.js"></script>
 
-<jsp:useBean id="h2table" class="com.JHTools.WebService.HBase2Table" scope="session"/>
+<jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
 <div id="graph">
   <script>

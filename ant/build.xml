@@ -1,9 +1,9 @@
-<project name="JHTools"
+<project name="Lomikel"
          default="compile"
          basedir="../run">
 
   <description>
-    JHTools
+    Lomikel
     </description>
 
   <!-- Setup ================================================================-->
@@ -62,15 +62,15 @@
           depends="init"
           description="Create Info class">
     <!-- TBD: allow in clients !-->
-    <mkdir dir="../build/com/JHTools/Utils"/>
-    <copy file="../src/java/com/JHTools/Utils/Info.pre"
-          tofile="../build/com/JHTools/Utils/Info.java"/>
-    <replace file="../build/com/JHTools/Utils/Info.java" token="@version@"   value="${version}"/>
-    <replace file="../build/com/JHTools/Utils/Info.java" token="@TSTAMP@"    value="${TSTAMP}"/>
-    <replace file="../build/com/JHTools/Utils/Info.java" token="@user.name@" value="${user.name}"/>
-    <replace file="../build/com/JHTools/Utils/Info.java" token="@TMP@"       value="${tmp_dir}"/>
-    <replace file="../build/com/JHTools/Utils/Info.java" token="@MANAGER@"   value="${manager}"/>
-    <replace file="../build/com/JHTools/Utils/Info.java" token="@TARGET@"    value="${target}"/>
+    <mkdir dir="../build/com/Lomikel/Utils"/>
+    <copy file="../src/java/com/Lomikel/Utils/Info.pre"
+          tofile="../build/com/Lomikel/Utils/Info.java"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@version@"   value="${version}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TSTAMP@"    value="${TSTAMP}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@user.name@" value="${user.name}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TMP@"       value="${tmp_dir}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@MANAGER@"   value="${manager}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TARGET@"    value="${target}"/>
     </target>
 
   <!-- Init =================================================================-->
@@ -122,17 +122,17 @@
         </fileset>
       </path>
     <property name="classpath.libs" refid="libs"/>
-    <jar jarfile="../lib/JHTools-${version}.jar" index="yes">
+    <jar jarfile="../lib/Lomikel-${version}.jar" index="yes">
       <fileset dir="../build"    includes="**/*.class"/>
-      <fileset dir="../src/java" includes="com/JHTools/**/*.properties"/>
-      <fileset dir="../src/java" includes="com/JHTools/**/*.bsh"/>
-      <fileset dir="../src/java" includes="com/JHTools/**/*.txt"/>
-      <fileset dir="../src/java" includes="com/JHTools/**/*.png"/>
-      <fileset dir="../src/java" includes="com/JHTools/**/*.gif"/>
-      <fileset dir="../src/java" includes="com/JHTools/**/*.css"/>
+      <fileset dir="../src/java" includes="com/Lomikel/**/*.properties"/>
+      <fileset dir="../src/java" includes="com/Lomikel/**/*.bsh"/>
+      <fileset dir="../src/java" includes="com/Lomikel/**/*.txt"/>
+      <fileset dir="../src/java" includes="com/Lomikel/**/*.png"/>
+      <fileset dir="../src/java" includes="com/Lomikel/**/*.gif"/>
+      <fileset dir="../src/java" includes="com/Lomikel/**/*.css"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="JHTools"/>
+        <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar>
@@ -159,7 +159,7 @@
     <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${browserlogo}"/>
     <replace file="../build/TopMini.jsp" token="@HOME@"    value="${browserurl}"/>
     <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${bootgremlin}"/>
-    <war destfile="../lib/JHTools.war" webxml="../src/ws/web.xml">
+    <war destfile="../lib/Lomikel.war" webxml="../src/ws/web.xml">
       <fileset dir="../src/ws">
 	    	<include name="**/*"/>
         </fileset>
@@ -174,7 +174,7 @@
       <classes dir="../src/ws">
         <include name="log4j.properties"/>
         </classes>
-      <lib file="../lib/JHTools-${version}.jar"/>
+      <lib file="../lib/Lomikel-${version}.jar"/>
       <lib file="${log4j_jar}"/>
       <lib file="${orgjson_jar}"/>
       <lib file="${httpcore_jar}"/>
@@ -189,7 +189,7 @@
       <lib file="${javaxservlet_jar}"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="JHTools"/>
+        <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </war>
@@ -200,15 +200,15 @@
   <target name="deploy"
           depends="war"
           description="Deploy Development WS">
-    <copy file="../lib/JHTools.war"
-          tofile="${server_dir}/${user.name}-JHTools.war"/>
+    <copy file="../lib/Lomikel.war"
+          tofile="${server_dir}/${user.name}-Lomikel.war"/>
     </target>
     
   <target name="deploy-prod"
           depends="war"
           description="Deploy Production WS">
-    <copy file="../lib/JHTools.war"
-          tofile="${server_dir}/JHTools.war"/>
+    <copy file="../lib/Lomikel.war"
+          tofile="${server_dir}/Lomikel.war"/>
     </target>
  
   <!-- Patch JanusGraph =====================================================-->
@@ -229,10 +229,10 @@
     <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
     <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.HOST@"         value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.PORT@"         value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.yaml"       token="@SERVER.HOST@"         value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.yaml"       token="@SERVER.PORT@"         value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.properties" token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/jhtools.properties" token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.yaml"       token="@SERVER.HOST@"         value="${gremlin_host}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.yaml"       token="@SERVER.PORT@"         value="${gremlin_port}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.properties" token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.properties" token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
     </target>
  
   <!-- Check ================================================================-->
@@ -240,7 +240,7 @@
   <target name="check-hbase"
           description="Check HBase">
     <echo>Check JanusGraph</echo>
-    <java classname="com.JHTools.HBaser.HBaseDirectClient"
+    <java classname="com.Lomikel.HBaser.HBaseDirectClient"
           fork="true">
       <classpath>
         <path refid="classpath.run"/>
@@ -318,17 +318,17 @@
              private="true"
              additionalparam=" -linksource -breakiterator -keywords -author -version"
              source="1.8"
-             Overview="../src/java/com/JHTools/Utils/overview.html"
-             windowtitle="JHtools">
-      <doctitle><![CDATA[<u>]]>JHTools<![CDATA[</u>]]></doctitle>
-      <Header><![CDATA[<center>]]>JHTools version: ${version}<![CDATA[</center>]]></Header>
+             Overview="../src/java/com/Lomikel/Utils/overview.html"
+             windowtitle="Lomikel">
+      <doctitle><![CDATA[<u>]]>Lomikel<![CDATA[</u>]]></doctitle>
+      <Header><![CDATA[<center>]]>Lomikel version: ${version}<![CDATA[</center>]]></Header>
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
-      <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Packages/JHTools'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
-      <group title="Apps"       packages="com.JHTools.Apps"/>
-      <group title="HBaser"     packages="com.JHTools.HBaser"/>
-      <group title="Graph"      packages="com.JHTools.Graph"/>
-      <group title="Utils"      packages="com.JHTools.Utils*"/>
-      <group title="WebService" packages="com.JHTools.WebService*"/>
+      <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
+      <group title="Apps"       packages="com.Lomikel.Apps"/>
+      <group title="HBaser"     packages="com.Lomikel.HBaser"/>
+      <group title="Graph"      packages="com.Lomikel.Graph"/>
+      <group title="Utils"      packages="com.Lomikel.Utils*"/>
+      <group title="WebService" packages="com.Lomikel.WebService*"/>
       <link href="http://docs.oracle.com/javase/8/docs/api"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>
@@ -382,7 +382,7 @@
         <pathelement location="../extlib/j2h.jar"/>
         </classpath>
       </taskdef>
-	  <java2html title="JHTools" 
+	  <java2html title="Lomikel" 
                simple="no"
              	  tabsize="4"
 		            marginsize="2"
@@ -457,7 +457,7 @@
         <path refid="classpath.run"/>
         </auxClasspath>
       <sourcePath path="../src" />
-      <class location="../lib/JHTools-${version}.jar" />
+      <class location="../lib/Lomikel-${version}.jar" />
       </findbugs>   
     </target>
 
@@ -466,7 +466,7 @@
   <target name="cleanimports"
           description="Clean Unused Imports">
     <exec executable="../src/python/remove-unused-imports.py">
-      <arg line="../src/java/com/JHTools"/>
+      <arg line="../src/java/com/Lomikel"/>
       </exec>
     </target>
  

@@ -1,12 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!-- JHTools HBase Table-->
+<!-- Lomikel HBase Table-->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
-<%@ page import="com.JHTools.HBaser.HBaseClient" %>
-<%@ page import="com.JHTools.HBaser.Schema" %>
-<%@ page import="com.JHTools.WebService.HBase2Table" %>
-<%@ page import="com.JHTools.HBaser.BinaryDataRepository" %>
+<%@ page import="com.Lomikel.HBaser.HBaseClient" %>
+<%@ page import="com.Lomikel.HBaser.Schema" %>
+<%@ page import="com.Lomikel.WebService.HBase2Table" %>
+<%@ page import="com.Lomikel.HBaser.BinaryDataRepository" %>
 
 <%@ page import="org.json.JSONObject" %>
 
@@ -25,7 +25,7 @@
 
 <%! static Logger log = Logger.getLogger(HBaseTable_jsp.class); %>
 
-<jsp:useBean id="h2table" class="com.JHTools.WebService.HBase2Table" scope="session"/>
+<jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
 <div id='hbasetable'>
 

@@ -6,9 +6,9 @@
          id="Web App_ID"
          version="2.5">
 
-  <display-name>AstroLabNet</display-name>
+  <display-name>Lomikel</display-name>
   
-  <description>JHTools Demo Web Service</description>
+  <description>Lomikel Demo Web Service</description>
 
   <session-config>
     <session-timeout>60</session-timeout>

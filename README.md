@@ -1,3 +1,3 @@
-JHTools is a set of general purpose tools.
+Lomikel is a set of general purpose tools.
 
-Home: https://cern.ch/hrivnac/Activities/Packages/JHTools
+Home: https://cern.ch/hrivnac/Activities/Packages/Lomikel
