@@ -3,8 +3,6 @@ package com.Lomikel.Graph;
 // org.json
 import org.json.JSONObject;
 
-// Java
-
 // Log4J
 import org.apache.log4j.Logger;
 

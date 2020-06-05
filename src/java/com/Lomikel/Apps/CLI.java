@@ -24,12 +24,6 @@ import bsh.EvalError;
 import java.io.InputStreamReader;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Dimension;
-import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
-
 
 // Log4J
 import org.apache.log4j.Logger;

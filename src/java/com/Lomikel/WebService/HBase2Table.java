@@ -1,16 +1,7 @@
 package com.Lomikel.WebService;
 
-import com.Lomikel.Utils.Coding;
 import com.Lomikel.HBaser.Schema;
-import com.Lomikel.HBaser.CellContent;
 import com.Lomikel.HBaser.BinaryDataRepository;
-
-// org.json
-import org.json.JSONObject;
-import org.json.JSONArray;
-
-// HBase
-import org.apache.hadoop.hbase.util.Bytes;
 
 // Java
 import java.util.Map;
@@ -19,8 +10,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 
 // Log4J
 import org.apache.log4j.Logger;

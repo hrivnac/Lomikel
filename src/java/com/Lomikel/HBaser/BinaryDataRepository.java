@@ -4,8 +4,6 @@ package com.Lomikel.HBaser;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Base64;
-import java.io.File;
-import java.nio.file.Files;
 
 // Log4J
 import org.apache.log4j.Logger;

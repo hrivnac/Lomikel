@@ -2,12 +2,7 @@ package com.Lomikel.Utils;
 
 // Log4J
 import org.apache.log4j.Logger;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Level;
 import org.apache.log4j.PropertyConfigurator;
-
-// Java
-import java.util.Enumeration;
 
 /** <code>Init</code> provides common initialisation.
   * @opt attributes
