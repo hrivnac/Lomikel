@@ -27,6 +27,9 @@ import bsh.util.JConsole;
 import bsh.EvalError;
 
 // Java
+import java.io.InputStreamReader;
+
+// AWT
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -35,7 +38,8 @@ import java.awt.Font;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import java.io.InputStreamReader;
+
+// Swing
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
@@ -70,8 +74,12 @@ import org.apache.log4j.Logger;
 public class CLI {
 
   /** Start {@link Interpreter} and run forever.
-    * @param msg The message so show. */
-  public CLI(String msg) {
+    * @param icon      The {@ImageIcon} for menu.
+    * @param toolTiple The menu tooltip.
+    * @param msg       The message so show. */
+  public CLI(ImageIcon icon,
+             String    toolTip,
+             String    msg) {
     if (_batch) {
       _interpreter = new Interpreter();
       }
@@ -88,7 +96,7 @@ public class CLI {
       JToolBar north = new JToolBar();
       north.setFloatable(true);
       north.setLayout(new BoxLayout(north, BoxLayout.X_AXIS));
-      north.add(new AboutLabel(Icons.lomikel, "<html><h3>http://cern.ch/hribnac/Activities/Packages/Lomikel</h3></html>"));
+      north.add(new AboutLabel(icon, toolTip));
       north.addSeparator(separatorDimension);
       north.add(new SimpleButton("Exit",
                                  Icons.exit,
@@ -131,7 +139,9 @@ public class CLI {
   public static void main(String[] args) {
     Init.init();
     parseArgs(args, "java -jar Lomikel.exe.jar");
-    new CLI("Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n");
+    new CLI(Icons.lomikel,
+            "<html><h3>http://cern.ch/hrivnac/Activities/Packages/Lomikel</h3></html>",
+            "Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n");
     }
 
   /** Load standard init files and setup standard environment. */

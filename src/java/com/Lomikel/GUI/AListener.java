@@ -12,14 +12,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import static java.lang.Math.floor;
 
-// Log4J
-import org.apache.log4j.Logger;
-
 // AWT
 import java.awt.Cursor;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+// Log4J
+import org.apache.log4j.Logger;
 
 /** <code>AListener</code> implements {@link ActionListener}.
   * @opt attributes

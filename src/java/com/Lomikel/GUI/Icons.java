@@ -16,5 +16,9 @@ public final class Icons {
   public static final ImageIcon lomikel = new ImageIcon(myLoader.getResource("com/Lomikel/GUI/images/Lomikel.png"));
 
   public static final ImageIcon exit    = new ImageIcon(myLoader.getResource("com/Lomikel/GUI/images/Exit.png"));
+ 
+  public static ImageIcon icon(String resource) {
+    return new ImageIcon(myLoader.getResource(resource));
+    }
 
   }
