@@ -1,9 +1,19 @@
 package com.Lomikel.Apps;
 
+import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Info;
 import com.Lomikel.Utils.StringFile;
 import com.Lomikel.Utils.StringResource;
 import com.Lomikel.Utils.CommonException;
+
+// CLI
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.ParseException;
 
 // Bean Shell
 import bsh.Interpreter;
@@ -12,6 +22,14 @@ import bsh.EvalError;
 
 // Java
 import java.io.InputStreamReader;
+import javax.swing.JFrame;
+import javax.swing.JSplitPane;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Dimension;
+import javax.swing.JScrollPane;
+import javax.swing.BorderFactory;
+
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -25,13 +43,42 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class CLI {
 
-  /** Start {@link Interpreter} and run forever. */
-  public CLI() {
-    _interpreter = new Interpreter(new InputStreamReader(System.in), System.out, System.err, true);
+  /** Start {@link Interpreter} and run forever.
+    * @param msg The message so show. */
+  public CLI(String msg) {
+    if (_batch) {
+      _interpreter = new Interpreter();
+      }
+    else if (_gui) {
+      JFrame f = new JFrame();
+      JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+      f.getContentPane().add(pane);
+      f.setSize(600, 800);  
+      f.setVisible(true);
+      _console = new Console();
+      pane.setLeftComponent(_console);
+      _interpreter = new Interpreter(_console);
+      }
+    else {
+      _interpreter = new Interpreter(new InputStreamReader(System.in), System.out, System.err, true);
+      }
+    if (!_quiet) {
+      _interpreter.print(msg);
+      }
     setupInterpreter();
-    new Thread(_interpreter).start();
+    if (!_batch) {
+      new Thread(_interpreter).start();
+      }
     }
-    
+
+  /** Start and pass arguments on.
+    * @param args The arguments. */
+  public static void main(String[] args) {
+    Init.init();
+    parseArgs(args, "java -jar Lomikel.exe.jar");
+    new CLI("Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n");
+    }
+
   /** Load standard init files and setup standard environment. */
   public void setupInterpreter() {
     // Set global reference and imports
@@ -100,6 +147,47 @@ public class CLI {
       }
     }
     
+  /** Parse the cli arguments.
+    * @param args    The cli arguments.
+    * @param helpMsg The general help message. */
+  public static void parseArgs(String[] args,
+                                String   helpMsg) {
+    CommandLineParser parser = new BasicParser();
+    Options options = new Options();
+    options.addOption("h", "help",  false, "show help");
+    options.addOption("q", "quiet", false, "minimal direct feedback");
+    options.addOption("g", "gui",   false, "run in a graphical window");
+    options.addOption("b", "batch", false, "run in a batch");
+    options.addOption(OptionBuilder.withLongOpt("source")
+                                   .withDescription("source bsh file (init.bsh is also read)")
+                                   .hasArg()
+                                   .withArgName("file")
+                                   .create("s"));
+    try {
+      CommandLine line = parser.parse(options, args );
+      if (line.hasOption("help")) {
+        new HelpFormatter().printHelp(helpMsg, options);
+        System.exit(0);
+        }
+      if (line.hasOption("quiet")) {
+        _quiet = true;
+        }
+      if (line.hasOption("gui")) {
+        _gui = true;
+        }
+      if (line.hasOption("batch")) {
+        _batch = true;
+        }
+      if (line.hasOption("source")) {
+        _source = line.getOptionValue("source");
+        }
+      }
+    catch (ParseException e) {
+      new HelpFormatter().printHelp("java -jar AstroLabNet.exe.jar", options);
+      System.exit(-1);
+      }
+    }
+    
   /** Set site profile.
     * @param profile The Resource path to the site profile. */
   public void setProfile(String profile) {
@@ -118,12 +206,26 @@ public class CLI {
     return _interpreter;
     }  
     
-  private String _profile;
+  /** Give {@link JConsole}.
+    * @return The {@link JConsole}. */
+  public static JConsole console() {
+    return _console;
+    }  
+    
+  private static String _profile;
   
-  private String _source;
+  private static boolean _quiet = false;
+  
+  private static boolean _gui = false;
+  
+  private static boolean _batch = false;
+  
+  private static String _source = null;
     
   private Interpreter _interpreter;
- 
+  
+  private static JConsole _console;
+
   /** Logging . */
   private static Logger log = Logger.getLogger(CLI.class);
    

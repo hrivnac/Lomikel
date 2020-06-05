@@ -136,6 +136,21 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar>
+    <jar jarfile="../lib/Lomikel.exe.jar" index="yes">
+      <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
+      <zipfileset includes="**/*" src="${bsh_jar}"/>
+      <zipfileset includes="**/*" src="${cli_jar}"/>
+      <zipfileset includes="**/*" src="${log4j_jar}"/>
+      <zipfileset includes="**/*" src="${slf4j_jar}"/>
+      <zipfileset includes="**/*" src="${slf4jlog4j_jar}"/>
+      <zipfileset includes="**/*" src="${logging_jar}"/>
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="Lomikel"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.CLI"/>
+        </manifest>
+      </jar>
     </target>
     
   <!-- WAR ==================================================================-->

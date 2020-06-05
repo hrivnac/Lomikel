@@ -22,6 +22,7 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;  
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;  
 import org.apache.hadoop.hbase.filter.RowFilter;  
+import org.apache.hadoop.hbase.filter.PrefixFilter;  
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.BinaryPrefixComparator;
 import org.apache.hadoop.hbase.filter.SubstringComparator;
@@ -348,6 +349,7 @@ public class HBaseClient {
                                                long                stop,
                                                boolean             ifkey,
                                                boolean             iftime) {
+    long time = System.currentTimeMillis();
     log.info("Searching for key: " + key + 
              ", search: " + search + 
              ", filter: " + (filter == null ? null : String.join(",", filter)) +
@@ -408,9 +410,20 @@ public class HBaseClient {
           column = fc[1];
           value  = entry.getValue();
           if (family.equals("key") && column.equals("key")) {
-            for (String k : value.split(",")) { // BUG: it only works if OR operator is set
-              filters.add(new RowFilter(CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(k))));
+            String[] keyArray = value.split(",");
+            Arrays.sort(keyArray);
+            String firstKey = null;
+            String lastKey  = null;
+            for (String k : keyArray) { // BUG: it only works if OR operator is set
+              //filters.add(new RowFilter(CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(k))));
+              filters.add(new PrefixFilter(Bytes.toBytes(k)));
+              if (firstKey == null) {
+                firstKey = k;
+                }
+              lastKey = k;
               }
+            scan.withStartRow(Bytes.toBytes(firstKey),               true);
+            scan.withStopRow(incrementBytes(Bytes.toBytes(lastKey)), true);
             }
           else {
             filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
@@ -451,7 +464,7 @@ public class HBaseClient {
         log.error("Cannot search", e);
         }
       }
-    log.info(results.size() + " results found");
+    log.info(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
     return results;
     }
     
@@ -533,7 +546,7 @@ public class HBaseClient {
     * @param columnName     The name of the column.
     * @param substringValue The column value substring to search for.
     * @param minutes        How far into the past it should search. 
-    * @param getValues      Whether get colun values or row keys.
+    * @param getValues      Whether to get column values or row keys.
     * @return               The {@link Set} of different values of that column. */
   public Set<String> latests(String columnName,
                              String substringValue,
@@ -615,8 +628,26 @@ public class HBaseClient {
       log.warn("Cannot close Table", e);
       }
     _table = null;
-    }               
-
+    }
+    
+  /** TBD */
+  public static byte[] incrementBytes(final byte[] value) {
+    byte[] newValue = Arrays.copyOf(value, value.length);
+    for (int i = 0; i < newValue.length; i++) {
+      int val = newValue[newValue.length - i - 1] & 0x0ff;
+      int total = val + 1;
+      boolean carry = false;
+      if (total > 255) {
+        carry = true;
+        total %= 256;
+        }
+      newValue[newValue.length - i - 1] = (byte) total;
+      if (!carry) {
+        return newValue;
+        }
+      }
+    return newValue;
+    }
   /** TBD */
   public static String results2String(Map<String, Map<String, String>> results) {
     String report = "";
