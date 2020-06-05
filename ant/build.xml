@@ -17,7 +17,6 @@
 
   <path id="classpath.build">
     <pathelement path="${log4j_jar}"/>
-    <pathelement path="${bsh_jar}"/>
     <pathelement path="${httpclient_jar}"/>
     <pathelement path="${httpcore_jar}"/>
     <pathelement path="${logging_jar}"/>
@@ -136,6 +135,7 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar>
+      <echo>${bsh_jar}</echo>
     <jar jarfile="../lib/Lomikel.exe.jar" index="yes">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
       <zipfileset includes="**/*" src="${bsh_jar}"/>

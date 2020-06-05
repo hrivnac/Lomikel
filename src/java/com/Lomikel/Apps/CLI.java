@@ -48,7 +48,7 @@ public class CLI {
       JFrame f = new JFrame();
       JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
       f.getContentPane().add(pane);
-      f.setSize(600, 800);  
+      f.setSize(1200, 600);  
       f.setVisible(true);
       _console = new Console();
       pane.setLeftComponent(_console);
@@ -58,7 +58,12 @@ public class CLI {
       _interpreter = new Interpreter(new InputStreamReader(System.in), System.out, System.err, true);
       }
     if (!_quiet) {
-      _interpreter.print(msg);
+      if (_gui) {
+        _console.setText(msg);
+        }
+      else {
+        _interpreter.print(msg);
+        }
       }
     setupInterpreter();
     if (!_batch) {
@@ -219,7 +224,7 @@ public class CLI {
     
   private Interpreter _interpreter;
   
-  private static JConsole _console;
+  private static Console _console;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(CLI.class);

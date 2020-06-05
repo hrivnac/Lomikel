@@ -23,15 +23,15 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public final class Console extends JConsole {
 
-  /** Create. TBD */
+  /** Create. */
   public Console() {
     _this = this;
     setFont(new Font("Helvetica", Font.PLAIN, 15));
     setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     setBorder(BorderFactory.createEtchedBorder());
-    setSize(                     Integer.MAX_VALUE, 800);
+    setSize(                     Integer.MAX_VALUE, 600);
     setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-    setMinimumSize(new Dimension(600,               800));
+    setMinimumSize(new Dimension(1200,              600));
     setWaitFeedback(true);
     }    
     
