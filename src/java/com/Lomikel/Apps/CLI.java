@@ -54,6 +54,7 @@ import javax.swing.JTree;
 import javax.swing.BoxLayout;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.ImageIcon;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -87,7 +88,7 @@ public class CLI {
       JToolBar north = new JToolBar();
       north.setFloatable(true);
       north.setLayout(new BoxLayout(north, BoxLayout.X_AXIS));
-      north.add(new AboutLabel());
+      north.add(new AboutLabel(Icons.lomikel, "<html><h3>http://cern.ch/hribnac/Activities/Packages/Lomikel</h3></html>"));
       north.addSeparator(separatorDimension);
       north.add(new SimpleButton("Exit",
                                  Icons.exit,
