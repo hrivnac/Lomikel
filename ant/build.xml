@@ -343,6 +343,7 @@
       <group title="HBaser"     packages="com.Lomikel.HBaser"/>
       <group title="Graph"      packages="com.Lomikel.Graph"/>
       <group title="Utils"      packages="com.Lomikel.Utils*"/>
+      <group title="GUI"        packages="com.Lomikel.GUI*"/>
       <group title="WebService" packages="com.Lomikel.WebService*"/>
       <link href="http://docs.oracle.com/javase/8/docs/api"/>
       <link href="http://www.beanshell.org/javadoc/"/>

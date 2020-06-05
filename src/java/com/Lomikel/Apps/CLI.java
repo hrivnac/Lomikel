@@ -5,6 +5,12 @@ import com.Lomikel.Utils.Info;
 import com.Lomikel.Utils.StringFile;
 import com.Lomikel.Utils.StringResource;
 import com.Lomikel.Utils.CommonException;
+import com.Lomikel.GUI.AboutLabel;
+import com.Lomikel.GUI.SimpleButton;
+import com.Lomikel.GUI.Icons;
+import com.Lomikel.GUI.Dimensions;
+import com.Lomikel.GUI.Fonts;
+import com.Lomikel.GUI.AListener;
 
 // CLI
 import org.apache.commons.cli.CommandLineParser;
@@ -21,9 +27,33 @@ import bsh.util.JConsole;
 import bsh.EvalError;
 
 // Java
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
 import java.io.InputStreamReader;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.UIManager;
+import javax.swing.ToolTipManager;
+import javax.swing.AbstractButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JApplet;
+import javax.swing.JTextArea;
+import javax.swing.JSlider;
+import javax.swing.JScrollBar;
+import javax.swing.JPopupMenu;
+import javax.swing.JToolBar;
+import javax.swing.JTree;
+import javax.swing.BoxLayout;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.ColorUIResource;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -45,13 +75,37 @@ public class CLI {
       _interpreter = new Interpreter();
       }
     else if (_gui) {
+      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+      ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+      UIManager.put("ToolTip.font",       new Font("Dialog", Font.PLAIN, 12));
+      UIManager.put("ToolTip.foreground", new ColorUIResource(Color.red));
+      UIManager.put("ToolTip.background", new ColorUIResource(0.95f, 0.95f, 0.3f));
+      Dimension separatorDimension = new Dimension(10, 0);
+   
       JFrame f = new JFrame();
-      JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-      f.getContentPane().add(pane);
-      f.setSize(1200, 600);  
-      f.setVisible(true);
+      
+      JToolBar north = new JToolBar();
+      north.setFloatable(true);
+      north.setLayout(new BoxLayout(north, BoxLayout.X_AXIS));
+      north.add(new AboutLabel());
+      north.addSeparator(separatorDimension);
+      north.add(new SimpleButton("Exit",
+                                 Icons.exit,
+                                 AbstractButton.CENTER,
+                                 Fonts.NONE,
+                                 Dimensions.BIG,
+                                 "Exit",
+                                 new AListener()));
+      f.getContentPane().add(north, BorderLayout.NORTH);
+
+      JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
       _console = new Console();
-      pane.setLeftComponent(_console);
+      center.setLeftComponent(_console);
+      f.getContentPane().add(center, BorderLayout.CENTER);
+      
+      f.setSize(1200, 600);  
+      f.setVisible(true);      
+
       _interpreter = new Interpreter(_console);
       }
     else {
