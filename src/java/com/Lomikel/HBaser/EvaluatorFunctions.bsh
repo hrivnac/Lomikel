@@ -1,0 +1,24 @@
+import com.Lomikel.HBaser.EvaluatorFunctions;
+
+/** <code>EvaluatorFuctions</code> provide static functions available to
+  * {@link Evaluator}. They interpreted within Evaluator process so that
+  * have access to all its variables and functions.
+  * In most cases, it just provides interface to {@link EvaluatorFunctions}
+  * class.
+  * @opt attributes
+  * @opt operations
+  * @opt types
+  * @opt visibility
+  * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+   
+/** TBD */
+public static boolean isWithinGeoLimits(double raMin,
+                                        double raMax,
+                                        double decMin,
+                                        double decMax) {
+  return EvaluatorFunctions.isWithinGeoLimits(ra, dec, raMin, raMax, decMin, decMax);
+  }
+
+
+
+  
