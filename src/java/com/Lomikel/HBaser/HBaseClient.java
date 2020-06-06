@@ -1,6 +1,7 @@
 package com.Lomikel.HBaser;
 
 import com.Lomikel.Utils.DateTimeManagement;
+import com.Lomikel.Utils.CommonException;
 
 // HBase
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;  
 import java.util.Map;  
+import java.util.HashMap;  
 import java.util.TreeMap;  
 import java.util.NavigableMap;
 import java.io.IOException;
@@ -348,6 +350,10 @@ public class HBaseClient {
                                                boolean             ifkey,
                                                boolean             iftime) {
     long time = System.currentTimeMillis();
+    if (_formula != null) {
+      log.debug("Resetting filter because formula exists");
+      filter = null;
+      }
     log.info("Searching for key: " + key + 
              ", search: " + search + 
              ", filter: " + (filter == null ? null : String.join(",", filter)) +
@@ -452,9 +458,10 @@ public class HBaseClient {
         int i = 0;
         for (Result r : rs) {
           result = new TreeMap<>();
-          addResult(r, result, filter, ifkey, iftime);
-          results.put(Bytes.toString(r.getRow()), result);
-          i++;
+          if (addResult(r, result, filter, ifkey, iftime)) {
+            results.put(Bytes.toString(r.getRow()), result);
+            i++;
+            }
           }
         log.info("" + i + " entries found");
         }
@@ -472,13 +479,17 @@ public class HBaseClient {
     * @param filter   The names of required values as array of <tt>family:column</tt>.
     *                 It can be <tt>null</tt>.
     * @param ifkey   Whether add also entries keys.
-    * @param iftime  Whether add also entries timestamps. */
-  private void addResult(Result              r,
-                         Map<String, String> result,
-                         String[]            filter,
-                         boolean             ifkey,
-                         boolean             iftime) {
+    * @param iftime  Whether add also entries timestamps.
+    * @return        Whether the result has been added. */
+  private boolean addResult(Result              r,
+                            Map<String, String> result,
+                            String[]            filter,
+                            boolean             ifkey,
+                            boolean             iftime) {
     String key = Bytes.toString(r.getRow());
+    if (!key.startsWith("schema") &&_evaluator != null && !evaluateResult(r)) {
+      return false;
+      }
     String[] ff;
     String ref;
     if (r != null && r.getRow() != null) {
@@ -526,6 +537,32 @@ public class HBaseClient {
           }
         }
       }
+    return true;
+    }
+    
+  /** Evaluate {@link Result} using registered formula.
+    * @param r The {@link Result} to be evaluated. */
+  private boolean evaluateResult(Result r) {
+    Map<String, String> values = new HashMap<>();
+    Map<byte[], NavigableMap<byte[], byte[]>>	resultMap = r.getNoVersionMap();
+    String family;
+    String column;
+    String value;
+    for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+      family = Bytes.toString(entry.getKey());
+      for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+        column = family + ":" + Bytes.toString(e.getKey());
+        value = _schema.decode(column, e.getValue());
+        values.put(column, value);
+        }
+      }
+    try {
+      return _evaluator.evalBoolean(values, _formula);
+      }
+    catch (CommonException e) {
+      log.error("Cannot evaluate " + _formula + " taking false", e);
+      return false;
+      }
     }
     
   /** Give the timeline for the column.
@@ -564,7 +601,35 @@ public class HBaseClient {
       }
     return l;
     }
+
+    /** Set formula to be used to filter rows.
+    * @param formula The formula to be used to filter rows.
+    *                The variables should apper without family names. */
+  public void setEvaluation(String formula,
+                            String variables) {
+    setEvaluation(formula);
+    _evaluator.setVariables(variables);
+    }
         
+  /** Set formula to be used to filter rows.
+    * @param formula The formula to be used to filter rows.
+    *                The variables should apper without family names. */
+  public void setEvaluation(String formula) {
+    log.info("Setting evaluation formula '" + formula + "'");
+    if (_schema == null) {
+      log.error("Evaluation can be set only for known Schema");
+      return;
+      }
+    try {
+      _evaluator = new Evaluator(_schema);
+      _evaluator.setVariables(formula);
+      _formula   = formula;
+      }
+    catch (CommonException e) {
+      log.error("Evaluator cannot be set", e);
+      }
+    }
+      
   /** Set the table {@link Schema}.
     * @param schema The {@link Schema} to set. */
   public void setSchema(Schema schema) {
@@ -628,7 +693,9 @@ public class HBaseClient {
     _table = null;
     }
     
-  /** TBD */
+  /** Increment <tt>byte[]</tt>.
+    * @param value The origibal value.
+    * @return      The incremented value. */
   public static byte[] incrementBytes(final byte[] value) {
     byte[] newValue = Arrays.copyOf(value, value.length);
     for (int i = 0; i < newValue.length; i++) {
@@ -646,7 +713,10 @@ public class HBaseClient {
       }
     return newValue;
     }
-  /** TBD */
+    
+  /** Results presented as readable {@link String}.
+    * @param results The {@link Map} of results.
+    * @return        The result is a readable form. */
   public static String results2String(Map<String, Map<String, String>> results) {
     String report = "";
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
@@ -679,6 +749,10 @@ public class HBaseClient {
     
   private BinaryDataRepository _repository = new BinaryDataRepository();  
 
+  private Evaluator _evaluator;
+  
+  private String _formula;
+  
   /** Logging . */
   private static Logger log = Logger.getLogger(HBaseClient.class);
 
