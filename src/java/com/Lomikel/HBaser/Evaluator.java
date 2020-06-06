@@ -23,16 +23,21 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Evaluator {
-
+  
   /** Create.
     * @param schema The {@link Schema} to use to interpret types.
     * @throws CommonpException If can't be initiated. */
   public Evaluator(Schema schema) throws CommonException {
+    log.info("Creating Evaluator");
     _schema = schema;
     _interpreter = new Interpreter();
     try {
-      _interpreter.eval("import com.Lomikel.HBaser.EvaluatorFunctions.*;");
-      _interpreter.eval(new StringResource("com/Lomikel/HBaser/EvaluatorFunctions.bsh").toString());
+      for (String javaClass : _auxJavaClasses) {
+        _interpreter.eval("import " + javaClass + ".*;");
+        }
+      for (String bshScript : _auxBshScripts) {
+        _interpreter.eval(new StringResource(bshScript).toString());
+        }
       }
     catch (EvalError e) {
       throw new CommonException("Can't initiate Evaluator", e);
@@ -118,13 +123,31 @@ public class Evaluator {
       }
     }
            
+  /** Set aux fuctions for evaluation.
+    * @param javaClass The aux Java class name.
+    * @param bshScript The aux Bsh script name (as resources). */
+  public static void setAuxFuctions(String javaClass,
+                                    String bshScript) {
+    _auxJavaClasses.add(javaClass);
+    _auxBshScripts.add(bshScript);
+    }
+    
   private Schema _schema;
   
   private Set<String> _variables = new TreeSet<>();
     
-  private Interpreter _interpreter;      
+  private Interpreter _interpreter;     
+  
+  private static Set<String> _auxJavaClasses = new TreeSet<>();
+  
+  private static Set<String> _auxBshScripts  = new TreeSet<>();
                                          
   /** Logging . */
   private static Logger log = Logger.getLogger(Evaluator.class);
+  
+  static { 
+    _auxJavaClasses.add("com.Lomikel.HBaser.EvaluatorFunctions");
+    _auxBshScripts.add("com/Lomikel/HBaser/EvaluatorFunctions.bsh");
+    }    
                                                 
   }
