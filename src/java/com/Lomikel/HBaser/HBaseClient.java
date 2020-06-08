@@ -26,6 +26,8 @@ import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.PrefixFilter;  
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.BinaryPrefixComparator;
+import org.apache.hadoop.hbase.filter.BinaryComparator;
+import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SubstringComparator;
 
 // Hadoop
@@ -197,9 +199,13 @@ public class HBaseClient {
   /** Get entry or entries from the {@link Catalog}.
     * @param key      The row key. Disables other search terms.
     *                 It can be <tt>null</tt>.
-    * @param search   The search terms:  <tt>family:column:value,...</tt>.
+    * @param search   The search terms: {@link Map} of <tt>family:column-value</tt>.
+    *                 Key can be searched with <tt>key:key<tt> "pseudo-name".
+    *                 {@link Comparator} can be chosen as <tt>family:column:comparator</tt>
+    *                 among <tt>exact,prefix,substring,regex</tt>.
+    *                 The default for key is <tt>prefix</tt>,
+    *                 the default for columns is <tt>substring</tt>.
     *                 It can be <tt>null</tt>.
-    *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as <tt>family:column,...</tt>.
     *                 It can be <tt>null</tt>.
@@ -215,7 +221,12 @@ public class HBaseClient {
     if (search != null && !search.trim().equals("")) {
       for (String s : search.trim().split(",")) {
         ss = s.trim().split(":");
-        searchMap.put(ss[0] + ":" + ss[1], ss[2]);
+        if (ss.length == 4) {
+          searchMap.put(ss[0] + ":" + ss[1] + ":" + ss[2], ss[3]);
+          }
+        else {
+          searchMap.put(ss[0] + ":" + ss[1], ss[2]);
+          }
         }
       }
     String[] filterA = null;
@@ -240,9 +251,13 @@ public class HBaseClient {
   /** Get entry or entries from the {@link Catalog}.
     * @param key      The row key. Disables other search terms.
     *                 It can be <tt>null</tt>.
-    * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
+    * @param search   The search terms: {@link Map} of <tt>family:column-value</tt>.
+    *                 Key can be searched with <tt>key:key<tt> "pseudo-name".
+    *                 {@link Comparator} can be chosen as <tt>family:column:comparator</tt>
+    *                 among <tt>exact,prefix,substring,regex</tt>.
+    *                 The default for key is <tt>prefix</tt>,
+    *                 the default for columns is <tt>substring</tt>.
     *                 It can be <tt>null</tt>.
-    *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>.
     *                 It can be <tt>null</tt>.
@@ -275,9 +290,13 @@ public class HBaseClient {
   /** Get entry or entries from the {@link Catalog}.
     * @param key      The row key. Disables other search terms.
     *                 It can be <tt>null</tt>.
-    * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
+    * @param search   The search terms: {@link Map} of <tt>family:column-value</tt>.
+    *                 Key can be searched with <tt>key:key<tt> "pseudo-name".
+    *                 {@link Comparator} can be chosen as <tt>family:column:comparator</tt>
+    *                 among <tt>exact,prefix,substring,regex</tt>.
+    *                 The default for key is <tt>prefix</tt>,
+    *                 the default for columns is <tt>substring</tt>.
     *                 It can be <tt>null</tt>.
-    *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>.
     *                 It can be <tt>null</tt>.
@@ -329,9 +348,13 @@ public class HBaseClient {
   /** Get entry or entries from the {@link Catalog}.
     * @param key      The row key. Disables other search terms.
     *                 It can be <tt>null</tt>.
-    * @param search   The search terms: {@link Map} of <tt>name-&gt;value</tt>.
+    * @param search   The search terms: {@link Map} of <tt>family:column-value</tt>.
+    *                 Key can be searched with <tt>key:key<tt> "pseudo-name".
+    *                 {@link Comparator} can be chosen as <tt>family:column:comparator</tt>
+    *                 among <tt>exact,prefix,substring,regex</tt>.
+    *                 The default for key is <tt>prefix</tt>,
+    *                 the default for columns is <tt>substring</tt>.
     *                 It can be <tt>null</tt>.
-    *                 Key can be searched with key:key "pseudo-name".
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>.
     *                 It can be <tt>null</tt>.
@@ -363,7 +386,8 @@ public class HBaseClient {
     Map<String, String> result;
     String[] fc;
     String family; 
-    String column; 
+    String column;
+    String comparator;
     String value;
     // Get
     if (key != null && !key.trim().equals("")) {
@@ -412,26 +436,55 @@ public class HBaseClient {
           fc = entry.getKey().split(":");
           family = fc[0];
           column = fc[1];
+          comparator = fc.length == 3 ? fc[2] : "default";
           value  = entry.getValue();
           if (family.equals("key") && column.equals("key")) {
             String[] keyArray = value.split(",");
             Arrays.sort(keyArray);
             String firstKey = null;
             String lastKey  = null;
-            for (String k : keyArray) { // BUG: it only works if OR operator is set
-              //filters.add(new RowFilter(CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(k))));
-              filters.add(new PrefixFilter(Bytes.toBytes(k)));
+            if (keyArray.length > 1) {
+              setSearchOperator("OR");
+              }
+            for (String k : keyArray) {
+              switch (comparator) {
+                case "exact":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new BinaryComparator(Bytes.toBytes(k))));
+                  break;
+                case "substring":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new SubstringComparator(k)));
+                  break;
+                case "regex":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new RegexStringComparator(k)));
+                  break;
+                default: // prefix
+                  filters.add(new PrefixFilter(Bytes.toBytes(k)));
+                }
               if (firstKey == null) {
                 firstKey = k;
                 }
               lastKey = k;
               }
-            scan.withStartRow(Bytes.toBytes(firstKey),               true);
-            scan.withStopRow(incrementBytes(Bytes.toBytes(lastKey)), true);
+            if (!comparator.equals("substring") && !substring.equals("regex")) {
+              scan.withStartRow(Bytes.toBytes(firstKey),               true);
+              scan.withStopRow(incrementBytes(Bytes.toBytes(lastKey)), true);
+              }
             }
           else {
-            filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
-            }
+            switch (comparator) {
+              case "exact":
+                filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, Bytes.toBytes(value)));
+                break;
+              case "prefix":
+                filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(value))));
+                break;
+              case "regex":
+                filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new RegexStringComparator(value)));
+                break;
+              default: // substring
+                filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
+              }
+             }
           }
         FilterList filterList = new FilterList(_operator, filters);  
         scan.setFilter(filterList);

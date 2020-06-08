@@ -39,13 +39,11 @@
       String krefix   = request.getParameter("krefix");
       String selects  = request.getParameter("selects");
       String filters  = request.getParameter("filters");
-      String version  = request.getParameter("version");
       String start    = request.getParameter("start");
       String stop     = request.getParameter("stop");
       String group    = request.getParameter("group");
       String schema   = request.getParameter("schema");
       String limitS   = request.getParameter("limit");
-      String operator = request.getParameter("operator");
       if (hbase  == null || hbase.trim( ).equals("") ||
           htable == null || htable.trim().equals("")) {
         log.fatal("Cannot connect to " + htable + "@" + hbase);
@@ -56,13 +54,11 @@
       krefix    = (krefix   == null || krefix.equals(  "null")) ? "" : krefix.trim();
       filters   = (filters  == null || filters.equals( "null")) ? "" : filters.trim();
       selects   = (selects  == null || selects.equals( "null")) ? "" : selects.trim();
-      version   = (version  == null || version.equals( "null")) ? "" : version.trim();
       start     = (start    == null || start.equals(   "null")) ? "" : start.trim();
       stop      = (stop     == null || stop.equals(    "null")) ? "" : stop.trim();
       group     = (group    == null || group.equals(   "null")) ? "" : group.trim();
       schema    = (schema   == null || schema.equals(  "null")) ? "" : schema.trim();
       limitS    = (limitS   == null || limitS.equals(  "null")) ? "" : limitS.trim();
-      operator  = (operator == null || operator.equals("null")) ? "" : operator.trim();
       Map<String, String> filterMap = new HashMap<>();
       if (!key.equals("")) {
         out.println("<b>key</b> is <b>" + key + "</b><br/>");
@@ -89,12 +85,11 @@
       if (!selects.equals("")) {
         out.println("showing only columns <b>" + selects + "</b><br/>");
         }
-      if (!version.equals("")) {
-        out.println("showing only version <b>" + version + "</b><br/>");
+      if (!schema.equals("")) {
+        out.println("using schema <b>" + schema + "</b><br/>");
         }
       HBaseClient h = new HBaseClient(hbase);
       h.setLimit(limit);
-      h.setSearchOperator(operator);
       if (schema.equals("")) {
         h.connect(htable);
         }
@@ -182,13 +177,13 @@
         header : 'HBase Search',
         url    : 'HBaseTable.jsp',
         fields : [
-          {field:'key',     type: 'text',     html: {caption: 'Exact Key',      text : ' (exact search on row keys: key,key,...)',                  attr: 'style="width: 500px"'}},
-          {field:'krefix',  type: 'text',     html: {caption: 'Prefix Key',     text : ' (prefix search on row keys)',                              attr: 'style="width: 500px"'}},
-          {field:'filters', type: 'text',     html: {caption: 'Search Columns', text : ' (columns substring search: family:column:value,...)',      attr: 'style="width: 500px"'}},
-          {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,...)',                      attr: 'style="width: 500px"'}},
-          {field:'start',   type: 'datetime', html: {caption: 'From',           text : ' (start time)',                                             attr: 'style="width: 150px"'}},
-          {field:'stop',    type: 'datetime', html: {caption: 'Till',           text : ' (end time)',                                               attr: 'style="width: 150px"'}},
-          {field:'limit',   type: 'int',      html: {caption: 'Limit',          text : ' (max number of rows)',                                     attr: 'style="width: 100px"'}}
+          {field:'key',     type: 'text',     html: {caption: 'Exact Key',      text : ' (exact search on row keys: key,key,...)',                          attr: 'style="width: 500px"'}},
+          {field:'krefix',  type: 'text',     html: {caption: 'Prefix Key',     text : ' (search on row keys prefix: key,key,...)',                         attr: 'style="width: 500px"'}},
+          {field:'filters', type: 'text',     html: {caption: 'Search Columns', text : ' (columns substring search: family:column:value[:comparator],...)', attr: 'style="width: 500px"'}},
+          {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,...)',                              attr: 'style="width: 500px"'}},
+          {field:'start',   type: 'datetime', html: {caption: 'From',           text : ' (start time)',                                                     attr: 'style="width: 150px"'}},
+          {field:'stop',    type: 'datetime', html: {caption: 'Till',           text : ' (end time)',                                                       attr: 'style="width: 150px"'}},
+          {field:'limit',   type: 'int',      html: {caption: 'Limit',          text : ' (max number of rows)',                                             attr: 'style="width: 100px"'}}
           ], 
         record : { 
           key     : '<%=key%>',
@@ -204,7 +199,7 @@
             this.clear();
             },
           Search: function () {
-            var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&version=<%=version%>&schema=<%=schema%>&group=<%=group%>"
+            var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&schema=<%=schema%>&group=<%=group%>"
                                                   + "&key="     + w2ui.hbaseTableForm.record.key
                                                   + "&krefix="  + w2ui.hbaseTableForm.record.krefix
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters

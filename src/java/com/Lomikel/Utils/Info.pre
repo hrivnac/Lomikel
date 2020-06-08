@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-// TBD: make non-static to allow overriding
 public class Info {
 
   /** Give builder release. 
@@ -37,41 +36,20 @@ public class Info {
   public static String tmp() {
     return _tmp;
     }
-    
-  /** Set temporary directory (available to Tomcat).
-    * @param tmp The temporary directory. */
-  public static void setTmp(String tmp) {
-    log.info("Setting tmp " + tmp);
-    _tmp = tmp;
-    }
 
   /** Give email of the package manager.
     * @return The email of the package manager. */
   public static String manager() {
     return _manager;
     }
-    
-  /** Set email of the package manager.
-    * @param manager The email of the package manager. */
-  public static void setManager(String manager) {
-    log.info("Setting manager " + manager);
-    _manager = manager;
-    }
-    
-  /** Set the target fir built.
-    * @param manager The target for built. */
-  public static void setTarget(String target) {
-    log.info("Setting target " + target);
-    _target = target;
-    }
        
-  private static String _name    = "Lomikel";
-  private static String _version = "@version@";
-  private static String _build   = "@TSTAMP@";
-  private static String _builder = "@user.name@";
-  private static String _tmp     = "@TMP@";
-  private static String _manager = "@MANAGER@";
-  private static String _target  = "@TARGET@";
+  protected static String _name    = "Lomikel";
+  protected static String _version = "@version@";
+  protected static String _build   = "@TSTAMP@";
+  protected static String _builder = "@user.name@";
+  protected static String _tmp     = "@TMP@";
+  protected static String _manager = "@MANAGER@";
+  protected static String _target  = "@TARGET@";
 
   /** Logging . */
   private static Logger log = Logger.getLogger(Info.class);
