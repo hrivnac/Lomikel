@@ -44,8 +44,8 @@ public class SmallHttpClient {
 
   /** Make http get call.
     * @param args[0] The http request.
-    * @throws CommonException If anything goes wrong. */
-  public static void main(String[] args) throws CommonException {
+    * @throws LomikelException If anything goes wrong. */
+  public static void main(String[] args) throws LomikelException {
     System.out.println(get(args[0]));
     }
   
@@ -54,8 +54,8 @@ public class SmallHttpClient {
   /** Make http get call.
     * @param question The http request.
     * @return         The answer.
-    * @throws CommonException If anything goes wrong. */
-  public static String get(String question) throws CommonException {
+    * @throws LomikelException If anything goes wrong. */
+  public static String get(String question) throws LomikelException {
     return get(question, null);
     }
    
@@ -63,9 +63,9 @@ public class SmallHttpClient {
     * @param question The http request.
     * @param headers  The additional headers.
     * @return         The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String get(String              question,
-                           Map<String, String> headers) throws CommonException {
+                           Map<String, String> headers) throws LomikelException {
     String answer = "";
     DefaultHttpClient client = new DefaultHttpClient();
     HttpGet get = new HttpGet(question);
@@ -80,14 +80,14 @@ public class SmallHttpClient {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new CommonException("Call to " + question + " failed: " + statusLine.getReasonPhrase());
+        throw new LomikelException("Call to " + question + " failed: " + statusLine.getReasonPhrase());
         }
       else {
         answer = getResponseBody(response);   
         }
       }
     catch (Exception e) {
-      throw new CommonException("Call to " + question + " failed", e);
+      throw new LomikelException("Call to " + question + " failed", e);
       }
     finally {
       get.releaseConnection();
@@ -100,8 +100,8 @@ public class SmallHttpClient {
   /** Make http delete call.
     * @param question The http request.
     * @return         The answer.
-    * @throws CommonException If anything goes wrong. */
-  public static String delete(String question) throws CommonException {
+    * @throws LomikelException If anything goes wrong. */
+  public static String delete(String question) throws LomikelException {
     return delete(question, null);
     }
    
@@ -109,9 +109,9 @@ public class SmallHttpClient {
     * @param question The http request.
     * @param headers  The additional headers.
     * @return         The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String delete(String              question,
-                              Map<String, String> headers) throws CommonException {
+                              Map<String, String> headers) throws LomikelException {
     String answer = "";
     DefaultHttpClient client = new DefaultHttpClient();
     HttpDelete delete = new HttpDelete(question);
@@ -126,14 +126,14 @@ public class SmallHttpClient {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new CommonException("Call to " + question + " failed: " + statusLine.getReasonPhrase());
+        throw new LomikelException("Call to " + question + " failed: " + statusLine.getReasonPhrase());
         }
       else {
         answer = getResponseBody(response);   
         }
       }
     catch (Exception e) {
-      throw new CommonException("Call to " + question + " failed", e);
+      throw new LomikelException("Call to " + question + " failed", e);
       }
     finally {
       delete.releaseConnection();
@@ -147,9 +147,9 @@ public class SmallHttpClient {
     * @param url The http url.
     * @param params The request parameters.
     * @return       The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String post(String              question,
-                            Map<String, String> params) throws CommonException {
+                            Map<String, String> params) throws LomikelException {
     return post(question, params, null);
     }
 
@@ -158,10 +158,10 @@ public class SmallHttpClient {
     * @param params  The request parameters.
     * @param headers The additional headers.
     * @return        The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String post(String              url,
                             Map<String, String> params,
-                            Map<String, String> headers) throws CommonException {
+                            Map<String, String> headers) throws LomikelException {
     String answer = "";
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPost post = new HttpPost(url);
@@ -186,14 +186,14 @@ public class SmallHttpClient {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new CommonException("Post to " + url + " " + params + " failed: " + statusLine.getReasonPhrase());
+        throw new LomikelException("Post to " + url + " " + params + " failed: " + statusLine.getReasonPhrase());
         }
       else {
         answer = getResponseBody(response);   
         }
       }
     catch (Exception e) {
-      throw new CommonException("Post to " + url + " " + params + " failed", e);
+      throw new LomikelException("Post to " + url + " " + params + " failed", e);
       }
     finally {
       post.releaseConnection();
@@ -207,11 +207,11 @@ public class SmallHttpClient {
     * @param headers The additional headers. May be <code>null</code>.
     * @param header  The requested header (instead of answer body). May be <code>null</code>.
     * @return        The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String postJSON(String              url,
                                 String              json,
                                 Map<String, String> headers,
-                                String              header) throws CommonException {
+                                String              header) throws LomikelException {
     String answer = "";
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPost post = new HttpPost(url);
@@ -234,7 +234,7 @@ public class SmallHttpClient {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new CommonException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+        throw new LomikelException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
         }
       else {
         if (header != null) {
@@ -251,7 +251,7 @@ public class SmallHttpClient {
         }
       }
     catch (Exception e) {
-      throw new CommonException("Post to " + url + " " + json + " failed", e);
+      throw new LomikelException("Post to " + url + " " + json + " failed", e);
       }
     finally {
       post.releaseConnection();
@@ -265,11 +265,11 @@ public class SmallHttpClient {
     * @param headers The additional headers. May be <code>null</code>.
     * @param header  The requested header (instead of answer body). May be <code>null</code>.
     * @return        The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String postXML(String              url,
                                String              json,
                                Map<String, String> headers,
-                               String              header) throws CommonException {
+                               String              header) throws LomikelException {
     String answer = "";
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPost post = new HttpPost(url);
@@ -292,7 +292,7 @@ public class SmallHttpClient {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new CommonException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+        throw new LomikelException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
         }
       else {
         if (header != null) {
@@ -309,7 +309,7 @@ public class SmallHttpClient {
         }
       }
     catch (Exception e) {
-      throw new CommonException("Post to " + url + " " + json + " failed", e);
+      throw new LomikelException("Post to " + url + " " + json + " failed", e);
       }
     finally {
       post.releaseConnection();
@@ -323,9 +323,9 @@ public class SmallHttpClient {
     * @param url The http url.
     * @param params The request parameters.
     * @return       The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String put(String              question,
-                           Map<String, String> params) throws CommonException {
+                           Map<String, String> params) throws LomikelException {
     return put(question, params, null);
     }
 
@@ -334,10 +334,10 @@ public class SmallHttpClient {
     * @param params  The request parameters.
     * @param headers The additional headers.
     * @return        The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String put(String              url,
                            Map<String, String> params,
-                           Map<String, String> headers) throws CommonException {
+                           Map<String, String> headers) throws LomikelException {
     String answer = "";
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPut put = new HttpPut(url);
@@ -362,14 +362,14 @@ public class SmallHttpClient {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new CommonException("Put to " + url + " " + params + " failed: " + statusLine.getReasonPhrase());
+        throw new LomikelException("Put to " + url + " " + params + " failed: " + statusLine.getReasonPhrase());
         }
       else {
         answer = getResponseBody(response);   
         }
       }
     catch (Exception e) {
-      throw new CommonException("Put to " + url + " " + params + " failed", e);
+      throw new LomikelException("Put to " + url + " " + params + " failed", e);
       }
     finally {
       put.releaseConnection();
@@ -383,11 +383,11 @@ public class SmallHttpClient {
     * @param headers The additional headers. May be <code>null</code>.
     * @param header  The requested header (instead of answer body). May be <code>null</code>.
     * @return        The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String putJSON(String              url,
                                String              json,
                                Map<String, String> headers,
-                               String              header) throws CommonException {
+                               String              header) throws LomikelException {
     String answer = "";
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPut put = new HttpPut(url);
@@ -410,7 +410,7 @@ public class SmallHttpClient {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new CommonException("Put to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+        throw new LomikelException("Put to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
         }
       else {
         if (header != null) {
@@ -427,7 +427,7 @@ public class SmallHttpClient {
         }
       }
     catch (Exception e) {
-      throw new CommonException("Put to " + url + " " + json + " failed", e);
+      throw new LomikelException("Put to " + url + " " + json + " failed", e);
       }
     finally {
       put.releaseConnection();
@@ -441,11 +441,11 @@ public class SmallHttpClient {
     * @param headers The additional headers. May be <code>null</code>.
     * @param header  The requested header (instead of answer body). May be <code>null</code>.
     * @return        The answer.
-    * @throws CommonException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public static String putXML(String              url,
                               String              json,
                               Map<String, String> headers,
-                              String              header) throws CommonException {
+                              String              header) throws LomikelException {
     String answer = "";
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPut put = new HttpPut(url);
@@ -468,7 +468,7 @@ public class SmallHttpClient {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new CommonException("Put to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+        throw new LomikelException("Put to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
         }
       else {
         if (header != null) {
@@ -485,7 +485,7 @@ public class SmallHttpClient {
         }
       }
     catch (Exception e) {
-      throw new CommonException("Put to " + url + " " + json + " failed", e);
+      throw new LomikelException("Put to " + url + " " + json + " failed", e);
       }
     finally {
       put.releaseConnection();

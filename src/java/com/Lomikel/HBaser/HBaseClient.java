@@ -1,7 +1,7 @@
 package com.Lomikel.HBaser;
 
 import com.Lomikel.Utils.DateTimeManagement;
-import com.Lomikel.Utils.CommonException;
+import com.Lomikel.Utils.LomikelException;
 
 // HBase
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -465,7 +465,7 @@ public class HBaseClient {
                 }
               lastKey = k;
               }
-            if (!comparator.equals("substring") && !substring.equals("regex")) {
+            if (!comparator.equals("substring") && !comparator.equals("regex")) {
               scan.withStartRow(Bytes.toBytes(firstKey),               true);
               scan.withStopRow(incrementBytes(Bytes.toBytes(lastKey)), true);
               }
@@ -612,7 +612,7 @@ public class HBaseClient {
     try {
       return _evaluator.evalBoolean(values, _formula);
       }
-    catch (CommonException e) {
+    catch (LomikelException e) {
       log.error("Cannot evaluate " + _formula + " taking false", e);
       return false;
       }
@@ -625,7 +625,9 @@ public class HBaseClient {
     Map<String, Long> tl = new TreeMap<>();
     Map<String, Map<String, String>> results = scan(null, null, new String[]{columnName}, 0, 0, false, true);
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      tl.put(entry.getValue().get(columnName), Long.parseLong(entry.getValue().get("key:time")));
+      if (!entry.getKey().startsWith("schema")) { 
+        tl.put(entry.getValue().get(columnName), Long.parseLong(entry.getValue().get("key:time")));
+        }
       }
     return tl;
     }
@@ -678,7 +680,7 @@ public class HBaseClient {
       _evaluator.setVariables(formula);
       _formula   = formula;
       }
-    catch (CommonException e) {
+    catch (LomikelException e) {
       log.error("Evaluator cannot be set", e);
       }
     }

@@ -1,6 +1,6 @@
 package com.Lomikel.HBaser;
 
-import com.Lomikel.Utils.CommonException;
+import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Utils.StringResource;
 
 // Bean Shell
@@ -27,7 +27,7 @@ public class Evaluator {
   /** Create.
     * @param schema The {@link Schema} to use to interpret types.
     * @throws CommonpException If can't be initiated. */
-  public Evaluator(Schema schema) throws CommonException {
+  public Evaluator(Schema schema) throws LomikelException {
     log.info("Creating Evaluator");
     _schema = schema;
     _interpreter = new Interpreter();
@@ -40,7 +40,7 @@ public class Evaluator {
         }
       }
     catch (EvalError e) {
-      throw new CommonException("Can't initiate Evaluator", e);
+      throw new LomikelException("Can't initiate Evaluator", e);
       }
     }
 
@@ -48,9 +48,9 @@ public class Evaluator {
     * @param values  The names and values of variables.
     * @param formula The formula to be evaluated. It should use supplied
     *                variables, which will be filled with supplied values.
-    * @throws CommonException If formula cannot be evaluated with supplied variables. */
+    * @throws LomikelException If formula cannot be evaluated with supplied variables. */
   public boolean evalBoolean(Map<String, String> values,
-                             String              formula) throws CommonException {
+                             String              formula) throws LomikelException {
     String r = eval(values, formula, "boolean");
     return Boolean.parseBoolean(r);
     }
@@ -60,10 +60,10 @@ public class Evaluator {
     * @param formula The formula to be evaluated. It should use supplied
     *                variables, which will be filled with supplied values.
     * @param type    The formula result type.
-    * @throws CommonException If formula cannot be evaluated with supplied variables. */
+    * @throws LomikelException If formula cannot be evaluated with supplied variables. */
   public String eval(Map<String, String> values,
                      String              formula,
-                     String              type) throws CommonException {
+                     String              type) throws LomikelException {
     try {
       for (String variable : _variables) {
         setVariable(variable, values.get(variable));
@@ -74,7 +74,7 @@ public class Evaluator {
       return result;
       }
     catch (EvalError e) {
-      throw new CommonException("Can't evaluate formula: " + formula, e);
+      throw new LomikelException("Can't evaluate formula: " + formula, e);
       }
     }
           

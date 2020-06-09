@@ -63,10 +63,10 @@ public class XSLTProcessor {
     * @throws IOException                       if result file can't be written.
     * @throws TransformerException              if transformation can't be performed.
     * @throws TransformerConfigurationException if {@link Transformer} can't be created.
-    * @throws CommonException if transformation can't be performed. */
+    * @throws LomikelException if transformation can't be performed. */
   public File transform(String fileName,
                         String xmlString,
-                        String xsltString) throws CommonException {
+                        String xsltString) throws LomikelException {
     try {
       xmlString = xmlString.substring(xmlString.indexOf("<?xml"));
       Transformer transformer = transformer(xsltString);
@@ -77,7 +77,7 @@ public class XSLTProcessor {
       return file;
       }
     catch (Exception e) {
-      throw new CommonException("Can't process XML fragment:\n\n" + xmlString, e);
+      throw new LomikelException("Can't process XML fragment:\n\n" + xmlString, e);
       }
     }
 
@@ -87,9 +87,9 @@ public class XSLTProcessor {
     * @param xsltString The conversion XSLT stylesheet.
     *                   If <code>null</code>, standard stylesheet is used.
     * @return           The HTML result.
-    * @throws CommonException if transformation can't be performed. */
+    * @throws LomikelException if transformation can't be performed. */
   public String transform(String xmlString,
-                          String xsltString) throws CommonException {
+                          String xsltString) throws LomikelException {
     xmlString = xmlString.substring(xmlString.indexOf("<?xml"));
     try {
       Transformer transformer = transformer(xsltString);
@@ -100,11 +100,11 @@ public class XSLTProcessor {
       return string.toString();
       }
     catch (Exception e) {
-      if (e instanceof CommonException) {
-        throw (CommonException)e;
+      if (e instanceof LomikelException) {
+        throw (LomikelException)e;
         }
       else {
-        throw new CommonException("Can't process XML fragment:\n\n" + xmlString, e);
+        throw new LomikelException("Can't process XML fragment:\n\n" + xmlString, e);
         }
       }
     }
@@ -112,8 +112,8 @@ public class XSLTProcessor {
   /** Get {@link Transformer} from XSLT string.
     * @param xsltString The String containing XSLT stylesheet.
     * @return           The corresponding {@link Transformer}.
-    * @throws CommonException if {@link Transformer} can't be created.*/
-  private Transformer transformer(String xsltString) throws CommonException {
+    * @throws LomikelException if {@link Transformer} can't be created.*/
+  private Transformer transformer(String xsltString) throws LomikelException {
     try {
       TransformerFactory factory = TransformerFactory.newInstance();
       Transformer transformer = factory.newTransformer(new StreamSource(new StringReader(xsltString)));
@@ -123,7 +123,7 @@ public class XSLTProcessor {
       return transformer;
       }
     catch (Exception e) {
-      throw new CommonException("Can't create Transformer:\n\n" + e.toString() + "\n\n" + xsltString, e);
+      throw new LomikelException("Can't create Transformer:\n\n" + e.toString() + "\n\n" + xsltString, e);
       }
     }
 

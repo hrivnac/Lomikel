@@ -11,7 +11,7 @@
 <%@ page import="com.Lomikel.Utils.NotifierMail" %>
 <%@ page import="com.Lomikel.Utils.NotifierURL" %>
 <%@ page import="com.Lomikel.Utils.Info" %>
-<%@ page import="com.Lomikel.Utils.CommonException" %>
+<%@ page import="com.Lomikel.Utils.LomikelException" %>
 
 <%@ page import="org.apache.log4j.Logger" %>
 

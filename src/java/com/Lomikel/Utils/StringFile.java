@@ -21,15 +21,15 @@ public class StringFile {
     
   /** Create.
     * @param fn The file path.
-    * @throws CommonException If file can't be read. */      
-  public StringFile(String fn) throws CommonException {
+    * @throws LomikelException If file can't be read. */      
+  public StringFile(String fn) throws LomikelException {
     this(new File(fn));
     }
     
   /** Create.
     * @param file The file.
-    * @throws CommonException If file can't be read. */      
-  public StringFile(File file) throws CommonException {
+    * @throws LomikelException If file can't be read. */      
+  public StringFile(File file) throws LomikelException {
     if (file.exists()) {
       FileInputStream     fis = null;
       BufferedInputStream bis = null;
@@ -48,10 +48,10 @@ public class StringFile {
         _content = buffer.toString();
         }
       catch (FileNotFoundException e) {
-        throw new CommonException("File " + file.getPath() + " not found !", e);
+        throw new LomikelException("File " + file.getPath() + " not found !", e);
         }
       catch (IOException e) {
-        throw new CommonException("File " + file.getPath() + " cannot be read !", e);
+        throw new LomikelException("File " + file.getPath() + " cannot be read !", e);
         }
       }
     }

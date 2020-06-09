@@ -4,7 +4,7 @@ import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Info;
 import com.Lomikel.Utils.StringFile;
 import com.Lomikel.Utils.StringResource;
-import com.Lomikel.Utils.CommonException;
+import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.GUI.AboutLabel;
 import com.Lomikel.GUI.SimpleButton;
 import com.Lomikel.GUI.Icons;
@@ -160,7 +160,7 @@ public class CLI {
       init = new StringFile("init.bsh").toString();
       _interpreter.eval(init);
       }
-    catch (CommonException e) {
+    catch (LomikelException e) {
       log.warn("init.bsh file cannot be read.");
       log.debug("init.bsh file cannot be read.", e);
       }
@@ -174,7 +174,7 @@ public class CLI {
         init = new StringResource(_profile + ".bsh").toString();
         _interpreter.eval(init);
         }
-      catch (CommonException e) {
+      catch (LomikelException e) {
         log.warn("Profile " + _profile + " cannot be loaded.");
         log.debug("Profile " + _profile + " cannot be loaded.", e);
         }
@@ -188,7 +188,7 @@ public class CLI {
       init = new StringFile(".state.bsh").toString();
       _interpreter.eval(init);
       }
-    catch (CommonException e) {
+    catch (LomikelException e) {
       log.warn(".state.bsh file cannot be read.");
       log.debug(".state.bsh file cannot be read.", e);
       }
@@ -202,7 +202,7 @@ public class CLI {
         init = new StringFile(_source).toString();
         _interpreter.eval(init);
         }
-      catch (CommonException e) {
+      catch (LomikelException e) {
         log.warn(_source + " file cannot be read.");
         log.debug(_source + " file cannot be read.", e);
         }
