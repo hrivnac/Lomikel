@@ -15,6 +15,7 @@ var data = {
     };
 var container = document.getElementById('vis');
 var network;
+var gr = 'g';
 
 var helpButton  = "<button onClick=\"w2popup.load({url:'Help-Top.html', showMax: true})\" style=\"position:absolute; top:0; right:0\">";
     helpButton += "<img src=\"images/Help.png\" width=\"10\"/>";
@@ -24,6 +25,7 @@ var helpButton  = "<button onClick=\"w2popup.load({url:'Help-Top.html', showMax:
 function bootstrap(button) {
   var server  =  document.getElementById('gremlin_server').value;
   var command =  document.getElementById('bootstrap_command').value;
+  gr = command.split('.')[0];
   if (button == 'selection') {
     command = document.getElementById('bootstrap_graph').value;
     }
@@ -304,16 +306,16 @@ function show(graph) {
           nodes.push(selectedNode);
           }
         if (document.getElementById('expandTo').checked) {
-          callGremlinGraph("g.V(" + selectedNode.id + ").out()");
+          callGremlinGraph(gr + ".V(" + selectedNode.id + ").out()");
            }
         if (document.getElementById('expandFrom').checked) {
-          callGremlinGraph("g.V(" + selectedNode.id + ").in()");
+          callGremlinGraph(gr + ".V(" + selectedNode.id + ").in()");
           }
         if (document.getElementById('expandTo').checked) {
-           callGremlinGraph("g.V(" + selectedNode.id + ").outE()");
+           callGremlinGraph(gr + ".V(" + selectedNode.id + ").outE()");
           }
         if (document.getElementById('expandFrom').checked) {
-           callGremlinGraph("g.V(" + selectedNode.id + ").inE()");
+           callGremlinGraph(gr + ".V(" + selectedNode.id + ").inE()");
           }
         }
       }
@@ -336,14 +338,14 @@ function expand(id, type) {
     
 // Describe selected node
 function describeNode(id) {
-  popup(id, callGremlinValues("g.V('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") + 
+  popup(id, callGremlinValues(gr + ".V('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") + 
             "<hr/>" +
             JSON.stringify(findObjectByKey(nodes, 'id', id)));
   }
     
 // Describe selected edge
 function describeEdge(id) {
-  popup(id, callGremlinValues("g.E('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") +
+  popup(id, callGremlinValues(gr + ".E('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") +
             "<hr/>" +
             JSON.stringify(findObjectByKey(edges, 'id', id)));
   }
@@ -433,10 +435,10 @@ function fillEdges() {
     var selectedNode = nodes[i];
     document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
     if (document.getElementById('expandTo').checked) {
-       callGremlinGraph("g.V(" + selectedNode.id + ").outE()");
+       callGremlinGraph(gr + ".V(" + selectedNode.id + ").outE()");
       }
     if (document.getElementById('expandFrom').checked) {
-       callGremlinGraph("g.V(" + selectedNode.id + ").inE()");
+       callGremlinGraph(gr + ".V(" + selectedNode.id + ").inE()");
       }  
     }
   }
@@ -597,7 +599,7 @@ function callInfo(element, key) {
 function stylesheetValue(nam, id, eMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
   if (nam.gremlin) {
-    val = callGremlinValues('g.' + set + '("' + id + '").' + nam.gremlin)[0];
+    val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin)[0];
     }
   else if (nam.js) {
     val = eval(nam.js);

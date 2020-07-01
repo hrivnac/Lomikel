@@ -52,8 +52,8 @@ public class Schema {
       case "long": 
         value = String.valueOf(Bytes.toLong(encodedValue));
         break;
-      case "image/fits": 
-        value = "*image/fits*";
+      case "fits": 
+        value = "*fits*";
         break;
       case "binary": 
         value = "*binary*";
@@ -90,7 +90,7 @@ public class Schema {
       case "long": 
         value = new CellContent(String.valueOf(Bytes.toLong(encodedValue)));
         break;
-      case "image/fits":
+      case "fits":
         value = new CellContent(encodedValue, CellContent.Type.FITS);
         break;
       case "binary":
@@ -128,7 +128,7 @@ public class Schema {
       case "long": 
         value = Bytes.toBytes(Long.valueOf(decodedValue));
         break;
-      case "image/fits": 
+      case "fits": 
         value  = new byte[0]; // BUG
         break;
       case "binary": 
