@@ -22,7 +22,8 @@
         <select name="gremlin_server" id="gremlin_server" title="database server url">
           <%@include file="Servers.jsp"%>
           </select>
-        <br/>
+         <input type="checkbox" name="add2graph" id="add2graph" value="false" title="add to the current graph">add</input>
+         <br/>
         <input type="button" onclick="bootstrap('selection')"  value="Start" title="execute command on the server" style="background-color:#eeffee;"/>
         <select name="bootstrap_graph" id="bootstrap_graph" title="bootstrap gremlin graph">
           <%@include file="Graphs.jsp"%>
@@ -34,3 +35,4 @@
       </tr>
     </table>
   </div>
+

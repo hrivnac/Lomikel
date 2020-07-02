@@ -5,6 +5,8 @@
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
+<jsp:useBean id="profile" class="com.Lomikel.WebService.Profile" scope="session"/>
+
 <!DOCTYPE html>
 <html>
 
@@ -23,6 +25,11 @@
     </head>
   
   <body>
+  
+    <%
+      String p = request.getParameter("profile");
+      profile.setProfile(p);
+      %>
   
     <script>
       var div = document.createElement("div");

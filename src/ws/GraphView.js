@@ -29,8 +29,10 @@ function bootstrap(button) {
   if (button == 'selection') {
     command = document.getElementById('bootstrap_graph').value;
     }
-  nodes.length = 0;
-  // edges.length = 0;
+  if (document.getElementById('add2graph').checked === false) {
+    nodes.length = 0;
+    edges.length = 0;
+    }
   callGremlinGraph(command,
                    server);
   }

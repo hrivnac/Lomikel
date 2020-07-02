@@ -7,6 +7,12 @@
 
 <link href="GraphView.css" rel="stylesheet" type="text/css"/>
 
+<jsp:useBean id="profile" class="com.Lomikel.WebService.Profile" scope="session"/>
+
+<%
+  String p = profile.profile();
+  %>
+
 <div id="graph">
   <div id="manip" title="graph manipulations" style="background-color:#ddffdd">
     <button onClick="w2popup.load({url:'Help-GraphView.html', showMax: true})" style="position:absolute; top:0; right:0">
@@ -47,6 +53,7 @@
 <script type="text/javascript" src="Stylesheet.js"></script>
 <script type="text/javascript" src="GraphView.js"></script>
 
+<script type="text/javascript" src="profiles/<%=p%>.js"/>
  
  
  
