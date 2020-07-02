@@ -197,8 +197,9 @@ function show(graph) {
         actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap, false, title);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          url = encodeURI(stylesheetValue(actionsArray[k].url, id, eMap, false, title));
+          url = stylesheetValue(actionsArray[k].url, id, eMap, false, title);
           if (url) {
+            url = encodeURI(url);
             actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
             if (!actionsArray[k].embedded) {
               actions += "(<a href='" + url + "' target='_blank'>*</a>)";
@@ -229,8 +230,9 @@ function show(graph) {
         actionsArray = stylesheetValue(stylesheetEdge.actions,               id, eMap, true, title);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          url = encodeURI(stylesheetValue(actionsArray[k].url, id, eMap, true, title));
+          url = stylesheetValue(actionsArray[k].url, id, eMap, true, title);
           if (url) {
+            url = encodeURI(url);
             actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
             if (!actionsArray[k].embedded) {
               actions += "(<a href='" + url + "' target='_blank'>*</a>)";

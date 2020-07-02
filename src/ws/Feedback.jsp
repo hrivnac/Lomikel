@@ -5,6 +5,12 @@
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
+<jsp:useBean id="profile" class="com.Lomikel.WebService.Profile" scope="session"/>
+
+<%
+  String p = profile.profile();
+  %>
+
 <link href="Feedback.css" rel="stylesheet" type="text/css"/>
 
 <div id="feedback" title="operation feedback">
@@ -14,3 +20,5 @@
   <p style="color:red;font-size:15px">Select <b>graph server</b> and initial <b>graph</b>,<br/>
                                       then select an <b>element</b> to see possible <b>actions</b>.</p>
   </div>
+
+<script type="text/javascript" src="profiles/<%=p%>.js"></script>

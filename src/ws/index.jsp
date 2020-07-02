@@ -93,7 +93,9 @@
       
     <script>
       async function loadPane(pane, url, iframe, height) {
-        document.getElementById("feedback").innerHTML += "Loading " + pane + " : " + url + "<br/>"
+        if (document.getElementById("feedback")) {
+          document.getElementById("feedback").innerHTML += "Loading " + pane + " : " + url + "<br/>"
+          }
         url = encodeURI(url);
         if (!height) {
           height = "100%";
