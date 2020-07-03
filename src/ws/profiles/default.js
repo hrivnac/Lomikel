@@ -1,1 +1,1 @@
-bootstrap('text');
+bootstrap('text', 1);

@@ -22,7 +22,7 @@ var helpButton  = "<button onClick=\"w2popup.load({url:'Help-Top.html', showMax:
     helpButton += "</button>";
 
 // Initial Gremlin call
-function bootstrap(button) {
+function bootstrap(button, level = 0) {
   var server  =  document.getElementById('gremlin_server').value;
   var command =  document.getElementById('bootstrap_command').value;
   gr = command.split('.')[0];
@@ -34,13 +34,13 @@ function bootstrap(button) {
     edges.length = 0;
     }
   callGremlinGraph(command,
-                   server);
+                   server, level);
   }
   
 // Send request to Gremlin server giving Graphson graph
 // TBD: use POST
 // TBD: check rc
-function callGremlinGraph(request, newServer) {
+function callGremlinGraph(request, newServer, level = 0) {
   if (newServer == null) {
     newServer = server;
     }
@@ -48,7 +48,8 @@ function callGremlinGraph(request, newServer) {
   var http = new XMLHttpRequest();
   http.onload = function() {
     if (http.readyState === 4 && http.status === 200) {
-      show(parseGraph(http.responseText)); 
+      show(parseGraph(http.responseText));
+      expandNodes(level);
       }
     };
   http.open("GET", server + '?gremlin=' + request);
@@ -303,43 +304,44 @@ function show(graph) {
         }
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
-        document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
-        if (document.getElementById('removeOld').checked) {
-          nodes.length = 0;
-          //edges.length = 0;
-          nodes.push(selectedNode);
-          }
-        if (document.getElementById('expandTo').checked) {
-          callGremlinGraph(gr + ".V(" + selectedNode.id + ").out()");
-           }
-        if (document.getElementById('expandFrom').checked) {
-          callGremlinGraph(gr + ".V(" + selectedNode.id + ").in()");
-          }
-        if (document.getElementById('expandTo').checked) {
-           callGremlinGraph(gr + ".V(" + selectedNode.id + ").outE()");
-          }
-        if (document.getElementById('expandFrom').checked) {
-           callGremlinGraph(gr + ".V(" + selectedNode.id + ").inE()");
-          }
+        expand(selectedNode.id);
         }
       }
     });
   }
-    
-// Expand from database
-function expand(id, type) {
-  var selectedNode = findObjectByKey(nodes, 'id', id);
-  document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
+  
+// Expand all Nodes by one level
+function expandNodes(level = 1) {
+  if (level > 0) {
+    for (var i = 0; i < nodes.length; i++) {
+      expand(nodes[i].id);
+      }
+    expandNodes(level - 1);
+    }
+  }
+
+// Expand one more level
+function expand(id) {
+  //document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
   if (document.getElementById('removeOld').checked) {
     nodes.length = 0;
-    edges.length = 0;
+    //edges.length = 0;
     nodes.push(selectedNode);
     }
-  eval(expandNode(type, id));
-  applyFilter();
-  show(null, null);
+  if (document.getElementById('expandTo').checked) {
+    callGremlinGraph(gr + ".V(" + id + ").out()");
+     }
+  if (document.getElementById('expandFrom').checked) {
+    callGremlinGraph(gr + ".V(" + id + ").in()");
+    }
+  if (document.getElementById('expandTo').checked) {
+     callGremlinGraph(gr + ".V(" + id + ").outE()");
+    }
+  if (document.getElementById('expandFrom').checked) {
+     callGremlinGraph(gr + ".V(" + id + ").inE()");
+    }
   }
-    
+      
 // Describe selected node
 function describeNode(id) {
   popup(id, callGremlinValues(gr + ".V('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") + 
