@@ -16,7 +16,6 @@
       <td><img src="@LOGO@" width="30"/></td>
       <td><b><u><a href="@HOME@" target="RESULT">@NAME@</a></u> <small>@VERSION@ [@BUILD@]</small></b></td>
       <td><input type="button" onclick="reset()"   value="Reset"   style="color:red"/></td>
-      <td><input type="button" onclick="restart()" value="Restart" style="color:violet"/></td>
       </tr>
     </table></center>
   </div>
@@ -24,10 +23,7 @@
 <script>
   async function reset() {
     loadPane("commands", "Top.jsp");
-    loadPane("graph", "GraphView.jsp");
-    loadPane("result", "Result.jsp");
-    }
-  async function restart() {
-    loadPane("commands", "Top.jsp");
+    loadPane("graph",    "GraphView.jsp");
+    loadPane("result",   "Result.jsp");
     }
   </script>

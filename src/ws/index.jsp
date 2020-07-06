@@ -68,24 +68,26 @@
         $().w2layout({
           name: 'layoutLeft',
           panels: [
-            {type:'top',  size:'20%', resizable:true, style:darkgreenstyle},
-            {type:'main', size:'80%', resizable:true, style:greenstyle}
+            {type:'top',    size:'05%', resizable:true, style:darkgreenstyle},
+            {type:'main',   size:'20%', resizable:true, style:greenstyle},
+            {type:'bottom', size:'75%', resizable:true, style:greenstyle}
             ]
           });
         $().w2layout({
           name: 'layoutMain',
           panels: [
-            {type:'top',    size:'05%', resizable:true, style:darkgreenstyle},
-            {type:'main',   size:'75%', resizable:true, style:bluestyle},
+            {type:'top',    size:'45%', resizable:true, style:bluestyle},
+            {type:'main',   size:'45%', resizable:true, style:bluestyle},
             {type:'bottom', size:'10%', resizable:true, style:darkbluestyle}
             ]
           });        
         w2ui['layout'].html('left', w2ui['layoutLeft']);
         w2ui['layout'].html('main', w2ui['layoutMain']);
-        w2ui['layoutLeft'].load('top',    'Top.jsp');
-        w2ui['layoutLeft'].load('main',   'GraphView.jsp');
-        w2ui['layoutMain'].load('top',    'TopMini.jsp');
-        w2ui['layoutMain'].load('main',   'Result.jsp');
+        w2ui['layoutLeft'].load('top',    'TopMini.jsp');
+        w2ui['layoutLeft'].load('main',   'Top.jsp');
+        w2ui['layoutLeft'].load('bottom', 'GraphView.jsp');
+        w2ui['layoutMain'].load('top',    'Result.jsp');
+        w2ui['layoutMain'].load('main',   'Plot.jsp');
         w2ui['layoutMain'].load('bottom', 'Feedback.jsp');    
         });
       var visheight;
