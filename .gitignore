@@ -7,7 +7,6 @@
 /run/*
 /doc/*
 /dosrc/*
-/dist/*
 **/*~
 **/*.log
 **/.zshhistory
