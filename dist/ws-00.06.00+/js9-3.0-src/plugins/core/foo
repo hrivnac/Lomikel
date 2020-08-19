@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cp -p blend.js{-sav,}
+cp -p blink.js{-sav,}
+cp -p cmaps.js{-sav,}
+cp -p colorbar.js{-sav,}
+cp -p console.js{-sav,}
+cp -p cube.js{-sav,}
+cp -p divs.js{-sav,}
+cp -p imarith.js{-sav,}
+cp -p info.js{-sav,}
+cp -p keyboard.js{-sav,}
+cp -p layers.js{-sav,}
+cp -p magnifier.js{-sav,}
+cp -p mef.js{-sav,}
+cp -p menubar.js{-sav,}
+cp -p panner.js{-sav,}
+cp -p prefs.js{-sav,}
+cp -p scalelimits.js{-sav,}
+cp -p separate.js{-sav,}
+cp -p sync.js{-sav,}
+cp -p toolbar.js{-sav,}

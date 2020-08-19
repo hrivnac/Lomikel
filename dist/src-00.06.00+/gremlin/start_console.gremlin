@@ -1,0 +1,6 @@
+//:record start MyGremlin.log
+zookeeper   = args[0]
+hbase_table = args[1]
+home        = args[2]
+graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", zookeeper).set("storage.hbase.table", hbase_table).open()
+g = graph.traversal()
