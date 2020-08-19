@@ -43,14 +43,14 @@
       <include name="*.jar"/>
       <exclude name="*.exe.jar"/>
       </fileset>
-    <fileset dir="${hadoop_dir}/share/hadoop/client">
-      <include name="*.jar"/>
+    <fileset dir="${hadoop_dir}">
+      <include name="share/hadoop/client/*.jar"/>
       </fileset>
-    <fileset dir="${hadoop_dir}/share/hadoop/common">
-      <include name="*.jar"/>
+    <fileset dir="${hadoop_dir}">
+      <include name="share/hadoop/common/*.jar"/>
       </fileset>
-     <fileset dir="${hbase_dir}/lib">
-      <include name="*.jar"/>
+     <fileset dir="${hbase_dir}">
+      <include name="lib/*.jar"/>
       </fileset>
     <path refid="classpath.build"/>
     </path>
