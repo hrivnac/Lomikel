@@ -22,8 +22,8 @@
   
 <script>
   async function reset() {
-    loadPane("commands", "Top.jsp");
-    loadPane("graph",    "GraphView.jsp");
-    loadPane("result",   "Result.jsp");
+    loadPane("graph",  "GraphView.jsp");
+    loadPane("result", "Result.jsp");
+    loadPane("plot",   "Plot.jsp");
     }
   </script>

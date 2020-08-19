@@ -30,6 +30,9 @@
     <pathelement path="${javaxservlet_jar}"/>
     <pathelement path="${bsh_jar}"/>
     <pathelement path="${cli_jar}"/>
+    <fileset dir="${janusgraph_dir}/lib">
+      <include name="*.jar"/>
+      </fileset>
     <fileset dir="../extlib">
       <include name="*.jar"/>
       </fileset>
@@ -51,6 +54,21 @@
       </fileset>
     <path refid="classpath.build"/>
     </path>
+    
+  <path id="classpath.janusgraph">
+    <fileset dir="${janusgraph_dir}/lib">
+      <include name="*.jar"/>
+      <exclude name="logback-classic-1.1.3.jar"/>
+      </fileset>
+    <fileset dir="../lib">
+      <include name="*.jar"/>
+      <exclude name="*.exe.jar"/>
+      </fileset>
+    <fileset dir="../extlib">
+      <include name="*.jar"/>
+      </fileset>
+    <pathelement path="${bsh_jar}"/>
+    </path>
 
   <property name="classpath.build.content" refid="classpath.build"/>
   <property name="classpath.run.content"   refid="classpath.run"/>
@@ -64,12 +82,14 @@
     <mkdir dir="../build/com/Lomikel/Utils"/>
     <copy file="../src/java/com/Lomikel/Utils/Info.pre"
           tofile="../build/com/Lomikel/Utils/Info.java"/>
-    <replace file="../build/com/Lomikel/Utils/Info.java" token="@version@"   value="${version}"/>
-    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TSTAMP@"    value="${TSTAMP}"/>
-    <replace file="../build/com/Lomikel/Utils/Info.java" token="@user.name@" value="${user.name}"/>
-    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TMP@"       value="${tmp_dir}"/>
-    <replace file="../build/com/Lomikel/Utils/Info.java" token="@MANAGER@"   value="${manager}"/>
-    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TARGET@"    value="${target}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@version@"     value="${version}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TSTAMP@"      value="${TSTAMP}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@user.name@"   value="${user.name}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@zookeeper@"   value="${zookeeper}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@hbase_table@" value="${hbase_table}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TMP@"         value="${tmp_dir}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@MANAGER@"     value="${manager}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@TARGET@"      value="${target}"/>
     </target>
 
   <!-- Init =================================================================-->
@@ -262,6 +282,19 @@
         </classpath>
       </java>
     </target>
+ 
+  <!-- Extract Schema =======================================================-->
+
+  <target name="extract-schema"
+          description="Extract Gtemlin Schema">
+    <echo>Extract Gtemlin Schema</echo>
+    <java classname="com.Lomikel.Januser.JanusClient"
+          fork="true">
+      <classpath>
+        <path refid="classpath.janusgraph"/>
+        </classpath>
+      </java>
+    </target>
     
   <!-- Clean ================================================================-->
 
@@ -341,6 +374,7 @@
       <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
       <group title="Apps"       packages="com.Lomikel.Apps"/>
       <group title="HBaser"     packages="com.Lomikel.HBaser"/>
+      <group title="Januser"    packages="com.Lomikel.Januser"/>
       <group title="Graph"      packages="com.Lomikel.Graph"/>
       <group title="Utils"      packages="com.Lomikel.Utils*"/>
       <group title="GUI"        packages="com.Lomikel.GUI*"/>

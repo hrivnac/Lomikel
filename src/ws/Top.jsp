@@ -14,14 +14,12 @@
       <td><img src="@LOGO@" width="100"/></td>
       <td><h2><u><a href="@HOME@" target="RESULT">@NAME@</a></u></h2>
           @VERSION@ <small>[@BUILD@]</small>
-          <br/>
-          Connect to the <b>graph server</b>
-          <br/>
-          and request the initial <b>graph</b>
           </td>
       <td colspan="2" rowspan="2">
         <div id="commands" title="context sensitive commands">
-          
+          Connect to the <b>graph server</b>
+          <br/>
+          and request the initial <b>graph</b>          
           </div>
         </td>
       </tr>
