@@ -39,12 +39,12 @@ public class JanusClient {
   public static void main(String[] args) {
     Init.init();
     JanusClient jc = new JanusClient();
-    jc.schema();
+    jc.metaSchema();
     System.exit(0);
     }
     
   /** Extract implicite schema. */
-  public void schema() {
+  public void metaSchema() {
     open();
     log.info("Cleaning MetaGraph");
     g().V().hasLabel("MetaGraph").drop().iterate();
@@ -139,36 +139,23 @@ public class JanusClient {
   protected GraphTraversalSource g() {
     return _g;
     }
-    
-  /** Add a {@link Vertex}, unless it exists
-    * @param label         The {@link Vertex} label.
-    * @return              The {@link List} of created {@link Vertex}es. */
-  // TBD: allow replacing
-  // TBD: isn't it just one ?
-  // TBD: refactor with following
-  // TBD: allow for more properties
-  protected List<Vertex> getOrCreate(String label) {
-    List<Vertex> vertexes = g().V().has(label)
-                                   .fold()
-                                   .coalesce(unfold(), 
-                                             g().addV(label)).toList();
-    return vertexes;
-    }
-    
+        
   /** Add a {@link Vertex}, unless it exists
     * @param label         The {@link Vertex} label.
     * @param propertyName  The name of {@link Vertex} property.
     * @param propertyValue The value of {@link Vertex} property.
     * @return              The {@link List} of created {@link Vertex}es. */
-  protected List<Vertex> getOrCreate(String label,
+  // TBD: allow replacing
+  // TBD: isn't it just one ?
+  protected List<Vertex> addOrCreate(String label,
                                      String propertyName,
                                      Object propertyValue) {
-    List<Vertex> vertexes = g().V().has(label, propertyName, propertyValue)
+     List<Vertex> vertexes = g().V().has(label, propertyName, propertyValue)
                                    .fold()
                                    .coalesce(unfold(), 
                                              g().addV(label).property(propertyName, propertyValue)).toList();
-    return vertexes;
-    }
+     return vertexes;
+     }
     
   /** Add an {@link Edge} between two {@link Vertex}s,
     * unless it exists.
