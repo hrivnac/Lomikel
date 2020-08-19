@@ -323,6 +323,24 @@
     <copy todir="../dist">
 			<fileset dir="../lib" includes="*.jar"/>
       </copy>
+    <mkdir dir="../dist/jars-${version}"/>
+    <copy todir="../dist/jars-${version}">
+			<fileset file="${log4j_jar}"/>
+			<fileset file="${slf4j_jar}"/>
+			<fileset file="${slf4jlog4j_jar}"/>
+			<fileset file="${bsh_jar}"/>
+			<fileset file="${scala_jar}"/>
+			<fileset file="${httpclient_jar}"/>
+			<fileset file="${httpcore_jar}"/>
+			<fileset file="${logging_jar}"/>
+			<fileset file="${cli_jar}"/>
+			<fileset file="${orgjson_jar}"/>
+			<fileset file="${hbasecommon_jar}"/>
+			<fileset file="${hbaseclient_jar}"/>
+			<fileset file="${hadoopcommon_jar}"/>
+			<fileset file="${javaxmail_jar}"/>
+			<fileset file="${javaxservlet_jar}"/>
+      </copy>
     <mkdir dir="../dist/ws-${version}"/>
     <copy todir="../dist/ws-${version}">
 			<fileset dir="../src/ws" includes="*/**"/>
