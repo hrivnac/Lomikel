@@ -75,7 +75,7 @@ public class JanusClient {
     Set<String> eSet;
     Property<Vertex> vP;
     Property<Edge>   eP;
-    for (Vertex v : g().V().toList()) {
+    for (Vertex v : g().V().limit(1000).toList()) {
       vSet = new HashSet<>();
       vMap.put(v.label(), vSet);
       for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
@@ -83,7 +83,7 @@ public class JanusClient {
         vSet.add(vP.key());
         }
       }
-    for (Edge e : g().E().toList()) {
+    for (Edge e : g().E().limit(1000).toList()) {
       eSet = new HashSet<>();
       eMap.put(e.label(), eSet);
       evMap.put(e.label(), e.outVertex().label() + " " + e.inVertex().label());
