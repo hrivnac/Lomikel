@@ -98,10 +98,15 @@ public class JanusClient {
     Vertex v;
     for (Map.Entry<String, Set<String>> entry : vMap.entrySet()) {
       log.info("Adding Vertex " + entry.getKey());
-      v = g().addV("MetaGraph").next();
-      v.property("MetaLabel", entry.getKey());
-      for (String p : entry.getValue()) {
-        v.property(p, "");
+      try {
+        v = g().addV("MetaGraph").next();
+        v.property("MetaLabel", entry.getKey());
+        for (String p : entry.getValue()) {
+          v.property(p, "");
+          }
+        }
+      catch (Exception e) {
+        log.error("... failed");
         }
       }
     String[] vvS;
