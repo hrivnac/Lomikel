@@ -38,9 +38,28 @@ public class JanusClient {
   /** Extract implicite schema. */ 
   public static void main(String[] args) {
     Init.init();
-    JanusClient jc = new JanusClient();
+    JanusClient jc;
+    if (args.length == 2) {
+      jc = new JanusClient(args[0], args[1]);
+      }
+    else {
+      jc = new JanusClient();
+      }
     jc.metaSchema();
     System.exit(0);
+    }
+    
+  /** Create, take connection parameters from configuration. */
+  public JanusClient() {
+    }
+    
+  /** Create with connection parameters.
+    * @param hostname The HBase hostname.
+    * @param table    The HBase table. */
+  public JanusClient(String hostname,
+                     String table) {
+    _hostname = hostname;
+    _table    = table;
     }
     
   /** Extract implicite schema. */
@@ -111,11 +130,11 @@ public class JanusClient {
   /** Open graph.
     * @param batch Whether open for batch loading. */
   protected GraphTraversalSource open(boolean batch) {
-    log.info("Opening connection");
+    log.info("Opening connection to " + _table + "@" + _hostname);
     _graph = JanusGraphFactory.build()
                               .set("storage.backend",       "hbase")
-                              .set("storage.hostname",      Info.zookeeper())
-                              .set("storage.hbase.table",   Info.hbase_table())
+                              .set("storage.hostname",      _hostname)
+                              .set("storage.hbase.table",   _table)
                               //.set("storage.batch-loading", true) // only with schema
                               .open();
     _g = _graph.traversal();
@@ -219,6 +238,10 @@ public class JanusClient {
 	    log.info("Committed");
       }
     }    
+    
+  private String _hostname = Info.zookeeper();
+  
+  private String _table    = Info.hbase_table();
     
   private boolean _found;  
     

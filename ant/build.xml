@@ -286,10 +286,12 @@
   <!-- Extract Schema =======================================================-->
 
   <target name="extract-schema"
-          description="Extract Gtemlin Schema">
-    <echo>Extract Gtemlin Schema</echo>
+          description="Extract Gremlin Schema">
+    <echo>Extract Gremlin Schema</echo>
     <java classname="com.Lomikel.Januser.JanusClient"
           fork="true">
+      <arg value="${zookeeper}"/>
+      <arg value="${hbase_table}"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
         </classpath>
