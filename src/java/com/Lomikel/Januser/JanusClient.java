@@ -66,8 +66,9 @@ public class JanusClient {
   public void metaSchema() {
     open();
     log.info("Cleaning MetaGraph");
-    g().V().hasLabel("MetaGraph").drop().iterate();
-    g().E().hasLabel("MetaGraph").drop().iterate();
+    //g().V().hasLabel("MetaGraph").drop().iterate();
+    //g().E().hasLabel("MetaGraph").drop().iterate();
+    commit();
     Map<String, Set<String>> vMap  = new HashMap<>();
     Map<String, Set<String>> eMap  = new HashMap<>();
     Map<String, String>      evMap = new HashMap<>();
@@ -75,6 +76,7 @@ public class JanusClient {
     Set<String> eSet;
     Property<Vertex> vP;
     Property<Edge>   eP;
+    log.info("Scanning Vertexes");
     for (Vertex v : g().V().limit(1000).toList()) {
       vSet = new HashSet<>();
       vMap.put(v.label(), vSet);
@@ -83,6 +85,7 @@ public class JanusClient {
         vSet.add(vP.key());
         }
       }
+    log.info("Scanning Edges");
     for (Edge e : g().E().limit(1000).toList()) {
       eSet = new HashSet<>();
       eMap.put(e.label(), eSet);
@@ -92,10 +95,6 @@ public class JanusClient {
         eSet.add(eP.key());
         }
       }
-    log.info(vMap);
-    log.info(eMap);
-    log.info(evMap);
-    commit();
     Vertex v;
     for (Map.Entry<String, Set<String>> entry : vMap.entrySet()) {
       log.info("Adding Vertex " + entry.getKey());
