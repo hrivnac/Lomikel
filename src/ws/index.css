@@ -43,3 +43,17 @@ html, body {
   top:0;
   right:0;
   }
+  
+.w2ui-tabs .w2ui-tab {
+  color: #67C54B;
+  background-color: #FFFFFF;
+  border: 1px solid #67C54B;
+  border-bottom: 1px solid transparent;
+  }
+  
+.w2ui-tabs .w2ui-tab.active {
+  color: #FFFFFF;
+  background-color: #67C54B;
+  border: 1px solid #FFFFFF;
+  border-bottom: 1px solid transparent;
+  }  

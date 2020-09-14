@@ -27,11 +27,11 @@ var stylesheet = {
         label:{gremlin:"properties('MetaLabel').value()"},        
         title:{gremlin:"properties('title').value()"},      
         subtitle:{gremlin:"properties('subtitle').value()"},
-        group:" ",         // specifies graphics properties
-        shape:"dot",       // in text:  ellipse, circle, database, box, text
-                           // out text: image, circularImage, diamond, dot, star, triangle, triangleDown, hexagon, square, icon
-        image:" ",         // should be present only if shape:"image"
-        borderRadius:"0",  // should be present only if shape:"box"
+        group:" ",         
+        shape:"ellipse",      
+                           
+        image:" ",         
+        borderRadius:"0",  
         borderWidth:"1",
         borderDashes:[1,0],
         value:"0"

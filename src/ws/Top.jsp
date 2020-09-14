@@ -5,17 +5,19 @@
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
+<link href="Top.css" rel="stylesheet" type="text/css"/>
+
 <div>
   <button onClick="w2popup.load({url:'Help-Top.html', showMax: true})" style="position:absolute; top:0; right:0">
     <img src="images/Help.png" width="10"/>
     </button>
   <table width="100%">
     <tr width="50%">
-      <td><img src="@LOGO@" width="100"/></td>
-      <td><h2><u><a href="@HOME@" target="RESULT">@NAME@</a></u></h2>
+      <td id="bar"><img src="@LOGO@" width="100"/></td>
+      <td id="bar"><h2><u><a href="@HOME@" target="RESULT">@NAME@</a></u></h2>
           @VERSION@ <small>[@BUILD@]</small>
           </td>
-      <td colspan="2" rowspan="2">
+      <td id="bar" colspan="2" rowspan="2">
         <div id="commands" title="context sensitive commands">
           Connect to the <b>graph server</b>
           <br/>
@@ -24,7 +26,7 @@
         </td>
       </tr>
     <tr width="50%">
-      <td colspan="2">
+      <td id="bar" colspan="2">
         <select name="gremlin_server" id="gremlin_server" title="database server url">
           <%@include file="Servers.jsp"%>
           </select>

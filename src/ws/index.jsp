@@ -22,6 +22,7 @@
     <link href="jquery-ui-1.12.1/jquery-ui.min.css"                     rel="stylesheet" type="text/css"/>
     <link href="index.css"                                              rel="stylesheet" type="text/css"/>
     <link href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css"                      rel="stylesheet" type="text/css" />
+    <link href="index.css"                                              rel="stylesheet" type="text/css"/>
     </head>
   
   <body>
@@ -68,27 +69,49 @@
         $().w2layout({
           name: 'layoutLeft',
           panels: [
-            {type:'top',    size:'05%', resizable:true, style:darkgreenstyle},
-            {type:'main',   size:'20%', resizable:true, style:greenstyle},
-            {type:'bottom', size:'75%', resizable:true, style:greenstyle}
+            {type:'top',    size:'05%', resizable:true, overflow:false, style:darkgreenstyle},
+            {type:'main',   size:'20%', resizable:true, overflow:false, style:greenstyle},
+            {type:'bottom', size:'75%', resizable:true, overflow:false, style:greenstyle,            
+              tabs: {
+                name:'tabs',
+                active:'graphTab',
+                tabs: [
+                  {id:'graphTab', caption:'Graph'},
+                  {id:'plotTab',  caption:'Plot' }
+                  ],
+                onClick:function (event) {
+                  if (event.target == 'graphTab') {
+                    document.getElementById("graph").style.display = 'block';
+                    document.getElementById("plot" ).style.display = 'none';
+                    //w2ui['layoutLeft'].load('bottom', 'GraphView.jsp');
+                    }
+                  else if (event.target == 'plotTab') {
+                    document.getElementById("graph").style.display = 'none';
+                    document.getElementById("plot" ).style.display = 'block';
+                    //w2ui['layoutLeft'].load('bottom', 'Plot.jsp');
+                    }
+                  }
+                } 
+              }
             ]
           });
         $().w2layout({
           name: 'layoutMain',
           panels: [
-            {type:'top',    size:'45%', resizable:true, style:bluestyle},
-            {type:'main',   size:'45%', resizable:true, style:bluestyle},
-            {type:'bottom', size:'10%', resizable:true, style:darkbluestyle}
+            {type:'main',   size:'45%', resizable:true, overflow:'auto', style:bluestyle},
+            {type:'bottom', size:'10%', resizable:true, overflow:'auto', style:darkbluestyle}
             ]
           });        
         w2ui['layout'].html('left', w2ui['layoutLeft']);
         w2ui['layout'].html('main', w2ui['layoutMain']);
         w2ui['layoutLeft'].load('top',    'TopMini.jsp');
         w2ui['layoutLeft'].load('main',   'Top.jsp');
-        w2ui['layoutLeft'].load('bottom', 'GraphView.jsp');
-        w2ui['layoutMain'].load('top',    'Result.jsp');
-        w2ui['layoutMain'].load('main',   'Plot.jsp');
-        w2ui['layoutMain'].load('bottom', 'Feedback.jsp');    
+        //w2ui['layoutLeft'].load('bottom', 'Plot.jsp');
+        w2ui['layoutLeft'].load('bottom', 'Tabs.jsp');
+        w2ui['layoutMain'].load('main',   'Result.jsp');
+        w2ui['layoutMain'].load('bottom', 'Feedback.jsp');  
+        //w2ui['layoutLeft']['panels'][2]['tabs'].set('graphTab', {caption:'New Caption'});
+        //w2ui['layoutLeft']['panels'][2]['tabs'].add([{ id:'tab3', text:'Tab 3' }]);        
         });
       var visheight;
       </script>

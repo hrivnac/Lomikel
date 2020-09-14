@@ -36,7 +36,7 @@
   <script>
     div = document.createElement("div");
     div.style.width = "100%";
-    div.style.height = (window.innerHeight * 0.7) + "px";
+    div.style.height = (window.innerHeight * 0.65) + "px";
     div.id = "vis";
     visheight = div.style.height;
     document.getElementById("graph").appendChild(div);

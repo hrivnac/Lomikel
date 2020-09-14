@@ -33,7 +33,7 @@
         String message = "";
         boolean more = true;
         if (exception == null) {
-          exception = new CommonException("No known Exception");
+          exception = new LomikelException("No known Exception");
           }
         do {
           message += "<p><u><pre>" + exception + "</pre></u><br>";
