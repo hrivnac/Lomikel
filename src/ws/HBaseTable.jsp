@@ -25,11 +25,15 @@
 
 <%! static Logger log = Logger.getLogger(HBaseTable_jsp.class); %>
 
+<jsp:useBean id="style"   class="com.Lomikel.WebService.Style"       scope="session"/>
 <jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
 <div id='hbasetable'>
 
   <div id="hbaseTableForm" style="width: 100%"></div>
+  <%
+    String s = style.style();
+    %>
   
   <div id="hbaseResult" style="width: 100%">
     <%
@@ -166,6 +170,8 @@
 
   <script type="text/javascript" src="CustomQuery.js"></script> 
   
+  <script type="text/javascript" src="styles/<%=s%>.js"></script>
+  
   <script>  
     $(function() {
       if (w2ui.hbaseTableForm) {
@@ -213,7 +219,9 @@
           }
         };
       modifyMenu(hform);
-      $('#hbaseTableForm').w2form(hform);
+      if (typeof hideHBaseForm === 'undefined' || !hideHBaseForm) {
+        $('#hbaseTableForm').w2form(hform);
+        }
       });
     </script>
     

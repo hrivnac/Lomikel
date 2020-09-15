@@ -6,6 +6,7 @@
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
 <jsp:useBean id="profile" class="com.Lomikel.WebService.Profile" scope="session"/>
+<jsp:useBean id="style"   class="com.Lomikel.WebService.Style"   scope="session"/>
 
 <!DOCTYPE html>
 <html>
@@ -30,6 +31,8 @@
     <%
       String p = request.getParameter("profile");
       profile.setProfile(p);
+      String s = request.getParameter("style");
+      style.setStyle(s);
       %>
   
     <script>
@@ -56,9 +59,9 @@
     <script type="text/javascript">
       $(function () {
         var greenstyle     = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ddffdd';
-        var darkgreenstyle = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ccffcc';
+        var darkgreenstyle = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #aaffaa';
         var bluestyle      = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ddddff';
-        var darkbluestyle  = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ccccff';
+        var darkbluestyle  = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #aaaaff';
         $('#layout').w2layout({
           name:'layout',
           panels:[
@@ -106,7 +109,6 @@
         w2ui['layout'].html('main', w2ui['layoutMain']);
         w2ui['layoutLeft'].load('top',    'TopMini.jsp');
         w2ui['layoutLeft'].load('main',   'Top.jsp');
-        //w2ui['layoutLeft'].load('bottom', 'Plot.jsp');
         w2ui['layoutLeft'].load('bottom', 'Tabs.jsp');
         w2ui['layoutMain'].load('main',   'Result.jsp');
         w2ui['layoutMain'].load('bottom', 'Feedback.jsp');  

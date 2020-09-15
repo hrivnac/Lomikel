@@ -5,6 +5,7 @@
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
+<!-- TBD: run from index.jsp -->
 <jsp:useBean id="profile" class="com.Lomikel.WebService.Profile" scope="session"/>
 
 <%
