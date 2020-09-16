@@ -1,3 +1,0 @@
-<%
-  HBaseColumnsProcessor processor = new HBaseColumnsProcessor();
-  %>
