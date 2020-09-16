@@ -275,7 +275,7 @@
   <target name="check-hbase"
           description="Check HBase">
     <echo>Check JanusGraph</echo>
-    <java classname="com.Lomikel.HBaser.HBaseDirectClient"
+    <java classname="com.Lomikel.HBaser.HBaseClient"
           fork="true">
       <classpath>
         <path refid="classpath.run"/>

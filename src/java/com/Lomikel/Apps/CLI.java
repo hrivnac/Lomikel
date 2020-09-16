@@ -248,7 +248,7 @@ public class CLI {
         }
       }
     catch (ParseException e) {
-      new HelpFormatter().printHelp("java -jar AstroLabNet.exe.jar", options);
+      new HelpFormatter().printHelp(helpMsg, options);
       System.exit(-1);
       }
     }

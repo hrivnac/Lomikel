@@ -12,7 +12,6 @@
 <h2>@VERSION@ [@BUILD@]</h2>
 </tr></table>
 <hr/>
-<hr/>
 
 <h4>Documentation</h4>
 
@@ -25,7 +24,6 @@
 <li>Externals:
     <a href="https://www.java.com">Java</a>,
     <a href="https://openjfx.io">JavaFX</a>,
-    <a href="https://github.com/beanshell/beanshell">BeanShell</a>,
     <a href="https://hbase.apache.org">HBase</a>,
     <a href="https://janusgraph.org">JanusGraph</a>,
     <a href="http://tinkerpop.apache.org">TinkerPop</a>,
@@ -54,6 +52,30 @@
     <a href="https://code.google.com/archive/p/apiviz">ApiViz</a>,
     <a href="https://github.com/clarkware/jdepend">JDepend</a></li>
 </ul>
+
+<h4><a name="WebService">Web Service</a></h4>
+<b><u>Customisation</u></b>
+<ul>
+<li><tt>Servers.jsp</tt> contains the list of <em>Gremlin</em> servets</li>
+<li><tt>Graphs.jsp</tt> contains the list of initial graphs, formed as <em>Gremlin</em> queries</li>
+<li><tt>bootgreamlin</tt> property contains the specific <em>Gremlin</em> query</li>
+</ul>
+<b><u>Options</u></b>
+<ul>
+<li><tt>profile</tt> for initial calls (<tt>null, test, autostart</tt>)</li>
+<li><tt>style</tt> for pane setup (<tt>null, test, simple</tt>)</li>
+</ul>
+
+<h4><a name="CLI">Command Line</a></h4>
+<pre>
+$ java -jar ../lib/Lomikel.exe.jar -h
+usage: java -jar Lomikel.exe.jar
+ -b,--batch           run in a batch
+ -g,--gui             run in a graphical window
+ -h,--help            show help
+ -q,--quiet           minimal direct feedback
+ -s,--source <file>   source bsh file (init.bsh is also read)
+</pre>
 
 <h4><a name="Bugs-ToDos">Bugs, Inconsistencies and ToDos</a></h4>
 <b><u>Bugs</u></b>
@@ -128,7 +150,7 @@
     <li>Faster HBase, using startrow, stoprow.</li>
     <li>Filtering HBase results by formula.</li>
     </ul></li>
-<li><u>*.*.*:</u>
+<li><u>00.07.00:</u>
     <ul>
     <li>It is possible to add graphs into view.</li>
     <li>Bootstrap profiles.</li>
