@@ -320,10 +320,11 @@
   <!-- Dist =================================================================-->
 
   <target name="dist"
-          depends="jar"
+          depends="war"
           description="Construct distribution">
     <copy todir="../dist">
 			<fileset dir="../lib" includes="*.jar"/>
+			<fileset dir="../lib" includes="*.war"/>
       </copy>
     <mkdir dir="../dist/jars-${version}"/>
     <copy todir="../dist/jars-${version}">
@@ -368,7 +369,8 @@
  		<copy todir="../doc">
 			<fileset dir="../src" includes="*.html"/>
 			<fileset dir="../src" includes="*.jpeg"/>
-      </copy>
+ 			<fileset dir="../src" includes="*.jpg"/>
+     </copy>
  		<copy todir="../doc/docsrc">
 			<fileset dir="../docsrc" includes="*"/>
       </copy>

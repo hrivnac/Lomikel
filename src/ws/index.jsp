@@ -34,11 +34,17 @@
       String s = request.getParameter("style");
       style.setStyle(s);
       %>
-  
+      
     <script>
+      var width = window.innerWidth
+               || document.documentElement.clientWidth
+               || document.body.clientWidth;
+      var height = window.innerHeight
+                || document.documentElement.clientHeight
+                || document.body.clientHeight;
       var div = document.createElement("div");
       div.style.width = "100%";
-      div.style.height = window.innerHeight + "px";
+      div.style.height = height + "px";
       div.id = "layout";
       document.body.appendChild(div);
       </script>
@@ -55,7 +61,8 @@
     <script type="text/javascript" src="knockout-3.2.0.js"></script>
     <script type="text/javascript" src="moment-2.25.2.js"></script>
     <script type="text/javascript" src="w2ui-1.5.rc1/w2ui-1.5.rc1.min.js"></script>
-    
+    <script type="text/javascript" src="Tabs.js"></script>
+      
     <script type="text/javascript">
       $(function () {
         var greenstyle     = 'border: 1px solid #dfdfdf; padding: 5px; background-color: #ddffdd';
@@ -80,19 +87,11 @@
                 active:'graphTab',
                 tabs: [
                   {id:'graphTab', caption:'Graph'},
+                  {id:'imageTab', caption:'Image'},
                   {id:'plotTab',  caption:'Plot' }
                   ],
                 onClick:function (event) {
-                  if (event.target == 'graphTab') {
-                    document.getElementById("graph").style.display = 'block';
-                    document.getElementById("plot" ).style.display = 'none';
-                    //w2ui['layoutLeft'].load('bottom', 'GraphView.jsp');
-                    }
-                  else if (event.target == 'plotTab') {
-                    document.getElementById("graph").style.display = 'none';
-                    document.getElementById("plot" ).style.display = 'block';
-                    //w2ui['layoutLeft'].load('bottom', 'Plot.jsp');
-                    }
+                  showTab(event.target.replace('Tab', ''));
                   }
                 } 
               }
@@ -101,7 +100,7 @@
         $().w2layout({
           name: 'layoutMain',
           panels: [
-            {type:'main',   size:'45%', resizable:true, overflow:'auto', style:bluestyle},
+            {type:'main',   size:'90%', resizable:true, overflow:'auto', style:bluestyle},
             {type:'bottom', size:'10%', resizable:true, overflow:'auto', style:darkbluestyle}
             ]
           });        
@@ -138,7 +137,6 @@
 
     <script type="text/javascript">
       function help(url) {
-        console.log(url);
         w2popup.load({url: url});
         }
       </script>

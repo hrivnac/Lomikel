@@ -34,7 +34,8 @@ function bootstrap(button, level = 0) {
     edges.length = 0;
     }
   callGremlinGraph(command,
-                   server, level);
+                   server,
+                   level);
   }
   
 // Send request to Gremlin server giving Graphson graph

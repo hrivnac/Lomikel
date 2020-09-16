@@ -7,4 +7,5 @@
 
 <%@include file="GraphView.jsp" %>
 <%@include file="Plot.jsp" %>
+<%@include file="Image.jsp" %>
 

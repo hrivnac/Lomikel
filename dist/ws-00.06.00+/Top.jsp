@@ -7,7 +7,7 @@
 
 <link href="Top.css" rel="stylesheet" type="text/css"/>
 
-<div>
+<div id="top" title="top">
   <button onClick="w2popup.load({url:'Help-Top.html', showMax: true})" style="position:absolute; top:0; right:0">
     <img src="images/Help.png" width="10"/>
     </button>

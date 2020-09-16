@@ -34,11 +34,14 @@
             <input type="button" onclick="applyFilter()" value="Apply" style="background-color:#bbffbb;">
     </div>  
   <script>
+    miniHeight  = document.getElementById("mini" ).offsetHeight;
+    topHeight   = document.getElementById("top"  ).offsetHeight;
+    manipHeight = document.getElementById("manip").offsetHeight;
+    visheight = (height - miniHeight - topHeight - manipHeight - 10);
     div = document.createElement("div");
     div.style.width = "100%";
-    div.style.height = (window.innerHeight * 0.65) + "px";
+    div.style.height = visheight + "px";
     div.id = "vis";
-    visheight = div.style.height;
     document.getElementById("graph").appendChild(div);
     </script>
   </div>

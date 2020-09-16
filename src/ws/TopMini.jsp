@@ -23,7 +23,8 @@
 <script>
   async function reset() {
     loadPane("graph",  "GraphView.jsp");
-    loadPane("result", "Result.jsp");
+    loadPane("image",  "Image.jsp");
     loadPane("plot",   "Plot.jsp");
+    loadPane("result", "Result.jsp");
     }
   </script>

@@ -253,7 +253,7 @@
       var html = []
       $.each(row, function (key, value) {
         if (value.startsWith('binary:')) {
-          html.push("<b><a href='#' onclick='loadPane(\"plot\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
+          html.push("<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
           }
         else {
           if (key == "key") {
@@ -267,7 +267,7 @@
       return html.join('')
       }
     function binaryFormatter(value, row) {
-      return "<b><a href='#' onclick='loadPane(\"plot\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
+      return "<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
       }
     function histSelector(key) {
       return "<input type='checkbox' name='y' class='y' id='y_" + key + "'></input>&nbsp;";
