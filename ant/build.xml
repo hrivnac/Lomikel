@@ -313,6 +313,9 @@
       <fileset dir="../doc" includes="**/*"/>
       </delete>
     <delete includeEmptyDirs="true">
+      <fileset dir="../dist" includes="**/*"/>
+      </delete>
+    <delete includeEmptyDirs="true">
       <fileset dir="." includes="**/*"/>
       </delete>
    </target>
@@ -320,11 +323,10 @@
   <!-- Dist =================================================================-->
 
   <target name="dist"
-          depends="war"
+          depends="jar"
           description="Construct distribution">
     <copy todir="../dist">
 			<fileset dir="../lib" includes="*.jar"/>
-			<fileset dir="../lib" includes="*.war"/>
       </copy>
     <mkdir dir="../dist/jars-${version}"/>
     <copy todir="../dist/jars-${version}">
