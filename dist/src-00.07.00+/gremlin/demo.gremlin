@@ -1,0 +1,48 @@
+top = g.addV('Top').property('lbl', 'top').
+                    property('title', 'titleTop').
+                    property('subtitle', 'subtitleTop').next();
+a = g.addV('A').property('lbl', 'labelA').
+                property('title', 'titleA').
+                property('subtitle', 'subtitleA').next();
+b = g.addV('B').property('lbl', 'labelB').
+                property('title', 'titleB').
+                property('subtitle', 'subtitleB').next();
+c = g.addV('C').property('lbl', 'labelC').
+                property('title', 'titleC').
+                property('subtitle', 'subtitleC').next();
+d = g.addV('D').property('lbl', 'labelD').
+                property('title', 'titleD').
+                property('subtitle', 'subtitleD').next();
+e = g.addV('E').property('lbl', 'labelE').
+                property('title', 'titleE').
+                property('subtitle', 'subtitleE').next();
+f = g.addV('F').property('lbl', 'labelF').
+                property('title', 'titleF').
+                property('subtitle', 'subtitleF').next();
+aa = g.addV('AA').property('lbl', 'labalAA').
+                  property('title', 'titleAA').
+                  property('subtitle', 'subtitleAA').next();
+ab = g.addV('AB').property('lbl', 'labelAB').
+                  property('title', 'titleAB').
+                  property('subtitle', 'subtitleAB').next();
+aba = g.addV('ABA').property('lbl', 'labelABA').
+                    property('title', 'titleABA').
+                    property('subtitle', 'subtitleABA').next();
+abb = g.addV('ABB').property('lbl', 'labelABB').
+                    property('title', 'titleABB').
+                    property('subtitle', 'subtitleABB').next();
+abc = g.addV('ABC').property('lbl', 'labelABC').
+                    property('title', 'titleABC').
+                    property('subtitle', 'subtitleABC').next();
+g.V(top).addE('has').to(a).iterate();
+g.V(top).addE('has').to(b).iterate();
+g.V(top).addE('has').to(c).iterate();
+g.V(top).addE('has').to(d).iterate();
+g.V(top).addE('has').to(e).iterate();
+g.V(top).addE('has').to(f).iterate();
+g.V(a).addE('contains').to(aa).iterate();
+g.V(a).addE('contains').to(ab).iterate();
+g.V(ab).addE('contains').to(aba).iterate();
+g.V(ab).addE('contains').to(abb).iterate();
+g.V(ab).addE('contains').to(abc).iterate();
+graph.traversal().tx().commit();
