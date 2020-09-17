@@ -426,7 +426,10 @@
   <target name="post"
           depends="init"
           description="Post documentation">
- 		<copy todir="${doc}">
+    <delete includeEmptyDirs="true">
+      <fileset dir="${doc}" includes="**/*"/>
+      </delete>
+ 		<copy todir="${doc}" force="true">
 			<fileset dir="../doc" includes="**/*"/>
       </copy>
     </target>

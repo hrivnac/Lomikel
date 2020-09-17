@@ -204,7 +204,7 @@ function show(graph) {
             url = encodeURI(url);
             actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
             if (!actionsArray[k].embedded) {
-              actions += "(<a href='" + url + "' target='_blank'>*</a>)";
+              actions += "<a href='" + url + "' target='_blank'>&#8599;</a>";
               }
             actions += " - ";
             }
@@ -237,7 +237,7 @@ function show(graph) {
             url = encodeURI(url);
             actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
             if (!actionsArray[k].embedded) {
-              actions += "(<a href='" + url + "' target='_blank'>*</a>)";
+              actions += "<a href='" + url + "' target='_blank'>&#8599;</a>";
               }
             actions += " - ";
             }
@@ -281,20 +281,20 @@ function show(graph) {
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("commands").innerHTML = "<b><u><h1>" + selectedNode.label + "</h1></u></u>" + helpButton
-                                                                 + "&nbsp;<input type='button' onclick='removeNode(" + selectedNode.id + ")'   value='Remove'>"
-                                                                 + "&nbsp;<input type='button' onclick='describeNode(" + selectedNode.id + ")' value='Describe'><br/>"
-                                                                 + selectedNode.actions;
+        document.getElementById("commands").innerHTML = "<b><u>" + selectedNode.title + "</u></b>" + helpButton
+                                                                 + "&nbsp;<input type='button' onclick='describeNode(" + selectedNode.id + ")'  title='describe' class='button-describe'>"
+                                                                 + "&nbsp;<input type='button' onclick='removeNode("   + selectedNode.id + ")'  title='remove'   class='button-remove'><hr/>"
+                                                                 + "Actions: " + selectedNode.actions;
         }
       }
     else if (params.edges.length == 1) {
       selectedEdge = findObjectByKey(edges, 'id', params.edges[0]);
       if (selectedEdge) { // TBD: should test on cluster
         //document.getElementById("output").innerHTML = "<iframe width='100%' name='output' frameborder='0'/>";
-        document.getElementById("commands").innerHTML = "<b><u><h1>" + selectedEdge.label + "</h1></u></u>" + helpButton
-                                                                 + "&nbsp;<input type='button' onclick='removeEdge(\"" + selectedEdge.id + "\")'   value='Remove'>"
-                                                                 + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' value='Describe'><br/>"
-                                                                 + selectedEdge.actions;
+        document.getElementById("commands").innerHTML = "<b><u>" + selectedEdge.title + "</u></b>" + helpButton
+                                                                 + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' title='describe' class='button-describe'>"
+                                                                 + "&nbsp;<input type='button' onclick='removeEdge(\""   + selectedEdge.id + "\")' title='remove'   class='button-remove'><hr/>"
+                                                                 +  "Actions: " + selectedEdge.actions;
         }
       }
     });
