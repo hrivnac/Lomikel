@@ -49,7 +49,7 @@
       </script>
   
     <script type="text/javascript" src="vis-network-8.3.2/standalone/umd/vis-network.min.js"></script> 
-    <script type="text/javascript" src="vis-timeline-7.3.8/standalone/umd/vis-timeline-graph2d.min.js"></script> 
+    <script type="text/javascript" src="vis-timeline-7.3.9/standalone/umd/vis-timeline-graph2d.min.js"></script> 
     <script type="text/javascript" src="OptionsDefault.js"></script>
     <script type="text/javascript" src="Options.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>

@@ -80,6 +80,8 @@ public class DateTimeManagement {
 
   private static String FORMAT = "HH:mm:ss.SSS dd/MMM/yyyy";
 
-  private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy MM dd HH:mm:ss.nnnnnnnnn");
+  //private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy MM dd HH:mm:ss.nnnnnnnnn");
+  //private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy MM dd HH:mm:ss.mm");
+  private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy MM dd HH:mm:ss");
   
   }

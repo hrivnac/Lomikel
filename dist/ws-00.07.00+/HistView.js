@@ -3,9 +3,8 @@ var timeline;
 
 // Construct VIS hist
 function showHist(itemsS, yS) {
-
-  var items = JSON.parse(itemsS);
   
+  var items = JSON.parse(itemsS);  
   var groups = new vis.DataSet();
   
   for (i in yS.split(" ")) {

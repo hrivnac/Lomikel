@@ -11,8 +11,8 @@
 
 <link href="GraphView.css" rel="stylesheet" type="text/css"/>
 <!-- TBD: it should be loaded from index.jsp -->
-<link href="vis-timeline-7.6.8/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="vis-timeline-7.6.8/standalone/umd/vis-timeline-graph2d.min.js"></script> 
+<link href="vis-timeline-7.3.9/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="vis-timeline-7.3.9/standalone/umd/vis-timeline-graph2d.min.js"></script> 
 <script type="text/javascript" src="OptionsDefault.js"></script>
 <script type="text/javascript" src="Options.js"></script>
 
