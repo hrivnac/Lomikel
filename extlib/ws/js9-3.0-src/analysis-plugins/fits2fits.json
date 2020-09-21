@@ -1,8 +1,0 @@
-[
-  {"name"   : "fits2fits",
-   "title"  : "Convert FITS to representation FITS", 
-   "files"  : "*",
-   "action" : "js9Xeq imsection",
-   "hidden" : true,
-   "rtype"  : "fits"}
-]
