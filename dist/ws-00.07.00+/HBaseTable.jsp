@@ -28,6 +28,8 @@
 <jsp:useBean id="style"   class="com.Lomikel.WebService.Style"       scope="session"/>
 <jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
+<%@include file="Params.jsp" %>
+
 <div id='hbasetable'>
 
   <div id="hbaseTableForm" style="width: 100%"></div>
@@ -119,11 +121,12 @@
       h.close();
       String toHide = "";
       if (showTable && !group.equals("")) {
-        toHide = h2table.toHide("i:objectId");
+        toHide = h2table.toHide(group);
       %>
     <div id="toolbar">
-      <button id="buttonHide" class="btn btn-secondary">latest objects</button>
-      <button id="buttonShow" class="btn btn-secondary">all objects</button>
+      <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaffaa; color:black">Show latest <%=hbaseRowName%>s</button>
+      <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaffaa; color:black">Show all <%=hbaseRowName%>s</button>
+      <button onclick="showHist()" style="background-color:#ddffdd">Plot selected variables</button>    
       </div>
     <%
       }
@@ -142,13 +145,13 @@
            data-show-button-icons='true'
            data-show-pagination-switch='true'
            data-page-number='1'
-           data-page-size='15'
+           xdata-page-size='15'
            data-pagination-pre-text='Previous'
            data-pagination-next-text='Next'
            data-show-columns='true'
            data-show-columns-toggle-all='true'
            data-show-columns-search='true'
-           data-height='600'
+           xdata-height='600'
            data-resizable='true'
            data-id-field='key'
            data-unique-id='key' 
@@ -160,7 +163,6 @@
           </tr>
         </thead>
       </table>
-      <input type="button" onclick="showHist()" value="Plot" style="background-color:#ddffdd">      
       </div>
     <%
       }
@@ -253,7 +255,7 @@
       var html = []
       $.each(row, function (key, value) {
         if (value.startsWith('binary:')) {
-          html.push("<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b></br/>");
+          html.push("<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a><a target='popup' href='FITSView.jsp?id=" + value + "'>&#8599;</a></b></br/>");
           }
         else {
           if (key == "key") {
@@ -267,7 +269,7 @@
       return html.join('')
       }
     function binaryFormatter(value, row) {
-      return "<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>*binary*</a>(<a target='popup' href='FITSView.jsp?id=" + value + "'>*</a>)</b>"
+      return "<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>*binary*</a><a target='popup' href='FITSView.jsp?id=" + value + "'>&#8599;</a></b>"
       }
     function histSelector(key) {
       return "<input type='checkbox' name='y' class='y' id='y_" + key + "'></input>&nbsp;";

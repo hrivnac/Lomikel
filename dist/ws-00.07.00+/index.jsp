@@ -15,13 +15,12 @@
     <title>@NAME@</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="vis-network-7.6.8/styles/vis-network.min.css"           rel="stylesheet" type="text/css" />
-    <link href="vis-timeline-7.6.8/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+    <link href="vis-network-8.3.2/styles/vis-network.min.css"           rel="stylesheet" type="text/css" />
+    <link href="vis-timeline-7.3.9/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
     <link href="bootstrap-4.4.1/css/bootstrap.min.css"                  rel="stylesheet" type="text/css">
     <link href="fontawesome-free-5.13.0-web/css/all.css"                rel="stylesheet" type="text/css">
     <link href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css"    rel="stylesheet" type="text/css">
     <link href="jquery-ui-1.12.1/jquery-ui.min.css"                     rel="stylesheet" type="text/css"/>
-    <link href="index.css"                                              rel="stylesheet" type="text/css"/>
     <link href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css"                      rel="stylesheet" type="text/css" />
     <link href="index.css"                                              rel="stylesheet" type="text/css"/>
     </head>
@@ -49,8 +48,8 @@
       document.body.appendChild(div);
       </script>
   
-    <script type="text/javascript" src="vis-network-7.6.8/standalone/umd/vis-network.min.js"></script> 
-    <script type="text/javascript" src="vis-timeline-7.6.8/standalone/umd/vis-timeline-graph2d.min.js"></script> 
+    <script type="text/javascript" src="vis-network-8.3.2/standalone/umd/vis-network.min.js"></script> 
+    <script type="text/javascript" src="vis-timeline-7.3.8/standalone/umd/vis-timeline-graph2d.min.js"></script> 
     <script type="text/javascript" src="OptionsDefault.js"></script>
     <script type="text/javascript" src="Options.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
@@ -86,9 +85,9 @@
                 name:'tabs',
                 active:'graphTab',
                 tabs: [
-                  {id:'graphTab', caption:'Graph'},
-                  {id:'imageTab', caption:'Image'},
-                  {id:'plotTab',  caption:'Plot' }
+                  {id:'graphTab', caption:'Graph', tooltip:'Graph View'},
+                  {id:'imageTab', caption:'Image', tooltip:'Image View'},
+                  {id:'plotTab',  caption:'Plot' , tooltip:'Plot View' }
                   ],
                 onClick:function (event) {
                   showTab(event.target.replace('Tab', ''));
@@ -117,7 +116,7 @@
       var visheight;
       </script>
       
-    <script>
+    <script type="text/javascript">
       async function loadPane(pane, url, iframe, height) {
         if (document.getElementById("feedback")) {
           document.getElementById("feedback").innerHTML += "Loading " + pane + " : " + url + "<br/>"
@@ -131,6 +130,10 @@
           }
         else {
           $("#" + pane).load(url);
+          }
+        if (pane == 'graph' || pane == 'image' || pane == 'plot') {
+          //showTab(pane);
+          w2ui['layoutLeft']['panels'][2]['tabs'].click(pane.concat("Tab"));
           }
         }        
       </script>

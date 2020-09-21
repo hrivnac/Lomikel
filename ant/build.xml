@@ -200,6 +200,9 @@
         </fileset>
       <fileset dir="../extlib/ws">
 	    	<include name="**/*"/>
+	    	<exclude name="js9-3.0-src/**/*"/>
+	    	<exclude name="vis-network-8.3.2-src/**/*"/>
+	    	<exclude name="vis-timeline-7.3.9-src/**/*"/>
         </fileset>
       <fileset dir="../build">
         <include name="index.jsp"/>
@@ -351,7 +354,7 @@
 			<fileset dir="../src/ws" includes="*/**"/>
       </copy>
     <copy todir="../dist/ws-${version}">
-			<fileset dir="../extlib/ws" includes="*/**"/>
+			<fileset dir="../extlib/ws" includes="*/**" excludes="*-src/**"/>
       </copy>
     <mkdir dir="../dist/src-${version}/gremlin"/>
     <copy todir="../dist/src-${version}/gremlin">

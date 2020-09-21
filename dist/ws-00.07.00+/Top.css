@@ -3,6 +3,6 @@ td#bar, th#bar {
   padding: 8px;
   }
   
-th#bar:nth-child(2), td#bar:nth-child(2) {
+th#bar:nth-child(1), td#bar:nth-child(1) {
   border-right:2px solid black;
   }

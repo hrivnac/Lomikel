@@ -9,3 +9,6 @@
 <%@include file="Plot.jsp" %>
 <%@include file="Image.jsp" %>
 
+<script type="text/javascript">
+  showTab('graph');
+  </script>
