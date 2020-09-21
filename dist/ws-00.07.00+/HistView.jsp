@@ -60,12 +60,17 @@
           else {
             items += ",";
             }
-          items += "{\"x\":\"" + xVal + "\",\"y\":" + yVal + ",\"group\":\"" + yi + "\"}";
+          items += "{\"x\":\"" + xVal + "\",\"y\":" + yVal + ",\"group\":\"" + yi.split(":")[1] + "\"}";
           }
         }
       }
     }
-  items = "["  + items + "]"; 
+  items = "["  + items + "]";
+  y = "";
+  for (String yi : ys) {
+    y += yi.split(":")[1] + " ";
+    }
+  y = y.trim();
   %>
   
 <script type="text/javascript" src="HistView.js"></script>

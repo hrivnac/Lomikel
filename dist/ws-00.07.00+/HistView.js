@@ -7,10 +7,11 @@ function showHist(itemsS, yS) {
   var items = JSON.parse(itemsS);  
   var groups = new vis.DataSet();
   
-  for (i in yS.split(" ")) {
+  var y = yS.split(" ");
+  for (var i = 0; i < y.length; i++) {
     groups.add({
-      id: yS[i],
-      content: yS[i],
+      id: y[i],
+      content: y[i],
       options: {
         drawPoints: {
           style: "circle", 
