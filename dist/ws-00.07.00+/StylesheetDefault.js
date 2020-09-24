@@ -2,6 +2,7 @@
 // can use gremlin/js:
 //   nodes: label, title, subtitle, group, shape, value, borderDashes, borderRadius, borderWidth, actions, actions.url
 //   edges: label, title, subtitle, group, arrows, value, actions, actions.url
+// nodes (but not edges) can use properties name
 var stylesheet = {
   nodes: {
     "default": {
