@@ -32,6 +32,7 @@
     <br/>
     filter: <input type="text" name="filter" value="" id="filter" title="show only nodes with a string in their label"/>
             <input type="button" onclick="applyFilter()" value="Apply" style="background-color:#bbffbb;">
+    select: <input type="text" name="select" value="limit(10)" id="select" title="restrict search results"/>
     </div>  
   <script>
     miniHeight  = document.getElementById("mini" ).offsetHeight;
