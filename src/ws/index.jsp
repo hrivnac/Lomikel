@@ -79,8 +79,8 @@
           name: 'layoutLeft',
           panels: [
             {type:'top',    size:'05%', resizable:true, overflow:false, style:darkgreenstyle},
-            {type:'main',   size:'20%', resizable:true, overflow:false, style:greenstyle},
-            {type:'bottom', size:'75%', resizable:true, overflow:false, style:greenstyle,            
+            {type:'main',   size:'15%', resizable:true, overflow:false, style:greenstyle},
+            {type:'bottom', size:'80%', resizable:true, overflow:false, style:greenstyle,            
               tabs: {
                 name:'tabs',
                 active:'graphTab',

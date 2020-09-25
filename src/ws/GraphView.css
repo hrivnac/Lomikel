@@ -1,6 +1,6 @@
 #vis {
+  position: relative;
   width: 100%;
-  height: 70%;
   border: 2px solid lightgray;
   background-color: white;
   }

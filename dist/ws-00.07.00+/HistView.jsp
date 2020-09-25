@@ -9,7 +9,7 @@
 
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
-<link href="GraphView.css" rel="stylesheet" type="text/css"/>
+<link href="HistView.css" rel="stylesheet" type="text/css"/>
 <!-- TBD: it should be loaded from index.jsp -->
 <link href="vis-timeline-7.3.9/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="vis-timeline-7.3.9/standalone/umd/vis-timeline-graph2d.min.js"></script> 
@@ -18,15 +18,7 @@
 
 <jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
-<div id="graph">
-  <script>
-    div = document.createElement("div");
-    div.style.width = "100%";
-    div.style.height = (window.innerHeight * 1.0) + "px";
-    div.id = "vis";
-    document.getElementById("graph").appendChild(div);
-    </script>
-  </div>
+<div id="vis"></div>
   
 <%
   String y = request.getParameter("y");

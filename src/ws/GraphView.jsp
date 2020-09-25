@@ -38,9 +38,8 @@
     miniHeight  = document.getElementById("mini" ).offsetHeight;
     topHeight   = document.getElementById("top"  ).offsetHeight;
     manipHeight = document.getElementById("manip").offsetHeight;
-    visheight = (height - miniHeight - topHeight - manipHeight - 10);
+    visheight = height - (miniHeight + topHeight + manipHeight) * 2.16; // BUG: magic number
     div = document.createElement("div");
-    div.style.width = "100%";
     div.style.height = visheight + "px";
     div.id = "vis";
     document.getElementById("graph").appendChild(div);

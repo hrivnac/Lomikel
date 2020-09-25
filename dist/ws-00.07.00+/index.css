@@ -1,35 +1,27 @@
-html, body {
-  height: 100%;
-  }  
-
-.h1, h1 {
-  display: block;
-  font-size: 2em;
-  margin-top: 0.67em;
-  margin-bottom: 0.67em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+* {
+  #font-family:Verdana, Arial, sans-serif;
+  font-size:10px;
+  #font-weight:normal;
   }
   
-.h2, h2 {
-  display: block;
-  font-size: 1.5em;
-  margin-top: 0.83em;
-  margin-bottom: 0.83em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+body {
+  font-size:10px;
+  #font-weight:normal;
+  }
+  
+h1 {
+  font-size:16px;
+  font-weight:bold;
   }
 
-.h3, h3 {
-  display: block;
-  font-size: 1.17em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+h2 {
+  font-size:14px;
+  font-weight:bold;
+  }
+
+h3 {
+  font-size:12px;
+  font-weight:bold;
   }
 
 .help {
