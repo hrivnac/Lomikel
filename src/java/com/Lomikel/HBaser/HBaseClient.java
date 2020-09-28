@@ -1,5 +1,6 @@
 package com.Lomikel.HBaser;
 
+import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.DateTimeManagement;
 import com.Lomikel.Utils.LomikelException;
 
@@ -77,6 +78,7 @@ public class HBaseClient {
    * @throws IOException If anything goes wrong. */
  public HBaseClient(String zookeepers,
                     String clientPort) throws IOException {
+   Init.init();
    log.info("Opening " + zookeepers + " on port " + clientPort);
    _conf = HBaseConfiguration.create();
    _conf.set("hbase.zookeeper.quorum", zookeepers);
@@ -193,6 +195,10 @@ public class HBaseClient {
                      String   search,
                      String   filter,
                      String   period) {
+    log.debug("Searching for key: " + key + 
+              ", search: " + search + 
+              ", filter: " + filter +
+              ", interval: " + period);
     Map<String, String> searchMap = new TreeMap<>();
     String[] ss;
     if (search != null && !search.trim().equals("")) {
@@ -219,7 +225,7 @@ public class HBaseClient {
         periodS = new String[]{"0", period.trim()};
         }
       }
-    long[] periodA = new long[]{Integer.parseInt(periodS[0]), Integer.parseInt(periodS[1])}; // TBD: allow inverse
+    Long[] periodA = new Long[]{Long.parseLong(periodS[0]), Long.parseLong(periodS[1])}; // TBD: allow inverse
     Arrays.sort(periodA);
     return results2String(scan(key, searchMap, filterA, periodA, false, false)); 
     }
@@ -246,22 +252,21 @@ public class HBaseClient {
   public Map<String, Map<String, String>> scan(String              key,
                                                Map<String, String> search,
                                                String[]            filter,
-                                               long[]              period,
+                                               Long[]              period,
                                                boolean             ifkey,
                                                boolean             iftime) {
-     if (period == null || period.length != 2) {
-       period = new long[]{0, 0};
-       }
-     long start = period[0];
-     long stop  = period[1];
+    log.debug("Searching for key: " + key + 
+              ", search: "   + search +
+              ", filter: "   + (filter == null ? null : String.join(",", filter)) +
+              ", interval: " + (period == null ? null : (period[0] + "-" + period[1])) +
+              ", id-time: "  + ifkey + "-" + iftime);
      long now   = System.currentTimeMillis(); 
-     if (start != 0) {
-       start  = now - (long)(start * 1000 * 60);
+     if (period == null || period.length != 2) {
+       period = new Long[]{0L, now};
        }
-     if (stop != 0) {
-       stop   = now - (long)(stop  * 1000 * 60);
-       }
-     return scan(key, search, filter, start, stop, ifkey, iftime);
+     period[0] = now - (long)(period[0] * 1000L * 60L);
+     period[1] = now - (long)(period[1]  * 1000L * 60L);
+     return scan(key, search, filter, period[1], period[0], ifkey, iftime);
      }
                     
   /** Get entry or entries from the {@link Catalog}.
@@ -293,6 +298,11 @@ public class HBaseClient {
                                                String              format,
                                                boolean             ifkey,
                                                boolean             iftime) {
+    log.debug("Searching for key: " + key + 
+              ", search: " + search + 
+              ", filter: " + (filter == null ? null : String.join(",", filter)) +
+              ", interval: " + startS + "-" + stopS +
+              ", id-time: " + ifkey + "-" + iftime);
      long start = 0;
      long stop  = 0;
      if (format == null || !format.trim().equals("")) {
@@ -349,16 +359,16 @@ public class HBaseClient {
                                                long                stop,
                                                boolean             ifkey,
                                                boolean             iftime) {
-    long time = System.currentTimeMillis();
-    if (_formula != null) {
-      log.debug("Resetting filter because formula exists");
-      filter = null;
-      }
     log.info("Searching for key: " + key + 
              ", search: " + search + 
              ", filter: " + (filter == null ? null : String.join(",", filter)) +
              ", interval: " + start + "-" + stop +
              ", id-time: " + ifkey + "-" + iftime);
+    long time = System.currentTimeMillis();
+    if (_formula != null) {
+      log.debug("Resetting filter because formula exists");
+      filter = null;
+      }
     Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;
     String[] fc;
@@ -401,6 +411,8 @@ public class HBaseClient {
         stop = Long.MAX_VALUE;
         }
       try {
+        log.info(start);
+        log.info(stop);
         scan.setTimeRange(start, stop);
         }
       catch (IOException e) {
@@ -617,7 +629,7 @@ public class HBaseClient {
     * @return               The {@link Set} of different values of that column. */
   public Set<String> latests(String columnName,
                              String substringValue,
-                             int minutes,
+                             long minutes,
                              boolean getValues) {
     Set<String> l = new TreeSet<>();
     Map<String, String> search = new TreeMap<>();
@@ -625,7 +637,7 @@ public class HBaseClient {
       search.put(columnName, substringValue);
       }
     String[] filter = (getValues ? new String[]{columnName} : new String[]{});
-    Map<String, Map<String, String>> results = scan(null, search, filter, new long[]{minutes, 0}, false, false);
+    Map<String, Map<String, String>> results = scan(null, search, filter, new Long[]{minutes, 0L}, false, false);
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (!entry.getKey().startsWith("schema")) {
         l.add(getValues ? entry.getValue().get(columnName) : entry.getKey());

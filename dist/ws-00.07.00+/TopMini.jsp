@@ -20,11 +20,16 @@
     </table></center>
   </div>
   
+<script type="text/javascript" src="Tabs.js"></script>
+  
 <script>
   async function reset() {
-    loadPane("graph",  "GraphView.jsp");
-    loadPane("image",  "Image.jsp");
-    loadPane("plot",   "Plot.jsp");
-    loadPane("result", "Result.jsp");
+    loadPane("feedback", "Feedback.jsp");
+    loadPane("top",      "Top.jsp");
+    loadPane("graph",    "GraphView.jsp");
+    loadPane("image",    "Image.jsp");
+    loadPane("plot",     "Plot.jsp");
+    loadPane("result",   "Result.jsp");
+    showTab("graph");
     }
   </script>
