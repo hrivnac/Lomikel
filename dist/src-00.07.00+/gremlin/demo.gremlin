@@ -1,3 +1,5 @@
+// Create testing graph
+// ====================
 top = g.addV('Top').property('lbl', 'top').
                     property('title', 'titleTop').
                     property('subtitle', 'subtitleTop').next();

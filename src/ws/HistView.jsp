@@ -7,7 +7,7 @@
 
 <%@ page import="java.util.Map" %>
 
-<!--%@ page errorPage="ExceptionHandler.jsp" %-->
+<%@ page errorPage="ExceptionHandler.jsp" %>
 
 <link href="HistView.css" rel="stylesheet" type="text/css"/>
 <!-- TBD: it should be loaded from index.jsp -->

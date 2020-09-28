@@ -154,7 +154,10 @@ public class HBase2Table {
     return _repository;
     }
     
-  /** TBD */
+  /** Group rows according the selected column.
+    * @param  idCol The column to use for grouping.
+    * @return       The String array (as [ ... ... ]) of row keys to hide.
+    *               For each group, corresponding to iDcol, only the last row is kept. */
   public String toHide(String idCol) {
     String id;
     Map<String, TreeSet<String>> id2key = new HashMap<>();

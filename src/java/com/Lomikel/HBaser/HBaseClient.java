@@ -66,23 +66,23 @@ public class HBaseClient {
    * @throws IOException If anything goes wrong. */
  public static void main(String[] args) throws IOException {
    String zookeepers = "localhost";
-   String clientPort = "2181";
    //String zookeepers = "134.158.74.54";
-   //String clientPort = "2181";
+   String clientPort = "2181";
    HBaseClient client = new HBaseClient(zookeepers, clientPort);
    //HBaseClient client = new HBaseClient("http://localhost:2181");
    client.connect("test_portal_tiny.1");
    Map<String, String> search = new TreeMap<>();
-   //search.put("key:key", "ZTF19");
+   search.put("key:key", "ZTF19");
    Map<String, Map<String, String>> results = client.scan(null,
                                                           search,
                                                           null,
                                                           new long[]{1000000, 0},
                                                           false,
-                                                          false); 
-   //log.info(client.timeline("i:jd"));
-   //System.out.println(client.latests("i:objectId", null, 0, false));
-   //System.out.println(client.latests("i:objectId", null, 0, true));
+                                                          false);
+   log.info(results);
+   log.info(client.timeline("i:jd"));
+   log.info(client.latests("i:objectId", null, 0, false));
+   log.info(client.latests("i:objectId", null, 0, true));
    }
    
  /** Create.

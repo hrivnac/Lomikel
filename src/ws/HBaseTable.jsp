@@ -21,7 +21,7 @@
 
 <%@ page import="org.apache.log4j.Logger" %>
 
-<!--%@ page errorPage="ExceptionHandler.jsp" %-->
+<%@ page errorPage="ExceptionHandler.jsp" %>
 
 <%! static Logger log = Logger.getLogger(HBaseTable_jsp.class); %>
 

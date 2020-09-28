@@ -1,7 +1,6 @@
 var container = document.getElementById('vis');
 var timeline;
 
-// Construct VIS hist
 function showHist(itemsS, yS) {
   
   var items = JSON.parse(itemsS);  
