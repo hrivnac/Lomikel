@@ -11,7 +11,6 @@ import bsh.EvalError;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
-import java.util.HashMap;
 
 // Log4J
 import org.apache.log4j.Logger;

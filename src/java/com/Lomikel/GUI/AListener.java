@@ -1,19 +1,9 @@
 package com.Lomikel.GUI;
 
 // Java
-import java.util.List;
-import java.util.ArrayList;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import static java.lang.Math.floor;
 
 // AWT
-import java.awt.Cursor;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

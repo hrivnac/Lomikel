@@ -61,30 +61,7 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBaseClient {
-    
- /** Selftest.https://vm-75109.lal.in2p3.fr:8443
-   * @throws IOException If anything goes wrong. */
- public static void main(String[] args) throws IOException {
-   String zookeepers = "localhost";
-   //String zookeepers = "134.158.74.54";
-   String clientPort = "2181";
-   HBaseClient client = new HBaseClient(zookeepers, clientPort);
-   //HBaseClient client = new HBaseClient("http://localhost:2181");
-   client.connect("test_portal_tiny.1");
-   Map<String, String> search = new TreeMap<>();
-   search.put("key:key", "ZTF19");
-   Map<String, Map<String, String>> results = client.scan(null,
-                                                          search,
-                                                          null,
-                                                          new long[]{1000000, 0},
-                                                          false,
-                                                          false);
-   log.info(results);
-   log.info(client.timeline("i:jd"));
-   log.info(client.latests("i:objectId", null, 0, false));
-   log.info(client.latests("i:objectId", null, 0, true));
-   }
-   
+       
  /** Create.
    * @param zookeepers The coma-separated list of zookeper ids.
    * @param clientPort The client port. 

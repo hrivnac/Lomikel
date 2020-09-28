@@ -31,13 +31,9 @@ import java.io.InputStreamReader;
 
 // AWT
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 
 // Swing
 import javax.swing.JFrame;
@@ -45,18 +41,10 @@ import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.ToolTipManager;
 import javax.swing.AbstractButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JApplet;
-import javax.swing.JTextArea;
-import javax.swing.JSlider;
-import javax.swing.JScrollBar;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
-import javax.swing.JTree;
 import javax.swing.BoxLayout;
-import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.ImageIcon;
 

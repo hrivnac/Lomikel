@@ -2,7 +2,6 @@ package com.Lomikel.GUI;
 
 // Java
 import java.awt.Component;
-import java.awt.Cursor;
 import static java.lang.Math.pow;
 
 // Swing

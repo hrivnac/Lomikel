@@ -272,20 +272,7 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.properties" token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.properties" token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
     </target>
- 
-  <!-- Check ================================================================-->
-
-  <target name="check-hbase"
-          description="Check HBase">
-    <echo>Check JanusGraph</echo>
-    <java classname="com.Lomikel.HBaser.HBaseClient"
-          fork="true">
-      <classpath>
-        <path refid="classpath.run"/>
-        </classpath>
-      </java>
-    </target>
- 
+  
   <!-- Extract Schema =======================================================-->
 
   <target name="extract-schema"
