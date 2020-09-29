@@ -17,9 +17,13 @@ public class Init {
     init(false);
     }
 
-  /** Setup Logging system.
+  /** Setup Logging system. Singleton.
     * @param quiet If no outupt is required. */
   public static void init(boolean quiet) {
+    if (_initialised) {
+      log.debug("Already initialised");
+      return;
+      }
     try {
       PropertyConfigurator.configure(Init.class.getClassLoader().getResource("com/Lomikel/Utils/log4j.properties"));
       NotifierURL.notify("", "Lomikel", Info.release());
@@ -27,7 +31,10 @@ public class Init {
     catch (Exception e) {
       System.err.println(e);
       }
+    _initialised = true;
     }
+    
+  public static boolean _initialised = false;  
     
   /** Logging . */
   private static Logger log = Logger.getLogger(Init.class);

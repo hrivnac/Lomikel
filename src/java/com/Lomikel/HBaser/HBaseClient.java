@@ -94,7 +94,7 @@ public class HBaseClient {
    String[] x = url.replaceAll("http://", "").split(":");
    _conf = HBaseConfiguration.create();
    _conf.set("hbase.zookeeper.quorum", x[0]);
-   _conf.set("hbase.zookeeper.property.clientPort", x[1]);
+   _conf.set("hbase.zookeeper.property.clientPorf t", x[1]);
    _connection = ConnectionFactory.createConnection(_conf); 
 
    }
@@ -265,8 +265,9 @@ public class HBaseClient {
        period = new Long[]{0L, now};
        }
      period[0] = now - (long)(period[0] * 1000L * 60L);
-     period[1] = now - (long)(period[1]  * 1000L * 60L);
-     return scan(key, search, filter, period[1], period[0], ifkey, iftime);
+     period[1] = now - (long)(period[1] * 1000L * 60L);
+     Arrays.sort(period);
+     return scan(key, search, filter, period[0], period[1], ifkey, iftime);
      }
                     
   /** Get entry or entries from the {@link Catalog}.
@@ -411,8 +412,6 @@ public class HBaseClient {
         stop = Long.MAX_VALUE;
         }
       try {
-        log.info(start);
-        log.info(stop);
         scan.setTimeRange(start, stop);
         }
       catch (IOException e) {
