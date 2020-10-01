@@ -380,12 +380,12 @@
              private="true"
              additionalparam=" -linksource -breakiterator -keywords -author -version"
              source="1.8"
-             Overview="../src/java/com/Lomikel/Utils/overview.html"
+             Overview="../src/java/com/Lomikel/overview.html"
              windowtitle="Lomikel">
       <doctitle><![CDATA[<u>]]>Lomikel<![CDATA[</u>]]></doctitle>
       <Header><![CDATA[<center>]]>Lomikel version: ${version}<![CDATA[</center>]]></Header>
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
-      <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
+      <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Activities/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
       <group title="Apps"       packages="com.Lomikel.Apps"/>
       <group title="HBaser"     packages="com.Lomikel.HBaser"/>
       <group title="Januser"    packages="com.Lomikel.Januser"/>
@@ -393,7 +393,7 @@
       <group title="Utils"      packages="com.Lomikel.Utils*"/>
       <group title="GUI"        packages="com.Lomikel.GUI*"/>
       <group title="WebService" packages="com.Lomikel.WebService*"/>
-      <link href="http://docs.oracle.com/javase/8/docs/api"/>
+      <link href="http://docs.oracle.com/javase/8/docs/api" packagelistLoc="${javadoc}" offline="true"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>
       <link href="https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs"/>

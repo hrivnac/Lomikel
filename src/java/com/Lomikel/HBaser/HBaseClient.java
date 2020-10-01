@@ -55,7 +55,7 @@ import java.util.Arrays;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>HBaseClient</code> handles HBase connection. 
+/** <code>HBaseClient</code> handles connectionto HBase table. 
   * @opt attributes
   * @opt operations
   * @opt types
@@ -99,23 +99,15 @@ public class HBaseClient {
 
    }
    
- /** Create local.
+ /** Create on <em>localhost</em>.
    * @throws IOException If anything goes wrong. */
  public HBaseClient() throws IOException {
    log.info("Opening");
    Configuration conf = HBaseConfiguration.create();
    _connection = ConnectionFactory.createConnection(_conf); 
    }
-    
- /** Connect the table.
-   * @param tableName  The table name.
-   * @return           The assigned id. 
-   * @throws IOException If anything goes wrong. */
-  public Table connect(String tableName) throws IOException {
-    return connect(tableName, "schema");
-    }
-    
- /** Connect the table.
+        
+ /** Connect to the table.
    * @param tableName  The table name.
    * @param schemaName The name of the {@link Schema} row.
    *                   <tt>null</tt> means to ignore schema,
@@ -127,7 +119,7 @@ public class HBaseClient {
     return connect(tableName, schemaName, 0);
     }
     
- /** Connect the table.
+ /** Connect to the table.
    * @param tableName  The table name.
    * @param schemaName The name of the {@link Schema} row.
    *                   <tt>null</tt> means to ignore schema,
@@ -175,7 +167,7 @@ public class HBaseClient {
     return _table;
     }
                     
-  /** Get entry or entries from the {@link Catalog}.
+  /** Get row(s).
     * @param key      The row key. Disables other search terms.
     *                 It can be <tt>null</tt>.
     * @param search   The search terms: {@link Map} of <tt>family:column-value</tt>.
@@ -187,6 +179,7 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as <tt>family:column,...</tt>.
+    *                 Filter is ignored if selection formula has been set.
     *                 It can be <tt>null</tt>.
     * @param period   The time period specified in <tt>min</tt>s back from now as <tt>start-stop</tt> or <tt>start</tt>.
     *                 <tt>0</tt> means no restriction.
@@ -231,7 +224,7 @@ public class HBaseClient {
     }
 
                     
-  /** Get entry or entries from the {@link Catalog}.
+  /** Get row(s).
     * @param key      The row key. Disables other search terms.
     *                 It can be <tt>null</tt>.
     * @param search   The search terms: {@link Map} of <tt>family:column-value</tt>.
@@ -243,6 +236,7 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>.
+    *                 Filter is ignored if selection formula has been set.
     *                 It can be <tt>null</tt>.
     * @param period   The time period specified in <tt>min</tt>s back from now.
     *                 <tt>0</tt> means no restriction.
@@ -270,7 +264,7 @@ public class HBaseClient {
      return scan(key, search, filter, period[0], period[1], ifkey, iftime);
      }
                     
-  /** Get entry or entries from the {@link Catalog}.
+  /** Get row(s).
     * @param key      The row key. Disables other search terms.
     *                 It can be <tt>null</tt>.
     * @param search   The search terms: {@link Map} of <tt>family:column-value</tt>.
@@ -282,6 +276,7 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>.
+    *                 Filter is ignored if selection formula has been set.
     *                 It can be <tt>null</tt>.
     * @param startS   The time period start.
     *                 <tt>null</tt> or <tt>blank</tt> means minus infinity.
@@ -333,7 +328,7 @@ public class HBaseClient {
      return scan(key, search, filter, start, stop, ifkey, iftime);
      }
                      
-  /** Get entry or entries from the {@link Catalog}.
+  /** Get row(s).
     * @param key      The row key. Disables other search terms.
     *                 It can be <tt>null</tt>.
     * @param search   The search terms: {@link Map} of <tt>family:column-value</tt>.
@@ -345,6 +340,7 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     *                 All searches are executed as prefix searches.
     * @param filter   The names of required values as array of <tt>family:column</tt>.
+    *                 Filter is ignored if selection formula has been set.
     *                 It can be <tt>null</tt>.
     * @param start    The time period start timestamp in <tt>ms</tt>.
     *                 <tt>0</tt> means minus inifinity.
@@ -645,9 +641,18 @@ public class HBaseClient {
     return l;
     }
 
-    /** Set formula to be used to filter rows.
+  /** Set formula to be used to filter rows.
+    * <pre>
+    * // a simple (Java) formula using HBase table columns and giving boolean value
+    * client.setEvaluation("dec < 10");
+    * // an external function, should also specify a list of columns internally used by their function 
+    * client.setEvaluation("isWithinGeoLimits(80, 85, -4.0, 0.0)", "ra,dec");
+    * // standard scan is executed after an evaluation function set
+    * client.scan(...);
+    * </pre>
     * @param formula The formula to be used to filter rows.
     *                The variables should apper without family names. */
+  // TBD: document how to create external fuctions
   public void setEvaluation(String formula,
                             String variables) {
     setEvaluation(formula);
