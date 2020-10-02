@@ -38,6 +38,12 @@ function bootstrap(button, level = 0) {
                    level);
   }
   
+// Gremlin call
+function gcall(command, level = 0) {
+  document.getElementById('bootstrap_command').value = command;
+  bootstrap('text', level);
+  }
+ 
 // Send request to Gremlin server giving Graphson graph
 // TBD: use POST
 // TBD: check rc

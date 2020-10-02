@@ -255,10 +255,12 @@
       var html = []
       $.each(row, function (key, value) {
         if (value.startsWith('binary:')) {
-          html.push("<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a><a target='popup' href='FITSView.jsp?id=" + value + "'>&#8599;</a></b></br/>");
+          html.push("<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a>");
+          html.push("<a target='popup' href='FITSView.jsp?id=" + value + "'>&#8599;</a></b></br/>");
           }
         else {
           if (key == "key") {
+            html.push("<b><a href='#' onclick='gcall(`g.V().hasLabel(\"alert\").has(\"rowkey\", \"" + value + "\")`)'>&#9738;</a></b></br/>");
             html.push('<b>' + key + ':</b> ' + value + '<br/>');
             }
           else {
@@ -271,15 +273,18 @@
     function binaryFormatter(value, row) {
       return "<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>*binary*</a><a target='popup' href='FITSView.jsp?id=" + value + "'>&#8599;</a></b>"
       }
-    function histSelector(key) {
-      return "<input type='checkbox' name='y' class='y' id='y_" + key + "'></input>&nbsp;";
+    function histSelector(column) {
+      return "<input type='checkbox' name='y1_" + column + "' class='y' id='y1_" + column + "'></input>&nbsp;";
       }
     function showHist() {
-      var ys = document.getElementsByClassName('y');
       var y = "";
+      var ys = document.getElementsByClassName('y');
       for (i = 0; i < ys.length; i++) {
         if (ys[i].checked) {
-          y += ys[i].id.substring(2) + " ";
+          console.log(ys[i].checked);
+          if (!y.includes(ys[i].id.substring(3))) { 
+            y += ys[i].id.substring(3) + " ";
+            }
           }
         }
       loadPane("plot", "HistView.jsp?y=" + y.trim(), true, visheight);

@@ -106,7 +106,16 @@ public class HBaseClient {
    Configuration conf = HBaseConfiguration.create();
    _connection = ConnectionFactory.createConnection(_conf); 
    }
-        
+   
+ /** Connect to the table.
+   * @param tableName  The table name.
+   * @return           The assigned id. 
+   * @throws IOException If anything goes wrong. */
+  // TBD: which schema is used ?
+  public Table connect(String tableName) throws IOException {
+    return connect(tableName, "schema");
+    }
+            
  /** Connect to the table.
    * @param tableName  The table name.
    * @param schemaName The name of the {@link Schema} row.

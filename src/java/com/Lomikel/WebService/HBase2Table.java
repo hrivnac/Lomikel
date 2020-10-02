@@ -83,10 +83,13 @@ public class HBase2Table {
       if (column.startsWith("b:")) {
         formatter += "data-formatter='binaryFormatter' ";
         }
-      _thead += "<th data-field='" + column + "' data-sortable='true' data-visible='false' " + formatter + "><b><u>" + column + "</u></b>";
+      _thead += "<th data-field='" + column + "' data-sortable='true' data-visible='false' " + formatter + "><b><u>" + column + "</u></b><br/>";
       if (_schema != null) {
-        _thead += "<br/><small>" + _schema.type(column) + "</small>";
+        _thead += "<small>" + _schema.type(column) + "</small>";
         }
+      //if (!column.startsWith("b:")) {
+      //  _thead += histSelector(column);
+      //  }
       _thead += "</th>";
       }
     String content;
@@ -187,6 +190,13 @@ public class HBase2Table {
       }
     hidden += "]";
     return hidden;
+    }
+    
+  /** Give <em>checkbox</em> for column selection.
+    * @param column The column name as <tt>family:column</tt>.
+    * @return       The corresponding <em>checkbox</em>. */
+  private String histSelector(String column) {
+    return "&nbsp;<input type='checkbox' name='y0_" + column + "' class='y' id='y0_" + column + "'></input>";
     }
     
   private BinaryDataRepository _repository = new BinaryDataRepository();  
