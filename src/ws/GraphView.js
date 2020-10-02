@@ -592,7 +592,7 @@ function popup(name, txt) {
 	w = window.open('', name, 'height=600, width=600, menubar=no, status=no, toolbar=no, titlebar=no');
 	var doc = w.document;
 	doc.write('<html><title>' + name + "</title><body>");
-  doc.write("<h1>" + name + "</h1>");
+  doc.write("<b>" + name + "</b>");
 	doc.write("<hr/><pre>");
 	doc.write(txt);
 	doc.write("</pre><hr/>");

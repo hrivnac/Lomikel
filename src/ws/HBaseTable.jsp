@@ -260,7 +260,7 @@
           }
         else {
           if (key == "key") {
-            html.push("<b><a href='#' onclick='gcall(`g.V().hasLabel(\"<%=hbaseRowName%>\").has(\"<%=hbaeRowKey%>\", \"" + value + "\")`)'>&#9738;</a></b></br/>");
+            html.push("<b><a href='#' onclick='gcall(`g.V().hasLabel(\"<%=hbaseRowName%>\").has(\"<%=hbaseRowKey%>\", \"" + value + "\")`)'>&#9738;</a></b></br/>");
             html.push('<b>' + key + ':</b> ' + value + '<br/>');
             }
           else {
