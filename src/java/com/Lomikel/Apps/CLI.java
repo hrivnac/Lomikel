@@ -126,10 +126,10 @@ public class CLI {
     * @param args The arguments. */
   public static void main(String[] args) {
     Init.init();
+    parseArgs(args, "java -jar Lomikel.exe.jar");
     new CLI(Icons.lomikel,
             "<html><h3>http://cern.ch/hrivnac/Activities/Packages/Lomikel</h3></html>",
             "Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n");
-    parseArgs(args, "java -jar Lomikel.exe.jar");
     }
 
   /** Load standard init files and setup standard environment. */
