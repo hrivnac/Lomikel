@@ -108,12 +108,12 @@
     <%@include file="CustomQuery.jsp"%>
     <%
       if (results == null) { // not performed in CustomQuery.jsp
+        log.info(filterMap);
         results = h.scan(key.equals("") ? null : key,
                          filterMap,
-                         selects.equals("") ? null : selects.split(","),
-                         start,
-                         stop,
-                         "dd/MM/yyy HH:mm",
+                         selects,
+                         0,
+                         0,
                          false,
                          false);
         }

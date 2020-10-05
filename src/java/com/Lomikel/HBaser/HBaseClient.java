@@ -350,7 +350,7 @@ public class HBaseClient {
     * @param filter   The names of required values as <tt>family:column,...</tt>.
     *                 It can be <tt>null</tt>.
     * @param delay   The time period start, in minutes back since dow.
-    *                 <tt>0</tt> means no time restriction..
+    *                 <tt>0</tt> means no time restriction.
     * @param ifkey    Whether give also entries keys.
     * @param iftime   Whether give also entries timestamps.
     * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
@@ -362,7 +362,7 @@ public class HBaseClient {
                                                boolean iftime) {
     log.debug("Searching for key: " + key + 
               ", search: " + search + 
-              ", filter: " + (filter == null ? null : String.join(",", filter)) +
+              ", filter: " + filter +
               ", delay: "  + delay + " min" + 
               ", id/time: " + ifkey + "/" + iftime);
     long now = System.currentTimeMillis();
@@ -386,7 +386,9 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     *                 It is ignored when searching using formula.
     * @param start    The time period start timestamp in <tt>ms</tt>.
+    *                 <tt>0</tt> means since the beginning.
     * @param stop     The time period stop timestamp in <tt>ms</tt>.
+    *                 <tt>0</tt> means till now.
     * @param ifkey    Whether give also entries keys.
     * @param iftime   Whether give also entries timestamps.
     * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
@@ -399,17 +401,9 @@ public class HBaseClient {
                                                boolean iftime) {
     log.info("Searching for key: " + key + 
              ", search: " + search + 
-             ", filter: " + (filter == null ? null : String.join(",", filter)) +
+             ", filter: " + filter +
              ", interval: " + start + " ms - " + stop + " ms" +
              ", id/time: " + ifkey + "/" + iftime);
-    long time = System.currentTimeMillis();
-    Map<String, Map<String, String>> results = new TreeMap<>();
-    Map<String, String> result;
-    String[] fc;
-    String family; 
-    String column;
-    String comparator;
-    String value;
     Map<String, String> searchM = new TreeMap<>();
     String[] ss;
     if (search != null && !search.trim().equals("")) {
@@ -423,6 +417,53 @@ public class HBaseClient {
           }
         }
       }
+    return scan(key, searchM, filter, start, stop, ifkey, iftime);
+    }
+                   
+  /** Get row(s).
+    * @param key       The row key. Disables other search terms.
+    *                  It can be <tt>null</tt>.
+    * @param searchMap The {@link Map} of search terms as <tt>family:column-value</tt>.
+    *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                  {@link Comparator} can be chosen as <tt>family:column-value:comparator</tt>
+    *                  among <tt>exact,prefix,substring,regex</tt>.
+    *                  The default for key is <tt>prefix</tt>,
+    *                  the default for columns is <tt>substring</tt>.
+    *                  It can be <tt>null</tt>.
+    *                  All searches are executed as prefix searches.    
+    * @param filter    The names of required values as <tt>family:column,...</tt>.
+    *                  It can be <tt>null</tt>.
+    *                  It is ignored when searching using formula.
+    * @param start     The time period start timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means since the beginning.
+    * @param stop      The time period stop timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means till now.
+    * @param ifkey     Whether give also entries keys.
+    * @param iftime    Whether give also entries timestamps.
+    * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, String>> scan(String              key,
+                                               Map<String, String> searchMap,
+                                               String              filter,
+                                               long                start,
+                                               long                stop,
+                                               boolean             ifkey,
+                                               boolean             iftime) {
+    log.info("Searching for key: " + key + 
+             ", search: " + searchMap + 
+             ", filter: " + filter +
+             ", interval: " + start + " ms - " + stop + " ms" +
+             ", id/time: " + ifkey + "/" + iftime);
+    long time = System.currentTimeMillis();
+    if (stop == 0) {
+      stop = System.currentTimeMillis();
+      }
+    Map<String, Map<String, String>> results = new TreeMap<>();
+    Map<String, String> result;
+    String[] fc;
+    String family; 
+    String column;
+    String comparator;
+    String value;
     String[] filterA = null;
     if (_formula == null && filter != null && !filter.trim().equals("")) {
       filterA = filter.trim().split(",");
@@ -465,9 +506,9 @@ public class HBaseClient {
         log.error("Cannot set time range " + start + " - " + stop);
         }
       // Search
-      if (search != null && !search.isEmpty()) {
+      if (searchMap != null && !searchMap.isEmpty()) {
         List<Filter> filters = new ArrayList<>();
-        for (Map.Entry<String, String> entry : searchM.entrySet()) {
+        for (Map.Entry<String, String> entry : searchMap.entrySet()) {
           fc = entry.getKey().split(":");
           family = fc[0];
           column = fc[1];
