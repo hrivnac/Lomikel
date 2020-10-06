@@ -575,10 +575,14 @@ public class HBaseClient {
           }
         }
       // Limit
-      if (_limit > 0) {
-        scan.setLimit(_limit);
+      int limit0 = _limit0;
+      if (_evaluator == null && (_limit < _limit0 || _limit0 == 0)) {
+        limit0 = _limit;
+        }
+      if (limit0 > 0) {
+        scan.setLimit(limit0);
         if (_schema != null) {
-          scan.setMaxResultSize(_limit * _schema.size());
+          scan.setMaxResultSize(limit0 * _schema.size());
           }
         }
       // Results
@@ -589,7 +593,9 @@ public class HBaseClient {
           result = new TreeMap<>();
           if (addResult(r, result, filterA, ifkey, iftime)) {
             results.put(Bytes.toString(r.getRow()), result);
-            i++;
+            if (++i == _limit) {
+              break;
+              }
             }
           }
         log.info("" + i + " entries found");
@@ -793,6 +799,13 @@ public class HBaseClient {
     _limit = limit;
     }
     
+  /** Set the limit for the number of searched results (before eventual evaluation).
+    * @param limit The limit for the number of searched esults. */
+  public void setSearchLimit(int limit) {
+    log.info("Setting search limit " + limit);
+    _limit0 = limit;
+    }
+    
   /** Set the AND/OR operator for prefix column search.
     * @param operator OR when contains OR, AND otherwise. */
   public void setSearchOperator(String operator) {
@@ -891,8 +904,10 @@ public class HBaseClient {
   
   private Schema _schema;
   
+  private int _limit0 = 0;
+   
   private int _limit = 0;
-  
+ 
   private String _dateFormat = null;
   
   private FilterList.Operator _operator = FilterList.Operator.MUST_PASS_ALL;
