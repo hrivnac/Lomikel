@@ -7,6 +7,7 @@
 <%@ page import="com.Lomikel.HBaser.Schema" %>
 <%@ page import="com.Lomikel.WebService.HBase2Table" %>
 <%@ page import="com.Lomikel.HBaser.BinaryDataRepository" %>
+<%@ page import="com.Lomikel.Utils.DateTimeManagement" %>
 
 <%@ page import="org.json.JSONObject" %>
 
@@ -93,6 +94,16 @@
         }
       if (!schema.equals("")) {
         out.println("using schema <b>" + schema + "</b><br/>");
+        }
+      long startL = 0;
+      long stopL  = 0;
+      if (!start.equals("")) {
+        startL = DateTimeManagement.string2time(start, "dd.MM.YYYY HH:mm");
+        out.println("since: " + start + " = " + startL);
+        }
+      if (!stop.equals("")) {
+        stopL  = DateTimeManagement.string2time(stop,  "dd.MM.YYYY HH:mm");
+        out.println("till: " + stop + " = " + stopL);
         }
       HBaseClient h = new HBaseClient(hbase);
       h.setLimit(limit);
