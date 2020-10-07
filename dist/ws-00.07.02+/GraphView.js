@@ -36,6 +36,7 @@ function bootstrap(button, level = 0) {
   callGremlinGraph(command,
                    server,
                    level);
+  showTab('graph');
   }
   
 // Gremlin call

@@ -50,8 +50,6 @@
   
     <script type="text/javascript" src="vis-network-8.3.2/standalone/umd/vis-network.min.js"></script> 
     <script type="text/javascript" src="vis-timeline-7.3.9/standalone/umd/vis-timeline-graph2d.min.js"></script> 
-    <script type="text/javascript" src="OptionsDefault.js"></script>
-    <script type="text/javascript" src="Options.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="jquery-ui-1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -60,45 +58,12 @@
     <script type="text/javascript" src="knockout-3.2.0.js"></script>
     <script type="text/javascript" src="moment-2.25.2.js"></script>
     <script type="text/javascript" src="w2ui-1.5.rc1/w2ui-1.5.rc1.min.js"></script>
-    <script type="text/javascript" src="Tabs.js"></script>
-
-    
-    <script type="text/javascript">
-      function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-        }
-      </script>
-        
-    <script type="text/javascript">
-      async function loadPane(pane, url, iframe, height) {
-        while (!document.getElementById(pane)) {
-          await sleep(1000);
-          }
-        if (document.getElementById("feedback")) {
-          document.getElementById("feedback").innerHTML += "Loading " + pane + " : " + url + "<br/>"
-          }
-        url = encodeURI(url);
-        if (!height) {
-          height = "100%";
-          }
-        if (iframe) {
-          document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
-          }
-        else {
-          $("#" + pane).load(url);
-          }
-        if (pane == 'graph' || pane == 'image' || pane == 'plot') {
-          //showTab(pane);
-          w2ui['layoutLeft']['panels'][2]['tabs'].click(pane.concat("Tab"));
-          }
-        }        
-      </script>
-
-    <script type="text/javascript">
-      function help(url) {
-        w2popup.load({url: url});
-        }
-      </script>
+    <script type="text/javascript" src="OptionsDefault.js"></script>
+    <script type="text/javascript" src="Options.js"></script>
+    <script type="text/javascript" src="Tabs.js"></script>      
+    <script type="text/javascript" src="Sleep.js"></script>        
+    <script type="text/javascript" src="LoadPane.js"></script>
+    <script type="text/javascript" src="Help.js"></script>
       
     <script type="text/javascript">
       $(function () {
