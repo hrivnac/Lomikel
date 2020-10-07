@@ -61,6 +61,44 @@
     <script type="text/javascript" src="moment-2.25.2.js"></script>
     <script type="text/javascript" src="w2ui-1.5.rc1/w2ui-1.5.rc1.min.js"></script>
     <script type="text/javascript" src="Tabs.js"></script>
+
+    
+    <script type="text/javascript">
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+        }
+      </script>
+        
+    <script type="text/javascript">
+      async function loadPane(pane, url, iframe, height) {
+        while (!document.getElementById(pane)) {
+          await sleep(1000);
+          }
+        if (document.getElementById("feedback")) {
+          document.getElementById("feedback").innerHTML += "Loading " + pane + " : " + url + "<br/>"
+          }
+        url = encodeURI(url);
+        if (!height) {
+          height = "100%";
+          }
+        if (iframe) {
+          document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
+          }
+        else {
+          $("#" + pane).load(url);
+          }
+        if (pane == 'graph' || pane == 'image' || pane == 'plot') {
+          //showTab(pane);
+          w2ui['layoutLeft']['panels'][2]['tabs'].click(pane.concat("Tab"));
+          }
+        }        
+      </script>
+
+    <script type="text/javascript">
+      function help(url) {
+        w2popup.load({url: url});
+        }
+      </script>
       
     <script type="text/javascript">
       $(function () {
@@ -114,36 +152,9 @@
         //w2ui['layoutLeft']['panels'][2]['tabs'].add([{ id:'tab3', text:'Tab 3' }]);        
         });
       var visheight;
+      $.getScript("profiles/<%=p%>.js", function() {});
       </script>
-      
-    <script type="text/javascript">
-      async function loadPane(pane, url, iframe, height) {
-        if (document.getElementById("feedback")) {
-          document.getElementById("feedback").innerHTML += "Loading " + pane + " : " + url + "<br/>"
-          }
-        url = encodeURI(url);
-        if (!height) {
-          height = "100%";
-          }
-        if (iframe) {
-          document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
-          }
-        else {
-          $("#" + pane).load(url);
-          }
-        if (pane == 'graph' || pane == 'image' || pane == 'plot') {
-          //showTab(pane);
-          w2ui['layoutLeft']['panels'][2]['tabs'].click(pane.concat("Tab"));
-          }
-        }        
-      </script>
-
-    <script type="text/javascript">
-      function help(url) {
-        w2popup.load({url: url});
-        }
-      </script>
-        
+         
     </body>
     
   </html>
