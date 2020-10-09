@@ -3,6 +3,7 @@ package com.Lomikel.Utils;
 // Java
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.JulianFields;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -32,30 +33,22 @@ public class DateTimeManagement {
     * @param jd     The Julian date (up to ns).
     * @param format The date format. <tt>null</tt> or empty will use the default format.
     * @return The {@link String} representation of Julian date. */
-  // BUG: wrong !
   public static String julianDate2String(double jd,
                                          String format) {
     if (format == null || format.trim().equals("")) {
       format = FORMAT;
       }
-    int days = (int)jd;
-    double fraction = jd - days;
-    days -= 2451545; //  12:00 UT (noon) on January 1, 2000
-    int y = (int)(days / 365); 
-    days -= y * 365;
-    y += 2000;
-    int m = (int)(days / 30);
-    days -= m * 30;
-    int d = days;
-    int h = (int)(24 * fraction);
-    fraction -= (double)h / 24.0;
-    int mi = (int)(24 * 60 * fraction);
-    fraction -= (double)mi / 24.0 / 60.0;
-    int s = (int)(24 * 60 * 60 * fraction);
-    fraction -= (double)s / 24.0 / 60.0 / 60.0;
-    long ns = (long)(24 * 60 * 60 * 1000000000L * fraction);
-    fraction -= (double)ns / 24.0 / 60.0 / 60.0 / 1000000000.0;
-    LocalDateTime ldt = LocalDateTime.of(y, m + 1, d + 1, h, mi, s, (int)ns);
+    long jdn = (long)Math.floor(jd + 0.5);
+    double frac = jd - jdn;
+    int hours = (int)Math.floor(frac * 24);
+    frac -= (double)(hours / 24.0);
+    int minutes = (int)Math.floor(frac * 24 * 60);
+    frac -= (double)(minutes / 24.0 / 60.0);
+    int seconds = (int)Math.floor(frac * 24 * 60 * 60);
+    frac -= (double)(seconds / 24.0 / 60.0 / 60.0);
+    int nano = (int)Math.floor(frac * 24 * 60 * 60 * 1000000000);
+    System.out.println(hours + " " + minutes + " " + nano);
+    LocalDateTime ldt = LocalDateTime.MIN.with(JulianFields.JULIAN_DAY, jdn).withHour(hours).withMinute(minutes).withSecond(seconds).withNano(nano);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
     return ldt.format(formatter);        
     }
