@@ -3,6 +3,9 @@
 <!-- Lomikel -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
+<%@ page import="com.Lomikel.Utils.Info" %>
+<%@ page import="com.Lomikel.Utils.NotifierURL" %>
+
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
 <jsp:useBean id="profile" class="com.Lomikel.WebService.Profile" scope="session"/>
@@ -119,6 +122,10 @@
       var visheight;
       $.getScript("profiles/<%=p%>.js", function() {});
       </script>
+      
+    <%
+      NotifierURL.notify("", "LomikelWS", Info.release());
+      %>
          
     </body>
     

@@ -291,7 +291,6 @@
       var ys = document.getElementsByClassName('y');
       for (i = 0; i < ys.length; i++) {
         if (ys[i].checked) {
-          console.log(ys[i].checked);
           if (!y.includes(ys[i].id.substring(3))) { 
             y += ys[i].id.substring(3) + " ";
             }
