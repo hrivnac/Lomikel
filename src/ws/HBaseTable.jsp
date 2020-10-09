@@ -119,7 +119,6 @@
     <%@include file="CustomQuery.jsp"%>
     <%
       if (results == null) { // not performed in CustomQuery.jsp
-        log.info(filterMap);
         results = h.scan(key.equals("") ? null : key,
                          filterMap,
                          selects,

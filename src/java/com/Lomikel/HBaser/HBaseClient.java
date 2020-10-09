@@ -570,7 +570,7 @@ public class HBaseClient {
     if (substringValue != null) {
       search += columnName + ":" + substringValue;
       }
-    Map<String, Map<String, String>> results = scan(null, search, null, 0L, false, false);
+    Map<String, Map<String, String>> results = scan(null, search, null, minutes, false, false);
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (!entry.getKey().startsWith("schema")) {
         l.add(getValues ? entry.getValue().get(columnName) : entry.getKey());

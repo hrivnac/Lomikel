@@ -22,7 +22,10 @@ var helpButton  = "<button onClick=\"w2popup.load({url:'Help-Top.html', showMax:
     helpButton += "</button>";
 
 // Initial Gremlin call
-function bootstrap(button, level = 0) {
+async function bootstrap(button, level = 0) {
+  while (!document.getElementById('gremlin_server') || !document.getElementById('bootstrap_command')) {
+    await sleep(1000);
+    }
   var server  =  document.getElementById('gremlin_server').value;
   var command =  document.getElementById('bootstrap_command').value;
   gr = command.split('.')[0];
