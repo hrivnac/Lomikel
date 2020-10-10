@@ -136,11 +136,29 @@ public class CLI {
   public void setupInterpreter() {
     // Set global reference and imports
     try {
-      _interpreter.set("fb", this);
+      _interpreter.set("cli", this);
+      log.info("cli set");
       }
     catch (EvalError e) {
-      log.error("Can't set CommandLine references", e);
+      log.error("Cannot set cli", e);
+      log.debug("Cannot set cli", e);
       }
+    try {
+      interpreter().eval("import com.Lomikel.HBaser.HBaseClient");
+      log.info("HBaseClient imported");
+      }
+    catch (EvalError e) {
+      log.error("Cannot import com.Lomikel.HBaser.HBaseClient");
+      log.debug("Cannot import com.Lomikel.HBaser.HBaseClient", e);
+      }
+    try {
+      interpreter().eval("import com.Lomikel.Januser.GremlinClient");
+      log.info("GremlinClient imported");
+      }
+    catch (EvalError e) {
+      log.error("Cannot import com.Lomikel.Januser.GremlinClient");
+      log.debug("Cannot import com.Lomikel.Januser.GremlinClient", e);
+      }      
     String init = "";
     // Source init.bsh
     log.debug("Sourcing init.bsh");

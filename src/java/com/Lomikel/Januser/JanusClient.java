@@ -35,24 +35,16 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class JanusClient {
 
-  /** Extract implicite schema. */ 
+  /** Extract implicite schema.
+    * @param args[0] The zookeeper host.
+    * @param args[1] The HBase table name. */ 
   public static void main(String[] args) {
     Init.init();
-    JanusClient jc;
-    if (args.length == 2) {
-      jc = new JanusClient(args[0], args[1]);
-      }
-    else {
-      jc = new JanusClient();
-      }
+    JanusClient jc = new JanusClient(args[0], args[1]);
     jc.metaSchema();
     System.exit(0);
     }
-    
-  /** Create, take connection parameters from configuration. */
-  public JanusClient() {
-    }
-    
+   
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
     * @param table    The HBase table. */
@@ -60,6 +52,10 @@ public class JanusClient {
                      String table) {
     _hostname = hostname;
     _table    = table;
+     }
+    
+  /** Create with default parameters. */
+  public JanusClient() {
     }
     
   /** Extract implicite schema. */
@@ -127,13 +123,13 @@ public class JanusClient {
    
   /** Open graph. */
   // BUG: too many opening
-  protected GraphTraversalSource open() {
+  public GraphTraversalSource open() {
     return open(false);
     }
     
   /** Open graph.
     * @param batch Whether open for batch loading. */
-  protected GraphTraversalSource open(boolean batch) {
+  public GraphTraversalSource open(boolean batch) {
     log.info("Opening connection to " + _table + "@" + _hostname);
     _graph = JanusGraphFactory.build()
                               .set("storage.backend",       "hbase")
@@ -147,19 +143,19 @@ public class JanusClient {
     }
     
   /** Commit transaction. */
-  protected void commit() {
+  public void commit() {
     _graph.tx().commit();
     log.info("Commited");
     }
     
   /** Close graph. */
-  protected void close() {
+  public void close() {
     log.info("Closed");
     }
     
   /** Give {@link GraphTraversalSource}.
     * @return {@link GraphTraversalSource}. */
-  protected GraphTraversalSource g() {
+  public GraphTraversalSource g() {
     return _g;
     }
         
