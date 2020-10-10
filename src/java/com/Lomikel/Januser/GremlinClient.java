@@ -42,23 +42,16 @@ public class GremlinClient {
     * @param table    The Gremlin port. */
   public GremlinClient(String hostname,
                        int    port) {
-    _hostname = hostname;
-    _port     = port;
-     }
-   
-  /** Open graph. */
-  // BUG: too many opening
-  public GraphTraversalSource open() {
-    log.info("Opening connection to " + _hostname + ":" + _port);
+    Init.init();
+    log.info("Opening " + hostname + ":" + port);
     _graph = EmptyGraph.instance();
     try {
-      _g = _graph.traversal().withRemote(DriverRemoteConnection.using(_hostname, _port));
+      _g = _graph.traversal().withRemote(DriverRemoteConnection.using(hostname, port));
       }
     catch (Exception e) {
       log.error("Cannot open connection", e);
       }
     log.info("Connected");
-    return _g;
     }
     
   /** Close graph. */
@@ -71,10 +64,6 @@ public class GremlinClient {
   public GraphTraversalSource g() {
     return _g;
     }
-
-  private String _hostname;
-  
-  private int   _port;
     
   private Graph _graph;
   

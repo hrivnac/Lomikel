@@ -45,22 +45,46 @@ public class JanusClient {
     System.exit(0);
     }
    
+  /** Create with default parameters. */
+  public JanusClient() {
+    this(Info.zookeeper(), Info.hbase_table());
+    }
+   
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
     * @param table    The HBase table. */
   public JanusClient(String hostname,
                      String table) {
-    _hostname = hostname;
-    _table    = table;
-     }
+    Init.init();
+    log.info("Opening " + table + "@" + hostname);
+    _graph = JanusGraphFactory.build()
+                              .set("storage.backend",       "hbase")
+                              .set("storage.hostname",      hostname)
+                              .set("storage.hbase.table",   table)
+                              .open();
+    _g = _graph.traversal();
+    log.info("Connected");
+    }
     
-  /** Create with default parameters. */
-  public JanusClient() {
+  /** Commit transaction. */
+  public void commit() {
+    _graph.tx().commit();
+    log.info("Commited");
+    }
+    
+  /** Close graph. */
+  public void close() {
+    log.info("Closed");
+    }
+    
+  /** Give {@link GraphTraversalSource}.
+    * @return {@link GraphTraversalSource}. */
+  public GraphTraversalSource g() {
+    return _g;
     }
     
   /** Extract implicite schema. */
   public void metaSchema() {
-    open();
     log.info("Cleaning MetaGraph");
     g().V().hasLabel("MetaGraph").drop().iterate();
     g().E().hasLabel("MetaGraph").drop().iterate();
@@ -119,44 +143,6 @@ public class JanusClient {
       }
     commit();
     close();
-    }
-   
-  /** Open graph. */
-  // BUG: too many opening
-  public GraphTraversalSource open() {
-    return open(false);
-    }
-    
-  /** Open graph.
-    * @param batch Whether open for batch loading. */
-  public GraphTraversalSource open(boolean batch) {
-    log.info("Opening connection to " + _table + "@" + _hostname);
-    _graph = JanusGraphFactory.build()
-                              .set("storage.backend",       "hbase")
-                              .set("storage.hostname",      _hostname)
-                              .set("storage.hbase.table",   _table)
-                              //.set("storage.batch-loading", true) // only with schema
-                              .open();
-    _g = _graph.traversal();
-    log.info("Connected");
-    return _g;
-    }
-    
-  /** Commit transaction. */
-  public void commit() {
-    _graph.tx().commit();
-    log.info("Commited");
-    }
-    
-  /** Close graph. */
-  public void close() {
-    log.info("Closed");
-    }
-    
-  /** Give {@link GraphTraversalSource}.
-    * @return {@link GraphTraversalSource}. */
-  public GraphTraversalSource g() {
-    return _g;
     }
         
   /** Add a {@link Vertex}, unless it exists
@@ -238,10 +224,6 @@ public class JanusClient {
 	    log.info("Committed");
       }
     }    
-    
-  private String _hostname = Info.zookeeper();
-  
-  private String _table    = Info.hbase_table();
     
   private boolean _found;  
     
