@@ -31,12 +31,28 @@
 
 <%@include file="Params.jsp" %>
 
+<link type="text/css" rel="stylesheet" href="jRange/jquery.range.css"/>
+
+<%
+  String s = style.style();
+  %>
+
 <div id='hbasetable'>
 
   <div id="hbaseTableForm" style="width: 100%"></div>
-  <%
-    String s = style.style();
-    %>
+    
+  <div id="hbaseTableSelector" style="width:100%; background-color:#eeeeee;">
+    <table style="background-color:#eeeeee">
+      <tr><td style="padding:15px;" rowspan="2"><b>Range<br/>Selectors</b></td>
+          <td style="padding:15px;">ra</td>
+          <td style="padding:15px;"><input type="hidden" class="range-slider-ra"  value="0,180"/></td></tr>
+      <tr><td style="padding:15px;">dec</td>
+          <td style="padding:15px;"><input type="hidden" class="range-slider-dec" value="-90,90"/></td></tr>
+      <tr><td style="padding:15px;" colspan="2"><b>Free-form<br/>Selector</b></td>
+          <td style="padding:15px;"><input type="text" id="ffselector" name="ffselector" size="60">&nbsp;(disables Range Selectors)</td></tr>
+      </table>
+      <hr/>
+    </div>
   
   <div id="hbaseResult" style="width: 100%">
     <%
@@ -299,5 +315,38 @@
       loadPane("plot", "HistView.jsp?y=" + y.trim(), true, visheight);
       }
     </script>
+
+  <script type="text/javascript" src="jRange/jquery.range.js"></script>
     
+  <script type="text/javascript">
+    if (typeof hideHBaseSelector === 'undefined' || !hideHBaseSelector) {
+      $(document).ready(function(){
+        $('.range-slider-ra').jRange({
+          from: 0,
+          to: 180,
+          step: 1,
+          scale: [0,45,90,135,180],
+          format: '%s',
+          width: 600,
+          showLabels: true,
+          isRange: true,
+          theme: 'theme-blue'
+          });
+        $('.range-slider-dec').jRange({
+          from: -90,
+          to: 90,
+          step: 1,
+          scale: [-90,-45,0,45,90],
+          format: '%s',
+          width: 600,
+          showLabels: true,
+          isRange: true,
+          theme: 'theme-blue'
+          });
+        });
+      }
+    else {
+      document.getElementById("hbaseTableSelector").style.display = 'none';
+      }
+    </script>
   
