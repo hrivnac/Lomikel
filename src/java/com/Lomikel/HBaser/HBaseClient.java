@@ -607,7 +607,7 @@ public class HBaseClient {
     *                <tt>null</tt> or empty unsets the evaluation formula. */
   public void setEvaluation(String formula) {
     if (formula == null || formula.trim().equals("")) {
-      _formula =  null;
+      _formula   = null;
       _evaluator = null;
       log.info("Unsetting evaluation formula");
       return;

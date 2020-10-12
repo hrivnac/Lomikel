@@ -36,6 +36,8 @@
       String s = request.getParameter("style");
       style.setStyle(s);
       %>
+  
+    <%@include file="Init.jsp"%>
       
     <script>
       var width = window.innerWidth

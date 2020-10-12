@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <!-- Lomikel HBase Table-->
@@ -29,9 +30,9 @@
 <jsp:useBean id="style"   class="com.Lomikel.WebService.Style"       scope="session"/>
 <jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
-<%@include file="Params.jsp" %>
-
 <link type="text/css" rel="stylesheet" href="jRange/jquery.range.css"/>
+
+<%@include file="Params.jsp" %>
 
 <%
   String s = style.style();
@@ -40,86 +41,80 @@
 <div id='hbasetable'>
 
   <div id="hbaseTableForm" style="width: 100%"></div>
-    
-  <div id="hbaseTableSelector" style="width:100%; background-color:#eeeeee;">
-    <table style="background-color:#eeeeee">
-      <tr><td style="padding:15px;" rowspan="2"><b>Range<br/>Selectors</b></td>
-          <td style="padding:15px;">ra</td>
-          <td style="padding:15px;"><input type="hidden" class="range-slider-ra"  value="0,180"/></td></tr>
-      <tr><td style="padding:15px;">dec</td>
-          <td style="padding:15px;"><input type="hidden" class="range-slider-dec" value="-90,90"/></td></tr>
-      <tr><td style="padding:15px;" colspan="2"><b>Free-form<br/>Selector</b></td>
-          <td style="padding:15px;"><input type="text" id="ffselector" name="ffselector" size="60">&nbsp;(disables Range Selectors)</td></tr>
-      </table>
-      <hr/>
-    </div>
-  
+      
   <div id="hbaseResult" style="width: 100%">
     <%
-      String hbase    = request.getParameter("hbase");
-      String htable   = request.getParameter("htable");
-      String key      = request.getParameter("key");
-      String krefix   = request.getParameter("krefix");
-      String selects  = request.getParameter("selects");
-      String filters  = request.getParameter("filters");
-      String start    = request.getParameter("start");
-      String stop     = request.getParameter("stop");
-      String group    = request.getParameter("group");
-      String schema   = request.getParameter("schema");
-      String limitS   = request.getParameter("limit");
+      String hbase       = request.getParameter("hbase");
+      String htable      = request.getParameter("htable");
+      String key         = request.getParameter("key");
+      String krefix      = request.getParameter("krefix");
+      String selects     = request.getParameter("selects");
+      String filters     = request.getParameter("filters");
+      String start       = request.getParameter("start");
+      String stop        = request.getParameter("stop");
+      String group       = request.getParameter("group");
+      String schema      = request.getParameter("schema");
+      String limitS      = request.getParameter("limit");
+      String formula     = request.getParameter("formula");
+      String formulaArgs = request.getParameter("formulaArgs");
       if (hbase  == null || hbase.trim( ).equals("") ||
           htable == null || htable.trim().equals("")) {
         log.fatal("Cannot connect to " + htable + "@" + hbase);
         }
-      out.println("<b><u>" + htable + "@" + hbase + "</u></b><br/>");
+      String msg = "<b><u>" + htable + "@" + hbase + "</u></b><br/>";
       log.info("Connection to " + htable + "@" + hbase);
-      key       = (key      == null || key.equals(     "null")) ? "" : key.trim();
-      krefix    = (krefix   == null || krefix.equals(  "null")) ? "" : krefix.trim();
-      filters   = (filters  == null || filters.equals( "null")) ? "" : filters.trim();
-      selects   = (selects  == null || selects.equals( "null")) ? "" : selects.trim();
-      start     = (start    == null || start.equals(   "null")) ? "" : start.trim();
-      stop      = (stop     == null || stop.equals(    "null")) ? "" : stop.trim();
-      group     = (group    == null || group.equals(   "null")) ? "" : group.trim();
-      schema    = (schema   == null || schema.equals(  "null")) ? "" : schema.trim();
-      limitS    = (limitS   == null || limitS.equals(  "null")) ? "" : limitS.trim();
+      key         = (key         == null || key.equals(         "null")) ? "" : key.trim();
+      krefix      = (krefix      == null || krefix.equals(      "null")) ? "" : krefix.trim();
+      filters     = (filters     == null || filters.equals(     "null")) ? "" : filters.trim();
+      selects     = (selects     == null || selects.equals(     "null")) ? "" : selects.trim();
+      start       = (start       == null || start.equals(       "null")) ? "" : start.trim();
+      stop        = (stop        == null || stop.equals(        "null")) ? "" : stop.trim();
+      group       = (group       == null || group.equals(       "null")) ? "" : group.trim();
+      schema      = (schema      == null || schema.equals(      "null")) ? "" : schema.trim();
+      limitS      = (limitS      == null || limitS.equals(      "null")) ? "" : limitS.trim();
+      formula     = (formula     == null || formula.equals(     "null")) ? "" : formula.trim();
+      formulaArgs = (formulaArgs == null || formulaArgs.equals( "null")) ? "" : formulaArgs.trim();
       Map<String, String> filterMap = new HashMap<>();
       if (!key.equals("")) {
-        out.println("<b>key</b> is <b>" + key + "</b><br/>");
+        msg += "<b>key</b> is <b>" + key + "</b><br/>";
         }
       else {
         if (!krefix.equals("")) {
-          out.println("<b>key</b> starts with <b>" + krefix + "</b></br>");
+          msg += "<b>key</b> starts with <b>" + krefix + "</b></br>";
           filterMap.put("key:key", krefix);
           }
         if (!filters.equals("")) {
           String[] term;
           for (String f : filters.split(",")) {
             term = f.split(":");
-            out.println("<b>" + term[0] + ":" + term[1] + "</b> contains <b>" + term[2] + "</b></br>");
+            msg += "<b>" + term[0] + ":" + term[1] + "</b> contains <b>" + term[2] + "</b></br>";
             filterMap.put(term[0] + ":" + term[1], term[2]);
             }
           }
         }
       int limit = 0;
       if (!limitS.equals("") && !limitS.equals("0")) {
-        out.println("showing max <b>" + limitS + "</b> results<br/>");
+        msg += "showing max <b>" + limitS + "</b> results<br/>";
         limit = Integer.valueOf(limitS);
         }
       if (!selects.equals("")) {
-        out.println("showing only columns <b>" + selects + "</b><br/>");
+        msg += "showing only columns <b>" + selects + "</b><br/>";
         }
       if (!schema.equals("")) {
-        out.println("using schema <b>" + schema + "</b><br/>");
+        msg += "using schema <b>" + schema + "</b><br/>";
         }
       long startL = 0;
       long stopL  = 0;
       if (!start.equals("")) {
         startL = DateTimeManagement.string2time(start, "dd.MM.YYYY HH:mm");
-        out.println("since: " + start + " = " + startL);
+        msg += "since: " + start + " = " + startL;
         }
       if (!stop.equals("")) {
         stopL  = DateTimeManagement.string2time(stop,  "dd.MM.YYYY HH:mm");
-        out.println("till: " + stop + " = " + stopL);
+        msg += "till: " + stop + " = " + stopL + "<br/>";
+        }
+      if (!formula.equals("")) {
+        msg += "evaluation formula: " + formula + "[" + formulaArgs + "]<br/>";
         }
       HBaseClient h = new HBaseClient(hbase);
       h.setLimit(limit);
@@ -131,10 +126,18 @@
         }
       Map<String, Map<String, String>> results = null;
       boolean showTable = true;
+      String url = "HBaseTable.jsp?hbase=" + hbase + "&htable=" + htable + "&schema=" + schema + "&group=" + group;
+      %>
+    <%@include file="CustomRange.jsp"%>
+    <%
+      out.println(msg);
       %>
     <%@include file="CustomQuery.jsp"%>
     <%
       if (results == null) { // not performed in CustomQuery.jsp
+        if (formula != null && !formula.trim().equals("")) {
+          h.setEvaluation(formula, formulaArgs);
+          }
         results = h.scan(key.equals("") ? null : key,
                          filterMap,
                          selects,
@@ -150,9 +153,9 @@
         toHide = h2table.toHide(group);
       %>
     <div id="toolbar">
-      <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaffaa; color:black">Show latest <%=hbaseRowName%>s</button>
-      <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaffaa; color:black">Show all <%=hbaseRowName%>s</button>
-      <button onclick="showHist()" style="background-color:#ddffdd">Plot selected variables</button>    
+      <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaaaff; color:black">Show latest <%=hbaseRowName%>s</button>
+      <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaaaff; color:black">Show all <%=hbaseRowName%>s</button>
+      <button onclick="showHist()" style="background-color:#ddddff">Plot selected variables</button>    
       </div>
     <%
       }
@@ -317,36 +320,5 @@
     </script>
 
   <script type="text/javascript" src="jRange/jquery.range.js"></script>
-    
-  <script type="text/javascript">
-    if (typeof hideHBaseSelector === 'undefined' || !hideHBaseSelector) {
-      $(document).ready(function(){
-        $('.range-slider-ra').jRange({
-          from: 0,
-          to: 180,
-          step: 1,
-          scale: [0,45,90,135,180],
-          format: '%s',
-          width: 600,
-          showLabels: true,
-          isRange: true,
-          theme: 'theme-blue'
-          });
-        $('.range-slider-dec').jRange({
-          from: -90,
-          to: 90,
-          step: 1,
-          scale: [-90,-45,0,45,90],
-          format: '%s',
-          width: 600,
-          showLabels: true,
-          isRange: true,
-          theme: 'theme-blue'
-          });
-        });
-      }
-    else {
-      document.getElementById("hbaseTableSelector").style.display = 'none';
-      }
-    </script>
+  <script type="text/javascript" src="CustomRange.js"></script>
   
