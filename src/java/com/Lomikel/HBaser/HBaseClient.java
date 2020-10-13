@@ -2,6 +2,7 @@ package com.Lomikel.HBaser;
 
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.DateTimeManagement;
+import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.LomikelException;
 
 // HBase
@@ -42,6 +43,7 @@ import java.util.TreeSet;
 import java.util.Map;  
 import java.util.HashMap;  
 import java.util.TreeMap;  
+import java.util.Collections;
 import java.util.NavigableMap;
 import java.io.IOException;
 import java.text.ParseException;
@@ -350,7 +352,10 @@ public class HBaseClient {
       // Search
       if (searchMap != null && !searchMap.isEmpty()) {
         List<Filter> filters = new ArrayList<>();
-        for (Map.Entry<String, String> entry : searchMap.entrySet()) {
+        String firstKey = null;
+        String lastKey  = null;
+        boolean onlyKeys = true;
+        for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap).entrySet()) {
           fc = entry.getKey().split(":");
           family = fc[0];
           column = fc[1];
@@ -363,15 +368,22 @@ public class HBaseClient {
                 break;
               case "substring":
                 filters.add(new RowFilter(CompareOp.EQUAL, new SubstringComparator(value)));
+                onlyKeys = false;
                 break;
               case "regex":
                 filters.add(new RowFilter(CompareOp.EQUAL, new RegexStringComparator(value)));
+                onlyKeys = false;
                 break;
               default: // prefix
                 filters.add(new PrefixFilter(Bytes.toBytes(value)));
               }
+            if (firstKey == null) {
+              firstKey = value;
+              }
+            lastKey = value;
             }
           else {
+            onlyKeys = false;
             switch (comparator) {
               case "exact":
                 log.info(family + " " + column + " " + value + " " + comparator);
@@ -387,6 +399,11 @@ public class HBaseClient {
                 filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
               }
              }
+          }
+        if (onlyKeys) {
+          log.debug("Serching between " + firstKey + " " + lastKey);
+          scan.withStartRow(Bytes.toBytes(firstKey),               true);
+          scan.withStopRow(incrementBytes(Bytes.toBytes(lastKey)), true);
           }
         FilterList filterList = new FilterList(_operator, filters);  
         scan.setFilter(filterList);
