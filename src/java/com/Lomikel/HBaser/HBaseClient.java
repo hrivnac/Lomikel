@@ -84,6 +84,7 @@ public class HBaseClient {
    _conf.set("hbase.zookeeper.quorum", zookeepers);
    _conf.set("hbase.zookeeper.property.clientPort", clientPort);
    _connection = ConnectionFactory.createConnection(_conf); 
+   setSearchOperator("OR");
    }
    
  /** Create.
@@ -96,7 +97,7 @@ public class HBaseClient {
    _conf.set("hbase.zookeeper.quorum", x[0]);
    _conf.set("hbase.zookeeper.property.clientPorf t", x[1]);
    _connection = ConnectionFactory.createConnection(_conf); 
-
+   setSearchOperator("OR");
    }
    
  /** Create on <em>localhost</em>.
@@ -251,7 +252,7 @@ public class HBaseClient {
       for (String s : search.trim().split(",")) {
         ss = s.trim().split(":");
         if (ss.length == 4) {
-          searchM.put(ss[0] + ":" + ss[1] + ":" + ss[2], ss[3]);
+          searchM.put(ss[0] + ":" + ss[1] + ":" + ss[3], ss[2]);
           }
         else {
           searchM.put(ss[0] + ":" + ss[1], ss[2]);
@@ -266,7 +267,7 @@ public class HBaseClient {
     *                  It can be <tt>null</tt>.
     * @param searchMap The {@link Map} of search terms as <tt>family:column-value</tt>.
     *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
-    *                  {@link Comparator} can be chosen as <tt>family:column-value:comparator</tt>
+    *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
     *                  among <tt>exact,prefix,substring,regex</tt>.
     *                  The default for key is <tt>prefix</tt>,
     *                  the default for columns is <tt>substring</tt>.
@@ -356,40 +357,24 @@ public class HBaseClient {
           comparator = fc.length == 3 ? fc[2] : "default";
           value  = entry.getValue();
           if (family.equals("key") && column.equals("key")) {
-            String[] keyArray = value.split(",");
-            Arrays.sort(keyArray);
-            String firstKey = null;
-            String lastKey  = null;
-            if (keyArray.length > 1) {
-              setSearchOperator("OR");
-              }
-            for (String k : keyArray) {
-              switch (comparator) {
-                case "exact":
-                  filters.add(new RowFilter(CompareOp.EQUAL, new BinaryComparator(Bytes.toBytes(k))));
-                  break;
-                case "substring":
-                  filters.add(new RowFilter(CompareOp.EQUAL, new SubstringComparator(k)));
-                  break;
-                case "regex":
-                  filters.add(new RowFilter(CompareOp.EQUAL, new RegexStringComparator(k)));
-                  break;
-                default: // prefix
-                  filters.add(new PrefixFilter(Bytes.toBytes(k)));
-                }
-              if (firstKey == null) {
-                firstKey = k;
-                }
-              lastKey = k;
-              }
-            if (!comparator.equals("substring") && !comparator.equals("regex")) {
-              scan.withStartRow(Bytes.toBytes(firstKey),               true);
-              scan.withStopRow(incrementBytes(Bytes.toBytes(lastKey)), true);
+            switch (comparator) {
+              case "exact":
+                filters.add(new RowFilter(CompareOp.EQUAL, new BinaryComparator(Bytes.toBytes(value))));
+                break;
+              case "substring":
+                filters.add(new RowFilter(CompareOp.EQUAL, new SubstringComparator(value)));
+                break;
+              case "regex":
+                filters.add(new RowFilter(CompareOp.EQUAL, new RegexStringComparator(value)));
+                break;
+              default: // prefix
+                filters.add(new PrefixFilter(Bytes.toBytes(value)));
               }
             }
           else {
             switch (comparator) {
               case "exact":
+                log.info(family + " " + column + " " + value + " " + comparator);
                 filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, Bytes.toBytes(value)));
                 break;
               case "prefix":

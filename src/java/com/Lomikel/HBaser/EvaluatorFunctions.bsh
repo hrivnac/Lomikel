@@ -11,7 +11,7 @@ import com.Lomikel.HBaser.EvaluatorFunctions;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
    
-/** Do-nohing Demo. */
+/** Do-nothing Demo. */
 public static boolean demo() {
   return EvaluatorFunctions.demo();
   }
