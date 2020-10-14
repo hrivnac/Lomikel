@@ -39,6 +39,7 @@ import org.apache.hadoop.conf.Configuration;
 import java.util.List;  
 import java.util.ArrayList;  
 import java.util.Set;
+import java.util.SortedSet;  
 import java.util.TreeSet;  
 import java.util.Map;  
 import java.util.HashMap;  
@@ -249,16 +250,23 @@ public class HBaseClient {
              ", interval: " + start + " ms - " + stop + " ms" +
              ", id/time: " + ifkey + "/" + iftime);
     Map<String, String> searchM = new TreeMap<>();
-    String[] ss;
     if (search != null && !search.trim().equals("")) {
+      String[] ss;
+      String k;
+      String v;
       for (String s : search.trim().split(",")) {
         ss = s.trim().split(":");
         if (ss.length == 4) {
-          searchM.put(ss[0] + ":" + ss[1] + ":" + ss[3], ss[2]);
+          k = ss[0] + ":" + ss[1] + ":" + ss[3];
           }
         else {
-          searchM.put(ss[0] + ":" + ss[1], ss[2]);
+          k = ss[0] + ":" + ss[1];
           }
+        v = ss[2];
+        if (searchM.containsKey(k)) {
+          v = searchM.get(k) + "," + v;
+          }
+        searchM.put(k, v);
         }
       }
     return scan(key, searchM, filter, start, stop, ifkey, iftime);
@@ -267,7 +275,7 @@ public class HBaseClient {
   /** Get row(s).
     * @param key       The row key. Disables other search terms.
     *                  It can be <tt>null</tt>.
-    * @param searchMap The {@link Map} of search terms as <tt>family:column-value</tt>.
+    * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
     *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
     *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
     *                  among <tt>exact,prefix,substring,regex</tt>.
@@ -355,6 +363,7 @@ public class HBaseClient {
         String firstKey = null;
         String lastKey  = null;
         boolean onlyKeys = true;
+        SortedSet<String> allKeys = new TreeSet<>();
         for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap).entrySet()) {
           fc = entry.getKey().split(":");
           family = fc[0];
@@ -362,48 +371,47 @@ public class HBaseClient {
           comparator = fc.length == 3 ? fc[2] : "default";
           value  = entry.getValue();
           if (family.equals("key") && column.equals("key")) {
-            switch (comparator) {
-              case "exact":
-                filters.add(new RowFilter(CompareOp.EQUAL, new BinaryComparator(Bytes.toBytes(value))));
-                break;
-              case "substring":
-                filters.add(new RowFilter(CompareOp.EQUAL, new SubstringComparator(value)));
-                onlyKeys = false;
-                break;
-              case "regex":
-                filters.add(new RowFilter(CompareOp.EQUAL, new RegexStringComparator(value)));
-                onlyKeys = false;
-                break;
-              default: // prefix
-                filters.add(new PrefixFilter(Bytes.toBytes(value)));
+            for (String v : value.split(",")) {
+              allKeys.add(v);
+              switch (comparator) {
+                case "exact":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new BinaryComparator(Bytes.toBytes(v))));
+                  break;
+                case "substring":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new SubstringComparator(v)));
+                  onlyKeys = false;
+                  break;
+                case "regex":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new RegexStringComparator(v)));
+                  onlyKeys = false;
+                  break;
+                default: // prefix
+                  filters.add(new PrefixFilter(Bytes.toBytes(v)));
+                }
               }
-            if (firstKey == null) {
-              firstKey = value;
-              }
-            lastKey = value;
             }
           else {
             onlyKeys = false;
-            switch (comparator) {
-              case "exact":
-                log.info(family + " " + column + " " + value + " " + comparator);
-                filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, Bytes.toBytes(value)));
-                break;
-              case "prefix":
-                filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(value))));
-                break;
-              case "regex":
-                filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new RegexStringComparator(value)));
-                break;
-              default: // substring
-                filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(value)));
+            for (String v : value.split(",")) {
+              switch (comparator) {
+                case "exact":
+                  filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, Bytes.toBytes(v)));
+                  break;
+                case "prefix":
+                  filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(v))));
+                  break;
+                case "regex":
+                  filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new RegexStringComparator(v)));
+                  break;
+                default: // substring
+                  filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(v)));
+                }
               }
-             }
+            }
           }
         if (onlyKeys) {
-          log.debug("Serching between " + firstKey + " " + lastKey);
-          scan.withStartRow(Bytes.toBytes(firstKey),               true);
-          scan.withStopRow(incrementBytes(Bytes.toBytes(lastKey)), true);
+          scan.withStartRow(              Bytes.toBytes(allKeys.first()), true);
+          scan.withStopRow(incrementBytes(Bytes.toBytes(allKeys.last())), true);
           }
         FilterList filterList = new FilterList(_operator, filters);  
         scan.setFilter(filterList);

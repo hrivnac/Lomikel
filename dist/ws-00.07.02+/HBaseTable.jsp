@@ -45,7 +45,6 @@
       String hbase       = request.getParameter("hbase");
       String htable      = request.getParameter("htable");
       String key         = request.getParameter("key");
-      String krefix      = request.getParameter("krefix");
       String selects     = request.getParameter("selects");
       String filters     = request.getParameter("filters");
       String start       = request.getParameter("start");
@@ -62,7 +61,6 @@
       String msg = "<b><u>" + htable + "@" + hbase + "</u></b><br/>";
       log.info("Connection to " + htable + "@" + hbase);
       key         = (key         == null || key.equals(         "null")) ? "" : key.trim();
-      krefix      = (krefix      == null || krefix.equals(      "null")) ? "" : krefix.trim();
       filters     = (filters     == null || filters.equals(     "null")) ? "" : filters.trim();
       selects     = (selects     == null || selects.equals(     "null")) ? "" : selects.trim();
       start       = (start       == null || start.equals(       "null")) ? "" : start.trim();
@@ -77,18 +75,22 @@
         msg += "<b>key</b> is <b>" + key + "</b><br/>";
         }
       else {
-        if (!krefix.equals("")) {
-          msg += "<b>key</b> starts with <b>" + krefix + "</b></br>";
-          filterMap.put("key:key", krefix);
-          }
         if (!filters.equals("")) {
           String[] term;
+          String k;
+          String v;
+          msg += "<b>searching for</b> " + filters;
           for (String f : filters.split(",")) {
             term = f.split(":");
-            msg += "<b>" + term[0] + ":" + term[1] + "</b> contains <b>" + term[2] + "</b></br>";
-            filterMap.put(term[0] + ":" + term[1], term[2]);
+            k = term[0] + ":" + term[1];
+            v = term[2];
+            if (filterMap.containsKey(k)) {
+              v = filterMap.get(k) + "," + v;
+              }
+            filterMap.put(k, v);
             }
           }
+        msg += "<br/>";
         }
       int limit = 0;
       if (!limitS.equals("") && !limitS.equals("0")) {
@@ -213,7 +215,6 @@
         url    : 'HBaseTable.jsp',
         fields : [
           {field:'key',     type: 'text',     html: {caption: 'Exact Key',      text : ' (exact search on row keys: key,key,...)',                          attr: 'style="width: 500px"'}},
-          {field:'krefix',  type: 'text',     html: {caption: 'Prefix Key',     text : ' (search on row keys prefix: key,key,...)',                         attr: 'style="width: 500px"'}},
           {field:'filters', type: 'text',     html: {caption: 'Search Columns', text : ' (columns substring search: family:column:value[:comparator],...)', attr: 'style="width: 500px"'}},
           {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,...)',                              attr: 'style="width: 500px"'}},
           {field:'start',   type: 'datetime', html: {caption: 'From',           text : ' (start time)',                                                     attr: 'style="width: 150px"'}},
@@ -222,7 +223,6 @@
           ], 
         record : { 
           key     : '<%=key%>',
-          krefix  : '<%=krefix%>',
           filters : '<%=filters%>',
           selects : '<%=selects%>',
           start   : '<%=start%>',
@@ -236,7 +236,6 @@
           Search: function () {
             var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&schema=<%=schema%>&group=<%=group%>"
                                                   + "&key="     + w2ui.hbaseTableForm.record.key
-                                                  + "&krefix="  + w2ui.hbaseTableForm.record.krefix
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters
                                                   + "&selects=" + w2ui.hbaseTableForm.record.selects
                                                   + "&start="   + w2ui.hbaseTableForm.record.start
