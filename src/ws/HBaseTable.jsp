@@ -30,8 +30,6 @@
 <jsp:useBean id="style"   class="com.Lomikel.WebService.Style"       scope="session"/>
 <jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
-<link type="text/css" rel="stylesheet" href="jRange/jquery.range.css"/>
-
 <%@include file="Params.jsp" %>
 
 <%
@@ -319,6 +317,5 @@
       }
     </script>
 
-  <script type="text/javascript" src="jRange/jquery.range.js"></script>
   <script type="text/javascript" src="CustomRange.js"></script>
   

@@ -365,7 +365,19 @@
 			}else{
 				this.setValue(this.getValue());
 			}
-		}
+		},
+updateRender: function(data) {
+	return 0 !== this.inputNode.width() || this.options.width ? (this.options.width = this.options.width || this.inputNode.width(), this.domNode.width(this.options.width), this.inputNode.hide(), this.isSingle() && (this.lowPointer.hide(), this.lowLabel.hide()), this.options.showLabels || this.labels.hide(), this.attachEvents(), this.options.showScale && this.updateScale(data), void this.setValue(this.options.value)) : void console.log("jRange : no width found, returning")
+		},
+updateScale: function(scale, from, to) {
+	for(var t = scale || [from, to], i = Math.round(100 / (t.length - 1) * 10) / 10, s = "", o = 0; o < t.length; o++) s += '<span style="left: ' + o * i + '%">' + ("|" != t[o] ? "<ins>" + t[o] + "</ins>" : "") + "</span>";
+			this.scale.html(s), $("ins", this.scale).each(function() {
+				$(this).css({
+					marginLeft: -$(this).outerWidth() / 2
+				})
+			})
+		},
+
 	};
 
 	var pluginName = 'jRange';
