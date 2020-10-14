@@ -229,7 +229,6 @@ public class HBaseClient {
     *                 All searches are executed as prefix searches.    
     * @param filter   The names of required values as <tt>family:column,...</tt>.
     *                 It can be <tt>null</tt>.
-    *                 It is ignored when searching using formula.
     * @param start    The time period start timestamp in <tt>ms</tt>.
     *                 <tt>0</tt> means since the beginning.
     * @param stop     The time period stop timestamp in <tt>ms</tt>.
@@ -285,7 +284,6 @@ public class HBaseClient {
     *                  All searches are executed as prefix searches.    
     * @param filter    The names of required values as <tt>family:column,...</tt>.
     *                  It can be <tt>null</tt>.
-    *                  It is ignored when searching using formula.
     * @param start     The time period start timestamp in <tt>ms</tt>.
     *                  <tt>0</tt> means since the beginning.
     * @param stop      The time period stop timestamp in <tt>ms</tt>.
@@ -317,9 +315,20 @@ public class HBaseClient {
     String comparator;
     String value;
     String[] filterA = null;
-    if (_formula == null && filter != null && !filter.trim().equals("")) {
+    if (filter != null && !filter.trim().equals("")) {
       filterA = filter.trim().split(",");
-      }         
+      } 
+    if (_formula != null) { // TBD: ugly merging of String[]
+      if (filterA == null) {
+        filterA = _evaluator.variables();
+        }
+      else {
+        String[] filterB = _evaluator.variables();
+        List<String> list = new ArrayList<>(Arrays.asList(filterA));
+        list.addAll(Arrays.asList(filterB));
+        filterA = list.toArray(new String[0]);
+        }
+      }
     // Get
     if (key != null && !key.trim().equals("")) {
       Get get;

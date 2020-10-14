@@ -112,6 +112,12 @@ public class Evaluator {
       }
     }
     
+  /** Give the array of used variables.
+    * @return The array of used variables. */
+  public String[] variables() {
+    return _variables.toArray(new String[0]);
+    }
+    
   /** Add variables to the list of used variables.
     * @param formula The formula to be used for list of used variables. */
   public void setVariables(String formula) {
