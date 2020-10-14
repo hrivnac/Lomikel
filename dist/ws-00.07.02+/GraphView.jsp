@@ -35,14 +35,22 @@
     select: <input type="text" name="select" value="limit(10)" id="select" title="restrict search results"/>
     </div>  
   <script>
-    miniHeight  = document.getElementById("mini" ).offsetHeight;
-    topHeight   = document.getElementById("top"  ).offsetHeight;
-    manipHeight = document.getElementById("manip").offsetHeight;
-    visheight = height - (miniHeight + topHeight + manipHeight) * 2.16; // BUG: magic number
-    div = document.createElement("div");
-    div.style.height = visheight + "px";
-    div.id = "vis";
-    document.getElementById("graph").appendChild(div);
+    showGraphPane();
+    async function showGraphPane() {
+      while (!document.getElementById('mini' ) ||
+             !document.getElementById('top'  ) ||
+             !document.getElementById('manip')) {
+        await sleep(1000);
+        }
+      miniHeight  = document.getElementById("mini" ).offsetHeight;
+      topHeight   = document.getElementById("top"  ).offsetHeight;
+      manipHeight = document.getElementById("manip").offsetHeight;
+      visheight = height - (miniHeight + topHeight + manipHeight) * 2.16; // BUG: magic number
+      div = document.createElement("div");
+      div.style.height = visheight + "px";
+      div.id = "vis";
+      document.getElementById("graph").appendChild(div);
+      }
     </script>
   </div>
   
