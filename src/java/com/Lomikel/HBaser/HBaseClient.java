@@ -205,8 +205,12 @@ public class HBaseClient {
                                                long    delay,
                                                boolean ifkey,
                                                boolean iftime) {
+    String searchMsg = search;
+    if (searchMsg != null && searchMsg.length() > 40) {
+      searchMsg = searchMsg.substring(0, 40) + "...";
+      }
     log.debug("Searching for key: " + key + 
-              ", search: " + search + 
+              ", search: " + searchMsg + 
               ", filter: " + filter +
               ", delay: "  + delay + " min" + 
               ", id/time: " + ifkey + "/" + iftime);
@@ -243,8 +247,12 @@ public class HBaseClient {
                                                long    stop,
                                                boolean ifkey,
                                                boolean iftime) {
+    String searchMsg = "";
+    if (search != null && searchMsg.length() > 40) {
+      searchMsg = searchMsg.substring(0, 40) + "...";
+      }
     log.info("Searching for key: " + key + 
-             ", search: " + search + 
+             ", search: " + searchMsg + 
              ", filter: " + filter +
              ", interval: " + start + " ms - " + stop + " ms" +
              ", id/time: " + ifkey + "/" + iftime);
@@ -298,8 +306,15 @@ public class HBaseClient {
                                                long                stop,
                                                boolean             ifkey,
                                                boolean             iftime) {
+    String searchMsg = "";
+    if (searchMap != null) {
+      searchMsg = searchMap.toString();
+      }
+    if (searchMsg.length() > 40) {
+      searchMsg = searchMsg.substring(0, 40) + "...}";
+      }
     log.info("Searching for key: " + key + 
-             ", search: " + searchMap + 
+             ", search: " + searchMsg + 
              ", filter: " + filter +
              ", interval: " + start + " ms - " + stop + " ms" +
              ", id/time: " + ifkey + "/" + iftime);
