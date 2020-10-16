@@ -31,6 +31,8 @@ import org.apache.hadoop.hbase.filter.BinaryPrefixComparator;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SubstringComparator;
+import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
+import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
 
 // Hadoop
 import org.apache.hadoop.conf.Configuration;
@@ -73,6 +75,8 @@ public class HBaseClient {
  public HBaseClient(String zookeepers,
                     String clientPort) throws IOException {
    Init.init();
+   _zookeepers = zookeepers;
+   _clientPort = clientPort;
    log.info("Opening " + zookeepers + " on port " + clientPort);
    _conf = HBaseConfiguration.create();
    if (zookeepers != null) {
@@ -418,7 +422,22 @@ public class HBaseClient {
           scan.withStartRow(              Bytes.toBytes(allKeys.first()), true);
           scan.withStopRow(incrementBytes(Bytes.toBytes(allKeys.last())), true);
           }
-        FilterList filterList = new FilterList(_operator, filters);  
+        if (_isRange && !onlyKeys) {
+          log.warn("Range scan is ignored because incompatible with other arguments");
+          _isRange = false;
+          }
+        FilterList filterList;
+        if (_isRange) {
+          log.info("Performing range scan");
+          RowRange rr = new RowRange(               Bytes.toBytes(allKeys.first()), true,
+                                     incrementBytes(Bytes.toBytes(allKeys.last())), true);
+          List<RowRange> lrr = new ArrayList<>();
+          lrr.add(rr);
+          filterList = new FilterList(_operator, new MultiRowRangeFilter(lrr));
+          }
+        else  {
+          filterList = new FilterList(_operator, filters);  
+          }
         scan.setFilter(filterList);
         }
       // Filter
@@ -750,15 +769,45 @@ public class HBaseClient {
     return _table;
     }
 
+  /** Give the used zookeepers.
+    * @return The used zookeepers. */
+  protected String zookeepers() {
+    return _zookeepers;
+    }
+    
+  /** Give the used client port.
+    * @return The used client port. */
+  protected String clientPort() {
+    return _clientPort;
+    }
+    
+  /** Give the used table name.
+    * @return The used table name. */
+  protected String tableName() {
+    return _tableName;
+    }
+    
+  /** Specify if the search should return all results between stricy results.
+    * @param isRange If the search should be considered as an inclusive range-search. */
+  public void setRangeScan(boolean isRange) {
+    _isRange = isRange;
+    }
+
   private Table _table;
   
   private Configuration _conf;
   
   private Connection _connection;
   
+  private String _zookeepers;
+  
+  private String _clientPort;
+  
   private String _tableName;
   
   private Schema _schema;
+  
+  private boolean _isRange = false;
   
   private int _limit0 = 0;
    
