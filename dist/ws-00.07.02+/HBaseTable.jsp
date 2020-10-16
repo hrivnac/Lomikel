@@ -106,12 +106,12 @@
       long startL = 0;
       long stopL  = 0;
       if (!start.equals("")) {
-        startL = DateTimeManagement.string2time(start, "dd.MM.YYYY HH:mm");
-        msg += "since: " + start + " = " + startL;
+        startL = DateTimeManagement.string2time(start, "dd/MM/YYYY HH:mm");
+        msg += "since: <b>" + start + "</b> = " + startL + "<br/>";
         }
       if (!stop.equals("")) {
-        stopL  = DateTimeManagement.string2time(stop,  "dd.MM.YYYY HH:mm");
-        msg += "till: " + stop + " = " + stopL + "<br/>";
+        stopL  = DateTimeManagement.string2time(stop,  "dd/MM/YYYY HH:mm");
+        msg += "till: <b>" + stop + "</b> = " + stopL + "<br/>";
         }
       if (!formula.equals("")) {
         msg += "evaluation formula: " + formula + "[" + formulaArgs + "]<br/>";
@@ -141,8 +141,8 @@
         results = h.scan(key.equals("") ? null : key,
                          filterMap,
                          selects,
-                         0,
-                         0,
+                         startL,
+                         stopL,
                          false,
                          false);
         }

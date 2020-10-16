@@ -67,7 +67,7 @@ public class DateTimeManagement {
    * @return       The time in <tt>ns</tt>. */
  public static long string2time(String timeS,
                                 String format) {
-   if (format == null || !format.trim().equals("")) {
+   if (format == null || format.trim().equals("")) {
      format = FORMAT;
      }
    DateFormat formatter = new SimpleDateFormat(format);
@@ -75,9 +75,7 @@ public class DateTimeManagement {
    try {
      if (timeS != null && !timeS.trim().equals("")) {       
        Date timeD = formatter.parse(timeS);
-       Calendar timeC = GregorianCalendar.getInstance();
-       timeC.setTime(timeD);
-       time = timeC.getTimeInMillis();
+       time = timeD.getTime();
        }
      }
    catch (ParseException e) {

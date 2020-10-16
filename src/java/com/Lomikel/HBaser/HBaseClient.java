@@ -65,6 +65,25 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBaseClient {
+   
+ /** Create.
+   * @param zookeepers The coma-separated list of zookeper ids.
+   * @param clientPort The client port. 
+   * @throws IOException If anything goes wrong. */
+ public HBaseClient(String zookeepers,
+                    String clientPort) throws IOException {
+   Init.init();
+   log.info("Opening " + zookeepers + " on port " + clientPort);
+   _conf = HBaseConfiguration.create();
+   if (zookeepers != null) {
+     _conf.set("hbase.zookeeper.quorum", zookeepers);
+     }
+   if (clientPort != null) {
+     _conf.set("hbase.zookeeper.property.clientPort", clientPort);
+     }
+   _connection = ConnectionFactory.createConnection(_conf); 
+   setSearchOperator("OR");
+   }
        
  /** Create.
    * @param zookeepers The coma-separated list of zookeper ids.
@@ -76,39 +95,16 @@ public class HBaseClient {
    }
    
  /** Create.
-   * @param zookeepers The coma-separated list of zookeper ids.
-   * @param clientPort The client port. 
-   * @throws IOException If anything goes wrong. */
- public HBaseClient(String zookeepers,
-                    String clientPort) throws IOException {
-   Init.init();
-   log.info("Opening " + zookeepers + " on port " + clientPort);
-   _conf = HBaseConfiguration.create();
-   _conf.set("hbase.zookeeper.quorum", zookeepers);
-   _conf.set("hbase.zookeeper.property.clientPort", clientPort);
-   _connection = ConnectionFactory.createConnection(_conf); 
-   setSearchOperator("OR");
-   }
-   
- /** Create.
    * @param url The HBase url.
    * @throws IOException If anything goes wrong. */
  public HBaseClient(String url) throws IOException {
-   log.info("Opening " + url);
-   String[] x = url.replaceAll("http://", "").split(":");
-   _conf = HBaseConfiguration.create();
-   _conf.set("hbase.zookeeper.quorum", x[0]);
-   _conf.set("hbase.zookeeper.property.clientPorf t", x[1]);
-   _connection = ConnectionFactory.createConnection(_conf); 
-   setSearchOperator("OR");
+   this(url.replaceAll("http://", "").split(":")[0], url.replaceAll("http://", "").split(":")[1]);
    }
    
  /** Create on <em>localhost</em>.
    * @throws IOException If anything goes wrong. */
  public HBaseClient() throws IOException {
-   log.info("Opening");
-   Configuration conf = HBaseConfiguration.create();
-   _connection = ConnectionFactory.createConnection(_conf); 
+   this(null, null);
    }
    
  /** Connect to the table.
