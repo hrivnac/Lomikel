@@ -12,11 +12,13 @@ package com.Lomikel.Utils;
 public class JulianDate {
 
   /* Convert a timestamp presented as an array of integers in the following
-   * order (from index 0 to 6): year,month,day,hours,minutes,seconds,nanos
-   * month (1-12), day (1-28 or 29), hours (0-23), min/sec (0-59) to a
-   * Modified Julian Day Number.
+   * to a (Modified) Julian Day Number.
    * The input values are assumed to be well-formed;
-   * error checking is not implemented.*/
+   * error checking is not implemented.
+   * @param ymd_hms  The time as year,month,day,hours,minutes,seconds,nanos, where
+   *                 month = 1-12, day = 1-28 or 29, hours = 0-23, min/sec = 0-59.
+   * @param modified Whether give the Modified Julian date.
+   * @return         The corresponding Julian date (up to day franction). */
   public static double toJD(int[]   ymd_hms,
                             boolean modified) {
     int y = ymd_hms[YEAR];
@@ -41,8 +43,12 @@ public class JulianDate {
     return jd;
     }
 
-  /* Convert an Modified Julian Day Number (double) to an integer array representing
-   * a timestamp (year,month,day,hours,mins,secs,nanos). */
+  /* Convert an Modified Julian Day Number (up to date fraction)
+   * to an integer array representing a timestamp.
+   * @param jd       The Julian date (up to day franction).
+   * @param modified Whether it is the  Modified Julian date.
+   * @return         The time as year,month,day,hours,minutes,seconds,nanos, where
+   *                 month = 1-12, day = 1-28 or 29, hours = 0-23, min/sec = 0-59. */
   public static int[] toTimestamp(double  jd,
                                   boolean modified) {
     int ymd_hms[] = {-1, -1, -1, -1, -1, -1, -1};

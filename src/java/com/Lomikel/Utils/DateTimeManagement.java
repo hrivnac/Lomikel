@@ -23,14 +23,14 @@ import org.apache.log4j.Logger;
 public class DateTimeManagement {
   
   /** Convert Julian date to {@link String} using the default format.
-    * @param jd The Julian date (up to ns).
+    * @param jd The Julian date (incl. fraction of a day).
     * @return The {@link String} representation of Julian date. */
   public static String julianDate2String(double jd) {
     return julianDate2String(jd, null);
     }
   
   /** Convert Julian date to {@link String}.
-    * @param jd     The Julian date (up to ns).
+    * @param jd     The Julian date (incl. fraction of a day).
     * @param format The date format. <tt>null</tt> or empty will use the default format.
     * @return The {@link String} representation of Julian date. */
   public static String julianDate2String(double jd,
@@ -67,7 +67,7 @@ public class DateTimeManagement {
  /** Give {@link String} time as Julian date using the default format.
    * @param timeS  The {@link String} time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
-   * @return       The Julian date (up to ns). */
+   * @return       The Julian date (incl. fraction of a day). */
  public static double string2julianDate(String timeS) {
    return string2julianDate(timeS, null);
    }
@@ -75,7 +75,7 @@ public class DateTimeManagement {
  /** Give {@link String} time as Julian date.
    * @param timeS  The {@link String} time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
-   * @return       The Julian date (up to ns). */
+   * @return       The Julian date (incl. fraction of a days). */
  // BUG: doesn't handle ns
  public static double string2julianDate(String timeS,
                                         String format) {
