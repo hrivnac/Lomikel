@@ -22,14 +22,14 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class DateTimeManagement {
   
-  /** Convert Julian data to {@link String} using the default format.
+  /** Convert Julian date to {@link String} using the default format.
     * @param jd The Julian date (up to ns).
     * @return The {@link String} representation of Julian date. */
   public static String julianDate2String(double jd) {
     return julianDate2String(jd, null);
     }
   
-  /** Convert Julian data to {@link String}.
+  /** Convert Julian date to {@link String}.
     * @param jd     The Julian date (up to ns).
     * @param format The date format. <tt>null</tt> or empty will use the default format.
     * @return The {@link String} representation of Julian date. */
@@ -38,21 +38,74 @@ public class DateTimeManagement {
     if (format == null || format.trim().equals("")) {
       format = FORMAT;
       }
-    long jdn = (long)Math.floor(jd + 0.5);
-    double frac = jd - jdn;
-    int hours = (int)Math.floor(frac * 24);
-    frac -= (double)(hours / 24.0);
-    int minutes = (int)Math.floor(frac * 24 * 60);
-    frac -= (double)(minutes / 24.0 / 60.0);
-    int seconds = (int)Math.floor(frac * 24 * 60 * 60);
-    frac -= (double)(seconds / 24.0 / 60.0 / 60.0);
-    int nano = (int)Math.floor(frac * 24 * 60 * 60 * 1000000000);
-    System.out.println(hours + " " + minutes + " " + nano);
-    LocalDateTime ldt = LocalDateTime.MIN.with(JulianFields.JULIAN_DAY, jdn).withHour(hours).withMinute(minutes).withSecond(seconds).withNano(nano);
+    int[] dt = JulianDate.toTimestamp(jd, false);
+    LocalDateTime ldt = LocalDateTime.MIN.withYear(      dt[0])
+                                         .withMonth(     dt[1])
+                                         .withDayOfMonth(dt[2])
+                                         .withHour(      dt[3])
+                                         .withMinute(    dt[4])
+                                         .withSecond(    dt[5])
+                                         .withNano(      dt[6]);
+    //long jdn = (long)Math.floor(jd + 0.5);
+    //double frac = jd - jdn;
+    //int hours = (int)Math.floor(frac * 24);
+    //frac -= (double)(hours / 24.0);
+    //int minutes = (int)Math.floor(frac * 24 * 60);
+    //frac -= (double)(minutes / 24.0 / 60.0);
+    //int seconds = (int)Math.floor(frac * 24 * 60 * 60);
+    //frac -= (double)(seconds / 24.0 / 60.0 / 60.0);
+    //int nano = (int)Math.floor(frac * 24 * 60 * 60 * 1000000000);
+    //LocalDateTime ldt = LocalDateTime.MIN.with(JulianFields.JULIAN_DAY, jdn)
+    //                                     .withHour(  hours)
+    //                                     .withMinute(minutes)
+    //                                     .withSecond(seconds)
+    //                                     .withNano(  nano);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
     return ldt.format(formatter);        
     }
-     
+    
+ /** Give {@link String} time as Julian date using the default format.
+   * @param timeS  The {@link String} time.
+   * @param format The date format. <tt>null</tt> or empty will use the default format.
+   * @return       The Julian date (up to ns). */
+ public static double string2julianDate(String timeS) {
+   return string2julianDate(timeS, null);
+   }
+  
+ /** Give {@link String} time as Julian date.
+   * @param timeS  The {@link String} time.
+   * @param format The date format. <tt>null</tt> or empty will use the default format.
+   * @return       The Julian date (up to ns). */
+ // BUG: doesn't handle ns
+ public static double string2julianDate(String timeS,
+                                        String format) {
+   if (format == null || format.trim().equals("")) {
+     format = FORMAT;
+     }
+   DateFormat formatter = new SimpleDateFormat(format);
+   Date timeD = new Date();
+   long time = timeD.getTime();
+   double jd = 0;
+   try {
+     if (timeS != null && !timeS.trim().equals("")) {       
+       timeD = formatter.parse(timeS);
+       time = timeD.getTime();
+       }
+     }
+   catch (ParseException e) {
+     log.error("Cannot parse time " + timeS + " as " + format + ", using current time");
+     }
+   int[] id = new int[]{timeD.getYear(), 
+                        timeD.getMonth(),
+                        timeD.getDate(),
+                        timeD.getHours(),
+                        timeD.getMinutes(),
+                        timeD.getSeconds(),
+                        0};
+   return JulianDate.toJD(id, false);
+   }
+    
+    
  /** Give {@link String} time in <tt>ns</tt> using the default format.
    * @param timeS  The {@link String} time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
