@@ -592,10 +592,19 @@ public class HBaseClient {
     
   /** Give the timeline for the column.
     * @param columnName The name of the column.
+    * @param search   The search terms as <tt>family:column:value,...</tt>.
+    *                 Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                 {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                 among <tt>exact,prefix,substring,regex</tt>.
+    *                 The default for key is <tt>prefix</tt>,
+    *                 the default for columns is <tt>substring</tt>.
+    *                 It can be <tt>null</tt>.
+    *                 All searches are executed as prefix searches.    
     * @return           The {@link Map} value-timestamp. */
-  public Map<String, Long> timeline(String columnName) {
-    Map<String, Long> tl = new TreeMap<>();
-    Map<String, Map<String, String>> results = scan(null, null, columnName, 0, false, true);
+  public Map<String, Number> timeline(String columnName,
+                                      String search) {
+    Map<String, Number> tl = new TreeMap<>();
+    Map<String, Map<String, String>> results = scan(null, search, columnName, 0, false, true);
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (!entry.getKey().startsWith("schema")) { 
         tl.put(entry.getValue().get(columnName), Long.parseLong(entry.getValue().get("key:time")));
