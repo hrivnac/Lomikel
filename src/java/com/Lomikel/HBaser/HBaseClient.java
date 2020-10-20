@@ -3,6 +3,7 @@ package com.Lomikel.HBaser;
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.DateTimeManagement;
 import com.Lomikel.Utils.MapUtil;
+import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
 
 // HBase
@@ -196,8 +197,8 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     * @param delay   The time period start, in minutes back since dow.
     *                 <tt>0</tt> means no time restriction.
-    * @param ifkey    Whether give also entries keys.
-    * @param iftime   Whether give also entries timestamps.
+    * @param ifkey    Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime   Whether give also entries timestamps (as <tt>key:time</tt>).
     * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, String>> scan(String  key,
                                                String  search,
@@ -237,8 +238,8 @@ public class HBaseClient {
     *                 <tt>0</tt> means since the beginning.
     * @param stop     The time period stop timestamp in <tt>ms</tt>.
     *                 <tt>0</tt> means till now.
-    * @param ifkey    Whether give also entries keys.
-    * @param iftime   Whether give also entries timestamps.
+    * @param ifkey    Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime   Whether give also entries timestamps (as <tt>key:time</tt>).
     * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, String>> scan(String  key,
                                                String  search,
@@ -296,8 +297,8 @@ public class HBaseClient {
     *                  <tt>0</tt> means since the beginning.
     * @param stop      The time period stop timestamp in <tt>ms</tt>.
     *                  <tt>0</tt> means till now.
-    * @param ifkey     Whether give also entries keys.
-    * @param iftime    Whether give also entries timestamps.
+    * @param ifkey     Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime    Whether give also entries timestamps (as <tt>key:time</tt>).
     * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, String>> scan(String              key,
                                                Map<String, String> searchMap,
@@ -503,8 +504,8 @@ public class HBaseClient {
     * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
     * @param filter  The names of required values as array of <tt>family:column</tt>.
     *                It can be <tt>null</tt>.
-    * @param ifkey   Whether add also entries keys.
-    * @param iftime  Whether add also entries timestamps.
+    * @param ifkey   Whether add also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether add also entries timestamps (as <tt>key:time</tt>).
     * @return        Whether the result has been added. */
   private boolean addResult(Result              r,
                             Map<String, String> result,
@@ -600,14 +601,17 @@ public class HBaseClient {
     *                 the default for columns is <tt>substring</tt>.
     *                 It can be <tt>null</tt>.
     *                 All searches are executed as prefix searches.    
-    * @return           The {@link Map} value-timestamp. */
-  public Map<String, Number> timeline(String columnName,
-                                      String search) {
-    Map<String, Number> tl = new TreeMap<>();
+    * @return         The {@link Set} of {@link Pair}s of timestamp-value. */
+  public Set<Pair<String, String>> timeline(String columnName,
+                                            String search) {
+    Set<Pair<String, String>> tl = new TreeSet<>();
     Map<String, Map<String, String>> results = scan(null, search, columnName, 0, false, true);
+    Pair<String, String> p;
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (!entry.getKey().startsWith("schema")) { 
-        tl.put(entry.getValue().get(columnName), Long.parseLong(entry.getValue().get("key:time")));
+        p = Pair.of(entry.getValue().get("key:time"),
+                    entry.getValue().get(columnName));
+        tl.add(p);
         }
       }
     return tl;
