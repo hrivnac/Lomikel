@@ -64,6 +64,12 @@ public class DateTimeManagement {
     return ldt.format(formatter);        
     }
     
+ /** Give the current time as Julian date.
+   * @return       The Julian date (incl. fraction of a day). */
+ public static double julianDate() {
+   return string2julianDate(null, null);
+   }
+    
  /** Give {@link String} time as Julian date using the default format.
    * @param timeS  The {@link String} time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
@@ -95,7 +101,7 @@ public class DateTimeManagement {
    catch (ParseException e) {
      log.error("Cannot parse time " + timeS + " as " + format + ", using current time");
      }
-   int[] id = new int[]{timeD.getYear(), 
+   int[] id = new int[]{timeD.getYear() + 1900, 
                         timeD.getMonth(),
                         timeD.getDate(),
                         timeD.getHours(),

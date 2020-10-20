@@ -206,8 +206,8 @@ public class HBaseClient {
                                                boolean ifkey,
                                                boolean iftime) {
     String searchMsg = search;
-    if (searchMsg != null && searchMsg.length() > 40) {
-      searchMsg = searchMsg.substring(0, 40) + "...";
+    if (searchMsg != null && searchMsg.length() > 80) {
+      searchMsg = searchMsg.substring(0, 80) + "...";
       }
     log.debug("Searching for key: " + key + 
               ", search: " + searchMsg + 
@@ -247,9 +247,9 @@ public class HBaseClient {
                                                long    stop,
                                                boolean ifkey,
                                                boolean iftime) {
-    String searchMsg = "";
-    if (search != null && searchMsg.length() > 40) {
-      searchMsg = searchMsg.substring(0, 40) + "...";
+    String searchMsg = search;
+    if (search != null && search.length() > 80) {
+      searchMsg = search.substring(0, 80) + "...";
       }
     log.info("Searching for key: " + key + 
              ", search: " + searchMsg + 
@@ -310,8 +310,8 @@ public class HBaseClient {
     if (searchMap != null) {
       searchMsg = searchMap.toString();
       }
-    if (searchMsg.length() > 40) {
-      searchMsg = searchMsg.substring(0, 40) + "...}";
+    if (searchMsg.length() > 80) {
+      searchMsg = searchMsg.substring(0, 80) + "...}";
       }
     log.info("Searching for key: " + key + 
              ", search: " + searchMsg + 
@@ -619,14 +619,14 @@ public class HBaseClient {
     * @param minutes        How far into the past it should search. 
     * @param getValues      Whether to get column values or row keys.
     * @return               The {@link Set} of different values of that column. */
-  public Set<String> latests(String columnName,
-                             String substringValue,
-                             long minutes,
+  public Set<String> latests(String  columnName,
+                             String  prefixValue,
+                             long    minutes,
                              boolean getValues) {
     Set<String> l = new TreeSet<>();
     String search = "";
-    if (substringValue != null) {
-      search += columnName + ":" + substringValue;
+    if (prefixValue != null) {
+      search += columnName + ":" + prefixValue + ":prefix";
       }
     Map<String, Map<String, String>> results = scan(null, search, null, minutes, false, false);
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
@@ -815,6 +815,12 @@ public class HBaseClient {
     * @param isRange If the search should be considered as an inclusive range-search. */
   public void setRangeScan(boolean isRange) {
     _isRange = isRange;
+    }
+    
+  /** Tell if the search should return all results between stricy results.
+    * @return If the search should be considered as an inclusive range-search. */
+  public boolean isRangeScan() {
+    return _isRange;
     }
 
   private Table _table;

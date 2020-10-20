@@ -1,5 +1,8 @@
 package com.Lomikel.Utils;
 
+// Log4J
+import org.apache.log4j.Logger;
+
 /** <code>JulianDate</code> converts to/from Julian date.
   * Take from <a href="https://stackoverflow.com/questions/14988459/how-do-i-use-julian-day-numbers-with-the-java-calendar-api">StackOverflow</a>.
   * Based on <em>Jean Meeus's Astronomical Algorithms, 1st ed., 1991</em>.
@@ -104,5 +107,8 @@ public class JulianDate {
   private static final int MINUTES = 4;
   private static final int SECONDS = 5;
   private static final int NANOS   = 6;
+  
+  /** Logging . */
+  private static Logger log = Logger.getLogger(JulianDate.class);
 
   }
