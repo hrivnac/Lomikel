@@ -47,15 +47,9 @@ import java.util.TreeSet;
 import java.util.Map;  
 import java.util.HashMap;  
 import java.util.TreeMap;  
-import java.util.Collections;
 import java.util.NavigableMap;
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 // Log4J
@@ -112,11 +106,10 @@ public class HBaseClient {
    this(null, null);
    }
    
- /** Connect to the table.
+ /** Connect to the table. Using the latest schema starting with <tt>schema</tt>.
    * @param tableName  The table name.
    * @return           The assigned id. 
    * @throws IOException If anything goes wrong. */
-  // TBD: which schema is used ?
   public Table connect(String tableName) throws IOException {
     return connect(tableName, "schema");
     }
@@ -154,7 +147,10 @@ public class HBaseClient {
       }
     _table = _connection.getTable(TableName.valueOf(_tableName));
     // Schema search
-    if (schemaName != null) {
+    if (schemaName == null) {
+      log.info("Not using schema");
+      }
+    else {
       if (schemaName.equals("")) {
         log.info("Using the most recent schema");
         }
@@ -172,7 +168,10 @@ public class HBaseClient {
         }
       else if (schemas.size() > 1) {
         log.info("" + schemas.size() + " schemas found, choosing the most recent one");
-        _schema = new Schema(schemas.entrySet().iterator().next().getValue()); // BUG: wrong
+        Set<Map.Entry<String, Map<String, String>>> schemasSet = schemas.entrySet();
+        List<Map.Entry<String, Map<String, String>>> schemasList = new ArrayList<>(schemasSet);
+        Map.Entry<String, Map<String, String>> schemaEntry = schemasList.get(schemasList.size() - 1);
+        _schema = new Schema(schemaEntry.getValue());
         }
       else {
         _schema = new Schema(schemas.entrySet().iterator().next().getValue());
@@ -334,7 +333,7 @@ public class HBaseClient {
     if (filter != null && !filter.trim().equals("")) {
       filterA = filter.trim().split(",");
       } 
-    if (_formula != null) { // TBD: ugly merging of String[]
+    if (_formula != null) { // merging of String[]s
       if (filterA == null) {
         filterA = _evaluator.variables();
         }
@@ -654,7 +653,6 @@ public class HBaseClient {
     *                  The variables (column names) should appear without family names.
     *                  <tt>null</tt> or empty unsets the evaluation formula.
     * @param variables The variables used by the formula if implemented as an external function. */
-  // TBD: document how to create external fuctions
   public void setEvaluation(String formula,
                             String variables) {
     setEvaluation(formula);

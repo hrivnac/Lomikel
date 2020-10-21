@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.JulianFields;
 import java.util.Date;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -78,11 +76,10 @@ public class DateTimeManagement {
    return string2julianDate(timeS, null);
    }
   
- /** Give {@link String} time as Julian date.
+ /** Give {@link String} time (up to <tt>s</tt>) as Julian date.
    * @param timeS  The {@link String} time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
    * @return       The Julian date (incl. fraction of a days). */
- // BUG: doesn't handle ns
  public static double string2julianDate(String timeS,
                                         String format) {
    if (format == null || format.trim().equals("")) {

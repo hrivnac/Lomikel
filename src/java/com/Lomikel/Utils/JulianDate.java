@@ -14,14 +14,14 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class JulianDate {
 
-  /* Convert a timestamp presented as an array of integers in the following
-   * to a (Modified) Julian Day Number.
-   * The input values are assumed to be well-formed;
-   * error checking is not implemented.
-   * @param ymd_hms  The time as year,month,day,hours,minutes,seconds,nanos, where
-   *                 month = 1-12, day = 1-28 or 29, hours = 0-23, min/sec = 0-59.
-   * @param modified Whether give the Modified Julian date.
-   * @return         The corresponding Julian date (up to day franction). */
+  /** Convert a timestamp presented as an array of integers in the following
+    * to a (Modified) Julian Day Number.
+    * The input values are assumed to be well-formed;
+    * error checking is not implemented.
+    * @param ymd_hms  The time as year,month,day,hours,minutes,seconds,nanos, where
+    *                 month = 1-12, day = 1-28 or 29, hours = 0-23, min/sec = 0-59.
+    * @param modified Whether give the Modified Julian date.
+    * @return         The corresponding Julian date (up to day franction). */
   public static double toJD(int[]   ymd_hms,
                             boolean modified) {
     int y = ymd_hms[YEAR];
@@ -46,12 +46,12 @@ public class JulianDate {
     return jd;
     }
 
-  /* Convert an Modified Julian Day Number (up to date fraction)
-   * to an integer array representing a timestamp.
-   * @param jd       The Julian date (up to day franction).
-   * @param modified Whether it is the  Modified Julian date.
-   * @return         The time as year,month,day,hours,minutes,seconds,nanos, where
-   *                 month = 1-12, day = 1-28 or 29, hours = 0-23, min/sec = 0-59. */
+  /** Convert an Modified Julian Day Number (up to date fraction)
+    * to an integer array representing a timestamp.
+    * @param jd       The Julian date (up to day franction).
+    * @param modified Whether it is the  Modified Julian date.
+    * @return         The time as year,month,day,hours,minutes,seconds,nanos, where
+    *                 month = 1-12, day = 1-28 or 29, hours = 0-23, min/sec = 0-59. */
   public static int[] toTimestamp(double  jd,
                                   boolean modified) {
     int ymd_hms[] = {-1, -1, -1, -1, -1, -1, -1};

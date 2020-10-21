@@ -20,7 +20,6 @@ public class Schema {
   
   /** Set overall schema.
     * @param schemaMap The schema to set. */
-  // TBD: handle schema per version
   public Schema(Map<String, String> schemaMap) {
     _schemaMap = schemaMap;
     }
@@ -94,7 +93,7 @@ public class Schema {
         value = new CellContent(String.valueOf(Bytes.toLong(encodedValue)));
         break;
       case "fits":
-        value = new CellContent(encodedValue, CellContent.Type.FITS);
+        value = new CellContent(encodedValue, CellContent.Type.FITS); // TBD: should disappear
         break;
       case "fits/image":
         value = new CellContent(encodedValue, CellContent.Type.FITS);
@@ -108,12 +107,11 @@ public class Schema {
     return value;
     }
     
-  /** Encode the column value.
+  /** Encode the column value. Doesn't encode binary values.
     * @param  column       The column to encode.
     * @param  decodedValue The decoded value.
     * @return              The encoded value.
     *                      Unknown types are decoded as strings. */
-  // TBD: How to encode *binary* ?
   public byte[] encode(String column,
                        String decodedValue) {
     byte[] value;
@@ -135,10 +133,10 @@ public class Schema {
         value = Bytes.toBytes(Long.valueOf(decodedValue));
         break;
       case "fits": 
-        value  = new byte[0]; // BUG
+        value  = new byte[0]; // TBD: should disappear
         break;
       case "fits/image": 
-        value  = new byte[0]; // BUG
+        value  = new byte[0];
         break;
       case "binary": 
         value  = new byte[0]; // TBD: should disappear

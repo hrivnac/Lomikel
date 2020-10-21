@@ -11,12 +11,10 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Profile {
     
-  /** TBD */
   public void setProfile(String profile) {
     _profile = profile;
     }
     
-  /** TBD */
   public String profile() {
     return _profile;
     }

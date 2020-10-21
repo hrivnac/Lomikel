@@ -11,12 +11,10 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Style {
     
-  /** TBD */
   public void setStyle(String style) {
     _style = style;
     }
     
-  /** TBD */
   public String style() {
     return _style;
     }

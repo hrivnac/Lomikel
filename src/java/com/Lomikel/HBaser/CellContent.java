@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-// TBD: better !
 public class CellContent {
 
   /** Create from {@link String}.

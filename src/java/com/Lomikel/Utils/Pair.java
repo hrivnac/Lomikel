@@ -9,10 +9,10 @@ package com.Lomikel.Utils;
 public class Pair<FIRST  extends Comparable<FIRST>,
                   SECOND extends Comparable<SECOND>> implements Comparable<Pair<FIRST, SECOND>> {
 
- private Pair(FIRST first, SECOND second) {
-   _first = first;
-   _second = second;
-   }
+  private Pair(FIRST first, SECOND second) {
+    _first  = first;
+    _second = second;
+    }
 
   public static <FIRST  extends Comparable<FIRST>,
                  SECOND extends Comparable<SECOND>> Pair<FIRST, SECOND> of(FIRST first, SECOND second) {
@@ -22,7 +22,7 @@ public class Pair<FIRST  extends Comparable<FIRST>,
   @Override
   public int compareTo(Pair<FIRST, SECOND> o) {
     int cmp = compare(_first, o._first);
-    return cmp == 0 ? compare(_second, o._second) : cmp;
+    return cmp == 0 ? compare(_second, o.second()) : cmp;
     }
 
 
@@ -60,12 +60,20 @@ public class Pair<FIRST  extends Comparable<FIRST>,
     if (this == obj) {
       return true;
       }
-    return equal(_first,  ((Pair) obj)._first )
-        && equal(_second, ((Pair) obj)._second);
+    return equal(_first,  ((Pair) obj).first() )
+        && equal(_second, ((Pair) obj).second());
     }
   
   private boolean equal(Object o1, Object o2) {
     return o1 == null ? o2 == null : (o1 == o2 || o1.equals(o2));
+    }
+
+  public FIRST first() {
+    return _first;
+    }
+    
+  public SECOND second() {
+    return _second;
     }
 
   @Override
@@ -73,7 +81,7 @@ public class Pair<FIRST  extends Comparable<FIRST>,
     return "(" + _first + ", " + _second + ')';
     }
          
-  public final FIRST  _first;
-  public final SECOND _second;
+  private final FIRST  _first;
+  private final SECOND _second;
 
   }
