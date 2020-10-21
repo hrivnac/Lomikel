@@ -1,1 +1,0 @@
-bootstrap('text', 1);
