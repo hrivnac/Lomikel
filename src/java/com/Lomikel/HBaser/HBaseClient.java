@@ -9,11 +9,15 @@ import com.Lomikel.Utils.LomikelException;
 // HBase
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName ;
+import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
+import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -63,77 +67,94 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBaseClient {
    
- /** Create.
-   * @param zookeepers The coma-separated list of zookeper ids.
-   * @param clientPort The client port. 
-   * @throws IOException If anything goes wrong. */
- public HBaseClient(String zookeepers,
-                    String clientPort) throws IOException {
-   Init.init();
-   _zookeepers = zookeepers;
-   _clientPort = clientPort;
-   log.info("Opening " + zookeepers + " on port " + clientPort);
-   _conf = HBaseConfiguration.create();
-   if (zookeepers != null) {
-     _conf.set("hbase.zookeeper.quorum", zookeepers);
-     }
-   if (clientPort != null) {
-     _conf.set("hbase.zookeeper.property.clientPort", clientPort);
-     }
-   _connection = ConnectionFactory.createConnection(_conf); 
-   setSearchOperator("OR");
-   }
-       
- /** Create.
-   * @param zookeepers The coma-separated list of zookeper ids.
-   * @param clientPort The client port. 
-   * @throws IOException If anything goes wrong. */
- public HBaseClient(String zookeepers,
-                    int    clientPort) throws IOException {
-   this(zookeepers, String.valueOf(clientPort));
-   }
-   
- /** Create.
-   * @param url The HBase url.
-   * @throws IOException If anything goes wrong. */
- public HBaseClient(String url) throws IOException {
-   this(url.replaceAll("http://", "").split(":")[0], url.replaceAll("http://", "").split(":")[1]);
-   }
-   
- /** Create on <em>localhost</em>.
-   * @throws IOException If anything goes wrong. */
- public HBaseClient() throws IOException {
-   this(null, null);
-   }
-   
- /** Connect to the table. Using the latest schema starting with <tt>schema</tt>.
-   * @param tableName  The table name.
-   * @return           The assigned id. 
-   * @throws IOException If anything goes wrong. */
-  public Table connect(String tableName) throws IOException {
-    return connect(tableName, "schema");
+  /** Create.
+    * @param zookeepers The coma-separated list of zookeper ids.
+    * @param clientPort The client port. 
+    * @throws IOException If anything goes wrong. */
+  public HBaseClient(String zookeepers,
+                     String clientPort) throws IOException {
+    Init.init();
+    _zookeepers = zookeepers;
+    _clientPort = clientPort;
+    log.info("Opening " + zookeepers + " on port " + clientPort);
+    _conf = HBaseConfiguration.create();
+    if (zookeepers != null) {
+      _conf.set("hbase.zookeeper.quorum", zookeepers);
+      }
+    if (clientPort != null) {
+      _conf.set("hbase.zookeeper.property.clientPort", clientPort);
+      }
+    _connection = ConnectionFactory.createConnection(_conf); 
+    setSearchOperator("OR");
     }
-            
- /** Connect to the table.
-   * @param tableName  The table name.
-   * @param schemaName The name of the {@link Schema} row.
-   *                   <tt>null</tt> means to ignore schema,
-   *                   empty {@link String} will take the latest one. 
-   * @return           The assigned id.
-   * @throws IOException If anything goes wrong. */
-  public Table connect(String tableName,
-                       String schemaName) throws IOException {
-    return connect(tableName, schemaName, 0);
+        
+  /** Create.
+    * @param zookeepers The coma-separated list of zookeper ids.
+    * @param clientPort The client port. 
+    * @throws IOException If anything goes wrong. */
+  public HBaseClient(String zookeepers,
+                     int    clientPort) throws IOException {
+    this(zookeepers, String.valueOf(clientPort));
     }
     
- /** Connect to the table.
-   * @param tableName  The table name.
-   * @param schemaName The name of the {@link Schema} row.
-   *                   <tt>null</tt> means to ignore schema,
-   *                   empty {@link String} will take the latest one. 
-   * @param timeout    The timeout in ms (may be <tt>0</tt>).
-   * @return           The assigned id.
-   * @throws IOException If anything goes wrong. */
+  /** Create.
+    * @param url The HBase url.
+    * @throws IOException If anything goes wrong. */
+  public HBaseClient(String url) throws IOException {
+    this(url.replaceAll("http://", "").split(":")[0], url.replaceAll("http://", "").split(":")[1]);
+    }
+    
+  /** Create on <em>localhost</em>.
+    * @throws IOException If anything goes wrong. */
+  public HBaseClient() throws IOException {
+    this(null, null);
+    }
+    
+  /** Create new table.
+    * @param tableName The name of new table.
+    * @param families  The name of families.
+    * @throws IOException If anything goes wrong. */
+  public void create(String   tableName,
+                     String[] families) throws IOException {
+    _tableName =  tableName;
+    Admin admin = _connection.getAdmin();
+    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(_tableName));
+    for (String family : families) {
+      builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(family)).build());
+      }
+    admin.createTable(builder.build());
+    admin.close();
+    log.info("Created table " + tableName + "(" + String.join(",", families) + ")");
+    }
+    
+  /** Connect to the table. Using the latest schema starting with <tt>schema</tt>.
+    * @param tableName  The table name.
+    * @return           The assigned id. 
+    * @throws IOException If anything goes wrong. */
+   public Table connect(String tableName) throws IOException {
+     return connect(tableName, "schema");
+     }
+             
+  /** Connect to the table.
+    * @param tableName  The table name.
+    * @param schemaName The name of the {@link Schema} row.
+    *                   <tt>null</tt> means to ignore schema,
+    *                   empty {@link String} will take the latest one. 
+    * @return           The assigned id.
+    * @throws IOException If anything goes wrong. */
+   public Table connect(String tableName,
+                        String schemaName) throws IOException {
+     return connect(tableName, schemaName, 0);
+     }
+     
+  /** Connect to the table.
+    * @param tableName  The table name.
+    * @param schemaName The name of the {@link Schema} row.
+    *                   <tt>null</tt> means to ignore schema,
+    *                   empty {@link String} will take the latest one. 
+    * @param timeout    The timeout in ms (may be <tt>0</tt>).
+    * @return           The assigned id.
+    * @throws IOException If anything goes wrong. */
   public Table connect(String tableName,
                        String schemaName,
                        int    timeout) throws IOException {
@@ -687,6 +708,21 @@ public class HBaseClient {
       }
     }
       
+  /** Add a row into table.
+    * @param key The row key.
+    * @param values The column values as family:column:value.
+    * @throws IOException If anything goes wrong. */
+  public void put(String key,
+                  String[] values) throws IOException {
+    Put put = new Put(Bytes.toBytes(key));
+    for (String v : values) {
+      String[] w = v.split(":");
+      put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), Bytes.toBytes(w[2]));
+      }
+    table().put(put);
+    }
+                  
+    
   /** Set the table {@link Schema}.
     * @param schema The {@link Schema} to set. */
   public void setSchema(Schema schema) {
@@ -778,13 +814,30 @@ public class HBaseClient {
     return newValue;
     }
     
-  /** Results presented as readable {@link String}.
+  /** Results presented as a readable {@link String}.
     * @param results The {@link Map} of results.
-    * @return        The result is a readable form. */
+    * @return        The result in a readable {@link String}. */
   public static String results2String(Map<String, Map<String, String>> results) {
     String report = "";
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       report += entry.getKey() + " = " + entry.getValue() + "\n";
+      }
+    return report;
+    }
+    
+  /** Results presented as a {@link List}.
+    * @param results The {@link Map} of results.
+    * @return        The result as a {@link List}. */
+  public static List<Map<String, String>> results2List(Map<String, Map<String, String>> results) {
+    List<Map<String, String>> report = new ArrayList<>();
+    Map<String, String> row;
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      row = new TreeMap<>();
+      row.put("key:key",  entry.getKey());
+      for (Map.Entry<String, String> cell : entry.getValue().entrySet()) {
+        row.put(cell.getKey(), cell.getValue());
+        }
+      report.add(row);
       }
     return report;
     }
