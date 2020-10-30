@@ -41,6 +41,10 @@
   <div id="hbaseTableForm" style="width: 100%"></div>
       
   <div id="hbaseResult" style="width: 100%">
+    <button onClick="w2popup.load({url:'Help-HBaseGeneric.html', showMax: true})" style="position:absolute; top:0; right:0">
+      <img src="images/Help.png" width="10"/>
+      </button>
+
     <%
       String hbase       = request.getParameter("hbase");
       String htable      = request.getParameter("htable");
@@ -153,6 +157,9 @@
         toHide = h2table.toHide(group);
       %>
     <div id="toolbar">
+      <button onClick="w2popup.load({url:'Help-HBaseTable.html', showMax: true})" style="position:absolute; right:0">
+        <img src="images/Help.png" width="10"/>
+        </button>
       <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaaaff; color:black">Show latest <%=hbaseRowName%>s</button>
       <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaaaff; color:black">Show all <%=hbaseRowName%>s</button>
       <button onclick="showHist()" style="background-color:#ddddff">Plot selected variables</button>    
@@ -161,9 +168,6 @@
       }
     if (showTable) {
       %>
-    <button onClick="w2popup.load({url:'Help-HBaseTable.html', showMax: true})" style="position:absolute; top:0; right:0">
-      <img src="images/Help.png" width="10"/>
-      </button>
     <table id='table'
            data-sortable='true'
            data-search='true'
