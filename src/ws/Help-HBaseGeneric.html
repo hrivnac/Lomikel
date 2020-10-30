@@ -1,0 +1,29 @@
+<div id="popup1" style="display: none; width: 600px; height: 400px; overflow: hidden">
+  <div rel="title">
+  hbase generic search      
+    </div>
+  <div rel="body" style="padding: 10px; line-height: 150%">
+    <!--div style="float: left; background-color: white; width: 150px; height: 80px; border: 1px solid silver; margin: 5px;"><img src="images/Lomikel.png"></div-->
+    <p>The <b>hbase generic search</b> panel allows generic searching of connected HBase databases.
+       It sends requests directly to the HBase. It searches for
+       data following several paterns. Firts three criteria are exclusive.</p>
+    <ul>
+      <li><b>Exact key:</b> Searching for just one row specifying its exact key.
+          Very fast search.</li>
+      <li><b>Prefix key:</b> Searching for rows with keys matching specified
+          string as a prefix.</li>
+      <li><b>Search columns:</b> Searching for rows with several columns matching
+          specified strings as substrings. The request should have format
+          <tt>family:column:value,.....</tt>.</li>
+      <li><b>Show columns:</b> Get only specified columns. This field is compatible
+          with any other criterium. The request should have format
+          <tt>family:column,.....</tt>.
+      <li><b>Limit</b></li> limits number of rows to be demanded.</li>
+      <li><b>From, Till</b></li> limits search to a specific time interval (of data
+          entries into database).
+      <ul>
+    </div>
+  <div rel="buttons">
+    <button class="w2ui-btn" onclick="w2popup.close()">Close</button>
+    </div>
+  </div>  
