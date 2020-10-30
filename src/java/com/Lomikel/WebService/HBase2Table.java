@@ -96,7 +96,12 @@ public class HBase2Table {
     String id;
     _data = "";
     boolean firstEntry = true;
+    int n = 0;
     for (Map.Entry<String, Map<String, String>> entry : _table.entrySet()) {
+      if (n++ > 100) {
+        log.warn("BUG: Table is to big, limiting to 100 rows");
+        break;
+        }
       if (entry.getKey().startsWith("schema")) {
         continue;
         }

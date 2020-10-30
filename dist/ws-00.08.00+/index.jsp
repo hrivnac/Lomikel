@@ -124,10 +124,6 @@
       var visheight;
       $.getScript("profiles/<%=p%>.js", function() {});
       </script>
-      
-    <%
-      NotifierURL.notify("", "LomikelWS", Info.release());
-      %>
          
     </body>
     

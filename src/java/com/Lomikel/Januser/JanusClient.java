@@ -41,10 +41,9 @@ public class JanusClient {
   public static void main(String[] args) {
     Init.init();
     JanusClient jc = new JanusClient(args[0], args[1]);
-    jc.metaSchema();
+    jc.createMetaSchema();
     System.exit(0);
-    }
-   
+    }   
   /** Create with default parameters. */
   public JanusClient() {
     this(Info.zookeeper(), Info.hbase_table());
@@ -84,7 +83,7 @@ public class JanusClient {
     }
     
   /** Extract implicite schema. */
-  public void metaSchema() {
+  public void createMetaSchema() {
     log.info("Cleaning MetaGraph");
     g().V().hasLabel("MetaGraph").drop().iterate();
     g().E().hasLabel("MetaGraph").drop().iterate();

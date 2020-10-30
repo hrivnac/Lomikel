@@ -1,6 +1,5 @@
-<%@ page import="com.Lomikel.Utils.Info" %>
-<%@ page import="com.Lomikel.Utils.NotifierURL" %>
+<%@ page import="com.Lomikel.Utils.Init" %>
 
 <%
-  NotifierURL.notify("", "LomikelWS", Info.release());
+  Init.initWS();
   %>
