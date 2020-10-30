@@ -350,21 +350,10 @@ public class HBaseClient {
     String column;
     String comparator;
     String value;
-    String[] filterA = null;
-    if (filter != null && !filter.trim().equals("")) {
-      filterA = filter.trim().split(",");
-      } 
-    if (_formula != null) { // merging of String[]s
-      if (filterA == null) {
-        filterA = _evaluator.variables();
-        }
-      else {
-        String[] filterB = _evaluator.variables();
-        List<String> list = new ArrayList<>(Arrays.asList(filterA));
-        list.addAll(Arrays.asList(filterB));
-        filterA = list.toArray(new String[0]);
-        }
+    if (_evaluator != null && _evaluator.variables() != null && _evaluator.variables().length > 0) {
+      filter = mergeColumns(filter, String.join(",", _evaluator.variables()));
       }
+    filter = mergeColumns(filter, _alwaysColumns);
     // Get
     if (key != null && !key.trim().equals("")) {
       Get get;
@@ -372,8 +361,8 @@ public class HBaseClient {
       for (String k : key.split(",")) {
         get = new Get(Bytes.toBytes(k.trim()));
         // Filter
-        if (filterA != null && filterA.length > 0) {
-          for (String f : filterA) {
+        if (filter != null && !filter.trim().equals("")) {
+          for (String f : filter.split(",")) {
             fc = f.split(":");
             family = fc[0];
             column = fc[1];
@@ -384,7 +373,7 @@ public class HBaseClient {
         try {
           r = table().get(get);
           log.info("" + r.size() + " entries found");
-          addResult(r, result, filterA, ifkey, iftime);
+          addResult(r, result, filter, ifkey, iftime);
           results.put(k, result);
           }
         catch (IOException e) {
@@ -477,8 +466,8 @@ public class HBaseClient {
         scan.setFilter(filterList);
         }
       // Filter
-      if (filterA != null && filterA.length > 0) {
-        for (String f : filterA) {
+      if (filter != null && !filter.trim().equals("")) {
+        for (String f : filter.split(",")) {
           fc = f.split(":");
           family = fc[0];
           column = fc[1];
@@ -502,7 +491,7 @@ public class HBaseClient {
         int i = 0;
         for (Result r : rs) {
           result = new TreeMap<>();
-          if (addResult(r, result, filterA, ifkey, iftime)) {
+          if (addResult(r, result, filter, ifkey, iftime)) {
             results.put(Bytes.toString(r.getRow()), result);
             if (++i == _limit) {
               break;
@@ -522,14 +511,14 @@ public class HBaseClient {
   /** Add {@link Result} into result {@link Map}.
     * @param r       The {@link Result} to add.
     * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
-    * @param filter  The names of required values as array of <tt>family:column</tt>.
+    * @param filter  The coma-separated list of names of required values as <tt>family:column</tt>.
     *                It can be <tt>null</tt>.
     * @param ifkey   Whether add also entries keys (as <tt>key:key</tt>).
     * @param iftime  Whether add also entries timestamps (as <tt>key:time</tt>).
     * @return        Whether the result has been added. */
   private boolean addResult(Result              r,
                             Map<String, String> result,
-                            String[]            filter,
+                            String              filter,
                             boolean             ifkey,
                             boolean             iftime) {
     String key = Bytes.toString(r.getRow());
@@ -542,7 +531,7 @@ public class HBaseClient {
       if (ifkey) {
         result.put("key:key", key);
         }
-      if (filter == null || filter.length > 0) {
+      if (filter == null || !filter.trim().equals("")) {
         String family;
         String column;
         NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
@@ -878,6 +867,56 @@ public class HBaseClient {
     return _isRange;
     }
 
+  /** Set columns to show in any case, regardless further filters.
+    * @param columns The coma-separated list of columns to show in any case, regardless further filters.
+    *                <tt>null</tt> will reset, <tt>*</tt> will set on all columns. */
+  public void setAlwaysColumns(String columns) {
+    if (columns == null || columns.trim().equals("")) {
+      _alwaysColumns = "";
+      }
+    else {
+      _alwaysColumns = columns;
+      }
+    }
+  
+  /** Add columns to show in any case, regardless further filters.
+    * @param columns The coma-separated list of columns to show in any case, regardless further filters.
+    *                <tt>null</tt> will be ignored, <tt>*</tt> will set on all columns. */
+  public void addAlwaysColumns(String columns) {
+    if (columns != null && !columns.trim().equals("")) {
+      _alwaysColumns = mergeColumns(_alwaysColumns, columns);
+      }
+    }
+  
+  /** Merge two coma-separated list of columns.
+    * <tt>null</tt> or <tt>*</tt> in either input gives <tt>null</tt> (i.e. all)
+    * on output.
+    * @param columns1 The first coma-separated list of columns.
+    * @param columns2 The second coma-separated list of columns.
+    * @return         The result coma-separated list of columns. */
+  // TBD: check for releated columns, wrong ,....
+  private String mergeColumns(String columns1,
+                              String columns2) {
+    if (columns1 == null ||
+        columns2 == null) {
+      return null;
+      }
+    String columns = null;
+    if (columns1.trim().equals("")) {
+      columns = columns2;
+      }
+    else if (columns2.trim().equals("")) {
+      columns = columns1;
+      }
+    else {
+      columns = columns1 + "," + columns2;
+      }
+    if (columns.contains("*")) {
+      columns = null;
+      }
+    return columns;
+    }
+    
   private Table _table;
   
   private Configuration _conf;
@@ -893,6 +932,8 @@ public class HBaseClient {
   private Schema _schema;
   
   private boolean _isRange = false;
+  
+  private String _alwaysColumns = "";
   
   private int _limit0 = 0;
    

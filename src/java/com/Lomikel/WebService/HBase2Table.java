@@ -53,17 +53,13 @@ public class HBase2Table {
     _schema     = schema;
     _repository = repository;
     Set<String> columns0;
-    if (_schema == null) {
-      columns0 = new TreeSet<>();
-      for (Map<String, String> entry : _table.values()) {
-        for (String column : entry.keySet()) {
-          columns0.add(column);
-          }
+    columns0 = new TreeSet<>();
+    for (Map<String, String> entry : _table.values()) {
+      for (String column : entry.keySet()) {
+        columns0.add(column);
         }
       }
-    else {
-      columns0 = _schema.columnNames();
-      }
+    //columns0 = _schema.columnNames();
     // TBD: support non-default columns
     List<String> columns = new ArrayList<>();
     _fLengths.clear();
