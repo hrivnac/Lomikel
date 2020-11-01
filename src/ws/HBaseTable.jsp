@@ -101,7 +101,16 @@
         msg += "showing max <b>" + limitS + "</b> results<br/>";
         limit = Integer.valueOf(limitS);
         }
-      if (!selects.equals("")) {
+      if (!formula.equals("")) {
+        msg += "evaluation formula: " + formula + "[" + formulaArgs + "]<br/>";
+        }
+      if (formulaArgs.contains("*")) {
+        select = "*";
+        }
+      if (selects.contains("*")) {
+        msg += "showing <b>all</b> columns<br/>";
+        }
+      else if (!selects.equals("")) {
         msg += "showing only columns <b>" + selects + "</b><br/>";
         }
       if (!schema.equals("")) {
@@ -116,9 +125,6 @@
       if (!stop.equals("")) {
         stopL  = DateTimeManagement.string2time(stop,  "dd/MM/YYYY HH:mm");
         msg += "till: <b>" + stop + "</b> = " + stopL + "<br/>";
-        }
-      if (!formula.equals("")) {
-        msg += "evaluation formula: " + formula + "[" + formulaArgs + "]<br/>";
         }
       HBaseClient h = new HBaseClient(hbase);
       h.setLimit(limit);

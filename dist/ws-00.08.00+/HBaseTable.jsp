@@ -101,7 +101,10 @@
         msg += "showing max <b>" + limitS + "</b> results<br/>";
         limit = Integer.valueOf(limitS);
         }
-      if (!selects.equals("")) {
+      if (selects.contains("*")) {
+        msg += "showing <b>all</b> columns<br/>";
+        }
+      else if (!selects.equals("")) {
         msg += "showing only columns <b>" + selects + "</b><br/>";
         }
       if (!schema.equals("")) {

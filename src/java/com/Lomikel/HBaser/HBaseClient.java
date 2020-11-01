@@ -214,8 +214,8 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     *                 All searches are executed as prefix searches.    
     * @param filter   The names of required values as <tt>family:column,...</tt>.
-    *                 It can be <tt>null</tt>.
-    * @param delay   The time period start, in minutes back since dow.
+    *                 <tt>*</tt> = all.
+    * @param delay    The time period start, in minutes back since dow.
     *                 <tt>0</tt> means no time restriction.
     * @param ifkey    Whether give also entries keys (as <tt>key:key</tt>).
     * @param iftime   Whether give also entries timestamps (as <tt>key:time</tt>).
@@ -253,7 +253,7 @@ public class HBaseClient {
     *                 It can be <tt>null</tt>.
     *                 All searches are executed as prefix searches.    
     * @param filter   The names of required values as <tt>family:column,...</tt>.
-    *                 It can be <tt>null</tt>.
+    *                 <tt>*</tt> = all.
     * @param start    The time period start timestamp in <tt>ms</tt>.
     *                 <tt>0</tt> means since the beginning.
     * @param stop     The time period stop timestamp in <tt>ms</tt>.
@@ -312,7 +312,7 @@ public class HBaseClient {
     *                  It can be <tt>null</tt>.
     *                  All searches are executed as prefix searches.    
     * @param filter    The names of required values as <tt>family:column,...</tt>.
-    *                  It can be <tt>null</tt>.
+    *                  <tt>*</tt> = all.
     * @param start     The time period start timestamp in <tt>ms</tt>.
     *                  <tt>0</tt> means since the beginning.
     * @param stop      The time period stop timestamp in <tt>ms</tt>.
@@ -350,10 +350,12 @@ public class HBaseClient {
     String column;
     String comparator;
     String value;
-    if (_evaluator != null && _evaluator.variables() != null && _evaluator.variables().length > 0) {
-      filter = mergeColumns(filter, String.join(",", _evaluator.variables()));
+    if (key == null || !key.startsWith("schema")) {
+      if (_evaluator != null) {
+        filter = mergeColumns(filter, String.join(",", _evaluator.variables()));
+        }
+      filter = mergeColumns(filter, _alwaysColumns);
       }
-    filter = mergeColumns(filter, _alwaysColumns);
     // Get
     if (key != null && !key.trim().equals("")) {
       Get get;
@@ -361,7 +363,7 @@ public class HBaseClient {
       for (String k : key.split(",")) {
         get = new Get(Bytes.toBytes(k.trim()));
         // Filter
-        if (filter != null && !filter.trim().equals("")) {
+        if (filter != null && !filter.trim().equals("") && !filter.trim().equals("*")) {
           for (String f : filter.split(",")) {
             fc = f.split(":");
             family = fc[0];
@@ -466,7 +468,7 @@ public class HBaseClient {
         scan.setFilter(filterList);
         }
       // Filter
-      if (filter != null && !filter.trim().equals("")) {
+      if (filter != null && !filter.trim().contains("*")) {
         for (String f : filter.split(",")) {
           fc = f.split(":");
           family = fc[0];
@@ -531,14 +533,14 @@ public class HBaseClient {
       if (ifkey) {
         result.put("key:key", key);
         }
-      if (filter == null || !filter.trim().equals("")) {
-        String family;
-        String column;
-        NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
-        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
-          family = Bytes.toString(entry.getKey());
-          for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
-            column = family + ":" + Bytes.toString(e.getKey());
+      String family;
+      String column;
+      NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
+      for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+        family = Bytes.toString(entry.getKey());
+        for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+          column = family + ":" + Bytes.toString(e.getKey());
+          if (filter == null || filter.contains("*") || filter.contains(column)) {
             // searching for schema
             if (key.startsWith("schema")) {
               result.put(column, Bytes.toString(e.getValue()));
@@ -869,23 +871,17 @@ public class HBaseClient {
 
   /** Set columns to show in any case, regardless further filters.
     * @param columns The coma-separated list of columns to show in any case, regardless further filters.
-    *                <tt>null</tt> will reset, <tt>*</tt> will set on all columns. */
+    */
   public void setAlwaysColumns(String columns) {
-    if (columns == null || columns.trim().equals("")) {
-      _alwaysColumns = "";
-      }
-    else {
-      _alwaysColumns = columns;
-      }
+    _alwaysColumns = columns;
+    log.info("Setting always columns " + columns );
     }
   
   /** Add columns to show in any case, regardless further filters.
-    * @param columns The coma-separated list of columns to show in any case, regardless further filters.
-    *                <tt>null</tt> will be ignored, <tt>*</tt> will set on all columns. */
+    * @param columns The coma-separated list of columns to show in any case, regardless further filters. */
   public void addAlwaysColumns(String columns) {
-    if (columns != null && !columns.trim().equals("")) {
-      _alwaysColumns = mergeColumns(_alwaysColumns, columns);
-      }
+    _alwaysColumns = mergeColumns(_alwaysColumns, columns);
+    log.info("Adding always columns " + columns + " => " + _alwaysColumns);
     }
   
   /** Merge two coma-separated list of columns.
@@ -897,23 +893,12 @@ public class HBaseClient {
   // TBD: check for releated columns, wrong ,....
   private String mergeColumns(String columns1,
                               String columns2) {
-    if (columns1 == null ||
-        columns2 == null) {
-      return null;
-      }
     String columns = null;
-    if (columns1.trim().equals("")) {
-      columns = columns2;
-      }
-    else if (columns2.trim().equals("")) {
-      columns = columns1;
-      }
-    else {
-      columns = columns1 + "," + columns2;
-      }
-    if (columns.contains("*")) {
-      columns = null;
-      }
+    columns = ((columns1 == null) ? "" : columns1)
+              + "," +
+              ((columns2 == null) ? "" : columns2);
+    columns = columns.replaceAll(",,", ",").replaceAll("^,", "").replaceAll(",$", "");
+    log.info("Merging " + columns1 + " + " + columns2 + " => " + columns);
     return columns;
     }
     
