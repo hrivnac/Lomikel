@@ -68,7 +68,7 @@ import org.apache.log4j.Logger;
 public class HBaseClient {
    
   /** Create.
-    * @param zookeepers The coma-separated list of zookeper ids.
+    * @param zookeepers The comma-separated list of zookeper ids.
     * @param clientPort The client port. 
     * @throws IOException If anything goes wrong. */
   public HBaseClient(String zookeepers,
@@ -89,7 +89,7 @@ public class HBaseClient {
     }
         
   /** Create.
-    * @param zookeepers The coma-separated list of zookeper ids.
+    * @param zookeepers The comma-separated list of zookeper ids.
     * @param clientPort The client port. 
     * @throws IOException If anything goes wrong. */
   public HBaseClient(String zookeepers,
@@ -515,7 +515,7 @@ public class HBaseClient {
   /** Add {@link Result} into result {@link Map}.
     * @param r       The {@link Result} to add.
     * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
-    * @param filter  The coma-separated list of names of required values as <tt>family:column</tt>.
+    * @param filter  The comma-separated list of names of required values as <tt>family:column</tt>.
     *                It can be <tt>null</tt>.
     * @param ifkey   Whether add also entries keys (as <tt>key:key</tt>).
     * @param iftime  Whether add also entries timestamps (as <tt>key:time</tt>).
@@ -872,7 +872,7 @@ public class HBaseClient {
     }
 
   /** Set columns to show in any case, regardless further filters.
-    * @param columns The coma-separated list of columns to show in any case, regardless further filters.
+    * @param columns The comma-separated list of columns to show in any case, regardless further filters.
     */
   public void setAlwaysColumns(String columns) {
     _alwaysColumns = columns;
@@ -880,18 +880,18 @@ public class HBaseClient {
     }
   
   /** Add columns to show in any case, regardless further filters.
-    * @param columns The coma-separated list of columns to show in any case, regardless further filters. */
+    * @param columns The comma-separated list of columns to show in any case, regardless further filters. */
   public void addAlwaysColumns(String columns) {
     _alwaysColumns = mergeColumns(_alwaysColumns, columns);
     log.info("Adding always columns " + columns + " => " + _alwaysColumns);
     }
   
-  /** Merge two coma-separated list of columns.
+  /** Merge two comma-separated list of columns.
     * <tt>null</tt> or <tt>*</tt> in either input gives <tt>null</tt> (i.e. all)
     * on output.
-    * @param columns1 The first coma-separated list of columns.
-    * @param columns2 The second coma-separated list of columns.
-    * @return         The result coma-separated list of columns. */
+    * @param columns1 The first comma-separated list of columns.
+    * @param columns2 The second comma-separated list of columns.
+    * @return         The result comma-separated list of columns. */
   // TBD: check for releated columns, wrong ,....
   private String mergeColumns(String columns1,
                               String columns2) {
