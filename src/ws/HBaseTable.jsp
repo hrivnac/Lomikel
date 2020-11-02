@@ -104,10 +104,11 @@
       if (!formula.equals("")) {
         msg += "evaluation formula: " + formula + "[" + formulaArgs + "]<br/>";
         }
-      if (formulaArgs.contains("*")) {
-        select = "*";
+      if (formulaArgs.contains("all")) {
+        selects = "all";
         }
-      if (selects.contains("*")) {
+      if (selects.contains("all")) {
+        selects = "*";
         msg += "showing <b>all</b> columns<br/>";
         }
       else if (!selects.equals("")) {
@@ -226,7 +227,7 @@
         fields : [
           {field:'key',     type: 'text',     html: {caption: 'Exact Key',      text : ' (exact search on row keys: key,key,...)',                          attr: 'style="width: 500px"'}},
           {field:'filters', type: 'text',     html: {caption: 'Search Columns', text : ' (columns substring search: family:column:value[:comparator],...)', attr: 'style="width: 500px"'}},
-          {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,...)',                              attr: 'style="width: 500px"'}},
+          {field:'selects', type: 'text',     html: {caption: 'Show Columns',   text : ' (columns to show family:column,... or *)',                         attr: 'style="width: 500px"'}},
           {field:'start',   type: 'datetime', html: {caption: 'From',           text : ' (start time)',                                                     attr: 'style="width: 150px"'}},
           {field:'stop',    type: 'datetime', html: {caption: 'Till',           text : ' (end time)',                                                       attr: 'style="width: 150px"'}},
           {field:'limit',   type: 'int',      html: {caption: 'Limit',          text : ' (max number of rows)',                                             attr: 'style="width: 100px"'}}
@@ -244,10 +245,14 @@
             this.clear();
             },
           Search: function () {
+            var selects = w2ui.hbaseTableForm.record.selects;
+            if (selects.includes("*")) {
+              selects = "all";
+              }
             var request = w2ui.hbaseTableForm.url + "?hbase=<%=hbase%>&htable=<%=htable%>&schema=<%=schema%>&group=<%=group%>"
                                                   + "&key="     + w2ui.hbaseTableForm.record.key
                                                   + "&filters=" + w2ui.hbaseTableForm.record.filters
-                                                  + "&selects=" + w2ui.hbaseTableForm.record.selects
+                                                  + "&selects=" + selects
                                                   + "&start="   + w2ui.hbaseTableForm.record.start
                                                   + "&stop="    + w2ui.hbaseTableForm.record.stop
                                                   + "&limit="   + w2ui.hbaseTableForm.record.limit

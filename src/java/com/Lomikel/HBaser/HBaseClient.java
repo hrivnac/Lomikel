@@ -468,12 +468,14 @@ public class HBaseClient {
         scan.setFilter(filterList);
         }
       // Filter
-      if (filter != null && !filter.trim().contains("*")) {
+      if (filter != null && !filter.trim().contains("*") && !filter.trim().equals("")) {
         for (String f : filter.split(",")) {
-          fc = f.split(":");
-          family = fc[0];
-          column = fc[1];
-          scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+          if (f.contains(":")) {
+            fc = f.split(":");
+            family = fc[0];
+            column = fc[1];
+            scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+            }
           }
         }
       // Limit
