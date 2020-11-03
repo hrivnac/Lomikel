@@ -38,7 +38,7 @@ import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
-
+import org.apache.hadoop.hbase.TableNotFoundException;
 // Hadoop
 import org.apache.hadoop.conf.Configuration;
 

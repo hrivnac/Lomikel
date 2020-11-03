@@ -190,6 +190,7 @@ public class HBase2Table {
         }
       }
     hidden += "]";
+    log.info(idCol + " " + hidden);
     return hidden;
     }
     

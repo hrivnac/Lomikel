@@ -172,7 +172,9 @@
         </button>
       <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaaaff; color:black">Show latest <%=hbaseRowName%>s</button>
       <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaaaff; color:black">Show all <%=hbaseRowName%>s</button>
-      <button onclick="showHist()" style="background-color:#ddddff">Plot selected variables</button>    
+      <button onclick="showHist()"    style="background-color:#ddddff" title="time dependence of multiple variables">Evolution</button>    
+      <button onclick="showScatter()" style="background-color:#ddddff" title="scatter plot of two variables"        >Scatter Plot</button>    
+      <button onclick="show3D()"      style="background-color:#ddddff" title="3d plot of three variables"           >3D Plot</button>    
       </div>
     <%
       }
