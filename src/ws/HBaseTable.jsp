@@ -127,7 +127,10 @@
         stopL  = DateTimeManagement.string2time(stop,  "dd/MM/YYYY HH:mm");
         msg += "till: <b>" + stop + "</b> = " + stopL + "<br/>";
         }
-      HBaseClient h = new HBaseClient(hbase);
+      %>
+    <%@include file="HBaseClient.jsp"%>
+    <%      
+      String clientName = h.getClass().getSimpleName();
       h.setLimit(limit);
       if (schema.equals("")) {
         h.connect(htable);
@@ -222,7 +225,7 @@
       w2utils.settings.dateFormat ='dd/MM/yyyy|h24:mm';
       var hform = { 
         name   : 'hbaseTableForm',
-        header : 'HBase Search',
+        header : '<%=clientName%>: <%=htable%>@<%=hbase%>',
         url    : 'HBaseTable.jsp',
         fields : [
           {field:'key',     type: 'text',     html: {caption: 'Exact Key',      text : ' (exact search on row keys: key,key,...)',                          attr: 'style="width: 500px"'}},
