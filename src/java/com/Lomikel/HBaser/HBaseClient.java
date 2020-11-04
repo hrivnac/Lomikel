@@ -446,8 +446,14 @@ public class HBaseClient {
             }
           }
         if (onlyKeys) {
-          scan.withStartRow(              Bytes.toBytes(allKeys.first()), true);
-          scan.withStopRow(incrementBytes(Bytes.toBytes(allKeys.last())), true);
+          if (isReversed()) {
+            scan.withStartRow(                              Bytes.toBytes(allKeys.last()), true);
+            scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.first())), true);
+            }
+          else {
+            scan.withStartRow(                              Bytes.toBytes(allKeys.first()), true);
+            scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.last())), true);
+            }
           }
         if (_isRange && !onlyKeys) {
           log.warn("Range scan is ignored because incompatible with other arguments");
@@ -456,8 +462,8 @@ public class HBaseClient {
         FilterList filterList;
         if (_isRange) {
           log.info("Performing range scan");
-          RowRange rr = new RowRange(               Bytes.toBytes(allKeys.first()), true,
-                                     incrementBytes(Bytes.toBytes(allKeys.last())), true);
+          RowRange rr = new RowRange(                               Bytes.toBytes(allKeys.first()), true,
+                                     Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.last())), true);
           List<RowRange> lrr = new ArrayList<>();
           lrr.add(rr);
           filterList = new FilterList(_operator, new MultiRowRangeFilter(lrr));
@@ -489,6 +495,8 @@ public class HBaseClient {
           scan.setMaxResultSize(limit0 * _schema.size());
           }
         }
+      // Reversed
+      scan.setReversed(isReversed());
       // Results
       try {
         ResultScanner rs = table().getScanner(scan);
@@ -510,7 +518,7 @@ public class HBaseClient {
       }
     log.info(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
     return results;
-    }
+    }    
     
   /** Add {@link Result} into result {@link Map}.
     * @param r       The {@link Result} to add.
@@ -617,6 +625,7 @@ public class HBaseClient {
     * @return         The {@link Set} of {@link Pair}s of timestamp-value. */
   public Set<Pair<String, String>> timeline(String columnName,
                                             String search) {
+    log.info("Getting timeline of " + columnName + " with " + search);
     Set<Pair<String, String>> tl = new TreeSet<>();
     Map<String, Map<String, String>> results = scan(null, search, columnName, 0, false, true);
     Pair<String, String> p;
@@ -631,6 +640,8 @@ public class HBaseClient {
     }
     
   /** Give all recent values of the column.
+    * Results are ordered by the row key, so evetual limits on results
+    * number will be apllied to them and not to the time.
     * @param columnName     The name of the column.
     * @param substringValue The column value substring to search for.
     * @param minutes        How far into the past it should search. 
@@ -640,12 +651,13 @@ public class HBaseClient {
                              String  prefixValue,
                              long    minutes,
                              boolean getValues) {
+    log.info("Getting " + columnName + " of rows prefixed by " + prefixValue + " from last " + minutes + " minutes");
     Set<String> l = new TreeSet<>();
     String search = "";
     if (prefixValue != null) {
       search += columnName + ":" + prefixValue + ":prefix";
       }
-    Map<String, Map<String, String>> results = scan(null, search, null, minutes, false, false);
+    Map<String, Map<String, String>> results = scan(null, search, columnName, minutes, false, false);
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (!entry.getKey().startsWith("schema")) {
         l.add(getValues ? entry.getValue().get(columnName) : entry.getKey());
@@ -729,11 +741,37 @@ public class HBaseClient {
     _limit = limit;
     }
     
+  /** Give the limit for the number of results.
+    * @return The limit for the number of results. */
+  public int limit() {
+    return _limit;
+    }
+    
+  /** Set whether the results should be in the reversed order.
+    * @param reversed Whether the results should be in the reversed order. */
+  public void setReversed(boolean reversed) {
+    log.info("Setting reversed " + reversed);
+    _reversed = reversed;
+    }
+    
+  /** Tell, whether the results should be in the reversed order.
+    * @return  Whether the results should be in the reversed order. */
+  public boolean isReversed() {
+    return _reversed;
+    }
+    
   /** Set the limit for the number of searched results (before eventual evaluation).
     * @param limit The limit for the number of searched esults. */
   public void setSearchLimit(int limit) {
     log.info("Setting search limit " + limit);
     _limit0 = limit;
+    }
+    
+    
+  /** Give the limit for the number of searched results (before eventual evaluation).
+    * @retrun The limit for the number of searched esults. */
+  public int searchLimit() {
+    return _limit0;
     }
     
   /** Set the AND/OR operator for prefix column search.
@@ -789,23 +827,23 @@ public class HBaseClient {
   /** Increment <tt>byte[]</tt>.
     * @param value The origibal value.
     * @return      The incremented value. */
-  public static byte[] incrementBytes(final byte[] value) {
-    byte[] newValue = Arrays.copyOf(value, value.length);
-    for (int i = 0; i < newValue.length; i++) {
-      int val = newValue[newValue.length - i - 1] & 0x0ff;
-      int total = val + 1;
-      boolean carry = false;
-      if (total > 255) {
-        carry = true;
-        total %= 256;
-        }
-      newValue[newValue.length - i - 1] = (byte) total;
-      if (!carry) {
-        return newValue;
-        }
-      }
-    return newValue;
-    }
+  //public static byte[] incrementBytes(final byte[] value) {
+  //  byte[] newValue = Arrays.copyOf(value, value.length);
+  //  for (int i = 0; i < newValue.length; i++) {
+  //    int val = newValue[newValue.length - i - 1] & 0x0ff;
+  //    int total = val + 1;
+  //    boolean carry = false;
+  //    if (total > 255) {
+  //      carry = true;
+  //      total %= 256;
+  //      }
+  //    newValue[newValue.length - i - 1] = (byte) total;
+  //    if (!carry) {
+  //      return newValue;
+  //      }
+  //    }
+  //  return newValue;
+  //  }
     
   /** Results presented as a readable {@link String}.
     * @param results The {@link Map} of results.
@@ -925,6 +963,8 @@ public class HBaseClient {
   private int _limit0 = 0;
    
   private int _limit = 0;
+  
+  private boolean _reversed = false;
  
   private String _dateFormat = null;
   

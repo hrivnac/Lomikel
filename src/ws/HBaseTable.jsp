@@ -170,8 +170,8 @@
       <button onClick="w2popup.load({url:'Help-HBaseTable.html', showMax: true})" style="position:absolute; right:0">
         <img src="images/Help.png" width="10"/>
         </button>
-      <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaaaff; color:black">Show latest <%=hbaseRowName%>s</button>
-      <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaaaff; color:black">Show all <%=hbaseRowName%>s</button>
+      <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaaaff; color:black"title="show only the latest <%=hbaseRowName%>s of each <%=group%>">Latest <%=hbaseRowName%>s</button>
+      <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaaaff; color:black"title="show all <%=hbaseRowName%>s of each <%=group%>">All <%=hbaseRowName%>s</button>
       <button onclick="showHist()"    style="background-color:#ddddff" title="time dependence of multiple variables">Evolution</button>    
       <button onclick="showScatter()" style="background-color:#ddddff" title="scatter plot of two variables"        >Scatter Plot</button>    
       <button onclick="show3D()"      style="background-color:#ddddff" title="3d plot of three variables"           >3D Plot</button>    
