@@ -19,9 +19,12 @@ import org.apache.log4j.Logger;
 public class Schema {
   
   /** Set overall schema.
-    * @param schemaMap The schema to set. */
-  public Schema(Map<String, String> schemaMap) {
-    _schemaMap = schemaMap;
+    * @param schemaName The name of the schema to set.
+    * @param schemaMap  The schema to set. */
+  public Schema(String              schemaName,
+                Map<String, String> schemaMap) {
+    _schemaName = schemaName;
+    _schemaMap  = schemaMap;
     }
     
   /** Decode the column value.
@@ -168,6 +171,14 @@ public class Schema {
   public Set<String> columnNames() {
     return _schemaMap.keySet();
     }
+    
+  /** Give schema name.
+    * @return The schema name.*/
+  public String name() {
+    return _schemaName;
+    }
+    
+  private String _schemaName;
     
   private Map<String, String> _schemaMap;
 

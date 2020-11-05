@@ -192,10 +192,10 @@ public class HBaseClient {
         Set<Map.Entry<String, Map<String, String>>> schemasSet = schemas.entrySet();
         List<Map.Entry<String, Map<String, String>>> schemasList = new ArrayList<>(schemasSet);
         Map.Entry<String, Map<String, String>> schemaEntry = schemasList.get(schemasList.size() - 1);
-        _schema = new Schema(schemaEntry.getValue());
+        _schema = new Schema(schemaName, schemaEntry.getValue());
         }
       else {
-        _schema = new Schema(schemas.entrySet().iterator().next().getValue());
+        _schema = new Schema(schemaName, schemas.entrySet().iterator().next().getValue());
         }
       }
     return _table;
