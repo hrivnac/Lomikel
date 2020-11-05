@@ -178,6 +178,11 @@ public class Schema {
     return _schemaName;
     }
     
+  @Override
+  public String toString() {
+    return "Schema " + name() + " = " + _schemaMap;
+    }
+    
   private String _schemaName;
     
   private Map<String, String> _schemaMap;
