@@ -320,11 +320,15 @@
       return "<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>*binary*</a><a target='popup' href='FITSView.jsp?id=" + value + "'>&#8599;</a></b>"
       }
     function histSelector(column) {
-      return "<input type='checkbox' name='y1_" + column + "' class='y' id='y1_" + column + "'></input>&nbsp;";
+      return "<input type='checkbox' name='x1_" + column + "' class='x' id='x1_" + column + "' title='x'></input>&nbsp;" +
+             "<input type='checkbox' name='y1_" + column + "' class='y' id='y1_" + column + "' title='y'></input>&nbsp;" +
+             "<input type='checkbox' name='z1_" + column + "' class='z' id='z1_" + column + "' title='z'></input>&nbsp;";
       }
     function showHist() {
       var y = "";
-      var ys = document.getElementsByClassName('y');
+      var ys = [].slice.call(document.getElementsByClassName('x')).concat(
+               [].slice.call(document.getElementsByClassName('y')).concat(
+               [].slice.call(document.getElementsByClassName('z'))));
       for (i = 0; i < ys.length; i++) {
         if (ys[i].checked) {
           if (!y.includes(ys[i].id.substring(3))) { 
@@ -335,19 +339,39 @@
       loadPane("plot", "HistView.jsp?y=" + y.trim(), true, visheight);
       }
     function showScatter() {
+      var x = "";
       var y = "";
+      var z = "";
+      var xs = document.getElementsByClassName('x');
       var ys = document.getElementsByClassName('y');
-      for (i = 0; i < ys.length; i++) {
-        if (ys[i].checked) {
-          if (!y.includes(ys[i].id.substring(3))) { 
-            y += ys[i].id.substring(3) + " ";
+      var zs = document.getElementsByClassName('z');
+      for (i = 0; i < xs.length; i++) {
+        if (xs[i].checked) {
+          if (!x.includes(xs[i].id.substring(3))) { 
+            x = xs[i].id.substring(3);
+            break;
             }
           }
         }
-      [xName, yName, zName] = y.split(" ");
-      var params = "x=" + xName + "&y=" + yName;
-      if (zName) {
-        params += "&z=" + zName;
+      for (i = 0; i < ys.length; i++) {
+        if (ys[i].checked) {
+          if (!y.includes(ys[i].id.substring(3))) { 
+            y = ys[i].id.substring(3);
+            break;
+            }
+          }
+        }
+      for (i = 0; i < zs.length; i++) {
+        if (zs[i].checked) {
+          if (!z.includes(zs[i].id.substring(3))) { 
+            z = zs[i].id.substring(3);
+            break;
+            }
+          }
+        }
+      var params = "x=" + x + "&y=" + y;
+      if (z) {
+        params += "&z=" + z;
         }
       loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
       }
