@@ -3,37 +3,61 @@
 <!-- Lomikel Scatter Plot -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
-<%@ page errorPage="ExceptionHandler.jsp" %>
+<%@ page import="org.apache.log4j.Logger" %>
+
+<%@ page errorPage="../ExceptionHandler.jsp" %>
+
+<%! static Logger log = Logger.getLogger(org.apache.jsp.d3.scatterplot_jsp.class); %>
 
 <script src="../d3-v6.0.0/d3.js"></script>
 
+<jsp:useBean id="h2table"    class="com.Lomikel.WebService.HBase2Table"    scope="session"/>
 <jsp:useBean id="repository" class="com.Lomikel.WebService.DataRepository" scope="session"/>
 
 <div id="scatter_area"></div>
 
 <%
-  String name = request.getParameter("data");
-  String x    = request.getParameter("x");
-  String y    = request.getParameter("y");
-  String data = null;
-  if (name != null && !name.trim().equals("")) {
-    data = repository.get(name);
+  String data     = request.getParameter("data");
+  String dataName = request.getParameter("dataName");
+  String name     = request.getParameter("name");
+  String x        = request.getParameter("x");
+  String y        = request.getParameter("y");
+  String z        = request.getParameter("z");
+  // data supplied as JSON string
+  if (data != null && !data.trim().equals("")) {
     }
-  if (data == null) {
-    data = "[{'x':10, 'y':20, 'z':5}, {'x':40, 'y':90, 'z':6}, {'x':80, 'y':50, 'z':7}]";
+  // data supplied via DataRepository
+  else if (dataName != null && !dataName.trim().equals("")) {
+    data = repository.get(dataName);
     }
+  // data supplied via HBase2Table
+  else {
+   data = h2table.xyz(x, y, z);
+   }
+  // no data found, use demo data
+  if (data == null || data.trim().equals("")) {
+    data = "[{'x':10, 'y':-20, 'z':5}, {'x':40, 'y':90, 'z':6}, {'x':80, 'y':50, 'z':7}]";
+    }
+   log.info(data);
+  // Variable names
   if (x == null) {
     x = "x";
     }
   if (y == null) {
     y = "y";
     }
+  if (z == null) {
+    z = "z";
+    }
+  if (name == null && dataName != null) {
+    name = dataName;
+    }
   %>
 
 <script type="text/javascript" src="scatterplot.js"></script>
   
 <script>
-  showScatterPlot("<%=data%>", "<%=name%>", "<%=x%>", "<%=y%>");
+  showScatterPlot("<%=data%>", "<%=name%>", "<%=x%>", "<%=y%>", "<%=z%>");
   </script>
 
   

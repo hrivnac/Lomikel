@@ -1,4 +1,4 @@
-function showScatterPlot(dataS, name, xS, yS) {
+function showScatterPlot(dataS, name, xS, yS, zS) {
   var w = 450;
   var h = 400;
   var margin = {top:10, right:40, bottom:30, left:30},
@@ -42,5 +42,5 @@ function showScatterPlot(dataS, name, xS, yS) {
      .append("circle")
      .attr("cx", function(d){return x(d.x)})
      .attr("cy", function(d){return y(d.y)})
-     .attr("r",  function(d){return   d.z})
+     .attr("r",  function(d){return   d.z ? d.z : 3})
   }

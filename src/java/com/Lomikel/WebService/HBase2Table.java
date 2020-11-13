@@ -194,6 +194,46 @@ public class HBase2Table {
     return hidden;
     }
     
+  /** Give 2/3D subtable as a JSON array.
+    * @param xName The name of the x-axis column.
+    * @param yName The name of the y-axis column. 
+    * @param zName The name of the z-axis column. Can be <tt>null</tt>.
+    * @return  The corresponding data as a JSON array. */
+  public String xyz(String xName,
+                    String yName,
+                    String zName) {
+    log.info("Getting data for " + xName + "," + yName + "," + zName);
+    String data = "";
+    Map<String, String> entry;
+    boolean first = true;
+    for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
+      String xVal = null;
+      String yVal = null;
+      String zVal = null;
+      if (!entry0.getKey().startsWith("schema")) {
+        if (first) {
+          first = false;
+          }
+        else {
+          data += ",";
+          }
+        entry = entry0.getValue();
+        xVal = entry.get(xName);
+        yVal = entry.get(yName);
+        if (zName != null) {
+          zVal = entry.get(zName);
+          data += "{'x':" + xVal + ",'y':" + yVal + ",'z':" + zVal + "}";
+          }
+        else {
+          data += "{'x':" + xVal + ",'y':" + yVal + "}";
+          }
+        }
+      }
+    data = "[" + data + "]";
+    log.info(data);
+    return data; 
+    }
+    
   /** Give <em>checkbox</em> for column selection.
     * @param column The column name as <tt>family:column</tt>.
     * @return       The corresponding <em>checkbox</em>. */

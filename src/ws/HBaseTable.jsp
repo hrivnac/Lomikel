@@ -334,6 +334,23 @@
         }
       loadPane("plot", "HistView.jsp?y=" + y.trim(), true, visheight);
       }
+    function showScatter() {
+      var y = "";
+      var ys = document.getElementsByClassName('y');
+      for (i = 0; i < ys.length; i++) {
+        if (ys[i].checked) {
+          if (!y.includes(ys[i].id.substring(3))) { 
+            y += ys[i].id.substring(3) + " ";
+            }
+          }
+        }
+      [xName, yName, zName] = y.split(" ");
+      var params = "x=" + xName + "&y=" + yName;
+      if (zName) {
+        params += "&z=" + zName;
+        }
+      loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
+      }
     </script>
 
   <script type="text/javascript" src="CustomRange.js"></script>
