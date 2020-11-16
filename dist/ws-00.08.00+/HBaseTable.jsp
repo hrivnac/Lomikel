@@ -172,9 +172,10 @@
         </button>
       <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaaaff; color:black"title="show only the latest <%=hbaseRowName%>s of each <%=group%>">Latest <%=hbaseRowName%>s</button>
       <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaaaff; color:black"title="show all <%=hbaseRowName%>s of each <%=group%>">All <%=hbaseRowName%>s</button>
-      <button onclick="showHist()"    style="background-color:#ddddff" title="time dependence of multiple variables">Evolution</button>    
-      <button onclick="showScatter()" style="background-color:#ddddff" title="scatter plot of two variables"        >Scatter Plot</button>    
-      <button onclick="show3D()"      style="background-color:#ddddff" title="3d plot of three variables"           >3D Plot</button>    
+      <button onclick="showHist()"      style="background-color:#ddddff" title="time dependence of multiple variables"   >Evolution</button>    
+      <button onclick="showEvolution()" style="background-color:#ddddff" title="time dependence of multiple variables"   >Evolution Plot</button>    
+      <button onclick="showScatter()"   style="background-color:#ddddff" title="scatter plot of two * multiple variables">Scatter Plot</button>    
+      <button onclick="show3D()"        style="background-color:#ddddff" title="3d plot of three variables"              >3D Plot</button>    
       </div>
     <%
       }
@@ -337,6 +338,21 @@
           }
         }
       loadPane("plot", "HistView.jsp?y=" + y.trim(), true, visheight);
+      }
+    function showEvolution() {
+      var y = "";
+      var ys = [].slice.call(document.getElementsByClassName('x')).concat(
+               [].slice.call(document.getElementsByClassName('y')).concat(
+               [].slice.call(document.getElementsByClassName('z'))));
+      for (i = 0; i < ys.length; i++) {
+        if (ys[i].checked) {
+          if (!y.includes(ys[i].id.substring(3))) { 
+            y += ys[i].id.substring(3) + " ";
+            }
+          }
+        }
+      var params = "y=" + y;
+      loadPane("plot", "d3/evolutionplot.jsp?" + params, true, visheight);
       }
     function showScatter() {
       var x = "";

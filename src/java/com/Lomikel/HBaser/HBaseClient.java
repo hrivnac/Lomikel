@@ -339,6 +339,9 @@ public class HBaseClient {
              ", filter: " + filter +
              ", interval: " + start + " ms - " + stop + " ms" +
              ", id/time: " + ifkey + "/" + iftime);
+    if (filter != null && filter.contains("*")) {
+      iftime = true;
+      }
     long time = System.currentTimeMillis();
     if (stop == 0) {
       stop = System.currentTimeMillis();

@@ -72,6 +72,7 @@ public class HBase2Table {
           }
         }
       }
+    columns.add("key:time");
     _thead = "";
     String formatter;
     for (String column : columns) {
@@ -261,7 +262,7 @@ public class HBase2Table {
           data += ",";
           }
         entry = entry0.getValue();
-        tVal = entry.get("time:time");
+        tVal = entry.get("key:time");
         int n = 0;
         for (String yN : yName.trim().split(" ")) {
           yVal = entry.get(yN);
