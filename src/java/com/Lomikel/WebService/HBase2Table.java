@@ -197,7 +197,9 @@ public class HBase2Table {
   /** Give 2/3D subtable as a JSON array.
     * @param xName The name of the x-axis column.
     * @param yName The name of the y-axis column. 
-    * @param zName The name of the z-axis column. Can be <tt>null</tt>.
+    * @param zName The name of the z-axis column
+    *              (or the blank separated list of them).
+    *              Can be <tt>null</tt>.
     * @return  The corresponding data as a JSON array. */
   public String xyz(String xName,
                     String yName,
@@ -236,8 +238,43 @@ public class HBase2Table {
         }
       }
     data = "[" + data + "]";
-    log.info(data);
     return data; 
+    }
+    
+  /** Give time-dependence as a JSON array.
+    * @param yName The name of the y-axis column
+    *              (or the blank separated list of them).
+    * @return  The corresponding data as a JSON array. */
+  public String ty(String yName) {
+    log.info("Getting data for " + yName);
+    String data = "";
+    Map<String, String> entry;
+    boolean first = true;
+    for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
+      String tVal = null;
+      String yVal = null;
+      if (!entry0.getKey().startsWith("schema")) {
+        if (first) {
+          first = false;
+          }
+        else {
+          data += ",";
+          }
+        entry = entry0.getValue();
+        tVal = entry.get("time:time");
+        int n = 0;
+        for (String yN : yName.trim().split(" ")) {
+          yVal = entry.get(yN);
+          if (n > 0) {
+            data +=",";
+            }
+          data += "{'t':" + tVal + ",'y':" + yVal + ",'g':" + n++ + "}";
+          }
+        }
+      }
+    data = "[" + data + "]";
+    log.info(data);
+    return data;
     }
     
   /** Give <em>checkbox</em> for column selection.
