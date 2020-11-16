@@ -364,8 +364,7 @@
       for (i = 0; i < zs.length; i++) {
         if (zs[i].checked) {
           if (!z.includes(zs[i].id.substring(3))) { 
-            z = zs[i].id.substring(3);
-            break;
+            z += zs[i].id.substring(3) + " ";
             }
           }
         }

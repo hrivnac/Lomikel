@@ -221,8 +221,14 @@ public class HBase2Table {
         xVal = entry.get(xName);
         yVal = entry.get(yName);
         if (zName != null) {
-          zVal = entry.get(zName);
-          data += "{'x':" + xVal + ",'y':" + yVal + ",'z':" + zVal + "}";
+          int n = 0;
+          for (String zN : zName.trim().split(" ")) {
+            zVal = entry.get(zN);
+            if (n > 0) {
+              data +=",";
+              }
+            data += "{'x':" + xVal + ",'y':" + yVal + ",'z':" + zVal + ",'g':" + n++ + "}";
+            }
           }
         else {
           data += "{'x':" + xVal + ",'y':" + yVal + "}";

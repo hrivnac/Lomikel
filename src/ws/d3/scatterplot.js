@@ -1,6 +1,7 @@
-function showScatterPlot(dataS, name, xS, yS, zS) {
+function showEvolutionPlot(dataS, name, xS, yS, zS) {
   var w = 450;
   var h = 400;
+  var colors = ['#ff0000', '#00ff00', '#0000ff'];
   var margin = {top:10, right:40, bottom:30, left:30},
                width =  w - margin.left - margin.right,
                height = h - margin.top  - margin.bottom;
@@ -13,7 +14,7 @@ function showScatterPlot(dataS, name, xS, yS, zS) {
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   svg.append("text")
      .attr("x", (width / 2))             
-     .attr("y", 0 + (margin.top / 2))
+     .attr("y", 0)
      .attr("text-anchor", "middle")
      .style("font-size", "16px")
      .style("font-weight", "bold")
@@ -54,6 +55,6 @@ function showScatterPlot(dataS, name, xS, yS, zS) {
      .append("circle")
      .attr("cx", d => x(d.x))
      .attr("cy", d => y(d.y))
-     .attr("r",  d => d.z ? z(d.z) : 3)
-     .style("fill", "steelblue");
+     .attr("r",  d => d.z ? z(d.z) : 1)
+     .style("fill", d => d.g ? colors[d.g] : 0);
   }
