@@ -262,7 +262,8 @@ public class HBase2Table {
           data += ",";
           }
         entry = entry0.getValue();
-        tVal = entry.get("key:time");
+        //tVal = entry.get("key:time");
+        tVal = _cProcessor.getTimestamp(entry);
         int n = 0;
         for (String yN : yName.trim().split(" ")) {
           yVal = entry.get(yN);
@@ -285,7 +286,16 @@ public class HBase2Table {
     return "&nbsp;<input type='checkbox' name='y0_" + column + "' class='y' id='y0_" + column + "'></input>";
     }
     
+  /** Change used {@link HBaseColumnsProcessor} to a customised one.
+    * @param cProcessor The customised {@link HBaseColumnsProcessor}. */
+  public static void changeColumnsProcessor(HBaseColumnsProcessor cProcessor) {
+    log.info("Changing Columns Processor to " + cProcessor);
+    _cProcessor = cProcessor;
+    }
+    
   private BinaryDataRepository _repository = new BinaryDataRepository();  
+  
+  private static HBaseColumnsProcessor _cProcessor = new HBaseColumnsProcessor();
     
   private Schema _schema;
   

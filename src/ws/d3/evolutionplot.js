@@ -51,6 +51,6 @@ function showEvolutionPlot(dataS, name, yS) {
      .append("circle")
      .attr("cx", d => t(d.t))
      .attr("cy", d => y(d.y))
-     .attr("r", 3)
+     .attr("r", 1)
      .style("fill", d => d.g ? colors[d.g] : 0);
   }

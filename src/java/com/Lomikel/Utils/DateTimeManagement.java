@@ -98,7 +98,7 @@ public class DateTimeManagement {
    catch (ParseException e) {
      log.error("Cannot parse time " + timeS + " as " + format + ", using current time");
      }
-   int[] id = new int[]{timeD.getYear() + 1900, 
+   int[] id = new int[]{timeD.getYear(), 
                         timeD.getMonth(),
                         timeD.getDate(),
                         timeD.getHours(),

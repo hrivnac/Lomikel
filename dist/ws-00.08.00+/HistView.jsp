@@ -35,8 +35,8 @@
     xVal = null;
     yVal = null;
     if (!entry0.getKey().startsWith("schema")) {
-      xVal = processor.getXDate(entry0);
       entry = entry0.getValue();
+      xVal = processor.getDate(entry);
       for (String yi : ys) {
         yVal = null;
         for (String k : entry.keySet()) {
