@@ -8,8 +8,17 @@ function showScatterPlot(dataS, name, xS, yS, zS) {
               .append("svg")
               .attr("width",  width  + margin.left + margin.right)
               .attr("height", height + margin.top  + margin.bottom)
+              .attr("class", "scatterplot")
               .append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  svg.append("text")
+     .attr("x", (width / 2))             
+     .attr("y", 0 + (margin.top / 2))
+     .attr("text-anchor", "middle")
+     .style("font-size", "16px")
+     .style("font-weight", "bold")
+     .style("text-decoration", "underline")  
+     .text(name);
   var data = JSON.parse(dataS.replace(/'/g, '"'));
   var x = d3.scaleLinear()
             .domain(d3.extent(data, d => d.x)).nice()
@@ -36,11 +45,15 @@ function showScatterPlot(dataS, name, xS, yS, zS) {
                  .attr("font-weight", "bold")
                  .attr("text-anchor", "start")
                  .text(yS));
+  var z = d3.scaleLinear()         
+            .domain(d3.extent(data, d => d.z)).nice()
+            .range([1, 5]);   
   svg.selectAll("whatever")
      .data(data)
      .enter()
      .append("circle")
-     .attr("cx", function(d){return x(d.x)})
-     .attr("cy", function(d){return y(d.y)})
-     .attr("r",  function(d){return   d.z ? d.z : 3})
+     .attr("cx", d => x(d.x))
+     .attr("cy", d => y(d.y))
+     .attr("r",  d => d.z ? z(d.z) : 3)
+     .style("fill", "steelblue");
   }

@@ -8,7 +8,8 @@
 <%@ page errorPage="../ExceptionHandler.jsp" %>
 
 <%! static Logger log = Logger.getLogger(org.apache.jsp.d3.scatterplot_jsp.class); %>
-
+   
+<link href="scatterplot.css" rel="stylesheet" type="text/css"/>
 <script src="../d3-v6.0.0/d3.js"></script>
 
 <jsp:useBean id="h2table"    class="com.Lomikel.WebService.HBase2Table"    scope="session"/>
@@ -35,8 +36,8 @@
    data = h2table.xyz(x, y, z);
    }
   // no data found, use demo data
-  if (data == null || data.trim().equals("")) {
-    data = "[{'x':10, 'y':-20, 'z':5}, {'x':40, 'y':90, 'z':6}, {'x':80, 'y':50, 'z':7}]";
+  if (data == null || data.trim().equals("") || data.trim().equals("[]")) {
+    data = "[{'x':10, 'y':-20, 'z':5}, {'x':60, 'y':90, 'z':6}, {'x':80, 'y':50, 'z':7}, {'x':60, 'y':30}]";
     }
    log.info(data);
   // Variable names
@@ -49,9 +50,17 @@
   if (z == null) {
     z = "z";
     }
-  if (name == null && dataName != null) {
-    name = dataName;
+  if (name == null) {
+    if (dataName != null) {
+      name = dataName;
+      }
+    else {
+      name = "";
+      }
     }
+  name += " (" + x + " * " + y + " * " + z + ")";
+  x += " →";
+  y =  "↑ " + y;
   %>
 
 <script type="text/javascript" src="scatterplot.js"></script>
