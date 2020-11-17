@@ -49,8 +49,6 @@
       name = "";
       }
     }
-  name += " (" + y + ")";
-  y =  "↑ " + y;
   %>
 
 <script type="text/javascript" src="evolutionplot.js"></script>

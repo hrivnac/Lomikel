@@ -58,9 +58,6 @@
       name = "";
       }
     }
-  name += " (" + x + " * " + y + " * " + z + ")";
-  x += " →";
-  y =  "↑ " + y;
   %>
 
 <script type="text/javascript" src="scatterplot.js"></script>

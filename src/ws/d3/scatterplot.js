@@ -1,7 +1,8 @@
 function showEvolutionPlot(dataS, name, xS, yS, zS) {
   var w = 450;
   var h = 400;
-  var colors = ['#ff0000', '#00ff00', '#0000ff'];
+  const colors = d3.schemeCategory10;
+  name += ": " + xS + " * " + yS + " => " + zS; 
   var margin = {top:10, right:40, bottom:30, left:30},
                width =  w - margin.left - margin.right,
                height = h - margin.top  - margin.bottom;
@@ -16,10 +17,10 @@ function showEvolutionPlot(dataS, name, xS, yS, zS) {
      .attr("x", (width / 2))             
      .attr("y", 0)
      .attr("text-anchor", "middle")
-     .style("font-size", "16px")
+     .style("font-size", "12px")
      .style("font-weight", "bold")
      .style("text-decoration", "underline")  
-     .text(name);
+     .text(name)
   var data = JSON.parse(dataS.replace(/'/g, '"'));
   var x = d3.scaleLinear()
             .domain(d3.extent(data, d => d.x)).nice()
@@ -33,7 +34,7 @@ function showEvolutionPlot(dataS, name, xS, yS, zS) {
                  .attr("fill", "#000")
                  .attr("font-weight", "bold")
                  .attr("text-anchor", "end")
-                 .text(xS));
+                 .text(xS + " →"));
   var y = d3.scaleLinear()         
             .domain(d3.extent(data, d => d.y)).nice()
             .range([height, 0]);   
@@ -45,7 +46,7 @@ function showEvolutionPlot(dataS, name, xS, yS, zS) {
                  .attr("fill", "#000")
                  .attr("font-weight", "bold")
                  .attr("text-anchor", "start")
-                 .text(yS));
+                 .text("↑ " + yS));
   var z = d3.scaleLinear()         
             .domain(d3.extent(data, d => d.z)).nice()
             .range([1, 5]);   
@@ -56,5 +57,5 @@ function showEvolutionPlot(dataS, name, xS, yS, zS) {
      .attr("cx", d => x(d.x))
      .attr("cy", d => y(d.y))
      .attr("r",  d => d.z ? z(d.z) : 1)
-     .style("fill", d => d.g ? colors[d.g] : 0);
+     .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black');
   }

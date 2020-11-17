@@ -1,7 +1,8 @@
 function showEvolutionPlot(dataS, name, yS) {
   var w = 650;
   var h = 400;
-  var colors = ["red", "green", "blue"];
+  const colors = d3.schemeCategory10;
+  name += ": " + yS;
   var margin = {top:10, right:40, bottom:120, left:60},
                width =  w - margin.left - margin.right,
                height = h - margin.top  - margin.bottom;
@@ -16,7 +17,7 @@ function showEvolutionPlot(dataS, name, yS) {
      .attr("x", (width / 2))             
      .attr("y", 0 + (margin.top / 2))
      .attr("text-anchor", "middle")
-     .style("font-size", "16px")
+     .style("font-size", "12px")
      .style("font-weight", "bold")
      .style("text-decoration", "underline")  
      .text(name);
@@ -44,7 +45,7 @@ function showEvolutionPlot(dataS, name, yS) {
                  .attr("fill", "#000")
                  .attr("font-weight", "bold")
                  .attr("text-anchor", "start")
-                 .text(yS));
+                 .text("↑ " + yS));
   svg.selectAll("whatever")
      .data(data)
      .enter()
@@ -52,5 +53,5 @@ function showEvolutionPlot(dataS, name, yS) {
      .attr("cx", d => t(d.t))
      .attr("cy", d => y(d.y))
      .attr("r", 1)
-     .style("fill", d => d.g ? colors[d.g] : 0);
+     .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black');
   }

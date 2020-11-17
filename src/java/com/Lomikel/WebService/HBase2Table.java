@@ -275,7 +275,6 @@ public class HBase2Table {
         }
       }
     data = "[" + data + "]";
-    log.info(data);
     return data;
     }
     
