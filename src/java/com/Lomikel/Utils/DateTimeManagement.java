@@ -1,10 +1,13 @@
 package com.Lomikel.Utils;
 
+import de.lehmannet.om.util.DateConverter;
+
 // Java
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.JulianFields;
 import java.util.Date;
+import java.util.Calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -36,30 +39,10 @@ public class DateTimeManagement {
     if (format == null || format.trim().equals("")) {
       format = FORMAT;
       }
-    int[] dt = JulianDate.toTimestamp(jd, false);
-    LocalDateTime ldt = LocalDateTime.MIN.withYear(      dt[0])
-                                         .withMonth(     dt[1])
-                                         .withDayOfMonth(dt[2])
-                                         .withHour(      dt[3])
-                                         .withMinute(    dt[4])
-                                         .withSecond(    dt[5])
-                                         .withNano(      dt[6]);
-    //long jdn = (long)Math.floor(jd + 0.5);
-    //double frac = jd - jdn;
-    //int hours = (int)Math.floor(frac * 24);
-    //frac -= (double)(hours / 24.0);
-    //int minutes = (int)Math.floor(frac * 24 * 60);
-    //frac -= (double)(minutes / 24.0 / 60.0);
-    //int seconds = (int)Math.floor(frac * 24 * 60 * 60);
-    //frac -= (double)(seconds / 24.0 / 60.0 / 60.0);
-    //int nano = (int)Math.floor(frac * 24 * 60 * 60 * 1000000000);
-    //LocalDateTime ldt = LocalDateTime.MIN.with(JulianFields.JULIAN_DAY, jdn)
-    //                                     .withHour(  hours)
-    //                                     .withMinute(minutes)
-    //                                     .withSecond(seconds)
-    //                                     .withNano(  nano);
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-    return ldt.format(formatter);        
+    Calendar calendar = DateConverter.toGregorianDate(jd);
+    Date date = calendar.getTime();
+    SimpleDateFormat formatter = new SimpleDateFormat(format);
+    return formatter.format(date);
     }
     
  /** Give the current time as Julian date.
@@ -86,26 +69,18 @@ public class DateTimeManagement {
      format = FORMAT;
      }
    DateFormat formatter = new SimpleDateFormat(format);
-   Date timeD = new Date();
-   long time = timeD.getTime();
-   double jd = 0;
+   Date date = new Date();
    try {
      if (timeS != null && !timeS.trim().equals("")) {       
-       timeD = formatter.parse(timeS);
-       time = timeD.getTime();
+       date = formatter.parse(timeS);
        }
      }
    catch (ParseException e) {
      log.error("Cannot parse time " + timeS + " as " + format + ", using current time");
      }
-   int[] id = new int[]{timeD.getYear(), 
-                        timeD.getMonth(),
-                        timeD.getDate(),
-                        timeD.getHours(),
-                        timeD.getMinutes(),
-                        timeD.getSeconds(),
-                        0};
-   return JulianDate.toJD(id, false);
+   Calendar calendar = Calendar.getInstance();
+   calendar.setTime(date);
+   return DateConverter.toJulianDate(calendar);
    }
     
     

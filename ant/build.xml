@@ -386,13 +386,14 @@
       <Header><![CDATA[<center>]]>Lomikel version: ${version}<![CDATA[</center>]]></Header>
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
       <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Activities/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
-      <group title="Apps"       packages="com.Lomikel.Apps"/>
-      <group title="HBaser"     packages="com.Lomikel.HBaser"/>
-      <group title="Januser"    packages="com.Lomikel.Januser"/>
-      <group title="Graph"      packages="com.Lomikel.Graph"/>
-      <group title="Utils"      packages="com.Lomikel.Utils*"/>
-      <group title="GUI"        packages="com.Lomikel.GUI*"/>
-      <group title="WebService" packages="com.Lomikel.WebService*"/>
+      <group title="Apps"        packages="com.Lomikel.Apps"/>
+      <group title="HBaser"      packages="com.Lomikel.HBaser"/>
+      <group title="Januser"     packages="com.Lomikel.Januser"/>
+      <group title="Graph"       packages="com.Lomikel.Graph"/>
+      <group title="Utils"       packages="com.Lomikel.Utils*"/>
+      <group title="GUI"         packages="com.Lomikel.GUI*"/>
+      <group title="WebService"  packages="com.Lomikel.WebService*"/>
+      <group title="LehmanUtils" packages="de.lehmannet.om.util*"/>
       <link href="http://docs.oracle.com/javase/8/docs/api" packagelistLoc="${javadoc}" offline="true"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>
