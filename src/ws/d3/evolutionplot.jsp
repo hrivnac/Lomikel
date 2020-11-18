@@ -32,7 +32,7 @@
     }
   // data supplied via HBase2Table
   else {
-   data = h2table.ty(y, s, false);
+   data = h2table.ty(y, s, true);
    }
   // no data found, use demo data
   if (data == null || data.trim().equals("") || data.trim().equals("[]")) {

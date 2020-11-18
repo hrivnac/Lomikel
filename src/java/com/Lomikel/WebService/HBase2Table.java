@@ -195,18 +195,6 @@ public class HBase2Table {
     log.info(idCol + " " + hidden);
     return hidden;
     }
-  /** Give 2/3D subtable as a JSON array.
-    * @param xName The name of the x-axis column.
-    * @param yName The name of the y-axis column. 
-    * @param zName The name of the z-axis column
-    *              (or the blank separated list of them).
-    *              Can be <tt>null</tt>.
-    * @return  The corresponding data as a JSON array. */    
-  public String xyz(String xName,
-                    String yName,
-                    String zName) {
-    return xyz(xName, yName, zName, null);
-    }
     
   /** Give 2/3D subtable as a JSON array.
     * @param xName The name of the x-axis column.
@@ -218,11 +206,12 @@ public class HBase2Table {
     *              Can be <tt>null</tt>.
     *              Disables <tt>zName</tt>.
     * @return  The corresponding data as a JSON array. */
-  public String xyz(String xName,
-                    String yName,
-                    String zName,
-                    String sName) {
-    log.info("Getting data for " + xName + "," + yName + "," + zName + "," + sName);
+  public String xyz(String  xName,
+                    String  yName,
+                    String  zName,
+                    String  sName,
+                    boolean meanValues) {
+    log.info("Getting data for " + xName + "," + yName + "," + zName + "," + sName + "(meanValues = " + meanValues + ")");
     Map<String, String> entry;
     Map<String, Integer> sMap = new HashMap<>();
     int n;
@@ -243,57 +232,91 @@ public class HBase2Table {
         }
       }
     // Data
-    String data = "";
-    boolean first = true;
+    //   Assemble
+    List<String[]> ntuple = new ArrayList<>();
     String xVal;
     String yVal;
     String zVal;
+    int m;
     for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
+      xVal = null;
+      yVal = null;
+      zVal = null;
       if (!entry0.getKey().startsWith("schema")) {
-        if (first) {
-          first = false;
-          }
-        else {
-          data += ",";
-          }
         entry = entry0.getValue();
         xVal = entry.get(xName);
         yVal = entry.get(yName);
-        // sName
-        if (sName != null) {
-          sVal = entry.get(sName);
-          n = sMap.get(sVal);
-          data += "{'x':" + xVal + ",'y':" + yVal + ",'g':" + n + "}";
-          }
-        // zName
-        else if (zName != null) {
-          n = 0;
+        n = 0;
+        if (zName != null) {
           for (String zN : zName.trim().split(" ")) {
             zVal = entry.get(zN);
-            if (n > 0) {
-              data +=",";
+            if (sName != null) {
+              sVal = entry.get(sName);
+              m = sMap.get(sVal);
               }
-            data += "{'x':" + xVal + ",'y':" + yVal + ",'z':" + zVal + ",'g':" + n++ + "}";
+            else {
+              m = n++;
+              }
+            ntuple.add(new String[]{xVal, yVal, zVal, String.valueOf(m)});
             }
           }
-        // noName
         else {
-          data += "{'x':" + xVal + ",'y':" + yVal + "}";
+          if (sName != null) {
+            sVal = entry.get(sName);
+            m = sMap.get(sVal);
+            }
+          else {
+            m = n++;
+            }
+          ntuple.add(new String[]{xVal, yVal, null, String.valueOf(m)});
           }
         }
+      }
+    //   Pack
+    if (meanValues) {
+      Pair<String, String> pair;
+      Map<Pair<String, String>, String> ntuple1 = new HashMap<>(); 
+      for (String[] row : ntuple) {
+        pair = Pair.of(row[3], row[0] + " " + row[1]);
+        if (ntuple1.containsKey(pair)) {
+          ntuple1.put(pair, ntuple1.get(pair) + " " + row[2]);
+          }
+        else {
+          ntuple1.put(pair, row[2]);
+          }
+        }
+      ntuple.clear();
+      double z;
+      String[] zA;
+      for (Map.Entry<Pair<String, String>, String> entry0 : ntuple1.entrySet()) {
+        pair = entry0.getKey();
+        z = 0;
+        if (entry0.getValue() != null) {
+          zA = entry0.getValue().split(" ");
+          for (String zS : zA) {
+            z += Double.valueOf(zS);
+            }
+          z = z / zA.length;
+          }
+        ntuple.add(new String[]{pair.second().split(" ")[0], pair.second().split(" ")[1], String.valueOf(z), pair.first()});
+        }
+      }
+    //   Compose
+    String data = "";
+    boolean first = true;
+    for (String[] row : ntuple) {
+      if (first) {
+        first = false;
+        }
+      else {
+        data += ",";
+        }
+      data += "{'x':" + row[0] + ",'y':" + row[1] +",'z':" + row[2] + ",'g':" + row[3] + "}";
       }
     data = "[" + data + "]";
     return data; 
     }
-    
-  /** Give time-dependence as a JSON array.
-    * @param yName The name of the y-axis column
-    *              (or the blank separated list of them).
-    * @return  The corresponding data as a JSON array. */
-  public String ty(String yName) {
-    return ty(yName, null, false);
-    }
-    
+        
   /** Give time-dependence as a JSON array.
     * @param yName      The name of the y-axis column
     *                   (or the blank separated list of them).

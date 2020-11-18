@@ -34,7 +34,7 @@
     }
   // data supplied via HBase2Table
   else {
-   data = h2table.xyz(x, y, z, s);
+   data = h2table.xyz(x, y, z, s, true);
    }
   // no data found, use demo data
   if (data == null || data.trim().equals("") || data.trim().equals("[]")) {

@@ -21,6 +21,7 @@ function showEvolutionPlot(dataS, name, xS, yS, zS) {
      .style("text-decoration", "underline")  
      .text(name)
   var data = JSON.parse(dataS.replace(/'/g, '"'));
+  console.log(data);
   var x = d3.scaleLinear()
             .domain(d3.extent(data, d => d.x)).nice()
             .range([0, width]);      
@@ -55,6 +56,6 @@ function showEvolutionPlot(dataS, name, xS, yS, zS) {
      .append("circle")
      .attr("cx", d => x(d.x))
      .attr("cy", d => y(d.y))
-     .attr("r",  d => d.z ? z(d.z) : 2)
+     .attr("r",  d => d.z ? z(d.z) : 1)
      .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black');
   }
