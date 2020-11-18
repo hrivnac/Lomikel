@@ -25,7 +25,6 @@ public class Pair<FIRST  extends Comparable<FIRST>,
     return cmp == 0 ? compare(_second, o.second()) : cmp;
     }
 
-
   private <T extends Comparable<T>> int compare(T o1, T o2) {
     if (o1 == null) {
       if (o2 == null) {

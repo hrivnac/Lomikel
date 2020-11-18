@@ -24,6 +24,7 @@
   String x        = request.getParameter("x");
   String y        = request.getParameter("y");
   String z        = request.getParameter("z");
+  String s        = request.getParameter("s");
   // data supplied as JSON string
   if (data != null && !data.trim().equals("")) {
     }
@@ -33,7 +34,7 @@
     }
   // data supplied via HBase2Table
   else {
-   data = h2table.xyz(x, y, z);
+   data = h2table.xyz(x, y, z, s);
    }
   // no data found, use demo data
   if (data == null || data.trim().equals("") || data.trim().equals("[]")) {

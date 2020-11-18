@@ -1,5 +1,6 @@
 package com.Lomikel.WebService;
 
+import com.Lomikel.Utils.Pair;
 import com.Lomikel.HBaser.Schema;
 import com.Lomikel.HBaser.BinaryDataRepository;
 
@@ -194,6 +195,18 @@ public class HBase2Table {
     log.info(idCol + " " + hidden);
     return hidden;
     }
+  /** Give 2/3D subtable as a JSON array.
+    * @param xName The name of the x-axis column.
+    * @param yName The name of the y-axis column. 
+    * @param zName The name of the z-axis column
+    *              (or the blank separated list of them).
+    *              Can be <tt>null</tt>.
+    * @return  The corresponding data as a JSON array. */    
+  public String xyz(String xName,
+                    String yName,
+                    String zName) {
+    return xyz(xName, yName, zName, null);
+    }
     
   /** Give 2/3D subtable as a JSON array.
     * @param xName The name of the x-axis column.
@@ -201,18 +214,41 @@ public class HBase2Table {
     * @param zName The name of the z-axis column
     *              (or the blank separated list of them).
     *              Can be <tt>null</tt>.
+    * @param sName The name of the selector column.
+    *              Can be <tt>null</tt>.
+    *              Disables <tt>zName</tt>.
     * @return  The corresponding data as a JSON array. */
   public String xyz(String xName,
                     String yName,
-                    String zName) {
-    log.info("Getting data for " + xName + "," + yName + "," + zName);
-    String data = "";
+                    String zName,
+                    String sName) {
+    log.info("Getting data for " + xName + "," + yName + "," + zName + "," + sName);
     Map<String, String> entry;
+    Map<String, Integer> sMap = new HashMap<>();
+    int n;
+    String sVal;
+    // Separator map
+    if (sName != null) {
+      Set<String> sSet = new TreeSet<>();
+      for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
+        if (!entry0.getKey().startsWith("schema")) {
+          entry = entry0.getValue();
+          sVal = entry.get(sName);
+          sSet.add(sVal);
+          }
+        }
+      n = 0;
+      for (String s : sSet) {
+        sMap.put(s, n++);
+        }
+      }
+    // Data
+    String data = "";
     boolean first = true;
+    String xVal;
+    String yVal;
+    String zVal;
     for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
-      String xVal = null;
-      String yVal = null;
-      String zVal = null;
       if (!entry0.getKey().startsWith("schema")) {
         if (first) {
           first = false;
@@ -223,8 +259,15 @@ public class HBase2Table {
         entry = entry0.getValue();
         xVal = entry.get(xName);
         yVal = entry.get(yName);
-        if (zName != null) {
-          int n = 0;
+        // sName
+        if (sName != null) {
+          sVal = entry.get(sName);
+          n = sMap.get(sVal);
+          data += "{'x':" + xVal + ",'y':" + yVal + ",'g':" + n + "}";
+          }
+        // zName
+        else if (zName != null) {
+          n = 0;
           for (String zN : zName.trim().split(" ")) {
             zVal = entry.get(zN);
             if (n > 0) {
@@ -233,6 +276,7 @@ public class HBase2Table {
             data += "{'x':" + xVal + ",'y':" + yVal + ",'z':" + zVal + ",'g':" + n++ + "}";
             }
           }
+        // noName
         else {
           data += "{'x':" + xVal + ",'y':" + yVal + "}";
           }
@@ -247,37 +291,109 @@ public class HBase2Table {
     *              (or the blank separated list of them).
     * @return  The corresponding data as a JSON array. */
   public String ty(String yName) {
-    log.info("Getting data for " + yName);
-    String data = "";
+    return ty(yName, null, false);
+    }
+    
+  /** Give time-dependence as a JSON array.
+    * @param yName      The name of the y-axis column
+    *                   (or the blank separated list of them).
+    * @param meanValues Whether replace repeated values with their measn value.
+    * @param sName      The name of the selector column.
+    *                   Can be <tt>null</tt>.
+    *                   Disables selector based on <tt>yName</tt>.
+    * @return           The corresponding data as a JSON array. */
+  public String ty(String  yName,
+                   String  sName,
+                   boolean meanValues) {
+    log.info("Getting data for " + yName + "(meanValues = " + meanValues + ")");
     Map<String, String> entry;
-    boolean first = true;
-    for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
-      String tVal = null;
-      String yVal = null;
-      if (!entry0.getKey().startsWith("schema")) {
-        if (first) {
-          first = false;
-          }
-        else {
-          data += ",";
-          }
-        entry = entry0.getValue();
-        //tVal = entry.get("key:time");
-        tVal = _cProcessor.getTimestamp(entry);
-        int n = 0;
-        for (String yN : yName.trim().split(" ")) {
-          yVal = entry.get(yN);
-          if (n > 0) {
-            data +=",";
-            }
-          data += "{'t':" + tVal + ",'y':" + yVal + ",'g':" + n++ + "}";
+    Map<String, Integer> sMap = new HashMap<>();
+    int n;
+    String sVal;
+    // Separator map
+    if (sName != null) {
+      Set<String> sSet = new TreeSet<>();
+      for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
+        if (!entry0.getKey().startsWith("schema")) {
+          entry = entry0.getValue();
+          sVal = entry.get(sName);
+          sSet.add(sVal);
           }
         }
+      n = 0;
+      for (String s : sSet) {
+        sMap.put(s, n++);
+        }
+      }
+    // Data
+    //   Assemble
+    List<String[]> ntuple = new ArrayList<>();
+    String tVal;
+    String yVal;
+    int m;
+    for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
+      tVal = null;
+      yVal = null;
+      if (!entry0.getKey().startsWith("schema")) {
+        entry = entry0.getValue();
+        tVal = _cProcessor.getTimestamp(entry);
+        n = 0;
+        for (String yN : yName.trim().split(" ")) {
+          yVal = entry.get(yN);
+          if (sName != null) {
+            sVal = entry.get(sName);
+            m = sMap.get(sVal);
+            }
+          else {
+            m = n++;
+            }
+          ntuple.add(new String[]{tVal, yVal, String.valueOf(m)});
+          }
+        }
+      }
+    //   Pack
+    if (meanValues) {
+      Pair<String, String> pair;
+      Map<Pair<String, String>, String> ntuple1 = new HashMap<>(); 
+      for (String[] row : ntuple) {
+        pair = Pair.of(row[2], row[0]);
+        if (ntuple1.containsKey(pair)) {
+          ntuple1.put(pair, ntuple1.get(pair) + " " + row[1]);
+          }
+        else {
+          ntuple1.put(pair, row[1]);
+          }
+        }
+      ntuple.clear();
+      double y;
+      String[] yA;
+      for (Map.Entry<Pair<String, String>, String> entry0 : ntuple1.entrySet()) {
+        pair = entry0.getKey();
+        y = 0;
+        yA = entry0.getValue().split(" ");
+        for (String yS : yA) {
+          y += Double.valueOf(yS);
+          }
+        y = y / yA.length;
+        ntuple.add(new String[]{pair.second(), String.valueOf(y), pair.first()});
+        }
+      }
+    //   Compose
+    String data = "";
+    boolean first = true;
+    for (String[] row : ntuple) {
+      if (first) {
+        first = false;
+        }
+      else {
+        data += ",";
+        }
+      data += "{'t':" + row[0] + ",'y':" + row[1] + ",'g':" + row[2] + "}";
       }
     data = "[" + data + "]";
     return data;
     }
-    
+        
   /** Give <em>checkbox</em> for column selection.
     * @param column The column name as <tt>family:column</tt>.
     * @return       The corresponding <em>checkbox</em>. */

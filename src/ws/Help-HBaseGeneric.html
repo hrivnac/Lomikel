@@ -14,10 +14,10 @@
           string as a prefix.</li>
       <li><b>Search columns:</b> Searching for rows with several columns matching
           specified strings as substrings. The request should have format
-          <tt>family:column:value,.....</tt>.</li>
+          <tt>family:column:value[:comparator],.....</tt>.</li>
       <li><b>Show columns:</b> Get only specified columns. This field is compatible
           with any other criterium. The request should have format
-          <tt>family:column,.....</tt>.
+          <tt>family:column,.....</tt>. <tt>*</tt> will give all columns.
       <li><b>Limit</b></li> limits number of rows to be demanded.</li>
       <li><b>From, Till</b></li> limits search to a specific time interval (of data
           entries into database).

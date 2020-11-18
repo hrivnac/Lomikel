@@ -25,6 +25,8 @@
 
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
+<link href="HBaseTable.css" rel="stylesheet" type="text/css"/>
+
 <%! static Logger log = Logger.getLogger(HBaseTable_jsp.class); %>
 
 <jsp:useBean id="style"   class="com.Lomikel.WebService.Style"       scope="session"/>
@@ -301,8 +303,8 @@
       var html = []
       $.each(row, function (key, value) {
         if (value.startsWith('binary:')) {
-          html.push("<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>" + key + "</a>");
-          html.push("<a target='popup' href='FITSView.jsp?id=" + value + "'>&#8599;</a></b></br/>");
+          html.push("<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")' title='show using JS9'>" + key + "</a>");
+          html.push("<a target='popup' href='FITSView.jsp?id=" + value + "' title='show in JS9' title='show in Graph'>&#8599;</a></b></br/>");
           }
         else {
           if (key == "key") {
@@ -320,15 +322,18 @@
       return "<b><a href='#' onclick='loadPane(\"image\", \"FITSView.jsp?id=" + value + "\", true, \"" + visheight + "px\")'>*binary*</a><a target='popup' href='FITSView.jsp?id=" + value + "'>&#8599;</a></b>"
       }
     function histSelector(column) {
-      return "<input type='checkbox' name='x1_" + column + "' class='x' id='x1_" + column + "' title='x'></input>&nbsp;" +
-             "<input type='checkbox' name='y1_" + column + "' class='y' id='y1_" + column + "' title='y'></input>&nbsp;" +
-             "<input type='checkbox' name='z1_" + column + "' class='z' id='z1_" + column + "' title='z'></input>&nbsp;";
+      return "<input type='checkbox' name='x1_" + column + "' class='x' id='x1_" + column + "'></input><label for='x1_" + column + "' title='var x'   >x</label>&nbsp;" +
+             "<input type='checkbox' name='y1_" + column + "' class='y' id='y1_" + column + "'></input><label for='y1_" + column + "' title='var y'   >y</label>&nbsp;" +
+             "<input type='checkbox' name='z1_" + column + "' class='z' id='z1_" + column + "'></input><label for='z1_" + column + "' title='var z'   >z</label>&nbsp;" +
+             "<input type='checkbox' name='s1_" + column + "' class='s' id='s1_" + column + "'></input><label for='s1_" + column + "' title='selector'>s</label>&nbsp;";
       }
     function showEvolution() {
       var y = "";
+      var s = "";
       var ys = [].slice.call(document.getElementsByClassName('x')).concat(
                [].slice.call(document.getElementsByClassName('y')).concat(
                [].slice.call(document.getElementsByClassName('z'))));
+      var ss = document.getElementsByClassName('s');
       for (i = 0; i < ys.length; i++) {
         if (ys[i].checked) {
           if (!y.includes(ys[i].id.substring(3))) { 
@@ -336,30 +341,37 @@
             }
           }
         }
+      for (i = 0; i < ss.length; i++) {
+        if (ss[i].checked) {
+          s = ss[i].id.substring(3);
+          break;
+          }
+        }
       var params = "y=" + y;
+      if (s) {
+        params += "&s=" + s;
+        }
       loadPane("plot", "d3/evolutionplot.jsp?" + params, true, visheight);
       }
     function showScatter() {
       var x = "";
       var y = "";
       var z = "";
+      var s = "";
       var xs = document.getElementsByClassName('x');
       var ys = document.getElementsByClassName('y');
       var zs = document.getElementsByClassName('z');
+      var ss = document.getElementsByClassName('s');
       for (i = 0; i < xs.length; i++) {
         if (xs[i].checked) {
-          if (!x.includes(xs[i].id.substring(3))) { 
-            x = xs[i].id.substring(3);
-            break;
-            }
+          x = xs[i].id.substring(3);
+          break;
           }
         }
       for (i = 0; i < ys.length; i++) {
         if (ys[i].checked) {
-          if (!y.includes(ys[i].id.substring(3))) { 
-            y = ys[i].id.substring(3);
-            break;
-            }
+          y = ys[i].id.substring(3);
+          break;
           }
         }
       for (i = 0; i < zs.length; i++) {
@@ -369,9 +381,18 @@
             }
           }
         }
+      for (i = 0; i < ss.length; i++) {
+        if (ss[i].checked) {
+          s = ss[i].id.substring(3);
+          break;
+          }
+        }
       var params = "x=" + x + "&y=" + y;
       if (z) {
         params += "&z=" + z;
+        }
+      if (s) {
+        params += "&s=" + s;
         }
       loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
       }

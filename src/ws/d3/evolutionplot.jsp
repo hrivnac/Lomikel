@@ -22,6 +22,7 @@
   String dataName = request.getParameter("dataName");
   String name     = request.getParameter("name");
   String y        = request.getParameter("y");
+  String s        = request.getParameter("s");
   // data supplied as JSON string
   if (data != null && !data.trim().equals("")) {
     }
@@ -31,7 +32,7 @@
     }
   // data supplied via HBase2Table
   else {
-   data = h2table.ty(y);
+   data = h2table.ty(y, s, false);
    }
   // no data found, use demo data
   if (data == null || data.trim().equals("") || data.trim().equals("[]")) {
@@ -48,6 +49,9 @@
     else {
       name = "";
       }
+    }
+  if (s != null) {
+    name += "(colors from " + s + ")";
     }
   %>
 

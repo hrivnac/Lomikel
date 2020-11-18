@@ -24,6 +24,7 @@
   String x        = request.getParameter("x");
   String y        = request.getParameter("y");
   String z        = request.getParameter("z");
+  String s        = request.getParameter("s");
   // data supplied as JSON string
   if (data != null && !data.trim().equals("")) {
     }
@@ -33,13 +34,12 @@
     }
   // data supplied via HBase2Table
   else {
-   data = h2table.xyz(x, y, z);
+   data = h2table.xyz(x, y, z, s);
    }
   // no data found, use demo data
   if (data == null || data.trim().equals("") || data.trim().equals("[]")) {
     data = "[{'x':10, 'y':-20, 'z':5, 'g':0}, {'x':60, 'y':90, 'z':6, 'g':0}, {'x':80, 'y':50, 'z':7,'g':1}, {'x':60, 'y':30, 'g':1}]";
     }
-   log.info(data);
   // Variable names
   if (x == null) {
     x = "x";
@@ -57,6 +57,9 @@
     else {
       name = "";
       }
+    }
+  if (s != null) {
+    name += "(colors from " + s + ")";
     }
   %>
 

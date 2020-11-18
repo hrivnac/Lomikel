@@ -2,7 +2,6 @@ function showEvolutionPlot(dataS, name, xS, yS, zS) {
   var w = 450;
   var h = 400;
   const colors = d3.schemeCategory10;
-  name += ": " + xS + " * " + yS + " => " + zS; 
   var margin = {top:10, right:40, bottom:30, left:30},
                width =  w - margin.left - margin.right,
                height = h - margin.top  - margin.bottom;
@@ -56,6 +55,6 @@ function showEvolutionPlot(dataS, name, xS, yS, zS) {
      .append("circle")
      .attr("cx", d => x(d.x))
      .attr("cy", d => y(d.y))
-     .attr("r",  d => d.z ? z(d.z) : 1)
+     .attr("r",  d => d.z ? z(d.z) : 2)
      .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black');
   }
