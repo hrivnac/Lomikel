@@ -22,6 +22,7 @@
   String dataName = request.getParameter("dataName");
   String name     = request.getParameter("name");
   String y        = request.getParameter("y");
+  String z        = request.getParameter("z");
   String s        = request.getParameter("s");
   // data supplied as JSON string
   if (data != null && !data.trim().equals("")) {
@@ -32,7 +33,7 @@
     }
   // data supplied via HBase2Table
   else {
-   data = h2table.ty(y, s, true);
+   data = h2table.xyz(null, y, z, s, true);
    }
   // no data found, use demo data
   if (data == null || data.trim().equals("") || data.trim().equals("[]")) {
@@ -41,6 +42,9 @@
   // Variable names
   if (y == null) {
     y = "y";
+    }
+  if (z == null) {
+    z = "z";
     }
   if (name == null) {
     if (dataName != null) {
@@ -58,7 +62,7 @@
 <script type="text/javascript" src="evolutionplot.js"></script>
   
 <script>
-  showEvolutionPlot("<%=data%>", "<%=name%>", "<%=y%>");
+  showEvolutionPlot("<%=data%>", "<%=name%>", "<%=y%>", "<%=z%>");
   </script>
 
   

@@ -42,13 +42,10 @@
     }
   // Variable names
   if (x == null) {
-    x = "x";
+    x = "";
     }
   if (y == null) {
-    y = "y";
-    }
-  if (z == null) {
-    z = "z";
+    y = "";
     }
   if (name == null) {
     if (dataName != null) {
@@ -58,15 +55,18 @@
       name = "";
       }
     }
+  if (z != null && y != "") {
+    name += " (z: " + z + ")";
+    }
   if (s != null) {
-    name += "(colors from " + s + ")";
+    name += " (col: " + s + ")";
     }
   %>
 
 <script type="text/javascript" src="scatterplot.js"></script>
   
 <script>
-  showEvolutionPlot("<%=data%>", "<%=name%>", "<%=x%>", "<%=y%>", "<%=z%>");
+  showScatterPlot("<%=data%>", "<%=name%>", "<%=x%>", "<%=y%>");
   </script>
 
   

@@ -192,13 +192,17 @@ public class HBase2Table {
         }
       }
     hidden += "]";
-    log.info(idCol + " " + hidden);
+    log.debug(idCol + " " + hidden);
     return hidden;
     }
     
   /** Give 2/3D subtable as a JSON array.
-    * @param xName The name of the x-axis column.
-    * @param yName The name of the y-axis column. 
+    * @param xName The name of the x-axis column
+    *              (or the blank separated list of them).
+    *              If <tt>null</tt>, timestamp used as x.
+    * @param yName The name of the y-axis column
+    *              (or the blank separated list of them).
+    *              Cannot be <tt>null</tt>.
     * @param zName The name of the z-axis column
     *              (or the blank separated list of them).
     *              Can be <tt>null</tt>.
@@ -239,14 +243,23 @@ public class HBase2Table {
     String zVal;
     int m;
     for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
-      xVal = null;
-      yVal = null;
-      zVal = null;
+      xVal = "";
+      yVal = "";
       if (!entry0.getKey().startsWith("schema")) {
         entry = entry0.getValue();
-        xVal = entry.get(xName);
-        yVal = entry.get(yName);
+        if (xName != null) {
+          for (String xN : xName.trim().split(" ")) {
+            xVal += entry.get(xN) + " ";
+            }
+          }
+        else {
+          xVal = _cProcessor.getTimestamp(entry);
+          }
+        for (String yN : yName.trim().split(" ")) {
+          yVal += entry.get(yN) + " ";
+          }
         n = 0;
+        // z defined
         if (zName != null) {
           for (String zN : zName.trim().split(" ")) {
             zVal = entry.get(zN);
@@ -257,9 +270,14 @@ public class HBase2Table {
             else {
               m = n++;
               }
-            ntuple.add(new String[]{xVal, yVal, zVal, String.valueOf(m)});
+            for (String xV : xVal.trim().split(" ")) {
+              for (String yV : yVal.trim().split(" ")) {
+                ntuple.add(new String[]{xV, yV, zVal, String.valueOf(m)});
+                }
+              }
             }
           }
+        // z not defined
         else {
           if (sName != null) {
             sVal = entry.get(sName);
@@ -268,7 +286,11 @@ public class HBase2Table {
           else {
             m = n++;
             }
-          ntuple.add(new String[]{xVal, yVal, null, String.valueOf(m)});
+          for (String xV : xVal.trim().split(" ")) {
+            for (String yV : yVal.trim().split(" ")) {
+              ntuple.add(new String[]{xV, yV, null, String.valueOf(m)});
+              }
+            }
           }
         }
       }
@@ -304,6 +326,7 @@ public class HBase2Table {
     //   Compose
     String data = "";
     boolean first = true;
+    String xVar = "x";
     for (String[] row : ntuple) {
       if (first) {
         first = false;
@@ -311,110 +334,14 @@ public class HBase2Table {
       else {
         data += ",";
         }
-      data += "{'x':" + row[0] + ",'y':" + row[1] +",'z':" + row[2] + ",'g':" + row[3] + "}";
+      if (xName == null) {
+        xVar = "t";
+        }
+      data += "{'" + xVar + "':" + row[0] + ",'y':" + row[1] +",'z':" + row[2] + ",'g':" + row[3] + "}";
       }
     data = "[" + data + "]";
+    log.info(data);
     return data; 
-    }
-        
-  /** Give time-dependence as a JSON array.
-    * @param yName      The name of the y-axis column
-    *                   (or the blank separated list of them).
-    * @param meanValues Whether replace repeated values with their measn value.
-    * @param sName      The name of the selector column.
-    *                   Can be <tt>null</tt>.
-    *                   Disables selector based on <tt>yName</tt>.
-    * @return           The corresponding data as a JSON array. */
-  public String ty(String  yName,
-                   String  sName,
-                   boolean meanValues) {
-    log.info("Getting data for " + yName + "(meanValues = " + meanValues + ")");
-    Map<String, String> entry;
-    Map<String, Integer> sMap = new HashMap<>();
-    int n;
-    String sVal;
-    // Separator map
-    if (sName != null) {
-      Set<String> sSet = new TreeSet<>();
-      for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
-        if (!entry0.getKey().startsWith("schema")) {
-          entry = entry0.getValue();
-          sVal = entry.get(sName);
-          sSet.add(sVal);
-          }
-        }
-      n = 0;
-      for (String s : sSet) {
-        sMap.put(s, n++);
-        }
-      }
-    // Data
-    //   Assemble
-    List<String[]> ntuple = new ArrayList<>();
-    String tVal;
-    String yVal;
-    int m;
-    for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
-      tVal = null;
-      yVal = null;
-      if (!entry0.getKey().startsWith("schema")) {
-        entry = entry0.getValue();
-        tVal = _cProcessor.getTimestamp(entry);
-        n = 0;
-        for (String yN : yName.trim().split(" ")) {
-          yVal = entry.get(yN);
-          if (sName != null) {
-            sVal = entry.get(sName);
-            m = sMap.get(sVal);
-            }
-          else {
-            m = n++;
-            }
-          ntuple.add(new String[]{tVal, yVal, String.valueOf(m)});
-          }
-        }
-      }
-    //   Pack
-    if (meanValues) {
-      Pair<String, String> pair;
-      Map<Pair<String, String>, String> ntuple1 = new HashMap<>(); 
-      for (String[] row : ntuple) {
-        pair = Pair.of(row[2], row[0]);
-        if (ntuple1.containsKey(pair)) {
-          ntuple1.put(pair, ntuple1.get(pair) + " " + row[1]);
-          }
-        else {
-          ntuple1.put(pair, row[1]);
-          }
-        }
-      ntuple.clear();
-      double y;
-      String[] yA;
-      for (Map.Entry<Pair<String, String>, String> entry0 : ntuple1.entrySet()) {
-        pair = entry0.getKey();
-        y = 0;
-        yA = entry0.getValue().split(" ");
-        for (String yS : yA) {
-          y += Double.valueOf(yS);
-          }
-        y = y / yA.length;
-        ntuple.add(new String[]{pair.second(), String.valueOf(y), pair.first()});
-        }
-      }
-    //   Compose
-    String data = "";
-    boolean first = true;
-    for (String[] row : ntuple) {
-      if (first) {
-        first = false;
-        }
-      else {
-        data += ",";
-        }
-      data += "{'t':" + row[0] + ",'y':" + row[1] + ",'g':" + row[2] + "}";
-      }
-    data = "[" + data + "]";
-    return data;
     }
         
   /** Give <em>checkbox</em> for column selection.

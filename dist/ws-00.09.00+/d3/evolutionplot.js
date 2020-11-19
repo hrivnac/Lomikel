@@ -1,4 +1,4 @@
-function showEvolutionPlot(dataS, name, yS) {
+function showEvolutionPlot(dataS, name, yS, zS) {
   var w = 650;
   var h = 400;
   const colors = d3.schemeCategory10;
@@ -45,12 +45,15 @@ function showEvolutionPlot(dataS, name, yS) {
                  .attr("font-weight", "bold")
                  .attr("text-anchor", "start")
                  .text("↑ " + yS));
+  var z = d3.scaleLinear()         
+            .domain(d3.extent(data, d => d.z)).nice()
+            .range([1, 5]);   
   svg.selectAll("whatever")
      .data(data)
      .enter()
      .append("circle")
      .attr("cx", d => t(d.t))
      .attr("cy", d => y(d.y))
-     .attr("r", 1)
+     .attr("r", d => d.z ? z(d.z) : 1)
      .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black');
   }
