@@ -209,6 +209,7 @@ public class HBase2Table {
     * @param sName The name of the selector column.
     *              Can be <tt>null</tt>.
     *              Disables <tt>zName</tt>.
+    * @param meanValues Whether calculate mean z values for entries with the same x,y and key.
     * @return  The corresponding data as a JSON array. */
   public String xyz(String  xName,
                     String  yName,
@@ -241,11 +242,14 @@ public class HBase2Table {
     String xVal;
     String yVal;
     String zVal;
+    String kVal;
     int m;
     for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
+      kVal = "";
       xVal = "";
       yVal = "";
       if (!entry0.getKey().startsWith("schema")) {
+        kVal = entry0.getKey();
         entry = entry0.getValue();
         if (xName != null) {
           for (String xN : xName.trim().split(" ")) {
@@ -272,7 +276,7 @@ public class HBase2Table {
               }
             for (String xV : xVal.trim().split(" ")) {
               for (String yV : yVal.trim().split(" ")) {
-                ntuple.add(new String[]{xV, yV, zVal, String.valueOf(m)});
+                ntuple.add(new String[]{xV, yV, zVal, kVal, String.valueOf(m)});
                 }
               }
             }
@@ -288,7 +292,7 @@ public class HBase2Table {
             }
           for (String xV : xVal.trim().split(" ")) {
             for (String yV : yVal.trim().split(" ")) {
-              ntuple.add(new String[]{xV, yV, null, String.valueOf(m)});
+              ntuple.add(new String[]{xV, yV, null, kVal, String.valueOf(m)});
               }
             }
           }
@@ -299,7 +303,7 @@ public class HBase2Table {
       Pair<String, String> pair;
       Map<Pair<String, String>, String> ntuple1 = new HashMap<>(); 
       for (String[] row : ntuple) {
-        pair = Pair.of(row[3], row[0] + " " + row[1]);
+        pair = Pair.of(row[4], row[0] + " " + row[1] + " " + row[3]);
         if (ntuple1.containsKey(pair)) {
           ntuple1.put(pair, ntuple1.get(pair) + " " + row[2]);
           }
@@ -320,7 +324,7 @@ public class HBase2Table {
             }
           z = z / zA.length;
           }
-        ntuple.add(new String[]{pair.second().split(" ")[0], pair.second().split(" ")[1], String.valueOf(z), pair.first()});
+        ntuple.add(new String[]{pair.second().split(" ")[0], pair.second().split(" ")[1], String.valueOf(z), pair.second().split(" ")[2], pair.first()});
         }
       }
     //   Compose
@@ -337,10 +341,10 @@ public class HBase2Table {
       if (xName == null) {
         xVar = "t";
         }
-      data += "{'" + xVar + "':" + row[0] + ",'y':" + row[1] +",'z':" + row[2] + ",'g':" + row[3] + "}";
+      data += "{'" + xVar + "':" + row[0] + ",'y':" + row[1] +",'z':" + row[2] + ",'k':'" + row[3] + "','g':" + row[4] + "}";
       }
     data = "[" + data + "]";
-    log.info(data);
+    log.debug(data);
     return data; 
     }
         

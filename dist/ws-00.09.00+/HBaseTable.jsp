@@ -338,14 +338,16 @@
       var ss = document.getElementsByClassName('s');
       for (i = 0; i < xs.length; i++) {
         if (xs[i].checked) {
-          x = xs[i].id.substring(3);
-          break;
-          }
+           if (!x.includes(xs[i].id.substring(3))) { 
+             x += xs[i].id.substring(3) + " ";
+             }
+           }
         }
       for (i = 0; i < ys.length; i++) {
         if (ys[i].checked) {
-          y = ys[i].id.substring(3);
-          break;
+          if (!y.includes(ys[i].id.substring(3))) { 
+            y += ys[i].id.substring(3) + " ";
+            }
           }
         }
       for (i = 0; i < zs.length; i++) {
@@ -361,12 +363,18 @@
           break;
           }
         }
-      if (kind == "evolution") {
-        y = z;
+      if (!y) {
+        window.alert("y - axis should be selected");
+        return;
         }
       var params = "y=" + y;
-      if (x && kind != "evolution") {
-        params += "&x=" + x;
+      if (x) {
+        if (kind == "evolution") {
+          params += x;
+          }
+        else {
+          params += "&x=" + x;
+          }
         }
       if (z) {
         params += "&z=" + z;

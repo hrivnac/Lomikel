@@ -22,9 +22,6 @@ function showScatterPlot(dataS, name, xS, yS) {
      .text(name)
   var data = JSON.parse(dataS.replace(/'/g, '"'));
   var x;
-  x = d3.scaleLinear()
-        .domain(d3.extent(data, d => d.x)).nice()
-        .range([0, width]);    
   if (xS) {
     x = d3.scaleLinear()
           .domain(d3.extent(data, d => d.x)).nice()
@@ -68,7 +65,10 @@ function showScatterPlot(dataS, name, xS, yS) {
                  .text("↑ " + yS));
   var z = d3.scaleLinear()         
             .domain(d3.extent(data, d => d.z)).nice()
-            .range([1, 5]);   
+            .range([1, 5]);               
+  var div = d3.select("body").append("div")	
+              .attr("class", "tooltip")				
+              .style("opacity", 0);
   if (xS) {
     svg.selectAll("whatever")
        .data(data)
@@ -77,7 +77,21 @@ function showScatterPlot(dataS, name, xS, yS) {
        .attr("cx", d => x(d.x))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
-       .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black');
+       .attr("popup", d => d.k)
+       .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black')
+       .on("mouseover", function(d) {		
+          div.transition()		
+             .duration(200)		
+             .style("opacity", 0.9);		
+          div.html(d3.select(this).attr("popup") + "<br/>")	
+             .style("left", (d3.select(this).attr("cx")) + "px")		
+             .style("top",  (d3.select(this).attr("cy")) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+               .duration(500)		
+               .style("opacity", 0);	
+        });
     }
   else {
     svg.selectAll("whatever")
@@ -87,6 +101,20 @@ function showScatterPlot(dataS, name, xS, yS) {
        .attr("cx", d => x(d.t))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
-       .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black');
+       .attr("popup", d => d.k)
+       .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black')
+       .on("mouseover", function(d) {		
+          div.transition()		
+             .duration(200)		
+             .style("opacity", 0.9);		
+          div.html(d3.select(this).attr("popup") + "<br/>")	
+             .style("left", (d3.select(this).attr("cx")) + "px")		
+             .style("top",  (d3.select(this).attr("cy")) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+               .duration(500)		
+               .style("opacity", 0);	
+        });
     }
   }

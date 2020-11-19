@@ -55,7 +55,7 @@
       name = "";
       }
     }
-  if (z != null) {
+  if (z != null && y != "") {
     name += " (z: " + z + ")";
     }
   if (s != null) {
