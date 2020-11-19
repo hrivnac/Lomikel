@@ -175,7 +175,7 @@
       <button id="buttonHide" class="btn btn-secondary" style="background-color:#aaaaff; color:black" title="show only the latest <%=hbaseRowName%>s of each <%=group%>">Latest <%=hbaseRowName%>s</button>
       <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaaaff; color:black" title="show all <%=hbaseRowName%>s of each <%=group%>"            >All <%=hbaseRowName%>s</button>
       <button onclick="showScatter('evolution')"        style="background-color:#ddddff"              title="time dependence of multiple variables"                     >Evolution Plot</button>    
-      <button onclick="showScatter('scatter')"          style="background-color:#ddddff"              title="scatter plot of two * multiple variables"                  >Scatter Plot</button>    
+      <button onclick="showScatter('scatter')"          style="background-color:#ddddff"              title="scatter plot of multiple variables"                        >Scatter Plot</button>    
       <button onclick="show3D()"                        style="background-color:#ddddff"              title="3d plot of three variables"                                >3D Plot</button>    
       </div>
     <%
