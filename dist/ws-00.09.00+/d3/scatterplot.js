@@ -77,23 +77,24 @@ function showScatterPlot(dataS, name, xS, yS) {
        .attr("cx", d => x(d.x))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
-       .attr("popup", d => d.k)
+       .attr("popup", d => ("<b><u>" + d.k + "</u></b><br/>x = " + d.x + "<br/>y = " + d.y + "<br/>z = " + d.z))
        .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black')
        .on("mouseover", function(d) {		
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("popup") + "<br/>")	
+          div.html(d3.select(this).attr("popup"))	
              .style("left", (d3.select(this).attr("cx")) + "px")		
              .style("top",  (d3.select(this).attr("cy")) + "px");	
             })					
         .on("mouseout", function(d) {		
             div.transition()		
-               .duration(500)		
+               .duration(2000)		
                .style("opacity", 0);	
         });
     }
   else {
+    var formatTime = d3.timeFormat("%d/%b/%y %H:%M:%S.%L");
     svg.selectAll("whatever")
        .data(data)
        .enter()
@@ -101,19 +102,19 @@ function showScatterPlot(dataS, name, xS, yS) {
        .attr("cx", d => x(d.t))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
-       .attr("popup", d => d.k)
+       .attr("popup", d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>y = " + d.y + "<br/>z = " + d.z))
        .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black')
        .on("mouseover", function(d) {		
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("popup") + "<br/>")	
+          div.html(d3.select(this).attr("popup"))	
              .style("left", (d3.select(this).attr("cx")) + "px")		
              .style("top",  (d3.select(this).attr("cy")) + "px");	
             })					
         .on("mouseout", function(d) {		
             div.transition()		
-               .duration(500)		
+               .duration(2000)		
                .style("opacity", 0);	
         });
     }
