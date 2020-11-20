@@ -363,7 +363,10 @@
           break;
           }
         }
-      if (!y) {
+      if (kind == "evolution" && !x && !y) {
+        window.alert("x or y - axis should be selected");
+        }
+      if (kind == "scatter" && !y) {
         window.alert("y - axis should be selected");
         return;
         }

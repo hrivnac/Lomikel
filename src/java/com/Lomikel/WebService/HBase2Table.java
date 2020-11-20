@@ -218,7 +218,7 @@ public class HBase2Table {
                     boolean meanValues) {
     log.info("Getting data for " + xName + "," + yName + "," + zName + "," + sName + "(meanValues = " + meanValues + ")");
     Map<String, String> entry;
-    Map<String, Integer> sMap = new HashMap<>();
+    Map<String, Integer> sMap = new HashMap<>(); // sVal-n
     int n;
     String sVal;
     // Separator map
@@ -238,7 +238,7 @@ public class HBase2Table {
       }
     // Data
     //   Assemble
-    List<String[]> ntuple = new ArrayList<>();
+    List<String[]> ntuple = new ArrayList<>(); // xV - yV - zV - kVal - n
     String xVal;
     String yVal;
     String zVal;
@@ -301,7 +301,7 @@ public class HBase2Table {
     //   Pack
     if (meanValues) {
       Pair<String, String> pair;
-      Map<Pair<String, String>, String> ntuple1 = new HashMap<>(); 
+      Map<Pair<String, String>, String> ntuple1 = new HashMap<>(); // (n * xV+yV+kV) - zV
       for (String[] row : ntuple) {
         pair = Pair.of(row[4], row[0] + " " + row[1] + " " + row[3]);
         if (ntuple1.containsKey(pair)) {
