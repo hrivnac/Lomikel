@@ -2,7 +2,33 @@
   display: none;
   }
 
-input[type="checkbox"] + label {
+input[type="checkbox"][name^="x1_"] + label {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid black;
+  color: black;
+  background-color: lightblue;
+  width: 12px;
+  height: 16px;
+  line-height: 16px;
+  }
+
+input[type="checkbox"][name^="y1_"] + label {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid black;
+  color: black;
+  background-color: lightgreen;
+  width: 12px;
+  height: 16px;
+  line-height: 16px;
+  }
+  
+input[type="checkbox"][name^="z1_"] + label {
   display: inline-block;
   text-align: center;
   vertical-align: middle;
@@ -14,9 +40,40 @@ input[type="checkbox"] + label {
   height: 16px;
   line-height: 16px;
   }
+  
+input[type="checkbox"][name^="s1_"] + label {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid black;
+  color: black;
+  background-color: lightpink;
+  width: 12px;
+  height: 16px;
+  line-height: 16px;
+  }
 
-input[type="checkbox"]:checked + label {
+input[type="checkbox"][name^="x1_"]:checked + label {
+  border: 1px solid white;
+  color: white;
+  background-color: darkblue;
+  } 
+
+input[type="checkbox"][name^="y1_"]:checked + label {
+  border: 1px solid white;
+  color: white;
+  background-color: darkgreen;
+  }  
+  
+input[type="checkbox"][name^="z1_"]:checked + label {
   border: 1px solid white;
   color: white;
   background-color: black;
+  }
+  
+input[type="checkbox"][name^="s1_"]:checked + label {
+  border: 1px solid white;
+  color: white;
+  background-color: darkred;
   } 
