@@ -1,10 +1,18 @@
-function showScatterPlot(dataS, name, xS, yS) {
+function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
   var w = 650;
   var h = 400;
   const colors = d3.schemeCategory10;
-  var margin = {top:10, right:40, bottom:120, left:60},
-               width =  w - margin.left - margin.right,
-               height = h - margin.top  - margin.bottom;
+  var margin;
+  if (xS) {
+    margin = {top:20, right:60, bottom:120, left:60},
+             width =  w - margin.left - margin.right,
+             height = h - margin.top  - margin.bottom;
+    }
+  else {
+    margin = {top:20, right:60, bottom:60, left:60},
+             width =  w - margin.left - margin.right,
+             height = h - margin.top  - margin.bottom;
+    }
   var svg = d3.select("#scatter_area")
               .append("svg")
               .attr("width",  width  + margin.left + margin.right)
@@ -21,6 +29,7 @@ function showScatterPlot(dataS, name, xS, yS) {
      .style("text-decoration", "underline")  
      .text(name)
   var data = JSON.parse(dataS.replace(/'/g, '"'));
+  var gMap = JSON.parse(gMapS.replace(/'/g, '"'));
   var x;
   if (xS) {
     x = d3.scaleLinear()
@@ -77,8 +86,10 @@ function showScatterPlot(dataS, name, xS, yS) {
        .attr("cx", d => x(d.x))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
-       .attr("popup", d => ("<b><u>" + d.k + "</u></b><br/>x = " + d.x + "<br/>y = " + d.y + "<br/>z = " + d.z))
-       .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black')
+       .attr("stroke-width", "1")
+       .attr("popup", d => ("<b><u>" + d.k + "</u></b><br/>" + (zS ? "x*y = " : "") + (gMap.find(e => e.g == d.g).s) + "<br/>x = " + d.x + "<br/>y = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
+       .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
+       .style("fill", 'white')
        .on("mouseover", function(d) {		
           div.transition()		
              .duration(200)		
@@ -102,9 +113,11 @@ function showScatterPlot(dataS, name, xS, yS) {
        .attr("cx", d => x(d.t))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
-       .attr("popup", d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>y = " + d.y + "<br/>z = " + d.z))
-       .style("fill", d => (d.g || d.g === 0) ? colors[d.g] : 'black')
-       .on("mouseover", function(d) {		
+       .attr("stroke-width", "1")
+       .attr("popup", d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>" + (gMap.find(e => e.g == d.g).s) + " = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
+       .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
+       .style("fill", 'white')
+       .on("mouseover", function(d) {
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		

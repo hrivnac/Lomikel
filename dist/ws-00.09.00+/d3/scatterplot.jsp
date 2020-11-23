@@ -25,6 +25,7 @@
   String y        = request.getParameter("y");
   String z        = request.getParameter("z");
   String s        = request.getParameter("s");
+  String gMap = "";
   // data supplied as JSON string
   if (data != null && !data.trim().equals("")) {
     }
@@ -34,7 +35,9 @@
     }
   // data supplied via HBase2Table
   else {
-   data = h2table.xyz(x, y, z, s, true);
+   String[] result = h2table.xyz(x, y, z, s, true);
+   data = result[0];
+   gMap = result[1];
    }
   // no data found, use demo data
   if (data == null || data.trim().equals("") || data.trim().equals("[]")) {
@@ -47,6 +50,12 @@
   if (y == null) {
     y = "";
     }
+  if (z == null) {
+    z = "";
+    }
+  if (s == null) {
+    s = "";
+    }
   if (name == null) {
     if (dataName != null) {
       name = dataName;
@@ -55,10 +64,10 @@
       name = "";
       }
     }
-  if (z != null && y != "") {
+  if (z != "") {
     name += " (z: " + z + ")";
     }
-  if (s != null) {
+  if (s != "") {
     name += " (col: " + s + ")";
     }
   %>
@@ -66,7 +75,7 @@
 <script type="text/javascript" src="scatterplot.js"></script>
   
 <script>
-  showScatterPlot("<%=data%>", "<%=name%>", "<%=x%>", "<%=y%>");
+  showScatterPlot("<%=data%>", "<%=gMap%>", "<%=name%>", "<%=x%>", "<%=y%>", "<%=z%>", "<%=s%>");
   </script>
 
   

@@ -197,28 +197,29 @@ public class HBase2Table {
     }
     
   /** Give 2/3D subtable as a JSON array.
-    * @param xName The name of the x-axis column
-    *              (or the blank separated list of them).
-    *              If <tt>null</tt>, timestamp used as x.
-    * @param yName The name of the y-axis column
-    *              (or the blank separated list of them).
-    *              Cannot be <tt>null</tt>.
-    * @param zName The name of the z-axis column
-    *              (or the blank separated list of them).
-    *              Can be <tt>null</tt>.
-    * @param sName The name of the selector column.
-    *              Can be <tt>null</tt>.
-    *              Disables <tt>zName</tt>.
+    * @param xName      The name of the x-axis column
+    *                   (or the blank separated list of them).
+    *                   If <tt>null</tt>, timestamp used as x.
+    * @param yName      The name of the y-axis column
+    *                   (or the blank separated list of them).
+    *                   Cannot be <tt>null</tt>.
+    * @param zName      The name of the z-axis column
+    *                   (or the blank separated list of them).
+    *                   Can be <tt>null</tt>.
+    * @param sName      The name of the selector column.
+    *                   Can be <tt>null</tt>.
+    *                   Disables <tt>zName</tt>.
     * @param meanValues Whether calculate mean z values for entries with the same x,y and key.
     * @return  The corresponding data as a JSON array. */
-  public String xyz(String  xName,
-                    String  yName,
-                    String  zName,
-                    String  sName,
-                    boolean meanValues) {
+  public String[] xyz(String  xName,
+                      String  yName,
+                      String  zName,
+                      String  sName,
+                      boolean meanValues) {
     log.info("Getting data for " + xName + "," + yName + "," + zName + "," + sName + "(meanValues = " + meanValues + ")");
     Map<String, String> entry;
-    Map<String, Integer> sMap = new HashMap<>(); // sVal-n
+    Map<String, Integer> sMap = new HashMap<>(); // sVal - n
+    Map<Integer, String> gMap = new HashMap<>(); // n - sVal | x/yVal
     int n;
     String sVal;
     // Separator map
@@ -233,7 +234,22 @@ public class HBase2Table {
         }
       n = 0;
       for (String s : sSet) {
-        sMap.put(s, n++);
+        sMap.put(s, n);
+        gMap.put(n, sName + "==" + s);
+        n++;
+        }
+      }
+    n = 0;
+    if (xName == null || xName.trim().equals("")) {
+      for (String yN : yName.trim().split(" ")) {
+        gMap.put(n++, yN);
+        }
+      }
+    else {
+      for (String xN : xName.trim().split(" ")) {
+        for (String yN : yName.trim().split(" ")) {
+          gMap.put(n++, xN + "*" + yN);
+          }
         }
       }
     // Data
@@ -243,6 +259,7 @@ public class HBase2Table {
     String yVal;
     String zVal;
     String kVal;
+    int s;
     int m;
     for (Map.Entry<String, Map<String, String>> entry0 : _table.entrySet()) {
       kVal = "";
@@ -251,7 +268,7 @@ public class HBase2Table {
       if (!entry0.getKey().startsWith("schema")) {
         kVal = entry0.getKey();
         entry = entry0.getValue();
-        if (xName != null) {
+        if (xName != null && !xName.trim().equals("")) {
           for (String xN : xName.trim().split(" ")) {
             xVal += entry.get(xN) + " ";
             }
@@ -262,36 +279,25 @@ public class HBase2Table {
         for (String yN : yName.trim().split(" ")) {
           yVal += entry.get(yN) + " ";
           }
+        s = 0;
+        if (sName != null && !sName.trim().equals("")) {
+          sVal = entry.get(sName);
+          s = sMap.get(sVal);
+          }
+        m = s;
         n = 0;
-        // z defined
-        if (zName != null) {
-          for (String zN : zName.trim().split(" ")) {
-            zVal = entry.get(zN);
-            if (sName != null) {
-              sVal = entry.get(sName);
-              m = sMap.get(sVal);
-              }
-            else {
+        for (String xV : xVal.trim().split(" ")) {
+          for (String yV : yVal.trim().split(" ")) {
+            if (s == 0) {
               m = n++;
               }
-            for (String xV : xVal.trim().split(" ")) {
-              for (String yV : yVal.trim().split(" ")) {
+            if (zName != null && !zName.trim().equals("")) {
+              for (String zN : zName.trim().split(" ")) {
+                zVal = entry.get(zN);
                 ntuple.add(new String[]{xV, yV, zVal, kVal, String.valueOf(m)});
                 }
               }
-            }
-          }
-        // z not defined
-        else {
-          if (sName != null) {
-            sVal = entry.get(sName);
-            m = sMap.get(sVal);
-            }
-          else {
-            m = n++;
-            }
-          for (String xV : xVal.trim().split(" ")) {
-            for (String yV : yVal.trim().split(" ")) {
+            else {
               ntuple.add(new String[]{xV, yV, null, kVal, String.valueOf(m)});
               }
             }
@@ -300,35 +306,38 @@ public class HBase2Table {
       }
     //   Pack
     if (meanValues) {
-      Pair<String, String> pair;
-      Map<Pair<String, String>, String> ntuple1 = new HashMap<>(); // (n * xV+yV+kV) - zV
+      String[] rowid;
+      Map<String[], String> ntuple1 = new HashMap<>(); // xV+yV+kV+n - zV
       for (String[] row : ntuple) {
-        pair = Pair.of(row[4], row[0] + " " + row[1] + " " + row[3]);
-        if (ntuple1.containsKey(pair)) {
-          ntuple1.put(pair, ntuple1.get(pair) + " " + row[2]);
+        rowid = new String[]{row[0], row[1], row[3], row[4]};
+        if (ntuple1.containsKey(rowid)) {
+          ntuple1.put(rowid, ntuple1.get(rowid) + " " + row[2]);
           }
         else {
-          ntuple1.put(pair, row[2]);
+          ntuple1.put(rowid, row[2]);
           }
         }
       ntuple.clear();
       double z;
       String[] zA;
-      for (Map.Entry<Pair<String, String>, String> entry0 : ntuple1.entrySet()) {
-        pair = entry0.getKey();
-        z = 0;
+      String zS;
+      for (Map.Entry<String[], String> entry0 : ntuple1.entrySet()) {
+        rowid = entry0.getKey();
+        zS = null;
         if (entry0.getValue() != null) {
-          zA = entry0.getValue().split(" ");
-          for (String zS : zA) {
-            z += Double.valueOf(zS);
+          z = 0;
+          zA = entry0.getValue().trim().split(" ");
+          for (String zSi : zA) {
+            z += Double.valueOf(zSi);
             }
           z = z / zA.length;
+          zS = String.valueOf(z);
           }
-        ntuple.add(new String[]{pair.second().split(" ")[0], pair.second().split(" ")[1], String.valueOf(z), pair.second().split(" ")[2], pair.first()});
+        ntuple.add(new String[]{rowid[0], rowid[1], zS, rowid[2], rowid[3]});
         }
       }
     //   Compose
-    String data = "";
+    String data = "[";
     boolean first = true;
     String xVar = "x";
     for (String[] row : ntuple) {
@@ -341,11 +350,24 @@ public class HBase2Table {
       if (xName == null) {
         xVar = "t";
         }
-      data += "{'" + xVar + "':" + row[0] + ",'y':" + row[1] +",'z':" + row[2] + ",'k':'" + row[3] + "','g':" + row[4] + "}";
+      data += "{'" + xVar + "':" + row[0] + ",'y':" + row[1] + ",'z':" + (row[2] == null ? 0 : row[2]) + ",'k':'" + row[3] + "','g':" + row[4] + "}";
       }
-    data = "[" + data + "]";
-    log.debug(data);
-    return data; 
+    data += "]";
+    String gS = "[";
+    first = true;
+    for (Map.Entry<Integer, String> entry0 : gMap.entrySet()) {
+      if (first) {
+        first = false;
+        }
+      else {
+        gS += ",";
+        }
+      gS += "{'g':" + entry0.getKey() + ",'s':'" + entry0.getValue() + "'}";
+      }
+    gS += "]";
+    log.debug("data = " + gS);
+    log.debug("sMap = " + gS);
+    return new String[]{data, gS}; 
     }
         
   /** Give <em>checkbox</em> for column selection.
