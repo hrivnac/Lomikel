@@ -1,0 +1,22 @@
+.x, .y, .z, .s {
+  display: none;
+  }
+
+input[type="checkbox"] + label {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid black;
+  color: black;
+  background-color: white;
+  width: 12px;
+  height: 16px;
+  line-height: 16px;
+  }
+
+input[type="checkbox"]:checked + label {
+  border: 1px solid white;
+  color: white;
+  background-color: black;
+  } 
