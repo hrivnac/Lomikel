@@ -1,4 +1,5 @@
 function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
+  
   var w = 650;
   var h = 400;
   const colors = d3.schemeCategory10;
@@ -13,6 +14,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
              width =  w - margin.left - margin.right,
              height = h - margin.top  - margin.bottom;
     }
+    
   var svg = d3.select("#scatter_area")
               .append("svg")
               .attr("width",  width  + margin.left + margin.right)
@@ -20,7 +22,8 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
               .attr("class", "scatterplot")
               .append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  svg.append("text")
+
+              svg.append("text")
      .attr("x", (width / 2))             
      .attr("y", 0)
      .attr("text-anchor", "middle")
@@ -28,9 +31,10 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
      .style("font-weight", "bold")
      .style("text-decoration", "underline")  
      .text(name)
+
   var data = JSON.parse(dataS.replace(/'/g, '"'));
   var gMap = JSON.parse(gMapS.replace(/'/g, '"'));
-  var x;
+
   if (xS) {
     x = d3.scaleLinear()
           .domain(d3.extent(data, d => d.x)).nice()
@@ -60,6 +64,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
        .attr("dy", ".15em")
        .attr("transform", "rotate(-65)");
     }
+    
   var y = d3.scaleLinear()         
             .domain(d3.extent(data, d => d.y)).nice()
             .range([height, 0]);   
@@ -72,12 +77,15 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
                  .attr("font-weight", "bold")
                  .attr("text-anchor", "start")
                  .text("↑ " + yS));
+     
   var z = d3.scaleLinear()         
             .domain(d3.extent(data, d => d.z)).nice()
-            .range([1, 5]);               
+            .range([1, 5]);  
+            
   var div = d3.select("body").append("div")	
               .attr("class", "tooltip")				
               .style("opacity", 0);
+              
   if (xS) {
     svg.selectAll("whatever")
        .data(data)
@@ -131,4 +139,5 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
                .style("opacity", 0);	
         });
     }
+    
   }

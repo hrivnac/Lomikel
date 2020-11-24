@@ -18,7 +18,7 @@
 <link href="skyview.css"                          rel="stylesheet" type="text/css"/>
 <link href="../d3-celestial-0.7.32/celestial.css" rel="stylesheet" type="text/css">
 
-<div style="overflow:hidden;">
+<div style="overflow:hidden;margin:0 auto;">
   <div id="celestial-map"></div>
   </div>
 <div id="celestial-form"></div>
@@ -31,7 +31,6 @@
   String y        = request.getParameter("y");
   String z        = request.getParameter("z");
   String s        = request.getParameter("s");
-  /*
   String gMap = "";
   // data supplied as JSON string
   if (data != null && !data.trim().equals("")) {
@@ -42,7 +41,7 @@
     }
   // data supplied via HBase2Table
   else {
-   String[] result = h2table.xyz(x, y, z, s, true);
+   String[] result = h2table.polar(z, s, true);
    data = result[0];
    gMap = result[1];
    }
@@ -77,12 +76,11 @@
   if (s != "") {
     name += " (col: " + s + ")";
     }
-    */
   %>
 
 <script src="skyview.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-  showSkyView();
+  showSkyView("<%=data%>", "<%=gMap%>", "<%=name%>", "<%=z%>", "<%=s%>");
   </script>
 

@@ -196,7 +196,26 @@ public class HBase2Table {
     return hidden;
     }
     
-  /** Give 2/3D subtable as a JSON array.
+  /** Give subtable as a JSON array of entries in polar coordinates.
+    * @param zName      The name of the z-axis column
+    *                   (or the blank separated list of them).
+    *                   Can be <tt>null</tt>.
+    * @param sName      The name of the selector column.
+    *                   Can be <tt>null</tt>.
+    *                   Disables <tt>zName</tt>.
+    * @param meanValues Whether calculate mean z values for entries with the same x,y and key.
+    * @return The corresponding data as a JSON array with entries <code>x, y, z, k, g</code>
+    *         and the JSON array describing the "s" values with entries <code>g, s</code>.
+    *         The <code>x, y </code> values correspond to <code>ra, dec</code> polar coordinates
+    *         in degrees. */
+  public String[] polar(String  zName,
+                        String  sName,
+                        boolean meanValues) {
+    log.info("Getting polar for " + zName + "," + sName + "(meanValues = " + meanValues + ")");
+    return xyz(_cProcessor.ra(), _cProcessor.dec(), zName, sName, meanValues);
+    }
+    
+  /** Give subtable as a JSON array.
     * @param xName      The name of the x-axis column
     *                   (or the blank separated list of them).
     *                   If <tt>null</tt>, timestamp used as x.
@@ -210,13 +229,14 @@ public class HBase2Table {
     *                   Can be <tt>null</tt>.
     *                   Disables <tt>zName</tt>.
     * @param meanValues Whether calculate mean z values for entries with the same x,y and key.
-    * @return  The corresponding data as a JSON array. */
+    * @return The corresponding data as a JSON array with entries <code>x, y, z, k, g</code>
+    *         and the JSON array describing the "s" values with entries <code>g, s</code>. */
   public String[] xyz(String  xName,
                       String  yName,
                       String  zName,
                       String  sName,
                       boolean meanValues) {
-    log.info("Getting data for " + xName + "," + yName + "," + zName + "," + sName + "(meanValues = " + meanValues + ")");
+    log.info("Getting xyz for " + xName + "," + yName + "," + zName + "," + sName + "(meanValues = " + meanValues + ")");
     Map<String, String> entry;
     Map<String, Integer> sMap = new HashMap<>(); // sVal - n
     Map<Integer, String> gMap = new HashMap<>(); // n - sVal | x/yVal

@@ -31,9 +31,18 @@ public class HBaseColumnsProcessor {
     return DateTimeManagement.time2String(Long.valueOf(date), "yyyy MM dd HH:mm:ss.nnnnnnnnn");
     }
 
-  /** TBD */
-  public double[] getSkyCoord(Map<String, String> entry) {
-    return new double[]{0.0, 0.0};
+  /** Give the <code>ra</code> polar coordinate in degrees.
+    * @return The <code>ra</code> polar coordinate in degrees.
+    *         The default is <tt>0</tt>. */
+  public String ra() {
+    return null;
+    }
+    
+  /** Give the <code>dec</code> polar coordinate in degrees.
+    * @return The <code>dec</code> polar coordinate in degrees.
+    *         The default is <tt>0</tt>. */
+  public String dec() {
+    return null;
     }
     
   /** Logging . */

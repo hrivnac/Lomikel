@@ -72,7 +72,7 @@
     }
   %>
 
-<script type="text/javascript" src="scatterplot.js"></script>
+<script src="scatterplot.js" type="text/javascript"></script>
   
 <script type="text/javascript">
   showScatterPlot("<%=data%>", "<%=gMap%>", "<%=name%>", "<%=x%>", "<%=y%>", "<%=z%>", "<%=s%>");
