@@ -182,6 +182,7 @@
  		<copy file="../src/ws/Top.jsp"     tofile="../build/Top.jsp"   overwrite="true"/>
  		<copy file="../src/ws/TopMini.jsp" tofile="../build/TopMini.jsp"   overwrite="true"/>
     <replace file="../build/index.jsp"   token="@NAME@"    value="${browsername}"/>
+    <replace file="../build/index.jsp"   token="@ICON@"    value="${browsericon}"/>
     <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
     <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
     <replace file="../build/Top.jsp"     token="@NAME@"    value="${browsername}"/>

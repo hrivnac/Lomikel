@@ -26,6 +26,7 @@
     <link href="jquery-ui-1.12.1/jquery-ui.min.css"                     rel="stylesheet" type="text/css"/>
     <link href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css"                      rel="stylesheet" type="text/css" />
     <link href="index.css"                                              rel="stylesheet" type="text/css"/>
+    <link href="@ICON@"                                                 rel="icon"       type="image">
     </head>
   
   <body>

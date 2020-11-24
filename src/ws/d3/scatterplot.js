@@ -4,7 +4,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
   const colors = d3.schemeCategory10;
   var margin;
   if (xS) {
-    margin = {top:20, right:60, bottom:120, left:60},
+    margin = {top:20, right:60, bottom:140, left:60},
              width =  w - margin.left - margin.right,
              height = h - margin.top  - margin.bottom;
     }
