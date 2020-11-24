@@ -41,7 +41,8 @@
    }
   // no data found, use demo data
   if (data == null || data.trim().equals("") || data.trim().equals("[]")) {
-    data = "[{'x':10, 'y':-20, 'z':5, 'g':0}, {'x':60, 'y':90, 'z':6, 'g':0}, {'x':80, 'y':50, 'z':7,'g':1}, {'x':60, 'y':30, 'g':1}]";
+    data = "[{'x':10, 'y':-20, 'z':5, 'k':'k1', 'g':0}, {'x':60, 'y':90, 'z':6, 'k':'k2', 'g':0}, {'x':80, 'y':50, 'z':7, 'k':'k3', 'g':1}, {'x':60, 'y':30, 'k':'k4', 'g':1}]";
+    gMap = "[{'g':0, 's':'aaa'}, {'g':1, 's':'bbb'}]";
     }
   // Variable names
   if (x == null) {

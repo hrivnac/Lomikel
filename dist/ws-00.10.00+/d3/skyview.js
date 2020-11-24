@@ -1,4 +1,17 @@
 function showSkyView(dataS, gMapS, name, zS, sS) {
+
+  //const colors = d3.schemeCategory10;
+  // taken from d3-v6.0.0
+  function colorsF(specifier) {
+    var n = specifier.length / 6 | 0, colors = new Array(n), i = 0;
+    while (i < n) colors[i] = "#" + specifier.slice(i * 6, ++i * 6);
+    return colors;
+    }
+  const category10 = colorsF("1f77b4ff7f0e2ca02cd627289467bd8c564be377c27f7f7fbcbd2217becf");
+  const colors = category10;
+  
+  var data = JSON.parse(dataS.replace(/'/g, '"'));
+  var gMap = JSON.parse(gMapS.replace(/'/g, '"'));
     
   var config = {
     form: true,
@@ -18,33 +31,40 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
     dsos: {show: false, size: 10},
     mw: {style: {fill:"#996", opacity: 0.1}},
     };
+    
+  var features = [];      
   
-  var pointStyle = {
-        stroke: "rgba(255, 0, 204, 1)",
-        fill:   "rgba(255, 0, 204, 0.15)"
-        },
-      textStyle = {
-        fill: "rgba(255, 0, 204, 1)",
-        font: "normal bold 15px Helvetica, Arial, sans-serif",
-        align: "left",
-        baseline: "bottom"
-        };
+  var zmin;
+  var zmax;
+  if (data[0].z) {
+    zmin = data[0].z;
+    zmax = zmin;
+    for (i in data) {
+      d = data[i];
+      if (d.z < zmin) {
+        zmin = d.z;
+        }
+      if (d.z > zmax) {
+        zmax = d.z;
+        }
+      }
+    }
   
+  for (i in data) {
+    var d = data[i];
+    // var name = (d.k + ": " + (gMap.find(e => e.g == d.g).s) + ", (ra, dec) = (" + d.x + ", " + d.y + ")" + (zS ? (", " + zS + " = " + d.z) : ""));
+    var name = d.k;
+    var size = data[0].z ? 50 - (100 - 50) * (d.z - zmin) / (zmax - zmin) : 50;
+    var color = (d.g || d.g === 0) ? colors[d.g % 10] : 'black';
+    features.push({"properties": {"name": name, "dim": size, "color": color},
+                   "geometry": {"type": "Point", "coordinates": [d.x, d.y]}});
+    }
+     
   var jsonSnr = {
     "type": "FeatureCollection",
-    "features": [
-      {"type": "type1",
-       "id": "id1",
-       "properties": {"name": "name1", "dim": 10},
-       "geometry": {"type": "Point", "coordinates": [-80.7653, 38.7837]}
-       },
-      {"type": "type2",
-       "id": "id2",
-       "properties": {"name": "name2", "dim": 20},
-       "geometry": {"type": "Point", "coordinates": [-90.7653, 48.7837]}
-       }
-    ]};
-  
+    "features": features
+    };
+    
   var PROXIMITY_LIMIT = 20;
   
   Celestial.add({
@@ -67,7 +87,8 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
         if (Celestial.clip(d.geometry.coordinates)) {
           var pt = Celestial.mapProjection(d.geometry.coordinates);
           var r = Math.pow(parseInt(d.properties.dim) * 0.25, 0.5);
-          Celestial.setStyle(pointStyle);
+          Celestial.setStyle({stroke: d.properties.color,
+                              fill:   'white'});
           Celestial.context.beginPath();
           Celestial.context.arc(pt[0], pt[1], r, 0, 2 * Math.PI);
           Celestial.context.closePath();
@@ -76,7 +97,11 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
           var nearest = quadtree.find(pt);
           if (!nearest || distance(nearest, pt) > PROXIMITY_LIMIT) {
             quadtree.add(pt)
-            Celestial.setTextStyle(textStyle);
+            Celestial.setTextStyle({fill: d.properties.color,
+                                    font:     "normal 8px Helvetica, Arial, sans-serif",
+                                    align:    "left",
+                                    baseline: "bottom"
+                                    });
             Celestial.context.fillText(d.properties.name, pt[0] + r + 2, pt[1] + r + 2);
             }
           }
