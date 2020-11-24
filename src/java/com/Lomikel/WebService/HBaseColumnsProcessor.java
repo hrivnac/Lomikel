@@ -31,6 +31,11 @@ public class HBaseColumnsProcessor {
     return DateTimeManagement.time2String(Long.valueOf(date), "yyyy MM dd HH:mm:ss.nnnnnnnnn");
     }
 
+  /** TBD */
+  public double[] getSkyCoord(Map<String, String> entry) {
+    return new double[]{0.0, 0.0};
+    }
+    
   /** Logging . */
   private static Logger log = Logger.getLogger(HBaseColumnsProcessor.class);
 

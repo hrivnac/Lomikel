@@ -176,7 +176,7 @@
       <button id="buttonShow" class="btn btn-secondary" style="background-color:#aaaaff; color:black" title="show all <%=hbaseRowName%>s of each <%=group%>"            >All <%=hbaseRowName%>s</button>
       <button onclick="showScatter('evolution')"        style="background-color:#ddddff"              title="time dependence of multiple variables"                     >Evolution Plot</button>    
       <button onclick="showScatter('scatter')"          style="background-color:#ddddff"              title="scatter plot of multiple variables"                        >Scatter Plot</button>    
-      <button onclick="show3D()"                        style="background-color:#ddddff"              title="3d plot of three variables"                                >3D Plot</button>    
+      <button onclick="showSky()"                       style="background-color:#ddddff"              title="sky view"                                                  >Sky View</button>    
       </div>
     <%
       }
@@ -386,6 +386,66 @@
         params += "&s=" + s;
         }
       loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
+      }
+    function showSky() {
+      var x = "";
+      var y = "";
+      var z = "";
+      var s = "";
+      var xs = document.getElementsByClassName('x');
+      var ys = document.getElementsByClassName('y');
+      var zs = document.getElementsByClassName('z');
+      var ss = document.getElementsByClassName('s');
+      for (i = 0; i < xs.length; i++) {
+        if (xs[i].checked) {
+           if (!x.includes(xs[i].id.substring(3))) { 
+             x += xs[i].id.substring(3) + " ";
+             }
+           }
+        }
+      for (i = 0; i < ys.length; i++) {
+        if (ys[i].checked) {
+          if (!y.includes(ys[i].id.substring(3))) { 
+            y += ys[i].id.substring(3) + " ";
+            }
+          }
+        }
+      for (i = 0; i < zs.length; i++) {
+        if (zs[i].checked) {
+          if (!z.includes(zs[i].id.substring(3))) { 
+            z += zs[i].id.substring(3) + " ";
+            }
+          }
+        }
+      for (i = 0; i < ss.length; i++) {
+        if (ss[i].checked) {
+          s = ss[i].id.substring(3);
+          break;
+          }
+        }
+      //if (kind == "evolution" && !x && !y) {
+      //  window.alert("x or y - axis should be selected");
+      //  }
+      //if (kind == "scatter" && !y) {
+      //  window.alert("y - axis should be selected");
+      //  return;
+      //  }
+      var params = "y=" + y;
+      if (x) {
+        //if (kind == "evolution") {
+        //  params += x;
+        //  }
+        //else {
+        //  params += "&x=" + x;
+        //  }
+        }
+      if (z) {
+        params += "&z=" + z;
+        }
+      if (s) {
+        params += "&s=" + s;
+        }
+      loadPane("plot", "d3/skyview.jsp?" + params, true, visheight);
       }
     </script>
 

@@ -8,12 +8,12 @@
 <%@ page errorPage="../ExceptionHandler.jsp" %>
 
 <%! static Logger log = Logger.getLogger(org.apache.jsp.d3.scatterplot_jsp.class); %>
-   
-<link href="scatterplot.css" rel="stylesheet" type="text/css"/>
-<script src="../d3-v6.0.0/d3.js"></script>
 
 <jsp:useBean id="h2table"    class="com.Lomikel.WebService.HBase2Table"    scope="session"/>
 <jsp:useBean id="repository" class="com.Lomikel.WebService.DataRepository" scope="session"/>
+   
+<link href="scatterplot.css" rel="stylesheet" type="text/css"/>
+<script src="../d3-v6.0.0/d3.js" type="text/javascript"></script>
 
 <div id="scatter_area"></div>
 
@@ -74,7 +74,7 @@
 
 <script type="text/javascript" src="scatterplot.js"></script>
   
-<script>
+<script type="text/javascript">
   showScatterPlot("<%=data%>", "<%=gMap%>", "<%=name%>", "<%=x%>", "<%=y%>", "<%=z%>", "<%=s%>");
   </script>
 
