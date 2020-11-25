@@ -354,6 +354,19 @@
       </copy>
   </target>
 
+  <!-- Check ================================================================-->
+    
+   <target name="check-sockets"
+          description="Check Sockets">
+    <echo>Check Sockets</echo>
+    <java classname="net.hep.atlas.Database.Atlascope.Sockets.SocketTest"
+          fork="true">
+      <classpath>
+        <path refid="classpath.run"/>
+        </classpath>
+      </java>
+    </target>
+  
   <!-- JavaDoc ==============================================================-->
 
   <target name="doc"
@@ -392,6 +405,7 @@
       <group title="Januser"     packages="com.Lomikel.Januser"/>
       <group title="Graph"       packages="com.Lomikel.Graph"/>
       <group title="Utils"       packages="com.Lomikel.Utils*"/>
+      <group title="Sockets"     packages="com.Lomikel.Sockets*"/>
       <group title="GUI"         packages="com.Lomikel.GUI*"/>
       <group title="WebService"  packages="com.Lomikel.WebService*"/>
       <group title="LehmanUtils" packages="de.lehmannet.om.util*"/>

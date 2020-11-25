@@ -44,6 +44,9 @@ public class Init {
       System.err.println(e);
       }
     _initialised = true;
+    if (!quiet) {
+      log.info("Initialised, version: " + Info.release());
+      }
     }
     
   public static boolean _initialised = false;  
