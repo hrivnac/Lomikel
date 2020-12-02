@@ -7,8 +7,8 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
     while (i < n) colors[i] = "#" + specifier.slice(i * 6, ++i * 6);
     return colors;
     }
-  const category10 = colorsF("1f77b4ff7f0e2ca02cd627289467bd8c564be377c27f7f7fbcbd2217becf");
-  const colors = category10;
+  const set1 = colorsF("e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999");
+  const colors = set1;
   
   var data = JSON.parse(dataS.replace(/'/g, '"'));
   var gMap = JSON.parse(gMapS.replace(/'/g, '"'));
@@ -118,7 +118,4 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
   Celestial.display(config);
    
   }
-    
-  //  Celestial.display({
-  //    });
  

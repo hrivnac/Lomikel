@@ -2,7 +2,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
   
   var w = 650;
   var h = 400;
-  const colors = d3.schemeCategory10;
+  const colors = d3.schemeSet1;
   var margin;
   if (xS) {
     margin = {top:20, right:60, bottom:60, left:60},
@@ -95,14 +95,20 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
        .attr("stroke-width", "1")
-       .attr("popup", d => ("<b><u>" + d.k + "</u></b><br/>" + (zS ? "x*y = " : "") + (gMap.find(e => e.g == d.g).s) + "<br/>x = " + d.x + "<br/>y = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
+       .attr("info",      d => ("<b><u>" + d.k + "</u></b><br/>" + (zS ? "x*y = " : "") + (gMap.find(e => e.g == d.g).s) + "<br/>x = " + d.x + "<br/>y = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
+       .attr("feedback",   d => (d.k + (zS ? ", x*y = " : "") + (gMap.find(e => e.g == d.g).s) + ", x = " + d.x + ", y = " + d.y + (zS ? (zS + " = " + d.z) : "")))
+       .attr("actionUrl",  d => "TBD")
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')
-       .on("mouseover", function(d) {		
+       .on("click", function(d) {
+          window.parent.parent.feedback("Scatter Point: " + d3.select(this).attr("feedback"))
+          window.parent.parent.commands(d3.select(this).attr("info"), "<a href='#' onclick='loadPane(\"result\", \"" + d3.select(this).attr("actionUrl") + "\")'>search</a>")
+          })
+       /*.on("mouseover", function(d) {		
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("popup"))	
+          div.html(d3.select(this).attr("info"))	
              .style("left", (d3.select(this).attr("cx")) + "px")		
              .style("top",  (d3.select(this).attr("cy")) + "px");	
             })					
@@ -110,7 +116,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
             div.transition()		
                .duration(2000)		
                .style("opacity", 0);	
-        });
+        })*/;
     }
   else {
     var formatTime = d3.timeFormat("%d/%b/%y %H:%M:%S.%L");
@@ -122,14 +128,20 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
        .attr("stroke-width", "1")
-       .attr("popup", d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>" + (gMap.find(e => e.g == d.g).s) + " = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
+       .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>" + (gMap.find(e => e.g == d.g).s) + " = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
+       .attr("feedback",   d => (d.k + ", t = " + formatTime(d.t) + ", " + (gMap.find(e => e.g == d.g).s) + " = " + d.y + (zS ? (zS + " = " + d.z) : "")))
+       .attr("actionUrl",  d => "TBD")
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')
-       .on("mouseover", function(d) {
+       .on("click", function(d) {
+          window.parent.parent.feedback("Evolution Point: " + d3.select(this).attr("feedback"))
+          window.parent.parent.commands(d3.select(this).attr("info"), "<a href='#' onclick='loadPane(\"result\", \"" + d3.select(this).attr("actionUrl") + "\")'>search</a>")
+          })
+       /*.on("mouseover", function(d) {
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("popup"))	
+          div.html(d3.select(this).attr("info"))	
              .style("left", (d3.select(this).attr("cx")) + "px")		
              .style("top",  (d3.select(this).attr("cy")) + "px");	
             })					
@@ -137,7 +149,9 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
             div.transition()		
                .duration(2000)		
                .style("opacity", 0);	
-        });
+        })*/;
     }
     
   }
+  
+  
