@@ -95,7 +95,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
        .attr("stroke-width", "1")
-       .attr("info",      d => ("<b><u>" + d.k + "</u></b><br/>" + (zS ? "x*y = " : "") + (gMap.find(e => e.g == d.g).s) + "<br/>x = " + d.x + "<br/>y = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
+       .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>" + (zS ? "x*y = " : "") + (gMap.find(e => e.g == d.g).s) + "<br/>x = " + d.x + "<br/>y = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
        .attr("feedback",   d => (d.k + (zS ? ", x*y = " : "") + (gMap.find(e => e.g == d.g).s) + ", x = " + d.x + ", y = " + d.y + (zS ? (zS + " = " + d.z) : "")))
        .attr("actionUrl",  d => "TBD")
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')

@@ -134,7 +134,7 @@
       var helpButton  = "<button onClick=\"w2popup.load({url:'Help-Top.html', showMax: true})\" style=\"position:absolute; top:0; right:0\">";
           helpButton += "<img src=\"images/Help.png\" width=\"10\"/>";
           helpButton += "</button>";      
-      window.commands = function(title, info, actions) {
+      window.commands = function(info, actions) {
         document.getElementById("commands").innerHTML = info + helpButton + "<hr/>" + "Actions: " + actions;
         }
       </script>
