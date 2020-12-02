@@ -32,9 +32,11 @@ public class Evaluator {
     _interpreter = new Interpreter();
     try {
       for (String javaClass : _auxJavaClasses) {
+        log.info("Importing " + javaClass);
         _interpreter.eval("import " + javaClass + ".*;");
         }
       for (String bshScript : _auxBshScripts) {
+        log.info("Importing " + bshScript);
         _interpreter.eval(new StringResource(bshScript).toString());
         }
       }
@@ -130,11 +132,17 @@ public class Evaluator {
            
   /** Set aux fuctions for evaluation.
     * @param javaClass The aux Java class name.
-    * @param bshScript The aux Bsh script name (as resources). */
+    *                  May be <code>null</code>.
+    * @param bshScript The aux Bsh script name (as resources). 
+    *                  May be <code>null</code>. */
   public static void setAuxFuctions(String javaClass,
                                     String bshScript) {
-    _auxJavaClasses.add(javaClass);
-    _auxBshScripts.add(bshScript);
+    if (javaClass != null) {
+      _auxJavaClasses.add(javaClass);
+      }
+    if (bshScript != null) {
+      _auxBshScripts.add(bshScript);
+      }
     }
     
   private Schema _schema;
@@ -149,10 +157,5 @@ public class Evaluator {
                                          
   /** Logging . */
   private static Logger log = Logger.getLogger(Evaluator.class);
-  
-  static { 
-    _auxJavaClasses.add("com.Lomikel.HBaser.EvaluatorFunctions");
-    _auxBshScripts.add("com/Lomikel/HBaser/EvaluatorFunctions.bsh");
-    }    
                                                 
   }

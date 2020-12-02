@@ -1,5 +1,7 @@
 package com.Lomikel.Utils;
 
+import com.Lomikel.HBaser.Evaluator;
+
 // Log4J
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -32,6 +34,10 @@ public class Init {
       return;
       }
     try {
+      Evaluator.setAuxFuctions("com.Lomikel.HBaser.EvaluatorFunctions",
+                               "com/Lomikel/HBaser/EvaluatorFunctions.bsh"); 
+      Evaluator.setAuxFuctions(null,
+                               "com/Lomikel/WebService/HBaseColumnsProcessor.bsh"); 
       if (ws) {
         NotifierURL.notify("", "LomikelWS", Info.release());
         }

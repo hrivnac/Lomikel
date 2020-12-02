@@ -151,9 +151,9 @@ public class JanusClient {
     * @return              The {@link List} of created {@link Vertex}es. */
   // TBD: allow replacing
   // TBD: isn't it just one ?
-  protected List<Vertex> addOrCreate(String label,
-                                     String propertyName,
-                                     Object propertyValue) {
+  public List<Vertex> addOrCreate(String label,
+                                  String propertyName,
+                                  Object propertyValue) {
      List<Vertex> vertexes = g().V().has(label, propertyName, propertyValue)
                                    .fold()
                                    .coalesce(unfold(), 
@@ -166,9 +166,9 @@ public class JanusClient {
     * @param v1       The first {@link Vertex}.
     * @param v2       The second {@link Vertex}.
     * @param relation The {@link Edge} name. */
-  protected void addEdge(Vertex v1,
-                         Vertex v2,
-                         String relation) {
+  public void addEdge(Vertex v1,
+                      Vertex v2,
+                      String relation) {
     if (!checkEdge(v1, v2, relation)) {
       v1.addEdge(relation, v2);
       }
@@ -179,9 +179,9 @@ public class JanusClient {
     * @param v2       The destination {@link Vertex}.
     * @param relation The {@link Edge} name.
     * @return         Whether this {@link Edge} exists. */
-  protected boolean checkEdge(Vertex v1,
-                              Vertex v2,
-                              String relation) {
+  public boolean checkEdge(Vertex v1,
+                           Vertex v2,
+                           String relation) {
     _found = false;
     if (v1.vertices(Direction.OUT, relation).hasNext()) {
       v1.vertices(Direction.OUT, relation).forEachRemaining(v -> {
