@@ -105,7 +105,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')
        .on("click", function(d) {
-          window.parent.parent.feedback("Scatter Point: " + d3.select(this).attr("info").replaceAll("<br/>", ", "))
+          window.parent.parent.feedback("Scatter Point: " + d3.select(this).attr("info"))
           window.parent.parent.commands(d3.select(this).attr("info"), "<a href='#' onclick='loadPane(\"result\", \"" + d3.select(this).attr("actionUrl") + "\")'>search</a>")
           })
        /*.on("mouseover", function(d) {		
@@ -143,7 +143,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')
        .on("click", function(d) {
-          window.parent.parent.feedback("Evolution Point: " + d3.select(this).attr("info").replaceAll("<br/>", ", "))
+          window.parent.parent.feedback("Evolution Point: " + d3.select(this).attr("info"))
           window.parent.parent.commands(d3.select(this).attr("info"), "<a href='#' onclick='loadPane(\"result\", \"" + d3.select(this).attr("actionUrl") + "\")'>search</a>")
           })
        /*.on("mouseover", function(d) {

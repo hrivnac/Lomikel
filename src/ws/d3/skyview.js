@@ -116,7 +116,7 @@ function showSkyView(dataS, gMapS, name, zS, sS, url) {
           path.closePath()
           document.addEventListener("click",  function (e) {
             if (distance(pt, getXY(Celestial.context.canvas, e)) < 5) {
-              window.parent.parent.feedback("Sky Point: " + d.properties.name);
+              window.parent.parent.feedback("Sky Point: <b><u>" + d.properties.name + "</u></b>");
               window.parent.parent.commands("<b><u>" + d.properties.name + "</u></b>",
                                             "<a href='#' onclick='loadPane(\"result\", \"" + url + "&key=" + d.properties.name + "\")'>search</a>");
               }
