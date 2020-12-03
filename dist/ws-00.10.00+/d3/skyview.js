@@ -115,7 +115,7 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
           path.arc(pt[0], pt[1], r, 0, 2 * Math.PI);
           path.closePath()
           document.addEventListener("click",  function (e) {
-            if (distance(pt, getXY(Celestial.context.canvas, e) < 5) {
+            if (distance(pt, getXY(Celestial.context.canvas, e)) < 5) {
               window.parent.parent.feedback("Sky Point: " + d.properties.name);
               window.parent.parent.commands("<b><u>" + d.properties.name + "</u></b>", "");
               }
