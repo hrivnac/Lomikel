@@ -58,7 +58,7 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
     var color = (d.g || d.g === 0) ? colors[d.g % 10] : 'black';
     features.push({"properties": {"name": name, "dim": size, "color": color},
                    "geometry": {"type": "Point", "coordinates": [d.x, d.y]}});
-    }
+    };
      
   var jsonSnr = {
     "type": "FeatureCollection",
@@ -66,6 +66,13 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
     };
     
   var PROXIMITY_LIMIT = 20;
+  
+  function getXY(canvas, event){
+    const rect = canvas.getBoundingClientRect();
+    const y = event.clientY - rect.top;
+    const x = event.clientX - rect.left;
+    return [x, y];
+    };
   
   Celestial.add({
     type: "point",      
@@ -81,12 +88,6 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
       Celestial.redraw();
       },   
     redraw: function() {      
-      function getXY(canvas, event){
-        const rect = canvas.getBoundingClientRect()
-        const y = event.clientY - rect.top
-        const x = event.clientX - rect.left
-        return {x:x, y:y}
-        };
       var m = Celestial.metrics(),
           quadtree = d3.geom.quadtree().extent([[-1, -1], [m.width + 1, m. height + 1]])([]);
       Celestial.container.selectAll(".snr").each(function(d) {
@@ -101,7 +102,7 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
           Celestial.context.stroke();
           Celestial.context.fill();
           var nearest = quadtree.find(pt);
-          /*if (!nearest || distance(nearest, pt) > PROXIMITY_LIMIT) {
+          if (!nearest || distance(nearest, pt) > PROXIMITY_LIMIT) {
             quadtree.add(pt)
             Celestial.setTextStyle({fill: d.properties.color,
                                     font:     "normal 8px Helvetica, Arial, sans-serif",
@@ -109,13 +110,12 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
                                     baseline: "bottom"
                                     });
             Celestial.context.fillText(d.properties.name, pt[0] + r + 2, pt[1] + r + 2);
-            }*/
-          const path = new Path2D()
+            }
+          const path = new Path2D();
           path.arc(pt[0], pt[1], r, 0, 2 * Math.PI);
           path.closePath()
           document.addEventListener("click",  function (e) {
-            const XY = getXY(Celestial.context.canvas, e)
-            if (Celestial.context.isPointInPath(path, XY.x, XY.y)) {
+            if (distance(pt, getXY(Celestial.context.canvas, e) < 5) {
               window.parent.parent.feedback("Sky Point: " + d.properties.name);
               window.parent.parent.commands("<b><u>" + d.properties.name + "</u></b>", "");
               }
