@@ -96,18 +96,16 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
        .attr("r",  d => d.z ? z(d.z) : 1)
        .attr("stroke-width", "1")
        .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>" +
-                                 (sS ? ("<br/>" + gMap.find(e => e.g == d.g).s) : "") +
-                                 "<br/>" + 
+                                 (sS ? ("<br/>" + gMap.find(e => e.g == d.g).s) + "<br/>" : "") +
                                  (sS ? "x" : gMap.find(e => e.g == d.g).s.split("*")[0]) + " = " + d.x +
                                  "<br/>" + 
                                  (sS ? "y" : gMap.find(e => e.g == d.g).s.split("*")[1]) + " = " + d.y +
                                  (zS ? ("<br/>" + zS + " = " + d.z) : "")))
-       .attr("actionUrl",  d => (url + "&key=" + d.k))
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')
        .on("click", function(d) {
-          window.parent.parent.feedback("Scatter Point: " + d3.select(this).attr("info").replaceAll("<br/>", ", "))
-          window.parent.parent.commands(d3.select(this).attr("info"), "<a href='#' onclick='loadPane(\"result\", \"" + d3.select(this).attr("actionUrl") + "\")'>search</a>")
+          window.parent.parent.feedback("Scatter Point: " + d3.select(this).attr("info"));
+          window.parent.parent.commands(d3.select(this).attr("info"), actions(url, d3.select(this).attr("key")));
           })
        /*.on("mouseover", function(d) {		
           div.transition()		
@@ -132,10 +130,10 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
        .attr("cx", d => x(d.t))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
+       .attr("key", d => d.k)
        .attr("stroke-width", "1")
        .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>" +
-                                 (sS ? ("<br/>" + gMap.find(e => e.g == d.g).s) : "") +
-                                 "<br/>" + 
+                                 (sS ? ("<br/>" + gMap.find(e => e.g == d.g).s) + "<br/>" : "") +
                                  "t = " + formatTime(d.t) +
                                  "<br/>" + 
                                  (sS ? "y" : gMap.find(e => e.g == d.g).s) + " = " + d.y +
@@ -145,8 +143,8 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')
        .on("click", function(d) {
-          window.parent.parent.feedback("Evolution Point: " + d3.select(this).attr("info").replaceAll("<br/>", ", "))
-          window.parent.parent.commands(d3.select(this).attr("info"), "<a href='#' onclick='loadPane(\"result\", \"" + d3.select(this).attr("actionUrl") + "\")'>search</a>")
+          window.parent.parent.feedback("Evolution Point: " + d3.select(this).attr("info"));
+          window.parent.parent.commands(d3.select(this).attr("info"), actions(url, d3.select(this).attr("key")));
           })
        /*.on("mouseover", function(d) {
           div.transition()		

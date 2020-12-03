@@ -76,6 +76,7 @@
     }
   %>
 
+<script src="actions.js" type="text/javascript"></script>
 <script src="skyview.js" type="text/javascript"></script>
 
 <script type="text/javascript">
