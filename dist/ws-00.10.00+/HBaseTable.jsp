@@ -369,7 +369,8 @@
         window.alert("y - axis should be selected");
         return;
         }
-      var params = "y=" + y;
+      var params = "hbase=<%=hbase%>&htable=<%=htable%>&schema=<%=schema%>&group=<%=group%>";
+      params += "&y=" + y;
       if (x) {
         if (kind == "evolution") {
           params += x;
@@ -404,7 +405,7 @@
           break;
           }
         }
-      var params = "";
+      var params = "hbase=<%=hbase%>&htable=<%=htable%>&schema=<%=schema%>&group=<%=group%>";
       if (z) {
         params += "&z=" + z;
         }

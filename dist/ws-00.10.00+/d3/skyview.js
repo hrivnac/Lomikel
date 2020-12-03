@@ -1,4 +1,4 @@
-function showSkyView(dataS, gMapS, name, zS, sS) {
+function showSkyView(dataS, gMapS, name, zS, sS, url) {
 
   //const colors = d3.schemeCategory10;
   // taken from d3-v6.0.0
@@ -104,7 +104,7 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
           var nearest = quadtree.find(pt);
           if (!nearest || distance(nearest, pt) > PROXIMITY_LIMIT) {
             quadtree.add(pt)
-            Celestial.setTextStyle({fill: d.properties.color,
+            Celestial.setTextStyle({fill:     d.properties.color,
                                     font:     "normal 8px Helvetica, Arial, sans-serif",
                                     align:    "left",
                                     baseline: "bottom"
@@ -117,7 +117,8 @@ function showSkyView(dataS, gMapS, name, zS, sS) {
           document.addEventListener("click",  function (e) {
             if (distance(pt, getXY(Celestial.context.canvas, e)) < 5) {
               window.parent.parent.feedback("Sky Point: " + d.properties.name);
-              window.parent.parent.commands("<b><u>" + d.properties.name + "</u></b>", "");
+              window.parent.parent.commands("<b><u>" + d.properties.name + "</u></b>",
+                                            "<a href='#' onclick='loadPane(\"result\", \"" + url + "&key=" + d.properties.name + "\")'>search</a>");
               }
             },
             false);

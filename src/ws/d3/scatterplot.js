@@ -1,4 +1,4 @@
-function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
+function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
   
   var w = 650;
   var h = 400;
@@ -97,7 +97,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
        .attr("stroke-width", "1")
        .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>" + (zS ? "x*y = " : "") + (gMap.find(e => e.g == d.g).s) + "<br/>x = " + d.x + "<br/>y = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
        .attr("feedback",   d => (d.k + (zS ? ", x*y = " : "") + (gMap.find(e => e.g == d.g).s) + ", x = " + d.x + ", y = " + d.y + (zS ? (zS + " = " + d.z) : "")))
-       .attr("actionUrl",  d => "TBD")
+       .attr("actionUrl",  d => (url + "&key=" + d.k))
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')
        .on("click", function(d) {
@@ -130,7 +130,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS) {
        .attr("stroke-width", "1")
        .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>" + (gMap.find(e => e.g == d.g).s) + " = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
        .attr("feedback",   d => (d.k + ", t = " + formatTime(d.t) + ", " + (gMap.find(e => e.g == d.g).s) + " = " + d.y + (zS ? (zS + " = " + d.z) : "")))
-       .attr("actionUrl",  d => "TBD")
+       .attr("actionUrl",  d => (url + "&key=" + d.k))
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')
        .on("click", function(d) {

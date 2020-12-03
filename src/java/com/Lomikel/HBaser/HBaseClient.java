@@ -366,7 +366,7 @@ public class HBaseClient {
       for (String k : key.split(",")) {
         get = new Get(Bytes.toBytes(k.trim()));
         // Filter
-        if (filter != null && !filter.trim().equals("") && !filter.trim().equals("*")) {
+        if (filter != null && !filter.trim().contains("*") && !filter.trim().equals("")) {
           for (String f : filter.split(",")) {
             fc = f.split(":");
             family = fc[0];

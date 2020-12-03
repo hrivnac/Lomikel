@@ -24,6 +24,10 @@
 <div id="celestial-form"></div>
 
 <%
+  String hbase    = request.getParameter("hbase");
+  String htable   = request.getParameter("htable");
+  String schema   = request.getParameter("schema");
+  String group    = request.getParameter("group");
   String data     = request.getParameter("data");
   String dataName = request.getParameter("dataName");
   String name     = request.getParameter("name");
@@ -49,6 +53,7 @@
     gMap = "[{'g':0, 's':'aaa'}, {'g':1, 's':'bbb'}]";
     }
   // Variable names
+  String url = "HBaseTable.jsp?hbase=" + hbase + "&htable=" + htable + "&schema=" + schema + "&group=" + group + "&selects=*";
   if (z == null) {
     z = "";
     }
@@ -74,6 +79,6 @@
 <script src="skyview.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-  showSkyView("<%=data%>", "<%=gMap%>", "<%=name%>", "<%=z%>", "<%=s%>");
+  showSkyView("<%=data%>", "<%=gMap%>", "<%=name%>", "<%=z%>", "<%=s%>", "<%=url%>");
   </script>
 
