@@ -1,0 +1,2 @@
+hideHBaseForm = true;
+hideHBaseSelector = true;

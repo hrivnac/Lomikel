@@ -1,0 +1,8 @@
+td#bar, th#bar {  
+  text-align: left;
+  padding: 8px;
+  }
+  
+th#bar:nth-child(1), td#bar:nth-child(1) {
+  border-right:2px solid black;
+  }
