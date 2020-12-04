@@ -1,2 +1,0 @@
-hideHBaseForm = true;
-hideHBaseSelector = true;
