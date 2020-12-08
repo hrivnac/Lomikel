@@ -94,6 +94,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
        .attr("cx", d => x(d.x))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 1)
+       .attr("key", d => d.k)
        .attr("stroke-width", "1")
        .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>" +
                                  (sS ? ("<br/>" + gMap.find(e => e.g == d.g).s) + "<br/>" : "") +
@@ -107,11 +108,11 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
           window.parent.parent.feedback("Scatter Point: " + d3.select(this).attr("info"));
           window.parent.parent.commands(d3.select(this).attr("info"), actions(url, d3.select(this).attr("key")));
           })
-       /*.on("mouseover", function(d) {		
+       .on("mouseover", function(d) {		
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("info"))	
+          div.html(d3.select(this).attr("key"))	
              .style("left", (d3.select(this).attr("cx")) + "px")		
              .style("top",  (d3.select(this).attr("cy")) + "px");	
             })					
@@ -119,7 +120,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
             div.transition()		
                .duration(2000)		
                .style("opacity", 0);	
-        })*/;
+        });
     }
   else {
     var formatTime = d3.timeFormat("%d/%b/%y %H:%M:%S.%L");
@@ -146,11 +147,11 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
           window.parent.parent.feedback("Evolution Point: " + d3.select(this).attr("info"));
           window.parent.parent.commands(d3.select(this).attr("info"), actions(url, d3.select(this).attr("key")));
           })
-       /*.on("mouseover", function(d) {
+       .on("mouseover", function(d) {
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("info"))	
+          div.html(d3.select(this).attr("key"))	
              .style("left", (d3.select(this).attr("cx")) + "px")		
              .style("top",  (d3.select(this).attr("cy")) + "px");	
             })					
@@ -158,7 +159,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
             div.transition()		
                .duration(2000)		
                .style("opacity", 0);	
-        })*/;
+        });
     }
     
   }
