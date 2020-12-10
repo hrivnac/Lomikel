@@ -40,7 +40,7 @@ public class GremlinClient {
       }
     log.info("Connected");
     }
-    
+        
   /** Close graph. */
   public void close() {
     log.info("Closed");

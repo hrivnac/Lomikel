@@ -215,6 +215,7 @@
         </classes>
       <lib file="../lib/Lomikel-${version}.jar"/>
       <lib file="${log4j_jar}"/>
+      <lib file="${bsh_jar}"/>
       <lib file="${orgjson_jar}"/>
       <lib file="${httpcore_jar}"/>
       <lib file="${httpclient_jar}"/>
@@ -281,8 +282,32 @@
     <echo>Extract Gremlin Schema</echo>
     <java classname="com.Lomikel.Januser.JanusClient"
           fork="true">
+      <arg value="extract"/>
       <arg value="${zookeeper}"/>
       <arg value="${hbase_table}"/>
+      <classpath>
+        <path refid="classpath.janusgraph"/>
+        </classpath>
+      </java>
+    </target>
+    
+  <!-- Populate Graph from HBase ============================================-->
+
+  <target name="populate-graph"
+          description="Populate Graph from HBase">
+    <echo>Extract Gremlin Schema</echo>
+    <java classname="com.Lomikel.Januser.JanusClient"
+          fork="true">
+      <arg value="populate"/>
+      <arg value="${zookeeper}"/>
+      <arg value="${hbase_table}"/>
+      <arg value="localhost"/>
+      <arg value="2181"/>
+      <arg value="test_portal_tiny.3"/>
+      <arg value="schema_0.7.0_0.3.6"/>
+      <arg value="alert"/>
+      <arg value="rowkey"/>
+      <arg value="ZTF"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
         </classpath>

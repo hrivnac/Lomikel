@@ -2,6 +2,7 @@ package com.Lomikel.Januser;
 
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Info;
+import com.Lomikel.HBaser.HBaseClient;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.io.IOException;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -36,12 +38,23 @@ import org.apache.log4j.Logger;
 public class JanusClient {
 
   /** Extract implicite schema.
-    * @param args[0] The zookeeper host.
-    * @param args[1] The HBase table name. */ 
-  public static void main(String[] args) {
+    * @param args[0] The operation: <tt>extract,populate</tt>.
+    * @param args[1] The zookeeper host.
+    * @param args[2] The HBase table name.
+    * @throws Exception If fails. */ 
+  public static void main(String[] args) throws Exception {
     Init.init();
-    JanusClient jc = new JanusClient(args[0], args[1]);
-    jc.createMetaSchema();
+    JanusClient jc = new JanusClient(args[1], args[2]);
+    if (args[0].trim().equals("extract")) {
+      jc.createMetaSchema();
+      }
+    else if (args[0].trim().equals("populate")) {
+      jc.populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9]);
+      }
+    else {
+      System.err.println("Unknown function " + args[0] + ", try extract or populate");
+      System.exit(-1);
+      }
     System.exit(0);
     }   
   /** Create with default parameters. */
@@ -140,6 +153,40 @@ public class JanusClient {
         e.property(p, "");
         }
       }
+    commit();
+    close();
+    }
+    
+  /** Populate JanusGraph from HBase table.
+    * TBD
+    * @throws IOException If anything goes wrong. */
+  public void populateGraph(String hbaseHost,
+                            int    hbasePort,
+                            String hbaseTable,
+                            String tableSchema,
+                            String label,
+                            String rowkey,
+                            String keyPrefixSearch) throws IOException { 
+    log.info("Cleaning Graph");
+    g().V().hasLabel(label).drop().iterate();
+    log.info("Connection to HBase table");
+    HBaseClient hc = new HBaseClient(hbaseHost, hbasePort);
+    hc.connect(hbaseTable, tableSchema); 
+    Map<String, Map<String, String>> results = hc.scan(null, "key:key:" + keyPrefixSearch + ":prefix", "*", 0, false, false);
+    log.info("Populating Graph");
+    Vertex v;
+    int i = 0;
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      if (!entry.getKey().startsWith("schema")) {
+        i++;
+        v = g().addV(label).next();
+        v.property(rowkey, entry.getKey());
+        for (Map.Entry<String, String> cell : entry.getValue().entrySet()) {
+          v.property(cell.getKey().split(":")[1], cell.getValue()); // TBD: handle binary data
+          }
+        }
+      }
+    log.info("" + i + " " + label + "s created");
     commit();
     close();
     }
