@@ -28,8 +28,9 @@
 
 <%! static Logger log = Logger.getLogger(HBaseTable_jsp.class); %>
 
-<jsp:useBean id="style"   class="com.Lomikel.WebService.Style"       scope="session"/>
-<jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
+<jsp:useBean id="style"   class="com.Lomikel.WebService.Style"            scope="session"/>
+<jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table"      scope="session"/>
+<jsp:useBean id="memory"  class="com.Lomikel.WebService.HBaseTableMemory" scope="session"/>
 
 <%@include file="Params.jsp" %>
 
@@ -59,10 +60,20 @@
       String limitS      = request.getParameter("limit");
       String formula     = request.getParameter("formula");
       String formulaArgs = request.getParameter("formulaArgs");
+      if (hbase  == null || hbase.trim( ).equals("")) {
+        hbase = memory.hbase();
+        log.info("Trying to reuse memorised hbase: " + hbase);
+        }
+      if (htable == null || htable.trim().equals("")) {
+        htable = memory.htable();
+        log.info("Trying to reuse memorised htable: " + htable);
+        }
       if (hbase  == null || hbase.trim( ).equals("") ||
           htable == null || htable.trim().equals("")) {
         log.fatal("Cannot connect to " + htable + "@" + hbase);
         }
+      memory.setHBase(hbase);
+      memory.setHTable(htable);
       String msg = "<b><u>" + htable + "@" + hbase + "</u></b><br/>";
       log.info("Connection to " + htable + "@" + hbase);
       key         = (key         == null || key.equals(         "null")) ? "" : key.trim();
@@ -115,8 +126,21 @@
       else if (!selects.equals("")) {
         msg += "showing only columns <b>" + selects + "</b><br/>";
         }
+      if (schema.equals("")) {
+        schema = memory.schema();
+        log.info("Trying to reuse memorised schema: " + schema);
+        }
       if (!schema.equals("")) {
         msg += "using schema <b>" + schema + "</b><br/>";
+        memory.setSchema(schema);
+        }
+      if (group.equals("")) {
+        group = memory.group();
+        log.info("Trying to reuse memorised group: " + group);
+        }
+      if (!group.equals("")) {
+        msg += "using group <b>" + group + "</b><br/>";
+        memory.setGroup(group);
         }
       long startL = 0;
       long stopL  = 0;

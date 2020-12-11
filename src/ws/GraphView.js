@@ -221,7 +221,7 @@ function show(graph) {
               actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
               }
             if (!actionsArray[k].embedded) {
-              actions += "<a href='" + url + "' target='_blank'>&#8599;</a>";
+              actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "&#8599;</a>";
               }
             actions += " - ";
             }
@@ -255,7 +255,7 @@ function show(graph) {
               actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
               }
             if (!actionsArray[k].embedded) {
-              actions += "<a href='" + url + "' target='_blank'>&#8599;</a>";
+              actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "&#8599;</a>";
               }
             actions += " - ";
             }
