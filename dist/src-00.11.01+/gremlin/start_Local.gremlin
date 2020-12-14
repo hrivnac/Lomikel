@@ -1,4 +1,0 @@
-//:record start MyGremlin.log
-:remote connect tinkerpop.server conf/Local.yaml session
-:remote console
-

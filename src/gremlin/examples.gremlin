@@ -129,5 +129,5 @@ g.V().hasLabel('dataset').limit(1).next().getClass().getMethods()
 evaluate(new File("..."))
 
 // profile a query
-g....profile()
+g.profile()
 
