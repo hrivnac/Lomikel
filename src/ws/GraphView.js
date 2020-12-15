@@ -69,6 +69,7 @@ function callGremlinGraph(request, newServer, level = 0) {
       }
     };
   http.open("GET", server + '?gremlin=' + request);
+  http.setRequestHeader("Authorization", "Basic " + btoa("admin:admin"));
   http.send(); 
   }  
   
@@ -83,6 +84,7 @@ function callGremlinValues(request, newServer) {
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
   http.open("GET", server + '?gremlin=' + request, false);
+  http.setRequestHeader("Authorization", "Basic " + btoa("admin:admin"));
   http.send();
   return parseValues(http.responseText)
   }
