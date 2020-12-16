@@ -60,16 +60,18 @@ function callGremlinGraph(request, newServer, level = 0) {
   if (select !== "") {
     request += "." + select;
     }
+  var [host, port] = server.split("//")[1].split(":");
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
   http.onload = function() {
     if (http.readyState === 4 && http.status === 200) {
-      show(parseGraph(http.responseText));
-      expandNodes(level);
+      //show(parseGraph(http.responseText));
+      console.log(http.responseText);
+      //expandNodes(level);
       }
     };
-  http.open("GET", server + '?gremlin=' + request);
-  http.setRequestHeader("Authorization", "Basic " + btoa("admin:admin"));
+  //http.open("GET", server + '?gremlin=' + request);
+  http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + request);
   http.send(); 
   }  
   
@@ -84,7 +86,6 @@ function callGremlinValues(request, newServer) {
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
   http.open("GET", server + '?gremlin=' + request, false);
-  http.setRequestHeader("Authorization", "Basic " + btoa("admin:admin"));
   http.send();
   return parseValues(http.responseText)
   }

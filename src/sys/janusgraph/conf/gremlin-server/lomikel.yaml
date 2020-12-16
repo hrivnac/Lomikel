@@ -42,18 +42,18 @@ maxAccumulationBufferComponents: 1024
 resultIterationBatchSize: 64
 writeBufferLowWaterMark: 32768
 writeBufferHighWaterMark: 65536
-authentication: {
-   authenticator: org.janusgraph.graphdb.tinkerpop.gremlin.server.auth.SaslAndHMACAuthenticator,
-   authenticationHandler: org.janusgraph.graphdb.tinkerpop.gremlin.server.handler.SaslAndHMACAuthenticationHandler,
-   config: {
-     defaultUsername: admin,
-     defaultPassword: admin,
-     hmacSecret: secretKey,
-     credentialsDb: conf/janusgraph-credentials-server.properties
-    }
- }
-ssl: {
-  enabled: true,
-  keyStore: /opt/janusgraph/data/server.jks,
-  keyStorePassword: prakrsno
-}
+#authentication: {
+#  authenticator: org.janusgraph.graphdb.tinkerpop.gremlin.server.auth.SaslAndHMACAuthenticator,
+#  authenticationHandler: org.janusgraph.graphdb.tinkerpop.gremlin.server.handler.SaslAndHMACAuthenticationHandler,
+#  config: {
+#    defaultUsername: admin,
+#    defaultPassword: admin,
+#    hmacSecret: secretKey,
+#    credentialsDb: conf/janusgraph-credentials-server.properties
+#    }
+#  }
+#ssl: {
+#  enabled: true,
+#  keyStore: /opt/janusgraph/data/server.jks,
+#  keyStorePassword: prakrsno
+#  }

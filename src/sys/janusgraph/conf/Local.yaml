@@ -1,9 +1,9 @@
 hosts: [@SERVER.HOST@]
 port: @SERVER.PORT@
-username: admin
-password: admin
-connectionPool: {
-  enableSsl: true,
-}
+#username: admin
+#password: admin
+#connectionPool: {
+#  enableSsl: true
+#  }
 serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1, config: { serializeResultToString: true }}
 serializer: { className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0, config: { serializeResultToString: true }}
