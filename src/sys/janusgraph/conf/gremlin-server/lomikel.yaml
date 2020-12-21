@@ -15,13 +15,13 @@ scriptEngines: {
                org.apache.tinkerpop.gremlin.jsr223.ScriptFileGremlinPlugin: {files: [scripts/setup-env.groovy, scripts/functions.gremlin]}}}}
 serializers:
   - { className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0,
-      config: { serializeResultToString: true,
-                ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
+      config: { #serializeResultToString: false,
+                ioRegistries: [#org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
                                org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
-  - { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV3d0,
-      config: {serializeResultToString: true,
-               ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
-                              org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
+  #- { className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV3d0,
+  #    config: {serializeResultToString: true,
+  #             ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
+  #                            org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
   # Older serializatio n versions for backwards compatibility:
   - { className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV1d0, config: { ioRegistries: [org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry] }}
   - { className: org.apache.tinkerpop.gremlin.driver.ser.GryoLiteMessageSerializerV1d0, config: {ioRegistries: [org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry] }}

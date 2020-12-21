@@ -28,6 +28,10 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0;
 import org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry;
 import org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0;
 import org.apache.tinkerpop.gremlin.structure.io.gryo.GryoMapper;
+import org.apache.tinkerpop.gremlin.driver.Client;
+import org.apache.tinkerpop.gremlin.driver.ResultSet;
+import org.apache.tinkerpop.gremlin.driver.Result;
+import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 
 // Java
 import java.util.concurrent.CompletableFuture;
@@ -49,6 +53,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: reuse (the same) serializer
 public class GremlinClient {
    
   /** Create with connection parameters.
@@ -58,28 +63,18 @@ public class GremlinClient {
                        int    port) {
     Init.init();
     log.info("Opening " + hostname + ":" + port);
-    _graph = EmptyGraph.instance();
     try {
       Map<String, Object>  builderConf = new HashMap<>();
-      builderConf.put("serializeResultToString", Boolean.TRUE);
-      
-      //GraphSONMapper.Builder builder = GraphSONMapper.build()
+      builderConf.put("serializeResultToString", Boolean.FALSE);      
       GryoMapper.Builder builder = GryoMapper.build()
-                                             .addRegistry(TinkerIoRegistryV3d0.instance())
-                                             .addRegistry(JanusGraphIoRegistry.instance());
-      
-                                                     
-      //MessageSerializer serializer = new GraphSONMessageSerializerV3d0(builder);
-      MessageSerializer serializer = new GryoMessageSerializerV3d0(builder);
-      
-      serializer.configure(builderConf, null);
-      Cluster cluster = Cluster.build(hostname)
-                               .port(port)
-                               .serializer(serializer)
-                               .maxContentLength(655360)
-                               .create();
-      _g = _graph.traversal().withRemote(DriverRemoteConnection.using(cluster));
-      //_g = _graph.traversal().withRemote(DriverRemoteConnection.using(hostname, port));
+                                             .addRegistry(JanusGraphIoRegistry.getInstance());                                                     
+      MessageSerializer serializer = new GryoMessageSerializerV3d0(builder);      
+      _cluster = Cluster.build()
+                        .addContactPoint(hostname)
+                        .port(port)
+                        .serializer(serializer)
+                        .create();
+      _client = _cluster.connect().init();
       log.info("Connected");
       }
     catch (Exception e) {
@@ -89,75 +84,43 @@ public class GremlinClient {
            
   /** Close graph. */
   public void close() {
+    _client.close();
+    _cluster.close();
     log.info("Closed");
     }
-    
-  /** Convert {@link Graph} to its <em>GraphSON</em> representation.
-    * @param graph The existing {@link Graph}.
-    * @return      The JSON representation.
-    * @throws      IOException If anything fails. */
-  public String toJSON(Graph graph) throws IOException {
-    OutputStream os = new ByteArrayOutputStream();
-    _graph.io(IoCore.graphson()).writer()
-                                .wrapAdjacencyList(true)
-                                .create()
-                                .writeGraph(os, graph);
-    return os.toString();
-    }
-    
-  /** Convert {@link Vertex} to its <em>GraphSON</em> representation.
-    * @param vertex The existing {@link Vertex}.
-    * @return       The JSON representation.
-    * @throws       IOException If anything fails. */
-  public String toJSON(Vertex vertex) throws IOException {
-    OutputStream os = new ByteArrayOutputStream();
-    _graph.io(IoCore.graphson()).writer()
-                                .wrapAdjacencyList(true)
-                                .create()
-                                .writeVertex(os, vertex, Direction.BOTH);
-    return os.toString();
-    }
-    
-  /** Convert {@link List} of {@link Vertex}es to its <em>GraphSON</em> representation.
-    * @param vertices The existing {@link List} of {@link Vertex}es.
-    * @return         The JSON representation.
-    * @throws         IOException If anything fails. */
-  public String toJSON(List<Vertex> vertices) throws IOException {
-    OutputStream os = new ByteArrayOutputStream();
-    _graph.io(IoCore.graphson()).writer()
-                                .wrapAdjacencyList(true)
-                                .create()
-                                .writeVertices(os, vertices.iterator(), Direction.BOTH);
-    return os.toString();
-    }
-    
+ 
   /** Interpret Gremlin String.
-    * @param request The Gremlin regurest string (without <tt>g.</tt>.
-    * @return        The result {@link Graph}.
+    * @param request The Gremlin regurest string.
+    * @return        The {@link ResultSet}.
     * @throws Exception If anything goes wrong. */
   // TBD: handle exceptions
-  // TBD: shouldn't contain magic number for timeout
-  public Graph interpret(String request) throws Exception {
+  public ResultSet interpret(String request) throws Exception {
     log.info("Evaluating " + request);
-    ConcurrentBindings cb = new ConcurrentBindings();
-    cb.putIfAbsent("g", _g);
-    GremlinExecutor ge = GremlinExecutor.build()
-                                        .evaluationTimeout(15000L)
-                                        .globalBindings(cb)
-                                        .create();
-    CompletableFuture<Object> evalResult = ge.eval("g." + request + ".bothE().subgraph(\"a\").cap(\"a\").next()", "gremlin-groovy", new SimpleBindings());
-    return (Graph)evalResult.get();
+    ResultSet results = _client.submit(request);
+    return results;
     }
     
-  /** Give {@link GraphTraversalSource}.
-    * @return {@link GraphTraversalSource}. */
-  public GraphTraversalSource g() {
-    return _g;
+  /** Interpret Gremlin String as JSON.
+    * @param request The Gremlin regurest string.
+    * @return        The {@link ResultSet} as JSON.
+    * @throws Exception If anything goes wrong. */
+  public String interpret2JSON(String request) throws Exception {
+    ResultSet results = interpret(request);
+    ObjectMapper mapper = GraphSONMapper.build()
+                                        .addRegistry(JanusGraphIoRegistry.getInstance())
+                                        .create()
+                                        .createMapper();
+    String json = "[";
+    for (Result result : results) {
+      json += mapper.writeValueAsString(result.getObject());
+      }
+    json += "]";
+    return json;
     }
     
-  private Graph _graph;
-  
-  private GraphTraversalSource _g;
+  private Cluster _cluster;  
+    
+  private Client _client;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(GremlinClient.class);
