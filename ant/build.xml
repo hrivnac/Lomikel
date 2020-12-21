@@ -309,6 +309,7 @@
       <lib file="${janusgraph_dir}/lib/slf4j-api-1.7.12.jar"/>
       <lib file="${janusgraph_dir}/lib/slf4j-log4j12-1.7.12.jar"/>
       <lib file="${janusgraph_dir}/lib/snakeyaml-1.11.jar"/>
+      <lib file="${janusgraph_dir}/lib/spatial4j-0.7.jar"/>
       <lib file="${janusgraph_dir}/lib/tinkergraph-gremlin-3.4.6.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>

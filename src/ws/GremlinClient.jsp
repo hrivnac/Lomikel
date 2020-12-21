@@ -9,6 +9,8 @@
   String port = request.getParameter("port");
   String req  = request.getParameter("request");
   GremlinClient gc = new GremlinClient(host, new Integer(port));
-  String output = gc.toJSON(gc.interpret(req));
+  String output = gc.interpret2JSON(req);
   %>
 <%=output%>
+
+

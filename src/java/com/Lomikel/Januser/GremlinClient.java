@@ -91,21 +91,21 @@ public class GremlinClient {
  
   /** Interpret Gremlin String.
     * @param request The Gremlin regurest string.
-    * @return        The {@link ResultSet}.
+    * @return        The {@link List} of {@link Result}s.
     * @throws Exception If anything goes wrong. */
   // TBD: handle exceptions
-  public ResultSet interpret(String request) throws Exception {
+  public List<Result>	 interpret(String request) throws Exception {
     log.info("Evaluating " + request);
     ResultSet results = _client.submit(request);
-    return results;
+    return results.all().get();
     }
     
-  /** Interpret Gremlin String as JSON.
-    * @param request The Gremlin regurest string.
-    * @return        The {@link ResultSet} as JSON.
+  /** Interpret Gremlin request as JSON string .
+    * @param request The Gremlin reguest string.
+    * @return        The {@link Result}s as JSON string .
     * @throws Exception If anything goes wrong. */
   public String interpret2JSON(String request) throws Exception {
-    ResultSet results = interpret(request);
+    List<Result> results = interpret(request);
     ObjectMapper mapper = GraphSONMapper.build()
                                         .addRegistry(JanusGraphIoRegistry.getInstance())
                                         .create()
