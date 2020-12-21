@@ -149,13 +149,12 @@
       <fileset dir="../src/java" includes="com/Lomikel/**/*.png"/>
       <fileset dir="../src/java" includes="com/Lomikel/**/*.gif"/>
       <fileset dir="../src/java" includes="com/Lomikel/**/*.css"/>
-      <manifest>
+     <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar>
-      <echo>${bsh_jar}</echo>
     <jar jarfile="../lib/Lomikel.exe.jar" index="yes">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
       <zipfileset includes="**/*" src="${bsh_jar}"/>
@@ -164,6 +163,48 @@
       <zipfileset includes="**/*" src="${slf4j_jar}"/>
       <zipfileset includes="**/*" src="${slf4jlog4j_jar}"/>
       <zipfileset includes="**/*" src="${logging_jar}"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.3.1.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-codec-1.14.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-collections-3.2.2.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-configuration-1.10.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-lang-2.5.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-lang3-3.3.1.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-logging-1.1.1.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/exp4j-0.4.8.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/guava-18.0.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-console-3.4.6.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-core-3.4.6.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-driver-3.4.6.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-groovy-3.4.6.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-shaded-3.4.6.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-2.5.7-indy.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-2.5.7.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-console-2.5.7.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-groovysh-2.5.7-indy.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-2.5.7-indy.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-2.5.7-indy.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-2.5.7.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-templates-2.5.7.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-xml-2.5.7.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hppc-0.7.1.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.10.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.12.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/ivy-2.3.0.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-driver-0.5.2.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javapoet-1.8.0.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javatuples-1.2.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jbcrypt-0.4.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-log-0.14.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-manifests-1.1.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcl-over-slf4j-1.7.25.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-2.14.6.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-1.2.16.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-all-4.1.45.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/picocli-3.9.5.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-api-1.7.12.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-log4j12-1.7.12.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snakeyaml-1.11.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.4.6.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -217,8 +258,6 @@
       <lib file="${log4j_jar}"/>
       <lib file="${bsh_jar}"/>
       <lib file="${orgjson_jar}"/>
-      <lib file="${httpcore_jar}"/>
-      <lib file="${httpclient_jar}"/>
       <lib file="${slf4j_jar}"/>
       <lib file="${slf4jlog4j_jar}"/>
       <lib file="${logging_jar}"/>
@@ -235,6 +274,7 @@
       <lib file="${janusgraph_dir}/lib/commons-lang3-3.3.1.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-logging-1.1.1.jar"/>
       <lib file="${janusgraph_dir}/lib/exp4j-0.4.8.jar"/>
+      <lib file="${janusgraph_dir}/lib/guava-18.0.jar"/>
       <lib file="${janusgraph_dir}/lib/gremlin-console-3.4.6.jar"/>
       <lib file="${janusgraph_dir}/lib/gremlin-core-3.4.6.jar"/>
       <lib file="${janusgraph_dir}/lib/gremlin-driver-3.4.6.jar"/>
@@ -253,6 +293,7 @@
       <lib file="${janusgraph_dir}/lib/httpclient-4.5.10.jar"/>
       <lib file="${janusgraph_dir}/lib/httpcore-4.4.12.jar"/>
       <lib file="${janusgraph_dir}/lib/ivy-2.3.0.jar"/>
+      <lib file="${janusgraph_dir}/lib/janusgraph-driver-0.5.2.jar"/>
       <lib file="${janusgraph_dir}/lib/javapoet-1.8.0.jar"/>
       <lib file="${janusgraph_dir}/lib/javatuples-1.2.jar"/>
       <lib file="${janusgraph_dir}/lib/jbcrypt-0.4.jar"/>
@@ -266,6 +307,7 @@
       <lib file="${janusgraph_dir}/lib/slf4j-api-1.7.12.jar"/>
       <lib file="${janusgraph_dir}/lib/slf4j-log4j12-1.7.12.jar"/>
       <lib file="${janusgraph_dir}/lib/snakeyaml-1.11.jar"/>
+      <lib file="${janusgraph_dir}/lib/tinkergraph-gremlin-3.4.6.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -290,10 +332,20 @@
           tofile="${server_dir}/Lomikel.war"/>
     </target>
  
+  <!-- Patch and Restart JanuGraph ==========================================-->
+  
+  <target name="janus-restart"
+          description="Patch and Restart JanuGraph">
+    <antcall target="janus-stop"/>
+    <antcall target="janus-patch"/>
+    <antcall target="janus-start"/>
+    </target>
+ 
   <!-- Patch JanusGraph =====================================================-->
   
-  <target name="patch"
+  <target name="janus-patch"
           description="Patch JanusGraph">
+    <echo>Patching JanusGraph Server</echo>
  		<copy todir="${janusgraph_dir}/scripts">
 			<fileset dir="../src/gremlin" includes="functions.gremlin"/>
 			<fileset dir="../src/sys/janusgraph/scripts" includes="*"/>
