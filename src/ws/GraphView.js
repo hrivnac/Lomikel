@@ -48,7 +48,7 @@ function gcall(command, level = 0) {
   bootstrap('text', level);
   }
  
-// Send request to Gremlin server giving Graphson graph
+// Send request to Gremlin server giving JSON graph
 // TBD: use POST
 // TBD: check rc
 function callGremlinGraph(request, newServer, level = 0) {
@@ -65,17 +65,16 @@ function callGremlinGraph(request, newServer, level = 0) {
   var http = new XMLHttpRequest();
   http.onload = function() {
     if (http.readyState === 4 && http.status === 200) {
-      //show(parseGraph(http.responseText));
-      console.log(http.responseText);
-      //expandNodes(level);
+      show(parseGraph(http.responseText));
+      expandNodes(level);
       }
     };
   //http.open("GET", server + '?gremlin=' + request);
-  http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + request);
+  http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + encodeURIComponent(request));
   http.send(); 
   }  
   
-// Send request to Gremlin server giving Graphson values
+// Send request to Gremlin server giving JSON values
 // TBD: use POST
 // TBD: check rc
 function callGremlinValues(request, newServer) {
@@ -83,16 +82,18 @@ function callGremlinValues(request, newServer) {
     newServer = server;
     }
   server = newServer;
+  var [host, port] = server.split("//")[1].split(":");
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
-  http.open("GET", server + '?gremlin=' + request, false);
+  //http.open("GET", server + '?gremlin=' + request, false);
+  http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + encodeURIComponent(request), false);
   http.send();
   return parseValues(http.responseText)
   }
 
-// Parse Graphson graph
-function parseGraph(graphson) {
-  var g = JSON.parse(graphson).result.data['@value'];
+// Parse JSON graph
+function parseGraph(json) {
+  var g = JSON.parse(json);
   document.getElementById("feedback").innerHTML += "Showing " + g.length + " new elements<br/>";
   var label;
   var id;
@@ -145,9 +146,28 @@ function parseGraph(graphson) {
   return graph;
   }
   
-// Parse Graphson values
-function parseValues(graphson) {
-  return JSON.parse(graphson).result.data['@value'];
+// Parse JSON values
+function parseValues(value) {
+  answer = value;
+  if (value != "") {
+    value = JSON.parse(value);
+    if (value) {
+      answer = value;
+      value = value[0]
+      if (value) {
+        answer = value;
+        value = value['@value'];
+        if (value) {
+          answer = value;
+          value = value.value;
+          if (value) {
+            answer = value;
+            }
+          }
+        }
+      }
+    }
+  return answer;
   }
  
 // Construct VIS graph
@@ -630,7 +650,7 @@ function callInfo(element, key) {
 function stylesheetValue(nam, id, eMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
   if (nam.gremlin) {
-    val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin)[0];
+    val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);
     }
   else if (nam.js) {
     val = eval(nam.js);

@@ -111,7 +111,14 @@ public class GremlinClient {
                                         .create()
                                         .createMapper();
     String json = "[";
+    boolean first = true;
     for (Result result : results) {
+      if (first) {
+        first = false;
+        }
+      else {
+        json += ",";
+        }
       json += mapper.writeValueAsString(result.getObject());
       }
     json += "]";

@@ -8,8 +8,8 @@ var stylesheet = {
     "default": {
       graphics: {
         label:{gremlin:"label()"},        
-        title:{gremlin:"properties('title').value()"},      
-        subtitle:{gremlin:"properties('subtitle').value()"},
+        title:{gremlin:"properties('title')"},      
+        subtitle:{gremlin:"properties('subtitle')"},
         group:" ",         // specifies graphics properties
         shape:"dot",       // in text:  ellipse, circle, database, box, text
                            // out text: image, circularImage, diamond, dot, star, triangle, triangleDown, hexagon, square, icon
@@ -25,9 +25,9 @@ var stylesheet = {
       },
     "MetaGraph": {
       graphics: {
-        label:{gremlin:"properties('MetaLabel').value()"},        
-        title:{gremlin:"properties('title').value()"},      
-        subtitle:{gremlin:"properties('subtitle').value()"},
+        label:{gremlin:"properties('MetaLabel')"},        
+        title:{gremlin:"properties('title')"},      
+        subtitle:{gremlin:"properties('subtitle')"},
         group:" ",         
         shape:"ellipse",      
                            
@@ -58,7 +58,7 @@ var stylesheet = {
       },
     "MetaGraph": {
       graphics: {
-        label:{gremlin:"properties('MetaLabel').value()"},        
+        label:{gremlin:"properties('MetaLabel')"},        
         title:" ",
         subtitle:" ",
         arrows:"middle",
