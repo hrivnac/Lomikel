@@ -51,12 +51,16 @@ function gcall(command, level = 0) {
 // Send request to Gremlin server giving JSON graph
 // TBD: use POST
 // TBD: check rc
-function callGremlinGraph(request, newServer, level = 0) {
+async function callGremlinGraph(request, newServer, level = 0) {
   if (newServer == null) {
     newServer = server;
     }
   server = newServer;
-  var select = document.getElementById('select').value.trim();
+  var select;
+  while (!document.getElementById('select')) { // TBD: do better
+    await new Promise(r => setTimeout(r, 1000));
+    }
+  select = document.getElementById('select').value.trim();
   if (select !== "") {
     request += "." + select;
     }
@@ -147,6 +151,7 @@ function parseGraph(json) {
   }
   
 // Parse JSON values
+// TBD: ugly
 function parseValues(value) {
   answer = value;
   if (value != "") {
@@ -166,6 +171,9 @@ function parseValues(value) {
           }
         }
       }
+    }
+  if (Array.isArray(answer) && answer.length == 0) {
+    answer = "";
     }
   return answer;
   }
@@ -244,7 +252,12 @@ function show(graph) {
               actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
               }
             if (!actionsArray[k].embedded) {
-              actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "&#8599;</a>";
+              if (!actionsArray[k].external) {
+                actions += "&nbsp;<a href='" + url + "' target='_blank'>" + "&#8599;</a>";
+                }
+              else {
+                actions += "&nbsp;" + actionsArray[k].name + "<a href='" + url + "' target='_blank'>" + "&#8599;</a>";
+                }
               }
             actions += " - ";
             }
@@ -278,7 +291,12 @@ function show(graph) {
               actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
               }
             if (!actionsArray[k].embedded) {
-              actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "&#8599;</a>";
+              if (!actionsArray[k].external) {
+                actions += "&nbsp;<a href='" + url + "' target='_blank'>" + "&#8599;</a>";
+                }
+              else {
+                actions += "&nbsp;" + actionsArray[k].name + "<a href='" + url + "' target='_blank'>" + "&#8599;</a>";
+                }
               }
             actions += " - ";
             }
