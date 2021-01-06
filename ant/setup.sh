@@ -14,9 +14,10 @@ if [[ ! "x" = "x${hbase_classpath}" ]]; then
   fi
   
 export janusgraph_dir
+export hbase_dir
+export gremlin_dir
 export zookeeper
 export hbase_table
-export hbase_dir
 
 export home=`pwd`/..
 

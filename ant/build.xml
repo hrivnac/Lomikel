@@ -263,11 +263,11 @@
       <lib file="${slf4j_jar}"/>
       <lib file="${slf4jlog4j_jar}"/>
       <lib file="${logging_jar}"/>
-      <lib file="${hbasecommon_jar}"/>
-      <lib file="${hbaseclient_jar}"/>
-      <lib file="${hadoopcommon_jar}"/>
       <lib file="${javaxmail_jar}"/>
       <lib file="${javaxservlet_jar}"/>
+      <lib file="${hbasecommon_jar}"/>
+      <lib file="${hbaseclient_ja}"/>
+      <lib file="${hadoopcommon_jar}"/>
       <lib file="${janusgraph_dir}/lib/caffeine-2.3.1.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-codec-1.14.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-collections-3.2.2.jar"/>
@@ -470,9 +470,6 @@
 			<fileset file="${logging_jar}"/>
 			<fileset file="${cli_jar}"/>
 			<fileset file="${orgjson_jar}"/>
-			<fileset file="${hbasecommon_jar}"/>
-			<fileset file="${hbaseclient_jar}"/>
-			<fileset file="${hadoopcommon_jar}"/>
 			<fileset file="${javaxmail_jar}"/>
 			<fileset file="${javaxservlet_jar}"/>
       </copy>
