@@ -1,0 +1,30 @@
+#vis {
+  position: relative;
+  width: 100%;
+  border: 2px solid lightgray;
+  background-color: white;
+  }
+
+input.button-remove {
+  background-image: url(images/Remove.png);
+  background-color: transparent; /* make the button transparent */
+  background-repeat: no-repeat;  /* make the background image appear only once */
+  background-position: 0px 0px;  /* equivalent to 'top left' */
+  border: none;           /* assuming we don't want any borders */
+  cursor: pointer;        /* make the cursor like hovering over an <a> element */
+  height: 32px;           /* make this the size of your image */
+  padding-left: 32px;     /* make text start to the right of the image */
+  vertical-align: middle; /* align the text vertically centered */
+  }
+  
+input.button-describe {
+  background-image: url(images/Describe.png);
+  background-color: transparent; /* make the button transparent */
+  background-repeat: no-repeat;  /* make the background image appear only once */
+  background-position: 0px 0px;  /* equivalent to 'top left' */
+  border: none;           /* assuming we don't want any borders */
+  cursor: pointer;        /* make the cursor like hovering over an <a> element */
+  height: 32px;           /* make this the size of your image */
+  padding-left: 32px;     /* make text start to the right of the image */
+  vertical-align: middle; /* align the text vertically centered */
+  }
