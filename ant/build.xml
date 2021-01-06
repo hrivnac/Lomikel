@@ -102,9 +102,24 @@
     <mkdir dir="../build"/>
     <mkdir dir="../lib"/>
     <mkdir dir="../extlib"/>
+    <mkdir dir="../extlib/import"/>
     <mkdir dir="../run"/>
     <mkdir dir="../dist"/>
     <mkdir dir="../doc/JavaDoc"/>
+    <copy todir="../extlib/import">
+			<fileset file="${log4j_jar}"/>
+			<fileset file="${slf4j_jar}"/>
+			<fileset file="${slf4jlog4j_jar}"/>
+			<fileset file="${bsh_jar}"/>
+			<fileset file="${scala_jar}"/>
+			<fileset file="${httpclient_jar}"/>
+			<fileset file="${httpcore_jar}"/>
+			<fileset file="${logging_jar}"/>
+			<fileset file="${cli_jar}"/>
+			<fileset file="${orgjson_jar}"/>
+			<fileset file="${javaxmail_jar}"/>
+			<fileset file="${javaxservlet_jar}"/>
+      </copy>
     </target>
     
 
@@ -444,6 +459,9 @@
       </delete>
     <delete includeEmptyDirs="true">
       <fileset dir="../dist" includes="**/*"/>
+      </delete>
+    <delete includeEmptyDirs="true">
+      <fileset dir="../extlib/import" includes="**/*"/>
       </delete>
     <delete includeEmptyDirs="true">
       <fileset dir="." includes="**/*"/>
