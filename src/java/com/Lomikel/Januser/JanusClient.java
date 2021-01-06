@@ -158,7 +158,13 @@ public class JanusClient {
     }
     
   /** Populate JanusGraph from HBase table.
-    * TBD
+    * @param hbaseHost       The HBase hostname.
+    * @param hbasePort       The HBase port.
+    * @param hbasetable      The HBase table to replicate in Graph.
+    * @param tableSchema     The HBase table schema name.
+    * @param label           The label of newly created Vertexes.
+    * @param rowkey          The row key name.
+    * @param keyPrefixSearch The key prefix to limit replication to.
     * @throws IOException If anything goes wrong. */
   public void populateGraph(String hbaseHost,
                             int    hbasePort,
