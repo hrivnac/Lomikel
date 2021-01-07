@@ -119,6 +119,8 @@
 			<fileset file="${orgjson_jar}"/>
 			<fileset file="${javaxmail_jar}"/>
 			<fileset file="${javaxservlet_jar}"/>
+			<fileset file="${math3_jar}"/>
+			<fileset file="${healpix_jar}"/>
       </copy>
     </target>
     
