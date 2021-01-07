@@ -179,7 +179,7 @@ public class JanusClient {
     log.info("Connection to HBase table");
     HBaseClient hc = new HBaseClient(hbaseHost, hbasePort);
     hc.connect(hbaseTable, tableSchema); 
-    Map<String, Map<String, String>> results = hc.scan(null, "key:key:" + keyPrefixSearch + ":prefix", "*", 0, false, false);
+    Map<String, Map<String, String>> results = hc.scan(null, "key:key:" + keyPrefixSearch + ":prefix", "*", limit, false, false);
     log.info("Populating Graph");
     Vertex v;
     int i = 0;
