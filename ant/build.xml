@@ -432,13 +432,14 @@
       <arg value="populate"/>
       <arg value="${zookeeper}"/>
       <arg value="${hbase_table}"/>
-      <arg value="localhost"/>
-      <arg value="2181"/>
+      <arg value="${zookeeper}"/>
+      <arg value="${hbase_port}"/>
       <arg value="test_portal_tiny.3"/>
       <arg value="schema_0.7.0_0.3.6"/>
       <arg value="alert"/>
       <arg value="rowkey"/>
       <arg value="ZTF"/>
+      <arg value="0"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
         </classpath>

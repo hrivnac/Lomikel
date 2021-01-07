@@ -39,8 +39,7 @@ public class JanusClient {
 
   /** Extract implicite schema.
     * @param args[0] The operation: <tt>extract,populate</tt>.
-    * @param args[1] The zookeeper host.
-    * @param args[2] The HBase table name.
+    * @param args[1] TBD.
     * @throws Exception If fails. */ 
   public static void main(String[] args) throws Exception {
     Init.init();
@@ -49,7 +48,7 @@ public class JanusClient {
       jc.createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      jc.populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9]);
+      jc.populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -165,6 +164,7 @@ public class JanusClient {
     * @param label           The label of newly created Vertexes.
     * @param rowkey          The row key name.
     * @param keyPrefixSearch The key prefix to limit replication to.
+    * @param limit           The maximal number of entries to process.
     * @throws IOException If anything goes wrong. */
   public void populateGraph(String hbaseHost,
                             int    hbasePort,
@@ -172,7 +172,8 @@ public class JanusClient {
                             String tableSchema,
                             String label,
                             String rowkey,
-                            String keyPrefixSearch) throws IOException { 
+                            String keyPrefixSearch,
+                            int    limit) throws IOException { 
     log.info("Cleaning Graph");
     g().V().hasLabel(label).drop().iterate();
     log.info("Connection to HBase table");
