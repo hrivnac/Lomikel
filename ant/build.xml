@@ -378,10 +378,10 @@
     <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
     <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.HOST@"         value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.PORT@"         value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.yaml"       token="@SERVER.HOST@"         value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.yaml"       token="@SERVER.PORT@"         value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.properties" token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/lomikel.properties" token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.HOST@"         value="${gremlin_host}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.PORT@"         value="${gremlin_port}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
     </target>
   
   <!-- Start/Stop JanusGraph ================================================-->
@@ -390,7 +390,7 @@
           description="Start JanusGraph Server">
     <echo>Starting JanusGraph Server</echo>
     <exec executable="${janusgraph_dir}/bin/gremlin-server.sh">
-      <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/lomikel.yaml"/>
+      <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/Local.yaml"/>
       <arg line="start"/>
       </exec>
     </target>
@@ -399,7 +399,7 @@
           description="Stop JanusGraph Server">
     <echo>Stoping JanusGraph Server</echo>
     <exec executable="${janusgraph_dir}/bin/gremlin-server.sh">
-      <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/lomikel.yaml"/>
+      <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/Local.yaml"/>
       <arg line="stop"/>
       </exec>
     </target>
