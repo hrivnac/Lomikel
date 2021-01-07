@@ -506,10 +506,6 @@
     <copy todir="../dist/src-${version}/gremlin">
 			<fileset dir="../src/gremlin" includes="*/**"/>
       </copy>
-    <mkdir dir="../dist/src-${version}/sh"/>
-    <copy todir="../dist/src-${version}/sh">
-			<fileset dir="../src/sh" includes="*/**"/>
-      </copy>
   </target>
 
   <!-- Check ================================================================-->
