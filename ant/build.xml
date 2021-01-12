@@ -173,7 +173,7 @@
         </manifest>
       </jar>
     <jar jarfile="../lib/Lomikel.exe.jar" index="yes">
-      <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
+      <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${log4j_jar}" excludes="META-INF/*"/>
@@ -336,18 +336,56 @@
       </war>
     </target>
 
-  <!-- Tomcat ===============================================================-->
+  <!-- Deploy WS ============================================================-->
     
   <target name="deploy"
           depends="war"
           description="Deploy Development WS">
+    <antcall target="deploy-pure"/>
+    <antcall target="deploy-sudo"/>
+    </target>
+    
+  <target name="deploy-sudo"
+          if="sudo">
+    <exec executable="/usr/bin/sudo">
+      <arg line="chmod 777 ${server_dir}"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
+      <arg line="/bin/rm -f ${server_dir}/${user.name}-Lomikel.war"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
+      <arg line="cp ../lib/Lomikel.war ${server_dir}/${user.name}-Lomikel.war"/>
+      </exec>
+    </target>
+    
+  <target name="deploy-pure"
+           unless="sudo">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/${user.name}-Lomikel.war"/>
     </target>
-    
+  
   <target name="deploy-prod"
           depends="war"
           description="Deploy Production WS">
+    <antcall target="deploy-prod-pure"/>
+    <antcall target="deploy-prod-sudo"/>
+    </target>
+    
+  <target name="deploy-prod-sudo"
+          if="sudo">
+    <exec executable="/usr/bin/sudo">
+      <arg line="chmod 777 ${server_dir}"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
+      <arg line="/bin/rm -f ${server_dir}/Lomikel.war"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
+      <arg line="cp ../lib/Lomikel.war ${server_dir}/Lomikel.war"/>
+      </exec>
+    </target>
+    
+  <target name="deploy-prod-pure"
+          unless="sudo">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/Lomikel.war"/>
     </target>
