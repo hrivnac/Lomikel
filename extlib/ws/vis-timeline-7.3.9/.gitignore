@@ -26,6 +26,6 @@ npm-debug.log
 /examples/timeline/index.html
 /gen/
 /peer/
-/standalone/
-/styles/
+#/standalone/
+#/styles/
 /vis-timeline-0.0.0-no-version.tgz
