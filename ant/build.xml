@@ -478,6 +478,7 @@
       <arg value="rowkey"/>
       <arg value="ZTF"/>
       <arg value="0"/>
+      <arg value="true"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
         </classpath>

@@ -48,7 +48,7 @@ public class JanusClient {
       jc.createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      jc.populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]));
+      jc.populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]), args[11].equals("true"));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -165,17 +165,24 @@ public class JanusClient {
     * @param rowkey          The row key name.
     * @param keyPrefixSearch The key prefix to limit replication to.
     * @param limit           The maximal number of entries to process.
+    * @param reset           Whether removee all {@link Vertex}es with the define
+    *                        label before populating or check for each one and only
+    *                        create it if it doesn't exist yet.
     * @throws IOException If anything goes wrong. */
-  public void populateGraph(String hbaseHost,
-                            int    hbasePort,
-                            String hbaseTable,
-                            String tableSchema,
-                            String label,
-                            String rowkey,
-                            String keyPrefixSearch,
-                            int    limit) throws IOException { 
-    log.info("Cleaning Graph");
-    g().V().hasLabel(label).drop().iterate();
+  // TBD: allow replacing, updating
+  public void populateGraph(String  hbaseHost,
+                            int     hbasePort,
+                            String  hbaseTable,
+                            String  tableSchema,
+                            String  label,
+                            String  rowkey,
+                            String  keyPrefixSearch,
+                            int     limit,
+                            boolean reset) throws IOException {
+    if (reset) {                        
+      log.info("Cleaning Graph");
+      g().V().hasLabel(label).drop().iterate();
+      }
     log.info("Connection to HBase table");
     HBaseClient hc = new HBaseClient(hbaseHost, hbasePort);
     hc.connect(hbaseTable, tableSchema); 
@@ -187,8 +194,14 @@ public class JanusClient {
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (!entry.getKey().startsWith("schema")) {
         i++;
-        v = g().addV(label).next();
-        v.property(rowkey, entry.getKey());
+        if (reset) {
+          v = g().addV(label).next();
+          v.property(rowkey, entry.getKey());
+          }
+        else {
+          v = addOrCreate(label, rowkey, entry.getKey());
+          }
+        v.property("lbl", label);
         for (Map.Entry<String, String> cell : entry.getValue().entrySet()) {
           v.property(cell.getKey().split(":")[1], cell.getValue()); // TBD: handle binary data
           }
@@ -203,17 +216,17 @@ public class JanusClient {
     * @param label         The {@link Vertex} label.
     * @param propertyName  The name of {@link Vertex} property.
     * @param propertyValue The value of {@link Vertex} property.
-    * @return              The {@link List} of created {@link Vertex}es. */
+    * @return              The created {@link Vertex}. */
   // TBD: allow replacing
-  // TBD: isn't it just one ?
-  public List<Vertex> addOrCreate(String label,
-                                  String propertyName,
-                                  Object propertyValue) {
+  // TBD: check if it is really only one
+  public Vertex addOrCreate(String label,
+                            String propertyName,
+                            Object propertyValue) {
      List<Vertex> vertexes = g().V().has(label, propertyName, propertyValue)
                                    .fold()
                                    .coalesce(unfold(), 
                                              g().addV(label).property(propertyName, propertyValue)).toList();
-     return vertexes;
+     return vertexes.get(0);
      }
     
   /** Add an {@link Edge} between two {@link Vertex}s,
