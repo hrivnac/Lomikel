@@ -390,6 +390,7 @@ public class HBaseClient {
     // Scan
     else {
       Scan scan = new Scan();
+      scan.setCaching(200);
       // Time range
       try {
         scan.setTimeRange(start, stop);
