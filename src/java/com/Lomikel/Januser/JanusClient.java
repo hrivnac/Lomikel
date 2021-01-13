@@ -270,7 +270,7 @@ public class JanusClient {
             }
           }
         }
-      timer(label + "s created", i, 100, 1000);
+      timer(label + "s created", i, 100, commitLimit);
       }
     timer(label + "s created", i, -1, -1);
     commit();
