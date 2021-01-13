@@ -179,6 +179,7 @@ public class JanusClient {
                             String  keyPrefixSearch,
                             int     limit,
                             boolean reset) throws IOException {
+    timerStart();
     if (reset) {                        
       log.info("Cleaning Graph");
       g().V().hasLabel(label).drop().iterate();
@@ -207,7 +208,7 @@ public class JanusClient {
           }
         }
       }
-    log.info("" + i + " " + label + "s created");
+    timer(label + "s created", i, -1, -1);
     commit();
     close();
     }
@@ -278,7 +279,7 @@ public class JanusClient {
     if (i == 0) {
       return;
       }
-    if (i%modulus != 0) {
+    if (modulus > -1 && i%modulus != 0) {
       return;
       }
     long dt = (System.currentTimeMillis() - _t) / 1000;
@@ -286,7 +287,7 @@ public class JanusClient {
       dt = 1;
       }
     log.info("" + i + " " + msg + " in " + dt + "s, freq = " + (i / dt) + "Hz");
-    if (i%modulusCommit == 0) {
+    if (modulusCommit > -1 && i%modulusCommit == 0) {
 	    commit();
 	    log.info("Committed");
       }
