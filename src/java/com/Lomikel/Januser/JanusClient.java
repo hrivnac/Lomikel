@@ -84,7 +84,7 @@ public class JanusClient {
       jc.createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      jc.populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]), args[11].equals("true"));
+      jc.populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]), new Integer(args[11]), args[12].equals("true"));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -201,6 +201,7 @@ public class JanusClient {
     * @param rowkey          The row key name.
     * @param keyPrefixSearch The key prefix to limit replication to.
     * @param limit           The maximal number of entries to process.
+    * @param commitLimit     The number of events to commit in one step.
     * @param reset           Whether removee all {@link Vertex}es with the define
     *                        label before populating or check for each one and only
     *                        create it if it doesn't exist yet.
@@ -214,6 +215,7 @@ public class JanusClient {
                             String  rowkey,
                             String  keyPrefixSearch,
                             int     limit,
+                            int     commitLimit,
                             boolean reset) throws IOException {
     timerStart();
     if (reset) {                        
