@@ -222,6 +222,7 @@ public class JanusClient {
       log.info("Cleaning Graph");
       g().V().has("lbl", label).drop().iterate();
       }
+    commit();
     log.info("Connection to HBase table");
     HBaseClient hc = new HBaseClient(hbaseHost, hbasePort);
     hc.connect(hbaseTable, tableSchema); 
