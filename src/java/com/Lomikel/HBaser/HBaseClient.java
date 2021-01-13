@@ -39,6 +39,7 @@ import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
 import org.apache.hadoop.hbase.TableNotFoundException;
+
 // Hadoop
 import org.apache.hadoop.conf.Configuration;
 
@@ -502,18 +503,18 @@ public class HBaseClient {
       scan.setReversed(isReversed());
       // Results
       try {
-        ResultScanner rs = table().getScanner(scan);
+        _rs = table().getScanner(scan);
         int i = 0;
-        for (Result r : rs) {
+        for (Result r : _rs) {
+          if (i++ == _limit) {
+            break;
+            }
           result = new TreeMap<>();
           if (addResult(r, result, filter, ifkey, iftime)) {
             results.put(Bytes.toString(r.getRow()), result);
-            if (++i == _limit) {
-              break;
-              }
             }
           }
-        log.info("" + i + " entries found");
+        log.info("" + (i-1) + " entries found");
         }
       catch (IOException e) {
         log.error("Cannot search", e);
@@ -945,11 +946,20 @@ public class HBaseClient {
     return columns;
     }
     
+  /** Give the actual {@link ResultScanner}.
+    * @return The actual {@link ResultScanner}
+    *         after <tt>limit</tt> results already been read. */
+  public ResultScanner resultScanner() {
+    return _rs;
+    }
+    
   private Table _table;
   
   private Configuration _conf;
   
   private Connection _connection;
+  
+  private ResultScanner _rs;
   
   private String _zookeepers;
   

@@ -3,6 +3,7 @@ package com.Lomikel.Januser;
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Info;
 import com.Lomikel.HBaser.HBaseClient;
+import com.Lomikel.HBaser.Schema;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -17,6 +18,40 @@ import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
 
+// HBase
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.TableName ;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
+import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
+import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.filter.Filter;  
+import org.apache.hadoop.hbase.filter.FilterList;  
+import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;  
+import org.apache.hadoop.hbase.filter.RowFilter;  
+import org.apache.hadoop.hbase.filter.PrefixFilter;  
+import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.BinaryPrefixComparator;
+import org.apache.hadoop.hbase.filter.BinaryComparator;
+import org.apache.hadoop.hbase.filter.RegexStringComparator;
+import org.apache.hadoop.hbase.filter.SubstringComparator;
+import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
+import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
+import org.apache.hadoop.hbase.TableNotFoundException;
+
 // Java
 import java.util.List;
 import java.util.Map;
@@ -24,6 +59,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NavigableMap;
 import java.io.IOException;
 
 // Log4J
@@ -182,31 +218,57 @@ public class JanusClient {
     timerStart();
     if (reset) {                        
       log.info("Cleaning Graph");
-      g().V().hasLabel(label).drop().iterate();
+      g().V().has("lbl", label).drop().iterate();
       }
     log.info("Connection to HBase table");
     HBaseClient hc = new HBaseClient(hbaseHost, hbasePort);
     hc.connect(hbaseTable, tableSchema); 
-    hc.setLimit(limit);
-    Map<String, Map<String, String>> results = hc.scan(null, "key:key:" + keyPrefixSearch + ":prefix", "*", 0, false, false);
+    hc.setLimit(0);
+    hc.scan(null, "key:key:" + keyPrefixSearch + ":prefix", "*", 0, false, false);
+    ResultScanner rs = hc.resultScanner();
+    Schema schema = hc.schema();
     log.info("Populating Graph");
     Vertex v;
+    String key;
+    String family;
+    String field;
+    String column;
+    String value;
     int i = 0;
-    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      if (!entry.getKey().startsWith("schema")) {
+    for (Result r : rs) {
+      NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
+      key = Bytes.toString(r.getRow());
+      if (!key.startsWith("schema")) {
+        if (limit != 0 && i == limit) {
+          break;
+          }
         i++;
         if (reset) {
           v = g().addV(label).next();
-          v.property(rowkey, entry.getKey());
+          v.property(rowkey, key);
           }
         else {
-          v = addOrCreate(label, rowkey, entry.getKey());
+          v = addOrCreate(label, rowkey, key);
           }
         v.property("lbl", label);
-        for (Map.Entry<String, String> cell : entry.getValue().entrySet()) {
-          v.property(cell.getKey().split(":")[1], cell.getValue()); // TBD: handle binary data
+        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+          family = Bytes.toString(entry.getKey());
+          if (!family.equals("b")) {
+            for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+              field = Bytes.toString(e.getKey());
+              column = family + ":" + field;
+              if (schema != null) {
+                value = schema.decode(column, e.getValue());
+                }
+              else {
+                value = Bytes.toString(e.getValue());
+                }
+              v.property(field, value);
+              }
+            }
           }
         }
+      timer(label + "s created", i, 100, 1000);
       }
     timer(label + "s created", i, -1, -1);
     commit();
@@ -289,7 +351,6 @@ public class JanusClient {
     log.info("" + i + " " + msg + " in " + dt + "s, freq = " + (i / dt) + "Hz");
     if (modulusCommit > -1 && i%modulusCommit == 0) {
 	    commit();
-	    log.info("Committed");
       }
     }    
     
