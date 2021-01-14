@@ -268,7 +268,7 @@ public class JanusClient {
         //  v = addOrCreate(label, rowkey, key);
         //  }
         //v.property("lbl", label);
-        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+        //for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
         //  family = Bytes.toString(entry.getKey());
         //  if (!family.equals("b")) {
         //    for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
@@ -283,7 +283,7 @@ public class JanusClient {
         //      v.property(field, value);
         //      }
         //    }
-          }
+        //  }
         }
       timer(label + "s created", i, 100, commitLimit);
       }
