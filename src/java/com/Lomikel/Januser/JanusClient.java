@@ -242,10 +242,10 @@ public class JanusClient {
       //NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
       //key = Bytes.toString(r.getRow());
       //if (!key.startsWith("schema")) {
-      //  if (limit != 0 && i == limit) {
-      //    break;
-      //    }
-      //  i++;
+        if (limit != 0 && i == limit) {
+          break;
+          }
+        i++;
       //  if (reset) {
       //    v = g().addV(label).next();
       //    v.property(rowkey, key);
