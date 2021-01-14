@@ -266,7 +266,7 @@ public class JanusClient {
               else {
                 value = Bytes.toString(e.getValue());
                 }
-              //v.property(field, value);
+              v.property(field, value);
               }
             }
           }
