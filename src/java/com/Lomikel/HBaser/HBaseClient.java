@@ -87,12 +87,12 @@ public class HBaseClient {
       _conf.set("hbase.client.scanner.timeout.period", "100000");
       _conf.set("hbase.client.retries.number", "3");
       _conf.set("hbase.client.pause", "1000");
+      _conf.set("hbase.client.ipc.pool.type", "RoundRobin");
+      _conf.set("hbase.client.ipc.pool.size", "128");
       _conf.set("hbase.rpc.timeout", "20000"); 
       _conf.set("hbase.cells.scanned.per.heartbeat.check", "10000");
       _conf.set("zookeeper.session.timeout", "10000");
       _conf.set("zookeeper.recovery.retry", "3");     }
-      _conf.set("hbase.client.ipc.pool.type", "RoundRobin");
-      _conf.set("hbase.client.ipc.pool.size", "128");
     if (clientPort != null) {
       _conf.set("hbase.zookeeper.property.clientPort", clientPort);
       }

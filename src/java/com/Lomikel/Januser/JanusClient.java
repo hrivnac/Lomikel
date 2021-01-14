@@ -226,7 +226,7 @@ public class JanusClient {
     log.info("Connection to HBase table");
     HBaseClient hc = new HBaseClient(hbaseHost, hbasePort);
     hc.connect(hbaseTable, tableSchema); 
-    hc.setLimit(0);
+    hc.setLimit(2000);
     hc.scan(null, "key:key:" + keyPrefixSearch + ":prefix", "*", 0, false, false);
     ResultScanner rs = hc.resultScanner();
     Schema schema = hc.schema();
