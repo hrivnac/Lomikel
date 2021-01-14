@@ -92,7 +92,8 @@ public class HBaseClient {
       _conf.set("hbase.rpc.timeout", "20000"); 
       _conf.set("hbase.cells.scanned.per.heartbeat.check", "10000");
       _conf.set("zookeeper.session.timeout", "10000");
-      _conf.set("zookeeper.recovery.retry", "3");     }
+      _conf.set("zookeeper.recovery.retry", "3");
+      }
     if (clientPort != null) {
       _conf.set("hbase.zookeeper.property.clientPort", clientPort);
       }

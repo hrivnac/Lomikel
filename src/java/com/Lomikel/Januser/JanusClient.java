@@ -108,6 +108,18 @@ public class JanusClient {
                               .set("storage.backend",       "hbase")
                               .set("storage.hostname",      hostname)
                               .set("storage.hbase.table",   table)
+                              .set("storage.hbase.ext.hbase.client.pause", "50")
+                              .set("storage.hbase.ext.hbase.client.retries.number", "30") 
+                              .set("storage.hbase.ext.hbase.client.operation.timeout", "30000") 
+                              .set("storage.hbase.ext.hbase.client.scanner.timeout.period", "100000")
+                              .set("storage.hbase.ext.hbase.client.retries.number", "3")
+                              .set("storage.hbase.ext.hbase.client.pause", "1000")
+                              .set("storage.hbase.ext.hbase.client.ipc.pool.type", "RoundRobin")
+                              .set("storage.hbase.ext.hbase.client.ipc.pool.size", "128")
+                              .set("storage.hbase.ext.hbase.rpc.timeout", "20000")
+                              .set("storage.hbase.ext.hbase.cells.scanned.per.heartbeat.check", "10000")
+                              //.set("zookeeper.session.timeout", "10000");
+                              //.set("zookeeper.recovery.retry", "3");
                               .open();
     _g = _graph.traversal();
     log.info("Connected");
