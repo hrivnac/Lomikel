@@ -255,22 +255,22 @@ public class JanusClient {
           v = addOrCreate(label, rowkey, key);
           }
         v.property("lbl", label);
-      //  for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
-      //    family = Bytes.toString(entry.getKey());
-      //    if (!family.equals("b")) {
-      //      for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
-      //        field = Bytes.toString(e.getKey());
-      //        column = family + ":" + field;
-      //        if (schema != null) {
-      //          value = schema.decode(column, e.getValue());
-      //          }
-      //        else {
-      //          value = Bytes.toString(e.getValue());
-      //          }
-      //        v.property(field, value);
-      //        }
-      //      }
-      //    }
+        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+          family = Bytes.toString(entry.getKey());
+          if (!family.equals("b")) {
+            for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+              field = Bytes.toString(e.getKey());
+              column = family + ":" + field;
+              if (schema != null) {
+                value = schema.decode(column, e.getValue());
+                }
+              else {
+                value = Bytes.toString(e.getValue());
+                }
+              //v.property(field, value);
+              }
+            }
+          }
         }
       timer(label + "s created", i, 100, commitLimit);
       }
