@@ -81,7 +81,12 @@ public class HBaseClient {
     _conf = HBaseConfiguration.create();
     if (zookeepers != null) {
       _conf.set("hbase.zookeeper.quorum", zookeepers);
-      }
+      _conf.set("hbase.client.pause", "50"); 
+      _conf.set("hbase.client.retries.number", "30"); 
+      _conf.set("hbase.rpc.timeout", "20000"); 
+      _conf.set("hbase.client.operation.timeout", "30000"); 
+      _conf.set("hbase.client.scanner.timeout.period", "100000");
+     }
     if (clientPort != null) {
       _conf.set("hbase.zookeeper.property.clientPort", clientPort);
       }
@@ -390,7 +395,6 @@ public class HBaseClient {
     // Scan
     else {
       Scan scan = new Scan();
-      scan.setCaching(200);
       // Time range
       try {
         scan.setTimeRange(start, stop);
