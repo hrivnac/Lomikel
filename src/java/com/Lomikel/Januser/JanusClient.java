@@ -107,6 +107,7 @@ public class JanusClient {
     _graph = JanusGraphFactory.build()
                               .set("storage.backend",       "hbase")
                               .set("storage.hostname",      hostname)
+                              .set("storage.batch-loading", true) // only with schema
                               .set("storage.hbase.table",   table)
                               .set("storage.hbase.ext.hbase.client.pause", "50")
                               .set("storage.hbase.ext.hbase.client.retries.number", "30") 
