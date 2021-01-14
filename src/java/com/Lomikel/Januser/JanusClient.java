@@ -241,37 +241,37 @@ public class JanusClient {
     NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap;
     for (Result r : rs) {
       resultMap = r.getNoVersionMap();
-      //key = Bytes.toString(r.getRow());
-      //if (!key.startsWith("schema")) {
+      key = Bytes.toString(r.getRow());
+      if (!key.startsWith("schema")) {
         if (limit != 0 && i == limit) {
           break;
           }
         i++;
-      //  if (reset) {
-      //    v = g().addV(label).next();
-      //    v.property(rowkey, key);
-      //    }
-      //  else {
-      //    v = addOrCreate(label, rowkey, key);
-      //    }
-      //  v.property("lbl", label);
-      //  for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
-      //    family = Bytes.toString(entry.getKey());
-      //    if (!family.equals("b")) {
-      //      for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
-      //        field = Bytes.toString(e.getKey());
-      //        column = family + ":" + field;
-      //        if (schema != null) {
-      //          value = schema.decode(column, e.getValue());
-      //          }
-      //        else {
-      //          value = Bytes.toString(e.getValue());
-      //          }
-      //        v.property(field, value);
-      //        }
-      //      }
-      //    }
-      //  }
+        if (reset) {
+          v = g().addV(label).next();
+          v.property(rowkey, key);
+          }
+        else {
+          v = addOrCreate(label, rowkey, key);
+          }
+        v.property("lbl", label);
+        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+          family = Bytes.toString(entry.getKey());
+          if (!family.equals("b")) {
+            for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+              field = Bytes.toString(e.getKey());
+              column = family + ":" + field;
+              if (schema != null) {
+                value = schema.decode(column, e.getValue());
+                }
+              else {
+                value = Bytes.toString(e.getValue());
+                }
+              v.property(field, value);
+              }
+            }
+          }
+        }
       timer(label + "s created", i, 100, commitLimit);
       }
     timer(label + "s created", i, -1, -1);
