@@ -238,8 +238,9 @@ public class JanusClient {
     String column;
     String value;
     int i = 0;
+    NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap;
     for (Result r : rs) {
-      //NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap = r.getNoVersionMap();
+      resultMap = r.getNoVersionMap();
       //key = Bytes.toString(r.getRow());
       //if (!key.startsWith("schema")) {
         if (limit != 0 && i == limit) {
