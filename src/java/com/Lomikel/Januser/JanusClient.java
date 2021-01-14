@@ -260,14 +260,14 @@ public class JanusClient {
           break;
           }
         i++;
-        if (reset) {
-          v = g().addV(label).next();
-          v.property(rowkey, key);
-          }
-        else {
-          v = addOrCreate(label, rowkey, key);
-          }
-        v.property("lbl", label);
+        //if (reset) {
+        //  v = g().addV(label).next();
+        //  v.property(rowkey, key);
+        //  }
+        //else {
+        //  v = addOrCreate(label, rowkey, key);
+        //  }
+        //v.property("lbl", label);
         for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
         //  family = Bytes.toString(entry.getKey());
         //  if (!family.equals("b")) {
