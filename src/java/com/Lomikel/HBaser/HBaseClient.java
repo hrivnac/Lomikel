@@ -525,7 +525,7 @@ public class HBaseClient {
             results.put(Bytes.toString(r.getRow()), result);
             }
           }
-        log.info("" + (i-1) + " entries found");
+        log.info("" + i + " entries found");
         }
       catch (IOException e) {
         log.error("Cannot search", e);
