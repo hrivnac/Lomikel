@@ -51,6 +51,7 @@ import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
 import org.apache.hadoop.hbase.TableNotFoundException;
+import org.apache.hadoop.hbase.Cell;
 
 // Java
 import java.util.List;
@@ -107,18 +108,20 @@ public class JanusClient {
     _graph = JanusGraphFactory.build()
                               .set("storage.backend",       "hbase")
                               .set("storage.hostname",      hostname)
-                              .set("storage.batch-loading", true) // only with schema
+                              //.set("storage.batch-loading", true) // only with schema
                               .set("storage.hbase.table",   table)
-                              .set("storage.hbase.ext.hbase.client.pause", "50")
-                              .set("storage.hbase.ext.hbase.client.retries.number", "30") 
-                              .set("storage.hbase.ext.hbase.client.operation.timeout", "30000") 
-                              .set("storage.hbase.ext.hbase.client.scanner.timeout.period", "100000")
-                              .set("storage.hbase.ext.hbase.client.retries.number", "3")
-                              .set("storage.hbase.ext.hbase.client.pause", "1000")
-                              .set("storage.hbase.ext.hbase.client.ipc.pool.type", "RoundRobin")
-                              .set("storage.hbase.ext.hbase.client.ipc.pool.size", "128")
-                              .set("storage.hbase.ext.hbase.rpc.timeout", "20000")
-                              .set("storage.hbase.ext.hbase.cells.scanned.per.heartbeat.check", "10000")
+                              //.set("storage.connection-timeout", "100000")
+                              //.set("storage.parallel-backend-ops", "true")
+                              //.set("storage.hbase.ext.hbase.client.pause", "50")
+                              //.set("storage.hbase.ext.hbase.client.retries.number", "30") 
+                              //.set("storage.hbase.ext.hbase.client.operation.timeout", "30000") 
+                              //.set("storage.hbase.ext.hbase.client.scanner.timeout.period", "100000")
+                              //.set("storage.hbase.ext.hbase.client.retries.number", "3")
+                              //.set("storage.hbase.ext.hbase.client.pause", "1000")
+                              //.set("storage.hbase.ext.hbase.client.ipc.pool.type", "RoundRobin")
+                              //.set("storage.hbase.ext.hbase.client.ipc.pool.size", "128")
+                              //.set("storage.hbase.ext.hbase.rpc.timeout", "20000")
+                              //.set("storage.hbase.ext.hbase.cells.scanned.per.heartbeat.check", "10000")
                               //.set("zookeeper.session.timeout", "10000");
                               //.set("zookeeper.recovery.retry", "3");
                               .open();
@@ -232,7 +235,7 @@ public class JanusClient {
                             boolean reset) throws IOException {
     timerStart();
     if (reset) {                        
-      log.info("Cleaning Graph");
+      log.info("Cleaning Graph, vertexes: " + label);
       g().V().has("lbl", label).drop().iterate();
       }
     commit();
@@ -251,6 +254,16 @@ public class JanusClient {
     String column;
     String value;
     int i = 0;
+    //for (Result r : rs) {
+    //  i++;
+    //  key = Bytes.toString(r.getRow());
+    //  for (Cell cell : r.listCells()) {
+    //    family = Bytes.toString(cell.getFamilyArray(),    cell.getFamilyOffset(),    cell.getFamilyLength());
+    //    column = Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength());
+    //    value  = Bytes.toString(cell.getValueArray(),     cell.getValueOffset(),     cell.getValueLength());
+    //    }
+    //  timer(label + "s created", i, 100, commitLimit);
+    //  } 
     NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap;
     for (Result r : rs) {
       resultMap = r.getNoVersionMap();
@@ -260,30 +273,30 @@ public class JanusClient {
           break;
           }
         i++;
-        //if (reset) {
-        //  v = g().addV(label).next();
-        //  v.property(rowkey, key);
-        //  }
-        //else {
-        //  v = addOrCreate(label, rowkey, key);
-        //  }
-        //v.property("lbl", label);
-        //for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
-        //  family = Bytes.toString(entry.getKey());
-        //  if (!family.equals("b")) {
-        //    for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
-        //      field = Bytes.toString(e.getKey());
-        //      column = family + ":" + field;
-        //      if (schema != null) {
-        //        value = schema.decode(column, e.getValue());
-        //        }
-        //      else {
-        //        value = Bytes.toString(e.getValue());
-        //        }
-        //      v.property(field, value);
-        //      }
-        //    }
-        //  }
+        if (reset) {
+          v = g().addV(label).next();
+          v.property(rowkey, key);
+          }
+        else {
+          v = addOrCreate(label, rowkey, key);
+          }
+        v.property("lbl", label);
+        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+          family = Bytes.toString(entry.getKey());
+          if (!family.equals("b")) {
+            for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+              field = Bytes.toString(e.getKey());
+              column = family + ":" + field;
+              if (schema != null) {
+                value = schema.decode(column, e.getValue());
+                }
+              else {
+                value = Bytes.toString(e.getValue());
+                }
+              v.property(field, value);
+              }
+            }
+          }
         }
       timer(label + "s created", i, 100, commitLimit);
       }

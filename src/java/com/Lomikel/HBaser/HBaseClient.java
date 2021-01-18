@@ -81,18 +81,18 @@ public class HBaseClient {
     _conf = HBaseConfiguration.create();
     if (zookeepers != null) {
       _conf.set("hbase.zookeeper.quorum", zookeepers);
-      _conf.set("hbase.client.pause", "50"); 
-      _conf.set("hbase.client.retries.number", "30"); 
-      _conf.set("hbase.client.operation.timeout", "30000"); 
-      _conf.set("hbase.client.scanner.timeout.period", "100000");
-      _conf.set("hbase.client.retries.number", "3");
-      _conf.set("hbase.client.pause", "1000");
-      _conf.set("hbase.client.ipc.pool.type", "RoundRobin");
-      _conf.set("hbase.client.ipc.pool.size", "128");
-      _conf.set("hbase.rpc.timeout", "20000"); 
-      _conf.set("hbase.cells.scanned.per.heartbeat.check", "10000");
-      _conf.set("zookeeper.session.timeout", "10000");
-      _conf.set("zookeeper.recovery.retry", "3");
+      //_conf.set("hbase.client.pause", "50"); 
+      //_conf.set("hbase.client.retries.number", "30"); 
+      //_conf.set("hbase.client.operation.timeout", "30000"); 
+      //_conf.set("hbase.client.scanner.timeout.period", "100000");
+      //_conf.set("hbase.client.retries.number", "3");
+      //_conf.set("hbase.client.pause", "1000");
+      //_conf.set("hbase.client.ipc.pool.type", "RoundRobin");
+      //_conf.set("hbase.client.ipc.pool.size", "128");
+      //_conf.set("hbase.rpc.timeout", "20000"); 
+      //_conf.set("hbase.cells.scanned.per.heartbeat.check", "10000");
+      //_conf.set("zookeeper.session.timeout", "10000");
+      //_conf.set("zookeeper.recovery.retry", "3");
       }
     if (clientPort != null) {
       _conf.set("hbase.zookeeper.property.clientPort", clientPort);

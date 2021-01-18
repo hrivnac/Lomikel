@@ -477,8 +477,8 @@
       <arg value="alert"/>
       <arg value="rowkey"/>
       <arg value="ZTF"/>
-      <arg value="0"/>
-      <arg value="500"/>
+      <arg value="300"/>
+      <arg value="100"/>
       <arg value="true"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
