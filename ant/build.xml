@@ -346,7 +346,7 @@
     </target>
     
   <target name="deploy-sudo"
-          if="sudo">
+          if="${sudo}">
     <exec executable="/usr/bin/sudo">
       <arg line="chmod 777 ${server_dir}"/>
       </exec>
@@ -359,7 +359,7 @@
     </target>
     
   <target name="deploy-pure"
-           unless="sudo">
+           unless="${sudo}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/${user.name}-Lomikel.war"/>
     </target>
@@ -372,7 +372,7 @@
     </target>
     
   <target name="deploy-prod-sudo"
-          if="sudo">
+          if="${sudo}">
     <exec executable="/usr/bin/sudo">
       <arg line="chmod 777 ${server_dir}"/>
       </exec>
@@ -385,7 +385,7 @@
     </target>
     
   <target name="deploy-prod-pure"
-          unless="sudo">
+          unless="${sudo}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/Lomikel.war"/>
     </target>
