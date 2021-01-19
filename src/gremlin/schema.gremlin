@@ -1,0 +1,34 @@
+// Specification of schema (constrains)
+// ====================================
+
+mgmt = graph.openManagement()
+
+// Vertexes
+// ...
+
+// Edges
+has      = mgmt.makeEdgeLabel('contains').multiplicity(ONE2MANY).make()
+contains = mgmt.makeEdgeLabel('has'     ).multiplicity(MULTI   ).make()
+
+// Properties
+title  = mgmt.makePropertyKey('title' ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
+lbl    = mgmt.makePropertyKey('lbl'   ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
+name   = mgmt.makePropertyKey('name'  ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
+
+// Vertex properties
+// ...
+                                      
+// Edge properties
+mgmt.addProperties(has,
+                   lbl)
+mgmt.addProperties(contains,
+                   lbl)
+
+// Connections                   
+// ...
+
+// Info
+mgmt.printSchema()
+
+mgmt.commit()
+
