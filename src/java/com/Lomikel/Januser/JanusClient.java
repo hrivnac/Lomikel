@@ -315,10 +315,13 @@ public class JanusClient {
   public Vertex addOrCreate(String label,
                             String propertyName,
                             Object propertyValue) {
-     List<Vertex> vertexes = g().V().has(label, propertyName, propertyValue)
-                                   .fold()
-                                   .coalesce(unfold(), 
-                                             g().addV(label).property(propertyName, propertyValue)).toList();
+     List<Vertex> vertexes = g().V().has("lbl", label)
+                                    .has(propertyName, propertyValue)
+                                    .fold()
+                                    .coalesce(unfold(), 
+                                              g().addV(label)
+                                                 .property("lbl", label)
+                                                 .property(propertyName, propertyValue)).toList();
      return vertexes.get(0);
      }
     
