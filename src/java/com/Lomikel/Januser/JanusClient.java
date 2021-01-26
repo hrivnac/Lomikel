@@ -108,8 +108,9 @@ public class JanusClient {
     _graph = JanusGraphFactory.build()
                               .set("storage.backend",       "hbase")
                               .set("storage.hostname",      hostname)
-                              //.set("storage.batch-loading", true) // only with schema
                               .set("storage.hbase.table",   table)
+                              .set("storage.batch-loading", true)
+                              //.set("ids.block-size", "10000") // default = 1000
                               //.set("storage.connection-timeout", "100000")
                               //.set("storage.parallel-backend-ops", "true")
                               //.set("storage.hbase.ext.hbase.client.pause", "50")
