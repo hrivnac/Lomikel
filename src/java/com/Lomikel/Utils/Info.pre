@@ -55,15 +55,15 @@ public class Info {
     return _hbase_table;
     }
        
-  protected static String _name        = "Lomikel";
-  protected static String _version     = "@version@";
-  protected static String _build       = "@TSTAMP@";
-  protected static String _builder     = "@user.name@";
-  protected static String _zookeeper   = "@zookeeper@";
-  protected static String _hbase_table = "@hbase_table@";
-  protected static String _tmp         = "@TMP@";
-  protected static String _manager     = "@MANAGER@";
-  protected static String _target      = "@TARGET@";
+  protected static String _name           = "Lomikel";
+  protected static String _version        = "@version@";
+  protected static String _build          = "@TSTAMP@";
+  protected static String _builder        = "@user.name@";
+  protected static String _zookeeper      = "@zookeeper@";
+  protected static String _hbase_table    = "@hbase_table@";
+  protected static String _tmp            = "@TMP@";
+  protected static String _manager        = "@MANAGER@";
+  protected static String _target         = "@TARGET@";
 
   /** Logging . */
   private static Logger log = Logger.getLogger(Info.class);

@@ -80,12 +80,11 @@ public class JanusClient {
     * @throws Exception If fails. */ 
   public static void main(String[] args) throws Exception {
     Init.init();
-    JanusClient jc = new JanusClient(args[1], args[2]);
     if (args[0].trim().equals("extract")) {
-      jc.createMetaSchema();
+      new JanusClient(args[1], args[2]).createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      jc.populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]), new Integer(args[11]), args[12].equals("true"));
+      new JanusClient(args[1], args[2], true).populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]), new Integer(args[11]), args[12].equals("true"));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -103,13 +102,23 @@ public class JanusClient {
     * @param table    The HBase table. */
   public JanusClient(String hostname,
                      String table) {
+    this(hostname, table, false);
+    }
+   
+  /** Create with connection parameters.
+    * @param hostname The HBase hostname.
+    * @param table    The HBase table.
+    * @param batch    Whether open graph for batch loading. */
+  public JanusClient(String  hostname,
+                     String  table,
+                     boolean batch) {
     Init.init();
     log.info("Opening " + table + "@" + hostname);
     _graph = JanusGraphFactory.build()
                               .set("storage.backend",       "hbase")
                               .set("storage.hostname",      hostname)
                               .set("storage.hbase.table",   table)
-                              .set("storage.batch-loading", true)
+                              .set("storage.batch-loading", batch)
                               //.set("ids.block-size", "10000") // default = 1000
                               //.set("storage.connection-timeout", "100000")
                               //.set("storage.parallel-backend-ops", "true")
@@ -279,7 +288,7 @@ public class JanusClient {
           v.property(rowkey, key);
           }
         else {
-          v = addOrCreate(label, rowkey, key);
+          v = getOrCreate(label, rowkey, key);
           }
         v.property("lbl", label);
         for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
@@ -306,14 +315,14 @@ public class JanusClient {
     close();
     }
         
-  /** Add a {@link Vertex}, unless it exists
+  /** Get a {@link Vertex}, create it if necessary.
     * @param label         The {@link Vertex} label.
     * @param propertyName  The name of {@link Vertex} property.
     * @param propertyValue The value of {@link Vertex} property.
     * @return              The created {@link Vertex}. */
   // TBD: allow replacing
   // TBD: check if it is really only one
-  public Vertex addOrCreate(String label,
+  public Vertex getOrCreate(String label,
                             String propertyName,
                             Object propertyValue) {
      List<Vertex> vertexes = g().V().has("lbl", label)
@@ -323,6 +332,13 @@ public class JanusClient {
                                               g().addV(label)
                                                  .property("lbl", label)
                                                  .property(propertyName, propertyValue)).toList();
+     if (vertexes.size() > 1) {
+       log.warn("" + vertexes.size() + " vertices found, only the first one returned");
+       }
+     else if (vertexes.size() == 0) {
+       log.error("No vertex found");
+       return null;
+       }
      return vertexes.get(0);
      }
     

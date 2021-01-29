@@ -518,9 +518,10 @@ public class HBaseClient {
         _rs = table().getScanner(scan);
         int i = 0;
         for (Result r : _rs) {
-          if (i++ == _limit) {
+          if (i == _limit) {
             break;
             }
+          i++;
           result = new TreeMap<>();
           if (addResult(r, result, filter, ifkey, iftime)) {
             results.put(Bytes.toString(r.getRow()), result);
