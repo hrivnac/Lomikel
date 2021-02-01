@@ -598,6 +598,7 @@
       <group title="Apps"        packages="com.Lomikel.Apps"/>
       <group title="HBaser"      packages="com.Lomikel.HBaser"/>
       <group title="Januser"     packages="com.Lomikel.Januser"/>
+      <group title="Phoenixer"   packages="com.Lomikel.Phoenixer"/>
       <group title="Graph"       packages="com.Lomikel.Graph"/>
       <group title="Utils"       packages="com.Lomikel.Utils*"/>
       <group title="Sockets"     packages="com.Lomikel.Sockets*"/>
