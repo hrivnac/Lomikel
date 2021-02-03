@@ -311,7 +311,7 @@ public class JanusClient {
           break;
           }
         i++;
-        /*if (reset) {
+        if (reset) {
           v = g().addV(label).next();
           v.property(rowkey, key);
           }
@@ -319,7 +319,7 @@ public class JanusClient {
           v = getOrCreate(label, rowkey, key);
           }
         v.property("lbl", label);
-        for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+        /*for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
           family = Bytes.toString(entry.getKey());
           if (!family.equals("b")) {
             for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
