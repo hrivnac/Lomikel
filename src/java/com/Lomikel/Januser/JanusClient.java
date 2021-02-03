@@ -334,8 +334,8 @@ public class JanusClient {
               v.property(field, value);
               }
             }
-          }
-        }*/
+          }*/
+        }
       timer(label + "s created", i, 100, commitLimit, sessionLimit);
       }
     timer(label + "s created", i, -1, -1, -1);
