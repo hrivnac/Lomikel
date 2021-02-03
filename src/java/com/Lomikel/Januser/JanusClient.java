@@ -306,12 +306,12 @@ public class JanusClient {
     for (Result r : rs) {
       resultMap = r.getNoVersionMap();
       key = Bytes.toString(r.getRow());
-      /*if (!key.startsWith("schema")) {
+      if (!key.startsWith("schema")) {
         if (limit != 0 && i == limit) {
           break;
           }
         i++;
-        if (reset) {
+        /*if (reset) {
           v = g().addV(label).next();
           v.property(rowkey, key);
           }
