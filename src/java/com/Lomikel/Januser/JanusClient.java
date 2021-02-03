@@ -84,7 +84,7 @@ public class JanusClient {
       new JanusClient(args[1], args[2]).createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      new JanusClient(args[1], args[2], true).populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]), new Integer(args[11]), args[12].equals("true"));
+      new JanusClient(args[1], args[2], true).populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]), new Integer(args[11]), new Integer(args[12]), args[13].equals("true"));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -112,13 +112,24 @@ public class JanusClient {
   public JanusClient(String  hostname,
                      String  table,
                      boolean batch) {
+    _hostname = hostname;
+    _table    = table;
+    _batch    = batch;
     Init.init();
-    log.info("Opening " + table + "@" + hostname);
+    open();
+    }
+    
+  /** Open graph. */
+  public void open() {
+    log.info("Opening " + _table + "@" + _hostname);
+    if (_batch) {
+      log.info("\tas batch");
+      }
     _graph = JanusGraphFactory.build()
                               .set("storage.backend",       "hbase")
-                              .set("storage.hostname",      hostname)
-                              .set("storage.hbase.table",   table)
-                              .set("storage.batch-loading", batch)
+                              .set("storage.hostname",      _hostname)
+                              .set("storage.hbase.table",   _table)
+                              .set("storage.batch-loading", _batch)
                               //.set("ids.block-size", "10000") // default = 1000
                               //.set("storage.connection-timeout", "100000")
                               //.set("storage.parallel-backend-ops", "true")
@@ -147,7 +158,15 @@ public class JanusClient {
     
   /** Close graph. */
   public void close() {
+    _graph.close();
     log.info("Closed");
+    }
+    
+  /** Reopen graph (commit, close, open). */
+  public void reopen() {
+    commit();
+    close();
+    open();
     }
     
   /** Give {@link GraphTraversalSource}.
@@ -221,14 +240,15 @@ public class JanusClient {
   /** Populate JanusGraph from HBase table.
     * @param hbaseHost       The HBase hostname.
     * @param hbasePort       The HBase port.
-    * @param hbasetable      The HBase table to replicate in Graph.
+    * @param hbaseTable      The HBase table to replicate in Graph.
     * @param tableSchema     The HBase table schema name.
     * @param label           The label of newly created Vertexes.
     * @param rowkey          The row key name.
     * @param keyPrefixSearch The key prefix to limit replication to.
     * @param limit           The maximal number of entries to process.
     * @param commitLimit     The number of events to commit in one step.
-    * @param reset           Whether removee all {@link Vertex}es with the define
+    * @param sessionLimit    The number of events to create in one session.
+    * @param reset           Whether remove all {@link Vertex}es with the define
     *                        label before populating or check for each one and only
     *                        create it if it doesn't exist yet.
     * @throws IOException If anything goes wrong. */
@@ -242,7 +262,15 @@ public class JanusClient {
                             String  keyPrefixSearch,
                             int     limit,
                             int     commitLimit,
+                            int     sessionLimit,
                             boolean reset) throws IOException {
+    log.info("Populating Graph from " + hbaseTable + "(" + tableSchema + ")@" + hbaseHost + ":" + hbasePort);
+    log.info("\tvertex labels: " + label);
+    log.info("\t" + rowkey + " starting with " + keyPrefixSearch);
+    log.info("\tlimit/commitLimit/sessionLimit: " + limit + "/" + commitLimit + "/" + sessionLimit);
+    if (reset) {
+      log.info("\tCleaning before population");
+      }
     timerStart();
     if (reset) {                        
       log.info("Cleaning Graph, vertexes: " + label);
@@ -308,9 +336,9 @@ public class JanusClient {
             }
           }
         }
-      timer(label + "s created", i, 100, commitLimit);
+      timer(label + "s created", i, 100, commitLimit, sessionLimit);
       }
-    timer(label + "s created", i, -1, -1);
+    timer(label + "s created", i, -1, -1, -1);
     commit();
     close();
     }
@@ -387,7 +415,8 @@ public class JanusClient {
   protected void timer(String msg,
                        int    i,
                        int    modulus,
-                       int    modulusCommit) {
+                       int    modulusCommit,
+                       int    modulusSession) {
     if (i == 0) {
       return;
       }
@@ -402,7 +431,16 @@ public class JanusClient {
     if (modulusCommit > -1 && i%modulusCommit == 0) {
 	    commit();
       }
+    if (modulusSession > -1 && i%modulusSession == 0) {
+	    reopen();
+      }
     }    
+    
+  private String _table;
+  
+  private String _hostname;
+  
+  private boolean _batch;
     
   private boolean _found;  
     
