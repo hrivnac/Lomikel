@@ -303,7 +303,7 @@ public class JanusClient {
     //  timer(label + "s created", i, 100, commitLimit);
     //  } 
     NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap;
-    for (Result r : rs) {
+    /*for (Result r : rs) {
       resultMap = r.getNoVersionMap();
       key = Bytes.toString(r.getRow());
       if (!key.startsWith("schema")) {
@@ -337,7 +337,7 @@ public class JanusClient {
           }
         }
       timer(label + "s created", i, 100, commitLimit, sessionLimit);
-      }
+      }*/
     timer(label + "s created", i, -1, -1, -1);
     commit();
     close();
