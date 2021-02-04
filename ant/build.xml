@@ -481,6 +481,7 @@
       <arg value="200"/>
       <arg value="300"/>
       <arg value="true"/>
+      <arg value="false"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
         </classpath>

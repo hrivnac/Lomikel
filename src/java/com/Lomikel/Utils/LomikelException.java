@@ -28,8 +28,8 @@ public class LomikelException extends Exception {
     super(nested);
     }
 
-  public LomikelException(String msg,
-                              Throwable nested) {
+  public LomikelException(String    msg,
+                          Throwable nested) {
     super(msg, nested);
     }
     

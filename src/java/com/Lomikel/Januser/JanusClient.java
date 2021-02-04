@@ -81,10 +81,24 @@ public class JanusClient {
   public static void main(String[] args) throws Exception {
     Init.init();
     if (args[0].trim().equals("extract")) {
-      new JanusClient(args[1], args[2]).createMetaSchema();
+      new JanusClient(args[1],
+                      args[2]).createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      new JanusClient(args[1], args[2], true).populateGraph(args[3], new Integer(args[4]), args[5], args[6], args[7], args[8], args[9], new Integer(args[10]), new Integer(args[11]), new Integer(args[12]), args[13].equals("true"));
+      new JanusClient(args[1],
+                      args[2],
+                      true).populateGraph(            args[3],
+                                          new Integer(args[4]),
+                                                      args[5],
+                                                      args[6],
+                                                      args[7],
+                                                      args[8],
+                                                      args[9],
+                                          new Integer(args[10]),
+                                          new Integer(args[11]),
+                                          new Integer(args[12]),
+                                                      args[13].equals("true"),
+                                                      args[14].equals("true"));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -251,8 +265,10 @@ public class JanusClient {
     * @param reset           Whether remove all {@link Vertex}es with the define
     *                        label before populating or check for each one and only
     *                        create it if it doesn't exist yet.
+    * @param fullFill        Whether fill all variables or just rowkey and lbl.
     * @throws IOException If anything goes wrong. */
   // TBD: allow replacing, updating
+  // TBD: read only rowkey if fullFill = false
   public void populateGraph(String  hbaseHost,
                             int     hbasePort,
                             String  hbaseTable,
@@ -263,13 +279,20 @@ public class JanusClient {
                             int     limit,
                             int     commitLimit,
                             int     sessionLimit,
-                            boolean reset) throws IOException {
+                            boolean reset,
+                            boolean fullFill) throws IOException {
     log.info("Populating Graph from " + hbaseTable + "(" + tableSchema + ")@" + hbaseHost + ":" + hbasePort);
     log.info("\tvertex labels: " + label);
     log.info("\t" + rowkey + " starting with " + keyPrefixSearch);
     log.info("\tlimit/commitLimit/sessionLimit: " + limit + "/" + commitLimit + "/" + sessionLimit);
     if (reset) {
-      log.info("\tCleaning before population");
+      log.info("\tcleaning before population");
+      }
+    if (fullFill) {
+      log.info("\tfilling all variables");
+      }
+    else {
+      log.info("\tfilling only " + rowkey + " and lbl");
       }
     timerStart();
     if (reset) {                        
@@ -319,22 +342,24 @@ public class JanusClient {
           v = getOrCreate(label, rowkey, key);
           }
         v.property("lbl", label);
-        /*for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
-          family = Bytes.toString(entry.getKey());
-          if (!family.equals("b")) {
-            for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
-              field = Bytes.toString(e.getKey());
-              column = family + ":" + field;
-              if (schema != null) {
-                value = schema.decode(column, e.getValue());
+        if (fullFill) {
+          for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+            family = Bytes.toString(entry.getKey());
+            if (!family.equals("b")) {
+              for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+                field = Bytes.toString(e.getKey());
+                column = family + ":" + field;
+                if (schema != null) {
+                  value = schema.decode(column, e.getValue());
+                  }
+                else {
+                  value = Bytes.toString(e.getValue());
+                  }
+                v.property(field, value);
                 }
-              else {
-                value = Bytes.toString(e.getValue());
-                }
-              v.property(field, value);
               }
             }
-          }*/
+          }
         }
       timer(label + "s created", i, 100, commitLimit, sessionLimit);
       }
