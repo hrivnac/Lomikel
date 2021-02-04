@@ -166,6 +166,9 @@
       <fileset dir="../src/java" includes="com/Lomikel/**/*.png"/>
       <fileset dir="../src/java" includes="com/Lomikel/**/*.gif"/>
       <fileset dir="../src/java" includes="com/Lomikel/**/*.css"/>
+      <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
+        <provider classname="com.Lomikel.GremlinPlugin.LomikelConnector"/>
+        </service>
      <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -404,6 +407,7 @@
   <target name="janus-patch"
           description="Patch JanusGraph">
     <echo>Patching JanusGraph Server</echo>
+    <echo>... system</echo>
  		<copy todir="${janusgraph_dir}/scripts">
 			<fileset dir="../src/gremlin" includes="functions.gremlin"/>
 			<fileset dir="../src/sys/janusgraph/scripts" includes="*"/>
@@ -422,6 +426,18 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.PORT@"         value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
+    <echo>... plugin</echo>
+    <mkdir dir="${janusgraph_dir}/ext/lomikel.connector"/>
+    <delete includeEmptyDirs="true">
+      <fileset dir="${janusgraph_dir}/ext/lomikel.connector" includes="Lomikel-*.jar"/>
+      </delete>
+ 		<copy todir="${janusgraph_dir}/ext/lomikel.connector">
+			<fileset dir="../lib" includes="Lomikel-${version}.jar"/>
+      </copy>
+    <copy file="../lib/Lomikel-${version}.jar" todir="${janusgraph_dir}/ext/lomikel.connector"/>
+    <exec executable="../src/sh/updateJanusExt.sh">
+      <arg line="${janusgraph_dir}/ext/plugins.txt"/>
+      </exec>
     </target>
   
   <!-- Start/Stop JanusGraph ================================================-->
@@ -597,16 +613,17 @@
       <Header><![CDATA[<center>]]>Lomikel version: ${version}<![CDATA[</center>]]></Header>
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
       <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Activities/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
-      <group title="Apps"        packages="com.Lomikel.Apps"/>
-      <group title="HBaser"      packages="com.Lomikel.HBaser"/>
-      <group title="Januser"     packages="com.Lomikel.Januser"/>
-      <group title="Phoenixer"   packages="com.Lomikel.Phoenixer"/>
-      <group title="Graph"       packages="com.Lomikel.Graph"/>
-      <group title="Utils"       packages="com.Lomikel.Utils*"/>
-      <group title="Sockets"     packages="com.Lomikel.Sockets*"/>
-      <group title="GUI"         packages="com.Lomikel.GUI*"/>
-      <group title="WebService"  packages="com.Lomikel.WebService*"/>
-      <group title="LehmanUtils" packages="de.lehmannet.om.util*"/>
+      <group title="Apps"          packages="com.Lomikel.Apps"/>
+      <group title="HBaser"        packages="com.Lomikel.HBaser"/>
+      <group title="Januser"       packages="com.Lomikel.Januser"/>
+      <group title="Phoenixer"     packages="com.Lomikel.Phoenixer"/>
+      <group title="Graph"         packages="com.Lomikel.Graph"/>
+      <group title="Utils"         packages="com.Lomikel.Utils*"/>
+      <group title="Sockets"       packages="com.Lomikel.Sockets*"/>
+      <group title="GremlinPlugin" packages="com.Lomikel.GremlinPlugin*"/>
+      <group title="GUI"           packages="com.Lomikel.GUI*"/>
+      <group title="WebService"    packages="com.Lomikel.WebService*"/>
+      <group title="LehmanUtils"   packages="de.lehmannet.om.util*"/>
       <link href="http://docs.oracle.com/javase/8/docs/api" packagelistLoc="${javadoc}" offline="true"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>
