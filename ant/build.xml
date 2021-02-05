@@ -171,6 +171,7 @@
       <zipfileset includes="**/*" src="${slf4jlog4j_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${logging_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
       <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
         <provider classname="com.Lomikel.GremlinPlugin.LomikelConnector"/>
         </service>
@@ -278,12 +279,7 @@
         <include name="log4j.properties"/>
         </classes>
       <lib file="../lib/Lomikel-${version}.jar"/>
-      <lib file="${log4j_jar}"/>
-      <lib file="${bsh_jar}"/>
       <lib file="${orgjson_jar}"/>
-      <lib file="${slf4j_jar}"/>
-      <lib file="${slf4jlog4j_jar}"/>
-      <lib file="${logging_jar}"/>
       <lib file="${javaxmail_jar}"/>
       <lib file="${javaxservlet_jar}"/>
       <lib file="${hbasecommon_jar}"/>
