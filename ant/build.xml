@@ -166,6 +166,11 @@
       <fileset dir="../src/java" includes="com/Lomikel/**/*.png"/>
       <fileset dir="../src/java" includes="com/Lomikel/**/*.gif"/>
       <fileset dir="../src/java" includes="com/Lomikel/**/*.css"/>
+      <zipfileset includes="**/*" src="${log4j_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${slf4j_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${slf4jlog4j_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${logging_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
       <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
         <provider classname="com.Lomikel.GremlinPlugin.LomikelConnector"/>
         </service>
@@ -177,11 +182,7 @@
       </jar>
     <jar jarfile="../lib/Lomikel.exe.jar" index="yes">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${log4j_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${slf4j_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${slf4jlog4j_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${logging_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.3.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-codec-1.14.jar" excludes="META-INF/*"/>
