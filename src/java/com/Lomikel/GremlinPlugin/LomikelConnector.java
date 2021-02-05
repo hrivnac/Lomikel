@@ -1,7 +1,8 @@
 package com.Lomikel.GremlinPlugin;
 
-import com.Lomikel.Januser.Sertex;
+import com.Lomikel.Januser.Wertex;
 import com.Lomikel.Januser.Hertex;
+import com.Lomikel.HBaser.HBaseClient;
 
 // TinkerPop
 import org.apache.tinkerpop.gremlin.jsr223.AbstractGremlinPlugin;
@@ -26,7 +27,7 @@ public class LomikelConnector extends AbstractGremlinPlugin {
   /** Create. */
   public LomikelConnector() {
     super("lomikel.connector",
-          imports(new Class[]{Sertex.class, Hertex.class}),
+          imports(new Class[]{Wertex.class, Hertex.class, HBaseClient.class}),
           new LomikelConsoleCustomizer());
     }
 
