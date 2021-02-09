@@ -64,11 +64,37 @@ public class GremlinClient {
    
   /** Create with connection parameters.
     * @param hostname The Gremlin hostname.
-    * @param table    The Gremlin port. */
-  public GremlinClient(String hostname,
-                       int    port) {
+    * @param table    The Gremlin port.
+    * @param gryo     Whether open <em>Gryo</em> serializer or <em>GraphBinary</em> serializer. */
+  public GremlinClient(String  hostname,
+                       int     port,
+                       boolean gryo) {
     Init.init();
     log.info("Opening " + hostname + ":" + port);
+    if (gryo) {
+      openGryo(hostname, port);
+      }
+    else {
+      open(hostname, port);
+      }
+    }
+    
+  /** Create with connection parameters, using <em>GraphBinary</em> serializer.
+    * @param hostname The Gremlin hostname.
+    * @param table    The Gremlin port. */
+  public GremlinClient(String  hostname,
+                       int     port) {
+    Init.init();
+    log.info("Opening " + hostname + ":" + port);
+    open(hostname, port);
+    }
+   
+  /** Open with <em>GraphBinary</em> serializer.
+    * @param hostname The Gremlin hostname.
+    * @param table    The Gremlin port. */
+  public void open(String hostname,
+                   int    port) {
+    log.info("Using GraphBinary serializer");
     try {
       Map<String, Object>  conf = new HashMap<>();
       conf.put("serializeResultToString", true);
@@ -79,6 +105,29 @@ public class GremlinClient {
       TypeSerializerRegistry.Builder builder = TypeSerializerRegistry.build();
       MessageSerializer serializer = new GraphBinaryMessageSerializerV1(builder);
       serializer.configure(conf, null);
+      _cluster = Cluster.build()
+                        .addContactPoint(hostname)
+                        .port(port)
+                        .serializer(serializer)
+                        .create();
+      _client = _cluster.connect().init();
+      log.info("Connected");
+      }
+    catch (Exception e) {
+      log.error("Cannot open connection", e);
+      }
+    }
+   
+  /** Open with <em>Gryo</em> serializer.
+    * @param hostname The Gremlin hostname.
+    * @param table    The Gremlin port. */
+  public void openGryo(String hostname,
+                       int    port) {
+    log.info("Using Gryo serializer");
+    try {
+      GryoMapper.Builder builder = GryoMapper.build()
+                                             .addRegistry(JanusGraphIoRegistry.getInstance());                                                     
+      MessageSerializer serializer = new GryoMessageSerializerV3d0(builder);      
       _cluster = Cluster.build()
                         .addContactPoint(hostname)
                         .port(port)

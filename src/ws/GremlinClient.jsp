@@ -12,7 +12,7 @@
   String host = request.getParameter("host");
   String port = request.getParameter("port");
   String req  = request.getParameter("request");
-  GremlinClient gc = new GremlinClient(host, new Integer(port));
+  GremlinClient gc = new GremlinClient(host, new Integer(port), true);
   req = URLDecoder.decode(req, "UTF-8");
   String output = gc.interpret2JSON(req);
   log.info("Interpreting: " + req + " => " + output);
