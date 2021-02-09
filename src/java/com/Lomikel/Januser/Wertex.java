@@ -97,32 +97,14 @@ public class Wertex implements Vertex {
   public String rowkey() {
     return _rowkey;
     }
-    
-  /** Give the field value from the database.
-    * @param key The database field name.
-    * @return    The correspoinding {@link VertexField} value from the database. */
-  public VertexField	field(String key) {
-    return _fields.get(key);
-    }
-    
-  /** Give all field values from the database.
-    * @return The {@link Iterator} over the key-value pairs from the database. */
-  public Iterator<VertexField> fields() {
-    return _fields.values().iterator();
-    }
-    
+        
   /** Set all field values read from the database.
     * @param fields The key-value pairs from the database. */
   protected void setFields(Map<String, String> fields) {
-    _fields = new TreeMap<>();
-    VertexField vf;
     for (Map.Entry<String, String> entry : fields.entrySet()) {
-      vf = new VertexField(entry.getKey(), entry.getValue(), _vertex);
-      _fields.put(entry.getKey(), vf);
+      property(entry.getKey(), entry.getValue());
       }
     }
-  
-  private Map<String, VertexField> _fields;
     
   private Vertex _vertex;  
   

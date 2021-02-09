@@ -353,7 +353,7 @@ function show(graph) {
         document.getElementById("commands").innerHTML = "<b><u>" + title + "</u></b>" + helpButton
                                                                  + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' title='describe' class='button-describe'>"
                                                                  + "&nbsp;<input type='button' onclick='removeEdge(\""   + selectedEdge.id + "\")' title='remove'   class='button-remove'><hr/>"
-                                                                 +  "Actions: " + selectedEdge.actions;
+                                                                 + "Actions: " + selectedEdge.actions;
         }
       }
     });
