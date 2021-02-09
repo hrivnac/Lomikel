@@ -5,11 +5,11 @@ port: 24444
 #connectionPool: {
 #  enableSsl: true
 #  }
-serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0,
-             config: {#serializeResultToString: true,
-                      ioRegistries: [#org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
-                                     org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
-#serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1,
-#             config: {serializeResultToString: true,
-#                      ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
+#serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0,
+#             config: {#serializeResultToString: true,
+#                      ioRegistries: [#org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
 #                                     org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
+serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1,
+             config: {serializeResultToString: true,
+                      ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
+                                     org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}

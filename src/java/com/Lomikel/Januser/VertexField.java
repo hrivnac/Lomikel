@@ -79,6 +79,11 @@ public class VertexField implements VertexProperty<String> {
     return null;
     }
     
+  @Override
+  public String toString() {
+    return "vf[" + _key + "->" + _value + "]";
+    }
+    
   private String _key;
   
   private String _value;

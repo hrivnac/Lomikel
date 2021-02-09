@@ -28,14 +28,20 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0;
 import org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry;
 import org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0;
 import org.apache.tinkerpop.gremlin.structure.io.gryo.GryoMapper;
+import org.apache.tinkerpop.gremlin.structure.io.binary.GraphBinaryIo;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.ResultSet;
 import org.apache.tinkerpop.gremlin.driver.Result;
 import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
+import org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0;
+import org.apache.tinkerpop.gremlin.structure.io.Mapper;
+import org.apache.tinkerpop.gremlin.structure.io.binary.TypeSerializerRegistry;
 
 // Java
 import java.util.concurrent.CompletableFuture;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.OutputStream;
@@ -64,11 +70,15 @@ public class GremlinClient {
     Init.init();
     log.info("Opening " + hostname + ":" + port);
     try {
-      Map<String, Object>  builderConf = new HashMap<>();
-      builderConf.put("serializeResultToString", Boolean.FALSE);      
-      GryoMapper.Builder builder = GryoMapper.build()
-                                             .addRegistry(JanusGraphIoRegistry.getInstance());                                                     
-      MessageSerializer serializer = new GryoMessageSerializerV3d0(builder);      
+      Map<String, Object>  conf = new HashMap<>();
+      conf.put("serializeResultToString", true);
+      List<String> ioRegistries =  new ArrayList<>();
+      ioRegistries.add("org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0");
+      ioRegistries.add("org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
+      conf.put("ioRegistries", ioRegistries);
+      TypeSerializerRegistry.Builder builder = TypeSerializerRegistry.build();
+      MessageSerializer serializer = new GraphBinaryMessageSerializerV1(builder);
+      serializer.configure(conf, null);
       _cluster = Cluster.build()
                         .addContactPoint(hostname)
                         .port(port)
