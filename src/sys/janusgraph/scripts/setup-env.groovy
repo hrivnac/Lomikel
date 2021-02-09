@@ -1,7 +1,7 @@
-client = new com.Lomikel.HBaser.HBaseClient("localhost", 2181)
-client.connect("test_portal_tiny.3", "schema_0.7.0_0.3.6")
+client = new com.Lomikel.HBaser.HBaseClient("@STORAGE.HOSTNAME@", @STORAGE.HBASE.PORT@)
+client.connect("@STORAGE.HBASE.TABLE@", "@STORAGE.HBASE.SCHEMA@")
 com.Lomikel.Januser.Hertex.setHBaseClient(client)
-com.Lomikel.Januser.Hertex.setRowkeyName("rowkey")
+com.Lomikel.Januser.Hertex.setRowkeyName("@ROWKEY.NAME@")
 
 def globals = [:]
 
@@ -10,6 +10,6 @@ globals << [hook : [
   onShutDown: { ctx -> ctx.logger.info("Executed once at shutdown of Gremlin Server.")}
   ] as LifeCycleHook]
   
-globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.hbase.table", "@STORAGE.HBASE.TABLE@").open()]
+globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()]
 globals << [g : graph.traversal()]
 

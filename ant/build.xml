@@ -415,14 +415,22 @@
  		<copy todir="${janusgraph_dir}/conf/gremlin-server">
 			<fileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="*"/>
       </copy>                                                                
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
-    <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.HOST@"         value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.PORT@"         value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.HOST@"         value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.PORT@"         value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HOSTNAME@"    value="${zookeeper}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.TABLE@" value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HOSTNAME@"     value="${zookeeper}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.JANUS.TABLE@"  value="${janus_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.TABLE@"  value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.SCHEMA@" value="${hbase_schema}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.PORT@"   value="${hbase_port}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@ROWKEY.NAME@"          value="${rowkey_name}"/>
+    <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.HOST@"          value="${gremlin_host}"/>
+    <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.PORT@"          value="${gremlin_port}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.HOST@"          value="${gremlin_host}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.PORT@"          value="${gremlin_port}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HOSTNAME@"     value="${zookeeper}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.JANUS.TABLE@"  value="${janus_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.TABLE@"  value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.SCHEMA@" value="${hbase_schema}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.PORT@"   value="${hbase_port}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@ROWKEY.NAME@"          value="${rowkey_name}"/>
     <echo>... plugin</echo>
     <mkdir dir="${janusgraph_dir}/ext/lomikel.connector"/>
     <delete includeEmptyDirs="true">
