@@ -98,6 +98,7 @@ public class JanusClient {
                                           new Integer(args[11]),
                                           new Integer(args[12]),
                                                       args[13].equals("true"),
+                                                      args[13].equals("true"),
                                                       args[14].equals("true"));
       }
     else {
@@ -265,10 +266,13 @@ public class JanusClient {
     * @param reset           Whether remove all {@link Vertex}es with the define
     *                        label before populating or check for each one and only
     *                        create it if it doesn't exist yet.
+    * @param getOrCreate     Whether check the existence of the vertex before creating it.
+    *                        (Index-based verification is disabled for speed.)
     * @param fullFill        Whether fill all variables or just rowkey and lbl.
     * @throws IOException If anything goes wrong. */
   // TBD: allow replacing, updating
   // TBD: read only rowkey if fullFill = false
+  // TBD: handle binary columns
   public void populateGraph(String  hbaseHost,
                             int     hbasePort,
                             String  hbaseTable,
@@ -280,6 +284,7 @@ public class JanusClient {
                             int     commitLimit,
                             int     sessionLimit,
                             boolean reset,
+                            boolean getOrCreate,
                             boolean fullFill) throws IOException {
     log.info("Populating Graph from " + hbaseTable + "(" + tableSchema + ")@" + hbaseHost + ":" + hbasePort);
     log.info("\tvertex labels: " + label);
@@ -334,14 +339,12 @@ public class JanusClient {
           break;
           }
         i++;
-        if (reset) {
-          v = g().addV(label).next();
-          v.property(rowkey, key);
-          }
-        else {
+        if (getOrCreate) {
           v = getOrCreate(label, rowkey, key);
           }
-        v.property("lbl", label);
+        else {
+          v = g().addV(label).property(rowkey, key).property("lbl", label).next();
+          }
         if (fullFill) {
           for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
             family = Bytes.toString(entry.getKey());
