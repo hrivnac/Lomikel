@@ -406,7 +406,7 @@ function expand(id) {
 // TBD: Vertex,Hertex,Sertex ?
 function describeNode(id) {
   var node = findObjectByKey(nodes, 'id', id);
-  popup(node.title, callGremlinValues("v=" + gr + ".V('" + id + "').next();h=new com.Lomikel.Januser.Hertex(v);h.properties().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '')") + 
+  popup(node.title, callGremlinValues("v=" + gr + ".V('" + id + "').next();h=new com.Lomikel.Januser.Hertex(v);h.properties().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '').replace('[', '')") + 
             "<hr/>" +
             JSON.stringify(node));
   }
