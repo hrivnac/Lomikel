@@ -490,7 +490,7 @@
           fork="true">
       <arg value="populate"/>
       <arg value="${zookeeper}"/>
-      <arg value="${hbase_table}"/>
+      <arg value="${janus_table}"/>
       <arg value="${zookeeper}"/>
       <arg value="${hbase_port}"/>
       <arg value="test_portal_tiny.3"/>

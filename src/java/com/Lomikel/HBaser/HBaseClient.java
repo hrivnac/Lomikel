@@ -84,7 +84,7 @@ public class HBaseClient {
       //_conf.set("hbase.client.pause", "50"); 
       //_conf.set("hbase.client.retries.number", "30"); 
       //_conf.set("hbase.client.operation.timeout", "30000"); 
-      //_conf.set("hbase.client.scanner.timeout.period", "100000");
+      _conf.set("hbase.client.scanner.timeout.period", "100000");
       //_conf.set("hbase.client.retries.number", "3");
       //_conf.set("hbase.client.pause", "1000");
       //_conf.set("hbase.client.ipc.pool.type", "RoundRobin");
