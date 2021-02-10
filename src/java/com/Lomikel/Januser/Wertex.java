@@ -29,14 +29,21 @@ import org.apache.log4j.Logger;
 public class Wertex implements Vertex {
    
   /** Dress existing {@link Vertex} with values from the database.
-    * @param vertex The original {@link Vertex}.
-    * @throws LomikelException If anything goes wrong. */
-  public Wertex(Vertex vertex) throws LomikelException {
+    * @param vertex The original {@link Vertex}. */
+  public Wertex(Vertex vertex) {
     _vertex = vertex;
+    _rowkey = null;
     if (_rowkeyName == null) {
-      throw new LomikelException("rowkey name is not set");
+      log.warn("rowkey name is not set, not dressing Vertex as Wertex");
+      return;
       }
-    _rowkey = vertex.<String>property(_rowkeyName).value();
+    // TBD: should be done without Exception 
+    try {
+      _rowkey = vertex.<String>property(_rowkeyName).value();
+      }
+    catch (IllegalStateException e) {
+      log.warn(_rowkeyName + " not set, not dressing Vertex as Wertex");
+      }
     }
     
   /** Set the name of the row key to form the correspondence between

@@ -29,17 +29,18 @@ import org.apache.log4j.Logger;
 public class Hertex extends Wertex {
    
   /** Dress existing {@link Vertex} with values from HBase.
-    * @param vertex The original {@link Vertex}.
-    * @throws LomikelException If anything goes wrong. */
-  public Hertex(Vertex vertex) throws LomikelException {
+    * @param vertex The original {@link Vertex}. */
+  public Hertex(Vertex vertex) {
     super(vertex);
     if (_client == null) {
-      throw new LomikelException("HBaseClient is not set");
+      log.warn("HBaseClient is not set, net dressing Vertex as Hertex");
       }
-    String n = null;
-    Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
-    Map<String, String> fields = results.get(rowkey());
-    setFields(fields); 
+    if (rowkey() != null) {
+      String n = null;
+      Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
+      Map<String, String> fields = results.get(rowkey());
+      setFields(fields); 
+      }
     }
     
   /** Set the {@link HBaseClient} to search for additional values.
