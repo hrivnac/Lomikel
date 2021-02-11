@@ -323,7 +323,7 @@ public class JanusClient {
     Schema schema = hc.schema();
     log.info("Populating Graph");
     Vertex v;
-    String key;
+    String key = "";
     String family;
     String field;
     String column;
@@ -340,45 +340,52 @@ public class JanusClient {
     //  timer(label + "s created", i, 100, commitLimit);
     //  } 
     NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap;
-    for (Result r : rs) {
-      resultMap = r.getNoVersionMap();
-      key = Bytes.toString(r.getRow());
-      if (!key.startsWith("schema")) {
-        i++;
-        if (i <= skip) {
-          continue;
-          }
-        if (limit > 0 && i > limit) {
-          break;
-          }
-        if (getOrCreate) {
-          v = getOrCreate(label, rowkey, key);
-          }
-        else {
-          v = g().addV(label).property(rowkey, key).property("lbl", label).next();
-          }
-        if (fullFill) {
-          for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
-            family = Bytes.toString(entry.getKey());
-            if (!family.equals("b")) {
-              for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
-                field = Bytes.toString(e.getKey());
-                column = family + ":" + field;
-                if (schema != null) {
-                  value = schema.decode(column, e.getValue());
+    try {
+      for (Result r : rs) {
+        resultMap = r.getNoVersionMap();
+        key = Bytes.toString(r.getRow());
+        if (!key.startsWith("schema")) {
+          i++;
+          if (i <= skip) {
+            continue;
+            }
+          if (limit > 0 && i > limit) {
+            break;
+            }
+          if (getOrCreate) {
+            v = getOrCreate(label, rowkey, key);
+            }
+          else {
+            v = g().addV(label).property(rowkey, key).property("lbl", label).next();
+            }
+          if (fullFill) {
+            for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
+              family = Bytes.toString(entry.getKey());
+              if (!family.equals("b")) {
+                for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
+                  field = Bytes.toString(e.getKey());
+                  column = family + ":" + field;
+                  if (schema != null) {
+                    value = schema.decode(column, e.getValue());
+                    }
+                  else {
+                    value = Bytes.toString(e.getValue());
+                    }
+                  v.property(field, value);
                   }
-                else {
-                  value = Bytes.toString(e.getValue());
-                  }
-                v.property(field, value);
                 }
               }
             }
           }
+        if (timer(label + "s created", i - 1, 100, commitLimit, sessionLimit)) {
+          rs.renewLease();
+          }
         }
-      if (timer(label + "s created", i - 1, 100, commitLimit, sessionLimit)) {
-        rs.renewLease();
-        }
+      }
+    catch (Exception e) {
+      log.fatal("Failed while inserting " + (i - 1) + "th vertex: " + key, e);
+      close();
+      return;
       }
     timer(label + "s created", i - 1, -1, -1, -1);
     commit();
