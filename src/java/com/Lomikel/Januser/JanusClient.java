@@ -292,7 +292,7 @@ public class JanusClient {
     log.info("Populating Graph from " + hbaseTable + "(" + tableSchema + ")@" + hbaseHost + ":" + hbasePort);
     log.info("\tvertex labels: " + label);
     log.info("\t" + rowkey + " starting with " + keyPrefixSearch);
-    log.info("\tlimit/commitLimit/sessionLimit: " + limit + "/" + commitLimit + "/" + sessionLimit);
+    log.info("\tlimit/skip/commitLimit/sessionLimit: " + limit + "/" + skip + "/" + commitLimit + "/" + sessionLimit);
     if (reset) {
       log.info("\tcleaning before population");
       }
@@ -351,7 +351,6 @@ public class JanusClient {
         if (limit > 0 && i > limit) {
           break;
           }
-        log.info(i);
         if (getOrCreate) {
           v = getOrCreate(label, rowkey, key);
           }
