@@ -85,25 +85,29 @@ public class JanusClient {
                       args[2]).createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      new JanusClient(args[1],
-                      args[2],
-                      true).populateGraph(            args[3],
-                                          new Integer(args[4]),
-                                                      args[5],
-                                                      args[6],
-                                                      args[7],
-                                                      args[8],
-                                                      args[9],
-                                                      args[10],
-                                                      args[11],
-                                          new Integer(args[12]),
-                                          new Integer(args[13]),
-                                          new Integer(args[14]),
-                                          new Integer(args[15]),
-                                                      args[16].equals("true"),
-                                                      args[17].equals("true"),
-                                                      args[18].equals("true"));
-      }
+      String failedKey = args[8];
+      do {
+        failedKey = new JanusClient(args[1],
+                                    args[2],
+                                    true).populateGraph(            args[3],
+                                                        new Integer(args[4]),
+                                                                    args[5],
+                                                                    args[6],
+                                                                    args[7],
+                                                                    failedKey,
+                                                                    args[9],
+                                                                    args[10],
+                                                                    args[11],
+                                                        new Integer(args[12]),
+                                                        new Integer(args[13]),
+                                                        new Integer(args[14]),
+                                                        new Integer(args[15]),
+                                                                    args[16].equals("true"),
+                                                                    args[17].equals("true"),
+                                                                    args[18].equals("true"));
+        }
+      while (!failedKey.equals(""));
+      }                             
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
       System.exit(-1);
@@ -279,7 +283,7 @@ public class JanusClient {
   // TBD: allow replacing, updating
   // TBD: read only rowkey if fullFill = false
   // TBD: handle binary columns
-  public void populateGraph(String  hbaseHost,
+  public String populateGraph(String  hbaseHost,
                             int     hbasePort,
                             String  hbaseTable,
                             String  tableSchema,
@@ -411,11 +415,12 @@ public class JanusClient {
     catch (Exception e) {
       log.fatal("Failed while inserting " + i + "th vertex,\tlast inserted vertex: " + lastInsertedKey + "\tfirst uncommited vertex: " + failedKey, e);
       close();
-      return;
+      return lastInsertedKey;
       }
     timer(label + "s created", i - 1, -1, -1, -1);
     commit();
     close();
+    return "";
     }
         
   /** Get a {@link Vertex}, create it if necessary.

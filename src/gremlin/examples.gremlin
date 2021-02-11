@@ -91,6 +91,9 @@ g.V().has(label, neq('dataset')).count()
 // More complex navigation
 // =======================
 
+// show duplicated verteces
+g.V().has('lbl', 'alert').group().by('rowkey').unfold().filter(select(values).count(local).is(gt(1))).select(keys)
+
 // show how many dataset each run has (relation: run -fills-> dataset)
 g.V().hasLabel('run').group().by('number').by(out().hasLabel('dataset').count()).unfold()
 g.V().hasLabel('run').group().by('number').by(outE().hasLabel('fills').count()).unfold()
