@@ -216,23 +216,24 @@ public class HBaseClient {
                     
                       
   /** Get row(s).
-    * @param key      The row key. Disables other search terms.
-    *                 It can be <tt>null</tt>.
-    * @param search   The search terms as <tt>family:column:value,...</tt>.
-    *                 Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
-    *                 {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
-    *                 among <tt>exact,prefix,substring,regex</tt>.
-    *                 The default for key is <tt>prefix</tt>,
-    *                 the default for columns is <tt>substring</tt>.
-    *                 It can be <tt>null</tt>.
-    *                 All searches are executed as prefix searches.    
-    * @param filter   The names of required values as <tt>family:column,...</tt>.
-    *                 <tt>*</tt> = all.
-    * @param delay    The time period start, in minutes back since dow.
-    *                 <tt>0</tt> means no time restriction.
-    * @param ifkey    Whether give also entries keys (as <tt>key:key</tt>).
-    * @param iftime   Whether give also entries timestamps (as <tt>key:time</tt>).
-    * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+    * @param key     The row key. Disables other search terms.
+    *                It can be <tt>null</tt>.
+    * @param search  The search terms as <tt>family:column:value,...</tt>.
+    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                among <tt>exact,prefix,substring,regex</tt>.
+    *                The default for key is <tt>prefix</tt>,
+    *                the default for columns is <tt>substring</tt>.
+    *                It can be <tt>null</tt>.
+    *                All searches are executed as prefix searches.    
+    * @param filter  The names of required values as <tt>family:column,...</tt>.
+    *                <tt>*</tt> = all.
+    * @param delay   The time period start, in minutes back since dow.
+    *                <tt>0</tt> means no time restriction.
+    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
+    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, String>> scan(String  key,
                                                String  search,
                                                String  filter,
@@ -255,25 +256,26 @@ public class HBaseClient {
     }
                    
   /** Get row(s).
-    * @param key      The row key. Disables other search terms.
-    *                 It can be <tt>null</tt>.
-    * @param search   The search terms as <tt>family:column:value,...</tt>.
-    *                 Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
-    *                 {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
-    *                 among <tt>exact,prefix,substring,regex</tt>.
-    *                 The default for key is <tt>prefix</tt>,
-    *                 the default for columns is <tt>substring</tt>.
-    *                 It can be <tt>null</tt>.
-    *                 All searches are executed as prefix searches.    
-    * @param filter   The names of required values as <tt>family:column,...</tt>.
-    *                 <tt>*</tt> = all.
-    * @param start    The time period start timestamp in <tt>ms</tt>.
-    *                 <tt>0</tt> means since the beginning.
-    * @param stop     The time period stop timestamp in <tt>ms</tt>.
-    *                 <tt>0</tt> means till now.
-    * @param ifkey    Whether give also entries keys (as <tt>key:key</tt>).
-    * @param iftime   Whether give also entries timestamps (as <tt>key:time</tt>).
-    * @return         The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+    * @param key     The row key. Disables other search terms.
+    *                It can be <tt>null</tt>.
+    * @param search  The search terms as <tt>family:column:value,...</tt>.
+    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                among <tt>exact,prefix,substring,regex</tt>.
+    *                The default for key is <tt>prefix</tt>,
+    *                the default for columns is <tt>substring</tt>.
+    *                It can be <tt>null</tt>.
+    *                All searches are executed as prefix searches.    
+    * @param filter  The names of required values as <tt>family:column,...</tt>.
+    *                <tt>*</tt> = all.
+    * @param start   The time period start timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means since the beginning.
+    * @param stop    The time period stop timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means till now.
+    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
+    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, String>> scan(String  key,
                                                String  search,
                                                String  filter,
@@ -318,6 +320,7 @@ public class HBaseClient {
     *                  It can be <tt>null</tt>.
     * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
     *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                  <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
     *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
     *                  among <tt>exact,prefix,substring,regex</tt>.
     *                  The default for key is <tt>prefix</tt>,
@@ -366,6 +369,8 @@ public class HBaseClient {
     String column;
     String comparator;
     String value;
+    String startKey = null;
+    String stopKey  = null;
     if (key == null || !key.startsWith("schema")) {
       if (_evaluator != null) {
         filter = mergeColumns(filter, String.join(",", _evaluator.variables()));
@@ -422,7 +427,13 @@ public class HBaseClient {
           column = fc[1];
           comparator = fc.length == 3 ? fc[2] : "default";
           value  = entry.getValue();
-          if (family.equals("key") && column.equals("key")) {
+          if (family.equals("key") && column.equals("start")) {
+            startKey = value;
+            }
+          else if (family.equals("key") && column.equals("stop")) {
+            stopKey = value;
+            }
+          else if (family.equals("key") && column.equals("key")) {
             for (String v : value.split(",")) {
               allKeys.add(v);
               switch (comparator) {
@@ -461,7 +472,25 @@ public class HBaseClient {
               }
             }
           }
-        if (onlyKeys) {
+        if (startKey != null || stopKey != null) {
+          if (isReversed()) {
+            if (stopKey != null) {
+              scan.withStartRow(                              Bytes.toBytes(stopKey ) , true);
+              }
+            if (startKey != null) {
+              scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(startKey)), true);
+              }
+            }
+          else {
+            if (startKey != null) {
+              scan.withStartRow(                              Bytes.toBytes(startKey) , true);
+              }
+            if (stopKey != null) {
+              scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(stopKey )), true);
+              }
+            }
+          }
+        else if (onlyKeys) {
           if (isReversed()) {
             scan.withStartRow(                              Bytes.toBytes(allKeys.last()), true);
             scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.first())), true);

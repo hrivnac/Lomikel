@@ -94,13 +94,15 @@ public class JanusClient {
                                                       args[7],
                                                       args[8],
                                                       args[9],
-                                          new Integer(args[10]),
-                                          new Integer(args[11]),
+                                                      args[10],
+                                                      args[11],
                                           new Integer(args[12]),
                                           new Integer(args[13]),
-                                                      args[14].equals("true"),
-                                                      args[15].equals("true"),
-                                                      args[16].equals("true"));
+                                          new Integer(args[14]),
+                                          new Integer(args[15]),
+                                                      args[16].equals("true"),
+                                                      args[17].equals("true"),
+                                                      args[18].equals("true"));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -261,6 +263,8 @@ public class JanusClient {
     * @param label           The label of newly created Vertexes.
     * @param rowkey          The row key name.
     * @param keyPrefixSearch The key prefix to limit replication to.
+    * @param keyStart        The key to start search from, may be blank.
+    * @param keyStop         The key to stop search at, may be blank.
     * @param limit           The maximal number of entries to process (-1 means all entries).
     * @param skip            The number of entries to skip (-1 or 0 means no skipping).
     * @param commitLimit     The number of events to commit in one step (-1 means commit only at the end).
@@ -282,6 +286,8 @@ public class JanusClient {
                             String  label,
                             String  rowkey,
                             String  keyPrefixSearch,
+                            String  keyStart,
+                            String  keyStop,
                             int     limit,
                             int     skip,
                             int     commitLimit,
@@ -308,6 +314,12 @@ public class JanusClient {
     else {
       log.info("\tfilling only " + rowkey + " and lbl");
       }
+    if (!keyStart.equals("")) {
+      log.info("Staring at " + keyStart);
+      }
+    if (!keyStop.equals("")) {
+      log.info("Stopping at " + keyStop);
+      }
     timerStart();
     if (reset) {                        
       log.info("Cleaning Graph, vertexes: " + label);
@@ -318,12 +330,20 @@ public class JanusClient {
     HBaseClient hc = new HBaseClient(hbaseHost, hbasePort);
     hc.connect(hbaseTable, tableSchema); 
     hc.setLimit(0);
-    hc.scan(null, "key:key:" + keyPrefixSearch + ":prefix", "*", 0, false, false);
+    String searchS = "key:key:" + keyPrefixSearch + ":prefix";
+    if (!keyStart.equals("")) {
+      searchS += ",key:startKey:" + keyStart;
+      }
+    if (!keyStop.equals("")) {
+      searchS += ",key:stopKey:" + keyStop;
+      }
+    hc.scan(null, searchS, "*", 0, false, false);
     ResultScanner rs = hc.resultScanner();
     Schema schema = hc.schema();
     log.info("Populating Graph");
     Vertex v;
-    String key = "";
+    String key;
+    String failedKey = null;
     String family;
     String field;
     String column;
@@ -345,6 +365,7 @@ public class JanusClient {
         resultMap = r.getNoVersionMap();
         key = Bytes.toString(r.getRow());
         if (!key.startsWith("schema")) {
+          failedKey = key;
           i++;
           if (i <= skip) {
             continue;
@@ -379,11 +400,12 @@ public class JanusClient {
           }
         if (timer(label + "s created", i - 1, 100, commitLimit, sessionLimit)) {
           rs.renewLease();
+          failedKey = null;
           }
         }
       }
     catch (Exception e) {
-      log.fatal("Failed while inserting " + (i - 1) + "th vertex: " + key, e);
+      log.fatal("Failed while inserting " + i + "th vertex, first uncommited vertes: " + failedKey, e);
       close();
       return;
       }
@@ -462,7 +484,7 @@ public class JanusClient {
     * @param modulus       The <em>mod</em> to specify report frequency.
     * @param modulusCommit The <em>mod</em> to specify commit frequency.
     * @param sessionCommit The <em>mod</em> to specify session reopenning frequency.
-    * @return              If any action has been taken. */
+    * @return              If any action has been commited. */
   protected boolean timer(String msg,
                           int    i,
                           int    modulus,
