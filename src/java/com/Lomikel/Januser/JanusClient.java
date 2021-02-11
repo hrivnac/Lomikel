@@ -343,7 +343,8 @@ public class JanusClient {
     log.info("Populating Graph");
     Vertex v;
     String key;
-    String failedKey = null;
+    String lastInsertedKey = null;
+    String failedKey       = null;
     String family;
     String field;
     String column;
@@ -365,7 +366,10 @@ public class JanusClient {
         resultMap = r.getNoVersionMap();
         key = Bytes.toString(r.getRow());
         if (!key.startsWith("schema")) {
-          failedKey = key;
+          log.info(key);
+          if (failedKey == null) {
+            failedKey = key;
+            }
           i++;
           if (i <= skip) {
             continue;
@@ -400,12 +404,13 @@ public class JanusClient {
           }
         if (timer(label + "s created", i - 1, 100, commitLimit, sessionLimit)) {
           rs.renewLease();
-          failedKey = null;
+          lastInsertedKey = key;
+          failedKey       = null;
           }
         }
       }
     catch (Exception e) {
-      log.fatal("Failed while inserting " + i + "th vertex, first uncommited vertes: " + failedKey, e);
+      log.fatal("Failed while inserting " + i + "th vertex,\tlast inserted vertex: " + lastInsertedKey + "\tfirst uncommited vertex: " + failedKey, e);
       close();
       return;
       }

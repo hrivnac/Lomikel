@@ -427,10 +427,10 @@ public class HBaseClient {
           column = fc[1];
           comparator = fc.length == 3 ? fc[2] : "default";
           value  = entry.getValue();
-          if (family.equals("key") && column.equals("start")) {
+          if (family.equals("key") && column.equals("startKey")) {
             startKey = value;
             }
-          else if (family.equals("key") && column.equals("stop")) {
+          else if (family.equals("key") && column.equals("stopKey")) {
             stopKey = value;
             }
           else if (family.equals("key") && column.equals("key")) {
@@ -492,7 +492,7 @@ public class HBaseClient {
           }
         else if (onlyKeys) {
           if (isReversed()) {
-            scan.withStartRow(                              Bytes.toBytes(allKeys.last()), true);
+            scan.withStartRow(                              Bytes.toBytes(allKeys.last()),   true);
             scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.first())), true);
             }
           else {
