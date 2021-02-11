@@ -1,5 +1,5 @@
-// Specification of Index
-// ======================
+// Create Index
+// ============
 
 graph.tx().rollback()
 

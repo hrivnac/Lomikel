@@ -97,9 +97,10 @@ public class JanusClient {
                                           new Integer(args[10]),
                                           new Integer(args[11]),
                                           new Integer(args[12]),
-                                                      args[13].equals("true"),
+                                          new Integer(args[13]),
                                                       args[14].equals("true"),
-                                                      args[15].equals("true"));
+                                                      args[15].equals("true"),
+                                                      args[16].equals("true"));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -260,9 +261,10 @@ public class JanusClient {
     * @param label           The label of newly created Vertexes.
     * @param rowkey          The row key name.
     * @param keyPrefixSearch The key prefix to limit replication to.
-    * @param limit           The maximal number of entries to process.
-    * @param commitLimit     The number of events to commit in one step.
-    * @param sessionLimit    The number of events to create in one session.
+    * @param limit           The maximal number of entries to process (-1 means all entries).
+    * @param skip            The number of entries to skip (-1 or 0 means no skipping).
+    * @param commitLimit     The number of events to commit in one step (-1 means commit only at the end).
+    * @param sessionLimit    The number of events to create in one session (-1 means running on one session).
     * @param reset           Whether remove all {@link Vertex}es with the define
     *                        label before populating or check for each one and only
     *                        create it if it doesn't exist yet.
@@ -281,6 +283,7 @@ public class JanusClient {
                             String  rowkey,
                             String  keyPrefixSearch,
                             int     limit,
+                            int     skip,
                             int     commitLimit,
                             int     sessionLimit,
                             boolean reset,
@@ -341,10 +344,14 @@ public class JanusClient {
       resultMap = r.getNoVersionMap();
       key = Bytes.toString(r.getRow());
       if (!key.startsWith("schema")) {
-        if (limit != 0 && i == limit) {
+        i++;
+        if (i <= skip) {
+          continue;
+          }
+        if (limit > 0 && i > limit) {
           break;
           }
-        i++;
+        log.info(i);
         if (getOrCreate) {
           v = getOrCreate(label, rowkey, key);
           }
@@ -370,11 +377,11 @@ public class JanusClient {
             }
           }
         }
-      if (timer(label + "s created", i, 100, commitLimit, sessionLimit)) {
+      if (timer(label + "s created", i - 1, 100, commitLimit, sessionLimit)) {
         rs.renewLease();
         }
       }
-    timer(label + "s created", i, -1, -1, -1);
+    timer(label + "s created", i - 1, -1, -1, -1);
     commit();
     close();
     }
