@@ -101,10 +101,9 @@ public class JanusClient {
                                                         new Integer(args[12]),
                                                         new Integer(args[13]),
                                                         new Integer(args[14]),
-                                                        new Integer(args[15]),
+                                                                    args[15].equals("true"),
                                                                     args[16].equals("true"),
-                                                                    args[17].equals("true"),
-                                                                    args[18].equals("true"));
+                                                                    args[17].equals("true"));
         }
       while (!failedKey.equals(""));
       }                             
@@ -272,7 +271,6 @@ public class JanusClient {
     * @param limit           The maximal number of entries to process (-1 means all entries).
     * @param skip            The number of entries to skip (-1 or 0 means no skipping).
     * @param commitLimit     The number of events to commit in one step (-1 means commit only at the end).
-    * @param sessionLimit    The number of events to create in one session (-1 means running on one session).
     * @param reset           Whether remove all {@link Vertex}es with the define
     *                        label before populating or check for each one and only
     *                        create it if it doesn't exist yet.
@@ -280,7 +278,7 @@ public class JanusClient {
     *                        (Index-based verification is disabled for speed.)
     * @param fullFill        Whether fill all variables or just rowkey and lbl.
     * @return                Blank if the population has been executed correctly, the last
-    *                        sucesfully uploaded key otherwise.
+    *                        sucessfull key otherwise.
     * @throws IOException If anything goes wrong. */
   // TBD: allow replacing, updating
   // TBD: read only rowkey if fullFill = false
@@ -297,14 +295,13 @@ public class JanusClient {
                               int     limit,
                               int     skip,
                               int     commitLimit,
-                              int     sessionLimit,
                               boolean reset,
                               boolean getOrCreate,
                               boolean fullFill) throws IOException {
     log.info("Populating Graph from " + hbaseTable + "(" + tableSchema + ")@" + hbaseHost + ":" + hbasePort);
     log.info("\tvertex labels: " + label);
     log.info("\t" + rowkey + " starting with " + keyPrefixSearch);
-    log.info("\tlimit/skip/commitLimit/sessionLimit: " + limit + "/" + skip + "/" + commitLimit + "/" + sessionLimit);
+    log.info("\tlimit/skip/commitLimit: " + limit + "/" + skip + "/" + commitLimit);
     if (reset) {
       log.info("\tcleaning before population");
       }
@@ -407,7 +404,7 @@ public class JanusClient {
               }
             }
           }
-        if (timer(label + "s created", i - 1, 100, commitLimit, sessionLimit)) {
+        if (timer(label + "s created", i - 1, 100, commitLimit)) {
           rs.renewLease();
           lastInsertedKey = key;
           failedKey       = null;
@@ -417,11 +414,13 @@ public class JanusClient {
     catch (Exception e) {
       log.fatal("Failed while inserting " + i + "th vertex,\tlast inserted vertex: " + lastInsertedKey + "\tfirst uncommited vertex: " + failedKey, e);
       close();
+      hc.close();
       return lastInsertedKey;
       }
-    timer(label + "s created", i - 1, -1, -1, -1);
+    timer(label + "s created", i - 1, -1, -1);
     commit();
     close();
+    hc.close();
     return "";
     }
         
@@ -489,18 +488,16 @@ public class JanusClient {
     _t = System.currentTimeMillis();
     }
     
-  /** Timer snapshot. Report, commit, reopen serssion.
+  /** Timer snapshot. Report, commit.
     * @param msg           The message to use for loggiong.
     * @param i             The call number.
     * @param modulus       The <em>mod</em> to specify report frequency.
     * @param modulusCommit The <em>mod</em> to specify commit frequency.
-    * @param sessionCommit The <em>mod</em> to specify session reopenning frequency.
     * @return              If any action has been commited. */
   protected boolean timer(String msg,
                           int    i,
                           int    modulus,
-                          int    modulusCommit,
-                          int    modulusSession) {
+                          int    modulusCommit) {
     if (i == 0) {
       return false;
       }
@@ -514,9 +511,6 @@ public class JanusClient {
     log.info("" + i + " " + msg + " in " + dt + "s, freq = " + (i / dt) + "Hz");
     if (modulusCommit > -1 && i%modulusCommit == 0) {
 	    commit();
-      }
-    if (modulusSession > -1 && i%modulusSession == 0) {
-	    reopen();
       }
     return true;
     }    
