@@ -85,7 +85,7 @@ public class JanusClient {
                       args[2]).createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      String failedKey = args[8];
+      String failedKey = args[10];
       do {
         failedKey = new JanusClient(args[1],
                                     args[2],
@@ -94,9 +94,9 @@ public class JanusClient {
                                                                     args[5],
                                                                     args[6],
                                                                     args[7],
-                                                                    failedKey,
+                                                                    args[8],
                                                                     args[9],
-                                                                    args[10],
+                                                                    failedKey,
                                                                     args[11],
                                                         new Integer(args[12]),
                                                         new Integer(args[13]),
@@ -279,26 +279,28 @@ public class JanusClient {
     * @param getOrCreate     Whether check the existence of the vertex before creating it.
     *                        (Index-based verification is disabled for speed.)
     * @param fullFill        Whether fill all variables or just rowkey and lbl.
+    * @return                Blank if the population has been executed correctly, the last
+    *                        sucesfully uploaded key otherwise.
     * @throws IOException If anything goes wrong. */
   // TBD: allow replacing, updating
   // TBD: read only rowkey if fullFill = false
   // TBD: handle binary columns
   public String populateGraph(String  hbaseHost,
-                            int     hbasePort,
-                            String  hbaseTable,
-                            String  tableSchema,
-                            String  label,
-                            String  rowkey,
-                            String  keyPrefixSearch,
-                            String  keyStart,
-                            String  keyStop,
-                            int     limit,
-                            int     skip,
-                            int     commitLimit,
-                            int     sessionLimit,
-                            boolean reset,
-                            boolean getOrCreate,
-                            boolean fullFill) throws IOException {
+                              int     hbasePort,
+                              String  hbaseTable,
+                              String  tableSchema,
+                              String  label,
+                              String  rowkey,
+                              String  keyPrefixSearch,
+                              String  keyStart,
+                              String  keyStop,
+                              int     limit,
+                              int     skip,
+                              int     commitLimit,
+                              int     sessionLimit,
+                              boolean reset,
+                              boolean getOrCreate,
+                              boolean fullFill) throws IOException {
     log.info("Populating Graph from " + hbaseTable + "(" + tableSchema + ")@" + hbaseHost + ":" + hbasePort);
     log.info("\tvertex labels: " + label);
     log.info("\t" + rowkey + " starting with " + keyPrefixSearch);
