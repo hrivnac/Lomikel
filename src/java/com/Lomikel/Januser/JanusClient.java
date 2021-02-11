@@ -98,8 +98,8 @@ public class JanusClient {
                                           new Integer(args[11]),
                                           new Integer(args[12]),
                                                       args[13].equals("true"),
-                                                      args[13].equals("true"),
-                                                      args[14].equals("true"));
+                                                      args[14].equals("true"),
+                                                      args[15].equals("true"));
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract or populate");
@@ -292,6 +292,12 @@ public class JanusClient {
     log.info("\tlimit/commitLimit/sessionLimit: " + limit + "/" + commitLimit + "/" + sessionLimit);
     if (reset) {
       log.info("\tcleaning before population");
+      }
+    if (getOrCreate) {
+      log.info("\tadd vertex only if non-existent");
+      }
+    else {
+      log.info("\tadd vertex even if it already exists");
       }
     if (fullFill) {
       log.info("\tfilling all variables");
