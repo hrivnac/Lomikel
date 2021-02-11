@@ -366,7 +366,6 @@ public class JanusClient {
         resultMap = r.getNoVersionMap();
         key = Bytes.toString(r.getRow());
         if (!key.startsWith("schema")) {
-          log.info(key);
           if (failedKey == null) {
             failedKey = key;
             }
