@@ -370,7 +370,9 @@ public class JanusClient {
             }
           }
         }
-      timer(label + "s created", i, 100, commitLimit, sessionLimit);
+      if (timer(label + "s created", i, 100, commitLimit, sessionLimit)) {
+        rs.renewLease();
+        }
       }
     timer(label + "s created", i, -1, -1, -1);
     commit();
@@ -441,21 +443,23 @@ public class JanusClient {
     _t = System.currentTimeMillis();
     }
     
-  /** Timer snapshot. Report and commit.
+  /** Timer snapshot. Report, commit, reopen serssion.
     * @param msg           The message to use for loggiong.
     * @param i             The call number.
     * @param modulus       The <em>mod</em> to specify report frequency.
-    * @param modulusCommit The <em>mod</em> to specify commit frequency. */
-  protected void timer(String msg,
-                       int    i,
-                       int    modulus,
-                       int    modulusCommit,
-                       int    modulusSession) {
+    * @param modulusCommit The <em>mod</em> to specify commit frequency.
+    * @param sessionCommit The <em>mod</em> to specify session reopenning frequency.
+    * @return              If any action has been taken. */
+  protected boolean timer(String msg,
+                          int    i,
+                          int    modulus,
+                          int    modulusCommit,
+                          int    modulusSession) {
     if (i == 0) {
-      return;
+      return false;
       }
     if (modulus > -1 && i%modulus != 0) {
-      return;
+      return false;
       }
     long dt = (System.currentTimeMillis() - _t) / 1000;
     if (dt == 0) {
@@ -468,6 +472,7 @@ public class JanusClient {
     if (modulusSession > -1 && i%modulusSession == 0) {
 	    reopen();
       }
+    return true;
     }    
     
   private String _table;
