@@ -11,21 +11,38 @@ title= mgmt.getPropertyKey('title')
 name = mgmt.getPropertyKey('name')
 
 // Indexes
-mgmt.buildIndex('byLbl',      Vertex.class).addKey(lbl)              .buildCompositeIndex()
-mgmt.buildIndex('byLblTitle', Vertex.class).addKey(lbl).addKey(title).buildCompositeIndex()
-mgmt.buildIndex('byLblName',  Vertex.class).addKey(lbl).addKey(name ).buildCompositeIndex()
+mgmt.buildIndex('byLbl',        Vertex.class).addKey(lbl)              .buildCompositeIndex()
+mgmt.buildIndex('byLblTitle',   Vertex.class).addKey(lbl).addKey(title).buildCompositeIndex()
+mgmt.buildIndex('byLblName',    Vertex.class).addKey(lbl).addKey(name ).buildCompositeIndex()
+mgmt.buildIndex('byLblES',      Vertex.class).addKey(lbl, Mapping.TEXTSTRING.asParameter())                                                .buildMixedIndex('search')
+mgmt.buildIndex('byLblTitleES', Vertex.class).addKey(lbl, Mapping.TEXTSTRING.asParameter()).addKey(title, Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
+mgmt.buildIndex('byLblNameES',  Vertex.class).addKey(lbl, Mapping.TEXTSTRING.asParameter()).addKey(name , Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
 
 mgmt.commit()
 
-// Wait for index
-ManagementSystem.awaitGraphIndexStatus(graph, 'byLbl'     ).call()
-ManagementSystem.awaitGraphIndexStatus(graph, 'byLblTitle').call()
-ManagementSystem.awaitGraphIndexStatus(graph, 'byLblName' ).call()
+// Wait for index                                           
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLbl'       ).status(SchemaStatus.REGISTERED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblTitle'  ).status(SchemaStatus.REGISTERED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblName'   ).status(SchemaStatus.REGISTERED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblES'     ).status(SchemaStatus.REGISTERED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblTitleES').status(SchemaStatus.REGISTERED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblNameES' ).status(SchemaStatus.REGISTERED).call()
 
 // Reindex existing data
 mgmt = graph.openManagement()
-mgmt.updateIndex(mgmt.getGraphIndex('byLbl'     ), SchemaAction.REINDEX).get()
-mgmt.updateIndex(mgmt.getGraphIndex('byLblTitle'), SchemaAction.REINDEX).get()
-mgmt.updateIndex(mgmt.getGraphIndex('byLblName' ), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLbl'       ), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLblTitle'  ), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLblName'   ), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLblES'     ), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLblTitleES'), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLblNameES' ), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
 mgmt.commit()
+
+// Enable index                                           
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLbl'       ).status(SchemaStatus.ENABLED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblTitle'  ).status(SchemaStatus.ENABLED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblName'   ).status(SchemaStatus.ENABLED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblES'     ).status(SchemaStatus.ENABLED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblTitleES').status(SchemaStatus.ENABLED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblNameES' ).status(SchemaStatus.ENABLED).call()

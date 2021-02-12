@@ -61,6 +61,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NavigableMap;
+import java.util.Properties;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 // Log4J
@@ -85,25 +88,23 @@ public class JanusClient {
                       args[2]).createMetaSchema();
       }
     else if (args[0].trim().equals("populate")) {
-      String failedKey = args[10];
+      String failedKey = args[9];
       do {
-        failedKey = new JanusClient(args[1],
-                                    args[2],
-                                    true).populateGraph(            args[3],
-                                                        new Integer(args[4]),
-                                                                    args[5],
-                                                                    args[6],
-                                                                    args[7],
-                                                                    args[8],
-                                                                    args[9],
-                                                                    failedKey,
-                                                                    args[11],
-                                                        new Integer(args[12]),
-                                                        new Integer(args[13]),
-                                                        new Integer(args[14]),
-                                                                    args[15].equals("true"),
-                                                                    args[16].equals("true"),
-                                                                    args[17].equals("true"));
+        failedKey = new JanusClient(args[1]).populateGraph(            args[2],
+                                                           new Integer(args[3]),
+                                                                       args[4],
+                                                                       args[5],
+                                                                       args[6],
+                                                                       args[7],
+                                                                       args[8],
+                                                                       failedKey,
+                                                                       args[10],
+                                                           new Integer(args[11]),
+                                                           new Integer(args[12]),
+                                                           new Integer(args[13]),
+                                                                       args[14].equals("true"),
+                                                                       args[15].equals("true"),
+                                                                       args[16].equals("true"));
         }
       while (!failedKey.equals(""));
       }                             
@@ -112,7 +113,8 @@ public class JanusClient {
       System.exit(-1);
       }
     System.exit(0);
-    }   
+    } 
+    
   /** Create with default parameters. */
   public JanusClient() {
     this(Info.zookeeper(), Info.hbase_table());
@@ -140,7 +142,14 @@ public class JanusClient {
     open();
     }
     
-  /** Open graph. */
+  /** Create with connection properties file.
+    * @param properties The file with the complete properties. */
+  public JanusClient(String properties) {
+    Init.init();
+    open(properties);
+    }
+    
+  /** Open graph with already set parameters. */
   public void open() {
     log.info("Opening " + _table + "@" + _hostname);
     if (_batch) {
@@ -151,22 +160,29 @@ public class JanusClient {
                               .set("storage.hostname",      _hostname)
                               .set("storage.hbase.table",   _table)
                               .set("storage.batch-loading", _batch)
-                              //.set("ids.block-size", "10000") // default = 1000
-                              //.set("storage.connection-timeout", "100000")
-                              //.set("storage.parallel-backend-ops", "true")
-                              //.set("storage.hbase.ext.hbase.client.pause", "50")
-                              //.set("storage.hbase.ext.hbase.client.retries.number", "30") 
-                              //.set("storage.hbase.ext.hbase.client.operation.timeout", "30000") 
-                              //.set("storage.hbase.ext.hbase.client.scanner.timeout.period", "100000")
-                              //.set("storage.hbase.ext.hbase.client.retries.number", "3")
-                              //.set("storage.hbase.ext.hbase.client.pause", "1000")
-                              //.set("storage.hbase.ext.hbase.client.ipc.pool.type", "RoundRobin")
-                              //.set("storage.hbase.ext.hbase.client.ipc.pool.size", "128")
-                              //.set("storage.hbase.ext.hbase.rpc.timeout", "20000")
-                              //.set("storage.hbase.ext.hbase.cells.scanned.per.heartbeat.check", "10000")
-                              //.set("zookeeper.session.timeout", "10000");
-                              //.set("zookeeper.recovery.retry", "3");
                               .open();
+    _g = _graph.traversal();
+    log.info("Connected");
+    }
+    
+  /** Open graph with file-based properties.
+    * @param properties The file with the complete properties. */
+  public void open(String properties) {
+    log.info("Opening " + properties);
+    Properties p = new Properties();
+    try {
+      p.load(new FileInputStream(properties));
+      }
+    catch (IOException e) {
+      log.error("Properties " + properties + " cannot be loaded", e);
+      }
+    _hostname = p.getProperty("storage.hostname");
+    _table    = p.getProperty("storage.hbase.table");
+    _batch = p.containsKey("storage.batch-loading") && p.getProperty("storage.batch-loading").equals("true");
+    if (_batch) {
+      log.info("\tas batch");
+      }
+    _graph = JanusGraphFactory.open(properties);
     _g = _graph.traversal();
     log.info("Connected");
     }

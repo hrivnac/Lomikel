@@ -426,11 +426,13 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.HOST@"          value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.PORT@"          value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HOSTNAME@"     value="${zookeeper}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.JANUS.TABLE@"  value="${janus_table}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.TABLE@"  value="${hbase_table}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.SCHEMA@" value="${hbase_schema}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.PORT@"   value="${hbase_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@ROWKEY.NAME@"          value="${rowkey_name}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@STORAGE.HBASE.TABLE@"  value="${janus_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.HBASE.TABLE@"  value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.HBASE.SCHEMA@" value="${hbase_schema}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.HBASE.PORT@"   value="${hbase_port}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.ROWKEY.NAME@"  value="${rowkey_name}"/>
+    <copy file="${janusgraph_dir}/conf/gremlin-server/Local.properties" tofile="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" overwrite="true"/>
+    <echo file="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" append="true">storage.batch-loading=true</echo>
     <echo>... plugin</echo>
     <mkdir dir="${janusgraph_dir}/ext/lomikel.connector"/>
     <delete includeEmptyDirs="true">
@@ -458,10 +460,18 @@
   
    <target name="janus-stop"
           description="Stop JanusGraph Server">
-    <echo>Stoping JanusGraph Server</echo>
+    <echo>Stopping JanusGraph Server</echo>
     <exec executable="${janusgraph_dir}/bin/gremlin-server.sh">
       <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/Local.yaml"/>
       <arg line="stop"/>
+      </exec>
+    </target>
+    
+   <target name="es-start"
+          description="Start Elastic Search">
+    <echo>Starting Elastic Search</echo>
+    <exec executable="${janusgraph_dir}/elasticsearch/bin/elasticsearch">
+      <arg line="-d -v"/>
       </exec>
     </target>
     
@@ -489,8 +499,7 @@
     <java classname="com.Lomikel.Januser.JanusClient"
           fork="true">
       <arg value="populate"/>
-      <arg value="${zookeeper}"/>
-      <arg value="${janus_table}"/>
+      <arg value="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties"/>
       <arg value="${zookeeper}"/>
       <arg value="${hbase_port}"/>
       <arg value="test_portal_tiny.3"/>

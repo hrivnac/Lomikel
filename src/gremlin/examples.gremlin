@@ -103,6 +103,9 @@ g.V().hasLabel('run').group().by('number').by(outE('fills').count()).unfold()
 // show overlapping datasets
 g.V().hasLabel('dataset').out('overlap').limit(10).path().by('name')
 
+// prefix search
+g.V().has('lbl', 'alert').has('rowkey', textContainsPrefix('ZTF19'))
+
 // is there an overlap bewtween two datasets ?
 g.V().has('dataset', 'name', 'data18_13TeV.00358031.physics_Main.deriv.DAOD_HIGG2D1.f961_m2015_p3597').out('overlap').has('dataset', 'name', 'data18_13TeV.00358031.physics_Main.deriv.DAOD_HIGG1D1.f961_m2015_p3583').hasNext()
 

@@ -23,7 +23,7 @@ export home=`pwd`/..
 
 alias gremlin_Local='CLASSPATH=""   ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
 alias gremlin_IJCLab='CLASSPATH=""  ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
-alias gremlin_console='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${zookeeper} ${janus_table} ${hbase_table} ${hbase_port} ${hbase_schema} ${rowid_name} ${home}"'
+alias gremlin_console='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
 
 echo "commands: gremlin_console, gremlin_Local, gremlin_IJCLab"
 

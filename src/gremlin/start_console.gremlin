@@ -1,15 +1,12 @@
 //:record start MyGremlin.log
-zookeeper    = args[0]
-janus_table  = args[1]
-hbase_table  = args[2]
-hbase_port   = args[3]
-hbase_schema = args[4]
-rowkey_name  = args[5]
-home         = args[6]
-graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", zookeeper).set("storage.hbase.table", janus_table).open()
-g = graph.traversal()
+prop = args[0]
+home = args[1]
 
-client = new HBaseClient(zookeeper, hbase_port)
-client.connect(hbase_table, hbase_schema)
+graph = JanusGraphFactory.open(prop)
+g = graph.traversal()
+c = graph.configuration()
+
+client = new HBaseClient(c.getString("storage.hostname"), c.getString("backend.hbase.port"))
+client.connect(c.getString("backend.hbase.table"), c.getString("backend.hbase.schema"))
 Hertex.setHBaseClient(client)
-Hertex.setRowkeyName(rowkey_name)
+Hertex.setRowkeyName(c.getString("backend.rowkey.name"))
