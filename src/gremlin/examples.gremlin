@@ -137,3 +137,18 @@ evaluate(new File("..."))
 // profile a query
 g.profile()
 
+// Management
+// ==========
+
+// disable index
+mgmt = graph.openManagement()
+x=mgmt.getGraphIndex('x')
+mgmt.updateIndex(x, SchemaAction.DISABLE_INDEX).get()
+mgmt.commit()
+
+// enable index
+mgmt = graph.openManagement()
+ManagementSystem.awaitGraphIndexStatus(graph, 'x').status(SchemaStatus.ENABLED).call()
+mgmt.commit()
+
+
