@@ -55,6 +55,15 @@
     <path refid="classpath.build"/>
     </path>
     
+  <path id="classpath_phoenix.run">
+    <fileset dir="../lib">
+      <include name="*.jar"/>
+      <exclude name="*.exe.jar"/>
+      </fileset>
+    <pathelement path="${phoenix_jar}"/>
+    <path refid="classpath.build"/>
+    </path>
+    
   <path id="classpath.janusgraph">
     <fileset dir="${janusgraph_dir}/lib">
       <include name="*.jar"/>
@@ -70,8 +79,9 @@
     <pathelement path="${bsh_jar}"/>
     </path>
 
-  <property name="classpath.build.content" refid="classpath.build"/>
-  <property name="classpath.run.content"   refid="classpath.run"/>
+  <property name="classpath.build.content"       refid="classpath.build"/>
+  <property name="classpath.run.content"         refid="classpath.run"/>
+  <property name="classpath_phoenix.run.content" refid="classpath_phoenix.run"/>
 
   <!-- Info =================================================================-->
     
@@ -516,6 +526,22 @@
       <arg value="false"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
+        </classpath>
+      </java>
+    </target>
+    
+  <!-- Manage Phoenix Proxy Server ==========================================-->
+    
+  <target name="start-phoenix-proxy-server"
+          description="Start Phoenix Proxy Server">
+    <echo>Start Phoenix Proxy Server</echo>
+    <java classname="com.Lomikel.Phoenixer.PhoenixProxyServer"
+          fork="true">
+      <arg value="5000"/>
+      <arg value="${phoenix_url}"/>
+      <sysproperty key="HBASE_CONF_DIR" value="${phoenix_conf_dir}"/>
+      <classpath>
+        <path refid="classpath_phoenix.run"/>
         </classpath>
       </java>
     </target>

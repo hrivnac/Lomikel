@@ -26,6 +26,14 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class PhoenixProxyServer extends PhoenixClient
                                 implements Servable {
+
+  /** Start {@link PhoenixProxyServer}. 
+    * @param args[0] The port for this sever.
+    * @param args[1] The url of the remote Phoenix server. */
+  public static void main(String[] args) throws LomikelException {
+    Init.init();
+    new PhoenixProxyServer(new Integer(args[0]), args[1]);
+    }
     
   /** Start {@link SocketServer}.
     * @param port       The proxyPort for this sever.
