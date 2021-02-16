@@ -60,7 +60,7 @@ import java.util.Arrays;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>HBaseClient</code> handles connectionto HBase table. 
+/** <code>HBaseClient</code> connects to HBase. 
   * @opt attributes
   * @opt operations
   * @opt types
@@ -68,12 +68,14 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBaseClient {
    
-  /** Create.
+  // Lifecycle -----------------------------------------------------------------
+  
+  /** Create and connect to HBase.
     * @param zookeepers The comma-separated list of zookeper ids.
     * @param clientPort The client port. 
-    * @throws IOException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public HBaseClient(String zookeepers,
-                     String clientPort) throws IOException {
+                     String clientPort) throws LomikelException {
     Init.init();
     _zookeepers = zookeepers;
     _clientPort = clientPort;
@@ -81,10 +83,10 @@ public class HBaseClient {
     _conf = HBaseConfiguration.create();
     if (zookeepers != null) {
       _conf.set("hbase.zookeeper.quorum", zookeepers);
+      _conf.set("hbase.client.scanner.timeout.period", "100000");
       //_conf.set("hbase.client.pause", "50"); 
       //_conf.set("hbase.client.retries.number", "30"); 
       //_conf.set("hbase.client.operation.timeout", "30000"); 
-      _conf.set("hbase.client.scanner.timeout.period", "100000");
       //_conf.set("hbase.client.retries.number", "3");
       //_conf.set("hbase.client.pause", "1000");
       //_conf.set("hbase.client.ipc.pool.type", "RoundRobin");
@@ -97,54 +99,36 @@ public class HBaseClient {
     if (clientPort != null) {
       _conf.set("hbase.zookeeper.property.clientPort", clientPort);
       }
-    _connection = ConnectionFactory.createConnection(_conf); 
+    try {
+      _connection = ConnectionFactory.createConnection(_conf); 
+      }
+    catch (IOException e) {
+      throw new LomikelException("Cannot create from " + _conf, e);
+      }
     setSearchOperator("OR");
     }
         
-  /** Create.
+  /** Create and connect to HBase.
     * @param zookeepers The comma-separated list of zookeper ids.
     * @param clientPort The client port. 
-    * @throws IOException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public HBaseClient(String zookeepers,
-                     int    clientPort) throws IOException {
+                     int    clientPort) throws LomikelException {
     this(zookeepers, String.valueOf(clientPort));
     }
     
-  /** Create.
+  /** Create and connect to HBase.
     * @param url The HBase url.
-    * @throws IOException If anything goes wrong. */
-  public HBaseClient(String url) throws IOException {
+    * @throws LomikelException If anything goes wrong. */
+  public HBaseClient(String url) throws LomikelException {
     this(url.replaceAll("http://", "").split(":")[0], url.replaceAll("http://", "").split(":")[1]);
-    }
-    
-  /** Create on <em>localhost</em>.
-    * @throws IOException If anything goes wrong. */
-  public HBaseClient() throws IOException {
-    this(null, null);
-    }
-    
-  /** Create new table.
-    * @param tableName The name of new table.
-    * @param families  The name of families.
-    * @throws IOException If anything goes wrong. */
-  public void create(String   tableName,
-                     String[] families) throws IOException {
-    _tableName =  tableName;
-    Admin admin = _connection.getAdmin();
-    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(_tableName));
-    for (String family : families) {
-      builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(family)).build());
-      }
-    admin.createTable(builder.build());
-    admin.close();
-    log.info("Created table " + tableName + "(" + String.join(",", families) + ")");
     }
     
   /** Connect to the table. Using the latest schema starting with <tt>schema</tt>.
     * @param tableName  The table name.
     * @return           The assigned id. 
-    * @throws IOException If anything goes wrong. */
-   public Table connect(String tableName) throws IOException {
+    * @throws LomikelException If anything goes wrong. */
+   public Table connect(String tableName) throws LomikelException {
      return connect(tableName, "schema");
      }
              
@@ -154,9 +138,9 @@ public class HBaseClient {
     *                   <tt>null</tt> means to ignore schema,
     *                   empty {@link String} will take the latest one. 
     * @return           The assigned id.
-    * @throws IOException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
    public Table connect(String tableName,
-                        String schemaName) throws IOException {
+                        String schemaName) throws LomikelException {
      return connect(tableName, schemaName, 0);
      }
      
@@ -167,10 +151,10 @@ public class HBaseClient {
     *                   empty {@link String} will take the latest one. 
     * @param timeout    The timeout in ms (may be <tt>0</tt>).
     * @return           The assigned id.
-    * @throws IOException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   public Table connect(String tableName,
                        String schemaName,
-                       int    timeout) throws IOException {
+                       int    timeout) throws LomikelException {
     // Table setup
     log.info("Connecting to " + tableName);
     _tableName = tableName;
@@ -179,7 +163,12 @@ public class HBaseClient {
       _conf.set("hbase.rpc.timeout",                   tout);
       _conf.set("hbase.client.scanner.timeout.period", tout);
       }
-    _table = _connection.getTable(TableName.valueOf(_tableName));
+    try {
+      _table = _connection.getTable(TableName.valueOf(_tableName));
+      }
+    catch (IOException e) {
+      throw new LomikelException("Cannot connect to " + _table);
+      }
     // Schema search
     if (schemaName == null) {
       log.info("Not using schema");
@@ -213,7 +202,43 @@ public class HBaseClient {
       }
     return _table;
     }
+
+  @Override
+  protected void finalize() throws Throwable {
+    close();
+    }
+    
+  /** Close and release resources. */
+  public void close() {
+    log.debug("Closing");
+    try {
+      _table.close();
+      _connection.close();
+      }
+    catch (IOException e) {
+      log.warn("Cannot close Table", e);
+      }
+    _table = null;
+    }
+    
+  // Search --------------------------------------------------------------------
                     
+  /** Create new table.
+    * @param tableName The name of new table.
+    * @param families  The name of families.
+    * @throws IOException If anything goes wrong. */
+  public void create(String   tableName,
+                     String[] families) throws IOException {
+    _tableName =  tableName;
+    Admin admin = _connection.getAdmin();
+    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(_tableName));
+    for (String family : families) {
+      builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(family)).build());
+      }
+    admin.createTable(builder.build());
+    admin.close();
+    log.info("Created table " + tableName + "(" + String.join(",", families) + ")");
+    }
                       
   /** Get row(s).
     * @param key     The row key. Disables other search terms.
@@ -851,25 +876,7 @@ public class HBaseClient {
   public BinaryDataRepository repository() {
     return _repository;
     }
-    
-  @Override
-  protected void finalize() throws Throwable {
-    close();
-    }
-    
-  /** Close and release resources. */
-  public void close() {
-    log.debug("Closing");
-    try {
-      _table.close();
-      _connection.close();
-      }
-    catch (IOException e) {
-      log.warn("Cannot close Table", e);
-      }
-    _table = null;
-    }
-    
+        
   /** Increment <tt>byte[]</tt>.
     * @param value The origibal value.
     * @return      The incremented value. */

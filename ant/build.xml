@@ -630,6 +630,7 @@
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
       <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Activities/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
       <group title="Apps"          packages="com.Lomikel.Apps"/>
+      <group title="DB"            packages="com.Lomikel.DB"/>
       <group title="HBaser"        packages="com.Lomikel.HBaser"/>
       <group title="Januser"       packages="com.Lomikel.Januser"/>
       <group title="Phoenixer"     packages="com.Lomikel.Phoenixer"/>

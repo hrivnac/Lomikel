@@ -2,6 +2,7 @@ package com.Lomikel.Januser;
 
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Info;
+import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.HBaser.Schema;
 
@@ -295,7 +296,7 @@ public class JanusClient {
     * @param fullFill        Whether fill all variables or just rowkey and lbl.
     * @return                Blank if the population has been executed correctly, the last
     *                        sucessfull key otherwise.
-    * @throws IOException If anything goes wrong. */
+    * @throws LomikelException If anything goes wrong. */
   // TBD: allow replacing, updating
   // TBD: read only rowkey if fullFill = false
   // TBD: handle binary columns
@@ -313,7 +314,7 @@ public class JanusClient {
                               int     commitLimit,
                               boolean reset,
                               boolean getOrCreate,
-                              boolean fullFill) throws IOException {
+                              boolean fullFill) throws LomikelException {
     log.info("Populating Graph from " + hbaseTable + "(" + tableSchema + ")@" + hbaseHost + ":" + hbasePort);
     log.info("\tvertex labels: " + label);
     log.info("\t" + rowkey + " starting with " + keyPrefixSearch);

@@ -24,106 +24,90 @@ import java.sql.Statement;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>PhoenixProxyClient</code> connects directly to Phoenix.
+/** <code>PhoenixClient</code> connects to Phoenix.
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class PhoenixClient {
-
-  /** Create and connect to the default Phoenix.
-    * @param ef The {@link ElementFactory} for {@link Element}s creation.
-    * @throws LomikelException If anything goes wrong. */
-  public PhoenixClient(ElementFactory ef) throws LomikelException {
-    this(DEFAULT_PHOENIX_URL, ef);
-    }
+   
+  // Lifecycle -----------------------------------------------------------------
     
   /** Create and connect to Phoenix.
     * @param phoenixUrl The {@link Phoenix} url.
-    *                   If <code>null</code>, no connection will be made.
-    * @param ef The {@link ElementFactory} for {@link Element}s creation.
     * @throws LomikelException If anything goes wrong. */
-  public PhoenixClient(String         phoenixUrl,
-                       ElementFactory ef) throws LomikelException {
+  public PhoenixClient(String phoenixUrl) throws LomikelException {
+    Init.init();
     _phoenixUrl = phoenixUrl;
-    _ef = ef;
     if (phoenixUrl != null) {
       log.info("Opening " + phoenixUrl);
-      connect();
+      }
+    try {
+      Class.forName(JDBC_DRIVER);
+      _connection = DriverManager.getConnection(_phoenixUrl);
+      }
+    catch (ClassNotFoundException | SQLException e) {
+      log.error("Cannot open " + _phoenixUrl, e);
       }
     }
-
-  /** Get all {@link Vertex}es satisfying search.
-    * @param vertexIds The {@link Vertex} identificators,
-    *                  starting with its type and continuing with
-    *                  pairs of property name and value.
-    * @return The {@link List} of found {@link Vertex}es.
-    *         They are created, if needed.
+	
+  /** Connect to the table. Using the latest schema starting with <tt>schema</tt>.
+    * @param tableName  The table name.
+    * @return           The assigned id. 
     * @throws LomikelException If anything goes wrong. */
-  // TBD: switch should not be necessary
-  public List<Vertex>	 vertexes(Object... vertexIds) throws LomikelException {
-    Element prototype = null;
-    boolean first = true;
-    boolean isName = true;
-    String name = "";
-    for (Object o : vertexIds) {
-      if (first) {
-        prototype = _ef.element(o.toString());
-        first = false;
-        }
-      else {
-        if (isName) {
-          name = o.toString();
-          isName = false;
-          }
-        else {
-          prototype.set(name, o);
-          isName = true;
-          }
-        }
-      }
-    List<Element> elements = search(prototype);
-    List<Vertex> vertexes = new ArrayList<>();
-    for (Element element : elements) {
-      log.info(element);
-      vertexes.add(element.vertex());
-      }
-    return vertexes;
-    }
-    
-  /** Search for {@link List} of {@link Element}s in remote Phoenix. 
-    * @param prototype The {@link Element} with filled searched values.
-    * @return          The {@link List} of found {@link Element}s.
-    * @throws LomikelException If anhything goes wrong. */
-  public List<Element> search(Element prototype) throws LomikelException {
-    return parsePhoenixResults(phoenixSearch(prototype), prototype);
-    }
-    
-  /** Send a simple sql clause to the remote Phoenix.
-    * @param sql The sql clause.
-    * @return    The search result.
-    * @throws LomikelException If anhything goes wrong. */
-  public String search(String sql) throws LomikelException {
-    return query(sql);
-    }
+   public String connect(String tableName) throws LomikelException {
+     return connect(tableName, "schema");
+     }
+             
+  /** Connect to the table.
+    * @param tableName  The table name.
+    * @param schemaName The name of the {@link Schema} row.
+    *                   <tt>null</tt> means to ignore schema,
+    *                   empty {@link String} will take the latest one. 
+    * @return           The assigned id.
+    * @throws LomikelException If anything goes wrong. */
+   public String connect(String tableName,
+                         String schemaName) throws LomikelException {
+     return connect(tableName, schemaName, 0);
+     }
      
-  /** Get {@link Element} in remote Phoenix. 
-    * @param vertex The {@link Vertex} with filled searched values.
-    * @return       The found {@link Element}.
-    * @throws LomikelException If anhything goes wrong. */    
-  public Element get(Vertex vertex) throws LomikelException {
-    Element prototype = prototype(vertex);
-    List<Element> elements = search(prototype);
-    if (elements.size() == 0) {
-      throw new LomikelException("No Element found for " + vertex);
+  /** Connect to the table.
+    * @param tableName  The table name.
+    * @param schemaName The name of the {@link Schema} row.
+    *                   <tt>null</tt> means to ignore schema,
+    *                   empty {@link String} will take the latest one. 
+    * @param timeout    The timeout in ms (may be <tt>0</tt>).
+    * @return           The assigned id.
+    * @throws LomikelException If anything goes wrong. */
+  public String connect(String tableName,
+                        String schemaName,
+                        int    timeout) throws LomikelException {
+     log.info("Connecting to " + tableName);
+    _tableName  = tableName;
+    _schema     = Schema.getSchema(schemaName);
+    return tableName;
+    }
+   
+  @Override
+  protected void finalize() throws Throwable {
+    close();
+    }
+	  
+  /** Close and release resources. */
+  public void close() {
+    log.info("Closing");
+    try {
+      if (_connection != null)
+        _connection.close();
+        }
+    catch (SQLException e) {
+      e.printStackTrace();
       }
-    else if (elements.size() > 1) {
-      throw new LomikelException("" + elements.size() + " Elements found for " + vertex);
-      }
-    return elements.get(0);
     }
     
+  // Search --------------------------------------------------------------------
+        
   /** Assemble Phoenix search sql clause.
     * @param prototype The {@link Element} to be matched by the sql clause.
     * @return          The Phoenix sql clause. */
@@ -280,32 +264,11 @@ public class PhoenixClient {
     log.info(result);
     return result;
     } 
-	
-  /** Connect to Phoenix server. */
-  public void connect() {
-    log.info("Connecting to " + _phoenixUrl);
-    try {
-      Class.forName(JDBC_DRIVER);
-      _connection = DriverManager.getConnection(_phoenixUrl);
-      }
-    catch (ClassNotFoundException | SQLException e) {
-      log.error("Cannot connect to " + _phoenixUrl, e);
-      }
-    }
-	  
-  /** Close the connection to the Phoenix server. */
-  // TBD: call it
-  public void close() {
-    log.info("Closing connection");
-    try {
-      if (_connection != null)
-        _connection.close();
-        }
-    catch (SQLException e) {
-      e.printStackTrace();
-      }
-    }
-        
+    
+  private String _tableName;
+  
+  private Schema _schema;
+    
   private Connection _connection;  
   
   private ElementFactory _ef;
