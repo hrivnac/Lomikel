@@ -24,50 +24,39 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-//public class PhoenixProxyServer extends PhoenixClient
-//                                implements Servable {
-//    
-//  /** Start {@link SocketServer}.
-//    * @param port       The proxyPort for this sever.
-//    *                   Will use the default port if <code>null</code>.
-//    * @param phoenixUrl The {@link Phoenix} url.
-//    *                   Will use the default url if <code>null</code>.
-//    * @param ef         The {@link ElementFactory} for {@link Element}s creation.
-//    * @throws LomikelException If anhything goes wrong. */
-//  public PhoenixProxyServer(int            proxyPort,
-//                            String         phoenixUrl,
-//                            ElementFactory ef) throws LomikelException {
-//     super(phoenixUrl == null ? DEFAULT_PHOENIX_URL : phoenixUrl, ef);
-//    if (proxyPort == 0) {
-//      proxyPort = DEFAULT_PROXY_PORT;
-//      }
-//    log.info("Serving " + (phoenixUrl == null ? DEFAULT_PHOENIX_URL : phoenixUrl) + " on " + proxyPort);
-//    PhoenixProxyServer proxy = this;
-//    final int proxyPortF = proxyPort;
-//    Thread thread = new Thread() {
-//      @Override
-//      public void run() {
-//        try {
-//          SocketServer server = new SocketServer(proxy, proxyPortF);
-//          while (true) {
-//            server.accept();
-//            }
-//          }
-//        catch (LomikelException e) {
-//          log.error("Cannot create SocketServer", e);
-//          }
-//        }
-//      };
-//    thread.start();
-//    }
-//        
-//  private String _url; 
-//    
-//	private static int DEFAULT_PROXY_PORT = 5000;
-//   
-//	private static String DEFAULT_PHOENIX_URL = "jdbc:phoenix:localhost:2181";
-//     
-// /** Logging . */
-// private static Logger log = Logger.getLogger(PhoenixProxyServer.class);
-//   
-// }
+public class PhoenixProxyServer extends PhoenixClient
+                                implements Servable {
+    
+  /** Start {@link SocketServer}.
+    * @param port       The proxyPort for this sever.
+    * @param phoenixUrl The {@link Phoenix} url.
+    * @throws LomikelException If anhything goes wrong. */
+  public PhoenixProxyServer(int            proxyPort,
+                            String         phoenixUrl) throws LomikelException {
+     super(phoenixUrl);
+     log.info("Serving " + phoenixUrl + " on " + proxyPort);
+    PhoenixProxyServer proxy = this;
+    final int proxyPortF = proxyPort;
+    Thread thread = new Thread() {
+      @Override
+      public void run() {
+        try {
+          SocketServer server = new SocketServer(proxy, proxyPortF);
+          while (true) {
+            server.accept();
+            }
+          }
+        catch (LomikelException e) {
+          log.error("Cannot create SocketServer", e);
+          }
+        }
+      };
+    thread.start();
+    }
+        
+  private String _url; 
+     
+ /** Logging . */
+ private static Logger log = Logger.getLogger(PhoenixProxyServer.class);
+   
+ }

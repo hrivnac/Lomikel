@@ -2,6 +2,7 @@ package com.Lomikel.Phoenixer;
 
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Coding;
+import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.LomikelException;
 
 // Tinker Pop
@@ -11,6 +12,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.sql.Date;
@@ -33,6 +35,13 @@ import org.apache.log4j.Logger;
 public class PhoenixClient {
    
   // Lifecycle -----------------------------------------------------------------
+    
+  /** Create and do not connect to Phoenix.
+    * @throws LomikelException If anything goes wrong. */
+  public PhoenixClient() throws LomikelException {
+    Init.init();
+    log.info("Empty opening");
+    }
     
   /** Create and connect to Phoenix.
     * @param phoenixUrl The {@link Phoenix} url.
@@ -107,14 +116,158 @@ public class PhoenixClient {
     }
     
   // Search --------------------------------------------------------------------
-        
-  /** Assemble Phoenix search sql clause.
-    * @param prototype The {@link Element} to be matched by the sql clause.
-    * @return          The Phoenix sql clause. */
-  protected String phoenixSearch(Element prototype) {
+  
+  /** Get row(s).
+    * @param key     The row key. Disables other search terms.
+    *                It can be <tt>null</tt>.
+    * @param search  The search terms as <tt>family:column:value,...</tt>.
+    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                among <tt>exact,prefix,substring,regex</tt>.
+    *                The default for key is <tt>prefix</tt>,
+    *                the default for columns is <tt>substring</tt>.
+    *                It can be <tt>null</tt>.
+    *                All searches are executed as prefix searches.    
+    * @param filter  The names of required values as <tt>family:column,...</tt>.
+    *                <tt>*</tt> = all.
+    * @param delay   The time period start, in minutes back since dow.
+    *                <tt>0</tt> means no time restriction.
+    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
+    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, String>> scan(String  key,
+                                               String  search,
+                                               String  filter,
+                                               long    delay,
+                                               boolean ifkey,
+                                               boolean iftime) {
+    String searchMsg = search;
+    if (searchMsg != null && searchMsg.length() > 80) {
+      searchMsg = searchMsg.substring(0, 80) + "...";
+      }
+    log.debug("Searching for key: " + key + 
+              ", search: " + searchMsg + 
+              ", filter: " + filter +
+              ", delay: "  + delay + " min" + 
+              ", id/time: " + ifkey + "/" + iftime);
+    long now = System.currentTimeMillis();
+    long start = (delay == 0L) ? 0L :  now - delay * 1000L * 60L;
+    long stop = now;
+    return scan(key, search, filter, start, stop, ifkey, iftime);
+    }
+                   
+  /** Get row(s).
+    * @param key     The row key. Disables other search terms.
+    *                It can be <tt>null</tt>.
+    * @param search  The search terms as <tt>family:column:value,...</tt>.
+    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                among <tt>exact,prefix,substring,regex</tt>.
+    *                The default for key is <tt>prefix</tt>,
+    *                the default for columns is <tt>substring</tt>.
+    *                It can be <tt>null</tt>.
+    *                All searches are executed as prefix searches.    
+    * @param filter  The names of required values as <tt>family:column,...</tt>.
+    *                <tt>*</tt> = all.
+    * @param start   The time period start timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means since the beginning.
+    * @param stop    The time period stop timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means till now.
+    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
+    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, String>> scan(String  key,
+                                               String  search,
+                                               String  filter,
+                                               long    start,
+                                               long    stop,
+                                               boolean ifkey,
+                                               boolean iftime) {
+    String searchMsg = search;
+    if (search != null && search.length() > 80) {
+      searchMsg = search.substring(0, 80) + "...";
+      }
+    log.info("Searching for key: " + key + 
+             ", search: " + searchMsg + 
+             ", filter: " + filter +
+             ", interval: " + start + " ms - " + stop + " ms" +
+             ", id/time: " + ifkey + "/" + iftime);
+    Map<String, String> searchM = new TreeMap<>();
+    if (search != null && !search.trim().equals("")) {
+      String[] ss;
+      String k;
+      String v;
+      for (String s : search.trim().split(",")) {
+        ss = s.trim().split(":");
+        if (ss.length == 4) {
+          k = ss[0] + ":" + ss[1] + ":" + ss[3];
+          }
+        else {
+          k = ss[0] + ":" + ss[1];
+          }
+        v = ss[2];
+        if (searchM.containsKey(k)) {
+          v = searchM.get(k) + "," + v;
+          }
+        searchM.put(k, v);
+        }
+      }
+    return scan(key, searchM, filter, start, stop, ifkey, iftime);
+    }
+                   
+  /** Get row(s).
+    * @param key       The row key. Disables other search terms.
+    *                  It can be <tt>null</tt>.
+    * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
+    *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                  <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
+    *                  among <tt>exact,prefix,substring,regex</tt>.
+    *                  The default for key is <tt>prefix</tt>,
+    *                  the default for columns is <tt>substring</tt>.
+    *                  It can be <tt>null</tt>.
+    *                  All searches are executed as prefix searches.    
+    * @param filter    The names of required values as <tt>family:column,...</tt>.
+    *                  <tt>*</tt> = all.
+    * @param start     The time period start timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means since the beginning.
+    * @param stop      The time period stop timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means till now.
+    * @param ifkey     Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime    Whether give also entries timestamps (as <tt>key:time</tt>).
+    * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, String>> scan(String              key,
+                                               Map<String, String> searchMap,
+                                               String              filter,
+                                               long                start,
+                                               long                stop,
+                                               boolean             ifkey,
+                                               boolean             iftime) {
+    String searchMsg = "";
+    if (searchMap != null) {
+      searchMsg = searchMap.toString();
+      }
+    if (searchMsg.length() > 80) {
+      searchMsg = searchMsg.substring(0, 80) + "...}";
+      }
+    log.info("Searching for key: " + key + 
+             ", search: " + searchMsg + 
+             ", filter: " + filter +
+             ", interval: " + start + " ms - " + stop + " ms" +
+             ", id/time: " + ifkey + "/" + iftime);
+    if (filter != null && filter.contains("*")) {
+      iftime = true;
+      }
+    long time = System.currentTimeMillis();
+    if (stop == 0) {
+      stop = System.currentTimeMillis();
+      }
     String where = "";
     boolean first = true;
-    for (Map.Entry<String, Object> entry : prototype.content().entrySet()) {
+    for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap).entrySet()) {
+      /* TBD
       if (first) {
         first = false;
         }
@@ -128,72 +281,29 @@ public class PhoenixClient {
       else {
         where += entry.getKey() + " = " + entry.getValue();
         }
+        */
       }
-    if (where.equals("")) {
-      return "select * from " + prototype.phoenixTable();
+    if (filter == null || filter.trim().equals("")) {
+      filter = "*";
       }
-    return "select * from " + prototype.phoenixTable() + " where " + where;
-    }
-    
-  /** Convert {@link Vertex} to {@link Element} prototype. 
-    * @param vertex The {@link Vertex} to be converted.
-    * @return       The {@link Element} prototype. 
-    * @throws LomikelException If {@link Element} cannot be created. */
-  protected Element prototype(Vertex vertex) throws LomikelException {
-    Element prototype = _ef.element(vertex.label());
-    String key = (String)(vertex.properties("phoenixkey").next().value());
-    prototype.setKey(Coding.spltKey(key));
-    return prototype;
-    }
-    
-  /** Convert Phoenix results to {@link Element}s.
-    * @param results   The Phoenix results
-    *                  as <tt>name=value;...\n...</tt>.
-    * @param prototype The {@link Element} prototype to be used.
-    * @return          The {@link List} of resulting {@link Element}s. */
-  protected List<Element> parsePhoenixResults(String  results,
-                                              Element prototype) {
-    List<Element> elements = new ArrayList<>();
-    String key;
-    String value;
+    String sql = "select " + filter + " from " + _tableName;
+    if (!where.equals("")) {
+      sql += " where " + where;
+      }
+    String answer = query(sql);
+    Map<String, Map<String, String>> results = new TreeMap<>();
+    Map<String, String> result;    
     String[] keyvalue;
-    for (String line : results.split("\n")) {
-      prototype = prototype.emptyClone();
-      for (String result : line.split("#")) {
-        keyvalue = result.split("=");
-        key   = keyvalue[0];
-        value = keyvalue[1];
-        if (value != null && !value.trim().equals("null") && !value.trim().equals("")) {
-          try {
-            //log.info(prototype + ": " + key + " => " + value);
-            switch (prototype.schema().get(key)) {
-             case "Integer":
-               prototype.set(key, Integer.valueOf(value));
-               break;
-             case "Long": 
-               prototype.set(key, Long.valueOf(value));
-               break;
-             case "String": 
-               prototype.set(key, value);
-               break;
-             case "Date": 
-               prototype.set(key, PHOENIX_DATE_FORMAT.parse(value));
-               break;
-             default:
-               log.error("Cannot process " + key + " = " + value);
-               }
-             }
-          catch (IllegalArgumentException e) {
-            log.error("Cannot process " + key + " = " + value, e);
-           }
-          catch (ParseException e) {
-            log.error("Cannot parse " + key + " = " + value, e);
-           }
-          }
+    int i = 0;
+    for (String line : answer.split("\n")) {
+      result = new TreeMap<>();
+      for (String r : line.split("#")) {
+        keyvalue = r.split("=");
+        result.put(keyvalue[0], keyvalue[1]);
         }
-      elements.add(prototype);
+      results.put("" + i++, result);
       }
-    return elements; 
+    return results;
     }
     
   /** Process the <em>Phoenix</em> SQL and give answer.
@@ -264,7 +374,7 @@ public class PhoenixClient {
     log.info(result);
     return result;
     } 
-    
+        
   private String _tableName;
   
   private Schema _schema;
@@ -274,8 +384,6 @@ public class PhoenixClient {
   private ElementFactory _ef;
   
 	private String _phoenixUrl;
-    
-	private static String DEFAULT_PHOENIX_URL = "jdbc:phoenix:localhost:2181";
   
   //private static SimpleDateFormat PHOENIX_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
   private static SimpleDateFormat PHOENIX_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
