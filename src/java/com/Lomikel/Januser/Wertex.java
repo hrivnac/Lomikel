@@ -15,6 +15,7 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Iterator;
+import java.util.Arrays;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -32,26 +33,59 @@ public class Wertex implements Vertex {
     * @param vertex The original {@link Vertex}. */
   public Wertex(Vertex vertex) {
     _vertex = vertex;
-    _rowkey = null;
-    if (_rowkeyName == null) {
-      log.warn("rowkey name is not set, not dressing Vertex as Wertex");
+    _rowkeys = null;
+    if (_rowkeyNames == null || _rowkeyNames.length == 0) {
+      log.warn("rowkey names not set, not dressing Vertex as Wertex");
       return;
       }
     // TBD: should be done without Exception 
     try {
-      _rowkey = vertex.<String>property(_rowkeyName).value();
+      for (int i = 0; i > _rowkeyNames.length; i++) {
+        _rowkeys[i] = vertex.<String>property(_rowkeyNames[i]).value();
+        }
       }
     catch (IllegalStateException e) {
-      log.warn(_rowkeyName + " not set, not dressing Vertex as Wertex");
+      log.warn(Arrays.toString(_rowkeyNames) + " not set, not dressing Vertex as Wertex");
       }
     }
     
-  /** Set the name of the row key to form the correspondence between
+  /** Set the names of the row keys to form the correspondence between
     * Graph and database. It should be set before any database request.
-    * @param rowkeyName The name of the common key in Graph {@link Vertex} and 
+    * @param rowkeyNames The names of the common keys in Graph {@link Vertex} and 
+    *                    database. */
+  public static void setRowkeyNames(String[] rowkeyNames) {
+    _rowkeyNames = rowkeyNames;
+    }
+    
+  /** Set the names of the first (and only) row key to form the correspondence between
+    * Graph and database. It should be set before any database request.
+    * @param rowkeyName The name of the first common keys in Graph {@link Vertex} and 
     *                   database. */
   public static void setRowkeyName(String rowkeyName) {
-    _rowkeyName = rowkeyName;
+    _rowkeyNames = new String[]{rowkeyName};
+    }
+    
+  /** Give the names of the row keys to form the correspondence between
+    * Graph and database.
+    * @return The names of the common keys in Graph {@link Vertex} and 
+    *         database. */
+  public static String[] rowkeyNames() {
+    return _rowkeyNames;
+    }
+    
+  /** Give the name of the first row key to form the correspondence between
+    * Graph and database.
+    * @return The names of the first common key in Graph {@link Vertex} and 
+    *         database. */
+  public static String rowkeyName() {
+    if (_rowkeyNames.length == 0) {
+      log.error("RowkeyNames not set");
+      return null;
+      }
+    else if (_rowkeyNames.length > 1) {
+      log.warn("Rowkeynames length " + _rowkeyNames.length + " > 1, the furst one returned");
+      }
+    return _rowkeyNames[0];
     }
     
   @Override
@@ -99,10 +133,31 @@ public class Wertex implements Vertex {
     _vertex.remove();
     }
     
-  /** Give the link rowkey.
-    * @return The link rowkey. */
+  /** Give the link rowkeys.
+    * @return The link rowkeys. */
+  public String[] rowkeys() {
+    return _rowkeys;
+    }
+    
+  /** Give the the first link rowkey.
+    * @return The first link rowkey. */
   public String rowkey() {
-    return _rowkey;
+    if (_rowkeys.length == 0) {
+      log.error("Rowkey not set");
+      return null;
+      }
+    else if (_rowkeys.length > 1) {
+      log.warn("Rowkeys length " + _rowkeys.length + " > 1, the furst one returned");
+      }
+    return _rowkeys[0];
+    }
+    
+  /** Tell if there is a valid and single rowkey.
+    * @return Whether there is a valid and single rowkey.
+    *         Non-existent or longer rowkey will give <tt>false</tt>. */
+  public boolean hasSingleRowkey() {
+    return (_rowkeyNames       != null && _rowkeys       != null &&
+            _rowkeyNames.length == 1   && _rowkeys.length == 1);
     }
         
   /** Set all field values read from the database.
@@ -112,12 +167,12 @@ public class Wertex implements Vertex {
       property(entry.getKey(), entry.getValue());
       }
     }
-    
+   
   private Vertex _vertex;  
   
-  private String _rowkey;
+  private String[] _rowkeys;
   
-  private static String _rowkeyName;
+  private static String[] _rowkeyNames;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(Wertex.class);

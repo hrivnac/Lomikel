@@ -34,6 +34,6 @@ public interface ElementFactory {
     * @param name The prototype {@link Element} name.
     * @return The created prototype {@link Element} .
     * @throws LomikelException If anything goes wrong. */
-  public Element	 element(String name) throws LomikelException;
+  public Element	element(String name) throws LomikelException;
     
   }

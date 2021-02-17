@@ -3,6 +3,7 @@ package com.Lomikel.GremlinPlugin;
 import com.Lomikel.Januser.Wertex;
 import com.Lomikel.Januser.Hertex;
 import com.Lomikel.HBaser.HBaseClient;
+import com.Lomikel.Phoenixer.PhoenixProxyClient;
 
 // TinkerPop
 import org.apache.tinkerpop.gremlin.jsr223.AbstractGremlinPlugin;
@@ -27,7 +28,10 @@ public class LomikelConnector extends AbstractGremlinPlugin {
   /** Create. */
   public LomikelConnector() {
     super("lomikel.connector",
-          imports(new Class[]{Wertex.class, Hertex.class, HBaseClient.class}),
+          imports(new Class[]{PhoenixProxyClient.class,
+                              Wertex.class,
+                              Hertex.class,
+                              HBaseClient.class}),
           new LomikelConsoleCustomizer());
     }
 
