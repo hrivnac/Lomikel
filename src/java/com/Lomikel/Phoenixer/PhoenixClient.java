@@ -300,21 +300,18 @@ public class PhoenixClient {
     String where = "";
     boolean first = true;
     for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap).entrySet()) {
-      /* TBD
       if (first) {
         first = false;
         }
       else {
         where += " and ";
         }
-      if (prototype.schema().get(entry.getKey()).equals("String") ||
-          prototype.schema().get(entry.getKey()).equals("Data"  )) {        
+      if (schema().type(entry.getKey()).equals("String")) {        
         where += entry.getKey() + " = '" + entry.getValue() + "'";
         }
       else {
         where += entry.getKey() + " = " + entry.getValue();
         }
-        */
       }
     if (filter == null || filter.trim().equals("")) {
       filter = "*";
@@ -322,6 +319,9 @@ public class PhoenixClient {
     String sql = "select " + filter + " from " + _tableName;
     if (!where.equals("")) {
       sql += " where " + where;
+      }
+    if (_limit != 0) {
+      sql += " limit " + _limit;
       }
     return sql;
     }
