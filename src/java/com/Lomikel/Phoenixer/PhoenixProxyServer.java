@@ -41,8 +41,8 @@ public class PhoenixProxyServer extends PhoenixClient
     * @throws LomikelException If anhything goes wrong. */
   public PhoenixProxyServer(int            proxyPort,
                             String         phoenixUrl) throws LomikelException {
-     super(phoenixUrl);
-     log.info("Serving " + phoenixUrl + " on " + proxyPort);
+    super(phoenixUrl);
+    log.info("Serving " + phoenixUrl + " on " + proxyPort);
     PhoenixProxyServer proxy = this;
     final int proxyPortF = proxyPort;
     Thread thread = new Thread() {

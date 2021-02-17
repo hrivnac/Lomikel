@@ -216,7 +216,7 @@ public class PhoenixClient {
       }
     return scan(key, searchM, filter, start, stop, ifkey, iftime);
     }
-                   
+    
   /** Get row(s).
     * @param key       The row key. Disables other search terms.
     *                  It can be <tt>null</tt>.
@@ -245,6 +245,39 @@ public class PhoenixClient {
                                                long                stop,
                                                boolean             ifkey,
                                                boolean             iftime) {
+    String sql = formSqlRequest(key, searchMap, filter, start, stop, ifkey, iftime);
+    String answer = query(sql);
+    return interpretSqlAnswer(answer);
+    }
+                   
+  /** Formulate SQL request.
+    * @param key       The row key. Disables other search terms.
+    *                  It can be <tt>null</tt>.
+    * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
+    *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                  <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
+    *                  among <tt>exact,prefix,substring,regex</tt>.
+    *                  The default for key is <tt>prefix</tt>,
+    *                  the default for columns is <tt>substring</tt>.
+    *                  It can be <tt>null</tt>.
+    *                  All searches are executed as prefix searches.    
+    * @param filter    The names of required values as <tt>family:column,...</tt>.
+    *                  <tt>*</tt> = all.
+    * @param start     The time period start timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means since the beginning.
+    * @param stop      The time period stop timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means till now.
+    * @param ifkey     Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime    Whether give also entries timestamps (as <tt>key:time</tt>).
+    * @return          The SQL request formed from the supplied arguments. */
+  public String formSqlRequest(String              key,
+                               Map<String, String> searchMap,
+                               String              filter,
+                               long                start,
+                               long                stop,
+                               boolean             ifkey,
+                               boolean             iftime) {
     String searchMsg = "";
     if (searchMap != null) {
       searchMsg = searchMap.toString();
@@ -290,7 +323,11 @@ public class PhoenixClient {
     if (!where.equals("")) {
       sql += " where " + where;
       }
-    String answer = query(sql);
+    return sql;
+    }
+    
+  /** TBD */
+  public Map<String, Map<String, String>> interpretSqlAnswer(String answer) {
     Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;    
     String[] keyvalue;
@@ -374,10 +411,52 @@ public class PhoenixClient {
     log.info(result);
     return result;
     } 
+    
+  /** Give the table {@link Schema}.
+    * @param schema The used {@link Schema}. */
+  public Schema schema() {
+    return _schema;
+    }
+                     
+  /** Set the table {@link Schema}.
+    * @param schema The {@link Schema} to set. */
+  public void setSchema(Schema schema) {
+    _schema = schema;
+    }
+    
+  /** Set the limit for the number of results.
+    * @param limit The limit for the number of results. */
+  public void setLimit(int limit) {
+    log.info("Setting limit " + limit);
+    _limit = limit;
+    }
+    
+  /** Give the limit for the number of results.
+    * @return The limit for the number of results. */
+  public int limit() {
+    return _limit;
+    }
+    
+  /** Set whether the results should be in the reversed order.
+    * @param reversed Whether the results should be in the reversed order. */
+  public void setReversed(boolean reversed) {
+    log.info("Setting reversed " + reversed);
+    _reversed = reversed;
+    }
+    
+  /** Tell, whether the results should be in the reversed order.
+    * @return  Whether the results should be in the reversed order. */
+  public boolean isReversed() {
+    return _reversed;
+    }
         
   private String _tableName;
   
   private Schema _schema;
+
+  private int _limit = 0;
+  
+  private boolean _reversed = false;
     
   private Connection _connection;  
   

@@ -797,8 +797,7 @@ public class HBaseClient {
       }
     table().put(put);
     }
-                  
-    
+                     
   /** Set the table {@link Schema}.
     * @param schema The {@link Schema} to set. */
   public void setSchema(Schema schema) {

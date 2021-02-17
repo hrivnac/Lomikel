@@ -158,6 +158,38 @@ public class CLI {
       log.error("Cannot import com.Lomikel.Januser.GremlinClient");
       log.debug("Cannot import com.Lomikel.Januser.GremlinClient", e);
       }      
+    try {
+      interpreter().eval("import com.Lomikel.Januser.Hertex");
+      log.info("GremlinClient imported");
+      }
+    catch (EvalError e) {
+      log.error("Cannot import com.Lomikel.Januser.Hertex");
+      log.debug("Cannot import com.Lomikel.Januser.Hertex", e);
+      }      
+    try {
+      interpreter().eval("import com.Lomikel.Januser.Sertex");
+      log.info("GremlinClient imported");
+      }
+    catch (EvalError e) {
+      log.error("Cannot import com.Lomikel.Januser.Sertex");
+      log.debug("Cannot import com.Lomikel.Januser.Sertex", e);
+      }      
+    try {
+      interpreter().eval("import com.Lomikel.Phoenixer.PhoenixClient");
+      log.info("PhoenixClient imported");
+      }
+    catch (EvalError e) {
+      log.error("Cannot import com.Lomikel.Phoenixer.PhoenixClient");
+      log.debug("Cannot import com.Lomikel.Phoenixer.PhoenixClient", e);
+      }
+    try {
+      interpreter().eval("import com.Lomikel.Phoenixer.PhoenixProxyClient");
+      log.info("PhoenixProxyClient imported");
+      }
+    catch (EvalError e) {
+      log.error("Cannot import com.Lomikel.Phoenixer.PhoenixProxyClient");
+      log.debug("Cannot import com.Lomikel.Phoenixer.PhoenixProxyClient", e);
+      }
     String init = "";
     // Source init.bsh
     log.debug("Sourcing init.bsh");

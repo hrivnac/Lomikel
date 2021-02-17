@@ -32,7 +32,7 @@ public class Wertex implements Vertex {
   /** Dress existing {@link Vertex} with values from the database.
     * @param vertex The original {@link Vertex}. */
   public Wertex(Vertex vertex) {
-    _vertex = vertex;
+    _vertex  = vertex;
     _rowkeys = null;
     if (_rowkeyNames == null || _rowkeyNames.length == 0) {
       log.warn("rowkey names not set, not dressing Vertex as Wertex");
@@ -40,7 +40,8 @@ public class Wertex implements Vertex {
       }
     // TBD: should be done without Exception 
     try {
-      for (int i = 0; i > _rowkeyNames.length; i++) {
+      _rowkeys = new String[_rowkeyNames.length];
+      for (int i = 0; i < _rowkeyNames.length; i++) {
         _rowkeys[i] = vertex.<String>property(_rowkeyNames[i]).value();
         }
       }

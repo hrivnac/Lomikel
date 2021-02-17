@@ -12,6 +12,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.sql.Date;
@@ -56,8 +57,15 @@ public class PhoenixProxyClient extends PhoenixClient {
                                                long                stop,
                                                boolean             ifkey,
                                                boolean             iftime) {
-    //_socketClient.send(...);
-    return null;
+    String sql = formSqlRequest(key, searchMap, filter, start, stop, ifkey, iftime);
+    try {
+      String answer = _socketClient.send(sql);
+      return interpretSqlAnswer(answer);
+      }
+    catch (LomikelException e) {
+      log.error("Cannot scan", e);
+      return new TreeMap<String, Map<String, String>>();
+      }
     }
     
   @Override
