@@ -2,10 +2,12 @@ package com.Lomikel.Januser;
 
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Info;
+import com.Lomikel.DB.Schema;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.HBaser.HBaseClient;
-import com.Lomikel.HBaser.Schema;
+import com.Lomikel.HBaser.HBaseSchema;
 import com.Lomikel.Phoenixer.PhoenixProxyClient;
+import com.Lomikel.Phoenixer.PhoenixSchema;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -547,7 +549,7 @@ public class JanusClient {
       }
     Map<String, Map<String, String>> rs = ppc.scan(keyPrefixSearch, "", "*", 0, false, false);
 //    ResultScanner rs = hc.resultScanner();
-    com.Lomikel.Phoenixer.Schema schema = ppc.schema();
+    PhoenixSchema schema = ppc.schema();
     log.info("Populating Graph");
     Vertex v;
     String key;

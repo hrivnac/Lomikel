@@ -4,6 +4,7 @@ import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Coding;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.LomikelException;
+import com.Lomikel.DB.Schema;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -94,7 +95,7 @@ public class PhoenixClient {
                         int    timeout) throws LomikelException {
      log.info("Connecting to " + tableName);
     _tableName  = tableName;
-    _schema     = Schema.getSchema(schemaName);
+    _schema     = PhoenixSchema.getSchema(schemaName);
     return tableName;
     }
    
@@ -427,15 +428,15 @@ public class PhoenixClient {
     return result;
     } 
     
-  /** Give the table {@link Schema}.
-    * @param schema The used {@link Schema}. */
-  public Schema schema() {
+  /** Give the table {@link PhoenixSchema}.
+    * @param schema The used {@link PhoenixSchema}. */
+  public PhoenixSchema schema() {
     return _schema;
     }
                      
-  /** Set the table {@link Schema}.
-    * @param schema The {@link Schema} to set. */
-  public void setSchema(Schema schema) {
+  /** Set the table {@link PhoenixSchema}.
+    * @param schema The {@link PhoenixSchema} to set. */
+  public void setSchema(PhoenixSchema schema) {
     _schema = schema;
     }
     
@@ -467,7 +468,7 @@ public class PhoenixClient {
         
   private String _tableName;
   
-  private Schema _schema;
+  private PhoenixSchema _schema;
 
   private int _limit = 0;
   

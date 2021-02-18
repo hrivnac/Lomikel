@@ -5,6 +5,7 @@ import com.Lomikel.Utils.DateTimeManagement;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
+import com.Lomikel.DB.Schema;
 
 // HBase
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -194,10 +195,10 @@ public class HBaseClient {
         Set<Map.Entry<String, Map<String, String>>> schemasSet = schemas.entrySet();
         List<Map.Entry<String, Map<String, String>>> schemasList = new ArrayList<>(schemasSet);
         Map.Entry<String, Map<String, String>> schemaEntry = schemasList.get(schemasList.size() - 1);
-        _schema = new Schema(schemaName, schemaEntry.getValue());
+        _schema = new HBaseSchema(schemaName, schemaEntry.getValue());
         }
       else {
-        _schema = new Schema(schemaName, schemas.entrySet().iterator().next().getValue());
+        _schema = new HBaseSchema(schemaName, schemas.entrySet().iterator().next().getValue());
         }
       }
     return _table;
@@ -798,9 +799,9 @@ public class HBaseClient {
     table().put(put);
     }
                      
-  /** Set the table {@link Schema}.
-    * @param schema The {@link Schema} to set. */
-  public void setSchema(Schema schema) {
+  /** Set the table {@link HBaseSchema}.
+    * @param schema The {@link HBaseSchema} to set. */
+  public void setSchema(HBaseSchema schema) {
     _schema = schema;
     }
     
@@ -1013,10 +1014,9 @@ public class HBaseClient {
   
   private String _clientPort;
   
-  
   private String _tableName;
   
-  private Schema _schema;
+  private HBaseSchema _schema;
   
   private boolean _isRange = false;
   

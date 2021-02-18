@@ -2,6 +2,7 @@ package com.Lomikel.HBaser;
 
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Utils.StringResource;
+import com.Lomikel.DB.Schema;
 
 // Bean Shell
 import bsh.Interpreter;
@@ -24,9 +25,9 @@ import org.apache.log4j.Logger;
 public class Evaluator {
   
   /** Create.
-    * @param schema The {@link Schema} to use to interpret types.
+    * @param schema The {@link HBaseSchema} to use to interpret types.
     * @throws CommonpException If can't be initiated. */
-  public Evaluator(Schema schema) throws LomikelException {
+  public Evaluator(HBaseSchema schema) throws LomikelException {
     log.info("Creating Evaluator");
     _schema = schema;
     _interpreter = new Interpreter();
@@ -145,7 +146,7 @@ public class Evaluator {
       }
     }
     
-  private Schema _schema;
+  private HBaseSchema _schema;
   
   private Set<String> _variables = new TreeSet<>();
     
