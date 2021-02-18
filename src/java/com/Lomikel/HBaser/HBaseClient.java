@@ -1013,6 +1013,7 @@ public class HBaseClient {
   
   private String _clientPort;
   
+  
   private String _tableName;
   
   private Schema _schema;

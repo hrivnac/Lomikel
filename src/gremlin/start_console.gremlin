@@ -6,12 +6,12 @@ graph = JanusGraphFactory.open(prop)
 g = graph.traversal()
 c = graph.configuration()
 
-//client = new HBaseClient(c.getString("storage.hostname"), c.getString("backend.hbase.port"))
-//client.connect(c.getString("backend.hbase.table"), c.getString("backend.hbase.schema"))
-//Hertex.setHBaseClient(client)
-//Hertex.setRowkeyName(c.getString("backend.rowkey.name"))
+hc = new HBaseClient(c.getString("storage.hostname"), c.getString("backend.hbase.port"))
+hc.connect(c.getString("backend.hbase.table"), c.getString("backend.hbase.schema"))
+Hertex.setHBaseClient(hc)
+Hertex.setRowkeyName(c.getString("backend.rowkey.name"))
 
-client = new PhoenixProxyClient("127.0.0.1", 5000)
-client.connect("aeidev.datasets", "aeidev.datasets")
-Sertex.setPhoenixClient(client);
-Sertex.setRowkeyNames(client.schema().rowkeyNames())
+//ppc = new PhoenixProxyClient("127.0.0.1", 5000)
+//ppc.connect("aeidev.datasets", "aeidev.datasets")
+//Sertex.setPhoenixClient(ppc);
+//Sertex.setRowkeyNames(ppc.schema().rowkeyNames())

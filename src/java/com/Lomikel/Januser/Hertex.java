@@ -35,15 +35,10 @@ public class Hertex extends Wertex {
     if (_client == null) {
       log.warn("HBaseClient is not set, not dressing Vertex as Hertex");
       }
-    if (hasSingleRowkey()) {
-      String n = null;
-      Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
-      Map<String, String> fields = results.get(rowkey());
-      setFields(fields); 
-      }
-    else {
-      log.warn("Missing or multiple rowkey => ignored");
-      }
+    String n = null;
+    Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
+    Map<String, String> fields = results.get(rowkey());
+    setFields(fields); 
     }
     
   /** Set the {@link HBaseClient} to search for additional values.
