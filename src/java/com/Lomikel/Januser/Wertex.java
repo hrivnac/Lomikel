@@ -42,7 +42,8 @@ public class Wertex implements Vertex {
     try {
       _rowkeys = new String[_rowkeyNames.length];
       for (int i = 0; i < _rowkeyNames.length; i++) {
-        _rowkeys[i] = vertex.<String>property(_rowkeyNames[i]).value();
+        //_rowkeys[i] = vertex.<String>property(_rowkeyNames[i]).value();
+        _rowkeys[i] = vertex.property(_rowkeyNames[i]).value().toString(); // TBD: proper types
         }
       }
     catch (IllegalStateException e) {
@@ -58,15 +59,15 @@ public class Wertex implements Vertex {
     _rowkeyNames = rowkeyNames;
     }
     
-  /** Set the names of the first (and only) row key to form the correspondence between
+  /** Set the names of the only row key to form the correspondence between
     * Graph and database. It should be set before any database request.
-    * @param rowkeyName The name of the first common keys in Graph {@link Vertex} and 
+    * @param rowkeyName The name of the common keys in Graph {@link Vertex} and 
     *                   database. */
   public static void setRowkeyName(String rowkeyName) {
     _rowkeyNames = new String[]{rowkeyName};
     }
     
-  /** Give the names of the row keys to form the correspondence between
+  /** Give the names of the keys to form the correspondence between
     * Graph and database.
     * @return The names of the common keys in Graph {@link Vertex} and 
     *         database. */
@@ -74,19 +75,18 @@ public class Wertex implements Vertex {
     return _rowkeyNames;
     }
     
-  /** Give the name of the first row key to form the correspondence between
+  /** Give the name of the keys to form the correspondence between
     * Graph and database.
-    * @return The names of the first common key in Graph {@link Vertex} and 
-    *         database. */
+    * @return The names of the common keys in Graph {@link Vertex} and 
+    *         database.
+    *         <tt>null</tt> if not set.
+    *         Concatenated with <tt>#</tt> if multivalue. */
   public static String rowkeyName() {
     if (_rowkeyNames.length == 0) {
-      log.error("RowkeyNames not set");
+      log.error("RowkeyName not set");
       return null;
       }
-    else if (_rowkeyNames.length > 1) {
-      log.warn("Rowkeynames length " + _rowkeyNames.length + " > 1, the furst one returned");
-      }
-    return _rowkeyNames[0];
+    return String.join("#", _rowkeyNames);
     }
     
   @Override
@@ -140,30 +140,22 @@ public class Wertex implements Vertex {
     return _rowkeys;
     }
     
-  /** Give the the first link rowkey.
-    * @return The first link rowkey. */
+  /** Give the the link rowkey.
+    * @return The link rowkey.
+    *         <tt>null</tt> if not set.
+    *         Concatenated with <tt>#</tt> if multivalue. */
   public String rowkey() {
     if (_rowkeys.length == 0) {
       log.error("Rowkey not set");
       return null;
       }
-    else if (_rowkeys.length > 1) {
-      log.warn("Rowkeys length " + _rowkeys.length + " > 1, the furst one returned");
-      }
-    return _rowkeys[0];
-    }
-    
-  /** Tell if there is a valid and single rowkey.
-    * @return Whether there is a valid and single rowkey.
-    *         Non-existent or longer rowkey will give <tt>false</tt>. */
-  public boolean hasSingleRowkey() {
-    return (_rowkeyNames       != null && _rowkeys       != null &&
-            _rowkeyNames.length == 1   && _rowkeys.length == 1);
+    return String.join("#", _rowkeys);
     }
         
   /** Set all field values read from the database.
     * @param fields The key-value pairs from the database. */
   protected void setFields(Map<String, String> fields) {
+    System.out.println(fields);
     for (Map.Entry<String, String> entry : fields.entrySet()) {
       property(entry.getKey(), entry.getValue());
       }

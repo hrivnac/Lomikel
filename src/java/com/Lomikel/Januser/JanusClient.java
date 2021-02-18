@@ -534,30 +534,30 @@ public class JanusClient {
       g().V().has("lbl", label).drop().iterate();
       }
     commit();
-    log.info("Connection to HBase table");
+    log.info("Connection to Phoenix table");
     PhoenixProxyClient ppc = new PhoenixProxyClient(proxyHost, proxyPort);
     ppc.connect(phoenixTable, tableSchema); 
-//    hc.setLimit(0);
-//    String searchS = "key:key:" + keyPrefixSearch + ":prefix";
-//    if (!keyStart.equals("")) {
-//      searchS += ",key:startKey:" + keyStart;
-//      }
-//    if (!keyStop.equals("")) {
-//      searchS += ",key:stopKey:" + keyStop;
-//      }
-//    hc.scan(null, searchS, "*", 0, false, false);
+    ppc.setLimit(limit);
+    String searchS = "key:key:" + keyPrefixSearch + ":prefix";
+    if (!keyStart.equals("")) {
+      searchS += ",key:startKey:" + keyStart;
+      }
+    if (!keyStop.equals("")) {
+      searchS += ",key:stopKey:" + keyStop;
+      }
+    Map<String, Map<String, String>> rs = ppc.scan(keyPrefixSearch, "", "*", 0, false, false);
 //    ResultScanner rs = hc.resultScanner();
-//    Schema schema = hc.schema();
-//    log.info("Populating Graph");
-//    Vertex v;
-//    String key;
-//    String lastInsertedKey = null;
-//    String failedKey       = null;
-//    String family;
-//    String field;
-//    String column;
-//    String value;
-//    int i = 0;
+    com.Lomikel.Phoenixer.Schema schema = ppc.schema();
+    log.info("Populating Graph");
+    Vertex v;
+    String key;
+    String lastInsertedKey = null;
+    String failedKey       = null;
+    String family;
+    String field;
+    String column;
+    String value;
+    int i = 0;
 //    //for (Result r : rs) {
 //    //  i++;
 //    //  key = Bytes.toString(r.getRow());
@@ -571,25 +571,31 @@ public class JanusClient {
 //    NavigableMap<byte[], NavigableMap<byte[], byte[]>>	 resultMap;
 //    try {
 //      for (Result r : rs) {
+    for (Map.Entry<String, Map<String, String>> r : rs.entrySet()) {
 //        resultMap = r.getNoVersionMap();
 //        key = Bytes.toString(r.getRow());
 //        if (!key.startsWith("schema")) {
-//          if (failedKey == null) {
-//            failedKey = key;
-//            }
-//          i++;
-//          if (i <= skip) {
-//            continue;
-//            }
-//          if (limit > 0 && i > limit) {
-//            break;
-//            }
-//          if (getOrCreate) {
-//            v = getOrCreate(label, rowkey, key);
-//            }
-//          else {
-//            v = g().addV(label).property(rowkey, key).property("lbl", label).next();
-//            }
+          key   = r.getKey();
+          if (failedKey == null) {
+            failedKey = key;
+            }
+          i++;
+          if (i <= skip) {
+            continue;
+            }
+          if (limit > 0 && i > limit) {
+            break;
+            }
+          if (getOrCreate) {
+            v = getOrCreate(label, rowkey, key);
+            }
+          else {
+            v = g().addV(label).property("lbl", label).next();
+            log.info(r.getValue());
+            for (String rkn : schema.rowkeyNames()) {
+              v.property(rkn, r.getValue().get(rkn)); 
+              }
+            }
 //          if (fullFill) {
 //            for (Map.Entry<byte[], NavigableMap<byte[], byte[]>> entry : resultMap.entrySet()) {
 //              family = Bytes.toString(entry.getKey());
@@ -609,23 +615,22 @@ public class JanusClient {
 //              }
 //            }
 //          }
-//        if (timer(label + "s created", i - 1, 100, commitLimit)) {
-//          rs.renewLease();
-//          lastInsertedKey = key;
-//          failedKey       = null;
-//          }
-//        }
-//      }
+        if (timer(label + "s created", i - 1, 100, commitLimit)) {
+          //rs.renewLease();
+          lastInsertedKey = key;
+          failedKey       = null;
+          }
+        }
 //    catch (Exception e) {
 //      log.fatal("Failed while inserting " + i + "th vertex,\tlast inserted vertex: " + lastInsertedKey + "\tfirst uncommited vertex: " + failedKey, e);
 //      close();
 //      hc.close();
 //      return lastInsertedKey;
 //      }
-//    timer(label + "s created", i - 1, -1, -1);
-//    commit();
-//    close();
-//    hc.close();
+    timer(label + "s created", i - 1, -1, -1);
+    commit();
+    close();
+    ppc.close();
     return "";
     }
        

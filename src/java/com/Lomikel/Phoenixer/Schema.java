@@ -110,9 +110,9 @@ public class Schema {
     _schemas.put(schemaName, new Schema(schemaName, schemaMap, rowkeys));
     }
     
-  /** Give row identifying keys.
-    * @return The row identifying keys. */
- public String[] rowkeys() {
+  /** Give row identifying key names.
+    * @return The row identifying key names. */
+ public String[] rowkeyNames() {
    return _rowkeys;
    }
     
@@ -172,7 +172,7 @@ public class Schema {
                                                       "datatype",
                                                       "version",
                                                       "dspid"});
-    schema.clear();
+    schema = new HashMap<>();
     schema.put("runnumber"         , "Integer");
     schema.put("project"           , "String" );
     schema.put("streamname"        , "String" );
@@ -205,7 +205,7 @@ public class Schema {
                                                     "datatype",
                                                     "version",
                                                     "dspid"});
-    schema.clear();
+    schema =  new HashMap<>();
     schema.put("dspid"             , "Integer");
     schema.put("dstypeid"          , "Short"  );
     schema.put("dssubtypeid"       , "Short"  );
@@ -233,7 +233,7 @@ public class Schema {
                                                     "dssubtypeid",
                                                     "eventno",
                                                     "seq"});
-    schema.clear();
+    schema = new HashMap<>();
     schema.put("dspid"             , "Integer");
     schema.put("eventnumber"       , "Long"   );
     schema.put("hltpsk"            , "Integer");

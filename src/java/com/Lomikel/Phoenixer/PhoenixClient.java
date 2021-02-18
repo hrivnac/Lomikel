@@ -297,6 +297,16 @@ public class PhoenixClient {
     if (stop == 0) {
       stop = System.currentTimeMillis();
       }
+    if (key != null) {
+      searchMap.clear();
+      String[] keyParts = key.split("#");
+      // TBD: check size of keyParts and Schema.rowkeynames()
+      for (int i = 0; i < keyParts.length; i++) {
+        if (!keyParts[i].trim().equals("")) {
+          searchMap.put(schema().rowkeyNames()[i], keyParts[i]);
+          }
+        }
+      }
     String where = "";
     boolean first = true;
     for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap).entrySet()) {
@@ -331,14 +341,19 @@ public class PhoenixClient {
     Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;    
     String[] keyvalue;
-    int i = 0;
+    String key;
+    String[] kv;
     for (String line : answer.split("\n")) {
       result = new TreeMap<>();
       for (String r : line.split("#")) {
         keyvalue = r.split("=");
         result.put(keyvalue[0], keyvalue[1]);
         }
-      results.put("" + i++, result);
+      kv = new String[schema().rowkeyNames().length];
+      for (int i = 0; i < schema().rowkeyNames().length; i++) {
+        kv[i] = result.get(schema().rowkeyNames()[i]);
+        }
+      results.put(String.join("#", kv), result);
       }
     return results;
     }

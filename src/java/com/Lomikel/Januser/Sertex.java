@@ -15,6 +15,7 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 
 // Java
 import java.util.Map;
+import java.util.HashMap;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -36,10 +37,15 @@ public class Sertex extends Wertex {
       log.warn("PhoenixClient is not set, not dressing Vertex as Sertex");
       }
     if (rowkeys() != null && rowkeys().length == rowkeyNames().length) {
-      String n = null;
-      //Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
-      //Map<String, String> fields = results.get(rowkey());
-      //setFields(fields); 
+      Map<String, String> searchMap = new HashMap<>();
+      for (int i = 0; i < rowkeyNames().length; i++) {
+        searchMap.put(rowkeyNames()[i], rowkeys()[i]);
+        }
+      Map<String, Map<String, String>> results = _client.scan(null, searchMap, "*", 0, 0, false, true);
+      log.info(results);
+      log.info(rowkey());
+      Map<String, String> fields = results.get(rowkey());
+      setFields(fields); 
       }
     }
     

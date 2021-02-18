@@ -501,9 +501,9 @@
       </java>
     </target>
     
-  <!-- Populate Graph from HBase ============================================-->
+  <!-- Populate Graph  ======================================================-->
 
-  <target name="populate-graph"
+  <target name="populate-graph-hbase"
           description="Populate Graph from HBase">
     <echo>Populating Graph from HBase</echo>
     <java classname="com.Lomikel.Januser.JanusClient"
@@ -519,10 +519,39 @@
       <arg value="ZTF"/>
       <arg value=""/>
       <arg value=""/>
-      <arg value="600"/>
+      <arg value="6"/>
       <arg value="0"/>
       <arg value="200"/>
       <arg value="true"/>
+      <arg value="false"/>
+      <arg value="false"/>
+      <classpath>
+        <path refid="classpath.janusgraph"/>
+        </classpath>
+      </java>
+    </target>
+
+  <target name="populate-graph-phoenix"
+          description="Populate Graph from Phoenix">
+    <echo>Populating Graph from HBase</echo>
+    <java classname="com.Lomikel.Januser.JanusClient"
+          fork="true">
+      <arg value="populates"/>
+      <arg value="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties"/>
+      <arg value="localhost"/>
+      <arg value="5000"/>
+      <arg value="aeidev.datasets"/>
+      <arg value="aeidev.datasets"/>
+      <arg value="dataset"/>
+      <arg value="rowkey"/>
+      <arg value="329829####"/>
+      <arg value=""/>
+      <arg value=""/>
+      <arg value="6"/>
+      <arg value="0"/>
+      <arg value="200"/>
+      <arg value="true"/>
+      <arg value="false"/>
       <arg value="false"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
