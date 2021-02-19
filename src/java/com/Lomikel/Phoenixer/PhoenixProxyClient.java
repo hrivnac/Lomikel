@@ -4,7 +4,7 @@ import com.Lomikel.Utils.Init;
 import com.Lomikel.Sockets.SocketServer;
 import com.Lomikel.Sockets.SocketClient;
 import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.DB.StringMap;
+import com.Lomikel.DB.SearchMap;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -52,7 +52,7 @@ public class PhoenixProxyClient extends PhoenixClient {
 
   @Override
   public Map<String, Map<String, String>> scan(String    key,
-                                               StringMap searchMap,
+                                               SearchMap searchMap,
                                                String    filter,
                                                long      start,
                                                long      stop,

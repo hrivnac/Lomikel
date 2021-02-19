@@ -195,7 +195,7 @@ public abstract class Client<T, S extends Schema> {
                                                long                stop,
                                                boolean             ifkey,
                                                boolean             iftime) {
-    return scan(key, (StringMap)searchMap, filter, start, stop, ifkey, iftime);
+    return scan(key, new SearchMap(searchMap), filter, start, stop, ifkey, iftime);
     }
     
   /** Get row(s).
@@ -220,7 +220,7 @@ public abstract class Client<T, S extends Schema> {
     * @param iftime    Whether give also entries timestamps (as <tt>key:time</tt>).
     * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public abstract Map<String, Map<String, String>> scan(String    key,
-                                                        StringMap searchMap,
+                                                        SearchMap searchMap,
                                                         String    filter,
                                                         long      start,
                                                         long      stop,

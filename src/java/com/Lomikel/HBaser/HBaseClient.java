@@ -7,7 +7,7 @@ import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Schema;
 import com.Lomikel.DB.Client;
-import com.Lomikel.DB.StringMap;
+import com.Lomikel.DB.SearchMap;
 
 // HBase
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -224,7 +224,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                                                            
   @Override
   public Map<String, Map<String, String>> scan(String    key,
-                                               StringMap searchMap,
+                                               SearchMap searchMap,
                                                String    filter,
                                                long      start,
                                                long      stop,
@@ -308,7 +308,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         String lastKey  = null;
         boolean onlyKeys = true;
         SortedSet<String> allKeys = new TreeSet<>();
-        for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap).entrySet()) {
+        for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap.map()).entrySet()) {
           fc = entry.getKey().split(":");
           family = fc[0];
           column = fc[1];

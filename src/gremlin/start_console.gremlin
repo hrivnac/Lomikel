@@ -1,17 +1,22 @@
 //:record start MyGremlin.log
 prop = args[0]
 home = args[1]
+db   = args[2]
 
 graph = JanusGraphFactory.open(prop)
 g = graph.traversal()
 c = graph.configuration()
 
-//hc = new HBaseClient(c.getString("storage.hostname"), c.getString("backend.hbase.port"))
-//hc.connect(c.getString("backend.hbase.table"), c.getString("backend.hbase.schema"))
-//Hertex.setHBaseClient(hc)
-//Hertex.setRowkeyName(c.getString("backend.rowkey.name"))
-
-ppc = new PhoenixProxyClient("127.0.0.1", 5000)
-ppc.connect("aeidev.datasets", "aeidev.datasets")
-Sertex.setPhoenixClient(ppc);
-Sertex.setRowkeyNames(ppc.schema().rowkeyNames())
+client = null
+if (db.equals("hbase")) {
+  client = new HBaseClient(c.getString("storage.hostname"), c.getString("backend.hbase.port"))
+  client.connect(c.getString("backend.hbase.table"), c.getString("backend.hbase.schema"))
+  Hertex.setHBaseClient(client)
+  Hertex.setRowkeyName(c.getString("backend.rowkey.name"))
+  }
+if (db.equals("phoenix")) {
+  client = new PhoenixProxyClient(c.getString("backend.phoenix.proxy.hostname"), c.getInt("backend.phoenix.proxy.port"))
+  client.connect(c.getString("backend.phoenix.table"), c.getString("backend.phoenix.schema"))
+  Sertex.setPhoenixClient(client)
+  Sertex.setRowkeyNames(client.schema().rowkeyNames())
+  }

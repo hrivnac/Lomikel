@@ -6,7 +6,7 @@ import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Schema;
 import com.Lomikel.DB.Client;
-import com.Lomikel.DB.StringMap;
+import com.Lomikel.DB.SearchMap;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -99,10 +99,15 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     }
     
   // Search --------------------------------------------------------------------
-                     
+           
+  /** 
+    * {@inheritDoc}
+    *
+    * The <em>family</em> part of arguments is omitted. */
+  // TBD: implement all arguments
   @Override
   public Map<String, Map<String, String>> scan(String    key,
-                                               StringMap searchMap,
+                                               SearchMap searchMap,
                                                String    filter,
                                                long      start,
                                                long      stop,
@@ -114,33 +119,15 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     }
                    
   /** Formulate SQL request.
-    * @param key       The row key. Disables other search terms.
-    *                  It can be <tt>null</tt>.
-    * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
-    *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
-    *                  <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
-    *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
-    *                  among <tt>exact,prefix,substring,regex</tt>.
-    *                  The default for key is <tt>prefix</tt>,
-    *                  the default for columns is <tt>substring</tt>.
-    *                  It can be <tt>null</tt>.
-    *                  All searches are executed as prefix searches.    
-    * @param filter    The names of required values as <tt>family:column,...</tt>.
-    *                  <tt>*</tt> = all.
-    * @param start     The time period start timestamp in <tt>ms</tt>.
-    *                  <tt>0</tt> means since the beginning.
-    * @param stop      The time period stop timestamp in <tt>ms</tt>.
-    *                  <tt>0</tt> means till now.
-    * @param ifkey     Whether give also entries keys (as <tt>key:key</tt>).
-    * @param iftime    Whether give also entries timestamps (as <tt>key:time</tt>).
-    * @return          The SQL request formed from the supplied arguments. */
-  public String formSqlRequest(String    key,
-                               StringMap searchMap,
-                               String    filter,
-                               long      start,
-                               long      stop,
-                               boolean   ifkey,
-                               boolean   iftime) {
+    * It has the same arguments as {@link #scan(String, SearchMap, String, long, long, boolean, boolean)}.
+    * @return The request formed as an SQL string. */
+   public String formSqlRequest(String    key,
+                                SearchMap searchMap,
+                                String    filter,
+                                long      start,
+                                long      stop,
+                                boolean   ifkey,
+                                boolean   iftime) {
     String searchMsg = "";
     if (searchMap != null) {
       searchMsg = searchMap.toString();
@@ -172,7 +159,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       }
     String where = "";
     boolean first = true;
-    for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap).entrySet()) {
+    for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap.map()).entrySet()) {
       if (first) {
         first = false;
         }
@@ -199,7 +186,9 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     return sql;
     }
     
-  /** TBD */
+  /** Interpret the SQL answer.
+    * @param answer The string answer from {@link #query(String}.
+    * @return The parsed result in the same form as {@link #scan(String, SearchMap, String, long, long, boolean, boolean)}. */
   public Map<String, Map<String, String>> interpretSqlAnswer(String answer) {
     Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;    
