@@ -1,0 +1,3 @@
+GremlinClient client = new GremlinClient("localhost", 8182);
+print(client.interpret2JSON("v=g.V().hasLabel('dataset').limit(1).next();s=new com.Lomikel.Januser.Sertex(v).properties()"));
+client.close();
