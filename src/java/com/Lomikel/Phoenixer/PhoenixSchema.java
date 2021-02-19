@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: handle all types
 public class PhoenixSchema extends Schema<String> {
   
   /** Set overall schema.

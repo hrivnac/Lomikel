@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: handle all types
 public class HBaseSchema extends Schema<ByteArray> {
   
   /** Set overall schema.
@@ -31,7 +32,13 @@ public class HBaseSchema extends Schema<ByteArray> {
     super(schemaName, schemaMap);
     }
 
-  /** TBD */  
+  /** Decode the column value.
+    * @param  column       The column to decode.
+    * @param  encodedValue The encoded value.
+    * @return              The decoded value.
+    *                      Binary values are decoded as <tt>*binary*</tt>,
+    *                      or showing their MIME-type, when known.
+    *                      Unknown types are decoded as strings. */        
   public String decode(String column,
                        byte[] encodedValue) {
     return decode(column, new ByteArray(encodedValue));
@@ -74,7 +81,11 @@ public class HBaseSchema extends Schema<ByteArray> {
     return value;
     }
     
-  /** TBD */  
+  /** Decode the column value to {@link CellContent}..
+    * @param  column       The column to decode.
+    * @param  encodedValue The encoded value.
+    * @return              The decoded value.
+    *                      Unknown types are decoded as strings. */
   public CellContent decode2Content(String column,
                                     byte[] encodedValue) {
     return decode2Content(column, new ByteArray(encodedValue));

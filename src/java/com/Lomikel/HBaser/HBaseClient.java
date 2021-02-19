@@ -6,6 +6,8 @@ import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Schema;
+import com.Lomikel.DB.Client;
+import com.Lomikel.DB.StringMap;
 
 // HBase
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -67,7 +69,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class HBaseClient {
+public class HBaseClient extends Client<Table, HBaseSchema> {
    
   // Lifecycle -----------------------------------------------------------------
   
@@ -125,47 +127,31 @@ public class HBaseClient {
     this(url.replaceAll("http://", "").split(":")[0], url.replaceAll("http://", "").split(":")[1]);
     }
     
-  /** Connect to the table. Using the latest schema starting with <tt>schema</tt>.
-    * @param tableName  The table name.
-    * @return           The assigned id. 
-    * @throws LomikelException If anything goes wrong. */
+  @Override
    public Table connect(String tableName) throws LomikelException {
      return connect(tableName, "schema");
      }
              
-  /** Connect to the table.
-    * @param tableName  The table name.
-    * @param schemaName The name of the {@link Schema} row.
-    *                   <tt>null</tt> means to ignore schema,
-    *                   empty {@link String} will take the latest one. 
-    * @return           The assigned id.
-    * @throws LomikelException If anything goes wrong. */
-   public Table connect(String tableName,
-                        String schemaName) throws LomikelException {
+  @Override
+  public Table connect(String tableName,
+                       String schemaName) throws LomikelException {
      return connect(tableName, schemaName, 0);
      }
      
-  /** Connect to the table.
-    * @param tableName  The table name.
-    * @param schemaName The name of the {@link Schema} row.
-    *                   <tt>null</tt> means to ignore schema,
-    *                   empty {@link String} will take the latest one. 
-    * @param timeout    The timeout in ms (may be <tt>0</tt>).
-    * @return           The assigned id.
-    * @throws LomikelException If anything goes wrong. */
+  @Override
   public Table connect(String tableName,
                        String schemaName,
                        int    timeout) throws LomikelException {
     // Table setup
     log.info("Connecting to " + tableName);
-    _tableName = tableName;
+    setTableName(tableName);
     if (timeout > 0) {
       String tout = String.valueOf(timeout);
       _conf.set("hbase.rpc.timeout",                   tout);
       _conf.set("hbase.client.scanner.timeout.period", tout);
       }
     try {
-      _table = _connection.getTable(TableName.valueOf(_tableName));
+      _table = _connection.getTable(TableName.valueOf(tableName()));
       }
     catch (IOException e) {
       throw new LomikelException("Cannot connect to " + _table);
@@ -195,21 +181,16 @@ public class HBaseClient {
         Set<Map.Entry<String, Map<String, String>>> schemasSet = schemas.entrySet();
         List<Map.Entry<String, Map<String, String>>> schemasList = new ArrayList<>(schemasSet);
         Map.Entry<String, Map<String, String>> schemaEntry = schemasList.get(schemasList.size() - 1);
-        _schema = new HBaseSchema(schemaName, schemaEntry.getValue());
+        setSchema(new HBaseSchema(schemaName, schemaEntry.getValue()));
         }
       else {
-        _schema = new HBaseSchema(schemaName, schemas.entrySet().iterator().next().getValue());
+        setSchema(new HBaseSchema(schemaName, schemas.entrySet().iterator().next().getValue()));
         }
       }
     return _table;
     }
 
   @Override
-  protected void finalize() throws Throwable {
-    close();
-    }
-    
-  /** Close and release resources. */
   public void close() {
     log.debug("Closing");
     try {
@@ -230,145 +211,25 @@ public class HBaseClient {
     * @throws IOException If anything goes wrong. */
   public void create(String   tableName,
                      String[] families) throws IOException {
-    _tableName =  tableName;
+    setTableName(tableName);
     Admin admin = _connection.getAdmin();
-    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(_tableName));
+    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName()));
     for (String family : families) {
       builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(family)).build());
       }
     admin.createTable(builder.build());
     admin.close();
-    log.info("Created table " + tableName + "(" + String.join(",", families) + ")");
+    log.info("Created table " + tableName() + "(" + String.join(",", families) + ")");
     }
-                      
-  /** Get row(s).
-    * @param key     The row key. Disables other search terms.
-    *                It can be <tt>null</tt>.
-    * @param search  The search terms as <tt>family:column:value,...</tt>.
-    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
-    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
-    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
-    *                among <tt>exact,prefix,substring,regex</tt>.
-    *                The default for key is <tt>prefix</tt>,
-    *                the default for columns is <tt>substring</tt>.
-    *                It can be <tt>null</tt>.
-    *                All searches are executed as prefix searches.    
-    * @param filter  The names of required values as <tt>family:column,...</tt>.
-    *                <tt>*</tt> = all.
-    * @param delay   The time period start, in minutes back since dow.
-    *                <tt>0</tt> means no time restriction.
-    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
-    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
-    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
-  public Map<String, Map<String, String>> scan(String  key,
-                                               String  search,
-                                               String  filter,
-                                               long    delay,
-                                               boolean ifkey,
-                                               boolean iftime) {
-    String searchMsg = search;
-    if (searchMsg != null && searchMsg.length() > 80) {
-      searchMsg = searchMsg.substring(0, 80) + "...";
-      }
-    log.debug("Searching for key: " + key + 
-              ", search: " + searchMsg + 
-              ", filter: " + filter +
-              ", delay: "  + delay + " min" + 
-              ", id/time: " + ifkey + "/" + iftime);
-    long now = System.currentTimeMillis();
-    long start = (delay == 0L) ? 0L :  now - delay * 1000L * 60L;
-    long stop = now;
-    return scan(key, search, filter, start, stop, ifkey, iftime);
-    }
-                   
-  /** Get row(s).
-    * @param key     The row key. Disables other search terms.
-    *                It can be <tt>null</tt>.
-    * @param search  The search terms as <tt>family:column:value,...</tt>.
-    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
-    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
-    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
-    *                among <tt>exact,prefix,substring,regex</tt>.
-    *                The default for key is <tt>prefix</tt>,
-    *                the default for columns is <tt>substring</tt>.
-    *                It can be <tt>null</tt>.
-    *                All searches are executed as prefix searches.    
-    * @param filter  The names of required values as <tt>family:column,...</tt>.
-    *                <tt>*</tt> = all.
-    * @param start   The time period start timestamp in <tt>ms</tt>.
-    *                <tt>0</tt> means since the beginning.
-    * @param stop    The time period stop timestamp in <tt>ms</tt>.
-    *                <tt>0</tt> means till now.
-    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
-    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
-    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
-  public Map<String, Map<String, String>> scan(String  key,
-                                               String  search,
-                                               String  filter,
-                                               long    start,
-                                               long    stop,
-                                               boolean ifkey,
-                                               boolean iftime) {
-    String searchMsg = search;
-    if (search != null && search.length() > 80) {
-      searchMsg = search.substring(0, 80) + "...";
-      }
-    log.info("Searching for key: " + key + 
-             ", search: " + searchMsg + 
-             ", filter: " + filter +
-             ", interval: " + start + " ms - " + stop + " ms" +
-             ", id/time: " + ifkey + "/" + iftime);
-    Map<String, String> searchM = new TreeMap<>();
-    if (search != null && !search.trim().equals("")) {
-      String[] ss;
-      String k;
-      String v;
-      for (String s : search.trim().split(",")) {
-        ss = s.trim().split(":");
-        if (ss.length == 4) {
-          k = ss[0] + ":" + ss[1] + ":" + ss[3];
-          }
-        else {
-          k = ss[0] + ":" + ss[1];
-          }
-        v = ss[2];
-        if (searchM.containsKey(k)) {
-          v = searchM.get(k) + "," + v;
-          }
-        searchM.put(k, v);
-        }
-      }
-    return scan(key, searchM, filter, start, stop, ifkey, iftime);
-    }
-                   
-  /** Get row(s).
-    * @param key       The row key. Disables other search terms.
-    *                  It can be <tt>null</tt>.
-    * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
-    *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
-    *                  <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
-    *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
-    *                  among <tt>exact,prefix,substring,regex</tt>.
-    *                  The default for key is <tt>prefix</tt>,
-    *                  the default for columns is <tt>substring</tt>.
-    *                  It can be <tt>null</tt>.
-    *                  All searches are executed as prefix searches.    
-    * @param filter    The names of required values as <tt>family:column,...</tt>.
-    *                  <tt>*</tt> = all.
-    * @param start     The time period start timestamp in <tt>ms</tt>.
-    *                  <tt>0</tt> means since the beginning.
-    * @param stop      The time period stop timestamp in <tt>ms</tt>.
-    *                  <tt>0</tt> means till now.
-    * @param ifkey     Whether give also entries keys (as <tt>key:key</tt>).
-    * @param iftime    Whether give also entries timestamps (as <tt>key:time</tt>).
-    * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
-  public Map<String, Map<String, String>> scan(String              key,
-                                               Map<String, String> searchMap,
-                                               String              filter,
-                                               long                start,
-                                               long                stop,
-                                               boolean             ifkey,
-                                               boolean             iftime) {
+                                                           
+  @Override
+  public Map<String, Map<String, String>> scan(String    key,
+                                               StringMap searchMap,
+                                               String    filter,
+                                               long      start,
+                                               long      stop,
+                                               boolean   ifkey,
+                                               boolean   iftime) {
     String searchMsg = "";
     if (searchMap != null) {
       searchMsg = searchMap.toString();
@@ -557,13 +418,13 @@ public class HBaseClient {
         }
       // Limit
       int limit0 = _limit0;
-      if (_evaluator == null && (_limit < _limit0 || _limit0 == 0)) {
-        limit0 = _limit;
+      if (_evaluator == null && (limit() < _limit0 || _limit0 == 0)) {
+        limit0 = limit();
         }
       if (limit0 > 0) {
         scan.setLimit(limit0);
-        if (_schema != null) {
-          scan.setMaxResultSize(limit0 * _schema.size());
+        if (schema() != null) {
+          scan.setMaxResultSize(limit0 * schema().size());
           }
         }
       // Reversed
@@ -573,7 +434,7 @@ public class HBaseClient {
         _rs = table().getScanner(scan);
         int i = 0;
         for (Result r : _rs) {
-          if (i == _limit) {
+          if (i == limit()) {
             break;
             }
           i++;
@@ -628,16 +489,16 @@ public class HBaseClient {
               result.put(column, Bytes.toString(e.getValue()));
               }
             // known schema
-            else if (_schema != null && _schema.type(column) != null) {
+            else if (schema() != null && schema().type(column) != null) {
               // binary
               if (family.equals("b")) {
                 ref = "binary:" + key + ":" + Bytes.toString(e.getKey());
                 result.put(column, ref);
-                _repository.put(ref, _schema.decode2Content(column, e.getValue()).asBytes());
+                _repository.put(ref, schema().decode2Content(column, e.getValue()).asBytes());
                 }
               // not binary
               else {
-                result.put(column, _schema.decode(column, e.getValue()));
+                result.put(column, schema().decode(column, e.getValue()));
                 }
               }
             // no schema
@@ -671,7 +532,7 @@ public class HBaseClient {
       family = Bytes.toString(entry.getKey());
       for (Map.Entry<byte[], byte[]> e : entry.getValue().entrySet()) {
         column = family + ":" + Bytes.toString(e.getKey());
-        value = _schema.decode(column, e.getValue());
+        value = schema().decode(column, e.getValue());
         values.put(column, value);
         }
       }
@@ -771,12 +632,12 @@ public class HBaseClient {
       return;
       }
     log.info("Setting evaluation formula '" + formula + "'");
-    if (_schema == null) {
+    if (schema() == null) {
       log.error("Evaluation can be set only for known Schema");
       return;
       }
     try {
-      _evaluator = new Evaluator(_schema);
+      _evaluator = new Evaluator(schema());
       _evaluator.setVariables(formula);
       _formula   = formula;
       }
@@ -786,7 +647,7 @@ public class HBaseClient {
     }
       
   /** Add a row into table.
-    * @param key The row key.
+    * @param key    The row key.
     * @param values The column values as family:column:value.
     * @throws IOException If anything goes wrong. */
   public void put(String key,
@@ -798,39 +659,9 @@ public class HBaseClient {
       }
     table().put(put);
     }
-                     
-  /** Set the table {@link HBaseSchema}.
-    * @param schema The {@link HBaseSchema} to set. */
-  public void setSchema(HBaseSchema schema) {
-    _schema = schema;
-    }
-    
-  /** Set the limit for the number of results.
-    * @param limit The limit for the number of results. */
-  public void setLimit(int limit) {
-    log.info("Setting limit " + limit);
-    _limit = limit;
-    }
-    
-  /** Give the limit for the number of results.
-    * @return The limit for the number of results. */
-  public int limit() {
-    return _limit;
-    }
-    
-  /** Set whether the results should be in the reversed order.
-    * @param reversed Whether the results should be in the reversed order. */
-  public void setReversed(boolean reversed) {
-    log.info("Setting reversed " + reversed);
-    _reversed = reversed;
-    }
-    
-  /** Tell, whether the results should be in the reversed order.
-    * @return  Whether the results should be in the reversed order. */
-  public boolean isReversed() {
-    return _reversed;
-    }
-    
+  
+  // Aux -----------------------------------------------------------------------
+        
   /** Set the limit for the number of searched results (before eventual evaluation).
     * @param limit The limit for the number of searched esults. */
   public void setSearchLimit(int limit) {
@@ -865,12 +696,6 @@ public class HBaseClient {
     _dateFormat = dateFormat;
     }
     
-  /** Give the table {@link Schema}.
-    * @param schema The used {@link Schema}. */
-  public Schema schema() {
-    return _schema;
-    }
-    
  /** Give the table {@link BinaryDataRepository}.
     * @param schema The used {@link BinaryDataRepository}. */
   public BinaryDataRepository repository() {
@@ -897,35 +722,7 @@ public class HBaseClient {
   //    }
   //  return newValue;
   //  }
-    
-  /** Results presented as a readable {@link String}.
-    * @param results The {@link Map} of results.
-    * @return        The result in a readable {@link String}. */
-  public static String results2String(Map<String, Map<String, String>> results) {
-    String report = "";
-    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      report += entry.getKey() + " = " + entry.getValue() + "\n";
-      }
-    return report;
-    }
-    
-  /** Results presented as a {@link List}.
-    * @param results The {@link Map} of results.
-    * @return        The result as a {@link List}. */
-  public static List<Map<String, String>> results2List(Map<String, Map<String, String>> results) {
-    List<Map<String, String>> report = new ArrayList<>();
-    Map<String, String> row;
-    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      row = new TreeMap<>();
-      row.put("key:key",  entry.getKey());
-      for (Map.Entry<String, String> cell : entry.getValue().entrySet()) {
-        row.put(cell.getKey(), cell.getValue());
-        }
-      report.add(row);
-      }
-    return report;
-    }
-    
+
   /** Give {@link Table}.
     * @return The {@link Table}. */
   public Table table() {
@@ -942,12 +739,6 @@ public class HBaseClient {
     * @return The used client port. */
   protected String clientPort() {
     return _clientPort;
-    }
-    
-  /** Give the used table name.
-    * @return The used table name. */
-  protected String tableName() {
-    return _tableName;
     }
     
   /** Specify if the search should return all results between stricy results.
@@ -1013,20 +804,12 @@ public class HBaseClient {
   private String _zookeepers;
   
   private String _clientPort;
-  
-  private String _tableName;
-  
-  private HBaseSchema _schema;
-  
+   
   private boolean _isRange = false;
   
   private String _alwaysColumns = "";
   
   private int _limit0 = 0;
-   
-  private int _limit = 0;
-  
-  private boolean _reversed = false;
  
   private String _dateFormat = null;
   

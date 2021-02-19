@@ -4,6 +4,7 @@ import com.Lomikel.Utils.Init;
 import com.Lomikel.Sockets.SocketServer;
 import com.Lomikel.Sockets.SocketClient;
 import com.Lomikel.Utils.LomikelException;
+import com.Lomikel.DB.StringMap;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -50,13 +51,13 @@ public class PhoenixProxyClient extends PhoenixClient {
     }
 
   @Override
-  public Map<String, Map<String, String>> scan(String              key,
-                                               Map<String, String> searchMap,
-                                               String              filter,
-                                               long                start,
-                                               long                stop,
-                                               boolean             ifkey,
-                                               boolean             iftime) {
+  public Map<String, Map<String, String>> scan(String    key,
+                                               StringMap searchMap,
+                                               String    filter,
+                                               long      start,
+                                               long      stop,
+                                               boolean   ifkey,
+                                               boolean   iftime) {
     String sql = formSqlRequest(key, searchMap, filter, start, stop, ifkey, iftime);
     try {
       String answer = _socketClient.send(sql);
