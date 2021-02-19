@@ -1,2 +1,0 @@
-v = g.V().has('lbl', 'dataset').limit(1).next()
-s = new Sertex(v)

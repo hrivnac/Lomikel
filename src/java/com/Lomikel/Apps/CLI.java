@@ -160,7 +160,7 @@ public class CLI {
       }      
     try {
       interpreter().eval("import com.Lomikel.Januser.Hertex");
-      log.info("GremlinClient imported");
+      log.info("Hertex imported");
       }
     catch (EvalError e) {
       log.error("Cannot import com.Lomikel.Januser.Hertex");
@@ -168,7 +168,7 @@ public class CLI {
       }      
     try {
       interpreter().eval("import com.Lomikel.Januser.Sertex");
-      log.info("GremlinClient imported");
+      log.info("Sertex imported");
       }
     catch (EvalError e) {
       log.error("Cannot import com.Lomikel.Januser.Sertex");
