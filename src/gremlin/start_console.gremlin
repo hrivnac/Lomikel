@@ -16,7 +16,7 @@ if (db.equals("hbase")) {
   }
 if (db.equals("phoenix")) {
   client = new PhoenixProxyClient(c.getString("backend.phoenix.proxy.hostname"), c.getInt("backend.phoenix.proxy.port"))
-  client.connect(c.getString("backend.phoenix.table"), c.getString("backend.phoenix.schema"))
+  client.connect(c.getString("datasets.table"), c.getString("datasets.schema"))
   Sertex.setPhoenixClient(client)
   Sertex.setRowkeyNames(client.schema().rowkeyNames())
   }

@@ -8,7 +8,7 @@ if (db.equals("hbase")) {
   }
 if (db.equals("phoenix")) {
   client = new com.Lomikel.Phoenixer.PhoenixProxyClient("@BACKEND.PHOENIX.PROXY.HOSTNAME@", @BACKEND.PHOENIX.PROXY.PORT@)
-  client.connect("@BACKEND.PHOENIX.TABLE@", "@BACKEND.PHOENIX.SCHEMA@")
+  client.connect("@DATASETS.TABLE@", "@DATASETS.SCHEMA@")
   com.Lomikel.Januser.Sertex.setPhoenixClient(client);
   com.Lomikel.Januser.Sertex.setRowkeyNames(client.schema().rowkeyNames())
   }

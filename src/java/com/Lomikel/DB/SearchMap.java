@@ -37,6 +37,11 @@ public class SearchMap {
     _map.put(k, v);
     }
     
+  @Override
+  public String toString() {
+    return _map.toString();
+    }
+    
   private Map<String, String> _map;
   
 
