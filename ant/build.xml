@@ -460,7 +460,6 @@
  		<copy todir="${janusgraph_dir}/ext/lomikel.connector">
 			<fileset dir="../lib" includes="Lomikel-${version}.jar"/>
       </copy>
-    <copy file="../lib/Lomikel-${version}.jar" todir="${janusgraph_dir}/ext/lomikel.connector"/>
     <exec executable="../src/sh/updateJanusExt.sh">
       <arg line="${janusgraph_dir}/ext/plugins.txt"/>
       </exec>
