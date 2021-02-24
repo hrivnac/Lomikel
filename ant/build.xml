@@ -435,8 +435,8 @@
     <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@BACKEND.DB@"                     value="${backend_db}"/>
     <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
     <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@DATASETS.TABLE@"                 value="${backend_phoenix_table}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@DATASETS.SCHEMA@"                value="${backend_phoenix_schema}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@DATASET.TABLE@"                  value="${dataset_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@DATASET.SCHEMA@"                 value="${dataset_schema}"/>
     <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.PORT@"                    value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.HOST@"                    value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.PORT@"                    value="${gremlin_port}"/>
@@ -448,8 +448,8 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.ROWKEY.NAME@"            value="${rowkey_name}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@DATASETS.TABLE@"                 value="${backend_phoenix_table}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@DATASETS.SCHEMA@"                value="${backend_phoenix_schema}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@DATASET.TABLE@"                  value="${dataset_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@DATASET.SCHEMA@"                 value="${dataset_schema}"/>
     <copy file="${janusgraph_dir}/conf/gremlin-server/Local.properties" tofile="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" overwrite="true"/>
     <echo file="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" append="true">storage.batch-loading=true</echo>
     <echo>... plugin</echo>

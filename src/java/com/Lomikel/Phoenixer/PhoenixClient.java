@@ -72,7 +72,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
              
   @Override
   public String connect(String tableName,
-                         String schemaName) throws LomikelException {
+                        String schemaName) throws LomikelException {
      return connect(tableName, schemaName, 0);
      }
      
@@ -80,7 +80,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
   public String connect(String tableName,
                         String schemaName,
                         int    timeout) throws LomikelException {
-     log.info("Connecting to " + tableName);
+    log.info("Connecting to " + tableName + ", using " + schemaName);
     setTableName(tableName);
     setSchema(PhoenixSchema.getSchema(schemaName));
     return tableName;
@@ -280,6 +280,18 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     } 
   
   // Aux -----------------------------------------------------------------------
+    
+  /** TBD */
+  public static void registerVertexType(String lbl,
+                                        Class  representant) {
+    log.info(lbl + "  will be represented by " + representant);
+    _representations.put(lbl, representant);
+    }  
+    
+  @Override
+  public Class representation(String lbl) {
+    return _representations.get(lbl);
+    }
  
   private Connection _connection;  
   
@@ -289,6 +301,8 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
   private static SimpleDateFormat PHOENIX_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     
   static final String JDBC_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";
+  
+  private static Map<String, Class> _representations = new TreeMap<>();
   
   /** Logging . */
   private static Logger log = Logger.getLogger(PhoenixClient.class);

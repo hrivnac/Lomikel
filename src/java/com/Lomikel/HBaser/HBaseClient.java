@@ -793,13 +793,25 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _rs;
     }
     
+  /** TBD */
+  public static void registerVertexType(String lbl,
+                                        Class  representant) {
+    log.info(lbl + "  will be represented by " + representant);
+    _representations.put(lbl, representant);
+    }  
+    
+  @Override
+  public Class representation(String lbl) {
+    return _representations.get(lbl);
+    }
+    
   private Table _table;
   
   private Configuration _conf;
   
   private Connection _connection;
   
-  private ResultScanner _rs;
+  private ResultScanner _rs;              
   
   private String _zookeepers;
   
@@ -820,6 +832,8 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   private Evaluator _evaluator;
   
   private String _formula;
+  
+  private static Map<String, Class> _representations = new TreeMap<>();
   
   /** Logging . */
   private static Logger log = Logger.getLogger(HBaseClient.class);

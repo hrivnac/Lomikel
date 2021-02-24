@@ -1,8 +1,8 @@
 package com.Lomikel.Januser;
 
-import com.Lomikel.Utils.LomikelException;
-
+import com.Lomikel.DB.Client;
 import com.Lomikel.HBaser.HBaseClient;
+import com.Lomikel.Utils.LomikelException;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -15,6 +15,8 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 
 // Java
 import java.util.Map;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -29,16 +31,25 @@ import org.apache.log4j.Logger;
 public class Hertex extends Wertex {
    
   /** Dress existing {@link Vertex} with values from HBase.
+    * Fill in all fields from the database.
     * @param vertex The original {@link Vertex}. */
   public Hertex(Vertex vertex) {
-    super(vertex);
+    this(vertex, null);
+    }
+   
+  /** Dress existing {@link Vertex} with values from HBase.
+    * @param vertex The original {@link Vertex}.
+    * @param fields The fields to fill in from the database.
+    *               All fields will be filled in if <tt>null</tt>. */
+  public Hertex(Vertex   vertex,
+                String[] fields) {
+    super(vertex, fields);
     if (_client == null) {
       log.warn("HBaseClient is not set, not dressing Vertex as Hertex");
       }
     String n = null;
     Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
-    Map<String, String> fields = results.get(rowkey());
-    setFields(fields); 
+    setFields(results.get(rowkey())); 
     }
     
   /** Set the {@link HBaseClient} to search for additional values.
@@ -48,6 +59,26 @@ public class Hertex extends Wertex {
     _client = client;
     }
     
+  @Override
+  public Client client() {
+    return _client;
+    }
+  
+  /** TBD */
+  // TBD: should be in Wertex
+  public static Vertex enhance(Vertex vertex) {
+    Class cl = _client.representation(vertex.property("lbl").value().toString());
+    try {
+      Constructor constructor = cl.getConstructor(new Class[]{Vertex.class});
+      Vertex newVertex = (Vertex)constructor.newInstance(vertex);
+      return newVertex;
+      }
+    catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+      log.error("Cannot construct " + cl, e);
+      return null;
+      }
+    }
+     
   private static HBaseClient _client;
     
   /** Logging . */

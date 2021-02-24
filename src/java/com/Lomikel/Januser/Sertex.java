@@ -1,7 +1,7 @@
 package com.Lomikel.Januser;
 
 import com.Lomikel.Utils.LomikelException;
-
+import com.Lomikel.DB.Client;
 import com.Lomikel.Phoenixer.PhoenixClient;
 
 // Tinker Pop
@@ -16,6 +16,8 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 // Java
 import java.util.Map;
 import java.util.HashMap;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -30,8 +32,18 @@ import org.apache.log4j.Logger;
 public class Sertex extends Wertex {
    
   /** Dress existing {@link Vertex} with values from Phoenix.
+    * Fill in all fields from the database.
     * @param vertex The original {@link Vertex}. */
   public Sertex(Vertex vertex) {
+    super(vertex, null);
+    }
+   
+  /** Dress existing {@link Vertex} with values from Phoenix.
+    * @param vertex The original {@link Vertex}.
+    * @param fields The fields to fill in from the database.
+    *               All fields will be filled in if <tt>null</tt>. */
+  public Sertex(Vertex   vertex,
+                String[] fields) {
     super(vertex);
     if (_client == null) {
       log.warn("PhoenixClient is not set, not dressing Vertex as Sertex");
@@ -42,8 +54,7 @@ public class Sertex extends Wertex {
         searchMap.put(rowkeyNames()[i], rowkeys()[i]);
         }
       Map<String, Map<String, String>> results = _client.scan(null, searchMap, "*", 0, 0, false, true);
-      Map<String, String> fields = results.get(rowkey());
-      setFields(fields); 
+      setFields(results.get(rowkey())); 
       }
     }
     
@@ -52,6 +63,26 @@ public class Sertex extends Wertex {
     * @param client The {@link PhoenixClient} to search for additional values. */
   public static void setPhoenixClient(PhoenixClient client) {
     _client = client;
+    }
+    
+  @Override
+  public Client client() {
+    return _client;
+    }
+  
+  /** TBD */
+  // TBD: should be in Wertex
+  public static Vertex enhance(Vertex vertex) {
+    Class cl = _client.representation(vertex.property("lbl").value().toString());
+    try {
+      Constructor constructor = cl.getConstructor(new Class[]{Vertex.class});
+      Vertex newVertex = (Vertex)constructor.newInstance(vertex);
+      return newVertex;
+      }
+    catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+      log.error("Cannot construct " + cl, e);
+      return null;
+      }
     }
     
   private static PhoenixClient _client;

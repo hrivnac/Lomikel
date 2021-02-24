@@ -1,17 +1,9 @@
-db = "@BACKEND.DB@"
-client = null
-if (db.equals("hbase")) {
-  client = new com.Lomikel.HBaser.HBaseClient("@STORAGE.HOSTNAME@", @STORAGE.HBASE.PORT@)
-  client.connect("@STORAGE.HBASE.TABLE@", "@STORAGE.HBASE.SCHEMA@")
-  com.Lomikel.Januser.Hertex.setHBaseClient(client)
-  com.Lomikel.Januser.Hertex.setRowkeyName("@ROWKEY.NAME@")
-  }
-if (db.equals("phoenix")) {
-  client = new com.Lomikel.Phoenixer.PhoenixProxyClient("@BACKEND.PHOENIX.PROXY.HOSTNAME@", @BACKEND.PHOENIX.PROXY.PORT@)
-  client.connect("@DATASETS.TABLE@", "@DATASETS.SCHEMA@")
-  com.Lomikel.Januser.Sertex.setPhoenixClient(client);
-  com.Lomikel.Januser.Sertex.setRowkeyNames(client.schema().rowkeyNames())
-  }
+clientH = new com.Lomikel.HBaser.HBaseClient("@STORAGE.HOSTNAME@", @STORAGE.HBASE.PORT@)
+clientH.connect("@STORAGE.HBASE.TABLE@", "@STORAGE.HBASE.SCHEMA@")
+com.Lomikel.Januser.Hertex.setHBaseClient(clientH)
+clientP = new com.Lomikel.Phoenixer.PhoenixProxyClient("@BACKEND.PHOENIX.PROXY.HOSTNAME@", @BACKEND.PHOENIX.PROXY.PORT@)
+clientP.connect("@DATASETS.TABLE@", "@DATASETS.SCHEMA@")
+com.Lomikel.Januser.Sertex.setPhoenixClient(clientP);
 
 def globals = [:]
 

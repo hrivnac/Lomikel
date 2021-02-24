@@ -306,7 +306,10 @@ public abstract class Client<T, S extends Schema> {
   public boolean isReversed() {
     return _reversed;
     }
- 
+    
+  /** TBD */
+  public abstract Class representation(String lbl);
+    
   private String _tableName;
   
   private S _schema;
