@@ -1,9 +1,9 @@
 clientH = new com.Lomikel.HBaser.HBaseClient("@STORAGE.HOSTNAME@", @STORAGE.HBASE.PORT@)
 clientH.connect("@STORAGE.HBASE.TABLE@", "@STORAGE.HBASE.SCHEMA@")
 com.Lomikel.Januser.Hertex.setHBaseClient(clientH)
-//clientP = new com.Lomikel.Phoenixer.PhoenixProxyClient("@BACKEND.PHOENIX.PROXY.HOSTNAME@", @BACKEND.PHOENIX.PROXY.PORT@)
-//clientP.connect("@DATASETS.TABLE@", "@DATASETS.SCHEMA@")
-//com.Lomikel.Januser.Sertex.setPhoenixClient(clientP);
+clientP = new com.Lomikel.Phoenixer.PhoenixProxyClient("@BACKEND.PHOENIX.PROXY.HOSTNAME@", @BACKEND.PHOENIX.PROXY.PORT@)
+clientP.connect("@DATASETS.TABLE@", "@DATASETS.SCHEMA@")
+com.Lomikel.Januser.Sertex.setPhoenixClient(clientP);
 
 def globals = [:]
 

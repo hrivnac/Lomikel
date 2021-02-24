@@ -1,2 +1,0 @@
-v = g.V().has('lbl', 'alert').limit(1).next()
-s = new com.Lomikel.Januser.Hertex(v)
