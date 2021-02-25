@@ -94,7 +94,7 @@ public class JanusClient {
     else {
       System.err.println("Unknown function " + args[0] + ", try extract");
       System.exit(-1);
-      }*/
+      }
     System.exit(0);
     } 
     

@@ -11,6 +11,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import  org.janusgraph.core.SchemaViolationException;
 
 // Java
 import java.util.Map;
@@ -191,7 +192,12 @@ public abstract class Wertex implements Vertex {
       }
     else {
       for (Map.Entry<String, String> entry : fields.entrySet()) {
-        property(entry.getKey(), entry.getValue());
+        try {
+          property(entry.getKey(), entry.getValue());
+          }
+        catch (SchemaViolationException e) {
+          log.warn("Cannot add " + entry.getKey() + " -> " + entry.getValue(), e);
+          }
         }
       }
     }
