@@ -48,14 +48,17 @@ public class PhoenixProxyServer extends PhoenixClient
     Thread thread = new Thread() {
       @Override
       public void run() {
-        try {
-          SocketServer server = new SocketServer(proxy, proxyPortF);
-          while (true) {
-            server.accept();
+        while (true) {
+          log.info("Starting the server");
+          try {
+            SocketServer server = new SocketServer(proxy, proxyPortF);
+            while (true) {
+              server.accept();
+              }
             }
-          }
-        catch (LomikelException e) {
-          log.error("Cannot create SocketServer", e);
+          catch (LomikelException e) {
+            log.error("Cannot create SocketServer", e);
+            }
           }
         }
       };

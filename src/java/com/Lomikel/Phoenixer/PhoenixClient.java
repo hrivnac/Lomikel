@@ -292,6 +292,11 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
   public Class representation(String lbl) {
     return _representations.get(lbl);
     }
+    
+  @Override
+  public Map<String, Class> representations() {
+    return _representations;
+    }
  
   private Connection _connection;  
   

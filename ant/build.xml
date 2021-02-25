@@ -425,18 +425,17 @@
  		<copy todir="${janusgraph_dir}/conf/gremlin-server">
 			<fileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="*"/>
       </copy>                                                                
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HOSTNAME@"               value="${zookeeper}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.JANUS.TABLE@"            value="${janus_table}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.TABLE@"            value="${hbase_table}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.SCHEMA@"           value="${hbase_schema}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@STORAGE.HBASE.PORT@"             value="${hbase_port}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@ROWKEY.NAME@"                    value="${rowkey_name}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@ROWKEY.NAME@"                    value="${rowkey_name}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@BACKEND.DB@"                     value="${backend_db}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@DATASET.TABLE@"                  value="${dataset_table}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-env.groovy"               token="@DATASET.SCHEMA@"                 value="${dataset_schema}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@STORAGE.HOSTNAME@"               value="${zookeeper}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@STORAGE.JANUS.TABLE@"            value="${janus_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@STORAGE.HBASE.TABLE@"            value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@STORAGE.HBASE.SCHEMA@"           value="${hbase_schema}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@STORAGE.HBASE.PORT@"             value="${hbase_port}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@ROWKEY.NAME@"                    value="${rowkey_name}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@ROWKEY.NAME@"                    value="${rowkey_name}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@DATASET.TABLE@"                  value="${dataset_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@DATASET.SCHEMA@"                 value="${dataset_schema}"/>
     <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.PORT@"                    value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.HOST@"                    value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.PORT@"                    value="${gremlin_port}"/>
@@ -508,65 +507,7 @@
         </classpath>
       </java>
     </target>
-    
-  <!-- Populate Graph  ======================================================-->
-
-  <target name="populate-graph-hbase"
-          description="Populate Graph from HBase">
-    <echo>Populating Graph from HBase</echo>
-    <java classname="com.Lomikel.Januser.JanusClient"
-          fork="true">
-      <arg value="populateh"/>
-      <arg value="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties"/>
-      <arg value="${zookeeper}"/>
-      <arg value="${hbase_port}"/>
-      <arg value="test_portal_tiny.3"/>
-      <arg value="schema_0.7.0_0.3.6"/>
-      <arg value="alert"/>
-      <arg value="rowkey"/>
-      <arg value="ZTF"/>
-      <arg value=""/>
-      <arg value=""/>
-      <arg value="6"/>
-      <arg value="0"/>
-      <arg value="200"/>
-      <arg value="true"/>
-      <arg value="false"/>
-      <arg value="false"/>
-      <classpath>
-        <path refid="classpath.janusgraph"/>
-        </classpath>
-      </java>
-    </target>
-
-  <target name="populate-graph-phoenix"
-          description="Populate Graph from Phoenix">
-    <echo>Populating Graph from Phoenix</echo>
-    <java classname="com.Lomikel.Januser.JanusClient"
-          fork="true">
-      <arg value="populates"/>
-      <arg value="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties"/>
-      <arg value="localhost"/>
-      <arg value="5000"/>
-      <arg value="aeidev.datasets"/>
-      <arg value="aeidev.datasets"/>
-      <arg value="dataset"/>
-      <arg value="rowkey"/>
-      <arg value="329829####"/>
-      <arg value=""/>
-      <arg value=""/>
-      <arg value="6"/>
-      <arg value="0"/>
-      <arg value="200"/>
-      <arg value="true"/>
-      <arg value="false"/>
-      <arg value="false"/>
-      <classpath>
-        <path refid="classpath.janusgraph"/>
-        </classpath>
-      </java>
-    </target>
-    
+        
   <!-- Manage Phoenix Proxy Server ==========================================-->
     
   <target name="start-phoenix-proxy-server"

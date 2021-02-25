@@ -310,6 +310,9 @@ public abstract class Client<T, S extends Schema> {
   /** TBD */
   public abstract Class representation(String lbl);
     
+  /** TBD */
+  public abstract Map<String, Class> representations();
+    
   private String _tableName;
   
   private S _schema;

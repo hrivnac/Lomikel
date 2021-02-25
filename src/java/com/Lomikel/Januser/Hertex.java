@@ -64,19 +64,35 @@ public class Hertex extends Wertex {
     return _client;
     }
   
-  /** TBD */
-  // TBD: should be in Wertex
+  /** Enhance {@link Vertex} with properties from HBase database.
+    * @param  @vertex The {@link Vertex} to be enhanced.
+    * @return         The enhanced {@link Vertex}, if possible. */
   public static Vertex enhance(Vertex vertex) {
+    if (_client == null || vertex.property("lbl") == null) {
+      return vertex;
+      }
     Class cl = _client.representation(vertex.property("lbl").value().toString());
+    if (cl == null) {
+      return vertex;
+      }
     try {
       Constructor constructor = cl.getConstructor(new Class[]{Vertex.class});
       Vertex newVertex = (Vertex)constructor.newInstance(vertex);
       return newVertex;
       }
     catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      log.error("Cannot construct " + cl, e);
-      return null;
+      log.error("Cannot enhance as " + cl, e);
+      return vertex;
       }
+    }
+   
+  @Override
+  public String toString() {
+    String msg = "Vertex backed up with " + _client;
+    if (_client != null) {
+      msg += "\tenhancing representations: " + _client.representations();
+      }
+    return msg;
     }
      
   private static HBaseClient _client;

@@ -805,6 +805,11 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _representations.get(lbl);
     }
     
+  @Override
+  public Map<String, Class> representations() {
+    return _representations;
+    }
+    
   private Table _table;
   
   private Configuration _conf;
