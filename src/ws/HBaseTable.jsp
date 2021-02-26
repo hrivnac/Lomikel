@@ -4,7 +4,7 @@
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
 <%@ page import="com.Lomikel.HBaser.HBaseClient" %>
-<%@ page import="com.Lomikel.HBaser.Schema" %>
+<%@ page import="com.Lomikel.HBaser.HBaseSchema" %>
 <%@ page import="com.Lomikel.WebService.HBase2Table" %>
 <%@ page import="com.Lomikel.HBaser.BinaryDataRepository" %>
 <%@ page import="com.Lomikel.Utils.DateTimeManagement" %>
