@@ -1,18 +1,11 @@
 package com.Lomikel.Januser;
 
-import com.Lomikel.Utils.LomikelException;
-
 // Tinker Pop
-import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.structure.Property;
-import org.apache.tinkerpop.gremlin.structure.Graph;
 
 // Java
-import java.util.Map;
 import java.util.Iterator;
 
 // Log4J

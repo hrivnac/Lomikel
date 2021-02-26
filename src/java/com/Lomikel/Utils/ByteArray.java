@@ -3,7 +3,7 @@ package com.Lomikel.Utils;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>ByteArray</code> presents Array of bytes as an Object.
+/** <code>ByteArray</code> presents array of bytes as an Object.
   * @opt attributes
   * @opt operations
   * @opt types
@@ -11,12 +11,14 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class ByteArray {
   
-  /** TBD */
+  /** Create.
+    * @param bytes The array of bytes to contain. */
   public ByteArray(byte[] bytes) {
     _bytes = bytes;
     }
     
-  /** TBD */
+  /** Give the content.
+    * @return The content. */
   public byte[] bytes() {
     return _bytes;
     }

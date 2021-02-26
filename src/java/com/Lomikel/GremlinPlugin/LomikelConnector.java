@@ -11,7 +11,6 @@ import org.apache.tinkerpop.gremlin.jsr223.AbstractGremlinPlugin;
 import org.apache.tinkerpop.gremlin.jsr223.DefaultImportCustomizer;
 import org.apache.tinkerpop.gremlin.jsr223.DefaultImportCustomizer.Builder;
 import org.apache.tinkerpop.gremlin.jsr223.ImportCustomizer;
-import org.apache.tinkerpop.gremlin.jsr223.console.ConsoleCustomizer;
 
 // Log4J
 import org.apache.log4j.Logger;

@@ -2,7 +2,6 @@ package com.Lomikel.HBaser;
 
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Utils.StringResource;
-import com.Lomikel.DB.Schema;
 
 // Bean Shell
 import bsh.Interpreter;

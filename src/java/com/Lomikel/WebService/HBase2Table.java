@@ -1,6 +1,5 @@
 package com.Lomikel.WebService;
 
-import com.Lomikel.Utils.Pair;
 import com.Lomikel.DB.Schema;
 import com.Lomikel.HBaser.BinaryDataRepository;
 

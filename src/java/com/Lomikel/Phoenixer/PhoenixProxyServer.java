@@ -1,18 +1,9 @@
 package com.Lomikel.Phoenixer;
 
 import com.Lomikel.Utils.Init;
-import com.Lomikel.Utils.Info;
 import com.Lomikel.Sockets.SocketServer;
 import com.Lomikel.Sockets.Servable;
 import com.Lomikel.Utils.LomikelException;
-
-// Java
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 // Log4J
 import org.apache.log4j.Logger;

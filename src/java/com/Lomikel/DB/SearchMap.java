@@ -12,27 +12,32 @@ import java.util.Map;
 // TBD: is should not be necessary
 public class SearchMap {
 
-  /** TBD */
+  /** Create.
+    @param map The {@link Map} of search terms.*/
   public SearchMap(Map<String, String> map) {
     _map = map;
     }
     
-  /** TBD */
+  /** Give the embedded {@link Map}.
+     *@return The embedded {@link Map}. */
   public Map<String, String> map() {
     return _map;
     }
     
-  /** TBD */
+  /** Tell, whether the {@link Map} is empty.
+    * @return Whether the {@link Map} is empty. */
   public boolean isEmpty() {
     return _map == null || _map.isEmpty();
     }
     
-  /** TBD */
+  /** Clear the {@link Map}. */
   public void clear() {
     _map.clear();
     }
     
-  /** TBD */
+  /** Put an entry into the {@link Map}.
+    * @param k The entry key (i.e. the name of the search term).
+    * @param v The entry value (i.e. the value of the search term). */
   public void put(String k, String v) {
     _map.put(k, v);
     }

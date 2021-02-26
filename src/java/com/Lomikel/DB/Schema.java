@@ -2,12 +2,8 @@ package com.Lomikel.DB;
 
 import com.Lomikel.DB.CellContent;
 
-// HBase
-import org.apache.hadoop.hbase.util.Bytes;
-
 // Java
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 
 // Log4J

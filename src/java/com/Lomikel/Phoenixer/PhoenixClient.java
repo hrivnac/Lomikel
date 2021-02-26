@@ -1,24 +1,16 @@
 package com.Lomikel.Phoenixer;
 
 import com.Lomikel.Utils.Init;
-import com.Lomikel.Utils.Coding;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Schema;
 import com.Lomikel.DB.Client;
 import com.Lomikel.DB.SearchMap;
 
-// Tinker Pop
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-
 // Java
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
-import java.sql.Date;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -281,7 +273,10 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
   
   // Aux -----------------------------------------------------------------------
     
-  /** TBD */
+  /** Give {@link Class} representing a {@link Vertex} of a label.
+    * @param lbl The {@link Vertex} label (i.e. <em>lbl</em>) value of
+    *            the {@link Vertex} to be represented.
+    * @return    The representation of requested {@link Vertex}. */
   public static void registerVertexType(String lbl,
                                         Class  representant) {
     log.info(lbl + "  will be represented by " + representant);

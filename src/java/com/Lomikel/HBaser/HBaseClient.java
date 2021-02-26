@@ -41,7 +41,6 @@ import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
 import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
-import org.apache.hadoop.hbase.TableNotFoundException;
 
 // Hadoop
 import org.apache.hadoop.conf.Configuration;
@@ -793,7 +792,11 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _rs;
     }
     
-  /** TBD */
+  /** Register {@link Class} representing a {@link Vector}
+    * of a label.
+    * @param lbl          The {@link Vertex} label (i.e. <em>lbl</em>) value of
+    *                     the {@link Vertex} to be represented.
+    * @param representant The representation of a {@link Vertex}. */
   public static void registerVertexType(String lbl,
                                         Class  representant) {
     log.info(lbl + "  will be represented by " + representant);

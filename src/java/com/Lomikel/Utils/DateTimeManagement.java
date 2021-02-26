@@ -3,9 +3,6 @@ package com.Lomikel.Utils;
 import de.lehmannet.om.util.DateConverter;
 
 // Java
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.JulianFields;
 import java.util.Date;
 import java.util.Calendar;
 import java.text.DateFormat;

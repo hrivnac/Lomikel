@@ -2,12 +2,6 @@ package com.Lomikel.Januser;
 
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Info;
-import com.Lomikel.DB.Schema;
-import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.HBaser.HBaseClient;
-import com.Lomikel.HBaser.HBaseSchema;
-import com.Lomikel.Phoenixer.PhoenixProxyClient;
-import com.Lomikel.Phoenixer.PhoenixSchema;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -23,39 +17,8 @@ import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
 
 // HBase
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.TableName ;
-import org.apache.hadoop.hbase.client.Admin;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.Table;
-import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
-import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.filter.Filter;  
-import org.apache.hadoop.hbase.filter.FilterList;  
-import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;  
-import org.apache.hadoop.hbase.filter.RowFilter;  
-import org.apache.hadoop.hbase.filter.PrefixFilter;  
-import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
-import org.apache.hadoop.hbase.filter.BinaryPrefixComparator;
-import org.apache.hadoop.hbase.filter.BinaryComparator;
-import org.apache.hadoop.hbase.filter.RegexStringComparator;
-import org.apache.hadoop.hbase.filter.SubstringComparator;
-import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
-import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
-import org.apache.hadoop.hbase.TableNotFoundException;
-import org.apache.hadoop.hbase.Cell;
 
 // Java
 import java.util.List;
@@ -64,10 +27,8 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NavigableMap;
 import java.util.Properties;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 // Log4J
@@ -83,7 +44,8 @@ public class JanusClient {
 
   /** Extract implicite schema.
     * @param args[0] The operation: <tt>extract,populate</tt>.
-    * @param args[1] TBD.
+    * @param args[1] The HBase hostname.
+    * @param args[2] The HBase table.
     * @throws Exception If fails. */ 
   public static void main(String[] args) throws Exception {
     Init.init();

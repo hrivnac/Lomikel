@@ -3,9 +3,6 @@ package com.Lomikel.Phoenixer;
 import com.Lomikel.DB.Schema;
 import com.Lomikel.DB.CellContent;
 
-// HBase
-import org.apache.hadoop.hbase.util.Bytes;
-
 // Java
 import java.util.Map;
 import java.util.HashMap;

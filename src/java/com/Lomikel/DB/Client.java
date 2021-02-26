@@ -1,14 +1,9 @@
 package com.Lomikel.DB;
 
-import com.Lomikel.DB.CellContent;
 import com.Lomikel.Utils.LomikelException;
-
-// HBase
-import org.apache.hadoop.hbase.util.Bytes;
 
 // Java
 import java.util.Map;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Set;
 import java.util.List;
@@ -307,10 +302,15 @@ public abstract class Client<T, S extends Schema> {
     return _reversed;
     }
     
-  /** TBD */
+  /** Give {@link Class} representing a {@link Vertex} of a label.
+    * @param lbl The {@link Vertex} label (i.e. <em>lbl</em>) value of
+    *            the {@link Vertex} to be represented.
+    * @return    The representation of requested {@link Vertex}. */
   public abstract Class representation(String lbl);
     
-  /** TBD */
+  /** Give all {@link Class} representing a {@link Vertex} of a label.
+    *            the {@link Vertex} to be represented.
+    * @return    All representation of requested {@link Vertexs}. */
   public abstract Map<String, Class> representations();
     
   private String _tableName;
