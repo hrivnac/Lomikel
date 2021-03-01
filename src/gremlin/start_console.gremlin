@@ -5,10 +5,3 @@ home = args[1]
 graph = JanusGraphFactory.open(prop)
 g = graph.traversal()
 c = graph.configuration()
-
-clientH = new HBaseClient(c.getString("storage.hostname"), c.getString("backend.hbase.port"))
-clientH.connect(c.getString("backend.hbase.table"), c.getString("backend.hbase.schema"))
-Hertex.setHBaseClient(clientH)
-clientP = new PhoenixProxyClient(c.getString("backend.phoenix.proxy.hostname"), c.getInt("backend.phoenix.proxy.port"))
-clientP.connect(c.getString("dataset.table"), c.getString("dataset.schema"))
-Sertex.setPhoenixClient(clientP)

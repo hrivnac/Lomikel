@@ -492,6 +492,14 @@
       </exec>
     </target>
     
+  <!-- Init JanusGraph ======================================================-->
+  
+   <target name="janus-init"
+          description="Initialize JanusGraph">
+    <echo>Initializing JanusGraph Database</echo>
+    <exec executable="../src/sh/initJanus.sh"/>
+    </target>
+    
   <!-- Extract Schema =======================================================-->
 
   <target name="extract-schema"
