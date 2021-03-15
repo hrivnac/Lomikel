@@ -1,9 +1,7 @@
 <%@ page language="java" contentType="application/json; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%@ page import="com.Lomikel.Januser.GremlinClient" %>
-
 <%@ page import="java.net.URLDecoder" %>
-
 <%@ page import="org.apache.log4j.Logger" %>
 
 <%! static Logger log = Logger.getLogger(GremlinClient_jsp.class); %>
