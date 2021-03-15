@@ -462,6 +462,10 @@
     <exec executable="../src/sh/updateJanusExt.sh">
       <arg line="${janusgraph_dir}/ext/plugins.txt"/>
       </exec>
+    <touch file="${janusgraph_dir}/scripts/setup-finkbrowser.groovy"/>
+    <touch file="${janusgraph_dir}/scripts/setup-atlascope.groovy"/>
+    <chmod file="${janusgraph_dir}/scripts/setup-finkbrowser.groovy" perm="a+x"/>
+    <chmod file="${janusgraph_dir}/scripts/setup-atlascope.groovy" perm="a+x"/>
     </target>
   
   <!-- Start/Stop JanusGraph ================================================-->
