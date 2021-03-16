@@ -30,7 +30,6 @@ public class DirectGremlinClient extends GremlinClient {
     super(hostname, port, true);
     }
    
-  /** Connect client and attach {@link Graph} and (@link GraphTraversalSource}. */
   @Override
   public void connect() {
     _graph = EmptyGraph.instance();
@@ -38,7 +37,7 @@ public class DirectGremlinClient extends GremlinClient {
       _g = _graph.traversal().withRemote(DriverRemoteConnection.using(cluster()));
       }
     catch (Exception e) {
-      log.error("Cannot Connect", e);
+      log.error("Cannot connect", e);
       }
     log.info("Connected");
     }

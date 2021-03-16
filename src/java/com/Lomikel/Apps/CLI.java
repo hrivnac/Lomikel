@@ -151,12 +151,12 @@ public class CLI {
       log.debug("Cannot import com.Lomikel.HBaser.HBaseClient", e);
       }
     try {
-      interpreter().eval("import com.Lomikel.Januser.GremlinClient");
-      log.info("GremlinClient imported");
+      interpreter().eval("import com.Lomikel.Januser.StringGremlinClient");
+      log.info("StringGremlinClient imported");
       }
     catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Januser.GremlinClient");
-      log.debug("Cannot import com.Lomikel.Januser.GremlinClient", e);
+      log.error("Cannot import com.Lomikel.Januser.StringGremlinClient");
+      log.debug("Cannot import com.Lomikel.Januser.StringGremlinClient", e);
       }      
     try {
       interpreter().eval("import com.Lomikel.Januser.DirectGremlinClient");

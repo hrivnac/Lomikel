@@ -30,14 +30,14 @@ import java.util.HashMap;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>GremlinClient</code> provides connection to Gremlin Graph passing Gremlin commands as Strings.
+/** <code>GremlinClient</code> provides connection to Gremlin Graph.
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // TBD: reuse (the same) serializer
-public class GremlinClient {
+public abstract class GremlinClient {
    
   /** Create with connection parameters.
     * @param hostname The Gremlin hostname.
@@ -55,14 +55,6 @@ public class GremlinClient {
       openBinary(hostname, port);
       }
     connect();
-    }
-    
-  /** Create with connection parameters, using <em>GraphBinary</em> serializer.
-    * @param hostname The Gremlin hostname.
-    * @param table    The Gremlin port. */
-  public GremlinClient(String  hostname,
-                       int     port) {
-    this(hostname, port, false);
     }
    
   /** Open with <em>GraphBinary</em> serializer.
@@ -116,53 +108,11 @@ public class GremlinClient {
     }
         
   /** Connect client. */
-  public void connect() {
-    _client = _cluster.connect().init();
-    log.info("Connected");
-    }
+  public abstract void connect();
        
   /** Close client. */
-  public void close() {
-    _client.close();
-    _cluster.close();
-    log.info("Closed");
-    }
+  public abstract void close();
  
-  /** Interpret Gremlin String.
-    * @param request The Gremlin regurest string.
-    * @return        The {@link List} of {@link Result}s.
-    * @throws Exception If anything goes wrong. */
-  // TBD: handle exceptions
-  public List<Result>	 interpret(String request) throws Exception {
-    log.info("Evaluating " + request);
-    ResultSet results = _client.submit(request);
-    return results.all().get();
-    }
-    
-  /** Interpret Gremlin request as JSON string .
-    * @param request The Gremlin reguest string.
-    * @return        The {@link Result}s as JSON string .
-    * @throws Exception If anything goes wrong. */
-  public String interpret2JSON(String request) throws Exception {
-    List<Result> results = interpret(request);
-    ObjectMapper mapper = GraphSONMapper.build()
-                                        .addRegistry(JanusGraphIoRegistry.getInstance())
-                                        .create()
-                                        .createMapper();
-    String json = "[";
-    boolean first = true;
-    for (Result result : results) {
-      if (first) {
-        first = false;
-        }
-      else {
-        json += ",";
-        }
-      json += mapper.writeValueAsString(result.getObject());
-      }
-    json += "]";
-    return json;
-    }
     
   /** Give the {@link Cluster}.
     * @return The attached {@link Cluster}. */
@@ -171,8 +121,6 @@ public class GremlinClient {
     }
     
   private Cluster _cluster;  
-    
-  private Client _client;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(GremlinClient.class);
