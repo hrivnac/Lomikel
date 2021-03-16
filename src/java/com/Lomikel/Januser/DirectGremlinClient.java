@@ -66,6 +66,6 @@ public class DirectGremlinClient extends GremlinClient {
   private GraphTraversalSource _g;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(SimpleGremlinClient.class);
+  private static Logger log = Logger.getLogger(DirectGremlinClient.class);
 
   }
