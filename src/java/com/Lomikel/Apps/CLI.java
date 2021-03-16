@@ -159,12 +159,12 @@ public class CLI {
       log.debug("Cannot import com.Lomikel.Januser.GremlinClient", e);
       }      
     try {
-      interpreter().eval("import com.Lomikel.Januser.SimpleGremlinClient");
-      log.info("SimpleGremlinClient imported");
+      interpreter().eval("import com.Lomikel.Januser.DirectGremlinClient");
+      log.info("DirectGremlinClient imported");
       }
     catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Januser.SimpleGremlinClient");
-      log.debug("Cannot import com.Lomikel.Januser.SimpleGremlinClient", e);
+      log.error("Cannot import com.Lomikel.Januser.DirectGremlinClient");
+      log.debug("Cannot import com.Lomikel.Januser.DirectGremlinClient", e);
       }      
     try {
       interpreter().eval("import com.Lomikel.Januser.Hertex");
