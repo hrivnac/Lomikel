@@ -63,7 +63,6 @@ public class GremlinClient {
   public GremlinClient(String  hostname,
                        int     port) {
     this(hostname, port, false);
-    connect();
     }
    
   /** Open with <em>GraphBinary</em> serializer.
