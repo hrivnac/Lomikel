@@ -159,6 +159,14 @@ public class CLI {
       log.debug("Cannot import com.Lomikel.Januser.GremlinClient", e);
       }      
     try {
+      interpreter().eval("import com.Lomikel.Januser.SimpleGremlinClient");
+      log.info("SimpleGremlinClient imported");
+      }
+    catch (EvalError e) {
+      log.error("Cannot import com.Lomikel.Januser.SimpleGremlinClient");
+      log.debug("Cannot import com.Lomikel.Januser.SimpleGremlinClient", e);
+      }      
+    try {
       interpreter().eval("import com.Lomikel.Januser.Hertex");
       log.info("Hertex imported");
       }

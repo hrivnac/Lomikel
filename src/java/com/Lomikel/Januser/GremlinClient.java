@@ -30,7 +30,7 @@ import java.util.HashMap;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>GremlinClient</code> provides connection to Gremlin Graph.
+/** <code>GremlinClient</code> provides connection to Gremlin Graph passing Gremlin commands as Strings.
   * @opt attributes
   * @opt operations
   * @opt types
@@ -54,6 +54,7 @@ public class GremlinClient {
     else {
       open(hostname, port);
       }
+    connect();
     }
     
   /** Create with connection parameters, using <em>GraphBinary</em> serializer.
@@ -87,8 +88,7 @@ public class GremlinClient {
                         .port(port)
                         .serializer(serializer)
                         .create();
-      _client = _cluster.connect().init();
-      log.info("Connected");
+      log.info("Opened");
       }
     catch (Exception e) {
       log.error("Cannot open connection", e);
@@ -110,15 +110,20 @@ public class GremlinClient {
                         .port(port)
                         .serializer(serializer)
                         .create();
-      _client = _cluster.connect().init();
-      log.info("Connected");
+      log.info("Opened");
       }
     catch (Exception e) {
       log.error("Cannot open connection", e);
       }
     }
-           
-  /** Close graph. */
+        
+  /** Connect client. */
+  public void connect() {
+    _client = _cluster.connect().init();
+    log.info("Connected");
+    }
+       
+  /** Close client. */
   public void close() {
     _client.close();
     _cluster.close();
@@ -159,6 +164,12 @@ public class GremlinClient {
       }
     json += "]";
     return json;
+    }
+    
+  /** Give the {@link Cluster}.
+    * @return The attached {@link Cluster}. */
+  public Cluster cluster() {
+    return _cluster;
     }
     
   private Cluster _cluster;  
