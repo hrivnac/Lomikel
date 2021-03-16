@@ -52,7 +52,7 @@ public class GremlinClient {
       openGryo(hostname, port);
       }
     else {
-      open(hostname, port);
+      openBinary(hostname, port);
       }
     connect();
     }
@@ -62,16 +62,15 @@ public class GremlinClient {
     * @param table    The Gremlin port. */
   public GremlinClient(String  hostname,
                        int     port) {
-    Init.init();
-    log.info("Opening " + hostname + ":" + port);
-    open(hostname, port);
+    this(hostname, port, false);
+    connect();
     }
    
   /** Open with <em>GraphBinary</em> serializer.
     * @param hostname The Gremlin hostname.
     * @param table    The Gremlin port. */
-  public void open(String hostname,
-                   int    port) {
+  public void openBinary(String hostname,
+                         int    port) {
     log.info("Using GraphBinary serializer");
     try {
       Map<String, Object>  conf = new HashMap<>();
