@@ -200,7 +200,7 @@ public abstract class Wertex implements Vertex {
           }
         }
       }
-    else {
+    else if (fields != null && !fields.isEmpty()) {
       for (Map.Entry<String, String> entry : fields.entrySet()) {
         try {
           property(prefix + entry.getKey(), entry.getValue());

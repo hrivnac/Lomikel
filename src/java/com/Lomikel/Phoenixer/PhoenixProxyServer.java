@@ -30,8 +30,8 @@ public class PhoenixProxyServer extends PhoenixClient
     * @param port       The proxyPort for this sever.
     * @param phoenixUrl The {@link Phoenix} url.
     * @throws LomikelException If anhything goes wrong. */
-  public PhoenixProxyServer(int            proxyPort,
-                            String         phoenixUrl) throws LomikelException {
+  public PhoenixProxyServer(int    proxyPort,
+                            String phoenixUrl) throws LomikelException {
     super(phoenixUrl);
     log.info("Serving " + phoenixUrl + " on " + proxyPort);
     PhoenixProxyServer proxy = this;

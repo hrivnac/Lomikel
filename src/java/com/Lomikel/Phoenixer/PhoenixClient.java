@@ -190,8 +190,10 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     for (String line : answer.split("\n")) {
       result = new TreeMap<>();
       for (String r : line.split("#")) {
-        keyvalue = r.split("=");
-        result.put(keyvalue[0], keyvalue[1]);
+        if (!r.trim().equals("")) {
+          keyvalue = r.split("=");
+          result.put(keyvalue[0], keyvalue[1]);
+          }
         }
       kv = new String[schema().rowkeyNames().length];
       for (int i = 0; i < schema().rowkeyNames().length; i++) {

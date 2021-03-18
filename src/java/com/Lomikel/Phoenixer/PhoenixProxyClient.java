@@ -43,14 +43,20 @@ public class PhoenixProxyClient extends PhoenixClient {
                                                boolean   ifkey,
                                                boolean   iftime) {
     String sql = formSqlRequest(key, searchMap, filter, start, stop, ifkey, iftime);
-    try {
-      String answer = _socketClient.send(sql);
-      return interpretSqlAnswer(answer);
+    String answer = null;
+    while (answer == null) {
+      answer = _socketClient.send(sql);
+      if (answer == null) {
+        try {
+          _socketClient.reconnect();
+          }
+        catch (LomikelException e) {
+          log.error("Cannot scan", e);
+          return new TreeMap<String, Map<String, String>>();
+          }
+        }
       }
-    catch (LomikelException e) {
-      log.error("Cannot scan", e);
-      return new TreeMap<String, Map<String, String>>();
-      }
+    return interpretSqlAnswer(answer);
     }
     
   @Override

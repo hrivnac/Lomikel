@@ -26,29 +26,44 @@ public class SocketClient {
     * @throws LomikelException When cannot be created. */
 	public SocketClient(String address,
 	                    int    port) throws LomikelException { 
+	  _address = address;
+	  _port    = port;
+	  connect();
+	  } 
+	  
+	/** Reconnect to the {@link Socket}. */
+    * @throws LomikelException When cannot be reconnected. */
+  public void reconnect() throws LomikelException {
+    log.info("Reconnecting");
+    close();
+    connect();
+    }
+	  
+	/** Connect to the {@link Socket}. */
+    * @throws LomikelException When cannot be connected. */
+  private void connect() throws LomikelException {
 		try { 
-			_socket = new Socket(address, port); 
+			_socket = new Socket(_address, _port); 
 			_in  = new DataInputStream(new BufferedInputStream(_socket.getInputStream())); 
 			_out = new DataOutputStream(_socket.getOutputStream()); 
-			log.info("Connected to " + address + ":" + port); 
+			log.info("Connected to " + _address + ":" + _port); 
 	  	} 
-		catch(IOException e) { 
-			throw new LomikelException("Cannot create", e);
+		catch (IOException e) { 
+			throw new LomikelException("Cannot connect Socket", e);
 		  } 
-	  } 
+    }
 	  
 	/** Send message to {@link SocketServer}.
 	  * @param  msg The message to be send.
-	  * @return     The result.
-    * @throws LomikelException When msg cannot be send. */
-	public String send(String msg) throws LomikelException {
+	  * @return     The result. <tt>null</tt> if message cannot be send. */
+	public String send(String msg) {
 	  String line = "";
 		try { 
 			_out.writeUTF(msg);
 			line = _in.readUTF();
 		  } 
 		catch(IOException e) { 
-			throw new LomikelException("Cannot send message: " + msg,  e); 
+			return null; 
 		  }
 		return line;
 	  }
@@ -60,16 +75,20 @@ public class SocketClient {
 			_out.close(); 
 			_socket.close(); 
 		  } 
-		catch(LomikelException | IOException e) { 
+		catch(IOException e) { 
 			log.warn("Could not close", e); 
 		  } 
 	  }
-
+	  
 	private Socket _socket = null; 
 	
 	private DataInputStream  _in  = null;
 	
 	private DataOutputStream _out	 = null; 
+	
+	private String _address;
+	
+	private int _port;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(SocketClient.class);
