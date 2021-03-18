@@ -47,7 +47,7 @@ public class Sertex extends Wertex {
         searchMap.put(rowkeyNames()[i], rowkeys()[i]);
         }
       Map<String, Map<String, String>> results = _client.scan(null, searchMap, "*", 0, 0, false, true);
-      setFields(results.get(rowkey())); 
+      setFields(results.get(rowkey()), "phoenix"); 
       }
     }
     

@@ -174,6 +174,20 @@ public abstract class Wertex implements Vertex {
   /** Set all field values read from the database.
     * @param fields The key-value pairs from the database. */
   protected void setFields(Map<String, String> fields) {
+    setFields(fields, null);
+    }
+        
+  /** Set all field values read from the database.
+    * @param fields The key-value pairs from the database.
+    * @param prefix The prefix to add (together with <tt>:</tt>) to the filed names. */
+  protected void setFields(Map<String, String> fields,
+                           String              prefix) {
+    if (prefix == null || prefix.trim().equals("")) {
+      prefix = "";
+      }
+    else {
+      prefix = prefix.trim() + ":";
+      }
     if (_fields != null) {
       String value;
       for (String field : _fields) {
@@ -182,14 +196,14 @@ public abstract class Wertex implements Vertex {
           log.error("" + field + " missing, not filled");
           }
         else {
-          property(field, value);
+          property(prefix + field, value);
           }
         }
       }
     else {
       for (Map.Entry<String, String> entry : fields.entrySet()) {
         try {
-          property(entry.getKey(), entry.getValue());
+          property(prefix + entry.getKey(), entry.getValue());
           }
         catch (SchemaViolationException e) {
           log.warn("Cannot add " + entry.getKey() + " -> " + entry.getValue(), e);
