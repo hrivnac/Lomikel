@@ -31,7 +31,7 @@ public class SocketClient {
 	  connect();
 	  } 
 	  
-	/** Reconnect to the {@link Socket}. */
+	/** Reconnect to the {@link Socket}.
     * @throws LomikelException When cannot be reconnected. */
   public void reconnect() throws LomikelException {
     log.info("Reconnecting");
@@ -39,7 +39,7 @@ public class SocketClient {
     connect();
     }
 	  
-	/** Connect to the {@link Socket}. */
+	/** Connect to the {@link Socket}.
     * @throws LomikelException When cannot be connected. */
   private void connect() throws LomikelException {
 		try { 

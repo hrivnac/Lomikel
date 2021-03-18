@@ -43,7 +43,7 @@ public class StringGremlinClient extends GremlinClient {
     * @param table    The Gremlin port. */
   public StringGremlinClient(String  hostname,
                              int     port) {
-    super(hostname, port, false);
+    super(hostname, port, true);
     }
         
   @Override

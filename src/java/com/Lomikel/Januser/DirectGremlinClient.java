@@ -27,7 +27,7 @@ public class DirectGremlinClient extends GremlinClient {
     * @param table    The Gremlin port. */
   public DirectGremlinClient(String  hostname,
                              int     port) {
-    super(hostname, port, true);
+    super(hostname, port, false);
     }
    
   @Override
