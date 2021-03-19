@@ -42,6 +42,12 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class GremlinRecipies {
     
+  /** Create and attach to {@link GraphTraversalSource}.
+    * @param g The attached  {@link GraphTraversalSource}. */
+  public GremlinRecipies(GraphTraversalSource g) {
+    _g = g;
+    }
+    
   /** Create and attach to {@link ModifyingGremlinClient}.
     * @param client The attached  {@link ModifyingGremlinClient}. */
   public GremlinRecipies(ModifyingGremlinClient client) {
@@ -53,7 +59,7 @@ public class GremlinRecipies {
     log.info("Cleaning MetaGraph");
     g().V().hasLabel("MetaGraph").drop().iterate();
     g().E().hasLabel("MetaGraph").drop().iterate();
-    _client.commit();
+    commit();
     Map<String, Set<String>> vMap  = new HashMap<>();
     Map<String, Set<String>> eMap  = new HashMap<>();
     Map<String, String>      evMap = new HashMap<>();
@@ -106,8 +112,8 @@ public class GremlinRecipies {
         e.property(p, "");
         }
       }
-    _client.commit();
-    _client.close();
+    commit();
+    close();
     }
        
   /** Get a {@link Vertex}, create it if necessary.
@@ -172,9 +178,27 @@ public class GremlinRecipies {
   /** Give {@link GraphTraversalSource}.
     * @return {@link GraphTraversalSource}. */
   public GraphTraversalSource g() {
-    return _client.g();
+    return _client == null ? _g : _client.g();
     }
   
+  /** Commit, if operating via {@link ModifyingGremlinClient},
+    * do nothing otherwise. */
+  private void commit() {
+    if (_client != null) {
+      _client.commit();
+      }
+    }
+    
+  /** Close, if operating via {@link ModifyingGremlinClient},
+    * do nothing otherwise. */
+  private void close() {
+    if (_client != null) {
+      _client.close();
+      }
+    }
+    
+  private GraphTraversalSource _g;
+    
   private ModifyingGremlinClient _client;
 
   private boolean _found;

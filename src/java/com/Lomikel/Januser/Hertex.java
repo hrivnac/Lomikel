@@ -5,6 +5,7 @@ import com.Lomikel.HBaser.HBaseClient;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 
 // Java
 import java.util.Map;
@@ -79,6 +80,25 @@ public class Hertex extends Wertex {
       }
     }
    
+  /** Get {@link Vertex} backuped by <em>HBase</em>
+    * from the <em>JanusGraph</em>, or create if it doesn't exist yet.
+    * @param lbl     The {@link Vertex} label.
+    * @param rowkey  The {@link Vertex} <tt>rowkey</tt> value. Its name is taken from the schema.
+    * @param g       The {@link GraphTraversalSource} to be used to execute operations.
+    * @param enhance Whether enhance all values from the <em>HBase</em>.
+    * @return        The created {@link Vertex}. It will be created even when no corresponding
+    *                entry exists in the <em>HBase</em>. In that case, it can be enhanced later. */
+  public static Vertex getOrCreate(String                 lbl,
+                                   String                 rowkey,
+                                   GraphTraversalSource   g,
+                                   boolean                enhance) {
+    Vertex v = new GremlinRecipies(g).getOrCreate(lbl, rowkeyName(representant(lbl)), rowkey);
+    if (enhance) {
+      v = enhance(v);
+      }
+    return v;
+    }
+    
   @Override
   public String toString() {
     String msg = "Vertex backed up with " + _client;

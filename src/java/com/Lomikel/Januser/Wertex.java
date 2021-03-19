@@ -66,24 +66,37 @@ public abstract class Wertex implements Vertex {
     
   /** Set the names of the row keys to form the correspondence between
     * Graph and database. It should be set before any database request.
+    * @param lbl         The {@link Vertex} label.
     * @param cl          The {@link Class} representing this {@link Wertex}.
     * @param rowkeyNames The names of the common keys in Graph {@link Vertex} and 
     *                    database. */
-  public static void setRowkeyNames(Class cl,
+  public static void setRowkeyNames(String   lbl,
+                                    Class    cl,
                                     String[] rowkeyNames) {
     log.info("Setting rowkey names for " + cl.getCanonicalName() + ": " + String.join(", ", rowkeyNames));
+    _representants.put(lbl, cl.getCanonicalName()); 
     _rowkeyNames.put(cl.getCanonicalName(), rowkeyNames);
     }
     
   /** Set the names of the only row key to form the correspondence between
     * Graph and database. It should be set before any database request.
+    * @param lbl         The {@link Vertex} label.
     * @param cl         The {@link Class} representing this {@link Wertex}.
     * @param rowkeyName The name of the common keys in Graph {@link Vertex} and 
     *                   database. */
-  public static void setRowkeyName(Class cl,
+  public static void setRowkeyName(String lbl,
+                                   Class  cl,
                                    String rowkeyName) {
     log.info("Setting rowkey name for " + cl.getCanonicalName() + ": " + rowkeyName);
+    _representants.put(lbl, cl.getCanonicalName()); 
     _rowkeyNames.put(cl.getCanonicalName(), new String[]{rowkeyName});
+    }
+    
+  /** Give the Canonical Class Name of the {@link Class} representing a <em>label</em>.
+    * @param lbl The <em>label</em> to be represented.
+    * @return    The representing Canonical Class Name. */
+  public static String representant(String lbl) {
+    return _representants.get(lbl);
     }
     
   /** Give the names of the keys to form the correspondence between
@@ -91,7 +104,16 @@ public abstract class Wertex implements Vertex {
     * @return The names of the common keys in Graph {@link Vertex} and 
     *         database. */
   public String[] rowkeyNames() {
-    return _rowkeyNames.get(getClass().getCanonicalName());
+    return rowkeyNames(getClass().getCanonicalName());
+    }
+    
+  /** Give the names of the keys to form the correspondence between
+    * Graph and database.
+    * @param representant The representing Canonical Class Name.
+    * @return             The names of the common keys in Graph {@link Vertex} and 
+    *                     database. */
+  public static String[] rowkeyNames(String representant) {
+    return _rowkeyNames.get(representant);
     }
     
   /** Give the name of the keys to form the correspondence between
@@ -101,12 +123,24 @@ public abstract class Wertex implements Vertex {
     *         <tt>null</tt> if not set.
     *         Concatenated with <tt>#</tt> if multivalue. */
   public String rowkeyName() {
-    if (_rowkeyNames.get(getClass().getCanonicalName()).length == 0) {
+    return rowkeyName(getClass().getCanonicalName());
+    }
+    
+  /** Give the name of the keys to form the correspondence between
+    * Graph and database.
+    * @param representant The representing Canonical Class Name.
+    * @return             The names of the common keys in Graph {@link Vertex} and 
+    *                     database.
+    *                     <tt>null</tt> if not set.
+    *                     Concatenated with <tt>#</tt> if multivalue. */
+  public static String rowkeyName(String representant) {
+    if (_rowkeyNames.get(representant).length == 0) {
       log.error("RowkeyName not set");
       return null;
       }
-    return String.join("#", _rowkeyNames.get(getClass().getCanonicalName()));
+    return String.join("#", _rowkeyNames.get(representant));
     }
+      
     
   @Override
   public Edge addEdge(String label, Vertex inVertex, Object... keyValues) {
@@ -232,6 +266,8 @@ public abstract class Wertex implements Vertex {
   private String[] _fields;
   
   private static Map<String, String[]> _rowkeyNames = new TreeMap<>();
+  
+  private static Map<String, String> _representants = new TreeMap<>();
 
   /** Logging . */
   private static Logger log = Logger.getLogger(Wertex.class);
