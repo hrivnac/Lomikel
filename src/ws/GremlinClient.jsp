@@ -14,6 +14,7 @@
   req = URLDecoder.decode(req, "UTF-8");
   String output = gc.interpret2JSON(req);
   log.info("Interpreting: " + req + " => " + output);
+  gc.close();
   %>
 <%=output%>
 

@@ -43,7 +43,26 @@ public class StringGremlinClient extends GremlinClient {
     * @param table    The Gremlin port. */
   public StringGremlinClient(String  hostname,
                              int     port) {
-    super(hostname, port, true);
+    super(hostname, port);
+    }
+   
+  /** Open with <em>Gryo</em> serializer.
+    * @param hostname The Gremlin hostname.
+    * @param table    The Gremlin port. */
+  @Override
+  public void open(String hostname,
+                   int    port) {
+    log.info("Using Gryo serializer");
+    try {
+      GryoMapper.Builder builder = GryoMapper.build()
+                                             .addRegistry(JanusGraphIoRegistry.getInstance());                                                     
+      MessageSerializer serializer = new GryoMessageSerializerV3d0(builder);      
+      createCluster(hostname, port, serializer);
+      log.info("Opened");
+      }
+    catch (Exception e) {
+      log.error("Cannot open connection", e);
+      }
     }
         
   @Override

@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class JanusClient {
+public class JanusClient implements ModifyingGremlinClient {
 
   /** Extract implicite schema.
     * @param args[0] The operation: <tt>extract,populate</tt>.
@@ -50,8 +50,10 @@ public class JanusClient {
   public static void main(String[] args) throws Exception {
     Init.init();
     if (args[0].trim().equals("extract")) {
-      new JanusClient(args[1],
-                      args[2]).createMetaSchema();
+      JanusClient jc = new JanusClient(args[1],
+                                       args[2]);
+      GremlinRecipies gr = new GremlinRecipies(jc); 
+      gr.createMetaSchema();
       }
     else {
       System.err.println("Unknown function " + args[0] + ", try extract");
@@ -132,13 +134,13 @@ public class JanusClient {
     log.info("Connected");
     }
     
-  /** Commit transaction. */
+  @Override
   public void commit() {
     _graph.tx().commit();
     log.info("Commited");
     }
     
-  /** Close graph. */
+  @Override
   public void close() {
     _graph.close();
     log.info("Closed");
@@ -151,131 +153,9 @@ public class JanusClient {
     open();
     }
     
-  /** Give {@link GraphTraversalSource}.
-    * @return {@link GraphTraversalSource}. */
+  @Override
   public GraphTraversalSource g() {
     return _g;
-    }
-    
-  /** Extract implicite schema. */
-  public void createMetaSchema() {
-    log.info("Cleaning MetaGraph");
-    g().V().hasLabel("MetaGraph").drop().iterate();
-    g().E().hasLabel("MetaGraph").drop().iterate();
-    commit();
-    Map<String, Set<String>> vMap  = new HashMap<>();
-    Map<String, Set<String>> eMap  = new HashMap<>();
-    Map<String, String>      evMap = new HashMap<>();
-    Set<String> vSet;
-    Set<String> eSet;
-    Property<Vertex> vP;
-    Property<Edge>   eP;
-    log.info("Scanning Vertexes");
-    for (Vertex v : g().V().toList()) {
-      vSet = new HashSet<>();
-      vMap.put(v.label(), vSet);
-      for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
-        vP = i.next();
-        vSet.add(vP.key());
-        }
-      }
-    log.info("Scanning Edges");
-    for (Edge e : g().E().toList()) {
-      eSet = new HashSet<>();
-      eMap.put(e.label(), eSet);
-      evMap.put(e.label(), e.outVertex().label() + " " + e.inVertex().label());
-      for (Iterator<Property<Edge>> i = e.properties(); i.hasNext();) { 
-        eP = i.next();
-        eSet.add(eP.key());
-        }
-      }
-    Vertex v;
-    for (Map.Entry<String, Set<String>> entry : vMap.entrySet()) {
-      log.info("Adding Vertex " + entry.getKey());
-      try {
-        v = g().addV("MetaGraph").next();
-        v.property("MetaLabel", entry.getKey());
-        for (String p : entry.getValue()) {
-          v.property(p, "");
-          }
-        }
-      catch (Exception e) {
-        log.error("... failed");
-        }
-      }
-    String[] vvS;
-    Edge e;
-    for (Map.Entry<String, String> entry : evMap.entrySet()) {
-      log.info("Adding Edge " + entry.getKey() + " : " + entry.getValue());
-      vvS = entry.getValue().split(" ");
-      v = g().V().has("MetaGraph", "MetaLabel", vvS[0]).next();
-      e = v.addEdge("MetaGraph", g().V().has("MetaGraph", "MetaLabel", vvS[1]).next());
-      e.property("MetaLabel", entry.getKey());
-      for (String p : eMap.get(entry.getKey())) {
-        e.property(p, "");
-        }
-      }
-    commit();
-    close();
-    }
-       
-  /** Get a {@link Vertex}, create it if necessary.
-    * @param label         The {@link Vertex} label.
-    * @param propertyName  The name of {@link Vertex} property.
-    * @param propertyValue The value of {@link Vertex} property.
-    * @return              The created {@link Vertex}. */
-  // TBD: allow replacing
-  // TBD: check if it is really only one
-  public Vertex getOrCreate(String label,
-                            String propertyName,
-                            Object propertyValue) {
-     List<Vertex> vertexes = g().V().has("lbl", label)
-                                    .has(propertyName, propertyValue)
-                                    .fold()
-                                    .coalesce(unfold(), 
-                                              g().addV(label)
-                                                 .property("lbl", label)
-                                                 .property(propertyName, propertyValue)).toList();
-     if (vertexes.size() > 1) {
-       log.warn("" + vertexes.size() + " vertices found, only the first one returned");
-       }
-     else if (vertexes.size() == 0) {
-       log.error("No vertex found");
-       return null;
-       }
-     return vertexes.get(0);
-     }
-    
-  /** Add an {@link Edge} between two {@link Vertex}s,
-    * unless it exists.
-    * @param v1       The first {@link Vertex}.
-    * @param v2       The second {@link Vertex}.
-    * @param relation The {@link Edge} name. */
-  public void addEdge(Vertex v1,
-                      Vertex v2,
-                      String relation) {
-    if (!checkEdge(v1, v2, relation)) {
-      v1.addEdge(relation, v2);
-      }
-    }
-    
-  /** Check whether an {@link Edge} exists.
-    * @param v1       The source {@link Vertex}.
-    * @param v2       The destination {@link Vertex}.
-    * @param relation The {@link Edge} name.
-    * @return         Whether this {@link Edge} exists. */
-  public boolean checkEdge(Vertex v1,
-                           Vertex v2,
-                           String relation) {
-    _found = false;
-    if (v1.vertices(Direction.OUT, relation).hasNext()) {
-      v1.vertices(Direction.OUT, relation).forEachRemaining(v -> {
-                                             if (v.equals(v2)) {
-                                               _found = true;
-                                               }
-                                             });
-      }
-    return _found;
     }
 
   /** Start timer. */
