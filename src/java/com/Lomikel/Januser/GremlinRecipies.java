@@ -5,6 +5,7 @@ import com.Lomikel.Utils.Info;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -142,6 +143,28 @@ public class GremlinRecipies {
        }
      return vertexes.get(0);
      }
+       
+  /** Get a {@link Vertex}, create it if necessary.
+    * @param label          The {@link Vertex} label.
+    * @param propertyNames  The name of {@link Vertex} properties.
+    * @param propertyValues The value of {@link Vertex} properties.
+    * @return               The created {@link Vertex}. */
+  // TBD: allow replacing
+  // TBD: check if it is really only one
+  public Vertex getOrCreate(String label,
+                            String[] propertyNames,
+                            Object[] propertyValues) {
+     List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
+                                                                                                    .coalesce(unfold(), addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
+     if (vertexes.size() > 1) {
+       log.warn("" + vertexes.size() + " vertices found, only the first one returned");
+       }
+     else if (vertexes.size() == 0) {
+       log.error("No vertex found");
+       return null;
+       }
+     return vertexes.get(0);
+     }
     
   /** Add an {@link Edge} between two {@link Vertex}s,
     * unless it exists.
@@ -195,6 +218,36 @@ public class GremlinRecipies {
     if (_client != null) {
       _client.close();
       }
+    }
+    
+  /** Add multiple properties.
+    * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
+    * @param names  The properties names.
+    * @param values The proerties values.
+    * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
+  // TBD check for the same length
+  private GraphTraversal<Vertex, Vertex> hasProperties(GraphTraversal<Vertex, Vertex> v,
+                                                       String[]                       names,
+                                                       Object[]                       values) {
+    for (int i = 0; i < names.length; i++) {
+      v = v.has(names[i], values[i]);
+      }
+    return v;
+    }
+    
+  /** Check multiple properties.
+    * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
+    * @param names  The properties names.
+    * @param values The proerties values.
+    * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
+  // TBD check for the same length
+  private GraphTraversal<Vertex, Vertex> addProperties(GraphTraversal<Vertex, Vertex> v,
+                                                       String[]                       names,
+                                                       Object[]                       values) {
+    for (int i = 0; i < names.length; i++) {
+      v.property(names[i], values[i]);
+      }
+    return v;
     }
     
   private GraphTraversalSource _g;

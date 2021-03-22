@@ -5,6 +5,7 @@ import com.Lomikel.Phoenixer.PhoenixClient;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 
 // Java
 import java.util.Map;
@@ -83,6 +84,25 @@ public class Sertex extends Wertex {
       log.error("Cannot enhance as " + cl, e);
       return vertex;
       }
+    }
+   
+  /** Get {@link Vertex} backuped by <em>Phoenix</em>
+    * from the <em>JanusGraph</em>, or create if it doesn't exist yet.
+    * @param lbl     The {@link Vertex} label.
+    * @param rowkey  The {@link Vertex} <tt>rowkeys</tt> value. Their names are taken from the schema.
+    * @param g       The {@link GraphTraversalSource} to be used to execute operations.
+    * @param enhance Whether enhance all values from the <em>Phoenix</em>.
+    * @return        The created {@link Vertex}. It will be created even when no corresponding
+    *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later. */
+  public static Vertex getOrCreate(String                 lbl,
+                                   String[]               rowkeys,
+                                   GraphTraversalSource   g,
+                                   boolean                enhance) {
+    Vertex v = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys);
+    if (enhance) {
+      v = enhance(v);
+      }
+    return v;
     }
    
   @Override
