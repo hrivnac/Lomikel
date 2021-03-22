@@ -48,6 +48,9 @@ public class Sertex extends Wertex {
         searchMap.put(rowkeyNames()[i], rowkeys()[i]);
         }
       Map<String, Map<String, String>> results = _client.scan(null, searchMap, "*", 0, 0, false, true);
+    if (results != null && !results.isEmpty()) {
+      property("phoenix", true);
+      }
       setFields(results.get(rowkey()), "phoenix"); 
       }
     }
@@ -69,10 +72,12 @@ public class Sertex extends Wertex {
     * @return         The enhanced {@link Vertex}, if possible. */
   public static Vertex enhance(Vertex vertex) {
     if (_client == null || vertex.property("lbl") == null) {
+      log.warn( "Cannot enhance, no client or label");
       return vertex;
       }
     Class cl = _client.representation(vertex.property("lbl").value().toString());
     if (cl == null) {
+      log.warn( "Cannot enhance, cannot get enhancing Class");
       return vertex;
       }
     try {
@@ -81,7 +86,8 @@ public class Sertex extends Wertex {
       return newVertex;
       }
     catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      log.error("Cannot enhance as " + cl, e);
+      log.warn( "Cannot enhance as " + cl);
+      log.debug("Cannot enhance as " + cl, e);
       return vertex;
       }
     }

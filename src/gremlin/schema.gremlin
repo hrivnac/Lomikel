@@ -11,9 +11,12 @@ has      = mgmt.makeEdgeLabel('contains').multiplicity(ONE2MANY).make()
 contains = mgmt.makeEdgeLabel('has'     ).multiplicity(MULTI   ).make()
 
 // Properties
-title  = mgmt.makePropertyKey('title' ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-lbl    = mgmt.makePropertyKey('lbl'   ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-name   = mgmt.makePropertyKey('name'  ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
+title    = mgmt.makePropertyKey('title'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+lbl      = mgmt.makePropertyKey('lbl'     ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+name     = mgmt.makePropertyKey('name'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+hbase    = mgmt.makePropertyKey('hbase'   ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
+phoenix  = mgmt.makePropertyKey('phoenix' ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
+fullfill = mgmt.makePropertyKey('fullfill').dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
 
 // Vertex properties
 // ...

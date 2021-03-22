@@ -43,6 +43,9 @@ public class Hertex extends Wertex {
       }
     String n = null;
     Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
+    if (results != null && !results.isEmpty()) {
+      property("hbase", true);
+      }
     setFields(results.get(rowkey())); 
     }
     
@@ -63,10 +66,12 @@ public class Hertex extends Wertex {
     * @return         The enhanced {@link Vertex}, if possible. */
   public static Vertex enhance(Vertex vertex) {
     if (_client == null || vertex.property("lbl") == null) {
+      log.warn( "Cannot enhance, no client or label");
       return vertex;
       }
     Class cl = _client.representation(vertex.property("lbl").value().toString());
     if (cl == null) {
+      log.warn( "Cannot enhance, cannot get enhancing Class");
       return vertex;
       }
     try {
@@ -75,7 +80,8 @@ public class Hertex extends Wertex {
       return newVertex;
       }
     catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      log.error("Cannot enhance as " + cl, e);
+      log.warn( "Cannot enhance as " + cl, e);
+      log.debug("Cannot enhance as " + cl);
       return vertex;
       }
     }

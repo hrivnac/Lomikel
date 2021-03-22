@@ -222,7 +222,9 @@ public abstract class Wertex implements Vertex {
     else {
       prefix = prefix.trim() + ":";
       }
+    // fill only _fileds
     if (_fields != null) {
+      property("fullfill", false);
       String value;
       for (String field : _fields) {
         value = fields.get(field);
@@ -234,7 +236,9 @@ public abstract class Wertex implements Vertex {
           }
         }
       }
+    // fill everything
     else if (fields != null && !fields.isEmpty()) {
+      property("fullfill", true);
       for (Map.Entry<String, String> entry : fields.entrySet()) {
         try {
           property(prefix + entry.getKey(), entry.getValue());
