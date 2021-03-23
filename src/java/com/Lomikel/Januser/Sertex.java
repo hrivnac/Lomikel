@@ -24,12 +24,14 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Sertex extends Wertex {
-   
+      
   /** Dress existing {@link Vertex} with values from Phoenix.
-    * Fill in all fields from the database.
-    * @param vertex The original {@link Vertex}. */
-  public Sertex(Vertex vertex) {
-    super(vertex, null);
+    * @param vertex The original {@link Vertex}.
+    * @param fields The coma-separated list of fields to fill in from the database.
+    *               All fields will be filled in if <tt>null</tt>. */
+  public Sertex(Vertex vertex,
+                String fields) {
+    this(vertex, fields == null ? null : fields.split(","));
     }
    
   /** Dress existing {@link Vertex} with values from Phoenix.
@@ -69,8 +71,12 @@ public class Sertex extends Wertex {
   
   /** Enhance {@link Vertex} with properties from Phoenix database.
     * @param  @vertex The {@link Vertex} to be enhanced.
-    * @return         The enhanced {@link Vertex}, if possible. */
-  public static Vertex enhance(Vertex vertex) {
+    * @param fields The coma-separated list of fields to fill.
+    *               <tt>null</tt> will fill all fields.
+    *               Empty String will fill nothing besides rowkey fields.
+    * @return       The enhanced {@link Vertex}, if possible. */
+  public static Vertex enhance(Vertex vertex,
+                               String fields) {
     if (_client == null || vertex.property("lbl") == null) {
       log.warn( "Cannot enhance, no client or label");
       return vertex;
@@ -81,8 +87,8 @@ public class Sertex extends Wertex {
       return vertex;
       }
     try {
-      Constructor constructor = cl.getConstructor(new Class[]{Vertex.class});
-      Vertex newVertex = (Vertex)constructor.newInstance(vertex);
+      Constructor constructor = cl.getConstructor(new Class[]{Vertex.class, String.class});
+      Vertex newVertex = (Vertex)constructor.newInstance(vertex, fields);
       return newVertex;
       }
     catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -96,18 +102,34 @@ public class Sertex extends Wertex {
     * from the <em>JanusGraph</em>, or create if it doesn't exist yet.
     * @param lbl     The {@link Vertex} label.
     * @param rowkey  The {@link Vertex} <tt>rowkeys</tt> value. Their names are taken from the schema.
-    * @param g       The {@link GraphTraversalSource} to be used to execute operations.
-    * @param enhance Whether enhance all values from the <em>Phoenix</em>.
+    * @param g        The {@link GraphTraversalSource} to be used to execute operations.
+    * @param fields  The coma-separated list of fields to fill.
+    *                <tt>null</tt> will fill all fields.
+    *                Empty String will fill nothing besides rowkey fields.
     * @return        The created {@link Vertex}. It will be created even when no corresponding
     *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later. */
   public static Vertex getOrCreate(String                 lbl,
                                    String[]               rowkeys,
                                    GraphTraversalSource   g,
                                    boolean                enhance) {
+    return getOrCreate(lbl, rowkeys, g, enhance ? null : "");
+    }
+   
+  /** Get {@link Vertex} backuped by <em>Phoenix</em>
+    * from the <em>JanusGraph</em>, or create if it doesn't exist yet.
+    * @param lbl     The {@link Vertex} label.
+    * @param rowkey  The {@link Vertex} <tt>rowkeys</tt> value. Their names are taken from the schema.
+    * @param g       The {@link GraphTraversalSource} to be used to execute operations.
+    * @param enhance Whether enhance all values from the <em>Phoenix</em>.
+    * @return        The created {@link Vertex}. It will be created even when no corresponding
+    *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later. */
+  // TBD: more user-riendly rowkeys
+  public static Vertex getOrCreate(String                 lbl,
+                                   String[]               rowkeys,
+                                   GraphTraversalSource   g,
+                                   String                 fields) {
     Vertex v = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys);
-    if (enhance) {
-      v = enhance(v);
-      }
+    v = enhance(v, fields);
     return v;
     }
    

@@ -27,10 +27,19 @@ public class Hertex extends Wertex {
   /** Dress existing {@link Vertex} with values from HBase.
     * Fill in all fields from the database.
     * @param vertex The original {@link Vertex}. */
-  public Hertex(Vertex vertex) {
-    this(vertex, null);
+//  public Hertex(Vertex vertex) {
+//    super(vertex, null);
+//    }
+    
+  /** Dress existing {@link Vertex} with values from HBase.
+    * @param vertex The original {@link Vertex}.
+    * @param fields The coma-separated list of fields to fill in from the database.
+    *               All fields will be filled in if <tt>null</tt>. */
+  public Hertex(Vertex vertex,
+                String fields) {
+    this(vertex, fields == null ? null : fields.split(","));
     }
-   
+  
   /** Dress existing {@link Vertex} with values from HBase.
     * @param vertex The original {@link Vertex}.
     * @param fields The fields to fill in from the database.
@@ -62,9 +71,13 @@ public class Hertex extends Wertex {
     }
   
   /** Enhance {@link Vertex} with properties from HBase database.
-    * @param  @vertex The {@link Vertex} to be enhanced.
-    * @return         The enhanced {@link Vertex}, if possible. */
-  public static Vertex enhance(Vertex vertex) {
+    * @param vertex The {@link Vertex} to be enhanced.
+    * @param fields The coma-separated list of fields to fill.
+    *               <tt>null</tt> will fill all fields.
+    *               Empty String will fill nothing besides rowkey fields.
+    * @return       The enhanced {@link Vertex}, if possible. */
+  public static Vertex enhance(Vertex vertex,
+                               String fields) {
     if (_client == null || vertex.property("lbl") == null) {
       log.warn( "Cannot enhance, no client or label");
       return vertex;
@@ -75,8 +88,8 @@ public class Hertex extends Wertex {
       return vertex;
       }
     try {
-      Constructor constructor = cl.getConstructor(new Class[]{Vertex.class});
-      Vertex newVertex = (Vertex)constructor.newInstance(vertex);
+      Constructor constructor = cl.getConstructor(new Class[]{Vertex.class, String.class});
+      Vertex newVertex = (Vertex)constructor.newInstance(vertex, fields);
       return newVertex;
       }
     catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -98,10 +111,25 @@ public class Hertex extends Wertex {
                                    String                 rowkey,
                                    GraphTraversalSource   g,
                                    boolean                enhance) {
+    return getOrCreate(lbl, rowkey, g, enhance ? null : "");
+    }
+   
+  /** Get {@link Vertex} backuped by <em>HBase</em>
+    * from the <em>JanusGraph</em>, or create if it doesn't exist yet.
+    * @param lbl     The {@link Vertex} label.
+    * @param rowkey  The {@link Vertex} <tt>rowkey</tt> value. Its name is taken from the schema.
+    * @param g       The {@link GraphTraversalSource} to be used to execute operations.
+    * @param fields  The coma-separated list of fields to fill.
+    *                <tt>null</tt> will fill all fields.
+    *                Empty String will fill nothing besides rowkey fields.
+    * @return        The created {@link Vertex}. It will be created even when no corresponding
+    *                entry exists in the <em>HBase</em>. In that case, it can be enhanced later. */
+  public static Vertex getOrCreate(String                 lbl,
+                                   String                 rowkey,
+                                   GraphTraversalSource   g,
+                                   String                 fields) {
     Vertex v = new GremlinRecipies(g).getOrCreate(lbl, rowkeyName(representant(lbl)), rowkey);
-    if (enhance) {
-      v = enhance(v);
-      }
+    v = enhance(v, fields);
     return v;
     }
     

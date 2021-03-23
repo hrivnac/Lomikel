@@ -257,9 +257,10 @@ public abstract class Wertex implements Vertex {
   /** Enhance {@link Vertex} with properties from HBase and Phoenix databases.
     * @param  @vertex The {@link Vertex} to be enhanced.
     * @return         The enhanced {@link Vertex}, if possible. */
-  public static Vertex enhance(Vertex vertex) {
-    vertex = Hertex.enhance(vertex);
-    vertex = Sertex.enhance(vertex);
+  public static Vertex enhance(Vertex vertex,
+                               String fields) {
+    vertex = Hertex.enhance(vertex, fields);
+    vertex = Sertex.enhance(vertex, fields);
     return vertex;
     }
 
