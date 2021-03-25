@@ -20,6 +20,7 @@ import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 import org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0;
 import org.apache.tinkerpop.gremlin.structure.io.binary.TypeSerializerRegistry;
+import org.apache.tinkerpop.gremlin.driver.ser.Serializers;
 
 // Java
 import java.util.List;
@@ -54,7 +55,7 @@ public abstract class GremlinClient {
     * @param hostname The Gremlin hostname.
     * @param table    The Gremlin port. */
   public abstract void open(String hostname,
-                           int    port);
+                            int    port);
         
   /** Connect client. */
   public abstract void connect();

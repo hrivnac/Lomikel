@@ -55,6 +55,7 @@ public class StringGremlinClient extends GremlinClient {
     log.info("Using Gryo serializer");
     try {
       GryoMapper.Builder builder = GryoMapper.build()
+                                             .addRegistry(TinkerIoRegistryV3d0.instance())                                                     
                                              .addRegistry(JanusGraphIoRegistry.getInstance());                                                     
       MessageSerializer serializer = new GryoMessageSerializerV3d0(builder);      
       createCluster(hostname, port, serializer);

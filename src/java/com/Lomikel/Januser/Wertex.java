@@ -254,6 +254,14 @@ public abstract class Wertex implements Vertex {
     * @return The associated {@link Client}. */
   public abstract Client client();
   
+  /** Enhance {@link Vertex} with properties from database.
+    * Fill all fields.
+    * @param vertex The {@link Vertex} to be enhanced.
+    * @return       The enhanced {@link Vertex}, if possible. */
+  public static Vertex enhance(Vertex vertex) {
+    return enhance(vertex, null);
+    }
+  
   /** Enhance {@link Vertex} with properties from HBase and Phoenix databases.
     * @param  @vertex The {@link Vertex} to be enhanced.
     * @return         The enhanced {@link Vertex}, if possible. */

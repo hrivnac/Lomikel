@@ -27,6 +27,7 @@ import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 import org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0;
 import org.apache.tinkerpop.gremlin.structure.io.binary.TypeSerializerRegistry;
+import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 
 // Java
 import java.util.List;
@@ -57,13 +58,13 @@ public class DirectGremlinClient extends    GremlinClient
   /** Open with <em>GraphBinary</em> serializer.
     * @param hostname The Gremlin hostname.
     * @param table    The Gremlin port. */
- @Override
+  @Override
   public void open(String hostname,
                    int    port) {
     log.info("Using GraphBinary serializer");
     try {
       Map<String, Object>  conf = new HashMap<>();
-      conf.put("serializeResultToString", true);
+      conf.put("serializeResultToString", false);
       List<String> ioRegistries =  new ArrayList<>();
       ioRegistries.add("org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0");
       ioRegistries.add("org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
@@ -83,7 +84,9 @@ public class DirectGremlinClient extends    GremlinClient
   public void connect() {
     _graph = EmptyGraph.instance();
     try {
-      _g = _graph.traversal().withRemote(DriverRemoteConnection.using(cluster()));
+      cluster().connect();
+      _g = _graph.traversal().withRemote(DriverRemoteConnection.using(cluster(), "g"));
+      _client = cluster().connect().alias("g");
       }
     catch (Exception e) {
       log.error("Cannot connect", e);
@@ -91,6 +94,19 @@ public class DirectGremlinClient extends    GremlinClient
     log.info("Connected");
     }
        
+  /** Submit Gremlin request as a {@link Traversal}.
+    * @param traversal The Gremlin request as a {@link Traversal}.
+    * @return          The {@link ResultSet}. */
+  public ResultSet submit(Traversal traversal) {
+    return _client.submit(traversal);
+    }
+  /** Submit Gremlin request as a {@link String}.
+    * @param traversal The Gremlin request as a {@link String}.
+    * @return          The {@link ResultSet}. */
+  public ResultSet submit(String gremlin) {
+    return _client.submit(gremlin);
+    }
+    
   @Override
   public void close() {
     try {
@@ -118,6 +134,8 @@ public class DirectGremlinClient extends    GremlinClient
   private Graph _graph;
   
   private GraphTraversalSource _g;
+  
+  private Client _client;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(DirectGremlinClient.class);
