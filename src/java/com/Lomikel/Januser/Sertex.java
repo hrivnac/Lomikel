@@ -43,6 +43,7 @@ public class Sertex extends Wertex {
     super(vertex);
     if (_client == null) {
       log.warn("PhoenixClient is not set, not dressing Vertex as Sertex");
+      return;
       }
     if (rowkeys() != null && rowkeys().length == rowkeyNames().length) {
       Map<String, String> searchMap = new HashMap<>();
@@ -50,9 +51,9 @@ public class Sertex extends Wertex {
         searchMap.put(rowkeyNames()[i], rowkeys()[i]);
         }
       Map<String, Map<String, String>> results = _client.scan(null, searchMap, "*", 0, 0, false, true);
-    if (results != null && !results.isEmpty()) {
-      property("phoenix", true);
-      }
+      if (results != null && !results.isEmpty()) {
+        property("phoenix", true);
+        }
       setFields(results.get(rowkey()), "phoenix"); 
       }
     }
@@ -77,8 +78,12 @@ public class Sertex extends Wertex {
     * @return       The enhanced {@link Vertex}, if possible. */
   public static Vertex enhance(Vertex vertex,
                                String fields) {
-    if (_client == null || vertex.property("lbl") == null) {
-      log.warn( "Cannot enhance, no client or label");
+    if (_client == null) {
+      log.warn( "Cannot enhance, no client");
+      return vertex;
+      }
+    if (vertex.property("lbl") == null) {
+      log.warn( "Cannot enhance, no label");
       return vertex;
       }
     Class cl = _client.representation(vertex.property("lbl").value().toString());

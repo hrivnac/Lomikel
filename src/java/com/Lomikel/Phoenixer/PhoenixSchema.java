@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // TBD: handle all types
+// TBD: put into Atlascope 
 public class PhoenixSchema extends Schema<String> {
   
   /** Set overall schema.

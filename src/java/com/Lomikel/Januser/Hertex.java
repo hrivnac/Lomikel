@@ -23,14 +23,7 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Hertex extends Wertex {
-   
-  /** Dress existing {@link Vertex} with values from HBase.
-    * Fill in all fields from the database.
-    * @param vertex The original {@link Vertex}. */
-//  public Hertex(Vertex vertex) {
-//    super(vertex, null);
-//    }
-    
+       
   /** Dress existing {@link Vertex} with values from HBase.
     * @param vertex The original {@link Vertex}.
     * @param fields The coma-separated list of fields to fill in from the database.
@@ -49,6 +42,7 @@ public class Hertex extends Wertex {
     super(vertex, fields);
     if (_client == null) {
       log.warn("HBaseClient is not set, not dressing Vertex as Hertex");
+      return;
       }
     String n = null;
     Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
@@ -78,8 +72,12 @@ public class Hertex extends Wertex {
     * @return       The enhanced {@link Vertex}, if possible. */
   public static Vertex enhance(Vertex vertex,
                                String fields) {
-    if (_client == null || vertex.property("lbl") == null) {
-      log.warn( "Cannot enhance, no client or label");
+    if (_client == null) {
+      log.warn( "Cannot enhance");
+      return vertex;
+      }
+    if (vertex.property("lbl") == null) {
+      log.warn( "Cannot enhance, no label");
       return vertex;
       }
     Class cl = _client.representation(vertex.property("lbl").value().toString());
