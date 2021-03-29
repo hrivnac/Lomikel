@@ -20,6 +20,7 @@ import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
 import org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0;
 import org.apache.tinkerpop.gremlin.structure.io.binary.TypeSerializerRegistry;
+import org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV3d0;
 
 // Java
 import java.util.List;
@@ -46,18 +47,19 @@ public class StringGremlinClient extends GremlinClient {
     super(hostname, port);
     }
    
-  /** Open with <em>Gryo</em> serializer.
+  /** Open with <em>GraphSON</em> serializer.
     * @param hostname The Gremlin hostname.
     * @param table    The Gremlin port. */
   @Override
   public void open(String hostname,
                    int    port) {
-    log.info("Using Gryo serializer");
+    log.info("Using GraphSON serializer");
     try {
-      GryoMapper.Builder builder = GryoMapper.build()
-                                             .addRegistry(TinkerIoRegistryV3d0.instance())                                                     
-                                             .addRegistry(JanusGraphIoRegistry.getInstance());                                                     
-      MessageSerializer serializer = new GryoMessageSerializerV3d0(builder);      
+      GraphSONMapper.Builder builder = GraphSONMapper.build()
+                                                     .addRegistry(TinkerIoRegistryV3d0.instance())                                                     
+                                                     .addRegistry(JanusGraphIoRegistry.getInstance());
+      _mapper = builder.create().createMapper();
+      MessageSerializer serializer = new GraphSONMessageSerializerV3d0(builder);  
       createCluster(hostname, port, serializer);
       log.info("Opened");
       }
@@ -65,7 +67,7 @@ public class StringGremlinClient extends GremlinClient {
       log.error("Cannot open connection", e);
       }
     }
-        
+    
   @Override
   public void connect() {
     _client = cluster().connect().init();
@@ -96,10 +98,6 @@ public class StringGremlinClient extends GremlinClient {
     * @throws Exception If anything goes wrong. */
   public String interpret2JSON(String request) throws Exception {
     List<Result> results = interpret(request);
-    ObjectMapper mapper = GraphSONMapper.build()
-                                        .addRegistry(JanusGraphIoRegistry.getInstance())
-                                        .create()
-                                        .createMapper();
     String json = "[";
     boolean first = true;
     for (Result result : results) {
@@ -109,13 +107,15 @@ public class StringGremlinClient extends GremlinClient {
       else {
         json += ",";
         }
-      json += mapper.writeValueAsString(result.getObject());
+      json += _mapper.writeValueAsString(result.getObject());
       }
     json += "]";
     return json;
     }
     
   private Client _client;
+       
+  private ObjectMapper _mapper;  
 
   /** Logging . */
   private static Logger log = Logger.getLogger(StringGremlinClient.class);
