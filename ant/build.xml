@@ -436,6 +436,7 @@
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@DATASET.TABLE@"                  value="${dataset_table}"/>
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@DATASET.SCHEMA@"                 value="${dataset_schema}"/>
+    <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.HOST@"                    value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.PORT@"                    value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.HOST@"                    value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"         token="@SERVER.PORT@"                    value="${gremlin_port}"/>
