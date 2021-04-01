@@ -476,6 +476,8 @@
     <echo>Starting JanusGraph Server</echo>
     <exec executable="${janusgraph_dir}/bin/gremlin-server.sh">
       <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/Local.yaml"/>
+      <!--env key="HBASE_CONF_DIR"  value="${phoenix_conf_dir}"/-->
+      <!--env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/-->
       <arg line="start"/>
       </exec>
     </target>
