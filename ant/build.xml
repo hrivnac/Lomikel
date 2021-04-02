@@ -61,6 +61,13 @@
       <exclude name="*.exe.jar"/>
       </fileset>
     <pathelement path="${phoenix_jar}"/>
+    <!-- CERN -->
+    <pathelement location="/usr/hdp/hbase/lib/hbase-server-2.2.4.jar"/>
+    <pathelement location="/usr/hdp/phoenix"/>
+    <pathelement location="/usr/hdp/phoenix/lib"/>
+    <pathelement location="/opt/hadoop/conf/etc/analytix/hadoop.analytix"/>
+    <pathelement location="/opt/hadoop/conf/etc/analytix/hbase.analytix"/>
+    <!-- -->
     <path refid="classpath.build"/>
     </path>
     
