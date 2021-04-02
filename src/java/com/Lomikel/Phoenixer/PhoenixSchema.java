@@ -127,6 +127,41 @@ public class PhoenixSchema extends Schema<String> {
                                                       "version",
                                                       "dspid"});
     schema = new HashMap<>();
+    schema.put("runno"             , "Integer");
+    schema.put("project"           , "String" );
+    schema.put("streamname"        , "String" );
+    schema.put("prodstep"          , "String" );
+    schema.put("datatype"          , "String" );
+    schema.put("version"           , "String" );
+    schema.put("dspid"             , "Integer"); 
+    schema.put("dstypeid"          , "Short"  ); 
+    schema.put("smk"               , "Integer");
+    schema.put("events_rucio"      , "Long"   ); 
+    schema.put("rucio_at"          , "Date"   ); 
+    schema.put("files"             , "Integer"); 
+    schema.put("events"            , "Long"   ); 
+    schema.put("events_uniq"       , "Long"   ); 
+    schema.put("events_dup"        , "Long"   ); 
+    schema.put("files_dup"         , "Integer"); 
+    schema.put("state"             , "String" ); 
+    schema.put("updated_at"        , "Date"   ); 
+    schema.put("dups_at"           , "Date"   ); 
+    schema.put("trigger_at"        , "Date"   ); 
+    schema.put("is_open"           , "Boolean"); 
+    schema.put("num_tids"          , "Integer"); 
+    schema.put("has_raw"           , "Boolean"); 
+    schema.put("has_trigger"       , "Boolean"); 
+    schema.put("prov_seen"         , "Short[]"); 
+    schema.put("is_rucio_eq"       , "Boolean"); 
+    addSchema("aeidev.jsz3_canonical", schema, new String[]{"runno",
+                                                            "project",
+                                                            "streamname",
+                                                            "prodstep",
+                                                            "datatype",
+                                                            "version",
+                                                            "dspid",
+                                                            "dstypeid"});
+    schema = new HashMap<>();
     schema.put("runnumber"         , "Integer");
     schema.put("project"           , "String" );
     schema.put("streamname"        , "String" );
