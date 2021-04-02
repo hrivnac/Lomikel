@@ -540,7 +540,14 @@
       <arg value="${phoenix_url}"/>
       <sysproperty key="HBASE_CONF_DIR" value="${phoenix_conf_dir}"/>
       <classpath>
-        <path refid="classpath_phoenix.run"/>
+        <!--path refid="classpath_phoenix.run"/-->
+        <pathelement location="/usr/hdp/hbase/lib/hbase-server-2.2.4.jar"/>
+        <pathelement location="/usr/hdp/phoenix/phoenix-5.0.0-HBase-2.2-client.jar"/>
+        <pathelement location="/usr/hdp/phoenix"/>
+        <pathelement location="/usr/hdp/phoenix/lib"/>
+        <pathelement location="/opt/hadoop/conf/etc/analytix/hadoop.analytix"/>
+        <pathelement location="/opt/hadoop/conf/etc/analytix/hbase.analytix"/>
+        <pathelement location="../lib/Lomikel-01.00.00+.jar"/>
         </classpath>
       </java>
     </target>
