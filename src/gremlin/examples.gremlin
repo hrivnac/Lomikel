@@ -200,7 +200,7 @@ g.V().hasLabel('dataset').limit(1).next().getClass().getMethods()
 evaluate(new File("..."))
 
 // profile a query
-g.profile()
+...profile()
 
 // Management
 // ==========
@@ -216,4 +216,66 @@ mgmt = graph.openManagement()
 ManagementSystem.awaitGraphIndexStatus(graph, 'x').status(SchemaStatus.ENABLED).call()
 mgmt.commit()
 
+// get open transactions
+graph.getOpenTransactions()
+
+// close open transaction
+graph.getOpenTransactions().getAt(0).rollback()
+
+// get stale instances
+mgmt.getOpenInstances()
+
+// close stale instances
+mgmt.forceCloseInstance('xyz') 
+
+// print schema
+mgmt.printSchema()
+
+// IO
+// ==
+
+// write into GraphML
+g.V().has('lbl', 'stream').outE().subgraph('x').cap('x').next().io(IoCore.graphml()).writeGraph("/tmp/x.graphml")
+graph.io(IoCore.graphml()).readGraph('/tmp/x.graphml');
+
+// write into GraphSON
+sg = g.V().has('lbl', 'stream').outE().subgraph('x').cap('x').next()
+file = new FileOutputStream("/tmp/x.json")
+mapper = GraphSONMapper.build().addCustomModule(org.janusgraph.graphdb.tinkerpop.io.graphson.JanusGraphSONModuleV2d0.getInstance()).create()
+writer = GraphSONWriter.build().mapper(mapper).create()
+writer.writeGraph(file, sg)
+// read from GraohSON
+graph.io(graphson()).readGraph('/tmp/x.json');
+
+// Console
+// =======
+
+// clear cli mess
+:clear
+
+// show commands history
+:history
+
+// Load a file
+:load x.gremlin
+
+// Scripts
+// =======
+
+// Load data from file
+batchSize = 10000
+new File(filename).eachLine {
+  line, count ->
+    if (line != null && line.trim().length() > 0) {
+      field = line.split(",");
+      t_v1 = g.V().has('u',field[0]); v1 = t_v1.hasNext() ? t_v1.next() : graph.addVertex('u', field[0]).next();
+      t_v2 = g.V().has('u',field[1]); v2 = t_v2.hasNext() ? t_v2.next() : graph.addVertex('u', field[1]).next();
+      g.V(v1).as('x').V(v2).as('y').addE(field[2]).from('x').to('y').property('v', p[3]).property('w', p[4]).iterate();
+      if (count % batchSize == 0) {
+        graph.tx().commit()
+        println count
+        }
+      }
+  }
+graph.tx().commit();
 
