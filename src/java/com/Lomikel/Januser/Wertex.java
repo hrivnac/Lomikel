@@ -222,8 +222,8 @@ public abstract class Wertex implements Vertex {
     else {
       prefix = prefix.trim() + ":";
       }
-    // fill only _fileds
-    if (_fields != null) {
+    // fill only _fields
+    if (_fields != null && _fields.length > 0) {
       property("fullfill", false);
       String value;
       for (String field : _fields) {

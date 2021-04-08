@@ -6,10 +6,11 @@
 var stylesheet = {
   nodes: {
     "default": {
+      properties:{gremlin:"valueMap('lbl', 'title', 'subtitle')"},
       graphics: {
-        label:{gremlin:"label()"},        
-        title:{gremlin:"properties('title')"},      
-        subtitle:{gremlin:"properties('subtitle')"},
+        label:{js:"lbl"},        
+        title:{js:"title"},      
+        subtitle:{js:"subtitle"},
         group:" ",         // specifies graphics properties
         shape:"dot",       // in text:  ellipse, circle, database, box, text
                            // out text: image, circularImage, diamond, dot, star, triangle, triangleDown, hexagon, square, icon
@@ -24,10 +25,11 @@ var stylesheet = {
         ]
       },
     "MetaGraph": {
+      properties:{gremlin:"valueMap('title', 'subtitle', 'MetaLabel')"},
       graphics: {
-        label:{gremlin:"properties('MetaLabel')"},        
-        title:{gremlin:"properties('title')"},      
-        subtitle:{gremlin:"properties('subtitle')"},
+        label:{js:"MetaLabel"},        
+        title:{js:"title"},      
+        subtitle:{js:"subtitle"},
         group:" ",         
         shape:"ellipse",      
                            
@@ -44,6 +46,7 @@ var stylesheet = {
     },
   edges: {
     "default": {
+      properties:{},
       graphics: {
         label:" ",
         title:" ",
@@ -57,8 +60,9 @@ var stylesheet = {
         ]
       },
     "MetaGraph": {
+      properties:{gremlin:"valueMap('MetaLabel')"},
       graphics: {
-        label:{gremlin:"properties('MetaLabel')"},        
+        label:{js:"MetaLabel"},        
         title:" ",
         subtitle:" ",
         arrows:"middle",

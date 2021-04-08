@@ -98,6 +98,10 @@ public class StringGremlinClient extends GremlinClient {
     * @throws Exception If anything goes wrong. */
   public String interpret2JSON(String request) throws Exception {
     List<Result> results = interpret(request);
+    ObjectMapper mapper = GraphSONMapper.build()
+                                        .addRegistry(JanusGraphIoRegistry.getInstance())
+                                        .create()
+                                        .createMapper();
     String json = "[";
     boolean first = true;
     for (Result result : results) {
@@ -107,7 +111,7 @@ public class StringGremlinClient extends GremlinClient {
       else {
         json += ",";
         }
-      json += _mapper.writeValueAsString(result.getObject());
+      json += mapper.writeValueAsString(result.getObject());
       }
     json += "]";
     return json;

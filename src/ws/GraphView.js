@@ -106,6 +106,7 @@ function parseGraph(json) {
   var element;
   var value;
   for (var i = 0; i < g.length; i++) {
+    console.log(g[i]);
     if (g[i]['@type'] === 'g:Vertex') {
       id = g[i]['@value'].id['@value'];
       label = g[i]['@value'].label;
@@ -225,27 +226,28 @@ function show(graph) {
         if (!stylesheetNode) {
           stylesheetNode = stylesheet.nodes["default"];
           }
-        title        = l + ":" + stylesheetValue(stylesheetNode.graphics.title,        id, eMap, false);
-        subtitle     = stylesheetValue(stylesheetNode.graphics.subtitle,     id, eMap, false, title);
-        label        = stylesheetValue(stylesheetNode.graphics.label,        id, eMap, false, title);
-        group        = stylesheetValue(stylesheetNode.graphics.group,        id, eMap, false, title);
-        value        = stylesheetValue(stylesheetNode.graphics.value,        id, eMap, false, title);
-        shape        = stylesheetValue(stylesheetNode.graphics.shape,        id, eMap, false, title);
-        borderDashes = stylesheetValue(stylesheetNode.graphics.borderDashes, id, eMap, false, title);
-        borderWidth  = stylesheetValue(stylesheetNode.graphics.borderWidth,  id, eMap, false, title);
+        pMap = stylesheetValue(stylesheetNode.properties, id, eMap, {}, false); // dictionary, not map
+        title        = l + ":" + stylesheetValue(stylesheetNode.graphics.title,        id, eMap, pMap, false);
+        subtitle     = stylesheetValue(stylesheetNode.graphics.subtitle,     id, eMap, pMap, false, title);
+        label        = stylesheetValue(stylesheetNode.graphics.label,        id, eMap, pMap, false, title);
+        group        = stylesheetValue(stylesheetNode.graphics.group,        id, eMap, pMap, false, title);
+        value        = stylesheetValue(stylesheetNode.graphics.value,        id, eMap, pMap, false, title);
+        shape        = stylesheetValue(stylesheetNode.graphics.shape,        id, eMap, pMap, false, title);
+        borderDashes = stylesheetValue(stylesheetNode.graphics.borderDashes, id, eMap, pMap, false, title);
+        borderWidth  = stylesheetValue(stylesheetNode.graphics.borderWidth,  id, eMap, pMap, false, title);
         borderWidth  = parseInt(borderWidth);
         if (shape === 'image') {
-          image        = stylesheetValue(stylesheetNode.graphics.image, id, eMap, false, title);
+          image        = stylesheetValue(stylesheetNode.graphics.image, id, eMap, pMap, false, title);
           image = (image === '') ? '' : 'images/' + image;
           }
         else if (shape === 'box') {
-          borderRadius = stylesheetValue(stylesheetNode.graphics.borderRadius, id, eMap, false, title);
+          borderRadius = stylesheetValue(stylesheetNode.graphics.borderRadius, id, eMap, pMap, false, title);
           borderRadius = parseInt(borderRadius);
           }
-        actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap, false, title);
+        actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap, pMap, false, title);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          url = stylesheetValue(actionsArray[k].url, id, eMap, false, title);
+          url = stylesheetValue(actionsArray[k].url, id, eMap, pMap, false, title);
           if (url) {
             url = encodeURI(url);
             if (!actionsArray[k].external) {
@@ -275,16 +277,17 @@ function show(graph) {
           }
         inVid = graph[i].inVid;
         outVid = graph[i].outVid;
-        title        = l + ":" + stylesheetValue(stylesheetEdge.graphics.title,        id, eMap, true);
-        subtitle     = stylesheetValue(stylesheetEdge.graphics.subtitle,     id, eMap, true, title);
-        label        = stylesheetValue(stylesheetEdge.graphics.label,        id, eMap, true, title);
-        group        = stylesheetValue(stylesheetEdge.graphics.group,        id, eMap, true, title);
-        arrows       = stylesheetValue(stylesheetEdge.graphics.arrows,       id, eMap, true, title);
-        value        = stylesheetValue(stylesheetEdge.graphics.value,        id, eMap, true, title);
-        actionsArray = stylesheetValue(stylesheetEdge.actions,               id, eMap, true, title);
+        pMap = stylesheetValue(stylesheetEdge.properties, id, eMap, {}, false); // dictionary, not map
+        title        = l + ":" + stylesheetValue(stylesheetEdge.graphics.title,        id, eMap, pMap, true);
+        subtitle     = stylesheetValue(stylesheetEdge.graphics.subtitle,     id, eMap, pMap, true, title);
+        label        = stylesheetValue(stylesheetEdge.graphics.label,        id, eMap, pMap, true, title);
+        group        = stylesheetValue(stylesheetEdge.graphics.group,        id, eMap, pMap, true, title);
+        arrows       = stylesheetValue(stylesheetEdge.graphics.arrows,       id, eMap, pMap, true, title);
+        value        = stylesheetValue(stylesheetEdge.graphics.value,        id, eMap, pMap, true, title);
+        actionsArray = stylesheetValue(stylesheetEdge.actions,               id, eMap, pMap, true, title);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          url = stylesheetValue(actionsArray[k].url, id, eMap, true, title);
+          url = stylesheetValue(actionsArray[k].url, id, eMap, pMap, true, title);
           if (url) {
             url = encodeURI(url);
             if (!actionsArray[k].external) {
@@ -665,19 +668,25 @@ function callInfo(element, key) {
 // Get stylesheet value
 // (title can be used by js)
 // TBD: handle default if undefined
-function stylesheetValue(nam, id, eMap, ifEdge, title) {
+function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
   if (nam.gremlin) {
     val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);
     }
   else if (nam.js) {
+    for (key in pMap) {
+      eval(key + '=' + '"' + pMap[key] + '"');
+      }
     val = eval(nam.js);
     }
-  else {
+  else if (pMap[nam]) {
+    val = pMap[nam];
+    }
+  else if (eMap.get(nam)) {
     val = eMap.get(nam);
-    if (!val) {
-      val = nam;
-      }
+    }
+  else {
+    val = nam;
     }
   if (typeof val == 'number') {
     val = val.toString();
