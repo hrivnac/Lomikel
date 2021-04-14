@@ -503,6 +503,12 @@
     <exec executable="../src/sh/stopES.sh"/>
     </target>
     
+    <target name="es-clean"
+          description="Clean Elastic Search">
+    <echo>Stopping Elastic Search</echo>
+    <exec executable="../src/sh/cleanES.sh"/>
+    </target>
+   
   <!-- Init JanusGraph ======================================================-->
   
    <target name="janus-init"
