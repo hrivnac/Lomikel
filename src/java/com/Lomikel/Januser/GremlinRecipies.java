@@ -136,16 +136,18 @@ public class GremlinRecipies {
       //       .union(fold().unfold(), repeat(out()).emit())
       //       .drop();
       //g().V().has("lbl", label)
+      //       .has(propertyName, propertyValue)
       //       .store("s")
       //       .repeat(out().store("s"))
       //       .cap("s")
       //       .unfold()
       //       .drop();
       List<Object> vv = g().V().has("lbl", label)
-                           .store("s")
-                           .repeat(out().store("s"))
-                           .cap("s")
-                           .unfold().toList();
+                               .has(propertyName, propertyValue)
+                               .store("s")
+                               .repeat(out().store("s"))
+                               .cap("s")
+                               .unfold().toList();
       StandardVertex v;
       for (Object o : vv) {
         v = (StandardVertex)o;
