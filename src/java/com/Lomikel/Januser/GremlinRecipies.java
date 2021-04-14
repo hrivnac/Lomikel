@@ -6,7 +6,10 @@ import com.Lomikel.Utils.Info;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.Property;
@@ -16,6 +19,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction;
 // Janus Graph
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.graphdb.vertices.StandardVertex;
 
 // HBase
 import org.apache.hadoop.hbase.client.Get;
@@ -116,6 +120,44 @@ public class GremlinRecipies {
     commit();
     close();
     }
+
+  /** Drop a {@link Vertex}.
+    * @param label         The {@link Vertex} label.
+    * @param propertyName  The name of {@link Vertex} property.
+    * @param propertyValue The value of {@link Vertex} property.
+    * @param deep          Whether to proceed recursively to all children. */
+  public void drop(String  label,
+                   String  propertyName,
+                   Object  propertyValue,
+                   boolean deep) {
+    if (deep) {
+      //g().V().has("lbl", label)
+      //       .has(propertyName, propertyValue)
+      //       .union(fold().unfold(), repeat(out()).emit())
+      //       .drop();
+      //g().V().has("lbl", label)
+      //       .store("s")
+      //       .repeat(out().store("s"))
+      //       .cap("s")
+      //       .unfold()
+      //       .drop();
+      List<Object> vv = g().V().has("lbl", label)
+                           .store("s")
+                           .repeat(out().store("s"))
+                           .cap("s")
+                           .unfold().toList();
+      StandardVertex v;
+      for (Object o : vv) {
+        v = (StandardVertex)o;
+        v.remove();
+        }
+      }
+    else {    
+      g().V().has("lbl", label)
+             .has(propertyName, propertyValue)
+             .drop().iterate();
+      }
+    }              
        
   /** Get a {@link Vertex}, create it if necessary.
     * @param label         The {@link Vertex} label.

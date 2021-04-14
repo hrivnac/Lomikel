@@ -6,11 +6,11 @@
 var stylesheet = {
   nodes: {
     "default": {
-      properties:{gremlin:"valueMap('lbl', 'title', 'subtitle')"},
+      properties:{gremlin:"valueMap('lbl', 'title')"},
       graphics: {
         label:{js:"lbl"},        
         title:{js:"title"},      
-        subtitle:{js:"subtitle"},
+        subtitle:" ",
         group:" ",         // specifies graphics properties
         shape:"dot",       // in text:  ellipse, circle, database, box, text
                            // out text: image, circularImage, diamond, dot, star, triangle, triangleDown, hexagon, square, icon
@@ -25,11 +25,11 @@ var stylesheet = {
         ]
       },
     "MetaGraph": {
-      properties:{gremlin:"valueMap('title', 'subtitle', 'MetaLabel')"},
+      properties:{gremlin:"valueMap('title', 'MetaLabel')"},
       graphics: {
         label:{js:"MetaLabel"},        
         title:{js:"title"},      
-        subtitle:{js:"subtitle"},
+        subtitle:" ",
         group:" ",         
         shape:"ellipse",      
                            

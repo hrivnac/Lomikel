@@ -106,7 +106,6 @@ function parseGraph(json) {
   var element;
   var value;
   for (var i = 0; i < g.length; i++) {
-    console.log(g[i]);
     if (g[i]['@type'] === 'g:Vertex') {
       id = g[i]['@value'].id['@value'];
       label = g[i]['@value'].label;
@@ -173,8 +172,13 @@ function parseValues(value) {
         }
       }
     }
-  if (Array.isArray(answer) && answer.length == 0) {
-    answer = "";
+  if (Array.isArray(answer)) {
+    if (answer.length == 0) {
+      answer = "";
+      }
+    else {
+      answer = answer[0];
+      }
     }
   return answer;
   }
@@ -248,7 +252,7 @@ function show(graph) {
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, pMap, false, title);
-          if (url) {
+          if (url && url != actionsArray[k].name) {
             url = encodeURI(url);
             if (!actionsArray[k].external) {
               actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
@@ -408,7 +412,8 @@ function expand(id) {
 // Describe selected node
 function describeNode(id) {
   var node = findObjectByKey(nodes, 'id', id);
-  popup(node.title, callGremlinValues("v=" + gr + ".V('" + id + "').next();com.Lomikel.Januser.Wertex.enhance(v).properties().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '').replace('[', '')") + 
+  //popup(node.title, callGremlinValues("v=" + gr + ".V('" + id + "').next();com.Lomikel.Januser.Wertex.enhance(v).properties().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '').replace('[', '')") + 
+  popup(node.title, callGremlinValues(gr + ".V('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '').replace('[', '')") + 
             "<hr/>" +
             JSON.stringify(node));
   }
