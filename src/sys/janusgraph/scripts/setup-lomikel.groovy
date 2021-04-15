@@ -8,3 +8,7 @@ globals << [hook : [
 globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()]
 globals << [g : graph.traversal()]
 
+def hi() {
+    return "Hello World!"
+}
+
