@@ -415,14 +415,14 @@
           description="Patch JanusGraph">
     <echo>Patching JanusGraph Server</echo>
     <echo>... system</echo>
- 		<copy todir="${janusgraph_dir}/scripts">
+ 		<copy todir="${janusgraph_dir}/scripts" overwrite="true">
 			<fileset dir="../src/gremlin" includes="functions.gremlin"/>
 			<fileset dir="../src/sys/janusgraph/scripts" includes="*"/>
       </copy>
- 		<copy todir="${janusgraph_dir}/conf">
+ 		<copy todir="${janusgraph_dir}/conf" overwrite="true">
 			<fileset dir="../src/sys/janusgraph/conf" includes="*"/>
       </copy>
- 		<copy todir="${janusgraph_dir}/conf/gremlin-server">
+ 		<copy todir="${janusgraph_dir}/conf/gremlin-server" overwrite="true">
 			<fileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="*"/>
       </copy>                                                                
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@STORAGE.HOSTNAME@"               value="${zookeeper}"/>
@@ -455,7 +455,7 @@
     <delete includeEmptyDirs="true">
       <fileset dir="${janusgraph_dir}/ext/lomikel.connector" includes="Lomikel-*.jar"/>
       </delete>
- 		<copy todir="${janusgraph_dir}/ext/lomikel.connector">
+ 		<copy todir="${janusgraph_dir}/ext/lomikel.connector" overwrite="true">
 			<fileset dir="../lib" includes="Lomikel-${version}.jar"/>
       </copy>
     <exec executable="../src/sh/updateJanusExt.sh">
