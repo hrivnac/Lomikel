@@ -21,10 +21,10 @@ export hbase_table
 
 export home=`pwd`/..
 
-alias gremlin_Local='CLASSPATH="${phoenix_jar}"   ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
-alias gremlin_IJCLab='CLASSPATH="${phoenix_jar}"  ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
-alias gremlin_CERN='CLASSPATH="${phoenix_jar}"    ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CERN.gremlin"'
-alias gremlin_console='CLASSPATH="${phoenix_jar}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
+alias gremlin_Local='CLASSPATH=""   ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
+alias gremlin_IJCLab='CLASSPATH=""  ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
+alias gremlin_CERN='CLASSPATH=""    ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CERN.gremlin"'
+alias gremlin_console='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
 
-echo "commands: gremlin_console, gremlin_Local, gremlin_IJCLab"
+echo "commands: gremlin_console, gremlin_Local, gremlin_IJCLab, gremlin_CERN"
 

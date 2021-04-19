@@ -222,7 +222,7 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.10.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.12.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/ivy-2.3.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-driver-0.5.2.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-driver-0.5.3.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javapoet-1.8.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javatuples-1.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jbcrypt-0.4.jar" excludes="META-INF/*"/>
@@ -322,7 +322,7 @@
       <lib file="${janusgraph_dir}/lib/httpclient-4.5.10.jar"/>
       <lib file="${janusgraph_dir}/lib/httpcore-4.4.12.jar"/>
       <lib file="${janusgraph_dir}/lib/ivy-2.3.0.jar"/>
-      <lib file="${janusgraph_dir}/lib/janusgraph-driver-0.5.2.jar"/>
+      <lib file="${janusgraph_dir}/lib/janusgraph-driver-0.5.3.jar"/>
       <lib file="${janusgraph_dir}/lib/javapoet-1.8.0.jar"/>
       <lib file="${janusgraph_dir}/lib/javatuples-1.2.jar"/>
       <lib file="${janusgraph_dir}/lib/jbcrypt-0.4.jar"/>
@@ -531,22 +531,6 @@
       <arg value="${hbase_table}"/>
       <classpath>
         <path refid="classpath.janusgraph"/>
-        </classpath>
-      </java>
-    </target>
-        
-  <!-- Manage Phoenix Proxy Server ==========================================-->
-    
-  <target name="start-phoenix-proxy-server"
-          description="Start Phoenix Proxy Server">
-    <echo>Start Phoenix Proxy Server</echo>
-    <java classname="com.Lomikel.Phoenixer.PhoenixProxyServer"
-          fork="true">
-      <arg value="${backend_phoenix_proxy_port}"/>
-      <arg value="${phoenix_url}"/>
-      <sysproperty key="HBASE_CONF_DIR" value="${phoenix_conf_dir}"/>
-      <classpath>
-        <path refid="classpath_phoenix.run"/>
         </classpath>
       </java>
     </target>
