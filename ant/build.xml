@@ -477,7 +477,7 @@
       <env key="HBASE_CONF_DIR"  value="${phoenix_conf_dir}"/>
       <env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/>
       <!--env key="HBASE_CONF_DIR"  value="/opt/hadoop/conf/etc/analytix/hbase.analytix"/-->
-      <env key="CLASSPATH"       value="/opt/hadoop/conf/etc/analytix/hadoop.analytix:/opt/hadoop/conf/etc/analytix/hbase.analytix"/>
+      <!--env key="CLASSPATH"       value="/opt/hadoop/conf/etc/analytix/hadoop.analytix:/opt/hadoop/conf/etc/analytix/hbase.analytix"/-->
       <arg line="start"/>
       </exec>
     </target>
