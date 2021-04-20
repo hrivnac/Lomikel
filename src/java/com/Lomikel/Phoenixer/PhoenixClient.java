@@ -139,21 +139,17 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     if (stop == 0) {
       stop = System.currentTimeMillis();
       }
-    log.info("x");
     if (key != null) {
       searchMap.clear();
       String[] keyParts = key.split("#");
       // TBD: check size of keyParts and Schema.rowkeynames()
       for (int i = 0; i < keyParts.length; i++) {
-	log.info(i);
         log.info(keyParts[i]);
         log.info(schema());
         if (!keyParts[i].trim().equals("")) {
           searchMap.put(schema().rowkeyNames()[i], keyParts[i]);
           }
-	log.info(i);
         }
-      log.info("y");
       }
     log.info(searchMap);
     String where = "";
@@ -218,9 +214,8 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     * @param sql The SQL query.
     * @return    The query result as <tt>name=value;...#...</tt>.*/
   public String query(String sql) {
-    log.info(sql);
+    log.info("Query: " + sql);
     Statement st = null;
-    int runNumber;
     String result = "";
     boolean firstRes = true;
     boolean firstVal;
@@ -264,9 +259,9 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
               result += rs.getDate(i + 1);
               break;
            default:
-	     log.error("Cannot get result " + i + "  of type " + md.getColumnTypeName(i + 1));
+	           log.error("Cannot get result " + i + "  of type " + md.getColumnTypeName(i + 1));
              }              
-          }
+           }
         }     
       rs.close();
       st.close();
@@ -285,7 +280,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       catch (SQLException se2) {
         } 
       }
-    log.info(result);
+    log.info("Result: " + result);
     return result;
     } 
   
@@ -311,6 +306,12 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     return _representations;
     }
  
+  /** Give {@link Connection}.
+    * @return The {@link Connection}. */
+  public Connection connection() {
+    return _connection;
+    }
+    
   private Connection _connection;  
   
 	private String _phoenixUrl;
