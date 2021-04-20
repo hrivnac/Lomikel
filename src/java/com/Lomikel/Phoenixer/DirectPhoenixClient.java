@@ -72,7 +72,7 @@ public class DirectPhoenixClient extends PhoenixClient {
         result = new TreeMap<>();
         for (int i = 0; i < md.getColumnCount(); i++) {
           key = md.getColumnName(i + 1).toLowerCase();
-          result.put(key, rs.getString(i + 1));
+          result.put(key, rs.getObject(i + 1));
           }
         kv = new String[schema().rowkeyNames().length];
         for (int i = 0; i < schema().rowkeyNames().length; i++) {
