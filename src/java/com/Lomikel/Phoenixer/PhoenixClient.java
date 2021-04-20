@@ -255,12 +255,12 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
             case "VARCHAR": 
               result += rs.getString(i + 1);
               break;
-             case "TIMESTAMP": 
+            case "TIMESTAMP": 
               result += rs.getDate(i + 1);
               break;
-           default:
-	           log.error("Cannot get result " + i + "  of type " + md.getColumnTypeName(i + 1));
-             }              
+            default:
+	            log.error("Cannot get result " + i + "  of type " + md.getColumnTypeName(i + 1));
+              }              
            }
         }     
       rs.close();
