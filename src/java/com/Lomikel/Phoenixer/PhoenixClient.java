@@ -200,6 +200,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       for (String r : line.split("#")) {
         if (!r.trim().equals("")) {
           keyvalue = r.split("=");
+          log.info(keyvalue);
           result.put(keyvalue[0], keyvalue[1]);
           }
         }
