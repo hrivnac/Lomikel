@@ -139,16 +139,23 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     if (stop == 0) {
       stop = System.currentTimeMillis();
       }
+    log.info("x");
     if (key != null) {
       searchMap.clear();
       String[] keyParts = key.split("#");
       // TBD: check size of keyParts and Schema.rowkeynames()
       for (int i = 0; i < keyParts.length; i++) {
+	log.info(i);
+        log.info(keyParts[i]);
+        log.info(schema());
         if (!keyParts[i].trim().equals("")) {
           searchMap.put(schema().rowkeyNames()[i], keyParts[i]);
           }
+	log.info(i);
         }
+      log.info("y");
       }
+    log.info(searchMap);
     String where = "";
     boolean first = true;
     for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap.map()).entrySet()) {
@@ -236,11 +243,17 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
             }
           result += md.getColumnName(i + 1).toLowerCase() + "=";
           switch (md.getColumnTypeName(i + 1)) {
+            case "BOOLEAN": 
+              result += rs.getBoolean(i + 1);
+              break;
             case "INTEGER": 
               result += rs.getInt(i + 1);
               break;
             case "BIGINT": 
               result += rs.getLong(i + 1);
+              break;
+            case "SMALLINT": 
+              result += rs.getShort(i + 1);
               break;
             case "VARCHAR": 
               result += rs.getString(i + 1);
@@ -249,8 +262,8 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
               result += rs.getDate(i + 1);
               break;
            default:
-              log.error("Cannot get result " + i + "  of type " + sql);
-              }              
+	     log.error("Cannot get result " + i + "  of type " + md.getColumnTypeName(i + 1));
+             }              
           }
         }     
       rs.close();
