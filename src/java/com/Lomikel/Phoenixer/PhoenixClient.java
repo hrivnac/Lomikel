@@ -200,8 +200,9 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       for (String r : line.split("#")) {
         if (!r.trim().equals("")) {
           keyvalue = r.split("=");
-          log.info(r);
-          result.put(keyvalue[0], keyvalue[1]);
+          if (keyvalue.length > 1) {
+            result.put(keyvalue[0], keyvalue[1]);
+            }
           }
         }
       kv = new String[schema().rowkeyNames().length];
