@@ -239,7 +239,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
             firstVal = false;
             }
           result += md.getColumnName(i + 1).toLowerCase() + "=";
-          // TBD: go via String ?
+          // TBD: go via String or Object ?
           switch (md.getColumnTypeName(i + 1)) {
             case "BOOLEAN": 
               result += rs.getBoolean(i + 1);

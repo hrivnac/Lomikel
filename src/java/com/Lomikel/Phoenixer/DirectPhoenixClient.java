@@ -42,14 +42,14 @@ public class DirectPhoenixClient extends PhoenixClient {
     super(phoenixUrl);
     }
            
-  @Override
-  public Map<String, Map<String, String>> scan(String    key,
-                                               SearchMap searchMap,
-                                               String    filter,
-                                               long      start,
-                                               long      stop,
-                                               boolean   ifkey,
-                                               boolean   iftime) {
+  // TBD @Override
+  public Map<String, Map<String, Object>> scan2objects(String    key,
+                                                       SearchMap searchMap,
+                                                       String    filter,
+                                                       long      start,
+                                                       long      stop,
+                                                       boolean   ifkey,
+                                                       boolean   iftime) {
     String sql = formSqlRequest(key, searchMap, filter, start, stop, ifkey, iftime);
     return query2map(sql);
     }
@@ -57,11 +57,11 @@ public class DirectPhoenixClient extends PhoenixClient {
   /** Process the <em>Phoenix</em> SQL and give answer.
     * @param sql The SQL query.
     * @return The parsed result in the same form as {@link #scan(String, SearchMap, String, long, long, boolean, boolean)}. */
-  public Map<String, Map<String, String>> query2map(String sql) {
+  public Map<String, Map<String, Object>> query2map(String sql) {
     log.info("Query: " + sql);
     Statement st = null;
-    Map<String, Map<String, String>> results = new TreeMap<>();
-    Map<String, String> result;    
+    Map<String, Map<String, Object>> results = new TreeMap<>();
+    Map<String, Object> result;    
     String key;
     String[] kv;
     try {
@@ -76,7 +76,7 @@ public class DirectPhoenixClient extends PhoenixClient {
           }
         kv = new String[schema().rowkeyNames().length];
         for (int i = 0; i < schema().rowkeyNames().length; i++) {
-          kv[i] = result.get(schema().rowkeyNames()[i]);
+          kv[i] = result.get(schema().rowkeyNames()[i]).toString();
           }
         results.put(String.join("#", kv), result);
         }     
