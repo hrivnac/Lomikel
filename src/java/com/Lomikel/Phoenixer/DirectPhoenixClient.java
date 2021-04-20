@@ -10,6 +10,7 @@ import com.Lomikel.DB.SearchMap;
 // Java
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -74,7 +75,7 @@ public class DirectPhoenixClient extends PhoenixClient {
           key = md.getColumnName(i + 1).toLowerCase();
           switch (md.getColumnTypeName(i + 1)) {
             case "TIMESTAMP":
-              result.put(key, rs.getDate(i + 1));
+              result.put(key, new Date(rs.getDate(i + 1).getTime()));
               break;
             default:
               result.put(key, rs.getObject(i + 1));

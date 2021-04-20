@@ -274,9 +274,10 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       }
     finally {
       try {
-        if (st != null)
+        if (st != null) {
           st.close();
           }
+        }
       catch (SQLException se2) {
         } 
       }
