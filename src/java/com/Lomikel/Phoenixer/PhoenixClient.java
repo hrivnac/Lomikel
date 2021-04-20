@@ -151,7 +151,6 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
           }
         }
       }
-    log.info(searchMap);
     String where = "";
     boolean first = true;
     for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap.map()).entrySet()) {

@@ -2,6 +2,7 @@ package com.Lomikel.DB;
 
 // Java
 import java.util.Map;
+import java.util.HashMap;
 
 /** <code>SearchMap</code> embeds {@link Map} of search arguments. 
   * @opt attributes
@@ -16,6 +17,11 @@ public class SearchMap {
     @param map The {@link Map} of search terms.*/
   public SearchMap(Map<String, String> map) {
     _map = map;
+    }
+
+  /** Create empty.*/
+  public SearchMap() {
+    _map = new HashMap<String, String>();
     }
     
   /** Give the embedded {@link Map}.
