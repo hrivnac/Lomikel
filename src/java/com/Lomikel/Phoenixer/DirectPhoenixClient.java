@@ -73,13 +73,7 @@ public class DirectPhoenixClient extends PhoenixClient {
         result = new TreeMap<>();
         for (int i = 0; i < md.getColumnCount(); i++) {
           key = md.getColumnName(i + 1).toLowerCase();
-          switch (md.getColumnTypeName(i + 1)) {
-            case "TIMESTAMP":
-              result.put(key, (Date)rs.getTimestamp(i + 1));
-              break;
-            default:
-              result.put(key, rs.getObject(i + 1));
-            }
+          result.put(key, rs.getObject(i + 1));
           }
         kv = new String[schema().rowkeyNames().length];
         for (int i = 0; i < schema().rowkeyNames().length; i++) {
