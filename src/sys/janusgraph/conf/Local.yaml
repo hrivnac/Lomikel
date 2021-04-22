@@ -10,6 +10,6 @@ port: @SERVER.PORT@
 #                      ioRegistries: [#org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
 #                                     org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
 serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1,
-             config: {serializeResultToString: true,
+             config: {serializeResultToString: false,
                       ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
                                      org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
