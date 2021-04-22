@@ -1,5 +1,5 @@
 hosts: [188.184.87.217]
-port: 24444
+port: 8182
 #username: admin
 #password: admin
 #connectionPool: {
