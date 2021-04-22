@@ -231,6 +231,18 @@ mgmt.forceCloseInstance('xyz')
 // print schema
 mgmt.printSchema()
 
+// drop schema
+schema.clear()
+
+// drop index
+schema.vertexLabel('v').index('i').remove()
+
+// drop graph
+:remote config alias reset
+system.graph('food').truncate()
+system.graph('food').drop()
+
+
 // IO
 // ==
 
