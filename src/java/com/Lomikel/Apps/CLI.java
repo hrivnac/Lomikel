@@ -191,6 +191,14 @@ public class CLI {
       log.debug("Cannot import com.Lomikel.Phoenixer.PhoenixClient", e);
       }
     try {
+      interpreter().eval("import com.Lomikel.Phoenixer.DirectPhoenixClient");
+      log.info("PhoenixClient imported");
+      }
+    catch (EvalError e) {
+      log.error("Cannot import com.Lomikel.Phoenixer.DirectPhoenixClient");
+      log.debug("Cannot import com.Lomikel.Phoenixer.DirectPhoenixClient", e);
+      }
+    try {
       interpreter().eval("import com.Lomikel.Phoenixer.PhoenixProxyClient");
       log.info("PhoenixProxyClient imported");
       }
