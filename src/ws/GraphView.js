@@ -680,7 +680,17 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
     }
   else if (nam.js) {
     for (key in pMap) {
-      eval(key + '=' + '"' + pMap[key] + '"');
+      if (typeof pMap[key] === 'object') {
+        if (typeof pMap[key][0] === 'object') {
+          eval(key + '=' + '"' + pMap[key][0]['@value'] + '"');
+          }
+        else {
+          eval(key + '=' + '"' + pMap[key][0] + '"');
+          }
+        }
+      else {
+        eval(key + '=' + '"' + pMap[key] + '"');
+        }
       }
     val = eval(nam.js);
     }

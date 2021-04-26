@@ -192,7 +192,7 @@ public class CLI {
       }
     try {
       interpreter().eval("import com.Lomikel.Phoenixer.DirectPhoenixClient");
-      log.info("PhoenixClient imported");
+      log.info("DirectPhoenixClient imported");
       }
     catch (EvalError e) {
       log.error("Cannot import com.Lomikel.Phoenixer.DirectPhoenixClient");
