@@ -446,8 +446,8 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.ROWKEY.NAME@"            value="${rowkey_name}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@CANONICAL.TABLE@"                value="${canonical_table}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@CANONICAL.SCHEMA@"               value="${canonical_schema}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@EVENTS.TABLE@"                   value="${events_table}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@EVENTS.SCHEMA@"                  value="${events_schema}"/>
     <copy file="${janusgraph_dir}/conf/gremlin-server/Local.properties" tofile="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" overwrite="true"/>
     <echo file="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" append="true">storage.batch-loading=true</echo>
     <echo>... plugin</echo>

@@ -165,12 +165,25 @@ public class GremlinRecipies {
     * @param label         The {@link Vertex} label.
     * @param propertyName  The name of {@link Vertex} property.
     * @param propertyValue The value of {@link Vertex} property.
-    * @return              The created {@link Vertex}. */
-  // TBD: allow replacing
-  // TBD: check if it is really only one
+    * @return              The created {@link Vertex}es.
+    *                      If multiple {@link Vertex}es exist, only thee first one is given. */
+  // TBD: check if it is at least one
   public Vertex getOrCreate(String label,
                             String propertyName,
                             Object propertyValue) {
+     return getOrCreates(label, propertyName, propertyValue).get(0);
+     }
+     
+  /** Get a {@link Vertex}, create it if necessary.
+    * @param label         The {@link Vertex} label.
+    * @param propertyName  The name of {@link Vertex} property.
+    * @param propertyValue The value of {@link Vertex} property.
+    * @return              The created {@link Vertex}es. */
+  // TBD: allow replacing
+  // TBD: refactor
+  public List<Vertex> getOrCreates(String label,
+                                   String propertyName,
+                                   Object propertyValue) {
      List<Vertex> vertexes = g().V().has("lbl", label)
                                     .has(propertyName, propertyValue)
                                     .fold()
@@ -185,19 +198,31 @@ public class GremlinRecipies {
        log.error("No vertex found");
        return null;
        }
-     return vertexes.get(0);
+     return vertexes;
      }
        
   /** Get a {@link Vertex}, create it if necessary.
     * @param label          The {@link Vertex} label.
     * @param propertyNames  The name of {@link Vertex} properties.
     * @param propertyValues The value of {@link Vertex} properties.
-    * @return               The created {@link Vertex}. */
-  // TBD: allow replacing
-  // TBD: check if it is really only one
-  public Vertex getOrCreate(String label,
+    * @return               The created {@link Vertex}. 
+    *                       If multiple {@link Vertex}es exist, only thee first one is given. */
+  // TBD: check if it is at least one
+  public Vertex getOrCreate(String   label,
                             String[] propertyNames,
                             Object[] propertyValues) {
+     return getOrCreates(label, propertyNames, propertyValues).get(0);
+     }
+     
+  /** Get {@link Vertex}es, create them if necessary.
+    * @param label          The {@link Vertex} label.
+    * @param propertyNames  The name of {@link Vertex} properties.
+    * @param propertyValues The value of {@link Vertex} properties.
+    * @return               The created {@link Vertex}es. */
+  // TBD: allow replacing
+  public List<Vertex> getOrCreates(String label,
+                                   String[] propertyNames,
+                                   Object[] propertyValues) {
      List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
                                                                                                     .coalesce(unfold(), addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
      if (vertexes.size() > 1) {
@@ -207,7 +232,7 @@ public class GremlinRecipies {
        log.error("No vertex found");
        return null;
        }
-     return vertexes.get(0);
+     return vertexes;
      }
     
   /** Add an {@link Edge} between two {@link Vertex}s,

@@ -248,6 +248,7 @@ system.graph('food').drop()
 
 // write into GraphML
 g.V().has('lbl', 'stream').outE().subgraph('x').cap('x').next().io(IoCore.graphml()).writeGraph("/tmp/x.graphml")
+// read from GraphML
 graph.io(IoCore.graphml()).readGraph('/tmp/x.graphml');
 
 // write into GraphSON
