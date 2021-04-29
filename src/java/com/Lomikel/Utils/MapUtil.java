@@ -20,7 +20,7 @@ public class MapUtil {
   /** Sort {@link Map} based on its values.
     * @arg map The {@link Map} to be sorted.
     * @return  The sorted {@link Map}. */
-  public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map){
+  public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
     List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
     Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
       public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
@@ -29,7 +29,7 @@ public class MapUtil {
       });
     Map<K, V> result = new LinkedHashMap<>();
     for (Map.Entry<K, V> entry : list) {
-      result.put( entry.getKey(), entry.getValue());
+      result.put(entry.getKey(), entry.getValue());
       }
     return result;
     }

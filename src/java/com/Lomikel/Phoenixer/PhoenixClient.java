@@ -146,7 +146,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       for (int i = 0; i < keyParts.length; i++) {
         log.info(keyParts[i]);
         log.info(schema());
-        if (!keyParts[i].trim().equals("")) {
+        if (keyParts[i] != null && !keyParts[i].trim().equals("")) {
           searchMap.put(schema().rowkeyNames()[i], keyParts[i]);
           }
         }
