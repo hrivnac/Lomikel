@@ -160,11 +160,13 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       else {
         where += " and ";
         }
-      if (schema().type(entry.getKey()).equals("String")) {        
-        where += entry.getKey() + " = '" + entry.getValue() + "'";
-        }
-      else {
-        where += entry.getKey() + " = " + entry.getValue();
+      if (entry.getValue() != null) {
+        if (schema().type(entry.getKey()).equals("String")) {        
+          where += entry.getKey() + " = '" + entry.getValue() + "'";
+          }
+        else {
+          where += entry.getKey() + " = " + entry.getValue();
+          }
         }
       }
     if (filter == null || filter.trim().equals("")) {
