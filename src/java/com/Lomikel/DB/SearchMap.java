@@ -3,6 +3,7 @@ package com.Lomikel.DB;
 // Java
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Objects;
 
 /** <code>SearchMap</code> embeds {@link Map} of search arguments. 
   * @opt attributes
@@ -35,6 +36,11 @@ public class SearchMap {
   public boolean isEmpty() {
     return _map == null || _map.isEmpty();
     }
+    
+  /** Remove all entries with <tt>null</tt> values. */
+  public void rmNullValues() {
+    _map.values().removeIf(Objects::isNull);
+    }  
     
   /** Clear the {@link Map}. */
   public void clear() {

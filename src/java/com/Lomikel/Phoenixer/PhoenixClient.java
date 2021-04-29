@@ -144,13 +144,12 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       String[] keyParts = key.split("#");
       // TBD: check size of keyParts and Schema.rowkeynames()
       for (int i = 0; i < keyParts.length; i++) {
-        log.info(keyParts[i]);
-        log.info(schema());
-        if (keyParts[i] != null && !keyParts[i].trim().equals("")) {
+        if (!keyParts[i].trim().equals("")) {
           searchMap.put(schema().rowkeyNames()[i], keyParts[i]);
           }
         }
       }
+    searchMap.rmNullValues();
     String where = "";
     boolean first = true;
     for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap.map()).entrySet()) {
