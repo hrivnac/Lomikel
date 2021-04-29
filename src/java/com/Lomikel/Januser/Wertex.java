@@ -56,6 +56,8 @@ public abstract class Wertex implements Vertex {
       _rowkeys = new String[rowkeyNames.length];
       for (int i = 0; i < rowkeyNames.length; i++) {
         //_rowkeys[i] = vertex.<String>property(_rowkeyNames[i]).value();
+        log.info(vertex.property(rowkeyNames[i]));
+        log.info(vertex.property(rowkeyNames[i]).value());
         _rowkeys[i] = vertex.property(rowkeyNames[i]).value().toString(); // TBD: proper types
         }
       }
