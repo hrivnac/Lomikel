@@ -59,6 +59,7 @@ public abstract class Wertex implements Vertex {
         _rowkeys[i] = vertex.property(rowkeyNames[i]).value().toString(); // TBD: proper types
         }
       catch (IllegalStateException e) {
+        _rowkeys[i] = "*";
         log.warn(rowkeyNames[i] + " not set");
         }
       }

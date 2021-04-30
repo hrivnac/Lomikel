@@ -178,7 +178,6 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     if (limit() != 0) {
       sql += " limit " + limit();
       }
-    log.info(sql);
     return sql;
     }
     
