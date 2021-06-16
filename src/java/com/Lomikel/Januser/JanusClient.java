@@ -125,7 +125,7 @@ public class JanusClient implements ModifyingGremlinClient {
       }
     _hostname = p.getProperty("storage.hostname");
     _table    = p.getProperty("storage.hbase.table");
-    _batch = p.containsKey("storage.batch-loading") && p.getProperty("storage.batch-loading").equals("true");
+    _batch    = p.containsKey("storage.batch-loading") && p.getProperty("storage.batch-loading").equals("true");
     if (_batch) {
       log.info("\tas batch");
       }

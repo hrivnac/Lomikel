@@ -88,6 +88,9 @@ g.V().hasLabel('dataset').has('dataType', 'AOD').and().has('prodStep', 'merge')
 g.V().not(hasLabel('dataset')).count()
 g.V().has(label, neq('dataset')).count()
 
+// formatted valueMap
+...valueMap().toList().each{l ->  l.each {k,v -> println "${k}\t${v}"};};null
+
 // More complex navigation
 // =======================
 
@@ -112,6 +115,10 @@ g.V().has('dataset', 'name', 'data18_13TeV.00358031.physics_Main.deriv.DAOD_HIGG
 // all labels
 g.V().groupCount().by(label).unfold().project('Label', 'Count').by(keys).by(values)
 g.E().groupCount().by(label).unfold().project('Label', 'Count').by(keys).by(values)
+
+// show subtree
+g.V().has('lbl', 'xxx').limit(1).emit().repeat(group('x').by(loops()).by(label().fold().index()).out()).cap('x').unfold()
+g.V().has('lbl', 'xxx').limit(1).emit().repeat(group('x').by(loops()).by(values('yyy').fold().index()).out()).cap('x').unfold()
 
 // Searches
 // ========
@@ -178,6 +185,9 @@ Geoshape.geoshape(Geoshape.getGeometryCollectionBuilder()
         .add(Geoshape.getShapeFactory().lineString().pointXY(119.0, 60.0).pointXY(121.0, 60.0).build())
         .add(Geoshape.getShapeFactory().polygon().pointXY(119.0, 59.0).pointXY(121.0, 59.0).pointXY(121.0, 61.0).pointXY(119.0, 61.0).pointXY(119.0, 59.0)).build())
 
+// search
+g.V().has('lbl', 'candidate').has('direction', geoWithin(Geoshape.circle(29, 108, 0.0001*6371.0087714*180/Math.PI)))        
+        
 // Also
 // ====
 // local(), coin(), sample()
@@ -271,6 +281,10 @@ graph.io(graphson()).readGraph('/tmp/x.json');
 
 // Load a file
 :load x.gremlin
+
+// Hints
+// =====
+// for several (nested) searches, search first on more selective field 
 
 // Scripts
 // =======
