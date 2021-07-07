@@ -7,8 +7,9 @@ mgmt = graph.openManagement()
 // ...
 
 // Edges
-has      = mgmt.makeEdgeLabel('contains').multiplicity(ONE2MANY).make()
-contains = mgmt.makeEdgeLabel('has'     ).multiplicity(MULTI   ).make()
+props    = mgmt.makeEdgeLabel('props'   ).multiplicity(SIMPLE  ).make()
+has      = mgmt.makeEdgeLabel('has'     ).multiplicity(ONE2MANY).make()
+contains = mgmt.makeEdgeLabel('contains').multiplicity(MULTI   ).make()
 
 // Properties
 title    = mgmt.makePropertyKey('title'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()

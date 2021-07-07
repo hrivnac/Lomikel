@@ -212,6 +212,9 @@ evaluate(new File("..."))
 // profile a query
 ...profile()
 
+// explain a query
+...explain()
+
 // Management
 // ==========
 
@@ -223,8 +226,12 @@ mgmt.commit()
 
 // enable index
 mgmt = graph.openManagement()
-ManagementSystem.awaitGraphIndexStatus(graph, 'x').status(SchemaStatus.ENABLED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'x').status(SchemaStatus.ENABLED).timeout(10, ChronoUnit.MINUTES).call()
 mgmt.commit()
+
+// show indexes
+mgmt.getGraphIndexes(Vertex.class)
+mgmt.printIndexes()
 
 // get open transactions
 graph.getOpenTransactions()
@@ -251,7 +258,6 @@ schema.vertexLabel('v').index('i').remove()
 :remote config alias reset
 system.graph('food').truncate()
 system.graph('food').drop()
-
 
 // IO
 // ==
