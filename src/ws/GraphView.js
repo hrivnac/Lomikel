@@ -73,8 +73,8 @@ async function callGremlinGraph(request, newServer, level = 0) {
       expandNodes(level);
       }
     };
-  //http.open("GET", server + '?gremlin=' + request);
-  http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + encodeURIComponent(request));
+  http.open("GET", server + '?gremlin=' + request);
+  //http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + encodeURIComponent(request));
   http.send(); 
   }  
   
@@ -89,14 +89,14 @@ function callGremlinValues(request, newServer) {
   var [host, port] = server.split("//")[1].split(":");
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
-  //http.open("GET", server + '?gremlin=' + request, false);
-  http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + encodeURIComponent(request), false);
+  http.open("GET", server + '?gremlin=' + request, false);
+  //http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + encodeURIComponent(request), false);
   http.send();
   return parseValues(http.responseText)
   }
 
 // Parse JSON graph
-function parseGraph(json) {
+function parseGraphx(json) {
   var g = JSON.parse(json);
   document.getElementById("feedback").innerHTML += "Showing " + g.length + " new elements<br/>";
   var label;
@@ -150,9 +150,69 @@ function parseGraph(json) {
   return graph;
   }
   
+// Parse Graphson graph
+function parseGraph(graphson) {
+  var g = JSON.parse(graphson).result.data['@value'];
+  document.getElementById("feedback").innerHTML += "Showing " + g.length + " new elements<br/>";
+  var label;
+  var id;
+  var properties;
+  var graph = [];
+  var element;
+  var value;
+  for (var i = 0; i < g.length; i++) {
+    if (g[i]['@type'] === 'g:Vertex') {
+      id = g[i]['@value'].id['@value'];
+      label = g[i]['@value'].label;
+      if (typeof label === 'object') {
+        label = g[i]['@value'].label['@value'];
+        }
+      properties = g[i]['@value'].properties;
+      element = [];
+      if (properties) {
+        Object.keys(properties).forEach(function(key) {
+          value = properties[key][0]['@value'].value;
+          if (typeof value === 'object') {
+            value = properties[key][0]['@value'].value['@value'];
+            }
+          element.push({key:key, value:value});
+          })
+        }
+      graph.push({type:'vertex', label:label, id:id, element:element});
+      }
+    else if (g[i]['@type'] === 'g:Edge') {
+      id = g[i]['@value'].id['@value'].relationId;
+      label = g[i]['@value'].label;
+      if (typeof label === 'object') {
+        label = g[i]['@value'].label['@value'];
+        }
+      properties = g[i]['@value'].properties;
+      element = [];
+      if (properties) {
+        Object.keys(properties).forEach(function(key) {
+          value = properties[key]['@value'].value;
+          if (typeof value === 'object') {
+            value = properties[key]['@value'].value['@value'];
+            }
+          element.push({key:key, value:value});
+          })
+        }
+      inVid = g[i]['@value'].inV['@value'];
+      outVid = g[i]['@value'].outV['@value'];
+      graph.push({type:'edge', label:label, id:id, element:element, inVid:inVid, outVid:outVid});
+      }
+    }
+  return graph;
+  }
+  
+// Parse Graphson values
+function parseValues(graphson) {
+  return JSON.parse(graphson).result.data['@value'];
+  }
+  
 // Parse JSON values
 // TBD: ugly
-function parseValues(value) {
+function parseValuesx(value) {
   answer = value;
   if (value != "") {
     value = JSON.parse(value);
@@ -679,24 +739,24 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
     val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);
     }
   else if (nam.js) {
-    for (key in pMap) {
-      if (typeof pMap[key] === 'object') {
-        if (typeof pMap[key][0] === 'object') {
-          eval(key + '=' + '"' + pMap[key][0]['@value'] + '"');
-          }
-        else {
-          eval(key + '=' + '"' + pMap[key][0] + '"');
-          }
-        }
-      else {
-        eval(key + '=' + '"' + pMap[key] + '"');
-        }
-      }
-    val = eval(nam.js);
+    //for (key in pMap) {
+    //  if (typeof pMap[key] === 'object') {
+    //    if (typeof pMap[key][0] === 'object') {
+    //      eval(key + '=' + '"' + pMap[key][0]['@value'] + '"');
+    //      }
+    //    else {
+    //      eval(key + '=' + '"' + pMap[key][0] + '"');
+    //      }
+    //    }
+    //  else {
+    //    eval(key + '=' + '"' + pMap[key] + '"');
+    //    }
+    //  }
+    //val = eval(nam.js);
     }
-  else if (pMap[nam]) {
-    val = pMap[nam];
-    }
+  //else if (pMap[nam]) {
+  //  val = pMap[nam];
+  //  }
   else if (eMap.get(nam)) {
     val = eMap.get(nam);
     }
@@ -708,4 +768,3 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
     }
   return val;
   }
-  
