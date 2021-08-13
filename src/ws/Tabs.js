@@ -1,5 +1,5 @@
 function showTab(tname) {
-  $("#graph").hide();
+  $("#result").hide();
   $("#image").hide();
   $("#plot" ).hide();
   $("#" + tname  ).show();

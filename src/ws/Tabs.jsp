@@ -5,10 +5,10 @@
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
-<%@include file="GraphView.jsp" %>
+<%@include file="Result.jsp" %>
 <%@include file="Plot.jsp" %>
 <%@include file="Image.jsp" %>
 
 <script type="text/javascript">
-  showTab('graph');
+  showTab('result');
   </script>
