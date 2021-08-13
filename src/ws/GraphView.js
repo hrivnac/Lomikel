@@ -290,7 +290,7 @@ function show(graph) {
         if (!stylesheetNode) {
           stylesheetNode = stylesheet.nodes["default"];
           }
-        pMap = stylesheetValue(stylesheetNode.properties, id, eMap, {}, false); // dictionary, not map
+        pMap = stylesheetValue(stylesheetNode.properties, id, eMap, {}, false);
         title        = l + ":" + stylesheetValue(stylesheetNode.graphics.title,        id, eMap, pMap, false);
         subtitle     = stylesheetValue(stylesheetNode.graphics.subtitle,     id, eMap, pMap, false, title);
         label        = stylesheetValue(stylesheetNode.graphics.label,        id, eMap, pMap, false, title);
@@ -341,7 +341,7 @@ function show(graph) {
           }
         inVid = graph[i].inVid;
         outVid = graph[i].outVid;
-        pMap = stylesheetValue(stylesheetEdge.properties, id, eMap, {}, false); // dictionary, not map
+        pMap = stylesheetValue(stylesheetEdge.properties, id, eMap, {}, false);
         title        = l + ":" + stylesheetValue(stylesheetEdge.graphics.title,        id, eMap, pMap, true);
         subtitle     = stylesheetValue(stylesheetEdge.graphics.subtitle,     id, eMap, pMap, true, title);
         label        = stylesheetValue(stylesheetEdge.graphics.label,        id, eMap, pMap, true, title);
@@ -735,28 +735,15 @@ function callInfo(element, key) {
 // TBD: handle default if undefined
 function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
+  for (key in pMap) {
+    eval(pMap[key]['@value'][0] + '=' + '"' + pMap[key]['@value'][1]['@value'][0] + '"');
+    }
   if (nam.gremlin) {
     val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);
     }
   else if (nam.js) {
-    //for (key in pMap) {
-    //  if (typeof pMap[key] === 'object') {
-    //    if (typeof pMap[key][0] === 'object') {
-    //      eval(key + '=' + '"' + pMap[key][0]['@value'] + '"');
-    //      }
-    //    else {
-    //      eval(key + '=' + '"' + pMap[key][0] + '"');
-    //      }
-    //    }
-    //  else {
-    //    eval(key + '=' + '"' + pMap[key] + '"');
-    //    }
-    //  }
-    //val = eval(nam.js);
+    val = eval(nam.js);
     }
-  //else if (pMap[nam]) {
-  //  val = pMap[nam];
-  //  }
   else if (eMap.get(nam)) {
     val = eMap.get(nam);
     }

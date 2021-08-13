@@ -6,10 +6,10 @@
 var stylesheet = {
   nodes: {
     "default": {
-      properties:{gremlin:"valueMap('lbl', 'title')"},
+      properties:{gremlin:"valueMap('lbl', 'title').toList()[0]"},
       graphics: {
-        label:{js:"lbl"},        
-        title:{js:"title"},      
+        label:"lbl",    // or label:{js:"lbl"}    
+        title:"title",      
         subtitle:" ",
         group:" ",         // specifies graphics properties
         shape:"dot",       // in text:  ellipse, circle, database, box, text
@@ -25,10 +25,10 @@ var stylesheet = {
         ]
       },
     "MetaGraph": {
-      properties:{gremlin:"valueMap('title', 'MetaLabel')"},
+      properties:{gremlin:"valueMap('title', 'MetaLabel').toList()[0]"},
       graphics: {
-        label:{js:"MetaLabel"},        
-        title:{js:"title"},      
+        label:"MetaLabel",        
+        title:"title",      
         subtitle:" ",
         group:" ",         
         shape:"ellipse",      
@@ -62,7 +62,7 @@ var stylesheet = {
     "MetaGraph": {
       properties:{gremlin:"valueMap('MetaLabel')"},
       graphics: {
-        label:{js:"MetaLabel"},        
+        label:"MetaLabel",        
         title:" ",
         subtitle:" ",
         arrows:"middle",
