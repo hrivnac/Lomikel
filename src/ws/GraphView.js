@@ -74,7 +74,6 @@ async function callGremlinGraph(request, newServer, level = 0) {
       }
     };
   http.open("GET", server + '?gremlin=' + request);
-  //http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + encodeURIComponent(request));
   http.send(); 
   }  
   
@@ -90,64 +89,8 @@ function callGremlinValues(request, newServer) {
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
   http.open("GET", server + '?gremlin=' + request, false);
-  //http.open("GET", "GremlinClient.jsp?host=" + host + "&port=" + port + "&request=" + encodeURIComponent(request), false);
   http.send();
   return parseValues(http.responseText)
-  }
-
-// Parse JSON graph
-function parseGraphx(json) {
-  var g = JSON.parse(json);
-  document.getElementById("feedback").innerHTML += "Showing " + g.length + " new elements<br/>";
-  var label;
-  var id;
-  var properties;
-  var graph = [];
-  var element;
-  var value;
-  for (var i = 0; i < g.length; i++) {
-    if (g[i]['@type'] === 'g:Vertex') {
-      id = g[i]['@value'].id['@value'];
-      label = g[i]['@value'].label;
-      if (typeof label === 'object') {
-        label = g[i]['@value'].label['@value'];
-        }
-      properties = g[i]['@value'].properties;
-      element = [];
-      if (properties) {
-        Object.keys(properties).forEach(function(key) {
-          value = properties[key][0]['@value'].value;
-          if (typeof value === 'object') {
-            value = properties[key][0]['@value'].value['@value'];
-            }
-          element.push({key:key, value:value});
-          })
-        }
-      graph.push({type:'vertex', label:label, id:id, element:element});
-      }
-    else if (g[i]['@type'] === 'g:Edge') {
-      id = g[i]['@value'].id['@value'].relationId;
-      label = g[i]['@value'].label;
-      if (typeof label === 'object') {
-        label = g[i]['@value'].label['@value'];
-        }
-      properties = g[i]['@value'].properties;
-      element = [];
-      if (properties) {
-        Object.keys(properties).forEach(function(key) {
-          value = properties[key]['@value'].value;
-          if (typeof value === 'object') {
-            value = properties[key]['@value'].value['@value'];
-            }
-          element.push({key:key, value:value});
-          })
-        }
-      inVid = g[i]['@value'].inV['@value'];
-      outVid = g[i]['@value'].outV['@value'];
-      graph.push({type:'edge', label:label, id:id, element:element, inVid:inVid, outVid:outVid});
-      }
-    }
-  return graph;
   }
   
 // Parse Graphson graph
@@ -209,40 +152,7 @@ function parseGraph(graphson) {
 function parseValues(graphson) {
   return JSON.parse(graphson).result.data['@value'];
   }
-  
-// Parse JSON values
-// TBD: ugly
-function parseValuesx(value) {
-  answer = value;
-  if (value != "") {
-    value = JSON.parse(value);
-    if (value) {
-      answer = value;
-      value = value[0]
-      if (value) {
-        answer = value;
-        value = value['@value'];
-        if (value) {
-          answer = value;
-          value = value.value;
-          if (value) {
-            answer = value;
-            }
-          }
-        }
-      }
-    }
-  if (Array.isArray(answer)) {
-    if (answer.length == 0) {
-      answer = "";
-      }
-    else {
-      answer = answer[0];
-      }
-    }
-  return answer;
-  }
- 
+   
 // Construct VIS graph
 function show(graph) {
   var target;
@@ -311,21 +221,24 @@ function show(graph) {
         actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap, pMap, false, title);
         actions = "";
         for (var k = 0; k < actionsArray.length; k++) {
-          url = stylesheetValue(actionsArray[k].url, id, eMap, pMap, false, title);
-          if (url && url != actionsArray[k].name) {
-            url = encodeURI(url);
-            if (!actionsArray[k].external) {
-              actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
-              }
-            if (!actionsArray[k].embedded) {
-              if (!actionsArray[k].external) {
-                actions += "&nbsp;<a href='" + url + "' target='_blank'>" + "&#8599;</a>";
+          if (actionsArray[k].url) {
+            url = stylesheetValue(actionsArray[k].url, id, eMap, pMap, false, title);
+            if (url) {
+              url = encodeURI(url);
+              if (actionsArray[k].target == "external") {
+                actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "<sup><small>&#8599;</small></sup></a>";
                 }
               else {
-                actions += "&nbsp;" + actionsArray[k].name + "<a href='" + url + "' target='_blank'>" + "&#8599;</a>";
+                actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
                 }
+              actions += " - ";
               }
-            actions += " - ";
+            }
+          if (actionsArray[k].fun) {
+            fun = stylesheetValue(actionsArray[k].fun, id, eMap, pMap, false, title);
+            if (fun) {
+              actions += "<input type='button' onclick='" + fun + "' value='" + actionsArray[k].name + "' class='button-aux'></input> - ";
+              }
             }
           }
         if ((filter === '' || label.includes(filter)) && !findObjectByKey(nodes, 'id', id)) {
@@ -354,16 +267,11 @@ function show(graph) {
           url = stylesheetValue(actionsArray[k].url, id, eMap, pMap, true, title);
           if (url) {
             url = encodeURI(url);
-            if (!actionsArray[k].external) {
-              actions += "<a href='#' onclick='loadPane(\"result\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
+            if (actionsArray[k].target == "external") {
+              actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + + "&#8599;</a>";
               }
-            if (!actionsArray[k].embedded) {
-              if (!actionsArray[k].external) {
-                actions += "&nbsp;<a href='" + url + "' target='_blank'>" + "&#8599;</a>";
-                }
-              else {
-                actions += "&nbsp;" + actionsArray[k].name + "<a href='" + url + "' target='_blank'>" + "&#8599;</a>";
-                }
+            else {
+              actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
               }
             actions += " - ";
             }
@@ -410,7 +318,7 @@ function show(graph) {
         document.getElementById("commands").innerHTML = "<b><u>" + title + "</u></b>" + helpButton
                                                                  + "&nbsp;<input type='button' onclick='describeNode(" + selectedNode.id + ")'  title='describe' class='button-describe'>"
                                                                  + "&nbsp;<input type='button' onclick='removeNode("   + selectedNode.id + ")'  title='remove'   class='button-remove'><hr/>"
-                                                                 + "Actions: " + selectedNode.actions;
+                                                                 + selectedNode.actions;
         }
       }
     else if (params.edges.length == 1) {
@@ -420,7 +328,7 @@ function show(graph) {
         document.getElementById("commands").innerHTML = "<b><u>" + title + "</u></b>" + helpButton
                                                                  + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' title='describe' class='button-describe'>"
                                                                  + "&nbsp;<input type='button' onclick='removeEdge(\""   + selectedEdge.id + "\")' title='remove'   class='button-remove'><hr/>"
-                                                                 + "Actions: " + selectedEdge.actions;
+                                                                 + selectedEdge.actions;
         }
       }
     });
@@ -736,7 +644,12 @@ function callInfo(element, key) {
 function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
   for (key in pMap) {
-    eval(pMap[key]['@value'][0] + '=' + '"' + pMap[key]['@value'][1]['@value'][0] + '"');
+    if (typeof(pMap[key]['@value'][1]['@value'][0]) == "object") {
+      eval(pMap[key]['@value'][0] + '=' + '"' + pMap[key]['@value'][1]['@value'][0]['@value'] + '"');
+      }
+    else {
+      eval(pMap[key]['@value'][0] + '=' + '"' + pMap[key]['@value'][1]['@value'][0] + '"');
+      }
     }
   if (nam.gremlin) {
     val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);

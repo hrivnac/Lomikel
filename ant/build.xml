@@ -133,7 +133,6 @@
 			<fileset file="${healpix_jar}"/>
       </copy>
     </target>
-    
 
   <!-- Compile ==============================================================-->
 
@@ -364,7 +363,13 @@
       <arg line="/bin/rm -f ${server_dir}/${user.name}-Lomikel.war"/>
       </exec>
     <exec executable="/usr/bin/sudo">
+      <arg line="/bin/rm -f ${server_dir}/${user.name}-LomikelHadoop.war"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/Lomikel.war ${server_dir}/${user.name}-Lomikel.war"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
+      <arg line="cp ../lib/LomikelHadoop.war ${server_dir}/${user.name}-LomikelHadoop.war"/>
       </exec>
     </target>
     
@@ -372,6 +377,8 @@
            unless="${sudo}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/${user.name}-Lomikel.war"/>
+    <copy file="../lib/LomikelHadoop.war"
+          tofile="${server_dir}/${user.name}-LomikelHadoop.war"/>
     </target>
   
   <target name="deploy-prod"
@@ -390,7 +397,13 @@
       <arg line="/bin/rm -f ${server_dir}/Lomikel.war"/>
       </exec>
     <exec executable="/usr/bin/sudo">
+      <arg line="/bin/rm -f ${server_dir}/LomikelHadoop.war"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/Lomikel.war ${server_dir}/Lomikel.war"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
+      <arg line="cp ../lib/LomikelHadoop.war ${server_dir}/LomikelHadoop.war"/>
       </exec>
     </target>
     
@@ -398,6 +411,8 @@
           unless="${sudo}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/Lomikel.war"/>
+    <copy file="../lib/LomikelHadoop.war"
+          tofile="${server_dir}/LomikelHadoop.war"/>
     </target>
  
   <!-- Patch and Restart JanuGraph ==========================================-->

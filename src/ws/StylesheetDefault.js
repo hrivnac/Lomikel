@@ -8,7 +8,7 @@ var stylesheet = {
     "default": {
       properties:{gremlin:"valueMap('lbl', 'title').toList()[0]"},
       graphics: {
-        label:"lbl",    // or label:{js:"lbl"}    
+        label:"lbl",       // or label:{js:"lbl"}    
         title:"title",      
         subtitle:" ",
         group:" ",         // specifies graphics properties
@@ -21,7 +21,9 @@ var stylesheet = {
         value:"0"
         },
       actions:[
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel"}
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel",        target:"external"},
+        {name:"help", url:"Result.jsp",                                                             target:"result"  },
+        {name:"show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"  }
         ]
       },
     "MetaGraph": {
@@ -40,7 +42,8 @@ var stylesheet = {
         value:"0"
         },
       actions:[
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel"}
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel", target:"external"},
+        {name:"help", url:"Result.jsp",                                                      target:"result"  }
         ]
       },
     },
@@ -56,7 +59,8 @@ var stylesheet = {
         group:" "
         },
       actions: [
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel"}
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel", target:"external"},
+        {name:"help", url:"Result.jsp",                                                      target:"result"  }
         ]
       },
     "MetaGraph": {
@@ -70,7 +74,8 @@ var stylesheet = {
         group:" "
         },
       actions: [
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel"}
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel", target:"external"},
+        {name:"help", url:"Result.jsp",                                                      target:"result"}
         ]
       }
     }

@@ -1,4 +1,4 @@
-function showSkyView(dataS, gMapS, name, zS, sS, url) {
+function showSkyView(dataS, name, zS, sS, url) {
 
   //const colors = d3.schemeCategory10;
   // taken from d3-v6.0.0
@@ -11,12 +11,11 @@ function showSkyView(dataS, gMapS, name, zS, sS, url) {
   const colors = set1;
   
   var data = JSON.parse(dataS.replace(/'/g, '"'));
-  var gMap = JSON.parse(gMapS.replace(/'/g, '"'));
     
   var config = {
     form: true,
     formFields: {download: true},
-    datapath: "../d3-celestial-0.7.32/data/",
+    datapath: "d3-celestial-0.7.32/data/",
     projection: "aitoff",
     transform: "galactic",
     background: {fill: "#fff", stroke: "#000", opacity: 1, width: 1},
@@ -52,7 +51,6 @@ function showSkyView(dataS, gMapS, name, zS, sS, url) {
   
   for (i in data) {
     var d = data[i];
-    // var name = (d.k + ": " + (gMap.find(e => e.g == d.g).s) + ", (ra, dec) = (" + d.x + ", " + d.y + ")" + (zS ? (", " + zS + " = " + d.z) : ""));
     var name = d.k;
     var size = data[0].z ? 50 - (100 - 50) * (d.z - zmin) / (zmax - zmin) : 50;
     var color = (d.g || d.g === 0) ? colors[d.g % 10] : 'black';

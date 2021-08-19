@@ -5,6 +5,8 @@
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
+<link href="Result.css" rel="stylesheet" type="text/css"/>
+
 <div id="result" title="results">
   <button onClick="w2popup.load({url:'Help-Result.html', showMax: true})" style="position:absolute; top:0; right:0">
     <img src="images/Help.png" width="10"/>

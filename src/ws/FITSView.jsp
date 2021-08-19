@@ -5,9 +5,13 @@
 
 <%@ page import="com.Lomikel.HBaser.BinaryDataRepository" %>
 <%@ page import="com.Lomikel.Utils.Info" %>
+<%@ page import="com.Lomikel.Utils.SmallHttpClient" %>
 
 <%@ page import="java.io.File"%>
 <%@ page import="java.io.FileOutputStream"%>
+<%@ page import="java.net.URL"%>
+<%@ page import="java.net.HttpURLConnection"%>
+<%@ page import="java.io.DataInputStream"%>
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
@@ -27,18 +31,26 @@
 <jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
 
 <%
-  // TBD: should be realy deleted
-  String id = request.getParameter("id");
-  byte[] content = h2table.repository().get(id);
-  String name = id.substring(7);
+  // TBD: should be deleted after
+  // TBD: parametrise fitsdir
+  String fitsdir = "http://localhost:14000/webhdfs/v1/user/hrivnac/fits";
+  String fn = request.getParameter("fn");
+  URL url = new URL(fitsdir + "/" + fn + "?op=OPEN&user.name=hadoop");
+  String lfn = Info.tmp() + "/FITS/" + fn;
+  HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+  DataInputStream dis = new DataInputStream(conn.getInputStream());
   new File(Info.tmp() +"/FITS").mkdirs();
-  String fn = Info.tmp() + "/FITS/" + name + ".fits";
-  File file = new File(fn);
+  File file = new File(lfn);
   file.deleteOnExit();      
-  FileOutputStream fos = new FileOutputStream(file);
-  fos.write(content);
-  fos.close();
-  String url = "FITSFile.jsp?fn=" + fn;                    
+  FileOutputStream fw = new FileOutputStream(file);
+  byte buffer[] = new byte[1024];
+  int offset = 0;
+  int bytes;
+  while ((bytes = dis.read(buffer, offset, buffer.length)) > 0) {
+    fw.write(buffer, 0, bytes);
+    }
+  fw.close();
+  String lurl = "FITSFile.jsp?fn=" + lfn;  
   %>
 
 <div id="fitsview">
@@ -50,7 +62,7 @@
   
 <script type="text/javascript">
   function init() {
-    JS9.Preload("<%=url%>", {colormap:"heat"});
+    JS9.Preload("<%=lurl%>", {colormap:"heat"});
     }
   $(document).ready(function() {
     init();

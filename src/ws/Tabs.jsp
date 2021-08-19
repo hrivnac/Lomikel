@@ -8,6 +8,7 @@
 <%@include file="Result.jsp" %>
 <%@include file="Plot.jsp" %>
 <%@include file="Image.jsp" %>
+<%@include file="SkyView.jsp" %>
 
 <script type="text/javascript">
   showTab('result');
