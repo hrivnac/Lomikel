@@ -189,6 +189,7 @@ function show(graph) {
       id = graph[i].id;
       e = graph[i].element;
       eMap = new Map();
+      pMap = new Map();
       if (e.length) {
         for (var j = 0; j < e.length; j++) { // TBD: make better loop
           eMap.set(e[j].key, e[j].value);
@@ -200,11 +201,15 @@ function show(graph) {
         if (!stylesheetNode) {
           stylesheetNode = stylesheet.nodes["default"];
           }
-        pMap = stylesheetValue(stylesheetNode.properties, id, eMap, {}, false);
+        stylesheetValue(stylesheetNode.properties, id, eMap, pMap, false);
         title        = l + ":" + stylesheetValue(stylesheetNode.graphics.title,        id, eMap, pMap, false);
         subtitle     = stylesheetValue(stylesheetNode.graphics.subtitle,     id, eMap, pMap, false, title);
         label        = stylesheetValue(stylesheetNode.graphics.label,        id, eMap, pMap, false, title);
         group        = stylesheetValue(stylesheetNode.graphics.group,        id, eMap, pMap, false, title);
+        if (Array.isArray(group)) { // TBD: ugly
+          group = group[0];
+          }
+        groups.push(group);
         value        = stylesheetValue(stylesheetNode.graphics.value,        id, eMap, pMap, false, title);
         shape        = stylesheetValue(stylesheetNode.graphics.shape,        id, eMap, pMap, false, title);
         borderDashes = stylesheetValue(stylesheetNode.graphics.borderDashes, id, eMap, pMap, false, title);
@@ -234,17 +239,11 @@ function show(graph) {
               actions += " - ";
               }
             }
-          if (actionsArray[k].fun) {
-            fun = stylesheetValue(actionsArray[k].fun, id, eMap, pMap, false, title);
-            if (fun) {
-              actions += "<input type='button' onclick='" + fun + "' value='" + actionsArray[k].name + "' class='button-aux'></input> - ";
-              }
-            }
           }
         if ((filter === '' || label.includes(filter)) && !findObjectByKey(nodes, 'id', id)) {
           nodes.push({id:id, value:value, label:label, title:(title + "<br/>" + subtitle), group:group, actions:actions, shape:shape, image:image, shapeProperties:{borderRadius:borderRadius, borderDashes:borderDashes}, borderWidth:borderWidth, color:color});
           }
-        groups.push(group);
+        //groups.push(group);
         }
       // edge
       else if (graph[i].type === 'edge') {
@@ -254,7 +253,7 @@ function show(graph) {
           }
         inVid = graph[i].inVid;
         outVid = graph[i].outVid;
-        pMap = stylesheetValue(stylesheetEdge.properties, id, eMap, {}, false);
+        stylesheetValue(stylesheetEdge.properties, id, eMap, pMap, false);
         title        = l + ":" + stylesheetValue(stylesheetEdge.graphics.title,        id, eMap, pMap, true);
         subtitle     = stylesheetValue(stylesheetEdge.graphics.subtitle,     id, eMap, pMap, true, title);
         label        = stylesheetValue(stylesheetEdge.graphics.label,        id, eMap, pMap, true, title);
@@ -643,13 +642,8 @@ function callInfo(element, key) {
 // TBD: handle default if undefined
 function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
-  for (key in pMap) {
-    if (typeof(pMap[key]['@value'][1]['@value'][0]) == "object") {
-      eval(pMap[key]['@value'][0] + '=' + '"' + pMap[key]['@value'][1]['@value'][0]['@value'] + '"');
-      }
-    else {
-      eval(pMap[key]['@value'][0] + '=' + '"' + pMap[key]['@value'][1]['@value'][0] + '"');
-      }
+  for ([key, value] of pMap.entries()) {
+    eval(key + '=' + '"' + value + '"');
     }
   if (nam.gremlin) {
     val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);
@@ -663,8 +657,22 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
   else {
     val = nam;
     }
-  if (typeof val == 'number') {
+  if (typeof(val) == 'number') {
     val = val.toString();
+    }
+  else if (typeof(val) == 'object') {
+    if (Array.isArray(val)) {
+      for (v in val) {
+        if (JSON.stringify(val[v]).startsWith('{"@type":"g:Map"')) { // TBD: this is ugly
+          if (typeof(val[v]['@value'][1]['@value'][0]) == "object") {
+            pMap.set(val[v]['@value'][0], val[v]['@value'][1]['@value'][0]['@value']);
+            }
+          else {
+            pMap.set(val[v]['@value'][0], val[v]['@value'][1]['@value'][0]);
+            }
+          }
+        }
+      }
     }
   return val;
   }
