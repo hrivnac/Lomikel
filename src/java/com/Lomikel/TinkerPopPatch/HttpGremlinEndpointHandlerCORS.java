@@ -205,8 +205,8 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
 
                         // handle cors business
                         if (origin != null) {
-                          response.headers().set(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-                          response.headers().add(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+                          //response.headers().set(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                          response.headers().set(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
                           response.headers().add(ACCESS_CONTROL_ALLOW_METHODS, "GET, POST");
                           response.headers().add(ACCESS_CONTROL_ALLOW_HEADERS, "origin, content-type, accept, X-Requested-With, authorization");
                           response.headers().add(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
