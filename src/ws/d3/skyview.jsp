@@ -9,7 +9,7 @@
 
 <%! static Logger log = Logger.getLogger(org.apache.jsp.d3.skyview_jsp.class); %>
 
-<jsp:useBean id="repository" class="com.Lomikel.WebService.DataRepository" scope="session"/>
+<jsp:useBean id="repository" class="com.Lomikel.WebService.StringRepository" scope="session"/>
    
 <script src="d3-celestial-0.7.32/lib/d3.min.js"                type="text/javascript"></script>
 <script src="d3-celestial-0.7.32/lib/d3.geo.projection.min.js" type="text/javascript"></script>
@@ -37,7 +37,7 @@
   // data supplied as JSON string
   else if (data != null && !data.trim().equals("")) {
     }
-  // data supplied via DataRepository
+  // data supplied via StringRepository
   else if (name != null && !name.trim().equals("")) {
     data = repository.get(name);
     }

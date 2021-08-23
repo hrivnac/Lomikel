@@ -7,7 +7,7 @@ import java.util.HashMap;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>DataRepository</code> communicates {@link String} data between applets..
+/** <code>DataRepository</code> communicates <tt>byte[]</tt> data between applets..
   * @opt attributes
   * @opt operations
   * @opt types
@@ -19,22 +19,22 @@ public class DataRepository {
     * @param name    The name of the data.
     * @param content The data content. */
   public void add(String name,
-                  String content) {
+                  byte[] content) {
     _data.put(name, content);
     }
     
   /** Give data.
     * @param name The name of the data.
     * @return     The data content. */
-  public String get(String name) {
+  public byte[] get(String name) {
     return _data.get(name);
     }
   
   /** Give data and remove them.
     * @param name The name of the data.
     * @return     The data content. */
-  public String getAndRemove(String name) {
-    String content = _data.get(name);
+  public byte[] getAndRemove(String name) {
+    byte[] content = _data.get(name);
     _data.remove(name);
     return content;
     }
@@ -44,7 +44,7 @@ public class DataRepository {
     _data.clear();
     }
     
-  private Map<String, String> _data = new  HashMap<>();
+  private Map<String, byte[]> _data = new  HashMap<>();
   
   /** Logging . */
   private static Logger log = Logger.getLogger(DataRepository.class);

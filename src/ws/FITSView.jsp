@@ -3,7 +3,6 @@
 <!-- Lomikel FITS View-->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
-<%@ page import="com.Lomikel.HBaser.BinaryDataRepository" %>
 <%@ page import="com.Lomikel.Utils.Info" %>
 <%@ page import="com.Lomikel.Utils.SmallHttpClient" %>
 
@@ -12,6 +11,7 @@
 <%@ page import="java.net.URL"%>
 <%@ page import="java.net.HttpURLConnection"%>
 <%@ page import="java.io.DataInputStream"%>
+<%@ page import="java.util.Base64"%>
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
@@ -28,29 +28,52 @@
 <script type="text/javascript" src="js9-3.0/js9.min.js"></script>
 <script type="text/javascript" src="js9-3.0/js9plugins.js"></script>
 
-<jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table" scope="session"/>
+<jsp:useBean id="dr" class="com.Lomikel.WebService.DataRepository" scope="session"/>
 
 <%
   // TBD: should be deleted after
   // TBD: parametrise fitsdir
-  String fitsdir = "http://localhost:14000/webhdfs/v1/user/hrivnac/fits";
-  String fn = request.getParameter("fn");
-  URL url = new URL(fitsdir + "/" + fn + "?op=OPEN&user.name=hadoop");
-  String lfn = Info.tmp() + "/FITS/" + fn;
-  HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-  DataInputStream dis = new DataInputStream(conn.getInputStream());
-  new File(Info.tmp() +"/FITS").mkdirs();
-  File file = new File(lfn);
-  file.deleteOnExit();      
-  FileOutputStream fw = new FileOutputStream(file);
-  byte buffer[] = new byte[1024];
-  int offset = 0;
-  int bytes;
-  while ((bytes = dis.read(buffer, offset, buffer.length)) > 0) {
-    fw.write(buffer, 0, bytes);
+  String id   = request.getParameter("id");
+  String fn   = request.getParameter("fn");
+  String data = request.getParameter("data");
+  String lurl;
+  // HDFS
+  if (fn != null) {
+    String fitsdir = "http://localhost:14000/webhdfs/v1/user/hrivnac/fits";
+    URL url = new URL(fitsdir + "/" + fn + "?op=OPEN&user.name=hadoop");
+    String lfn = Info.tmp() + "/FITS/" + fn;
+    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+    DataInputStream dis = new DataInputStream(conn.getInputStream());
+    new File(Info.tmp() +"/FITS").mkdirs();
+    File file = new File(lfn);
+    file.deleteOnExit();      
+    FileOutputStream fw = new FileOutputStream(file);
+    byte buffer[] = new byte[1024];
+    int offset = 0;
+    int bytes;
+    while ((bytes = dis.read(buffer, offset, buffer.length)) > 0) {
+      fw.write(buffer, 0, bytes);
+      }
+    fw.close();
     }
-  fw.close();
-  String lurl = "FITSFile.jsp?fn=" + lfn;  
+  // DataRepository or data
+  else if (id != null || data != null) {
+    byte[] content;
+    if (id != null) {
+      content = dr().get(id);
+      }
+    else if (data != null) {
+      content = Base64.getDecoder().decode(data);
+      }
+    String lfn = Info.tmp() + "/FITS/" + id;
+    new File(Info.tmp() +"/FITS").mkdirs();
+    File file = new File(lfn);
+    file.deleteOnExit();      
+    FileOutputStream fos = new FileOutputStream(file);
+    fos.write(content);
+    fos.close();
+    }
+  String lurl = "FITSFile.jsp?fn=" + lfn;
   %>
 
 <div id="fitsview">
