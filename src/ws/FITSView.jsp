@@ -12,6 +12,10 @@
 <%@ page import="java.net.HttpURLConnection"%>
 <%@ page import="java.io.DataInputStream"%>
 <%@ page import="java.util.Base64"%>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page import="org.apache.log4j.Logger" %>
+
+<%! static Logger log = Logger.getLogger(FITSView_jsp.class); %>
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
@@ -36,41 +40,43 @@
   String id   = request.getParameter("id");
   String fn   = request.getParameter("fn");
   String data = request.getParameter("data");
-  String lurl;
+  String lfn = "";
+  File file;
+  FileOutputStream fos;
+  // DataRepository or data
+  if (id != null || data != null) {
+    byte[] content = null;
+    if (id != null) {
+      content = dr.get(id);
+      }
+    else if (data != null) {
+      content = Base64.getDecoder().decode(URLDecoder.decode(data, "UTF-8"));
+      }
+    lfn = Info.tmp() + "/FITS/" + id;
+    new File(Info.tmp() +"/FITS").mkdirs();
+    file = new File(lfn);
+    file.deleteOnExit();      
+    fos = new FileOutputStream(file);
+    fos.write(content);
+    fos.close();
+    }
   // HDFS
-  if (fn != null) {
+  else if (fn != null) {
     String fitsdir = "http://localhost:14000/webhdfs/v1/user/hrivnac/fits";
     URL url = new URL(fitsdir + "/" + fn + "?op=OPEN&user.name=hadoop");
-    String lfn = Info.tmp() + "/FITS/" + fn;
+    lfn = Info.tmp() + "/FITS/" + fn;
     HttpURLConnection conn = (HttpURLConnection)url.openConnection();
     DataInputStream dis = new DataInputStream(conn.getInputStream());
     new File(Info.tmp() +"/FITS").mkdirs();
-    File file = new File(lfn);
+    file = new File(lfn);
     file.deleteOnExit();      
-    FileOutputStream fw = new FileOutputStream(file);
+    fos = new FileOutputStream(file);
     byte buffer[] = new byte[1024];
     int offset = 0;
     int bytes;
     while ((bytes = dis.read(buffer, offset, buffer.length)) > 0) {
-      fw.write(buffer, 0, bytes);
+      fos.write(buffer, 0, bytes);
       }
-    fw.close();
-    }
-  // DataRepository or data
-  else if (id != null || data != null) {
-    byte[] content;
-    if (id != null) {
-      content = dr().get(id);
-      }
-    else if (data != null) {
-      content = Base64.getDecoder().decode(data);
-      }
-    String lfn = Info.tmp() + "/FITS/" + id;
-    new File(Info.tmp() +"/FITS").mkdirs();
-    File file = new File(lfn);
-    file.deleteOnExit();      
-    FileOutputStream fos = new FileOutputStream(file);
-    fos.write(content);
     fos.close();
     }
   String lurl = "FITSFile.jsp?fn=" + lfn;
