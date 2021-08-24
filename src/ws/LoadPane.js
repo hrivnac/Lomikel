@@ -15,7 +15,7 @@ async function loadPane(pane, url, iframe, height) {
   else {
     $("#" + pane).load(url);
     }
-  if (pane == 'result' || pane == 'image' || pane == 'plot' || pane == 'skyview') {
+  if (pane == 'result' || pane == 'table' || pane == 'image' || pane == 'plot' || pane == 'skyview') {
     showTab(pane);
     w2ui['layoutMain']['panels'][0]['tabs'].click(pane.concat("Tab"));
     }

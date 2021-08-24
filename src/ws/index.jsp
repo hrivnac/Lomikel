@@ -100,10 +100,11 @@
                 name:'tabs',
                 active:'resultTab',
                 tabs: [
-                  {id:'resultTab',  caption:'Results', tooltip:'Results View' },
-                  {id:'imageTab',   caption:'Image',   tooltip:'Image View'   },
-                  {id:'plotTab',    caption:'Plot' ,   tooltip:'Plot View'    },
-                  {id:'skyviewTab', caption:'SkyView', tooltip:'SkyView View' }
+                  {id:'resultTab',  caption:'Results', tooltip:'Results View'},
+                  {id:'tableTab',   caption:'Table',   tooltip:'Table View'  },
+                  {id:'imageTab',   caption:'Image',   tooltip:'Image View'  },
+                  {id:'plotTab',    caption:'Plot' ,   tooltip:'Plot View'   },
+                  {id:'skyviewTab', caption:'SkyView', tooltip:'SkyView View'}
                   ], 
                 onClick:function (event) {
                   showTab(event.target.replace('Tab', ''));

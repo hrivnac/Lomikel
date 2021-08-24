@@ -21,9 +21,10 @@ var stylesheet = {
         value:"0"
         },
       actions:[
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel",        target:"external"},
-        {name:"help", url:"Result.jsp",                                                             target:"result"  },
-        {name:"show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"  }
+        {name:"info",  url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel",         target:"external"},
+        {name:"help",  url:"Result.jsp",                                                              target:"result"  },
+        {name:"show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"  },
+        {name:"table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
         ]
       },
     "MetaGraph": {

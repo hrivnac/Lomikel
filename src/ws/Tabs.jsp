@@ -6,6 +6,7 @@
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
 <%@include file="Result.jsp" %>
+<%@include file="Table.jsp" %>
 <%@include file="Plot.jsp" %>
 <%@include file="Image.jsp" %>
 <%@include file="SkyView.jsp" %>
