@@ -23,51 +23,52 @@
 <div id="celestial-form"></div>
 
 <%
-  String ra       = request.getParameter("ra");
-  String dec      = request.getParameter("dec");
-  String data     = request.getParameter("data");
-  String name     = request.getParameter("name");
-  String z        = request.getParameter("z");
-  String s        = request.getParameter("s");
-  // data supplied as ra-dec
-  if (ra  != null && !ra.trim( ).equals("") &&
-      dec != null && !dec.trim().equals("")) {
-    data = "[{'x':" + ra + ", 'y':" + dec + ", 'z':0, 'k':'x', 'g':0}]";
-    }
-  // data supplied as JSON string
-  else if (data != null && !data.trim().equals("")) {
-    }
-  // data supplied via StringRepository
-  else if (name != null && !name.trim().equals("")) {
-    data = repository.get(name);
-    }
-  // no data found, use demo data
-  if (data == null || data.trim().equals("") || data.trim().equals("[]")) {
-    data = "[{'x':10, 'y':-20, 'z':5, 'k':'k1', 'g':0}, {'x':60, 'y':90, 'z':6, 'k':'k2', 'g':0}, {'x':80, 'y':50, 'z':7, 'k':'k3', 'g':1}, {'x':60, 'y':30, 'k':'k4', 'g':1}]";
-    }
-  // Variable names
-  String url = "TBD";
-  if (z == null) {
-    z = "";
-    }
-  if (s == null) {
-    s = "";
-    }
-  if (name == null) {
-    name = "";
-    }
-  if (z != "") {
-    name += " (z: " + z + ")";
-    }
-  if (s != "") {
-    name += " (col: " + s + ")";
-    }
+  String id = request.getParameter("id");
   %>
-
+  
 <script src="d3/actions.js" type="text/javascript"></script>
 <script src="d3/skyview.js" type="text/javascript"></script>
-
+  
 <script type="text/javascript">
-  showSkyView("<%=data%>", "<%=name%>", "<%=z%>", "<%=s%>", "<%=url%>");
+  id = <%=id%>;
+  var node = findObjectByKey(nodes, 'id', id);
+  var tit = node.title.split(':')[0];
+  var data  = "[";
+  var firstrow = true;
+  var firstval;
+  for (var i = 0; i < nodes.length; i++) {
+    node1 = nodes[i];
+    id1 = node1.id;
+    if (node1.title.split(':')[0] == tit) {
+	    txt = callGremlinValues(gr + ".V('" + id1 + "').valueMap('ra', 'dec').toList().toString().replace(']', '').replace('[', '')")[0];
+      if (!firstrow) {
+        data += ",";
+        }
+      else {
+        firstrow = false;
+        }
+	    data += "{";
+	    firstval = true;
+      for (t of txt.split(",")) {
+        [column, value] = t.trim().split(":");
+        if (!firstval) {
+          data += ",";
+          }
+        else {
+          firstval = false;
+          }
+        if (column == "ra") {
+          data += "\"x\":\"" + value + "\"";
+          }
+        else if (column == "dec") {
+          data += "\"y\":\"" + value + "\"";
+          }
+        }
+      data += ", \"z\":0, \"k\":\"x\", \"g\":0}";
+      }
+    }
+  data += "]";
+  data = JSON.parse(data);
+  showSkyView(data, "", "", "", "");
   </script>
 

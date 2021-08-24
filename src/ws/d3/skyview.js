@@ -1,4 +1,4 @@
-function showSkyView(dataS, name, zS, sS, url) {
+function showSkyView(data, name, zS, sS, url) {
 
   //const colors = d3.schemeCategory10;
   // taken from d3-v6.0.0
@@ -10,7 +10,7 @@ function showSkyView(dataS, name, zS, sS, url) {
   const set1 = colorsF("e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999");
   const colors = set1;
   
-  var data = JSON.parse(dataS.replace(/'/g, '"'));
+  //var data = JSON.parse(dataS.replace(/'/g, '"'));
     
   var config = {
     form: true,
