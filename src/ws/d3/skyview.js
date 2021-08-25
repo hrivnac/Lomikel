@@ -1,4 +1,4 @@
-function showSkyView(data, name, zS, sS, url) {
+function showSkyView(data, url} {
 
   //const colors = d3.schemeCategory10;
   // taken from d3-v6.0.0

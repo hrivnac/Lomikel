@@ -1,4 +1,4 @@
-function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
+function showScatterPlot(data, name, xS, yS, zS, sS, url) {
   
   var w = 650;
   var h = 400;
@@ -30,10 +30,7 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
      .style("font-size", "12px")
      .style("font-weight", "bold")
      .style("text-decoration", "underline")  
-     .text(name)
-
-  var data = JSON.parse(dataS.replace(/'/g, '"'));
-  var gMap = JSON.parse(gMapS.replace(/'/g, '"'));
+     .text(name + (zS ? ", z: " + zS : "") + (sS ? ", s: " + sS : ""))
 
   if (xS) {
     x = d3.scaleLinear()
@@ -82,6 +79,10 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
             .domain(d3.extent(data, d => d.z)).nice()
             .range([1, 5]);  
             
+  var g = d3.scaleOrdinal()
+	          .domain(d3.extent(data, d => d.g))
+	          .range(colors);
+            
   var div = d3.select("body").append("div")	
               .attr("class", "tooltip")				
               .style("opacity", 0);
@@ -93,16 +94,15 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
        .append("circle")
        .attr("cx", d => x(d.x))
        .attr("cy", d => y(d.y))
-       .attr("r",  d => d.z ? z(d.z) : 1)
-       .attr("key", d => d.k)
+       .attr("r",  d => d.z ? z(d.z) : 10)
+       .attr("key", d => d.s)
        .attr("stroke-width", "1")
-       .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>" +
-                                 (sS ? ("<br/>" + gMap.find(e => e.g == d.g).s) + "<br/>" : "") +
-                                 (sS ? "x" : gMap.find(e => e.g == d.g).s.split("*")[0]) + " = " + d.x +
-                                 "<br/>" + 
-                                 (sS ? "y" : gMap.find(e => e.g == d.g).s.split("*")[1]) + " = " + d.y +
-                                 (zS ? ("<br/>" + zS + " = " + d.z) : "")))
-       .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
+       .attr("info",       d => (d.k ? ("<b><u>" + d.k + "</u></b><br/>"            ) : "") +
+                                (xS  ? ("<br/>x: " + xS + " = "             + d.x   ) : "") + 
+                                (yS  ? ("<br/>y: " + yS + " = "             + d.y   ) : "") + 
+                                (zS  ? ("<br/>z: " + zS + " = "             + d.z   ) : "") +
+                                (d.g ? ("<br/>g: " + (sS ? (sS + "=") : "") + d.g   ) : ""))
+       .style("stroke", d => d.g ? g(d.g) : 'black')
        .style("fill", 'white')
        .on("click", function(d) {
           window.parent.parent.feedback("Scatter Point: " + d3.select(this).attr("info"));
@@ -134,12 +134,9 @@ function showScatterPlot(dataS, gMapS, name, xS, yS, zS, sS, url) {
        .attr("key", d => d.k)
        .attr("stroke-width", "1")
        .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>" +
-                                 (sS ? ("<br/>" + gMap.find(e => e.g == d.g).s) + "<br/>" : "") +
                                  "t = " + formatTime(d.t) +
-                                 "<br/>" + 
-                                 (sS ? "y" : gMap.find(e => e.g == d.g).s) + " = " + d.y +
                                  (zS ? ("<br/>" + zS + " = " + d.z) : "")))
-       .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>" + (gMap.find(e => e.g == d.g).s) + " = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
+       .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>" +  " = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
        .attr("actionUrl",  d => (url + "&key=" + d.k))
        .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
        .style("fill", 'white')

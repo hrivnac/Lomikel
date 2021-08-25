@@ -79,6 +79,7 @@
     </button>
   <button onclick="showScatter('evolution')" style="background-color:#ddddff" title="time dependence of multiple variables">Evolution Plot</button>    
   <button onclick="showScatter('scatter')"   style="background-color:#ddddff" title="scatter plot of multiple variables"   >Scatter Plot</button>    
+  <button onclick="showSky()"                style="background-color:#ddddff" title="sky view"                             >Sky View</button>    
   </div>
 <table id='tbl'
        data-sortable='true'
@@ -153,6 +154,70 @@
     for (i = 0; i < zs.length; i++) {
       if (zs[i].checked) {
         if (!z.includes(zs[i].id.substring(3))) { 
+          z = zs[i].id.substring(3);
+          break;
+          }
+        }
+      }
+    for (i = 0; i < ss.length; i++) {
+      if (ss[i].checked) {
+        s = ss[i].id.substring(3);
+        break;
+        }
+      }
+    if (kind == "evolution") {
+      if (!x && !y) {
+        window.alert("x or y - axis should be selected");
+        return;
+        }
+      }
+    if (kind == "scatter") {
+      if (!x || !y) {
+        window.alert("x and y - axis should be selected");
+        return;
+        }
+      x = x.trim();
+      y = y.trim();
+      params = "name=" + tit + "&url=&x=" + x + "&y=" + y + "&z=" + z + "&s=" + s + "&data=[";
+      first = true;
+      for (i = 0; i < data.length; i++) {
+        for (xx of x.split(" ")) {    
+          for (yy of y.split(" ")) { 
+            if (data[i][xx] && data[i][yy]) {
+              if (!first) {
+                params += ",";
+                }
+              else {
+                first = false;
+                }
+              params += "{\"x\":\"" + data[i][xx] + "\",\"y\":\"" + data[i][yy] + "\"";
+              params += ",\"g\":\"" + xx + "/" + yy + "\"";
+              if (z != "" && data[i][z]) {
+                params += ",\"z\":\"" + data[i][z] + "\"";
+                }
+              g = xx + "/" + yy;
+              if (s != "" && data[i][s]) {
+                g = data[i][s] + "/" + g;
+                }
+              params += ",\"g\":\"" + g + "\"";
+              params += "}";
+              }
+            }
+          }
+        }
+      params += "]";
+      }  
+    console.log(params);
+    loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
+    }
+  function showSky() {
+    var z = "";
+    var s = "";
+    var zs = document.getElementsByClassName('z');
+    var ss = document.getElementsByClassName('s');
+    for (i = 0; i < zs.length; i++) {
+      if (zs[i].checked) {
+        if (!z.includes(zs[i].id.substring(3))) { 
           z += zs[i].id.substring(3) + " ";
           }
         }
@@ -163,28 +228,13 @@
         break;
         }
       }
-    if (kind == "evolution" && !x && !y) {
-      window.alert("x or y - axis should be selected");
-      }
-    if (kind == "scatter" && !y) {
-      window.alert("y - axis should be selected");
-      return;
-      }
-    params += "&y=" + y;
-    if (x) {
-      if (kind == "evolution") {
-        params += x;
-        }
-      else {
-        params += "&x=" + x;
-        }
-      }
+    var params = "";
     if (z) {
       params += "&z=" + z;
       }
     if (s) {
       params += "&s=" + s;
       }
-    loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
+    loadPane("skyview", "d3/skyview.jsp?" + params, true, visheight);
     }
   </script>

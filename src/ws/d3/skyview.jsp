@@ -69,6 +69,7 @@
     }
   data += "]";
   data = JSON.parse(data);
-  showSkyView(data, "", "", "", "");
+  url = "";
+  showSkyView(data, url);
   </script>
 
