@@ -1,4 +1,6 @@
-function showSkyView(data, url} {
+function showSkyView(data, url) {
+  
+  console.log(data);
 
   //const colors = d3.schemeCategory10;
   // taken from d3-v6.0.0
@@ -15,7 +17,7 @@ function showSkyView(data, url} {
   var config = {
     form: true,
     formFields: {download: true},
-    datapath: "d3-celestial-0.7.32/data/",
+    datapath: "../d3-celestial-0.7.32/data/",
     projection: "aitoff",
     transform: "galactic",
     background: {fill: "#fff", stroke: "#000", opacity: 1, width: 1},

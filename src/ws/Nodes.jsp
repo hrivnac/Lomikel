@@ -269,6 +269,22 @@
     if (s) {
       params += "&s=" + s;
       }
+    params += "&data=[";
+    first = true;
+    for (i = 0; i < data.length; i++) {
+      if (data[i]['<%=raField%>'] && data[i]['<%=decField%>']) {
+        if (!first) {
+          params += ",";
+          }
+        else {
+          first = false;
+          }
+        params += "{\"x\":\"" + data[i]['<%=raField%>'] + "\",\"y\":\"" + data[i]['<%=decField%>'] + "\"";
+        params += "}";
+        }
+      }
+    params += "]";
+    console.log(params);
     loadPane("skyview", "d3/skyview.jsp?" + params, true, visheight);
     }
   </script>
