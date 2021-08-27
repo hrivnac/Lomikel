@@ -1,6 +1,4 @@
-function showSkyView(data, url) {
-  
-  console.log(data);
+function showSkyView(data, name, url) {
 
   //const colors = d3.schemeCategory10;
   // taken from d3-v6.0.0
@@ -53,10 +51,10 @@ function showSkyView(data, url) {
   
   for (i in data) {
     var d = data[i];
-    var name = d.k;
-    var size = data[0].z ? 50 - (100 - 50) * (d.z - zmin) / (zmax - zmin) : 50;
+    var info = name + " " + (d.k ? d.k : "") + "(" + d.x + ", " + d.y +")";
+    var size = (d.z ? 50 - (100 - 50) * (d.z - zmin) / (zmax - zmin) : 50)|0; // TBD: better
     var color = (d.g || d.g === 0) ? colors[d.g % 10] : 'black';
-    features.push({"properties": {"name": name, "dim": size, "color": color},
+    features.push({"properties": {"info": info, "dim": size, "color": color},
                    "geometry": {"type": "Point", "coordinates": [d.x, d.y]}});
     };
      
@@ -109,15 +107,15 @@ function showSkyView(data, url) {
                                     align:    "left",
                                     baseline: "bottom"
                                     });
-            Celestial.context.fillText(d.properties.name, pt[0] + r + 2, pt[1] + r + 2);
+            Celestial.context.fillText(d.properties.info, pt[0] + r + 2, pt[1] + r + 2);
             }
           const path = new Path2D();
           path.arc(pt[0], pt[1], r, 0, 2 * Math.PI);
           path.closePath()
           document.addEventListener("click",  function (e) {
             if (distance(pt, getXY(Celestial.context.canvas, e)) < 5) {
-              window.parent.parent.feedback("Sky Point: <b><u>" + d.properties.name + "</u></b>");
-              window.parent.parent.commands("<b><u>" + d.properties.name + "</u></b>", actions(url, d.properties.name));
+              window.parent.parent.feedback("Sky Point: <b><u>" + d.properties.info + "</u></b>");
+              window.parent.parent.commands("<b><u>" + d.properties.info + "</u></b>", actions(url, d.properties.info));
               }
             },
             false);

@@ -130,17 +130,20 @@
     return "<input type='checkbox' name='x1_" + column + "' class='x' id='x1_" + column + "'></input><label for='x1_" + column + "' title='var x'   >x</label>&nbsp;" +
            "<input type='checkbox' name='y1_" + column + "' class='y' id='y1_" + column + "'></input><label for='y1_" + column + "' title='var y'   >y</label>&nbsp;" +
            "<input type='checkbox' name='z1_" + column + "' class='z' id='z1_" + column + "'></input><label for='z1_" + column + "' title='var z'   >z</label>&nbsp;" +
-           "<input type='checkbox' name='s1_" + column + "' class='s' id='s1_" + column + "'></input><label for='s1_" + column + "' title='selector'>s</label>&nbsp;";
+           "<input type='checkbox' name='s1_" + column + "' class='s' id='s1_" + column + "'></input><label for='s1_" + column + "' title='selector'>s</label>&nbsp;" +
+           "<input type='checkbox' name='k1_" + column + "' class='k' id='k1_" + column + "'></input><label for='k1_" + column + "' title='info'    >k</label>&nbsp;";
     }
   function showScatter(kind) {
     var x = "";
     var y = "";
     var z = "";
     var s = "";
+    var k = "";
     var xs = document.getElementsByClassName('x');
     var ys = document.getElementsByClassName('y');
     var zs = document.getElementsByClassName('z');
     var ss = document.getElementsByClassName('s');
+    var ks = document.getElementsByClassName('k');
     for (i = 0; i < xs.length; i++) {
       if (xs[i].checked) {
          if (!x.includes(xs[i].id.substring(3))) { 
@@ -167,6 +170,13 @@
       if (ss[i].checked) {
         s = ss[i].id.substring(3);
         break;
+        }
+      }
+    for (i = 0; i < ks.length; i++) {
+      if (ks[i].checked) {
+        if (!k.includes(ks[i].id.substring(3))) { 
+          k += ks[i].id.substring(3) + " ";
+          }
         }
       }
     if (kind == "evolution") {
@@ -200,6 +210,15 @@
               g = data[i][s] + "/" + g;
               }
             params += ",\"g\":\"" + g + "\"";
+            c = ""
+            if (k != "") {
+              for (kk of k.split(" ")) { 
+                if (data[i][kk]) {
+                  c += kk + "=" + data[i][kk] + " "; 
+                  }
+                }
+              params += ",\"k\":\"" + c + "\"";
+              }
             params += "}";
             }
           }
@@ -235,6 +254,15 @@
                 g = data[i][s] + "/" + g;
                 }
               params += ",\"g\":\"" + g + "\"";
+              c = ""
+              if (k != "") {
+                for (kk of k.split(" ")) { 
+                  if (data[i][kk]) {
+                    c += kk + "=" + data[i][kk] + " "; 
+                    }
+                  }
+                params += ",\"k\":\"" + c + "\"";
+                }
               params += "}";
               }
             }
@@ -247,12 +275,15 @@
   function showSky() {
     var z = "";
     var s = "";
+    var k = "";
     var zs = document.getElementsByClassName('z');
     var ss = document.getElementsByClassName('s');
+    var ks = document.getElementsByClassName('k');
     for (i = 0; i < zs.length; i++) {
       if (zs[i].checked) {
         if (!z.includes(zs[i].id.substring(3))) { 
-          z += zs[i].id.substring(3) + " ";
+          z = zs[i].id.substring(3);
+          break;
           }
         }
       }
@@ -262,7 +293,14 @@
         break;
         }
       }
-    var params = "";
+    for (i = 0; i < ks.length; i++) {
+      if (ks[i].checked) {
+        if (!k.includes(ks[i].id.substring(3))) { 
+          k += ks[i].id.substring(3) + " ";
+          }
+        }
+      }
+    var params = "name=" + tit + "&url=";
     if (z) {
       params += "&z=" + z;
       }
@@ -280,11 +318,24 @@
           first = false;
           }
         params += "{\"x\":\"" + data[i]['<%=raField%>'] + "\",\"y\":\"" + data[i]['<%=decField%>'] + "\"";
+        if (z != "" && data[i][z]) {
+          params += ",\"z\":\"" + data[i][z] + "\"";
+          }
+        if (s != "" && data[i][s]) {
+          params += ",\"g\":\"" + data[i][s] + "\"";
+          }
+        if (k != "") {
+          for (kk of k.split(" ")) { 
+            if (data[i][kk]) {
+              c += kk + "=" + data[i][kk] + " "; 
+              }
+            }
+          params += ",\"k\":\"" + c + "\"";
+          }
         params += "}";
         }
       }
     params += "]";
-    console.log(params);
     loadPane("skyview", "d3/skyview.jsp?" + params, true, visheight);
     }
   </script>

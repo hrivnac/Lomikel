@@ -1,4 +1,4 @@
-.x, .y, .z, .s {
+.x, .y, .z, .s, .k {
   display: none;
   }
 
@@ -54,6 +54,19 @@ input[type="checkbox"][name^="s1_"] + label {
   line-height: 16px;
   }
 
+input[type="checkbox"][name^="k1_"] + label {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid black;
+  color: black;
+  background-color: yellow;
+  width: 12px;
+  height: 16px;
+  line-height: 16px;
+  }
+
 input[type="checkbox"][name^="x1_"]:checked + label {
   border: 1px solid white;
   color: white;
@@ -76,4 +89,10 @@ input[type="checkbox"][name^="s1_"]:checked + label {
   border: 1px solid white;
   color: white;
   background-color: darkred;
+  }   
+  
+input[type="checkbox"][name^="k1_"]:checked + label {
+  border: 1px solid white;
+  color: white;
+  background-color: brown;
   } 

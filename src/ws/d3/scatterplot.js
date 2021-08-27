@@ -95,7 +95,7 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
        .attr("cx", d => x(d.x))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 5)
-       .attr("key", d => d.s)
+       .attr("key", d => d.k + " " + d.s)
        .attr("stroke-width", "1")
        .attr("info",       d => (d.k ? ("<b><u>" + d.k + "</u></b><br/>"            ) : "") +
                                 (xS  ? ("<br/>x: " + xS + " = "             + d.x   ) : "") + 
@@ -131,7 +131,7 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
        .attr("cx", d => x(d.t))
        .attr("cy", d => y(d.y))
        .attr("r",  d => d.z ? z(d.z) : 5)
-       .attr("key", d => d.t)
+       .attr("key", d => d.k + " " + d.t)
        .attr("stroke-width", "1")
        .attr("info",       d => (d.k ? ("<b><u>" + d.k + "</u></b><br/>"            ) : "") +
                                 "<br/>t = " + formatTime(d.t) + " (" + d.t + ")" +
