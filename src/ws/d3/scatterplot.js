@@ -23,7 +23,7 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
               .append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-              svg.append("text")
+  svg.append("text")
      .attr("x", (width / 2))             
      .attr("y", 0)
      .attr("text-anchor", "middle")
@@ -112,15 +112,15 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("key"))	
+          div.html(d3.select(this).attr("info"))	
              .style("left", (d3.select(this).attr("cx")) + "px")		
              .style("top",  (d3.select(this).attr("cy")) + "px");	
             })					
-        .on("mouseout", function(d) {		
-            div.transition()		
-               .duration(2000)		
-               .style("opacity", 0);	
-        });
+       .on("mouseout", function(d) {		
+           div.transition()		
+              .duration(2000)		
+              .style("opacity", 0);	
+       });
     }
   else {
     var formatTime = d3.timeFormat("%d/%b/%y %H:%M:%S.%L");
@@ -130,15 +130,15 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
        .append("circle")
        .attr("cx", d => x(d.t))
        .attr("cy", d => y(d.y))
-       .attr("r",  d => d.z ? z(d.z) : 1)
-       .attr("key", d => d.k)
+       .attr("r",  d => d.z ? z(d.z) : 10)
+       .attr("key", d => d.t)
        .attr("stroke-width", "1")
-       .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>" +
-                                 "t = " + formatTime(d.t) +
-                                 (zS ? ("<br/>" + zS + " = " + d.z) : "")))
-       .attr("info",       d => ("<b><u>" + d.k + "</u></b><br/>t = " + formatTime(d.t) + "<br/>" +  " = " + d.y + (zS ? ("<br/>" + zS + " = " + d.z) : "")))
-       .attr("actionUrl",  d => (url + "&key=" + d.k))
-       .style("stroke", d => (d.g || d.g === 0) ? colors[d.g % 10] : 'black')
+       .attr("info",       d => (d.k ? ("<b><u>" + d.k + "</u></b><br/>"            ) : "") +
+                                "<br/>t = " + formatTime(d.t) + " (" + d.t + ")" +
+                                (yS  ? ("<br/>y: " + yS + " = "             + d.y   ) : "") + 
+                                (zS  ? ("<br/>z: " + zS + " = "             + d.z   ) : "") +
+                                (d.g ? ("<br/>g: " + (sS ? (sS + "=") : "") + d.g   ) : ""))
+       .style("stroke", d => d.g ? g(d.g) : 'black')
        .style("fill", 'white')
        .on("click", function(d) {
           window.parent.parent.feedback("Evolution Point: " + d3.select(this).attr("info"));
@@ -148,15 +148,15 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("key"))	
+          div.html(d3.select(this).attr("info"))	
              .style("left", (d3.select(this).attr("cx")) + "px")		
              .style("top",  (d3.select(this).attr("cy")) + "px");	
             })					
-        .on("mouseout", function(d) {		
-            div.transition()		
-               .duration(2000)		
-               .style("opacity", 0);	
-        });
+       .on("mouseout", function(d) {		
+           div.transition()		
+              .duration(2000)		
+              .style("opacity", 0);	
+       });
     }
     
   }

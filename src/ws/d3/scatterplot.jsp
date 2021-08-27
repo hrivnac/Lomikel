@@ -3,6 +3,8 @@
 <!-- Lomikel Scatter Plot -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
+<%@ page import="com.Lomikel.WebService.PropertiesProcessor" %>
+
 <%@ page import="org.apache.log4j.Logger" %>
 
 <%@ page errorPage="../ExceptionHandler.jsp" %>
@@ -24,6 +26,21 @@
   String z     = request.getParameter("z");
   String s     = request.getParameter("s");
   String data  = request.getParameter("data");
+  %>
+<%@include file="../PropertiesProcessor.jsp"%>
+<%
+  String[] dd;
+  String ts;
+  String[] datas = data.split(",");
+  for (int i = 0; i < datas.length; i++) { // TBD: should use JSON
+    dd = datas[i].split(":");
+    if (dd[0].equals("\"t\"")) {
+      ts = dd[1].replaceAll("\"", "");
+      ts = pp.getTimestamp(ts);
+      datas[i] = "\"t\":\"" + ts + "\"";
+      }
+    }
+  data = String.join(",", datas);
   %>
   
 <script src="actions.js"     type="text/javascript"></script>

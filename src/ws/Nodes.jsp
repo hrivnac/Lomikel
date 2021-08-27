@@ -3,6 +3,8 @@
 <!-- Lomikel Nodes -->
 <!-- @author Julius.Hrivnac@cern.ch  -->
 
+<%@ page import="com.Lomikel.WebService.PropertiesProcessor" %>
+
 <%@ page import="org.json.JSONObject" %>
 
 <%@ page import="java.util.Set" %>
@@ -21,6 +23,8 @@
 <link href="Nodes.css" rel="stylesheet" type="text/css"/>
 
 <%! static Logger log = Logger.getLogger(Nodes_jsp.class); %>
+
+<%@include file="Params.jsp" %>
 
 <%
   String id = request.getParameter("id");
@@ -170,6 +174,37 @@
         window.alert("x or y - axis should be selected");
         return;
         }
+      y = (x + y).trim();
+      params = "name=" + tit + "&url=&x=&y=" + y + "&z=" + z + "&s=" + s + "&data=[";
+      first = true;
+      for (i = 0; i < data.length; i++) {
+        for (yy of y.split(" ")) { 
+          if (data[i][yy]) {
+            if (!first) {
+              params += ",";
+              }
+            else {
+              first = false;
+              }
+            params += "{";
+            params += "\"y\":\"" + data[i][yy] + "\"";
+            params += ",\"g\":\"" + yy + "\"";
+            if (data[i]['<%=timestampField%>']) {
+              params += ",\"t\":\"" + data[i]['<%=timestampField%>'] + "\"";
+              }
+            if (z != "" && data[i][z]) {
+              params += ",\"z\":\"" + data[i][z] + "\"";
+              }
+            g = yy;
+            if (s != "" && data[i][s]) {
+              g = data[i][s] + "/" + g;
+              }
+            params += ",\"g\":\"" + g + "\"";
+            params += "}";
+            }
+          }
+        }
+      params += "]";
       }
     if (kind == "scatter") {
       if (!x || !y) {
@@ -207,7 +242,6 @@
         }
       params += "]";
       }  
-    console.log(params);
     loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
     }
   function showSky() {
