@@ -325,6 +325,7 @@
           params += ",\"g\":\"" + data[i][s] + "\"";
           }
         if (k != "") {
+          c = "";
           for (kk of k.split(" ")) { 
             if (data[i][kk]) {
               c += kk + "=" + data[i][kk] + " "; 
