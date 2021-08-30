@@ -27,7 +27,7 @@
 <%
   String name  = request.getParameter("name");
   String url   = request.getParameter("url");
-  String data  = request.getParameter("data");
+  String tdata = request.getParameter("tdata");
   %>
 <%@include file="../PropertiesProcessor.jsp"%>
   
@@ -35,6 +35,6 @@
 <script src="skyview.js" type="text/javascript"></script>
   
 <script type="text/javascript">
-  showSkyView(<%=data%>, "<%=name%>", "<%=url%>");
+  showSkyView(<%=tdata%>, "<%=name%>", "<%=url%>");
   </script>
 

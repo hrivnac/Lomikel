@@ -35,7 +35,7 @@
   var node = findObjectByKey(nodes, 'id', id);
   var tit = node.title.split(':')[0];
   var columns = [];
-  var data  = "[";
+  var tdata  = "[";
   var firstrow = true;
   var firstval;
   for (var i = 0; i < nodes.length; i++) {
@@ -44,12 +44,12 @@
     if (node1.title.split(':')[0] == tit) {
 	    txt = callGremlinValues(gr + ".V('" + id1 + "').valueMap().toList().toString().replace(']', '').replace('[', '')")[0];
       if (!firstrow) {
-        data += ",";
+        tdata += ",";
         }
       else {
         firstrow = false;
         }
-	    data += "{";
+	    tdata += "{";
 	    firstval = true;
       for (t of txt.split(",")) {
         [column, value] = t.trim().split(":");
@@ -57,18 +57,18 @@
           columns.push(column);
           }
         if (!firstval) {
-          data += ",";
+          tdata += ",";
           }
         else {
           firstval = false;
           }
-        data += "\"" + column + "\":\"" + value + "\"";
+        tdata += "\"" + column + "\":\"" + value + "\"";
         }
-      data += "}";
+      tdata += "}";
       }
     }
-  data += "]";
-  data = JSON.parse(data);
+  tdata += "]";
+  tdata = JSON.parse(tdata);
   var header = "<tr>";
   for (var i = 0; i < columns.length; i++) {
     var column = columns[i];
@@ -114,7 +114,7 @@
   var thead = table.createTHead();
   thead.innerHTML = header;
   $(function() { 
-    $table.bootstrapTable({data: data})
+    $table.bootstrapTable({data: tdata})
     $table.bootstrapTable('refreshOptions', {classes: 'table table-bordered table-hover table-striped table-sm'})
     $table.bootstrapTable('refreshOptions', {theadClasses: 'thead-light'})
     $table.bootstrapTable('refreshOptions', {sortable: 'true'})
@@ -185,11 +185,11 @@
         return;
         }
       y = (x + y).trim();
-      params = "name=" + tit + "&url=&x=&y=" + y + "&z=" + z + "&s=" + s + "&data=[";
+      params = "name=" + tit + "&url=&x=&y=" + y + "&z=" + z + "&s=" + s + "&tdata=[";
       first = true;
-      for (i = 0; i < data.length; i++) {
+      for (i = 0; i < tdata.length; i++) {
         for (yy of y.split(" ")) { 
-          if (data[i][yy]) {
+          if (tdata[i][yy]) {
             if (!first) {
               params += ",";
               }
@@ -197,24 +197,24 @@
               first = false;
               }
             params += "{";
-            params += "\"y\":\"" + data[i][yy] + "\"";
+            params += "\"y\":\"" + tdata[i][yy] + "\"";
             params += ",\"g\":\"" + yy + "\"";
-            if (data[i]['<%=timestampField%>']) {
-              params += ",\"t\":\"" + data[i]['<%=timestampField%>'] + "\"";
+            if (tdata[i]['<%=timestampField%>']) {
+              params += ",\"t\":\"" + tdata[i]['<%=timestampField%>'] + "\"";
               }
-            if (z != "" && data[i][z]) {
-              params += ",\"z\":\"" + data[i][z] + "\"";
+            if (z != "" && tdata[i][z]) {
+              params += ",\"z\":\"" + tdata[i][z] + "\"";
               }
             g = yy;
-            if (s != "" && data[i][s]) {
-              g = data[i][s] + "/" + g;
+            if (s != "" && tdata[i][s]) {
+              g = tdata[i][s] + "/" + g;
               }
             params += ",\"g\":\"" + g + "\"";
             c = ""
             if (k != "") {
               for (kk of k.split(" ")) { 
-                if (data[i][kk]) {
-                  c += kk + "=" + data[i][kk] + " "; 
+                if (tdata[i][kk]) {
+                  c += kk + "=" + tdata[i][kk] + " "; 
                   }
                 }
               params += ",\"k\":\"" + c + "\"";
@@ -232,33 +232,33 @@
         }
       x = x.trim();
       y = y.trim();
-      params = "name=" + tit + "&url=&x=" + x + "&y=" + y + "&z=" + z + "&s=" + s + "&data=[";
+      params = "name=" + tit + "&url=&x=" + x + "&y=" + y + "&z=" + z + "&s=" + s + "&tdata=[";
       first = true;
-      for (i = 0; i < data.length; i++) {
+      for (i = 0; i < tdata.length; i++) {
         for (xx of x.split(" ")) {    
           for (yy of y.split(" ")) { 
-            if (data[i][xx] && data[i][yy]) {
+            if (tdata[i][xx] && tdata[i][yy]) {
               if (!first) {
                 params += ",";
                 }
               else {
                 first = false;
                 }
-              params += "{\"x\":\"" + data[i][xx] + "\",\"y\":\"" + data[i][yy] + "\"";
+              params += "{\"x\":\"" + tdata[i][xx] + "\",\"y\":\"" + tdata[i][yy] + "\"";
               params += ",\"g\":\"" + xx + "/" + yy + "\"";
-              if (z != "" && data[i][z]) {
-                params += ",\"z\":\"" + data[i][z] + "\"";
+              if (z != "" && tdata[i][z]) {
+                params += ",\"z\":\"" + tdata[i][z] + "\"";
                 }
               g = xx + "/" + yy;
-              if (s != "" && data[i][s]) {
-                g = data[i][s] + "/" + g;
+              if (s != "" && tdata[i][s]) {
+                g = tdata[i][s] + "/" + g;
                 }
               params += ",\"g\":\"" + g + "\"";
               c = ""
               if (k != "") {
                 for (kk of k.split(" ")) { 
-                  if (data[i][kk]) {
-                    c += kk + "=" + data[i][kk] + " "; 
+                  if (tdata[i][kk]) {
+                    c += kk + "=" + tdata[i][kk] + " "; 
                     }
                   }
                 params += ",\"k\":\"" + c + "\"";
@@ -307,28 +307,28 @@
     if (s) {
       params += "&s=" + s;
       }
-    params += "&data=[";
+    params += "&tdata=[";
     first = true;
-    for (i = 0; i < data.length; i++) {
-      if (data[i]['<%=raField%>'] && data[i]['<%=decField%>']) {
+    for (i = 0; i < tdata.length; i++) {
+      if (tdata[i]['<%=raField%>'] && tdata[i]['<%=decField%>']) {
         if (!first) {
           params += ",";
           }
         else {
           first = false;
           }
-        params += "{\"x\":\"" + data[i]['<%=raField%>'] + "\",\"y\":\"" + data[i]['<%=decField%>'] + "\"";
-        if (z != "" && data[i][z]) {
-          params += ",\"z\":\"" + data[i][z] + "\"";
+        params += "{\"x\":\"" + tdata[i]['<%=raField%>'] + "\",\"y\":\"" + tdata[i]['<%=decField%>'] + "\"";
+        if (z != "" && tdata[i][z]) {
+          params += ",\"z\":\"" + tdata[i][z] + "\"";
           }
-        if (s != "" && data[i][s]) {
-          params += ",\"g\":\"" + data[i][s] + "\"";
+        if (s != "" && tdata[i][s]) {
+          params += ",\"g\":\"" + tdata[i][s] + "\"";
           }
         if (k != "") {
           c = "";
           for (kk of k.split(" ")) { 
-            if (data[i][kk]) {
-              c += kk + "=" + data[i][kk] + " "; 
+            if (tdata[i][kk]) {
+              c += kk + "=" + tdata[i][kk] + " "; 
               }
             }
           params += ",\"k\":\"" + c + "\"";

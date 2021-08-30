@@ -25,27 +25,27 @@
   String y     = request.getParameter("y");
   String z     = request.getParameter("z");
   String s     = request.getParameter("s");
-  String data  = request.getParameter("data");
+  String tdata = request.getParameter("tdata");
   %>
 <%@include file="../PropertiesProcessor.jsp"%>
 <%
   String[] dd;
   String ts;
-  String[] datas = data.split(",");
-  for (int i = 0; i < datas.length; i++) { // TBD: should use JSON
-    dd = datas[i].split(":");
+  String[] tdatas = tdata.split(",");
+  for (int i = 0; i < tdatas.length; i++) { // TBD: should use JSON
+    dd = tdatas[i].split(":");
     if (dd[0].equals("\"t\"")) {
       ts = dd[1].replaceAll("\"", "");
       ts = pp.getTimestamp(ts);
-      datas[i] = "\"t\":\"" + ts + "\"";
+      tdatas[i] = "\"t\":\"" + ts + "\"";
       }
     }
-  data = String.join(",", datas);
+  tdata = String.join(",", tdatas);
   %>
   
 <script src="actions.js"     type="text/javascript"></script>
 <script src="scatterplot.js" type="text/javascript"></script>
   
 <script type="text/javascript">
-  showScatterPlot(<%=data%>, "<%=name%>", "<%=x%>", "<%=y%>", "<%=z%>", "<%=s%>", "<%=url%>");
+  showScatterPlot(<%=tdata%>, "<%=name%>", "<%=x%>", "<%=y%>", "<%=z%>", "<%=s%>", "<%=url%>");
   </script>
