@@ -135,7 +135,8 @@
           helpButton += "<img src=\"images/Help.png\" width=\"10\"/>";
           helpButton += "</button>";      
       window.commands = function(info, actions) {
-        document.getElementById("commands").innerHTML = info + helpButton + "<hr/>" + "Actions: " + actions;
+        console.log(actions);
+        document.getElementById("commands").innerHTML = info + helpButton + "<hr/>" + actions;
         }
       </script>
     

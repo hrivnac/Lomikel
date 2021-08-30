@@ -180,6 +180,10 @@
         }
       }
     if (kind == "evolution") {
+      if ("<%=timestampField%>".trim() == "") {
+        window.alert("timestampField not defined");
+        return;
+        }
       if (!x && !y) {
         window.alert("x or y - axis should be selected");
         return;
@@ -273,6 +277,10 @@
     loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
     }
   function showSky() {
+    if ("<%=raField%>".trim() == "" || "<%=decField%>".trim() == "") {
+      window.alert("raField or decField not defined");
+      return;
+      }
     var z = "";
     var s = "";
     var k = "";
