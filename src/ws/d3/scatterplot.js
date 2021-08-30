@@ -34,7 +34,7 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
 
   if (xS) {
     x = d3.scaleLinear()
-          .domain(d3.extent(data, d => d.x)).nice()
+          .domain(d3.extent(data, d => +d.x)).nice()
           .range([0, width]);    
     svg.append('g')
        .attr("transform", "translate(0," + height + ")")
@@ -63,7 +63,7 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
     }
     
   var y = d3.scaleLinear()         
-            .domain(d3.extent(data, d => d.y)).nice()
+            .domain(d3.extent(data, d => +d.y)).nice()
             .range([height, 0]);   
   svg.append('g')
      .call(d3.axisLeft(y))
