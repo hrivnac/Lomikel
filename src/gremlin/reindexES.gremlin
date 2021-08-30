@@ -5,7 +5,7 @@ graph.tx().rollback()
 
 // Reindex existing data
 mgmt = graph.openManagement()
-mgmt.updateIndex(mgmt.getGraphIndex('bylblES'  ), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLblES'  ), SchemaAction.REINDEX).get()
 mgmt.updateIndex(mgmt.getGraphIndex('byTitleES'), SchemaAction.REINDEX).get()
 mgmt.updateIndex(mgmt.getGraphIndex('byNameES' ), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)

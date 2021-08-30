@@ -1,5 +1,6 @@
 // Create HBase Index
-// ==================
+// (uses direct indexing, big data can use also MR indexing) 
+// =========================================================
 
 graph.tx().rollback()
 
