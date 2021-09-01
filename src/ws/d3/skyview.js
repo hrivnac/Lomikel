@@ -9,8 +9,6 @@ function showSkyView(data, name, url) {
     }
   const set1 = colorsF("e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999");
   const colors = set1;
-  
-  //var data = JSON.parse(dataS.replace(/'/g, '"'));
     
   var config = {
     form: true,

@@ -263,12 +263,12 @@ system.graph('food').drop()
 // ==
 
 // write into GraphML
-g.V().has('lbl', 'stream').outE().subgraph('x').cap('x').next().io(IoCore.graphml()).writeGraph("/tmp/x.graphml")
+g.V().has('lbl', 'ATLAS').outE().subgraph('x').cap('x').next().io(IoCore.graphml()).writeGraph("/tmp/x.graphml")
 // read from GraphML
 graph.io(IoCore.graphml()).readGraph('/tmp/x.graphml');
 
 // write into GraphSON
-sg = g.V().has('lbl', 'stream').outE().subgraph('x').cap('x').next()
+sg = g.V().has('lbl', 'ATLAS').outE().subgraph('x').cap('x').next()
 file = new FileOutputStream("/tmp/x.json")
 mapper = GraphSONMapper.build().addCustomModule(org.janusgraph.graphdb.tinkerpop.io.graphson.JanusGraphSONModuleV2d0.getInstance()).create()
 writer = GraphSONWriter.build().mapper(mapper).create()

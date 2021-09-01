@@ -352,6 +352,7 @@
           description="Deploy Development WS">
     <antcall target="deploy-pure"/>
     <antcall target="deploy-sudo"/>
+    <antcall target="deploy-ssh"/>
     </target>
     
   <target name="deploy-sudo"
@@ -373,6 +374,19 @@
       </exec>
     </target>
     
+  <target name="deploy-ssh"
+          if="${ssh}">
+    <exec executable="/usr/bin/ssh">
+      <arg line="root@${hostname} 'chmod 777 ${server_dir}'"/>
+      </exec>
+    <exec executable="/usr/bin/ssh">
+      <arg line="root@${hostname} '/bin/rm -f ${server_dir}/${user.name}-Lomikel.war'"/>
+      </exec>
+    <copy file="../lib/Lomikel.war"
+          tofile="${server_dir}/${user.name}-Lomikel.war"/>
+    </target>
+    
+    
   <target name="deploy-pure"
            unless="${sudo}">
     <copy file="../lib/Lomikel.war"
@@ -386,6 +400,7 @@
           description="Deploy Production WS">
     <antcall target="deploy-prod-pure"/>
     <antcall target="deploy-prod-sudo"/>
+    <antcall target="deploy-prod-ssh"/>
     </target>
     
   <target name="deploy-prod-sudo"
@@ -405,6 +420,18 @@
     <exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/LomikelHadoop.war ${server_dir}/LomikelHadoop.war"/>
       </exec>
+    </target>
+    
+  <target name="deploy-prod-ssh"
+          if="${ssh}">
+    <exec executable="/usr/bin/ssh">
+      <arg line="root@${hostname} 'chmod 777 ${server_dir}'"/>
+      </exec>
+    <exec executable="/usr/bin/ssh">
+      <arg line="root@${hostname} '/bin/rm -f ${server_dir}/Lomikel.war'"/>
+      </exec>
+    <copy file="../lib/Lomikel.war"
+          tofile="${server_dir}/Lomikel.war"/>
     </target>
     
   <target name="deploy-prod-pure"

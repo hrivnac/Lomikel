@@ -325,7 +325,6 @@
         else {
           first = false;
           }
-        console.log(tdata[i]['<%=raField%>'] + " " + tdata[i]['<%=decField%>']);
         params += "{\"x\":\"" + tdata[i]['<%=raField%>'] + "\",\"y\":\"" + tdata[i]['<%=decField%>'] + "\"";
         if (z != "" && tdata[i][z]) {
           params += ",\"z\":\"" + tdata[i][z] + "\"";
