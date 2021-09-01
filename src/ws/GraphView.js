@@ -64,7 +64,7 @@ async function callGremlinGraph(request, newServer, level = 0) {
   if (select !== "") {
     request += "." + select;
     }
-  var [host, port] = server.split(":");
+  var [host, port] = server.split("//")[1].split(":");
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
   http.onload = function() {
@@ -85,7 +85,7 @@ function callGremlinValues(request, newServer) {
     newServer = server;
     }
   server = newServer;
-  var [host, port] = server.split(":");
+  var [host, port] = server.split("//")[1].split(":");
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
   http.open("GET", server + '?gremlin=' + request, false);
