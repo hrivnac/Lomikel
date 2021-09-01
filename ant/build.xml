@@ -369,9 +369,6 @@
     <exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/Lomikel.war ${server_dir}/${user.name}-Lomikel.war"/>
       </exec>
-    <exec executable="/usr/bin/sudo">
-      <arg line="cp ../lib/LomikelHadoop.war ${server_dir}/${user.name}-LomikelHadoop.war"/>
-      </exec>
     </target>
     
   <target name="deploy-ssh"
@@ -391,8 +388,6 @@
            unless="${sudo}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/${user.name}-Lomikel.war"/>
-    <copy file="../lib/LomikelHadoop.war"
-          tofile="${server_dir}/${user.name}-LomikelHadoop.war"/>
     </target>
   
   <target name="deploy-prod"
@@ -417,9 +412,6 @@
     <exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/Lomikel.war ${server_dir}/Lomikel.war"/>
       </exec>
-    <exec executable="/usr/bin/sudo">
-      <arg line="cp ../lib/LomikelHadoop.war ${server_dir}/LomikelHadoop.war"/>
-      </exec>
     </target>
     
   <target name="deploy-prod-ssh"
@@ -438,8 +430,6 @@
           unless="${sudo}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/Lomikel.war"/>
-    <copy file="../lib/LomikelHadoop.war"
-          tofile="${server_dir}/LomikelHadoop.war"/>
     </target>
  
   <!-- Patch and Restart JanuGraph ==========================================-->
