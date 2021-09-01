@@ -1,8 +1,8 @@
 host: @SERVER.HOST@
 port: @SERVER.PORT@
 scriptEvaluationTimeout: 300000
-channelizer: com.Lomikel.TinkerPopPatch.HttpChannelizerCORS
-#channelizer: org.apache.tinkerpop.gremlin.server.channel.WsAndHttpChannelizer
+#channelizer: com.Lomikel.TinkerPopPatch.HttpChannelizerCORS
+channelizer: org.apache.tinkerpop.gremlin.server.channel.WsAndHttpChannelizer
 #channelizer: org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer
 graphs: {
   graph: conf/gremlin-server/Local.properties
