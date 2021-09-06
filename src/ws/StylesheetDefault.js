@@ -26,27 +26,7 @@ var stylesheet = {
         {name:"show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"  },
         {name:"table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
         ]
-      },
-    "MetaGraph": {
-      properties:{gremlin:"valueMap('title', 'MetaLabel').toList()[0]"},
-      graphics: {
-        label:"MetaLabel",        
-        title:"title",      
-        subtitle:" ",
-        group:" ",         
-        shape:"ellipse",      
-                           
-        image:" ",         
-        borderRadius:"0",  
-        borderWidth:"1",
-        borderDashes:[1,0],
-        value:"0"
-        },
-      actions:[
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel", target:"external"},
-        {name:"help", url:"Result.jsp",                                                      target:"result"  }
-        ]
-      },
+      }
     },
   edges: {
     "default": {
@@ -62,21 +42,6 @@ var stylesheet = {
       actions: [
         {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel", target:"external"},
         {name:"help", url:"Result.jsp",                                                      target:"result"  }
-        ]
-      },
-    "MetaGraph": {
-      properties:{gremlin:"valueMap('MetaLabel')"},
-      graphics: {
-        label:"MetaLabel",        
-        title:" ",
-        subtitle:" ",
-        arrows:"middle",
-        value:"0",
-        group:" "
-        },
-      actions: [
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel", target:"external"},
-        {name:"help", url:"Result.jsp",                                                      target:"result"}
         ]
       }
     }

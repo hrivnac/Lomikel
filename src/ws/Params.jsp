@@ -1,9 +1,9 @@
 <%
-  String hbaseRowName = "row";
-  String hbaseRowKey  = "rowkey";
-  String alwaysColumns = null;
+  String hbaseRowName   = "row";
+  String hbaseRowKey    = "rowkey";
+  String alwaysColumns  = null;
   String column4latests = null;
   String timestampField = "timestamp";
-  String raField = "";
-  String decField = "";
+  String raField        = "ra";
+  String decField       = "dec";
   %>

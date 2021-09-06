@@ -4,35 +4,61 @@
 mgmt = graph.openManagement()
 
 // Vertexes
-// ...
+testVertex = mgmt.makeVertexLabel('testVertex').make()
 
 // Edges
 props    = mgmt.makeEdgeLabel('props'   ).multiplicity(SIMPLE  ).make()
 has      = mgmt.makeEdgeLabel('has'     ).multiplicity(ONE2MANY).make()
 contains = mgmt.makeEdgeLabel('contains').multiplicity(MULTI   ).make()
+overlaps = mgmt.makeEdgeLabel('overlaps').multiplicity(SIMPLE  ).make()
 
 // Properties
-title    = mgmt.makePropertyKey('title'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-lbl      = mgmt.makePropertyKey('lbl'     ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-name     = mgmt.makePropertyKey('name'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-hbase    = mgmt.makePropertyKey('hbase'   ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
-phoenix  = mgmt.makePropertyKey('phoenix' ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
-fullfill = mgmt.makePropertyKey('fullfill').dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
+title         = mgmt.makePropertyKey('title'        ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+lbl           = mgmt.makePropertyKey('lbl'          ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+name          = mgmt.makePropertyKey('name'         ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+hbase         = mgmt.makePropertyKey('hbase'        ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
+phoenix       = mgmt.makePropertyKey('phoenix'      ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
+fullfill      = mgmt.makePropertyKey('fullfill'     ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
+x             = mgmt.makePropertyKey('x'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+y             = mgmt.makePropertyKey('y'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+z             = mgmt.makePropertyKey('z'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+ra            = mgmt.makePropertyKey('ra'           ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+dec           = mgmt.makePropertyKey('dec'          ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+timestamp     = mgmt.makePropertyKey('timestamp'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make() // LocalDateTime
+union         = mgmt.makePropertyKey('union'        ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
+intersection  = mgmt.makePropertyKey('intersection' ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
+differenceIn  = mgmt.makePropertyKey('differenceIn' ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
+differenceOut = mgmt.makePropertyKey('differenceOut').dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
+// union = intersection + differenceIn + differenceOut
 
 // Vertex properties
-// ...
+mgmt.addProperties(testVertex,
+                   lbl,
+                   title,
+                   x,
+                   y,
+                   z,
+                   ra,
+                   dec,
+                   timestamp)
                                       
 // Edge properties
+mgmt.addProperties(props,
+                   lbl)
 mgmt.addProperties(has,
                    lbl)
 mgmt.addProperties(contains,
                    lbl)
+mgmt.addProperties(overlaps,
+                   lbl,
+                   intersection,
+                   differenceIn,
+                   differenceOut)
 
-// Connections                   
-// ...
+// Connections   
+mgmt.addConnection(overlaps, testVertex, testVertex)
 
 // Info
 mgmt.printSchema()
 
 mgmt.commit()
-
