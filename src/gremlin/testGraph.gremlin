@@ -1,0 +1,83 @@
+g.V().has('lbl', 'testVertex').drop()
+g.E().has('lbl', 'testEdge'  ).drop()
+
+v1 = g.addV('testVertex').property('lbl',      'testVertex').
+                          property('title',    'Test Vertex 1').
+                          property('x',         1).
+                          property('y',         100).
+                          property('z',         5.06).
+                          property('ra',        140).
+                          property('dec',       -25).
+                          property('timestamp', '1617357479999042').
+                          next()
+v2 = g.addV('testVertex').property('lbl',      'testVertex').
+                          property('title',    'Test Vertex 2').
+                          property('x',         2).
+                          property('y',         110).
+                          property('z',         6.09).
+                          property('ra',        280).
+                          property('dec',       -40).
+                          property('timestamp', '1617357489999042').
+                          next()
+v3 = g.addV('testVertex').property('lbl',      'testVertex').
+                          property('title',    'Test Vertex 3').
+                          property('x',         3).
+                          property('y',         150).
+                          property('z',         3.9).
+                          property('ra',        200).
+                          property('dec',       -75).
+                          property('timestamp', '1617357476999042').
+                          next()
+v4 = g.addV('testVertex').property('lbl',      'testVertex').
+                          property('title',    'Test Vertex 4').
+                          property('x',         4).
+                          property('y',         130).
+                          property('z',         1.0).
+                          property('ra',        220).
+                          property('dec',       -30).
+                          property('timestamp', '1617357480999042').
+                          next()
+v5 = g.addV('testVertex').property('lbl',      'testVertex').
+                          property('title',    'Test Vertex 5').
+                          property('x',         5).
+                          property('y',         80).
+                          property('z',         -5.3).
+                          property('ra',        170).
+                          property('dec',       -60).
+                          property('timestamp', '1617357472999042').
+                          next()
+                          
+g.V(v1).addE('overlaps').to(v2).property('intersection',    0).
+                           property('differenceIn',        10).
+                           property('differenceOut',       90).
+                           iterate()                      
+g.V(v1).addE('overlaps').to(v3).property('intersection',   10).
+                           property('differenceIn',         0).
+                           property('differenceOut',        0).
+                           iterate()
+g.V(v1).addE('overlaps').to(v4).property('intersection',  100).
+                           property('differenceIn',        10).
+                           property('differenceOut',       20).
+                           iterate()
+g.V(v1).addE('overlaps').to(v5).property('intersection',  200).
+                           property('differenceIn',       100).
+                           property('differenceOut',      100).
+                           iterate()
+g.V(v2).addE('overlaps').to(v3).property('intersection',   80).
+                           property('differenceIn',       100).
+                           property('differenceOut',      120).
+                           iterate()
+g.V(v2).addE('overlaps').to(v4).property('intersection',  120).
+                           property('differenceIn',        20).
+                           property('differenceOut',      200).
+                           iterate()
+g.V(v2).addE('overlaps').to(v5).property('intersection',   50).
+                           property('differenceIn',         0).
+                           property('differenceOut',       30).
+                           iterate()
+g.V(v4).addE('overlaps').to(v5).property('intersection',    5).
+                           property('differenceIn',        20).
+                           property('differenceOut',        2).
+                           iterate()
+
+graph.traversal().tx().commit();
