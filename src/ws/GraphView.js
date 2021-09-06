@@ -74,10 +74,10 @@ async function callGremlinGraph(request, newServer, level = 0) {
       }
     };
   if (server.includes("?")) {
-    http.open("GET", server + '&gremlin=' + request);
+    http.open("GET", server + '&gremlin=' + request, false);
     }
   else {
-    http.open("GET", server + '?gremlin=' + request.replaceAll("[", "%5b").replaceAll("]", "%5d"));
+    http.open("GET", server + '?gremlin=' + request, false);
     }
   http.send(); 
   }  
@@ -94,10 +94,10 @@ function callGremlinValues(request, newServer) {
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
   if (server.includes("?")) {
-    http.open("GET", server + '&gremlin=' + request);
+    http.open("GET", server + '&gremlin=' + encodeURIComponent(request), false);
     }
   else {
-    http.open("GET", server + '?gremlin=' + request);
+    http.open("GET", server + '?gremlin=' + request, false);
     }
   http.send();
   return parseValues(http.responseText)
