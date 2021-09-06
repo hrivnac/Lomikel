@@ -12,7 +12,7 @@
 <%
   String query = request.getQueryString();
   String server = request.getParameter("server");
-  String answer = SmallHttpClient.get(server + "?" + URLDecoder.decode(query, "UTF-8"));
+  String answer = SmallHttpClient.get(server + "?" + query.replaceAll("%22", "'").replaceAll("%27", "\"").replaceAll("%20", " "));
   answer = answer.trim();
   out.print(answer);
   %>
