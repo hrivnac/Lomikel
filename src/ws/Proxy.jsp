@@ -2,7 +2,6 @@
 
 <!-- Lomikel Proxy -->
 <!-- @author Julius.Hrivnac@cern.ch  -->
-<!-- TBD: parametrise -->
 <!-- TBD: notify -->
 
 <%@ page trimDirectiveWhitespaces="true"  %>

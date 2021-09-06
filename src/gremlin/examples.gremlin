@@ -282,7 +282,6 @@ file.write(x)
 // read from GraohSON
 graph.io(graphson()).readGraph('/tmp/x.json');
 
-
 // Console
 // =======
 
