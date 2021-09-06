@@ -93,7 +93,12 @@ function callGremlinValues(request, newServer) {
   var [host, port] = server.split("//")[1].split(":");
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
-  http.open("GET", server + '?gremlin=' + request, false);
+  if (server.includes("?")) {
+    http.open("GET", server + '&gremlin=' + request);
+    }
+  else {
+    http.open("GET", server + '?gremlin=' + request);
+    }
   http.send();
   return parseValues(http.responseText)
   }
