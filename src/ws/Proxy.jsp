@@ -3,7 +3,6 @@
 <%@ page trimDirectiveWhitespaces="true"  %>
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
-<%@ page import="java.net.URLDecoder" %>
 <%@ page import="com.Lomikel.Utils.SmallHttpClient" %>
 <%@ page import="org.apache.log4j.Logger" %>
 
@@ -12,7 +11,7 @@
 <%
   String query = request.getQueryString();
   String server = request.getParameter("server");
-  String answer = SmallHttpClient.get(server + "?" + query.replaceAll("%22", "'").replaceAll("%27", "\"").replaceAll("%20", " "));
+  String answer = SmallHttpClient.get(server + "?" + query);
   answer = answer.trim();
   out.print(answer);
   %>

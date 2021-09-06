@@ -94,7 +94,7 @@ function callGremlinValues(request, newServer) {
   document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
   var http = new XMLHttpRequest();
   if (server.includes("?")) {
-    http.open("GET", server + '&gremlin=' + request);
+    http.open("GET", server + '&gremlin=' + decodeURI(request));
     }
   else {
     http.open("GET", server + '?gremlin=' + request);
