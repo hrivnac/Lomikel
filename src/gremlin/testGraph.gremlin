@@ -47,37 +47,37 @@ v5 = g.addV('testVertex').property('lbl',      'testVertex').
                           property('timestamp', '1617357472999042').
                           next()
                           
-g.V(v1).addE('overlaps').to(v2).property('intersection',    0).
-                           property('differenceIn',        10).
-                           property('differenceOut',       90).
-                           iterate()                      
-g.V(v1).addE('overlaps').to(v3).property('intersection',   10).
-                           property('differenceIn',         0).
-                           property('differenceOut',        0).
-                           iterate()
-g.V(v1).addE('overlaps').to(v4).property('intersection',  100).
-                           property('differenceIn',        10).
-                           property('differenceOut',       20).
-                           iterate()
-g.V(v1).addE('overlaps').to(v5).property('intersection',  200).
-                           property('differenceIn',       100).
-                           property('differenceOut',      100).
-                           iterate()
-g.V(v2).addE('overlaps').to(v3).property('intersection',   80).
-                           property('differenceIn',       100).
-                           property('differenceOut',      120).
-                           iterate()
-g.V(v2).addE('overlaps').to(v4).property('intersection',  120).
-                           property('differenceIn',        20).
-                           property('differenceOut',      200).
-                           iterate()
-g.V(v2).addE('overlaps').to(v5).property('intersection',   50).
-                           property('differenceIn',         0).
-                           property('differenceOut',       30).
-                           iterate()
-g.V(v4).addE('overlaps').to(v5).property('intersection',    5).
-                           property('differenceIn',        20).
-                           property('differenceOut',        2).
-                           iterate()
+g.V(v1).addE('overlaps').to(v2).property('intersection',   0).
+                                property('sizeIn',        10).
+                                property('sizeOut',       90).
+                                iterate()                     
+g.V(v1).addE('overlaps').to(v3).property('intersection',  10).
+                                property('sizeIn',        12).
+                                property('sizeOut',       14).
+                                iterate()                
+g.V(v1).addE('overlaps').to(v4).property('intersection',   5).
+                                property('sizeIn',       100).
+                                property('sizeOut',       20).
+                                iterate()
+g.V(v1).addE('overlaps').to(v5).property('intersection', 100).
+                                property('sizeIn',       100).
+                                property('sizeOut',      100).
+                                iterate()
+g.V(v2).addE('overlaps').to(v3).property('intersection',  80).
+                                property('sizeIn',        80).
+                                property('sizeOut',      120).
+                                iterate()
+g.V(v2).addE('overlaps').to(v4).property('intersection',  20).
+                                property('sizeIn',        40).
+                                property('sizeOut',      200).
+                                iterate()
+g.V(v2).addE('overlaps').to(v5).property('intersection',   8).
+                                property('sizeIn',        10).
+                                property('sizeOut',       50).
+                                iterate()
+g.V(v4).addE('overlaps').to(v5).property('intersection',   5).
+                                property('sizeIn',        20).
+                                property('sizeOut',        7).
+                                iterate()
 
 graph.traversal().tx().commit();

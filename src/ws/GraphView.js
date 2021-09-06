@@ -263,7 +263,7 @@ function show(graph) {
           }
         inVid = graph[i].inVid;
         outVid = graph[i].outVid;
-        stylesheetValue(stylesheetEdge.properties, id, eMap, pMap, false);
+        stylesheetValue(stylesheetEdge.properties, id, eMap, pMap, true);
         title        = l + ":" + stylesheetValue(stylesheetEdge.graphics.title,        id, eMap, pMap, true);
         subtitle     = stylesheetValue(stylesheetEdge.graphics.subtitle,     id, eMap, pMap, true, title);
         label        = stylesheetValue(stylesheetEdge.graphics.label,        id, eMap, pMap, true, title);
@@ -277,7 +277,7 @@ function show(graph) {
           if (url) {
             url = encodeURI(url);
             if (actionsArray[k].target == "external") {
-              actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + + "&#8599;</a>";
+              actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "<sup><small>&#8599;</small></sup></a>";
               }
             else {
               actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
@@ -674,7 +674,10 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
     if (Array.isArray(val)) {
       for (v in val) {
         if (JSON.stringify(val[v]).startsWith('{"@type":"g:Map"')) { // TBD: this is ugly
-          if (typeof(val[v]['@value'][1]['@value'][0]) == "object") {
+          if (typeof(val[v]['@value'][1]['@value']) == "number") {
+            pMap.set(val[v]['@value'][0], val[v]['@value'][1]['@value']);
+            }
+          else if (typeof(val[v]['@value'][1]['@value'][0]) == "object") {
             pMap.set(val[v]['@value'][0], val[v]['@value'][1]['@value'][0]['@value']);
             }
           else {

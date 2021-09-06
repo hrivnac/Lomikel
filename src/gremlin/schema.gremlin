@@ -27,8 +27,8 @@ dec           = mgmt.makePropertyKey('dec'          ).dataType(Double.class ).ca
 timestamp     = mgmt.makePropertyKey('timestamp'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make() // LocalDateTime
 union         = mgmt.makePropertyKey('union'        ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
 intersection  = mgmt.makePropertyKey('intersection' ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
-differenceIn  = mgmt.makePropertyKey('differenceIn' ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
-differenceOut = mgmt.makePropertyKey('differenceOut').dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
+sizeIn        = mgmt.makePropertyKey('sizeIn'       ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
+sizeOut       = mgmt.makePropertyKey('sizeOut'      ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
 // union = intersection + differenceIn + differenceOut
 
 // Vertex properties
@@ -52,8 +52,8 @@ mgmt.addProperties(contains,
 mgmt.addProperties(overlaps,
                    lbl,
                    intersection,
-                   differenceIn,
-                   differenceOut)
+                   sizeIn,
+                   sizeOut)
 
 // Connections   
 mgmt.addConnection(overlaps, testVertex, testVertex)

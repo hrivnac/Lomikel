@@ -43,6 +43,22 @@ var stylesheet = {
         {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel", target:"external"},
         {name:"help", url:"Result.jsp",                                                      target:"result"  }
         ]
+      },
+    "overlaps": {
+      properties:{gremlin:"valueMap('sizeIn', 'sizeOut', 'intersection').toList()[0]"},
+      graphics: {
+        label:" ",
+        title:" ",
+        subtitle:" ",
+        arrows:"middle",
+        value:"0",
+        group:" "
+        },
+      actions: [
+        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel",             target:"external"},
+        {name:"help", url:"Result.jsp",                                                                  target:"result"  },
+        {name:"venn", url:{js:"'d3/venn.jsp?n1=' + sizeIn + '&n2=' + sizeOut + '&n12=' + intersection"}, target:"result"  }
+        ]
       }
     }
   };
