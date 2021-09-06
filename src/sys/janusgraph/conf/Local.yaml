@@ -1,10 +1,11 @@
 hosts: [@SERVER.HOST@]
 port: @SERVER.PORT@
-#username: admin
-#password: admin
-#connectionPool: {
-#  enableSsl: true
-#  }
+username: admin
+password: admin
+connectionPool: {
+  enableSsl: true,
+  sslEnabledProtocols: [TLSv1.2]
+  }
 #serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0,
 #             config: {#serializeResultToString: true,
 #                      ioRegistries: [#org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,

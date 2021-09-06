@@ -268,13 +268,20 @@ g.V().has('lbl', 'ATLAS').outE().subgraph('x').cap('x').next().io(IoCore.graphml
 graph.io(IoCore.graphml()).readGraph('/tmp/x.graphml');
 
 // write into GraphSON
-sg = g.V().has('lbl', 'ATLAS').outE().subgraph('x').cap('x').next()
-file = new FileOutputStream("/tmp/x.json")
-mapper = GraphSONMapper.build().addCustomModule(org.janusgraph.graphdb.tinkerpop.io.graphson.JanusGraphSONModuleV2d0.getInstance()).create()
-writer = GraphSONWriter.build().mapper(mapper).create()
-writer.writeGraph(file, sg)
+file = new File("/tmp/x.json")
+query = g.V().valueMap().toList()
+x = GraphSONMapper.build().
+                   typeInfo(org.apache.tinkerpop.gremlin.structure.io.graphson.TypeInfo.PARTIAL_TYPES).
+                   addCustomModule(org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONXModuleV2d0.build().create(false)).
+                   version(GraphSONVersion.V3_0).
+                   addRegistry(JanusGraphIoRegistry.instance()).
+                   create().
+                   createMapper().
+                   writeValueAsString(query)
+file.write(x)
 // read from GraohSON
 graph.io(graphson()).readGraph('/tmp/x.json');
+
 
 // Console
 // =======
