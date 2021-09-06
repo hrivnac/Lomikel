@@ -73,7 +73,12 @@ async function callGremlinGraph(request, newServer, level = 0) {
       expandNodes(level);
       }
     };
-  http.open("GET", server + '?gremlin=' + request);
+  if (server.includes("?")) {
+    http.open("GET", server + '&gremlin=' + request);
+    }
+  else {
+    http.open("GET", server + '?gremlin=' + request);
+    }
   http.send(); 
   }  
   
