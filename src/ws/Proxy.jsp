@@ -3,6 +3,7 @@
 <%@ page trimDirectiveWhitespaces="true"  %>
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
+<%@ page import="java.net.URLDecoder" %>
 <%@ page import="com.Lomikel.Utils.SmallHttpClient" %>
 <%@ page import="org.apache.log4j.Logger" %>
 
@@ -11,7 +12,7 @@
 <%
   String query = request.getQueryString();
   String server = request.getParameter("server");
-  String answer = SmallHttpClient.get(server + "?" + query);
+  String answer = SmallHttpClient.get(server + "?" + URLDecoder.decode(query, "UTF-8"));
   answer = answer.trim();
   out.print(answer);
   %>
