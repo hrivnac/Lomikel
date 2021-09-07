@@ -274,7 +274,7 @@
         }
       params += "]";
       }  
-    loadPane("plot", "d3/scatterplot.jsp?" + params, true, visheight);
+    loadPane("plot", "d3/scatterplot.jsp?" + params, true, 400 * 1.2);
     }
   function showSky() {
     if ("<%=raField%>".trim() == "" || "<%=decField%>".trim() == "") {
@@ -345,6 +345,6 @@
         }
       }
     params += "]";
-    loadPane("skyview", "d3/skyview.jsp?" + params, true, visheight);
+    loadPane("skyview", "d3/skyview.jsp?" + params, true, 600 * 1.2);
     }
   </script>

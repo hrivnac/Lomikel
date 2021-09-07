@@ -83,7 +83,8 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
 	          .domain(d3.extent(data, d => d.g))
 	          .range(colors);
             
-  var div = d3.select("body").append("div")	
+  var div = d3.select("body")
+              .append("div")	
               .attr("class", "tooltip")				
               .style("opacity", 0);
               

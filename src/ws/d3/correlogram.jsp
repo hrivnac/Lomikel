@@ -15,11 +15,12 @@
 <div id="corr_area"></div>
 
 <%
+  String tdata = request.getParameter("tdata");
   %>
   
 <script src="actions.js"     type="text/javascript"></script>
 <script src="correlogram.js" type="text/javascript"></script>
   
 <script type="text/javascript">
-  showCorrelogram();
+  showCorrelogram(<%=tdata%>);
   </script>

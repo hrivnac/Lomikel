@@ -53,7 +53,7 @@ var stylesheet = {
         title:" ",
         subtitle:" ",
         arrows:"middle",
-        value:"0",
+        value:"0", // TBD: intersection
         group:" "
         },
       actions: [

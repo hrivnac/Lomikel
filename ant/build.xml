@@ -385,7 +385,7 @@
     
     
   <target name="deploy-pure"
-           unless="${cp}">
+           if="${cp}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/${user.name}-Lomikel.war"/>
     </target>
@@ -427,7 +427,7 @@
     </target>
     
   <target name="deploy-prod-pure"
-          unless="${cp}">
+          if="${cp}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/Lomikel.war"/>
     </target>
