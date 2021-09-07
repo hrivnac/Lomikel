@@ -9,6 +9,7 @@
 
 <%! static Logger log = Logger.getLogger(org.apache.jsp.d3.venn_jsp.class); %>
 
+<link href="d3/venn.css" rel="stylesheet" type="text/css"/>
 <script src="d3-v6.0.0/d3.js"       type="text/javascript"></script>
 <script src="venn-v.0.2.14/venn.js" type="text/javascript"></script>
 
@@ -28,7 +29,7 @@
   <tr>
     <td width="40%">
       <div id="text">
-        <b>A =&gt; B<hr/>
+        <b>A =&gt; B</b><hr/>
         <table>
           <tr><td><b>A</b>    </td><td><%=n1%>        </td><td>(<%=p1%>%) </td></tr>
           <tr><td><b>B</b>    </td><td><%=n2%>        </td><td>(<%=p2%>%) </td></tr>
