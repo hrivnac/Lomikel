@@ -1,0 +1,12 @@
+svg {font: 12px sans-serif;
+     text-anchor: middle;
+     }
+    
+rect {stroke: lightgray;
+      stoke-width: 1px;
+      fill: none;
+      }
+    
+.y.axis path {fill: none;
+              stroke: none;
+              }
