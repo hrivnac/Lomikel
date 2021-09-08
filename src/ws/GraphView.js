@@ -298,6 +298,7 @@ function show(graph) {
       }
     }
   network = new vis.Network(container, data, options4Graph);
+  console.log(network);
   if (graph != null && document.getElementById('clusterize').checked === true) {
     clusterByGroups();   
     }
