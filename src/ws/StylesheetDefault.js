@@ -40,10 +40,10 @@ var stylesheet = {
         group:" "
         },
       actions: [
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel",          target:"external"},
-        {name:"help", url:"Result.jsp",                                                               target:"result"  },
-        {name:"show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},  target:"result"  },
-        {name:"table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"}, target:"table"   }
+        {name:"info",  url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel",          target:"external"},
+        {name:"help",  url:"Result.jsp",                                                               target:"result"  },
+        {name:"show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},   target:"result"  },
+        {name:"table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
         ]
       },
     "overlaps": {
@@ -57,11 +57,11 @@ var stylesheet = {
         group:" "
         },
       actions: [
-        {name:"info", url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel",             target:"external"},
-        {name:"help", url:"Result.jsp",                                                                  target:"result"  },
-        {name:"show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},     target:"result"  },
-        {name:"table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},    target:"table"   },
-        {name:"venn", url:{js:"'d3/venn.jsp?n1=' + sizeIn + '&n2=' + sizeOut + '&n12=' + intersection"}, target:"plot"    }
+        {name:"info",  url:"http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel",             target:"external"},
+        {name:"help",  url:"Result.jsp",                                                                  target:"result"  },
+        {name:"show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},      target:"result"  },
+        {name:"table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},     target:"table"   },
+        {name:"venn",  url:{js:"'d3/venn.jsp?n1=' + sizeIn + '&n2=' + sizeOut + '&n12=' + intersection"}, target:"plot"    }
         ]
       }
     }

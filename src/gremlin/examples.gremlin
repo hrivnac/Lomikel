@@ -259,6 +259,10 @@ schema.vertexLabel('v').index('i').remove()
 system.graph('food').truncate()
 system.graph('food').drop()
 
+// clean everything
+graph.close()
+org.janusgraph.core.util.JanusGraphCleanup.clear(graph)
+
 // IO
 // ==
 

@@ -98,7 +98,7 @@ public class DirectPhoenixClient extends PhoenixClient {
       catch (SQLException se2) {
         } 
       }
-    log.info("Result: " + results);
+    log.debug("Result: " + results);
     return results;
     } 
   
