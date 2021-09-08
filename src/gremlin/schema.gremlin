@@ -25,6 +25,7 @@ z             = mgmt.makePropertyKey('z'            ).dataType(Double.class ).ca
 ra            = mgmt.makePropertyKey('ra'           ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
 dec           = mgmt.makePropertyKey('dec'          ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
 timestamp     = mgmt.makePropertyKey('timestamp'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make() // LocalDateTime
+importDate    = mgmt.makePropertyKey('importDate'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 union         = mgmt.makePropertyKey('union'        ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
 intersection  = mgmt.makePropertyKey('intersection' ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()
 sizeIn        = mgmt.makePropertyKey('sizeIn'       ).dataType(Integer.class).cardinality(Cardinality.SINGLE).make()

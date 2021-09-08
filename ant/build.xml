@@ -252,9 +252,11 @@
   <target name="war"
           depends="jar"
           description="Create WAR">
- 		<copy file="../src/ws/index.jsp"   tofile="../build/index.jsp" overwrite="true"/>
- 		<copy file="../src/ws/Top.jsp"     tofile="../build/Top.jsp"   overwrite="true"/>
- 		<copy file="../src/ws/TopMini.jsp" tofile="../build/TopMini.jsp"   overwrite="true"/>
+ 		<copy file="../src/ws/index.jsp"             tofile="../build/index.jsp"   overwrite="true"/>
+ 		<copy file="../src/ws/Top.jsp"               tofile="../build/Top.jsp"     overwrite="true"/>
+ 		<copy file="../src/ws/TopMini.jsp"           tofile="../build/TopMini.jsp" overwrite="true"/>
+ 		<copy file="../src/ws/Servers-${target}.jsp" tofile="../build/Servers.jsp" overwrite="true"/>
+ 		<copy file="../src/ws/Graphs-${target}.jsp"  tofile="../build/Graphs.jsp"  overwrite="true"/>
     <replace file="../build/index.jsp"   token="@NAME@"    value="${browsername}"/>
     <replace file="../build/index.jsp"   token="@ICON@"    value="${browsericon}"/>
     <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
@@ -278,11 +280,15 @@
 	    	<exclude name="js9-3.0-src/**/*"/>
 	    	<exclude name="vis-network-8.3.2-src/**/*"/>
 	    	<exclude name="vis-timeline-7.3.9-src/**/*"/>
+        <exclude name="Servers-*.jsp"/>
+        <exclude name="Graphs-*.jsp"/>
         </fileset>
       <fileset dir="../build">
         <include name="index.jsp"/>
         <include name="Top.jsp"/>
         <include name="TopMini.jsp"/>
+        <include name="Graphs.jsp"/>
+        <include name="Servers.jsp"/>
         </fileset>
       <classes dir="../src/ws">
         <include name="log4j.properties"/>
@@ -382,7 +388,6 @@
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/${user.name}-Lomikel.war"/>
     </target>
-    
     
   <target name="deploy-pure"
            if="${cp}">
@@ -641,7 +646,9 @@
       </copy>
     <mkdir dir="../dist/ws-${version}"/>
     <copy todir="../dist/ws-${version}">
-			<fileset dir="../src/ws" includes="*/**"/>
+			<fileset dir="../src/ws">
+			  <include name="*/**"/>
+			  </fileset>
       </copy>
     <copy todir="../dist/ws-${version}">
 			<fileset dir="../extlib/ws" includes="*/**" excludes="*-src/**"/>
