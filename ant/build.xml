@@ -612,9 +612,9 @@
     <delete includeEmptyDirs="true">
       <fileset dir="../dist" includes="**/*"/>
       </delete>
-    <delete includeEmptyDirs="true">
+    <!--delete includeEmptyDirs="true">
       <fileset dir="../extlib/import" includes="**/*"/>
-      </delete>
+      </delete-->
     <delete includeEmptyDirs="true">
       <fileset dir="." includes="**/*"/>
       </delete>
