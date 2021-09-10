@@ -11,9 +11,10 @@
   <property environment="env"/>
   <property file="../ant/build-global.properties"/>
   <property file="../ant/build-local.properties"/>
+  <property file="../ant/target-${target}.properties"/>
   <property name="site" value="${env.site}"/>
   
-  <echo>Building for site ${target}</echo>
+  <echo>Building for site ${target} on ${site}</echo>
 
   <path id="classpath.build">
     <pathelement path="${log4j_jar}"/>

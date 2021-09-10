@@ -71,7 +71,7 @@ function showCorrelogram(otable) {
                           })
      .append("text")
      .attr("y", 5)
-     .attr("info", function(d) {return "<b><u>" + d.x + " => " + d.y + "</u></b></br>" +
+     .attr("info", function(d) {return "<b><u>" + d.y + " => " + d.x + "</u></b></br>" +
                                        "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info})
      .attr("popx", function(d) {return x(d.x)})
      .attr("popy", function(d) {return y(d.y)})
@@ -79,7 +79,7 @@ function showCorrelogram(otable) {
                           return d.x;
                           }
                         else {
-                          return d.value;
+                          return d.value + "/"+ d.info;
                           }
                         })
      .style("font-size", 11)
@@ -91,7 +91,7 @@ function showCorrelogram(otable) {
                                    return color(d.value);
                                    }
                                  })
-      .on("mouseover", function(d) {		
+      .on("mouseover", function(d) {	
           div.transition()		
              .duration(200)		
              .style("opacity", 0.9);		
