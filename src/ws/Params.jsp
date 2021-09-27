@@ -6,4 +6,5 @@
   String timestampField = "timestamp";
   String raField        = "ra";
   String decField       = "dec";
+  String vertexTitle    = "title";
   %>
