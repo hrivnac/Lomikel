@@ -68,9 +68,9 @@ authentication: {
 #    credentialsDb: conf/tinkergraph-credentials.properties
 #    }
 #  }
-ssl: {
-  enabled: true,
-  sslEnabledProtocols: [TLSv1, TLSv1.1, TLSv1.2],
-  keyStore: /opt/janusgraph/data/server.jks,
-  keyStorePassword: prakrsno
-  }
+#ssl: {
+#  enabled: true,
+#  sslEnabledProtocols: [TLSv1, TLSv1.1, TLSv1.2],
+#  keyStore: /opt/janusgraph/data/server.jks,
+#  keyStorePassword: prakrsno
+#  }
