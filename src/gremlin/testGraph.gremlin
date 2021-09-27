@@ -1,5 +1,4 @@
 g.V().has('lbl', 'testVertex').drop()
-g.E().has('lbl', 'testEdge'  ).drop()
 
 v1 = g.addV('testVertex').property('lbl',      'testVertex').
                           property('title',    'Test Vertex 1').

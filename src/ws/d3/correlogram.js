@@ -12,10 +12,11 @@ function showCorrelogram(otable) {
       max = o.value
       }
     }
+  min = 0;
   otable = otable.concat(otable1);
   med = (min + max ) / 2
 
-  const margin = {top:40, right:80, bottom:40, left:40},
+  const margin = {top:40, right:100, bottom:40, left:40},
                   width  = 430 - margin.left - margin.right,
                   height = 430 - margin.top  - margin.bottom
   
