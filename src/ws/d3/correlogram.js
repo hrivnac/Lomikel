@@ -5,9 +5,9 @@ function showCorrelogram(otable) {
   var max = otable[0].value;
   for (o of otable) {
     otable1.push({x:o.y, y:o.x, value:o.value, info:o.info})
-    if (min > o.value) {
-      min = o.value
-      }
+    //if (min > o.value) {
+    //  min = o.value
+    //  }
     if (max < o.value) {
       max = o.value
       }
@@ -27,11 +27,12 @@ function showCorrelogram(otable) {
                 .append("g")
                 .attr("transform", `translate(${margin.left}, ${margin.top})`); 
   
-  const domain = Array.from(new Set(otable.map(function(d) {return d.x})))
+  const domain = Array.from(new Set(otable.map(function(d) {return d.x})));
+  const num = domain.length;
+  
   for (d of domain) {
     otable.push({x:d, y:d, value:0, info:""})
     }
-  const num = Math.sqrt(otable.length)
 
   const color = d3.scaleLinear()
                   .domain([min, med, max])
@@ -60,11 +61,12 @@ function showCorrelogram(otable) {
                  .join("g")
                  .attr("class", "cor")
                  .attr("transform", function(d) {return `translate(${x(d.x)}, ${y(d.y)})`});
+
   cor.append("rect")
-     .attr("width",  xSpace / num - 1)
-     .attr("height", ySpace / num - 1)
-     .attr("x",     -xSpace / num / 2)
-     .attr("y",     -ySpace / num / 2)                 
+     .attr("width",  xSpace / (num - 1))
+     .attr("height", ySpace / (num - 1))
+     .attr("x",     -xSpace / (num - 1) / 2)
+     .attr("y",     -ySpace / (num - 1) / 2)                 
                             
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
