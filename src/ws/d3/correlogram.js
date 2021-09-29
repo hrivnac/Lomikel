@@ -73,11 +73,17 @@ function showCorrelogram(otable) {
                           return xpos <= ypos;
                           })
      .append("text")
+     .attr("m1",    function(d) {return d.x})
+     .attr("m2",    function(d) {return d.y})
+     .attr("n1",    function(d) {return d.info.split("/")[0]})
+     .attr("n2",    function(d) {return d.info.split("/")[1]})
+     .attr("n12",   function(d) {return d.value})
+     .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
      .attr("y", 5)
-     .attr("info", function(d) {return "<b><u>" + d.y + " => " + d.x + "</u></b></br>" +
-                                       "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info})
-     .attr("popx", function(d) {return x(d.x)})
-     .attr("popy", function(d) {return y(d.y)})
+     .attr("info",  function(d) {return "<center><b><u>" + d.y + " => " + d.x + "</u></b></br>" +
+                                       "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
+     .attr("popx",  function(d) {return x(d.x)})
+     .attr("popy",  function(d) {return y(d.y)})
      .text(function(d) {if (d.x === d.y) {
                           return d.x;
                           }
@@ -95,17 +101,14 @@ function showCorrelogram(otable) {
                                    }
                                  })
       .on("mouseover", function(d) {	
-          div.transition()		
-             .duration(200)		
-             .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("info"))	
-             .style("left", (d3.select(this).attr("popx")) + "px")		
-             .style("top",  (d3.select(this).attr("popy")) + "px");	
-          })					
-      .on("mouseout", function(d) {		
-          div.transition()		
-             .duration(2000)		
-             .style("opacity", 0);	
+          if (d3.select(this).attr("valid")) {
+            showVenn(d3.select(this).attr("n1"),
+                     d3.select(this).attr("n2"),
+                     d3.select(this).attr("n12"),
+                     d3.select(this).attr("m1"),
+                     d3.select(this).attr("m2"));
+            document.getElementById("vennTxt").innerHTML = d3.select(this).attr("info");
+            }
           });
       
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
@@ -113,11 +116,17 @@ function showCorrelogram(otable) {
                           return xpos > ypos;
                           })
      .append("circle")
-     .attr("r", function(d) {return size(Math.abs(d.value))})
-     .attr("info", function(d) {return "<b><u>" + d.x + " => " + d.y + "</u></b></br>" +
-                                       "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info})
-     .attr("popx", function(d) {return x(d.x)})
-     .attr("popy", function(d) {return y(d.y)})
+     .attr("m1",    function(d) {return d.x})
+     .attr("m2",    function(d) {return d.y})
+     .attr("n1",    function(d) {return d.info.split("/")[0]})
+     .attr("n2",    function(d) {return d.info.split("/")[1]})
+     .attr("n12",   function(d) {return d.value})
+     .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
+     .attr("r",     function(d) {return size(Math.abs(d.value))})
+     .attr("info",  function(d) {return "<center><b><u>" + d.x + " => " + d.y + "</u></b></br>" +
+                                       "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
+     .attr("popx",  function(d) {return x(d.x)})
+     .attr("popy",  function(d) {return y(d.y)})
      .style("fill", function(d) {if (d.x === d.y) {
                                    return "#000";
                                    }
@@ -127,17 +136,14 @@ function showCorrelogram(otable) {
                                  })
       .style("opacity", 0.8)
       .on("mouseover", function(d) {		
-          div.transition()		
-             .duration(200)		
-             .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("info"))	
-             .style("left", (d3.select(this).attr("popx")) + "px")		
-             .style("top",  (d3.select(this).attr("popy")) + "px");	
-          })					
-      .on("mouseout", function(d) {		
-          div.transition()		
-             .duration(2000)		
-             .style("opacity", 0);	
+          if (d3.select(this).attr("valid")) {
+            showVenn(d3.select(this).attr("n1"),
+                     d3.select(this).attr("n2"),
+                     d3.select(this).attr("n12"),
+                     d3.select(this).attr("m1"),
+                     d3.select(this).attr("m2"));
+            document.getElementById("vennTxt").innerHTML = d3.select(this).attr("info");
+            }
           });
 
   var aS = d3.scaleLinear()

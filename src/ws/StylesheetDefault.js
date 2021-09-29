@@ -50,10 +50,10 @@ var stylesheet = {
       properties:{gremlin:"valueMap('sizeIn', 'sizeOut', 'intersection').toList()[0]"},
       graphics: {
         label:" ",
-        title:" ",
+        title:"intersection",
         subtitle:" ",
         arrows:"middle",
-        value:"0", // TBD: intersection
+        value:"intersection",
         group:" "
         },
       actions: [

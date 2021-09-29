@@ -64,8 +64,8 @@
           }
         tdata += "\"" + column + "\":\"" + value + "\"";
         }
-      vFrom = callGremlinValues(gr + ".E('" + id1 + "').inV().valueMap('<%=vertexTitle%>').toList().toString().replace(']', '').replace('[', '')")[0].replace("title:", "");
-      vTo   = callGremlinValues(gr + ".E('" + id1 + "').outV().valueMap('<%=vertexTitle%>').toList().toString().replace(']', '').replace('[', '')")[0].replace("title:", "");
+      vFrom = callGremlinValues(gr + ".E('" + id1 + "').inV().<%=vertexName%>")[0];
+      vTo   = callGremlinValues(gr + ".E('" + id1 + "').outV().<%=vertexName%>")[0];
       tdata += ",\"from\":\"" + vFrom + "\"";
       tdata += ",\"to\":\""   + vTo   + "\"";
       tdata += "}";

@@ -6,5 +6,5 @@
   String timestampField = "timestamp";
   String raField        = "ra";
   String decField       = "dec";
-  String vertexTitle    = "title";
+  String vertexName    = "values('lbl', 'title').toList().toString().replace(']', '').replace('[', '').replaceAll(' ', '').replaceAll(',', '.')";
   %>

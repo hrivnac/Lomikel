@@ -46,10 +46,11 @@ var options4Graph = {
       },
     scaling: {
       customScalingFunction: function (min, max, total, value) {
-        if (min == max) {
-          return value;
+        if (min === max) {
+          return 0.5;
           }
-        return (value - min) / (max - min) / 2;
+        var scale = 1 / (max - min);
+        return Math.max(0, (value - min) * scale);
         }
       }
     },
@@ -73,3 +74,6 @@ var options4Hist = {
       }
     },
   };
+
+  
+  
