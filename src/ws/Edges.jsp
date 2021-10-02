@@ -295,6 +295,6 @@
         params += "}";        
       }
     params += "]";
-    loadPane("plot", "d3/correlogram.jsp?" + params, true, 430 * 1.2);
+    loadPane("plot", "d3/correlogram.jsp?" + params, true, 500 * 1.2);
     }
   </script>

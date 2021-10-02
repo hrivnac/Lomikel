@@ -15,17 +15,6 @@ function showCorrelogram(otable) {
   min = 0;
   otable = otable.concat(otable1);
   med = (min + max ) / 2
-
-  const margin = {top:40, right:100, bottom:40, left:40},
-                  width  = 430 - margin.left - margin.right,
-                  height = 430 - margin.top  - margin.bottom
-  
-  const svg = d3.select("#corr_area")
-                .append("svg")
-                .attr("width",  width  + margin.left + margin.right)
-                .attr("height", height + margin.top  + margin.bottom)
-                .append("g")
-                .attr("transform", `translate(${margin.left}, ${margin.top})`); 
   
   const domain = Array.from(new Set(otable.map(function(d) {return d.x})));
   const num = domain.length;
@@ -33,6 +22,22 @@ function showCorrelogram(otable) {
   for (d of domain) {
     otable.push({x:d, y:d, value:0, info:""})
     }
+
+  const width0 = 430;
+  const height0 = 430;
+  const margin = { top:(height0 / num / 2),
+                   right:(width0 / num / 2 + 50),
+                   bottom:(height0 / num / 2),
+                   left:(width0 / num / 2)},
+                 width  = width0  - margin.left - margin.right,
+                 height = height0 - margin.top  - margin.bottom
+  
+  const svg = d3.select("#corr_area")
+                .append("svg")
+                .attr("width",  width  + margin.left + margin.right)
+                .attr("height", height + margin.top  + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left}, ${margin.top})`); 
 
   const color = d3.scaleLinear()
                   .domain([min, med, max])
