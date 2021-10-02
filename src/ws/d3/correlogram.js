@@ -102,18 +102,18 @@ function showCorrelogram(otable) {
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .text(function(d) {return "overlap = " + d.value})
+     .text(function(d) {return d.value})
      .style("font-size", 11)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d.value)})
      .on("mouseover", function(d) {	
           if (d3.select(this).attr("valid")) {
-            showVenn(d3.select(this).attr("n1"),
-                     d3.select(this).attr("n2"),
-                     d3.select(this).attr("n12"),
-                     d3.select(this).attr("m1").replaceAll('.', ' '),
-                     d3.select(this).attr("m2").replaceAll('.', ' '));
-            document.getElementById("vennTxt").innerHTML = d3.select(this).attr("info");
+            info = showVenn(d3.select(this).attr("n1"),
+                            d3.select(this).attr("n2"),
+                            d3.select(this).attr("n12"),
+                            d3.select(this).attr("m1").replaceAll('.', ' '),
+                            d3.select(this).attr("m2").replaceAll('.', ' '));
+            document.getElementById("vennTxt").innerHTML = info;
             }
           });
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
@@ -132,18 +132,18 @@ function showCorrelogram(otable) {
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .text(function(d) {return "in/out = "+ d.info})
+     .text(function(d) {return d.info})
      .style("font-size", 11)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d.value)})
      .on("mouseover", function(d) {	
           if (d3.select(this).attr("valid")) {
-            showVenn(d3.select(this).attr("n1"),
-                     d3.select(this).attr("n2"),
-                     d3.select(this).attr("n12"),
-                     d3.select(this).attr("m1").replaceAll('.', ' '),
-                     d3.select(this).attr("m2").replaceAll('.', ' '));
-            document.getElementById("vennTxt").innerHTML = d3.select(this).attr("info");
+            info = showVenn(d3.select(this).attr("n1"),
+                            d3.select(this).attr("n2"),
+                            d3.select(this).attr("n12"),
+                            d3.select(this).attr("m1").replaceAll('.', ' '),
+                            d3.select(this).attr("m2").replaceAll('.', ' '));
+            document.getElementById("vennTxt").innerHTML = info;
             }
           });
       
@@ -173,12 +173,12 @@ function showCorrelogram(otable) {
       .style("opacity", 0.8)
       .on("mouseover", function(d) {		
           if (d3.select(this).attr("valid")) {
-            showVenn(d3.select(this).attr("n1"),
-                     d3.select(this).attr("n2"),
-                     d3.select(this).attr("n12"),
-                     d3.select(this).attr("m1").replaceAll('.', ' '),
-                     d3.select(this).attr("m2").replaceAll('.', ' '));
-            document.getElementById("vennTxt").innerHTML = d3.select(this).attr("info");
+            info = showVenn(d3.select(this).attr("n1"),
+                            d3.select(this).attr("n2"),
+                            d3.select(this).attr("n12"),
+                            d3.select(this).attr("m1").replaceAll('.', ' '),
+                            d3.select(this).attr("m2").replaceAll('.', ' '));
+            document.getElementById("vennTxt").innerHTML = info;
             }
           });
 

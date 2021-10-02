@@ -28,16 +28,7 @@
 <table>
   <tr>
     <td width="40%">
-      <div id="text">
-        <b>A =&gt; B</b><hr/>
-        <table>
-          <tr><td><b>A</b>    </td><td><%=n1%>        </td><td>(<%=p1%>%) </td></tr>
-          <tr><td><b>B</b>    </td><td><%=n2%>        </td><td>(<%=p2%>%) </td></tr>
-          <tr><td><b>A^B</b>  </td><td><%=n12%>       </td><td>(<%=p12%>%)</td></tr>
-          <tr><td><b>A-A^B</b></td><td><%=n1-n12%>    </td><td>(<%=q1%>%) </td></tr>
-          <tr><td><b>B-A^B</b></td><td><%=n2-n12%>    </td><td>(<%=q2%>%) </td></tr>
-          <tr><td><b>AvB</b>  </td><td><%=n1+n2-n12%> </td><td>           </td></tr>
-          </table>
+      <div id="venntext">
         </div>
       </td>
     <td>   
@@ -49,7 +40,8 @@
 <script src="d3/venn.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-  showVenn(<%=n1%>, <%=n2%>, <%=n12%>);
+  info = showVenn(<%=n1%>, <%=n2%>, <%=n12%>);
+  document.getElementById("venntext").innerHTML = info;
   </script>
 
  
