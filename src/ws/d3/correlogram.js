@@ -186,7 +186,7 @@ function showCorrelogram(otable) {
 
   var aS = d3.scaleLinear()
              .range([-margin.top + 5, height + margin.bottom - 5])
-             .domain([max, min]);
+             .domain([100, 0]);
 
   var yA = d3.axisRight().scale(aS).tickPadding(7);
 
