@@ -196,11 +196,11 @@ function showCorrelogram(otable) {
               .call(yA)
               .attr('transform', `translate(${yWidth}, 0)`);
 
-  var iR = d3.range(0, 100.01, 0.01);
+  var iR = d3.range(0, 101, 1);
   var h = height / iR.length + 3;
   iR.forEach(function (d) {aG.append('rect').style('fill', color(d))
                                             .style('stroke-width', 0)
-                                            .style('stoke', 'none')
+                                            .style('stroke', 'none')
                                             .attr('height', h)
                                             .attr('width', 10)
                                             .attr('x', 0)
