@@ -72,10 +72,24 @@ function showCorrelogram(otable) {
      .attr("height", ySpace / (num - 1))
      .attr("x",     -xSpace / (num - 1) / 2)
      .attr("y",     -ySpace / (num - 1) / 2)                 
+      
+  for (var i = 0; i < 7; i++) {
+    cor.filter(function(d) {const ypos = domain.indexOf(d.y);
+                            const xpos = domain.indexOf(d.x);
+                            return xpos == ypos;
+                            })
+       .append("text")
+       .text(function(d) {return d.x.split('.')[i]})
+       .attr("dy", "" + i + "em")
+       .style("font-size", 11)
+       .style("text-align", "center")
+       .style("fill", function(d) {return "#000"})
+    }
+     
                             
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
-                          return xpos <= ypos;
+                          return xpos < ypos;
                           })
      .append("text")
      .attr("m1",    function(d) {return d.x})
@@ -84,34 +98,21 @@ function showCorrelogram(otable) {
      .attr("n2",    function(d) {return d.info.split("/")[1]})
      .attr("n12",   function(d) {return d.value})
      .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
-     .attr("y", 5)
-     .attr("info",  function(d) {return "<center><b><u>" + d.y + " => " + d.x + "</u></b></br>" +
-                                       "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
+     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=><br/>" + d.x + "</u></b></br>" +
+                                        "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .text(function(d) {if (d.x === d.y) {
-                          return d.x;
-                          }
-                        else {
-                          return d.value + "/"+ d.info;
-                          }
-                        })
+     .text(function(d) {return d.value + " in/out="+ d.info})
      .style("font-size", 11)
      .style("text-align", "center")
-     .style("fill", function(d) {if (d.x === d.y) {
-                                   return "#000";
-                                   }
-                                 else {
-                                   return color(d.value);
-                                   }
-                                 })
-      .on("mouseover", function(d) {	
+     .style("fill", function(d) {return color(d.value)})
+     .on("mouseover", function(d) {	
           if (d3.select(this).attr("valid")) {
             showVenn(d3.select(this).attr("n1"),
                      d3.select(this).attr("n2"),
                      d3.select(this).attr("n12"),
-                     d3.select(this).attr("m1"),
-                     d3.select(this).attr("m2"));
+                     d3.select(this).attr("m1").replaceAll('.', ' '),
+                     d3.select(this).attr("m2").replaceAll('.', ' '));
             document.getElementById("vennTxt").innerHTML = d3.select(this).attr("info");
             }
           });
@@ -128,8 +129,8 @@ function showCorrelogram(otable) {
      .attr("n12",   function(d) {return d.value})
      .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
      .attr("r",     function(d) {return size(Math.abs(d.value))})
-     .attr("info",  function(d) {return "<center><b><u>" + d.x + " => " + d.y + "</u></b></br>" +
-                                       "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
+     .attr("info",  function(d) {return "<center><b><u>" + d.x + "<br/>=><br/>" + d.y + "</u></b></br>" +
+                                        "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
      .style("fill", function(d) {if (d.x === d.y) {
@@ -145,8 +146,8 @@ function showCorrelogram(otable) {
             showVenn(d3.select(this).attr("n1"),
                      d3.select(this).attr("n2"),
                      d3.select(this).attr("n12"),
-                     d3.select(this).attr("m1"),
-                     d3.select(this).attr("m2"));
+                     d3.select(this).attr("m1").replaceAll('.', ' '),
+                     d3.select(this).attr("m2").replaceAll('.', ' '));
             document.getElementById("vennTxt").innerHTML = d3.select(this).attr("info");
             }
           });
