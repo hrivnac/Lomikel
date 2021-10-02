@@ -80,7 +80,7 @@ function showCorrelogram(otable) {
        .append("text")
        .text(function(d) {return d.x.split('.')[i]})
        .attr("dy", "" + (i - 2) + "em")
-       .style("font-size", 9)
+       .style("font-size", 8)
        .style("text-align", "center")
        .style("fill", function(d) {return "#fff"})
     }
@@ -103,7 +103,7 @@ function showCorrelogram(otable) {
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
      .text(function(d) {return d.value})
-     .style("font-size", 9)
+     .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
      .on("mouseover", function(d) {	
@@ -134,7 +134,7 @@ function showCorrelogram(otable) {
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
      .text(function(d) {return d.info})
-     .style("font-size", 9)
+     .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
      .on("mouseover", function(d) {	
@@ -196,7 +196,7 @@ function showCorrelogram(otable) {
               .call(yA)
               .attr('transform', `translate(${yWidth}, 0)`);
 
-  var iR = d3.range(min, max * 1.01, max * 0.01);
+  var iR = d3.range(0, 100.01, 0.01);
   var h = height / iR.length + 3;
   iR.forEach(function (d) {aG.append('rect').style('fill', color(d))
                                             .style('stroke-width', 0)
