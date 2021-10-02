@@ -19,7 +19,7 @@ function showVenn(n1, n2, n12, m1, m2) {
     
   var info = "";
   if (m1 != "A" || m2 != "B") {
-    info += "<b>A = " + m1 + "<br/> B = " + m2 + "</b>";
+    info += "<b><small>A = " + m1 + "<br/> B = " + m2 + "</small></b>";
     }
   info += "<hr/>";
   info += "<table>";

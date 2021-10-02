@@ -14,15 +14,9 @@
 <script src="venn-v.0.2.14/venn.js" type="text/javascript"></script>
 
 <%
-  // TBD: add datasets names
   long n1    = Long.valueOf(request.getParameter("n1"));
   long n2    = Long.valueOf(request.getParameter("n2"));
   long n12   = Long.valueOf(request.getParameter("n12"));
-  String p1  = String.format("%2.2f", 100.0 * ((double)n1  / ((double)n1 + (double)n2 - (double)n12)));
-  String p2  = String.format("%2.2f", 100.0 * ((double)n2  / ((double)n1 + (double)n2 - (double)n12)));
-  String p12 = String.format("%2.2f", 100.0 * ((double)n12 / ((double)n1 + (double)n2 - (double)n12)));
-  String q1  = String.format("%2.2f", 100.0 * (((double)n1 -(double)n12) / ((double)n1 + (double)n2 - (double)n12)));
-  String q2  = String.format("%2.2f", 100.0 * (((double)n2 -(double)n12) / ((double)n1 + (double)n2 - (double)n12)));
   %>
   
 <table>
