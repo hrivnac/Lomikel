@@ -72,14 +72,14 @@ function showCorrelogram(otable) {
      .attr("x",     -xSpace / (num - 1) / 2)
      .attr("y",     -ySpace / (num - 1) / 2)                 
       
-  for (var i = 0; i < 7; i++) {
+  for (var i = 2; i < 7; i++) {
     cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                             const xpos = domain.indexOf(d.x);
                             return xpos == ypos;
                             })
        .append("text")
        .text(function(d) {return d.x.split('.')[i]})
-       .attr("dy", "" + i + "em")
+       .attr("dy", "" + (i - 2) + "em")
        .style("font-size", 9)
        .style("text-align", "center")
        .style("fill", function(d) {return "#fff"})
