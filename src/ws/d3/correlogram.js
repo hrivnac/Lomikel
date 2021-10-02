@@ -85,13 +85,13 @@ function showCorrelogram(otable) {
        .style("text-align", "center")
        .style("fill", function(d) {return "#000"})
     }
-     
-                            
+                           
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
                           })
      .append("text")
+     .attr("dy", "0em")
      .attr("m1",    function(d) {return d.x})
      .attr("m2",    function(d) {return d.y})
      .attr("n1",    function(d) {return d.info.split("/")[0]})
@@ -102,7 +102,37 @@ function showCorrelogram(otable) {
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .text(function(d) {return d.value + " in/out="+ d.info})
+     .text(function(d) {return "overlap = " + d.value})
+     .style("font-size", 11)
+     .style("text-align", "center")
+     .style("fill", function(d) {return color(d.value)})
+     .on("mouseover", function(d) {	
+          if (d3.select(this).attr("valid")) {
+            showVenn(d3.select(this).attr("n1"),
+                     d3.select(this).attr("n2"),
+                     d3.select(this).attr("n12"),
+                     d3.select(this).attr("m1").replaceAll('.', ' '),
+                     d3.select(this).attr("m2").replaceAll('.', ' '));
+            document.getElementById("vennTxt").innerHTML = d3.select(this).attr("info");
+            }
+          });
+  cor.filter(function(d) {const ypos = domain.indexOf(d.y);
+                          const xpos = domain.indexOf(d.x);
+                          return xpos < ypos;
+                          })
+     .append("text")
+     .attr("dy", "1em")
+     .attr("m1",    function(d) {return d.x})
+     .attr("m2",    function(d) {return d.y})
+     .attr("n1",    function(d) {return d.info.split("/")[0]})
+     .attr("n2",    function(d) {return d.info.split("/")[1]})
+     .attr("n12",   function(d) {return d.value})
+     .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
+     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=><br/>" + d.x + "</u></b></br>" +
+                                        "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
+     .attr("popx",  function(d) {return x(d.x)})
+     .attr("popy",  function(d) {return y(d.y)})
+     .text(function(d) {return "in/out = "+ d.info})
      .style("font-size", 11)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d.value)})
