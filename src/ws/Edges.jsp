@@ -252,7 +252,7 @@
                 first = false;
                 }
               params += "{\"x\":\"" + tdata[i][xx] + "\",\"y\":\"" + tdata[i][yy] + "\"";
-              params += ",\"g\":\"" + xx + "/" + yy + "\"";
+              //params += ",\"g\":\"" + xx + "/" + yy + "\"";
               if (z != "" && tdata[i][z]) {
                 params += ",\"z\":\"" + tdata[i][z] + "\"";
                 }
