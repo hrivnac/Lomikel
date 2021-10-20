@@ -266,13 +266,19 @@ org.janusgraph.core.util.JanusGraphCleanup.clear(graph)
 // IO
 // ==
 
-// write into GraphML
-g.V().has('lbl', 'ATLAS').outE().subgraph('x').cap('x').next().io(IoCore.graphml()).writeGraph("/tmp/x.graphml")
-// read from GraphML
-graph.io(IoCore.graphml()).readGraph('/tmp/x.graphml');
+// GraphML
 
-// write into GraphSON
-file = new File("/tmp/x.json")
+graph.io(IoCore.graphml()).writeGraph('x.graphml')
+
+g.V().has('lbl', 'ATLAS').outE().subgraph('x').cap('x').next().io(IoCore.graphml()).writeGraph('x.graphml')
+
+graph.io(IoCore.graphml()).readGraph('x.graphml')
+
+// GraphSON
+
+graph.io(IoCore.graphson()).writeGraph('x.json')   
+
+file = new File('x.json')
 query = g.V().valueMap().toList()
 x = GraphSONMapper.build().
                    typeInfo(org.apache.tinkerpop.gremlin.structure.io.graphson.TypeInfo.PARTIAL_TYPES).
@@ -283,8 +289,14 @@ x = GraphSONMapper.build().
                    createMapper().
                    writeValueAsString(query)
 file.write(x)
-// read from GraohSON
-graph.io(graphson()).readGraph('/tmp/x.json');
+
+graph.io(graphson()).readGraph('x.json');
+
+// Gryo
+
+graph.io(IoCore.gryo()).writeGraph('x.kryo')
+
+graph.io(IoCore.gryo()).readGraph('x.kryo')
 
 // Console
 // =======
@@ -322,3 +334,8 @@ new File(filename).eachLine {
   }
 graph.tx().commit();
 
+// More
+// ====
+
+https://kelvinlawrence.net/book/Gremlin-Graph-Guide.html
+https://gist.github.com/jeremysears/3ceada192827983837ee1551c50688c7

@@ -239,28 +239,32 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
             }
           result += md.getColumnName(i + 1).toLowerCase() + "=";
           // TBD: go via String or Object ?
-          switch (md.getColumnTypeName(i + 1)) {
-            case "BOOLEAN": 
-              result += rs.getBoolean(i + 1);
-              break;
-            case "INTEGER": 
-              result += rs.getInt(i + 1);
-              break;
-            case "BIGINT": 
-              result += rs.getLong(i + 1);
-              break;
-            case "SMALLINT": 
-              result += rs.getShort(i + 1);
-              break;
-            case "VARCHAR": 
-              result += rs.getString(i + 1);
-              break;
-            case "TIMESTAMP": 
-              result += rs.getDate(i + 1);
-              break;
-            default:
-	            log.error("Cannot get result " + i + "  of type " + md.getColumnTypeName(i + 1));
-              }              
+          result += rs.getString(i + 1);
+          //switch (md.getColumnTypeName(i + 1)) {
+          //  case "BOOLEAN": 
+          //    result += rs.getBoolean(i + 1);
+          //    break;
+          //  case "INTEGER": 
+          //    result += rs.getInt(i + 1);
+          //    break;
+          //  case "FLOAT": 
+          //    result += rs.getFloat(i + 1);
+          //    break;
+          //  case "BIGINT": 
+          //    result += rs.getLong(i + 1);
+          //    break;
+          //  case "SMALLINT": 
+          //    result += rs.getShort(i + 1);
+          //    break;
+          //  case "VARCHAR": 
+          //    result += rs.getString(i + 1);
+          //    break;
+          //  case "TIMESTAMP": 
+          //    result += rs.getDate(i + 1);
+          //    break;
+          //  default:
+	        //    log.error("Cannot get result " + i + "  of type " + md.getColumnTypeName(i + 1));
+          //    }              
            }
         }     
       rs.close();
