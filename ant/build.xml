@@ -470,6 +470,7 @@
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@STORAGE.PORT@"                   value="${hbase_port}"/>
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@ROWKEY.NAME@"                    value="${rowkey_name}"/>
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@ROWKEY.NAME@"                    value="${rowkey_name}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@BACKEND.PHOENIX.URL@"            value="${phoenix_url}"/>
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
     <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"           token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
     <replace file="${janusgraph_dir}/conf/Local.yaml"                        token="@SERVER.HOST@"                    value="${gremlin_host}"/>
@@ -487,6 +488,7 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.HBASE.SCHEMA@"           value="${hbase_schema}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.HBASE.PORT@"             value="${hbase_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.ROWKEY.NAME@"            value="${rowkey_name}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.PHOENIX.URL@"            value="${phoenix_url}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"   token="@EVENTS.TABLE@"                   value="${events_table}"/>

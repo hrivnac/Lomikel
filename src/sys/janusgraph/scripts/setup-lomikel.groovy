@@ -1,4 +1,4 @@
-def globals = [:]
+ffdef globals = [:]
 
 globals << [hook : [
   onStartUp: { ctx -> ctx.logger.info("Executed once at startup of Gremlin Server.")},
