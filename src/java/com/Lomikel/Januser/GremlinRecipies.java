@@ -204,7 +204,7 @@ public class GremlinRecipies {
   /** Get a {@link Vertex}, create it if necessary.
     * @param label          The {@link Vertex} label.
     * @param propertyNames  The name of {@link Vertex} properties.
-    * @param propertyValues The value of {@link Vertex} properties.
+    * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
     * @return               The created {@link Vertex}. 
     *                       If multiple {@link Vertex}es exist, only thee first one is given. */
   // TBD: check if it is at least one
@@ -217,12 +217,16 @@ public class GremlinRecipies {
   /** Get {@link Vertex}es, create them if necessary.
     * @param label          The {@link Vertex} label.
     * @param propertyNames  The name of {@link Vertex} properties.
-    * @param propertyValues The value of {@link Vertex} properties.
+    * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
     * @return               The created {@link Vertex}es. */
   // TBD: allow replacing
   public List<Vertex> getOrCreates(String label,
                                    String[] propertyNames,
                                    Object[] propertyValues) {
+     if (propertyNames.length != propertyValues.length) {
+       log.error("Wrong number of search values: " + propertyValues.length + ", should be: " + propertyNames.length);
+       return null;
+       }
      List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
                                                                                                     .coalesce(unfold(), addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
      if (vertexes.size() > 1) {
@@ -292,14 +296,19 @@ public class GremlinRecipies {
   /** Add multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
-    * @param values The proerties values.
+    * @param values The proerties values (<tt>*</tt> will skip search for that value).
     * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
-  // TBD check for the same length
   private GraphTraversal<Vertex, Vertex> hasProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
                                                        Object[]                       values) {
+     if (names.length != values.length) {
+       log.error("Wrong number of search values: " + values.length + ", should be: " + names.length);
+       return v;
+       }
     for (int i = 0; i < names.length; i++) {
-      v = v.has(names[i], values[i]);
+      if (values[i].toString().trim().equals("*")) {
+        v = v.has(names[i], values[i]);
+        }
       }
     return v;
     }
@@ -307,12 +316,15 @@ public class GremlinRecipies {
   /** Check multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
-    * @param values The proerties values.
+    * @param values The proerties values (<tt>*</tt> will skip search for that value).
     * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
-  // TBD check for the same length
   private GraphTraversal<Vertex, Vertex> addProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
                                                        Object[]                       values) {
+     if (names.length != values.length) {
+       log.error("Wrong number of search values: " + values.length + ", should be: " + names.length);
+       return v;
+       }
     for (int i = 0; i < names.length; i++) {
       v.property(names[i], values[i]);
       }
