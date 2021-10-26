@@ -9,6 +9,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 
 // Java
 import java.util.Map;
+import java.util.HashMap;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -44,12 +45,30 @@ public class Hertex extends Wertex {
       log.warn("HBaseClient is not set, not dressing Vertex as Hertex");
       return;
       }
-    String n = null;
-    Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
-    if (results != null && !results.isEmpty()) {
-      property("hbase", true);
+    if (rowkey() != null) {
+      String n = null;
+      Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
+      if (results != null && !results.isEmpty()) {
+        property("hbase", true);
+        }
+      Map<String, String> allFields = results.get(rowkey());
+      Map<String, String> fields2fill;
+      if (fields == null) {
+        fields2fill = allFields;
+        }
+      else {
+        fields2fill = new HashMap<>();
+        for (String field : fields) {
+          if (!allFields.containsKey(field)) {
+            log.warn("Cannot get " + field + " from " + allFields);
+            }
+          else {
+            fields2fill.put(field, allFields.get(field));
+            }
+          }
+        }    
+      setFields(fields2fill, "hbase"); 
       }
-    setFields(results.get(rowkey())); 
     }
     
   /** Set the {@link HBaseClient} to search for additional values.

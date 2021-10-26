@@ -56,7 +56,23 @@ public class Sertex extends Wertex {
       if (results != null && !results.isEmpty()) {
         property("phoenix", true);
         }
-      setFields(results.get(rowkey()), "phoenix"); 
+      Map<String, String> allFields = results.get(rowkey());
+      Map<String, String> fields2fill;
+      if (fields == null) {
+        fields2fill = allFields;
+        }
+      else {
+        fields2fill = new HashMap<>();
+        for (String field : fields) {
+          if (!allFields.containsKey(field)) {
+            log.warn("Cannot get " + field + " from " + allFields);
+            }
+          else {
+            fields2fill.put(field, allFields.get(field));
+            }
+          }
+        }    
+      setFields(fields2fill, "phoenix"); 
       }
     }
     
