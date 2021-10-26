@@ -63,6 +63,11 @@ public class Rowkeys {
     return _rowkeys;
     }
     
+  @Override
+  public String toString() {
+    return "Rowkeys:\n\t" + String.join(",", _rowkeyNames) + "\n\t" + _rowkeys;
+    }
+    
   private String[] _rowkeyNames;
   
   private Map<String, String> _rowkeys = new HashMap<>();

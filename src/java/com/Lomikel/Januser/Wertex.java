@@ -29,22 +29,11 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // TBD: allow partial filling at runtime
 public abstract class Wertex implements Vertex {
-   
+      
   /** Dress existing {@link Vertex} with values from the database.
-    * Fill in all fields from the database.
     * @param vertex The original {@link Vertex}. */
   public Wertex(Vertex vertex) {
-    this(vertex, null);
-    }
-   
-  /** Dress existing {@link Vertex} with values from the database.
-    * @param vertex The original {@link Vertex}.
-    * @param fields The fields to fill in from the database.
-    *               All fields will be filled in if <tt>null</tt>. */
-  public Wertex(Vertex   vertex,
-                String[] fields) {
     _vertex  = vertex;
-    _fields  = fields;
     String[] rowkeyNames = rowkeyNames();
     _rowkeys = null;
     if (rowkeyNames == null || rowkeyNames.length == 0) {
@@ -222,23 +211,7 @@ public abstract class Wertex implements Vertex {
     else {
       prefix = prefix.trim() + ":";
       }
-    // fill only _fields
-    if (_fields != null && _fields.length > 0) {
-      property("fullfill", false);
-      String value;
-      for (String field : _fields) {
-        value = fields.get(field);
-        if (value == null) {
-          log.error("" + field + " missing, not filled");
-          }
-        else {
-          property(prefix + field, value);
-          }
-        }
-      }
-    // fill everything
-    else if (fields != null && !fields.isEmpty()) {
-      property("fullfill", true);
+    if (fields != null && !fields.isEmpty()) {
       for (Map.Entry<String, String> entry : fields.entrySet()) {
         try {
           property(prefix + entry.getKey(), entry.getValue());
@@ -275,9 +248,7 @@ public abstract class Wertex implements Vertex {
   private Vertex _vertex;  
   
   private String[] _rowkeys;
-  
-  private String[] _fields;
-  
+   
   private static Map<String, String[]> _rowkeyNames = new TreeMap<>();
   
   private static Map<String, String> _representants = new TreeMap<>();
