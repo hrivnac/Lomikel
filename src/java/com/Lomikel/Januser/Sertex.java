@@ -113,23 +113,6 @@ public class Sertex extends Wertex {
     * @param fields  The coma-separated list of fields to fill.
     *                <tt>null</tt> will fill all fields.
     *                Empty String will fill nothing besides rowkey fields.
-    * @return        The created {@link Vertex}es. It will be created even when no corresponding
-    *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later. */
-  public static List<Vertex> getOrCreates(String                 lbl,
-                                          String[]               rowkeys,
-                                          GraphTraversalSource   g,
-                                          boolean                enhance) {
-    return getOrCreates(lbl, rowkeys, g, enhance ? null : "");
-    }
-   
-  /** Get {@link Vertex} backuped by <em>Phoenix</em>
-    * from the <em>JanusGraph</em>, or create if it doesn't exist yet.
-    * @param lbl     The {@link Vertex} label.
-    * @param rowkey  The {@link Vertex} <tt>rowkeys</tt> value. Their names are taken from the schema.
-    * @param g        The {@link GraphTraversalSource} to be used to execute operations.
-    * @param fields  The coma-separated list of fields to fill.
-    *                <tt>null</tt> will fill all fields.
-    *                Empty String will fill nothing besides rowkey fields.
     * @return        The created {@link Vertex}. It will be created even when no corresponding
     *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later. */
   public static Vertex getOrCreate(String                 lbl,
@@ -156,6 +139,23 @@ public class Sertex extends Wertex {
     Vertex v = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys);
     v = enhance(v, fields);
     return v;
+    }
+   
+  /** Get {@link Vertex} backuped by <em>Phoenix</em>
+    * from the <em>JanusGraph</em>, or create if it doesn't exist yet.
+    * @param lbl     The {@link Vertex} label.
+    * @param rowkey  The {@link Vertex} <tt>rowkeys</tt> value. Their names are taken from the schema.
+    * @param g        The {@link GraphTraversalSource} to be used to execute operations.
+    * @param fields  The coma-separated list of fields to fill.
+    *                <tt>null</tt> will fill all fields.
+    *                Empty String will fill nothing besides rowkey fields.
+    * @return        The created {@link Vertex}es. It will be created even when no corresponding
+    *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later. */
+  public static List<Vertex> getOrCreates(String                 lbl,
+                                          String[]               rowkeys,
+                                          GraphTraversalSource   g,
+                                          boolean                enhance) {
+    return getOrCreates(lbl, rowkeys, g, enhance ? null : "");
     }
     
   /** Get {@link Vertex} backuped by <em>Phoenix</em>
