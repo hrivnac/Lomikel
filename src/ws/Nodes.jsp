@@ -42,7 +42,8 @@
     node1 = nodes[i];
     id1 = node1.id;
     if (node1.title.split(':')[0] == tit) {
-	    txt = callGremlinValues(gr + ".V('" + id1 + "').valueMap().toList().toString().replace(']', '').replace('[', '')")[0];
+	    txt = callGremlinValues(gr + ".V('" + id1 + "').elementMap().toList().toString()")[0];
+	    txt = txt.substring(2, txt.length - 2);
       if (!firstrow) {
         tdata += ",";
         }
@@ -68,6 +69,7 @@
       }
     }
   tdata += "]";
+  console.log(tdata);
   tdata = JSON.parse(tdata);
   var header = "<tr>";
   for (var i = 0; i < columns.length; i++) {
