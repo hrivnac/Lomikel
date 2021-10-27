@@ -72,7 +72,7 @@ public class Sertex extends Wertex {
             }
           }
         }    
-      setFields(fields2fill, "phoenix"); 
+      setFields(fields2fill, null); 
       }
     }
     

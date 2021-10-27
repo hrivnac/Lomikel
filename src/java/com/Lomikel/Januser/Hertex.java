@@ -68,7 +68,7 @@ public class Hertex extends Wertex {
             }
           }
         }    
-      setFields(fields2fill, "hbase"); 
+      setFields(fields2fill, null); 
       }
     }
     
