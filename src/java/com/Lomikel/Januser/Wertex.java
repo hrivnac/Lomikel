@@ -228,10 +228,7 @@ public abstract class Wertex implements Vertex {
       String value;
       for (String field : _fields) {
         value = fields.get(field);
-        if (value == null) {
-          log.error("" + field + " missing, not filled");
-          }
-        else {
+        if (value != null) {
           property(prefix + field, value);
           }
         }
@@ -241,7 +238,9 @@ public abstract class Wertex implements Vertex {
       property("fullfill", true);
       for (Map.Entry<String, String> entry : fields.entrySet()) {
         try {
-          property(prefix + entry.getKey(), entry.getValue());
+          if (entry.getValue() != null) {
+            property(prefix + entry.getKey(), entry.getValue());
+            }
           }
         catch (SchemaViolationException e) {
           log.warn("Cannot add " + entry.getKey() + " -> " + entry.getValue(), e);
