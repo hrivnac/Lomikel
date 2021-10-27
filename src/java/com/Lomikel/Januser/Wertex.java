@@ -220,7 +220,7 @@ public abstract class Wertex implements Vertex {
       prefix = "";
       }
     else {
-      prefix = prefix.trim() + ":";
+      prefix = prefix.trim() + ".";
       }
     // fill only _fields
     if (_fields != null && _fields.length > 0) {

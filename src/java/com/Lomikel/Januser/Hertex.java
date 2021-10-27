@@ -38,6 +38,7 @@ public class Hertex extends Wertex {
     * @param vertex The original {@link Vertex}.
     * @param fields The fields to fill in from the database.
     *               All fields will be filled in if <tt>null</tt>. */
+  // TBD: rafactor with Sertex
   public Hertex(Vertex   vertex,
                 String[] fields) {
     super(vertex, fields);
