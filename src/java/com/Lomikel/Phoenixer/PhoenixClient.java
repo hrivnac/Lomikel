@@ -243,6 +243,9 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
             case "BOOLEAN": 
               result += rs.getBoolean(i + 1);
               break;
+            case "BINARY": 
+              result += rs.getString(i + 1);
+              break;
             case "INTEGER": 
               result += rs.getInt(i + 1);
               break;
@@ -262,7 +265,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
               result += rs.getDate(i + 1);
               break;
             default:
-	            log.error("Cannot get result " + i + "  of type " + md.getColumnTypeName(i + 1));
+	            log.error("Cannot get result " + md.getColumnName(i + 1).toLowerCase() + "  of type " + md.getColumnTypeName(i + 1));
               }              
            }
         }     
