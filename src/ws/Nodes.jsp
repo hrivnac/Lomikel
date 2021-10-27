@@ -79,13 +79,12 @@
         else {
           firstval = false;
           }
-        tdata += "\"" + column + "\":\"" + value + "\"";
+        tdata += "\"" + column + "\":\"" + value.replace(';', ',') + "\"";
         }
       tdata += "}";
       }
     }
   tdata += "]";
-  console.log(tdata);
   tdata = JSON.parse(tdata);
   var header = "<tr>";
   for (var i = 0; i < columns.length; i++) {

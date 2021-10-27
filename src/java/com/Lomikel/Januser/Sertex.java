@@ -54,7 +54,7 @@ public class Sertex extends Wertex {
         }
       Map<String, Map<String, String>> results = _client.scan(null, searchMap, "*", 0, 0, false, true);
       if (results != null && !results.isEmpty()) {
-        property("phoenix", true);
+        property(null, true);
         }
       Map<String, String> allFields = results.get(rowkey());
       Map<String, String> fields2fill;
