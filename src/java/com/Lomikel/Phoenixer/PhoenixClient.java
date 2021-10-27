@@ -244,7 +244,8 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
               result += rs.getBoolean(i + 1);
               break;
             case "BINARY": 
-              result += new String(rs.getBytes(i + 1), "UTF-16LE"); // TBD: ?
+              result += rs.getString(i + 1);
+              //result += new String(rs.getBytes(i + 1), "UTF-16LE");
               break;
             case "BINARY ARRAY": 
               result += rs.getString(i + 1);
