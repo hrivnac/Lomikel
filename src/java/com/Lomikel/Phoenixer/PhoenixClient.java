@@ -261,6 +261,9 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
             case "SMALLINT": 
               result += rs.getShort(i + 1);
               break;
+            case "SMALLINT ARRAY": 
+              result += rs.getString(i + 1);
+              break;
             case "VARCHAR": 
               result += rs.getString(i + 1);
               break;
