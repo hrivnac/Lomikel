@@ -57,7 +57,7 @@
         if (inside > 0 && tj == ",") {
           tj = ";";
           }
-        txt1 =+ tj;
+        txt1 += tj;
         }
       txt = txt1;
       if (!firstrow) {
