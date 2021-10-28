@@ -216,6 +216,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     log.info("Query: " + sql);
     Statement st = null;
     String result = "";
+    String r;
     boolean firstRes = true;
     boolean firstVal;
     try {
@@ -237,44 +238,47 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
           else {
             firstVal = false;
             }
-          result += md.getColumnName(i + 1).toLowerCase() + "=";
-          //result += rs.getString(i + 1);
+          r = "";
+          //r += rs.getString(i + 1);
           switch (md.getColumnTypeName(i + 1)) {
             case "BOOLEAN": 
-              result += rs.getBoolean(i + 1);
+              r += rs.getBoolean(i + 1);
               break;
             case "BINARY": 
-              result += "***";
+              r += "***";
               //result += rs.getString(i + 1);
               //result += new String(rs.getBytes(i + 1), "UTF-16LE");
               break;
             case "BINARY ARRAY": 
-              result += rs.getString(i + 1);
+              r += rs.getString(i + 1);
               break;
             case "INTEGER": 
-              result += rs.getInt(i + 1);
+              r += rs.getInt(i + 1);
               break;
             case "FLOAT": 
-              result += rs.getFloat(i + 1);
+              r += rs.getFloat(i + 1);
               break;
             case "BIGINT": 
-              result += rs.getLong(i + 1);
+              r += rs.getLong(i + 1);
               break;
             case "SMALLINT": 
-              result += rs.getShort(i + 1);
+              r += rs.getShort(i + 1);
               break;
             case "SMALLINT ARRAY": 
-              result += rs.getString(i + 1);
+              r += rs.getString(i + 1);
               break;
             case "VARCHAR": 
-              result += rs.getString(i + 1);
+              r += rs.getString(i + 1);
               break;
             case "TIMESTAMP": 
-              result += rs.getDate(i + 1);
+              r += rs.getDate(i + 1);
               break;
             default:
 	            log.error("Cannot get result " + md.getColumnName(i + 1).toLowerCase() + "  of type " + md.getColumnTypeName(i + 1));
-              }              
+              }  
+           if (!rs.wasNull()) {
+             result += md.getColumnName(i + 1).toLowerCase() + "=" + r;
+             }
            }
         }     
       rs.close();
