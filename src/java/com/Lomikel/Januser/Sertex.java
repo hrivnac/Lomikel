@@ -2,6 +2,7 @@ package com.Lomikel.Januser;
 
 import com.Lomikel.DB.Client;
 import com.Lomikel.Phoenixer.PhoenixClient;
+import com.Lomikel.Phoenixer.PhoenixSchema;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -86,6 +88,25 @@ public class Sertex extends Wertex {
   @Override
   public Client client() {
     return _client;
+    }
+    
+  /** Set the schema to form the correspondence between
+    * Graph and database. It should be set before any database request.
+    * @param lbl         The {@link Vertex} label.
+    * @param cl          The {@link Class} representing this {@link Wertex}.
+    * @param rowkeyNames The names of the common keys in Graph {@link Vertex} and 
+    *                    database. */
+  public static void setSchema(String        lbl,
+                               Class         cl,
+                               PhoenixSchema schema) {
+    log.info("Setting schema for " + cl.getCanonicalName() + ": " + schema);
+    _schemas.put(lbl, schema);
+    setRowkeyNames(lbl, cl, schema.rowkeyNames());
+    }
+    
+  /** TBD */
+  public static PhoenixSchema schema(String lbl) {
+    return _schemas.get(lbl);
     }
   
   /** Enhance {@link Vertex} with properties from Phoenix database.
@@ -206,6 +227,8 @@ public class Sertex extends Wertex {
     }
     
   private static PhoenixClient _client;
+  
+  private static Map<String, PhoenixSchema> _schemas = new TreeMap<>();
     
   /** Logging . */
   private static Logger log = Logger.getLogger(Sertex.class);

@@ -63,7 +63,7 @@ public abstract class Wertex implements Vertex {
         }
       }
     }
-    
+        
   /** Set the names of the row keys to form the correspondence between
     * Graph and database. It should be set before any database request.
     * @param lbl         The {@link Vertex} label.
