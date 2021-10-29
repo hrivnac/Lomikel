@@ -42,7 +42,24 @@
     edge1 = edges[i];
     id1 = edge1.id;
     if (edge1.title.split(':')[0] == tit) {
-	    txt = callGremlinValues(gr + ".E('" + id1 + "').valueMap().toList().toString().replace(']', '').replace('[', '')")[0];
+	    txt = callGremlinValues(gr + ".E('" + id1 + "').elementMap().toList().toString()")[0];
+	    txt = txt.substring(2, txt.length - 2);
+	    txt1 = "";
+	    inside = 0;
+	    for (var j = 0; j < txt.length; j++) {
+	      tj = txt[j]
+        if (tj == "[") {
+          inside++;
+          }
+        else if (tj == "]") {
+          inside--;
+          }
+        if (inside > 0 && tj == ",") {
+          tj = ";";
+          }
+        txt1 += tj;
+        }
+      txt = txt1;
       if (!firstrow) {
         tdata += ",";
         }
