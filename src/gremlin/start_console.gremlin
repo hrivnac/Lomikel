@@ -5,3 +5,18 @@ home = args[1]
 graph = JanusGraphFactory.open(prop)
 g = graph.traversal()
 c = graph.configuration()
+
+def hi_lomikel() {
+  return "Hello World from Lomikel console !"
+  }
+
+def get_or_create(g, lbl, name, value) {
+  return g.V().has('lbl', lbl).
+               has(name, value).
+               fold().
+               coalesce(unfold(),
+                        addV(lbl).
+                        property('lbl', lbl).
+                        property(name, value));
+  }
+             

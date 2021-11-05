@@ -9,5 +9,16 @@ globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").se
 globals << [g : graph.traversal()]
 
 def hi_lomikel() {
-  return "Hello World from Lomikel !"
+  return "Hello World from Lomikel server !"
   }
+  
+def get_or_create(lbl, name, value) {
+  return g.V().has('lbl', lbl).
+               has(name, value).
+               fold().
+               coalesce(unfold(),
+                        addV(lbl).
+                        property('lbl', lbl).
+                        property(name, value));
+  }
+             
