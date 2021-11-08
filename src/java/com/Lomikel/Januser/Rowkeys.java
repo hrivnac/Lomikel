@@ -26,24 +26,36 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Rowkeys {
 
+  /** Create.
+    * @param rowkeyNames The array of rowkey names. */
   public Rowkeys(String[] rowkeyNames) {
     _rowkeyNames = rowkeyNames;
     }
 
+  /** Put in a rowkey.
+    * @param rowkeyName The name of the rowkey.
+    * @param rowkey     The value of the rowkey. */
   public void put(String rowkeyName,
                   String rowkey) {
     _rowkeys.put(rowkeyName, rowkey);
     }
 
     
-  // TBD: check correct size
+  /** Set all rowkeys.
+    * @param rowkeys The rowkeys. */
   public void set(String[] rowkeys) {
+    if (rowkeys.length != _rowkeyNames.length) {
+      log.error("Too few/many rowkeys: " + rowkeys.length + " instead of " + _rowkeyNames.length);
+      return;
+      }
     _rowkeys.clear();
     for (int i = 0; i < _rowkeyNames.length; i++) {
       put(_rowkeyNames[i], rowkeys[i]);
       }
     }
     
+  /** Set all rowkeys.
+    * @param rowkeys The rowkeys as <tt>name=value</tt> separated by <tt>#</tt>. */
   // TBD: check correct size and names
   public void set(String rowkeys) {
     _rowkeys.clear();
@@ -54,11 +66,15 @@ public class Rowkeys {
       }
     }
     
-  // TBD: check for correct name
+  /** Get one rowkey.
+    * @param rowkeyName The rowkey name to get.
+    * @return           The value of the rowkey. */
   public String get(String rowkeyName) {
     return _rowkeys.get(rowkeyName);
     }
     
+  /** Get all rowkeys.
+    * @return The {@link Map} of all rowkeys. */
   public Map<String, String> get() {
     return _rowkeys;
     }
@@ -71,5 +87,8 @@ public class Rowkeys {
   private String[] _rowkeyNames;
   
   private Map<String, String> _rowkeys = new HashMap<>();
+
+  /** Logging . */
+  private static Logger log = Logger.getLogger(Rowkeys.class);
   
   } 

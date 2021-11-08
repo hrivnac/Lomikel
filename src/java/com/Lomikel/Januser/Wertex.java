@@ -266,6 +266,10 @@ public abstract class Wertex implements Vertex {
     * @return         The enhanced {@link Vertex}, if possible. */
   public static Vertex enhance(Vertex vertex,
                                String fields) {
+    if (vertex == null) {
+      log.error("Cannot enhance null vertex");
+      return vertex;
+      }
     vertex = Hertex.enhance(vertex, fields);
     vertex = Sertex.enhance(vertex, fields);
     return vertex;

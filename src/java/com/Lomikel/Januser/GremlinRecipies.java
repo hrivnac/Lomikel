@@ -48,7 +48,7 @@ import org.apache.log4j.Logger;
 public class GremlinRecipies {
     
   /** Create and attach to {@link GraphTraversalSource}.
-    * @param g The attached  {@link GraphTraversalSource}. */
+    * @param g The attached {@link GraphTraversalSource}. */
   public GremlinRecipies(GraphTraversalSource g) {
     _g = g;
     }

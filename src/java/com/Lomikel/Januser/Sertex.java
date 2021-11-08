@@ -136,7 +136,7 @@ public class Sertex extends Wertex {
       return newVertex;
       }
     catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      log.warn( "Cannot enhance as " + cl, e);
+      log.warn( "Cannot enhance as " + cl);
       log.debug("Cannot enhance as " + cl, e);
       return vertex;
       }
