@@ -285,10 +285,12 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
       st.close();
       }
     catch (SQLException se) {
-      se.printStackTrace();
+      log.error("Query " + sql + " has failed");
+      log.debug("Query " + sql + " has failed", se);
       }
     catch (Exception e) {
-      e.printStackTrace();
+      log.error("Query " + sql + " has failed");
+      log.debug("Query " + sql + " has failed", e);
       }
     finally {
       try {
@@ -297,7 +299,12 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
           }
         }
       catch (SQLException se2) {
+        log.error("Query " + sql + " has failed");
+        log.debug("Query " + sql + " has failed", se2);
         } 
+      }
+    if (result.trim().equals("")) {
+      result = null;
       }
     log.info("Result: " + result);
     return result;
