@@ -275,6 +275,11 @@ public abstract class Wertex implements Vertex {
     return vertex;
     }
 
+  /** TBD */
+  public Vertex vertex() {
+    return _vertex;
+    }
+    
   private Vertex _vertex;  
   
   private String[] _rowkeys;
