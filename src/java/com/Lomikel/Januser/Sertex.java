@@ -187,6 +187,7 @@ public class Sertex extends Wertex {
     if (_client != null) {
       msg += "\tenhancing representations: " + _client.representations();
       }
+    msg += "\n\t" + super.toString();
     return msg;
     }
     

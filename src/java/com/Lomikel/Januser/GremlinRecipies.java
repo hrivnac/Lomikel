@@ -280,7 +280,7 @@ public class GremlinRecipies {
       }
     }
     
-  /** Add multiple properties.
+  /** Check multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
     * @param values The proerties values (<tt>*</tt> will skip search for that value).
@@ -300,7 +300,7 @@ public class GremlinRecipies {
     return v;
     }
     
-  /** Check multiple properties.
+  /** Add multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
     * @param values The proerties values (<tt>*</tt> will skip search for that value).
