@@ -174,7 +174,7 @@ public class GremlinRecipies {
      return getOrCreates(label, propertyName, propertyValue).get(0);
      }
      
-  /** Get a {@link Vertex}, create it if necessary.
+  /** Get a {@link Vertex}s, create them if necessary.
     * @param label         The {@link Vertex} label.
     * @param propertyName  The name of {@link Vertex} property.
     * @param propertyValue The value of {@link Vertex} property.
@@ -215,7 +215,8 @@ public class GremlinRecipies {
        return null;
        }
      List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
-                                                                                                    .coalesce(unfold(), addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
+                                                                                                    .coalesce(unfold(),
+                                                                                                              addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
      if (vertexes.size() > 1) {
        log.warn("" + vertexes.size() + " vertices found, only the first one returned");
        }
@@ -297,6 +298,7 @@ public class GremlinRecipies {
         v = v.has(names[i], values[i]);
         }
       }
+    log.info(v);
     return v;
     }
     
