@@ -188,7 +188,11 @@ public class GremlinRecipies {
      //List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
      //                                                                                               .coalesce(unfold(),
      //                                                                                                         addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
-     GraphTraversal<Vertex, Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
+     GraphTraversal<Vertex, Vertex> vertexes;
+     vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
+     if (!vertexes.hasNext()) {
+       vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues);
+       }
      return vertexes;
      }
     
@@ -249,7 +253,7 @@ public class GremlinRecipies {
   /** Check multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
-    * @param values The proerties values (<tt>*</tt> will skip search for that value).
+    * @param values The proerties values (<tt>null</tt> will skip search for that value).
     * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
   private GraphTraversal<Vertex, Vertex> hasProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
@@ -269,7 +273,7 @@ public class GremlinRecipies {
   /** Add multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
-    * @param values The proerties values (<tt>*</tt> will skip search for that value).
+    * @param values The properties values (<tt>null</tt> will skip search for that value).
     * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
   private GraphTraversal<Vertex, Vertex> addProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
