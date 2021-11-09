@@ -181,15 +181,15 @@ public class Sertex extends Wertex {
     return vs1;
     }
    
-  @Override
-  public String toString() {
-    String msg = "Vertex backed up with " + _client;
-    if (_client != null) {
-      msg += "\tenhancing representations: " + _client.representations();
-      }
-    msg += "\n\t" + super.toString();
-    return msg;
-    }
+  //@Override
+  //public String toString() {
+  //  String msg = "Vertex backed up with " + _client;
+  //  if (_client != null) {
+  //    msg += "\tenhancing representations: " + _client.representations();
+  //    }
+  //  msg += "\n\t" + super.toString();
+  //  return msg;
+  //  }
     
   private static PhoenixClient _client;
   
