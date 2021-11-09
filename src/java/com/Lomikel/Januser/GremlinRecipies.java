@@ -259,7 +259,7 @@ public class GremlinRecipies {
        return v;
        }
     for (int i = 0; i < names.length; i++) {
-      if (!values[i].toString().trim().equals("*")) {
+      if (values[i] != null) {
         v = v.has(names[i], values[i]);
         }
       }
@@ -279,7 +279,7 @@ public class GremlinRecipies {
        return v;
        }
     for (int i = 0; i < names.length; i++) {
-      if (!values[i].toString().trim().equals("*")) {
+      if (values[i] != null) {
         v.property(names[i], values[i]);
         }
       }
