@@ -200,29 +200,16 @@ public class GremlinRecipies {
        }
      return vertexes;
      }
-       
-  /** Get a {@link Vertex}, create it if necessary.
-    * @param label          The {@link Vertex} label.
-    * @param propertyNames  The name of {@link Vertex} properties.
-    * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
-    * @return               The created {@link Vertex}. 
-    *                       If multiple {@link Vertex}es exist, only thee first one is given. */
-  // TBD: check if it is at least one
-  public Vertex getOrCreate(String   label,
-                            String[] propertyNames,
-                            Object[] propertyValues) {
-     return getOrCreates(label, propertyNames, propertyValues).get(0);
-     }
-     
+            
   /** Get {@link Vertex}es, create them if necessary.
     * @param label          The {@link Vertex} label.
     * @param propertyNames  The name of {@link Vertex} properties.
     * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
     * @return               The created {@link Vertex}es. */
   // TBD: allow replacing
-  public List<Vertex> getOrCreates(String label,
-                                   String[] propertyNames,
-                                   Object[] propertyValues) {
+  public List<Vertex> getOrCreate(String label,
+                                  String[] propertyNames,
+                                  Object[] propertyValues) {
      if (propertyNames.length != propertyValues.length) {
        log.error("Wrong number of search values: " + propertyValues.length + ", should be: " + propertyNames.length);
        return null;

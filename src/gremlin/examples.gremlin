@@ -200,7 +200,7 @@ g.V().has('lbl', 'candidate').has('direction', geoWithin(Geoshape.circle(29, 108
 // prevent auto-iteration (in console)
 g.V();null
 
-// supress output
+// supress output (disable automatic iteration in console)
 g.V().limit(10);[]
 
 // show result object methods
