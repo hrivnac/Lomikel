@@ -161,69 +161,34 @@ public class GremlinRecipies {
       }
     }              
        
-  /** Get a {@link Vertex}, create it if necessary.
+  /** Get  {@link Vertex}es, create it if necessary.
     * @param label         The {@link Vertex} label.
     * @param propertyName  The name of {@link Vertex} property.
     * @param propertyValue The value of {@link Vertex} property.
     * @return              The created {@link Vertex}es.
     *                      If multiple {@link Vertex}es exist, only thee first one is given. */
-  // TBD: check if it is at least one
-  public Vertex getOrCreate(String label,
-                            String propertyName,
-                            Object propertyValue) {
-     return getOrCreates(label, propertyName, propertyValue).get(0);
+  public GraphTraversal<Vertex, Vertex> getOrCreate(String label,
+                                                    String propertyName,
+                                                    Object propertyValue) {
+     return getOrCreate(label, propertyName, propertyValue);
      }
-     
-  /** Get a {@link Vertex}s, create them if necessary.
-    * @param label         The {@link Vertex} label.
-    * @param propertyName  The name of {@link Vertex} property.
-    * @param propertyValue The value of {@link Vertex} property.
-    * @return              The created {@link Vertex}es. */
-  // TBD: allow replacing
-  // TBD: refactor
-  public List<Vertex> getOrCreates(String label,
-                                   String propertyName,
-                                   Object propertyValue) {
-     List<Vertex> vertexes = g().V().has("lbl", label)
-                                    .has(propertyName, propertyValue)
-                                    .fold()
-                                    .coalesce(unfold(), 
-                                              g().addV(label)
-                                                 .property("lbl", label)
-                                                 .property(propertyName, propertyValue)).toList();
-     if (vertexes.size() > 1) {
-       log.warn("" + vertexes.size() + " vertices found, only the first one returned");
-       }
-     else if (vertexes.size() == 0) {
-       log.error("No vertex found");
-       return null;
-       }
-     return vertexes;
-     }
-            
+                
   /** Get {@link Vertex}es, create them if necessary.
     * @param label          The {@link Vertex} label.
     * @param propertyNames  The name of {@link Vertex} properties.
     * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
     * @return               The created {@link Vertex}es. */
-  // TBD: allow replacing
-  public List<Vertex> getOrCreate(String label,
-                                  String[] propertyNames,
-                                  Object[] propertyValues) {
+  public GraphTraversal<Vertex, Vertex> getOrCreate(String label,
+                                                    String[] propertyNames,
+                                                    Object[] propertyValues) {
      if (propertyNames.length != propertyValues.length) {
        log.error("Wrong number of search values: " + propertyValues.length + ", should be: " + propertyNames.length);
        return null;
        }
-     List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
-                                                                                                    .coalesce(unfold(),
-                                                                                                              addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
-     if (vertexes.size() > 1) {
-       log.warn("" + vertexes.size() + " vertices found, only the first one returned");
-       }
-     else if (vertexes.size() == 0) {
-       log.error("No vertex found");
-       return null;
-       }
+     //List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
+     //                                                                                               .coalesce(unfold(),
+     //                                                                                                         addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
+     GraphTraversal<Vertex, Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
      return vertexes;
      }
     
@@ -298,7 +263,6 @@ public class GremlinRecipies {
         v = v.has(names[i], values[i]);
         }
       }
-    log.info(v);
     return v;
     }
     
