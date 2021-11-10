@@ -150,9 +150,7 @@ public class Sertex extends Wertex {
     * @param lbl     The {@link Vertex} label.
     * @param rowkey  The {@link Vertex} <tt>rowkeys</tt> value. Their names are taken from the schema.
     * @param g        The {@link GraphTraversalSource} to be used to execute operations.
-    * @param fields  The coma-separated list of fields to fill.
-    *                <tt>null</tt> will fill all fields.
-    *                Empty String will fill nothing besides rowkey fields.
+    * @param enhance Whether enhance all values from the <em>Phoenix</em>.
     * @return        The created {@link Vertex}es. It will be created even when no corresponding
     *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later. */
   public static GraphTraversal<Vertex, Vertex> getOrCreate(String                 lbl,
@@ -167,7 +165,9 @@ public class Sertex extends Wertex {
     * @param lbl     The {@link Vertex} label.
     * @param rowkey  The {@link Vertex} <tt>rowkeys</tt> value. Their names are taken from the schema.
     * @param g       The {@link GraphTraversalSource} to be used to execute operations.
-    * @param enhance Whether enhance all values from the <em>Phoenix</em>.
+    * @param fields  The coma-separated list of fields to fill.
+    *                <tt>null</tt> will fill all fields.
+    *                Empty String will fill nothing besides rowkey fields.
     * @return        The created {@link Vertex}es. It will be created even when no corresponding
     *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later.
     *                      If multiple {@link Vertex}es exist, only thee first one is given. */
@@ -177,10 +177,8 @@ public class Sertex extends Wertex {
                                                            GraphTraversalSource   g,
                                                            String                 fields) {
     GraphTraversal<Vertex, Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys);
-    if (fields != null) {
-      while (vertexes.hasNext()) {
-        enhance(vertexes.next(), fields);
-        }
+    while (vertexes.hasNext()) {
+      enhance(vertexes.next(), fields);
       }
     //List<Vertex> vs1 = new ArrayList<>();
     //for (Vertex v : vs) {
