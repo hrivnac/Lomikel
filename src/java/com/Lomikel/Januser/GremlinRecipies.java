@@ -190,7 +190,12 @@ public class GremlinRecipies {
      //                                                                                                         addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
      GraphTraversal<Vertex, Vertex> vertexes;
      vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
-     //if (!vertexes.hasNext()) {
+     if (vertexes.hasNext()) {
+       log.info("Existing vertexes found");
+       }
+     else {
+       log.info("No existing vertexes found - searching backend databases");
+       }
      //  vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues);
      //  }
      return vertexes;
