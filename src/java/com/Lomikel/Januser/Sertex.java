@@ -67,11 +67,13 @@ public class Sertex extends Wertex {
       else {
         fields2fill = new HashMap<>();
         for (String field : fields) {
-          if (!allFields.containsKey(field)) {
-            log.warn("Cannot get " + field + " from " + allFields);
-            }
-          else {
-            fields2fill.put(field, allFields.get(field));
+          if (!field.trim().equals("")) {
+            if (!allFields.containsKey(field)) {
+              log.warn("Cannot get " + field + " from " + allFields);
+              }
+            else {
+              fields2fill.put(field, allFields.get(field));
+              }
             }
           }
         }    
