@@ -195,9 +195,8 @@ public class GremlinRecipies {
        }
      else {
        log.info("No existing vertexes found - searching backend databases");
+       vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues);
        }
-     //  vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues);
-     //  }
      return vertexes;
      }
     
