@@ -175,6 +175,9 @@ public class Sertex extends Wertex {
                                                            GraphTraversalSource   g,
                                                            String                 fields) {
     GraphTraversal<Vertex, Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys);
+    while (vertexes.hasNext()) {
+      enhance(vertexes.next(), fields);
+      }
     //List<Vertex> vs1 = new ArrayList<>();
     //for (Vertex v : vs) {
     //  vs1.add(enhance(v, fields));

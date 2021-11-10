@@ -274,11 +274,6 @@ public abstract class Wertex implements Vertex {
     vertex = Sertex.enhance(vertex, fields);
     return vertex;
     }
-
-  /** TBD */
-  public Vertex vertex() {
-    return _vertex;
-    }
     
   private Vertex _vertex;  
   
