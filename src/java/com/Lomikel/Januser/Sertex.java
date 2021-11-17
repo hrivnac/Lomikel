@@ -46,7 +46,7 @@ public class Sertex extends Wertex {
   public Sertex(Vertex   vertex,
                 String[] fields) {
     super(vertex);
-    if(!property("phoenix").isPresent()) {
+    if(property("phoenix").isPresent()) {
       log.info("Fields already filled");
       return;
       }
