@@ -46,8 +46,16 @@ public class Sertex extends Wertex {
   public Sertex(Vertex   vertex,
                 String[] fields) {
     super(vertex);
+    if(!property("phoenix").isPresent()) {
+      log.info("Fields already filled");
+      return;
+      }
     if (_client == null) {
-      log.warn("PhoenixClient is not set, not dressing Vertex as Sertex");
+      log.warn("PhoenixClient is not set");
+      return;
+      }
+    if (fields != null && fields.length == 0) {
+      log.info("No fields are set");
       return;
       }
     if (rowkeys() != null && rowkeys().length == rowkeyNames().length) {
@@ -62,6 +70,7 @@ public class Sertex extends Wertex {
       Map<String, String> allFields = results.get(rowkey());
       Map<String, String> fields2fill;
       if (fields == null) {
+        log.info("Filling all fields");
         fields2fill = allFields;
         }
       else {

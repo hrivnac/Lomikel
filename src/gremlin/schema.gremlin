@@ -18,7 +18,6 @@ lbl           = mgmt.makePropertyKey('lbl'          ).dataType(String.class ).ca
 name          = mgmt.makePropertyKey('name'         ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 hbase         = mgmt.makePropertyKey('hbase'        ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
 phoenix       = mgmt.makePropertyKey('phoenix'      ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
-fullfill      = mgmt.makePropertyKey('fullfill'     ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
 x             = mgmt.makePropertyKey('x'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
 y             = mgmt.makePropertyKey('y'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
 z             = mgmt.makePropertyKey('z'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
