@@ -188,9 +188,9 @@ public class GremlinRecipies {
      //List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
      //                                                                                               .coalesce(unfold(),
      //                                                                                                         addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
-     GraphTraversal<Vertex, Vertex> vertexes;
-     vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
-     if (vertexes.hasNext()) {
+     GraphTraversal<Vertex, Vertex> vertexes0 = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
+     GraphTraversal<Vertex, Vertex> vertexes = vertexes0.asAdmin().clone();
+     if (vertexes0.hasNext()) {
        log.info(""  + vertexes.count() + " existing vertexes found");
        }
      else {
