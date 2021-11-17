@@ -9,6 +9,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 
 // Java
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.reflect.Constructor;
@@ -126,10 +128,10 @@ public class Hertex extends Wertex {
     * @param enhance Whether enhance all values from the <em>HBase</em>.
     * @return        The created {@link Vertex}. It will be created even when no corresponding
     *                entry exists in the <em>HBase</em>. In that case, it can be enhanced later. */
-  public static GraphTraversal<Vertex, Vertex> getOrCreate(String                 lbl,
-                                                           String                 rowkey,
-                                                           GraphTraversalSource   g,
-                                                           boolean                enhance) {
+  public static List<Vertex> getOrCreate(String                 lbl,
+                                         String                 rowkey,
+                                         GraphTraversalSource   g,
+                                         boolean                enhance) {
     return getOrCreate(lbl, rowkey, g, enhance ? null : "");
     }
    
@@ -143,12 +145,15 @@ public class Hertex extends Wertex {
     *                Empty String will fill nothing besides rowkey fields.
     * @return        The created {@link Vertex}. It will be created even when no corresponding
     *                entry exists in the <em>HBase</em>. In that case, it can be enhanced later. */
-  public static GraphTraversal<Vertex, Vertex> getOrCreate(String                 lbl,
-                                                           String                 rowkey,
-                                                           GraphTraversalSource   g,
-                                                           String                 fields) {
-    GraphTraversal<Vertex, Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyName(representant(lbl)), rowkey);
-    //v = enhance(v, fields);
+  public static List<Vertex> getOrCreate(String                 lbl,
+                                         String                 rowkey,
+                                         GraphTraversalSource   g,
+                                         String                 fields) {
+    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyName(representant(lbl)), rowkey);
+    List<Vertex> newVertexes = new ArrayList<>();
+    for (Vertex v : vertexes) {
+      newVertexes.add(enhance(v, fields));
+      }
     return vertexes;
     }
     

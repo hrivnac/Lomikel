@@ -153,10 +153,10 @@ public class Sertex extends Wertex {
     * @param enhance Whether enhance all values from the <em>Phoenix</em>.
     * @return        The created {@link Vertex}es. It will be created even when no corresponding
     *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later. */
-  public static GraphTraversal<Vertex, Vertex> getOrCreate(String                 lbl,
-                                                           String[]               rowkeys,
-                                                           GraphTraversalSource   g,
-                                                           boolean                enhance) {
+  public static List<Vertex> getOrCreate(String                 lbl,
+                                         String[]               rowkeys,
+                                         GraphTraversalSource   g,
+                                         boolean                enhance) {
     return getOrCreate(lbl, rowkeys, g, enhance ? null : "");
     }
     
@@ -172,19 +172,16 @@ public class Sertex extends Wertex {
     *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later.
     *                      If multiple {@link Vertex}es exist, only thee first one is given. */
   // TBD: more user-riendly rowkeys
-  public static GraphTraversal<Vertex, Vertex> getOrCreate(String                 lbl,
-                                                           String[]               rowkeys,
-                                                           GraphTraversalSource   g,
-                                                           String                 fields) {
-    GraphTraversal<Vertex, Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys);
-    while (vertexes.hasNext()) {
-      enhance(vertexes.next(), fields);
+  public static List<Vertex> getOrCreate(String                 lbl,
+                                         String[]               rowkeys,
+                                         GraphTraversalSource   g,
+                                         String                 fields) {
+    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys);
+    List<Vertex> newVertexes = new ArrayList<>();
+    for (Vertex v : vertexes) {
+      newVertexes.add(enhance(v, fields));
       }
-    //List<Vertex> vs1 = new ArrayList<>();
-    //for (Vertex v : vs) {
-    //  vs1.add(enhance(v, fields));
-    //  }
-    return vertexes;
+    return newVertexes;
     }
    
   //@Override

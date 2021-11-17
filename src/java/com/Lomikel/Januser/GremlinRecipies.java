@@ -161,15 +161,15 @@ public class GremlinRecipies {
       }
     }              
        
-  /** Get  {@link Vertex}es, create it if necessary.
+  /** Get {@link Vertex}es, create it if necessary.
     * @param label         The {@link Vertex} label.
     * @param propertyName  The name of {@link Vertex} property.
     * @param propertyValue The value of {@link Vertex} property.
     * @return              The created {@link Vertex}es.
     *                      If multiple {@link Vertex}es exist, only thee first one is given. */
-  public GraphTraversal<Vertex, Vertex> getOrCreate(String label,
-                                                    String propertyName,
-                                                    Object propertyValue) {
+  public List<Vertex> getOrCreate(String label,
+                                  String propertyName,
+                                  Object propertyValue) {
      return getOrCreate(label, propertyName, propertyValue);
      }
                 
@@ -178,9 +178,9 @@ public class GremlinRecipies {
     * @param propertyNames  The name of {@link Vertex} properties.
     * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
     * @return               The created {@link Vertex}es. */
-  public GraphTraversal<Vertex, Vertex> getOrCreate(String label,
-                                                    String[] propertyNames,
-                                                    Object[] propertyValues) {
+  public List<Vertex> getOrCreate(String label,
+                                  String[] propertyNames,
+                                  Object[] propertyValues) {
      if (propertyNames.length != propertyValues.length) {
        log.error("Wrong number of search values: " + propertyValues.length + ", should be: " + propertyNames.length);
        return null;
@@ -188,14 +188,13 @@ public class GremlinRecipies {
      //List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
      //                                                                                               .coalesce(unfold(),
      //                                                                                                         addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
-     GraphTraversal<Vertex, Vertex> vertexes0 = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
-     GraphTraversal<Vertex, Vertex> vertexes = vertexes0.asAdmin().clone();
-     if (vertexes0.hasNext()) {
-       log.info(""  + vertexes.count() + " existing vertexes found");
+     List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).toList();
+     if (!vertexes.isEmpty()) {
+       log.info(""  + vertexes.size() + " existing vertexes found");
        }
      else {
        log.info("No existing vertexes found - searching backend databases");
-       vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues);
+       vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues).toList();
        }
      return vertexes;
      }
