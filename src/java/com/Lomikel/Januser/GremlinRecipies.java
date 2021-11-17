@@ -191,7 +191,7 @@ public class GremlinRecipies {
      GraphTraversal<Vertex, Vertex> vertexes;
      vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
      if (vertexes.hasNext()) {
-       log.info("Existing vertexes found");
+       log.info(""  + vertexes.count() + " existing vertexes found");
        }
      else {
        log.info("No existing vertexes found - searching backend databases");
