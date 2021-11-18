@@ -106,7 +106,7 @@ public class Sertex extends Wertex {
       if (results != null && !results.isEmpty()) {
         for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
           value = entry.getValue();
-          rk = new String[rowkeys.length]
+          rk = new String[rowkeys.length];
           for (int i = 0; i < rowkeyNames.length; i++) {
             rk[i] = value.get(rowkeyNames[i]);
             }         
