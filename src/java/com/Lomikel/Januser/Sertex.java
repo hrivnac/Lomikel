@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -97,11 +99,9 @@ public class Sertex extends Wertex {
     if (rowkeys != null && rowkeys.length == rowkeyNames.length) { // TBD: error if not
       Map<String, String> searchMap = new HashMap<>();
       for (int i = 0; i < rowkeyNames.length; i++) {
-        if (rowkeys[i] != null) {
-          searchMap.put(rowkeyNames[i], rowkeys[i]);
-          }
+        searchMap.put(rowkeyNames[i], rowkeys[i]);
         }
-      String filter = String.join(",", rowkeys);
+      String filter = Arrays.stream(rowkeys).filter(rk -> rk != null).collect(Collectors.joining(","));
       Map<String, Map<String, String>> results = _client.scan(null, searchMap, filter, 0, 0, false, true);
       if (results != null && !results.isEmpty()) {
         for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
