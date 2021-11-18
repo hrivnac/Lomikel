@@ -101,9 +101,15 @@ public class Sertex extends Wertex {
         }
       String filter = String.join(",", rowkeyNames);
       Map<String, Map<String, String>> results = _client.scan(null, searchMap, filter, 0, 0, false, true);
+      Map<String, String> value;
+      String[] rk = new String[rowkeys.length];
       if (results != null && !results.isEmpty()) {
         for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-          log.info(entry.getValue());
+          value = entry.getValue();
+          for (int i = 0; i < rowkeyNames.length; i++) {
+            rk[i] = value.get(rowkeyNames[i]);
+            }         
+          existingRowkeys.add(rk);
           }
         }
       }
