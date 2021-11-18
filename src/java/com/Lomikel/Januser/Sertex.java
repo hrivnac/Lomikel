@@ -97,7 +97,9 @@ public class Sertex extends Wertex {
     if (rowkeys != null && rowkeys.length == rowkeyNames.length) { // TBD: error if not
       Map<String, String> searchMap = new HashMap<>();
       for (int i = 0; i < rowkeyNames.length; i++) {
-        searchMap.put(rowkeyNames[i], rowkeys[i]);
+        if (rowkeys[i] != null) {
+          searchMap.put(rowkeyNames[i], rowkeys[i]);
+          }
         }
       String filter = String.join(",", rowkeys);
       Map<String, Map<String, String>> results = _client.scan(null, searchMap, filter, 0, 0, false, true);
