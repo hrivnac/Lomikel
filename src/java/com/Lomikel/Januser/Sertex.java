@@ -58,7 +58,7 @@ public class Sertex extends Wertex {
       log.info("No fields are set");
       return;
       }
-    if (rowkeys() != null && rowkeys().length == rowkeyNames().length) {
+    if (rowkeys() != null && rowkeys().length == rowkeyNames().length) { // TBD: error if not
       Map<String, String> searchMap = new HashMap<>();
       for (int i = 0; i < rowkeyNames().length; i++) {
         searchMap.put(rowkeyNames()[i], rowkeys()[i]);
@@ -88,6 +88,25 @@ public class Sertex extends Wertex {
         }    
       setFields(fields2fill, null); 
       }
+    }
+    
+  /** TBD */
+  public List<String[]> lookUp(String[] rowkeys) {
+    List<String[]> existingRowkeys = new ArrayList<>();
+    if (rowkeys != null && rowkeys.length == rowkeyNames().length) { // TBD: error if not
+      Map<String, String> searchMap = new HashMap<>();
+      for (int i = 0; i < rowkeyNames().length; i++) {
+        searchMap.put(rowkeyNames()[i], rowkeys[i]);
+        }
+      String filter = String.join(",", rowkeys);
+      Map<String, Map<String, String>> results = _client.scan(null, searchMap, filter, 0, 0, false, true);
+      if (results != null && !results.isEmpty()) {
+        for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+          log.info(entry.getValue());
+          }
+        }
+      }
+    return existingRowkeys;
     }
     
   /** Set the {@link PhoenixClient} to search for additional values.

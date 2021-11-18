@@ -178,7 +178,7 @@ public class GremlinRecipies {
     * @param propertyNames  The name of {@link Vertex} properties.
     * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
     * @return               The created {@link Vertex}es. */
-  public List<Vertex> getOrCreate(String label,
+  public List<Vertex> getOrCreate(String   label,
                                   String[] propertyNames,
                                   Object[] propertyValues) {
      if (propertyNames.length != propertyValues.length) {
