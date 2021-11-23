@@ -90,7 +90,10 @@ public class Sertex extends Wertex {
       }
     }
     
-  /** TBD */
+  /** Find all potential {@link Sertex}es from <em>Phoenix</em>.
+    * @param rowkeys     The array of rowkeys, some may be <tt>null</tt> (i.e. wildcards).
+    * @param rowKeynames The array of rowkey names.
+    * @return         The found arrays of <em>rowkeys</em>. */
   public static List<String[]> lookUp(String[] rowkeys,
                                       String[] rowkeyNames) {
     List<String[]> existingRowkeys = new ArrayList<>();
