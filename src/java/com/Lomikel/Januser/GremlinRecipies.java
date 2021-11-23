@@ -190,10 +190,10 @@ public class GremlinRecipies {
      //                                                                                                         addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
      List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).toList();
      if (!vertexes.isEmpty()) {
-       log.info(""  + vertexes.size() + " existing vertexes found");
+       log.debug(""  + vertexes.size() + " existing vertexes " + label + " found");
        }
      else {
-       log.info("No existing vertexes found - searching backend databases");
+       log.debug("No existing vertexes " + label + " found - searching backend databases");
        vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues).toList();
        }
      return vertexes;
