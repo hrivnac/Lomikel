@@ -170,7 +170,7 @@ public class GremlinRecipies {
   public List<Vertex> getOrCreate(String label,
                                   String propertyName,
                                   Object propertyValue) {
-     return getOrCreate(label, propertyName, propertyValue);
+     return getOrCreate(label, new String[]{propertyName}, new Object[]{propertyValue});
      }
                 
   /** Get {@link Vertex}es, create them if necessary.
