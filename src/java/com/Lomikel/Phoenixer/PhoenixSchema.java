@@ -72,12 +72,24 @@ public class PhoenixSchema extends Schema<String> {
     
   /** Register named {@link PhoenixSchema}.
     * @param schemaName The name of the {@link PhoenixSchema} to register. 
-    * @param schemaName The {@link PhoenixSchema} to register. 
+    * @param schemaMap The {@link PhoenixSchema} to register. 
     * @param rowkeys    The rowkeys to idetify rows. */
   public static void addSchema(String              schemaName,
                                Map<String, String> schemaMap,
                                String[]            rowkeys) {
     _schemas.put(schemaName, new PhoenixSchema(schemaName, schemaMap, rowkeys));
+    }
+    
+  /** Register named {@link PhoenixSchema}.
+    * @param schemaName The name of the {@link PhoenixSchema} to register. 
+    * @param schemaMap  The {@link PhoenixSchema} to register. 
+    * @param reMap      The renaming of attributes.
+    * @param rowkeys    The rowkeys to idetify rows. */
+  public static void addSchema(String              schemaName,
+                               Map<String, String> schemaMap,
+                               Map<String, String> reMap,
+                               String[]            rowkeys) {
+    _schemas.put(schemaName, new PhoenixSchema(schemaName, schemaMap, reMap, rowkeys));
     }
     
   /** Give row identifying key names.
