@@ -237,14 +237,14 @@ public abstract class Wertex implements Vertex {
       for (Map.Entry<String, String> entry : fields.entrySet()) {
         try {
           if (entry.getValue() != null) {
-            if (entry.getValue().startsWith("[") && entry.getValue().endsWith("]")) {
-              for (String v : entry.getValue().substring(1, entry.getValue().length() - 1).split(",")) { // TBD: should get information about array from somewhere
-                property(prefix + entry.getKey(), v.trim());
-                }
-              }
-            else {
+            //if (entry.getValue().startsWith("[") && entry.getValue().endsWith("]")) {
+            //  for (String v : entry.getValue().substring(1, entry.getValue().length() - 1).split(",")) { // TBD: should get information about array from somewhere
+            //    property(prefix + entry.getKey(), v.trim());
+            //    }
+            //  }
+            //else {
               property(prefix + entry.getKey(), entry.getValue());
-              }
+            //  }
             }
           }
         catch (SchemaViolationException e) {
