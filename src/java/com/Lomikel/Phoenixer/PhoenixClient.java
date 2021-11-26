@@ -197,7 +197,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
         if (!r.trim().equals("")) {
           keyvalue = r.split("=");
           if (keyvalue.length > 1) {
-            result.put(keyvalue[0], keyvalue[1]);
+            result.put(rename(keyvalue[0]), keyvalue[1]);
             }
           }
         }
@@ -218,6 +218,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     Statement st = null;
     String result = "";
     String r;
+    String cName;
     boolean firstRes = true;
     boolean firstVal;
     try {
@@ -240,6 +241,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
             firstVal = false;
             }
           r = "";
+          cName = md.getColumnName(i + 1).toLowerCase();
           //r += rs.getString(i + 1);
           switch (md.getColumnTypeName(i + 1)) {
             case "BOOLEAN": 
@@ -276,10 +278,10 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
               r += rs.getDate(i + 1);
               break;
             default:
-	            log.error("Cannot get result " + md.getColumnName(i + 1).toLowerCase() + "  of type " + md.getColumnTypeName(i + 1));
+	            log.error("Cannot get result " + cName + "  of type " + md.getColumnTypeName(i + 1));
               }  
            if (!rs.wasNull()) {
-             result += md.getColumnName(i + 1).toLowerCase() + "=" + r;
+             result += cName + "=" + r;
              }
            }
         }     

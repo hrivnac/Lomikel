@@ -31,6 +31,19 @@ public class PhoenixSchema extends Schema<String> {
     super(schemaName, schemaMap);   
     _rowkeys = rowkeys;
     }
+  
+  /** Set overall schema.
+    * @param schemaName The name of the schema to set.
+    * @param schemaMap  The schema to set.
+    * @param reMap      The renaming of attributes.
+    * @param rowkeys    The rowkeys to idetify rows. */
+  public PhoenixSchema(String              schemaName,
+                       Map<String, String> schemaMap,
+                       Map<String, String> reMap,
+                       String[]            rowkeys) {
+    super(schemaName, schemaMap, reMap);
+    _rowkeys = rowkeys;
+    }
     
   @Override
   public String decode(String column,

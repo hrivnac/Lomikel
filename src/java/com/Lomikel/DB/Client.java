@@ -313,6 +313,14 @@ public abstract class Client<T, S extends Schema> {
     * @return    All representation of requested {@link Vertexs}. */
   public abstract Map<String, Class> representations();
     
+  /** TBD */
+  public String rename(String name) {
+    if (_schema.reMap() != null && _schema.reMap().containsKey(name)) {
+      return _schema.reMap().get(name).toString(); // BUG: toString() should not be needed
+      }
+    return name;
+    }
+  
   private String _tableName;
   
   private S _schema;

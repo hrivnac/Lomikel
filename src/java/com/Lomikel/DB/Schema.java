@@ -25,6 +25,18 @@ public abstract class Schema<T> {
     _schemaName = schemaName;
     _schemaMap  = schemaMap;
     }
+  
+  /** Set overall schema.
+    * @param schemaName The name of the schema to set.
+    * @param reMap      The renaming of attributes.
+    * @param schemaMap  The schema to set. */
+  public Schema(String              schemaName,
+                Map<String, String> schemaMap,
+                Map<String, String> reMap) {
+    _schemaName = schemaName;
+    _schemaMap  = schemaMap;
+    _reMap      = reMap;
+    }
     
   /** Decode the column value.
     * @param  column       The column to decode.
@@ -86,14 +98,22 @@ public abstract class Schema<T> {
     return _schemaMap;
     }
     
+ /** Give renaming map.
+   * @return The renaming map.*/
+  protected Map<String, String> reMap() {
+    return _reMap;
+    }
+    
   @Override
   public String toString() {
-    return "Schema " + name() + " = " + map();
+    return "Schema " + name() + " =\n\t" + map() + "\t" + reMap();
     }
    
   private String _schemaName;
     
   private Map<String, String> _schemaMap;
+    
+  private Map<String, String> _reMap;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(Schema.class);
