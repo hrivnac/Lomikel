@@ -247,7 +247,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
               break;
             case "BINARY": 
               //r += "***";
-              r = rs.getString(i + 1);
+              //r = rs.getString(i + 1);
               //r = new String(rs.getBytes(i + 1), "UTF-16LE");
               r = Base64.getEncoder().encodeToString(rs.getBytes(i + 1));
               break;
