@@ -10,6 +10,7 @@ import com.Lomikel.DB.SearchMap;
 // Java
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Base64;
 import java.text.SimpleDateFormat;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -248,6 +249,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
               //r += "***";
               r = rs.getString(i + 1);
               //r = new String(rs.getBytes(i + 1), "UTF-16LE");
+              r = Base64.getEncoder().encodeToString(rs.getBytes(i + 1));
               break;
             case "BINARY ARRAY": 
               r += rs.getString(i + 1);
