@@ -146,7 +146,9 @@ public class Sertex extends Wertex {
     setRowkeyNames(lbl, cl, schema.rowkeyNames());
     }
     
-  /** TBD */
+  /** Give the {@link PhoenixSchema} for a label.
+    * @param lbl The label for {@link PhoenixSchema}.
+    * @return    The corresponding {@link PhoenixSchema}. */
   public static PhoenixSchema schema(String lbl) {
     return _schemas.get(lbl);
     }
@@ -210,7 +212,6 @@ public class Sertex extends Wertex {
     * @return        The created {@link Vertex}es. It will be created even when no corresponding
     *                entry exists in the <em>Phoenix</em>. In that case, it can be enhanced later.
     *                      If multiple {@link Vertex}es exist, only thee first one is given. */
-  // TBD: more user-riendly rowkeys
   public static List<Vertex> getOrCreate(String                 lbl,
                                          String[]               rowkeys,
                                          GraphTraversalSource   g,

@@ -84,6 +84,9 @@
   <property name="classpath.run.content"         refid="classpath.run"/>
   <property name="classpath_phoenix.run.content" refid="classpath_phoenix.run"/>
 
+  <taskdef resource="edu/umd/cs/findbugs/anttask/tasks.properties"
+           classpath="${spotbugs}/lib/spotbugs-ant.jar" />
+
   <!-- Info =================================================================-->
     
   <target name="info"
@@ -854,6 +857,18 @@
       <sourcePath path="../src" />
       <class location="../lib/Lomikel-${version}.jar" />
       </findbugs>   
+    </target>
+    
+  <target name="spotbugs"
+          depends="jar"
+          description="SpotBugs Check">
+    <spotbugs home="${spotbugs}"
+              output="html"
+              outputFile="Spotbugs.html" >
+      <auxClasspath refid="classpath.build"/>
+      <sourcePath path="../src/java" />
+      <class location="../lib/Lomikel-${version}.jar" />
+      </spotbugs>
     </target>
 
   <!-- Clean Imports ========================================================-->  
