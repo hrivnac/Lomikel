@@ -1,19 +1,8 @@
 package com.Lomikel.Januser;
 
-import com.Lomikel.DB.Client;
-import com.Lomikel.Phoenixer.PhoenixClient;
-
-// Tinker Pop
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-
 // Java
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 // Log4J
 import org.apache.log4j.Logger;

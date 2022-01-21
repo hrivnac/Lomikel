@@ -2,9 +2,6 @@ package com.Lomikel.WebService;
 
 import com.Lomikel.Utils.DateTimeManagement;
 
-// Java
-import java.util.Map;
-
 // Log4J
 import org.apache.log4j.Logger;
 

@@ -1,19 +1,11 @@
 package com.Lomikel.Phoenixer;
 
-import com.Lomikel.Utils.Init;
-import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.DB.Schema;
-import com.Lomikel.DB.Client;
 import com.Lomikel.DB.SearchMap;
 
 // Java
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;

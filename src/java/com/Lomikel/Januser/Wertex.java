@@ -15,7 +15,6 @@ import  org.janusgraph.core.SchemaViolationException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Iterator;
-import java.util.Arrays;
 
 // Log4J
 import org.apache.log4j.Logger;

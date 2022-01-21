@@ -7,7 +7,6 @@ import com.Lomikel.Phoenixer.PhoenixSchema;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 
 // Java
 import java.util.List;
