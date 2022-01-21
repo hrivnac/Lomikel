@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public final class Icons {
   
-  private static final ClassLoader myLoader = (new Icons()).getClass().getClassLoader();
+  private static final ClassLoader myLoader = Icons.class.getClassLoader();
 
   public static final ImageIcon lomikel = new ImageIcon(myLoader.getResource("com/Lomikel/GUI/images/Lomikel.png"));
 

@@ -212,7 +212,7 @@ public class SmallHttpClient {
                                 String              json,
                                 Map<String, String> headers,
                                 String              header) throws LomikelException {
-    String answer = "";
+    StringBuffer answerB = new StringBuffer("");
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
@@ -240,13 +240,16 @@ public class SmallHttpClient {
         if (header != null) {
           for (Header h : response.getHeaders(header)) {
             for (HeaderElement helement : h.getElements()) {
-              answer += helement.getName() + " = " + helement.getValue() + "\n";
+              answerB.append(helement.getName())
+                     .append(" = ")
+                     .append(helement.getValue())
+                     .append("\n");
               }
             }
           //answer = response.getHeaders(header)[0].getElements()[0].getName();
           }
         else {
-          answer = getResponseBody(response);   
+          answerB = new StringBuffer(getResponseBody(response));   
           }
         }
       }
@@ -256,7 +259,7 @@ public class SmallHttpClient {
     finally {
       post.releaseConnection();
       }  
-    return answer;
+    return answerB.toString();
     }
     
   /** Make http post call. It accepts gzipped results.
@@ -270,7 +273,7 @@ public class SmallHttpClient {
                                String              json,
                                Map<String, String> headers,
                                String              header) throws LomikelException {
-    String answer = "";
+    StringBuffer answerB = new StringBuffer("");
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
@@ -298,13 +301,16 @@ public class SmallHttpClient {
         if (header != null) {
           for (Header h : response.getHeaders(header)) {
             for (HeaderElement helement : h.getElements()) {
-              answer += helement.getName() + " = " + helement.getValue() + "\n";
+              answerB.append(helement.getName())
+                     .append(" = ")
+                     .append(helement.getValue())
+                     .append("\n");
               }
             }
           //answer = response.getHeaders(header)[0].getElements()[0].getName();
           }
         else {
-          answer = getResponseBody(response);
+          answerB = new StringBuffer(getResponseBody(response));
           }
         }
       }
@@ -314,7 +320,7 @@ public class SmallHttpClient {
     finally {
       post.releaseConnection();
       }  
-    return answer;
+    return answerB.toString();
     }
     
   // PUT -----------------------------------------------------------------------
@@ -388,7 +394,7 @@ public class SmallHttpClient {
                                String              json,
                                Map<String, String> headers,
                                String              header) throws LomikelException {
-    String answer = "";
+    StringBuffer answerB = new StringBuffer("");
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPut put = new HttpPut(url);
     put.addHeader("Accept-Encoding", "gzip");
@@ -416,13 +422,16 @@ public class SmallHttpClient {
         if (header != null) {
           for (Header h : response.getHeaders(header)) {
             for (HeaderElement helement : h.getElements()) {
-              answer += helement.getName() + " = " + helement.getValue() + "\n";
+              answerB.append(helement.getName())
+                     .append(" = ")
+                     .append(helement.getValue())
+                     .append("\n");
               }
             }
           //answer = response.getHeaders(header)[0].getElements()[0].getName();
           }
         else {
-          answer = getResponseBody(response);   
+          answerB = new StringBuffer(getResponseBody(response));   
           }
         }
       }
@@ -432,7 +441,7 @@ public class SmallHttpClient {
     finally {
       put.releaseConnection();
       }  
-    return answer;
+    return answerB.toString();
     }
     
   /** Make http put call. It accepts gzipped results.
@@ -446,7 +455,7 @@ public class SmallHttpClient {
                               String              json,
                               Map<String, String> headers,
                               String              header) throws LomikelException {
-    String answer = "";
+    StringBuffer answerB = new StringBuffer("");
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPut put = new HttpPut(url);
     put.addHeader("Accept-Encoding", "gzip");
@@ -474,13 +483,16 @@ public class SmallHttpClient {
         if (header != null) {
           for (Header h : response.getHeaders(header)) {
             for (HeaderElement helement : h.getElements()) {
-              answer += helement.getName() + " = " + helement.getValue() + "\n";
+              answerB.append(helement.getName())
+                     .append(" = ")
+                     .append(helement.getValue())
+                     .append("\n");
               }
             }
           //answer = response.getHeaders(header)[0].getElements()[0].getName();
           }
         else {
-          answer = getResponseBody(response);
+          answerB = new StringBuffer(getResponseBody(response));
           }
         }
       }
@@ -490,7 +502,7 @@ public class SmallHttpClient {
     finally {
       put.releaseConnection();
       }  
-    return answer;
+    return answerB.toString();
     }
   
   // ---------------------------------------------------------------------------

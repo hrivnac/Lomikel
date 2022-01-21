@@ -21,8 +21,8 @@ public final class CListener implements ChangeListener {
     * analyse the {@link ChangeEvent} and perform appropriate action.
     * @param ce The {@link ChangeEvent} to be an analysed. */
   public final void stateChanged(ChangeEvent ce) {
-    String name = ((Component)ce.getSource()).getName();
-    final int value = ((JSlider)ce.getSource()).getValue();
+    //String name = ((Component)ce.getSource()).getName();
+    //final int value = ((JSlider)ce.getSource()).getValue();
     }
 
   }

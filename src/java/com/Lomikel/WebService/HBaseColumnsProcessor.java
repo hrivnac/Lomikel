@@ -28,7 +28,7 @@ public class HBaseColumnsProcessor {
     * @return      The corresponding date. */
   public String getDate(Map<String, String> entry) {
     String date = getTimestamp(entry);
-    return DateTimeManagement.time2String(Long.valueOf(date), "yyyy MM dd HH:mm:ss.nnnnnnnnn");
+    return DateTimeManagement.time2String(Long.parseLong(date), "yyyy MM dd HH:mm:ss.nnnnnnnnn");
     }
 
   /** Give the <code>ra</code> polar coordinate in degrees.

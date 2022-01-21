@@ -23,7 +23,7 @@ public final class AListener implements ActionListener {
     * analyse it and perform appropriate reaction.
     * @param ae The {@link ActionEvent} to be an analysed. */
   public final void actionPerformed(ActionEvent ae) {
-    String name = ((Component)ae.getSource()).getName();
+    //String name = ((Component)ae.getSource()).getName();
     String value = ae.getActionCommand();
     if (value.equals("Exit")) {
       System.exit(0);

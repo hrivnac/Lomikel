@@ -42,20 +42,13 @@ public class Network {
                                   int    port) {
     Socket s = null;
     try {
-      s = new Socket(host, port);
+      new Socket(host, port).close();
       return true;
       }
     catch (Exception e) {
       return false;
       }
-    finally {
-      if (s != null)
-        try {
-          s.close();
-          }
-        catch(Exception e){}
-       }
-     }
+    }
   
   /** Logging . */
   private static Logger log = Logger.getLogger(Network.class);

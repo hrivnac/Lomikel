@@ -465,13 +465,16 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                             String              filter,
                             boolean             ifkey,
                             boolean             iftime) {
+    if (r == null) {
+      return false;
+      }
     String key = Bytes.toString(r.getRow());
     if (!key.startsWith("schema") &&_evaluator != null && !evaluateResult(r)) {
       return false;
       }
     String[] ff;
     String ref;
-    if (r != null && r.getRow() != null) {
+    if (r.getRow() != null) {
       if (ifkey) {
         result.put("key:key", key);
         }

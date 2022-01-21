@@ -74,7 +74,7 @@ public class Gzipper {
         bos.close();
         bis.close();
         }
-      catch (Exception ignored) {
+      catch (IOException ignored) {
         }
       }
     return new byte[]{};

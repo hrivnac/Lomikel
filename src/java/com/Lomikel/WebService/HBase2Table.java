@@ -176,23 +176,25 @@ public class HBase2Table {
         }
       id2key.get(id).add(entry.getKey());
       }
-    String hidden = "[";
+    StringBuffer hiddenB = new StringBuffer("[");
     boolean firstEntry = true;
     for (Map.Entry<String, TreeSet<String>> e : id2key.entrySet()) {
       e.getValue().remove(e.getValue().last());
       for (String s : e.getValue()) {
         if (!firstEntry) {
-          hidden += ",";
+          hiddenB.append(",");
           }
         else {
           firstEntry = false;
           }
-        hidden += "'" + s + "'";
+        hiddenB.append("'")
+               .append(s)
+               .append("'");
         }
       }
-    hidden += "]";
-    log.debug(idCol + " " + hidden);
-    return hidden;
+    hiddenB.append("]");
+    log.debug(idCol + " " + hiddenB);
+    return hiddenB.toString();
     }
     
   /** Give subtable as a JSON array of entries in polar coordinates.
@@ -347,7 +349,7 @@ public class HBase2Table {
           z = 0;
           zA = entry0.getValue().trim().split(" ");
           for (String zSi : zA) {
-            z += Double.valueOf(zSi);
+            z += Double.parseDouble(zSi);
             }
           z = z / zA.length;
           zS = String.valueOf(z);

@@ -50,12 +50,13 @@ public class BinaryDataRepository {
 	  
 	@Override
 	public String toString() {
-	  String result = "BinaryDataRepository(" + _data.size() + ") = {";
+	  StringBuffer resultB = new StringBuffer("BinaryDataRepository(" + _data.size() + ") = {");
 	  for (Map.Entry entry : _data.entrySet()) {
-      result += entry.getKey() + ",";
+      resultB.append(entry.getKey())
+             .append(",");
       }
-	  result += "}";
-	  return result;
+	  resultB.append("}");
+	  return resultB.toString();
 	  }
 	  
 	private static Map<String, byte[]> _data;

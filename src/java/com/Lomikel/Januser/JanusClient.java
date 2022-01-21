@@ -103,7 +103,9 @@ public class JanusClient implements ModifyingGremlinClient {
     log.info("Opening " + properties);
     Properties p = new Properties();
     try {
-      p.load(new FileInputStream(properties));
+      FileInputStream propStream = new FileInputStream(properties);
+      p.load(propStream);
+      propStream.close();
       }
     catch (IOException e) {
       log.error("Properties " + properties + " cannot be loaded", e);

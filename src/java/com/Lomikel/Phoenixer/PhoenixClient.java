@@ -136,10 +136,6 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     if (filter != null && filter.contains("*")) {
       iftime = true;
       }
-    long time = System.currentTimeMillis();
-    if (stop == 0) {
-      stop = System.currentTimeMillis();
-      }
     if (key != null) {
       searchMap.clear();
       String[] keyParts = key.split("#");
@@ -150,36 +146,45 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
           }
         }
       }
-    searchMap.rmNullValues();
-    String where = "";
+    if (searchMap != null) {
+      searchMap.rmNullValues();
+      }
+    StringBuffer whereB = new StringBuffer("");
     boolean first = true;
     for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap.map()).entrySet()) {
       if (first) {
         first = false;
         }
       else {
-        where += " and ";
+        whereB.append(" and ");
         }
       if (entry.getValue() != null) {
         if (schema().type(entry.getKey()).equals("String")) {        
-          where += entry.getKey() + " = '" + entry.getValue() + "'";
+          whereB.append(entry.getKey())
+                .append(" = '")
+                .append(entry.getValue())
+                .append("'");
           }
         else {
-          where += entry.getKey() + " = " + entry.getValue();
+          whereB.append(entry.getKey())
+                .append(" = ")
+                .append(entry.getValue());
           }
         }
       }
     if (filter == null || filter.trim().equals("")) {
       filter = "*";
       }
-    String sql = "select " + filter + " from " + tableName();
-    if (!where.equals("")) {
-      sql += " where " + where;
+    StringBuffer sqlB = new StringBuffer("select " + filter + " from " + tableName());
+    if (!whereB.toString().equals("")) {
+      sqlB.append(" where ")
+          .append(whereB);
       }
     if (limit() != 0) {
-      sql += " limit " + limit();
+      sqlB.append(" limit ")
+          .append(limit());
       }
-    return sql;
+    return sqlB.toString();
     }
     
   /** Interpret the SQL answer.

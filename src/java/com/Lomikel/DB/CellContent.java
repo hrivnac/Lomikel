@@ -57,7 +57,7 @@ public class CellContent {
       return "CellContent(String : " + _sContent + ")";
       }
     else {
-      return "CellContent(" + _type + " : " + _bContent + ")";
+      return "CellContent(" + _type + ")";
       }
     }
 	  

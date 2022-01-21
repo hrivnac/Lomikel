@@ -24,7 +24,7 @@ public class PropertiesProcessor {
     * @param timestamp The timestamp.
     * @return      The corresponding date. */
   public String getDate(String timestamp) {
-    return DateTimeManagement.time2String(Long.valueOf(timestamp), "HH:mm:ss.nnnnnnnnn dd/MM/yyyy ");
+    return DateTimeManagement.time2String(Long.parseLong(timestamp), "HH:mm:ss.nnnnnnnnn dd/MM/yyyy ");
     }
     
   /** Logging . */

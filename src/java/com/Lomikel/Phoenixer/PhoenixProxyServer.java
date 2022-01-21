@@ -23,7 +23,7 @@ public class PhoenixProxyServer extends PhoenixClient
     * @param args[1] The url of the remote Phoenix server. */
   public static void main(String[] args) throws LomikelException {
     Init.init();
-    new PhoenixProxyServer(new Integer(args[0]), args[1]);
+    new PhoenixProxyServer(Integer.parseInt(args[0]), args[1]);
     }
     
   /** Start {@link SocketServer}.

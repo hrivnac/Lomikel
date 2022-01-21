@@ -228,11 +228,14 @@ public abstract class Client<T, S extends Schema> {
     * @param results The {@link Map} of results.
     * @return        The result in a readable {@link String}. */
   public static String results2String(Map<String, Map<String, String>> results) {
-    String report = "";
+    StringBuffer reportB = new StringBuffer();
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      report += entry.getKey() + " = " + entry.getValue() + "\n";
+      reportB.append(entry.getKey())
+             .append(" = ")
+             .append(entry.getValue())
+             .append("\n");
       }
-    return report;
+    return reportB.toString();
     }
     
   /** Results presented as a {@link List}.

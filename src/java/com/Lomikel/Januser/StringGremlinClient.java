@@ -92,19 +92,19 @@ public class StringGremlinClient extends GremlinClient {
                                         .addRegistry(JanusGraphIoRegistry.getInstance())
                                         .create()
                                         .createMapper();
-    String json = "[";
+    StringBuffer jsonB = new StringBuffer("[");
     boolean first = true;
     for (Result result : results) {
       if (first) {
         first = false;
         }
       else {
-        json += ",";
+        jsonB.append(",");
         }
-      json += mapper.writeValueAsString(result.getObject());
+      jsonB.append(mapper.writeValueAsString(result.getObject()));
       }
-    json += "]";
-    return json;
+    jsonB.append("]");
+    return jsonB.toString();
     }
     
   private Client _client;

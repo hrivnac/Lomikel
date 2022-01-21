@@ -137,16 +137,16 @@ public class HBaseSchema extends Schema<ByteArray> {
       }
     switch (type) {
       case "float": 
-        value = Bytes.toBytes(Float.valueOf(decodedValue));
+        value = Bytes.toBytes(Float.parseFloat(decodedValue));
         break;
       case "double": 
-        value = Bytes.toBytes(Double.valueOf(decodedValue));
+        value = Bytes.toBytes(Double.parseDouble(decodedValue));
         break;
       case "integer": 
-        value = Bytes.toBytes(Integer.valueOf(decodedValue));
+        value = Bytes.toBytes(Integer.parseInt(decodedValue));
         break;
       case "long": 
-        value = Bytes.toBytes(Long.valueOf(decodedValue));
+        value = Bytes.toBytes(Long.parseLong(decodedValue));
         break;
       case "fits": 
         value  = new byte[0]; // TBD: should disappear

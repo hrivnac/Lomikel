@@ -37,7 +37,7 @@ public class StringResource {
       is.close();
       _content = buffer.toString();
       }
-    catch (IOException | NullPointerException e) {
+    catch (IOException e) {
       throw new LomikelException("Resource " + resource + " cannot be read !", e);
       }
     }

@@ -39,6 +39,7 @@ public class ByteResource {
     try {
       FileOutputStream fos = new FileOutputStream(fn);
       fos.write(_content);
+      fos.close();
       }
     catch (IOException e) {
       System.err.println("Cannot write to file " + fn + " !\n" + e);

@@ -40,7 +40,7 @@ public class Hertex extends Wertex {
     * @param vertex The original {@link Vertex}.
     * @param fields The fields to fill in from the database.
     *               All fields will be filled in if <tt>null</tt>. */
-  // TBD: rafactor with Sertex
+  // TBD: refactor with Sertex
   public Hertex(Vertex   vertex,
                 String[] fields) {
     super(vertex, fields);
@@ -51,7 +51,7 @@ public class Hertex extends Wertex {
     if (rowkey() != null) {
       String n = null;
       Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
-      if (results != null && !results.isEmpty()) {
+      if (!results.isEmpty()) {
         property("hbase", true);
         }
       Map<String, String> allFields = results.get(rowkey());
