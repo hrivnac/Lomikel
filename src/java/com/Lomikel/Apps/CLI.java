@@ -267,11 +267,25 @@ public class CLI {
     
   /** Parse the cli arguments.
     * @param args    The cli arguments.
-    * @param helpMsg The general help message. */
-  public static void parseArgs(String[] args,
-                                String   helpMsg) {
+    * @param helpMsg The general help message.
+    * @return        The parsed {@link CommandLine}. */
+  public static CommandLine parseArgs(String[] args,
+                                      String   helpMsg) {
+    return parseArgs(args, helpMsg, null);
+    }
+    
+  /** Parse the cli arguments.
+    * @param args    The cli arguments.
+    * @param helpMsg The general help message.
+    * @param options The already initialised {@link Options}. May be <tt>null</tt>.
+    * @return        The parsed {@link CommandLine}. */
+  public static CommandLine parseArgs(String[] args,
+                                      String   helpMsg,
+                                      Options  options) {
     CommandLineParser parser = new BasicParser();
-    Options options = new Options();
+    if (options == null) {
+      options = new Options();
+      }
     options.addOption("h", "help",  false, "show help");
     options.addOption("q", "quiet", false, "minimal direct feedback");
     options.addOption("g", "gui",   false, "run in a graphical window");
@@ -282,28 +296,30 @@ public class CLI {
                                    .withArgName("file")
                                    .create("s"));
     try {
-      CommandLine line = parser.parse(options, args );
-      if (line.hasOption("help")) {
+      CommandLine cline = parser.parse(options, args );
+      if (cline.hasOption("help")) {
         new HelpFormatter().printHelp(helpMsg, options);
         System.exit(0);
         }
-      if (line.hasOption("quiet")) {
+      if (cline.hasOption("quiet")) {
         _quiet = true;
         }
-      if (line.hasOption("gui")) {
+      if (cline.hasOption("gui")) {
         _gui = true;
         }
-      if (line.hasOption("batch")) {
+      if (cline.hasOption("batch")) {
         _batch = true;
         }
-      if (line.hasOption("source")) {
-        _source = line.getOptionValue("source");
+      if (cline.hasOption("source")) {
+        _source = cline.getOptionValue("source");
         }
+      return cline;
       }
     catch (ParseException e) {
       new HelpFormatter().printHelp(helpMsg, options);
       System.exit(-1);
       }
+    return null;
     }
     
   /** Set site profile.
@@ -330,15 +346,15 @@ public class CLI {
     return _console;
     }  
     
-  private static String _profile;
+  protected static String _profile;
   
-  private static boolean _quiet = false;
+  protected static boolean _quiet = false;
   
-  private static boolean _gui = false;
+  protected static boolean _gui = false;
   
-  private static boolean _batch = false;
+  protected static boolean _batch = false;
   
-  private static String _source = null;
+  protected static String _source = null;
     
   private Interpreter _interpreter;
   
