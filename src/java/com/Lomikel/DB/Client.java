@@ -72,6 +72,7 @@ public abstract class Client<T, S extends Schema> {
     *                among <tt>exact,prefix,substring,regex</tt>.
     *                The default for key is <tt>prefix</tt>,
     *                the default for columns is <tt>substring</tt>.
+    *                The randomiser can be added with <tt>random:random:chance</tt>.
     *                It can be <tt>null</tt>.
     *                All searches are executed as prefix searches.    
     * @param filter  The names of required values as <tt>family:column,...</tt>.
@@ -112,6 +113,7 @@ public abstract class Client<T, S extends Schema> {
     *                among <tt>exact,prefix,substring,regex</tt>.
     *                The default for key is <tt>prefix</tt>,
     *                the default for columns is <tt>substring</tt>.
+    *                The randomiser can be added with <tt>random:random:chance</tt>.
     *                It can be <tt>null</tt>.
     *                All searches are executed as prefix searches.    
     * @param filter  The names of required values as <tt>family:column,...</tt>.
@@ -172,6 +174,7 @@ public abstract class Client<T, S extends Schema> {
     *                  among <tt>exact,prefix,substring,regex</tt>.
     *                  The default for key is <tt>prefix</tt>,
     *                  the default for columns is <tt>substring</tt>.
+    *                  The randomiser can be added with <tt>random:random:chance</tt>.
     *                  It can be <tt>null</tt>.
     *                  All searches are executed as prefix searches.    
     * @param filter    The names of required values as <tt>family:column,...</tt>.
@@ -203,6 +206,7 @@ public abstract class Client<T, S extends Schema> {
     *                  among <tt>exact,prefix,substring,regex</tt>.
     *                  The default for key is <tt>prefix</tt>,
     *                  the default for columns is <tt>substring</tt>.
+    *                  The randomiser can be added with <tt>random:random:chance</tt>.
     *                  It can be <tt>null</tt>.
     *                  All searches are executed as prefix searches.    
     * @param filter    The names of required values as <tt>family:column,...</tt>.

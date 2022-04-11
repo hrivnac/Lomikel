@@ -32,6 +32,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.filter.Filter;  
 import org.apache.hadoop.hbase.filter.FilterList;  
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;  
+import org.apache.hadoop.hbase.filter.RandomRowFilter;  
 import org.apache.hadoop.hbase.filter.RowFilter;  
 import org.apache.hadoop.hbase.filter.PrefixFilter;  
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
@@ -313,7 +314,10 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           column = fc[1];
           comparator = fc.length == 3 ? fc[2] : "default";
           value  = entry.getValue();
-          if (family.equals("key") && column.equals("startKey")) {
+          if (family.equals("random") && column.equals("random")) {
+            filters.add(new RandomRowFilter(Float.parseFloat(value)));
+            }
+          else if (family.equals("key") && column.equals("startKey")) {
             startKey = value;
             }
           else if (family.equals("key") && column.equals("stopKey")) {

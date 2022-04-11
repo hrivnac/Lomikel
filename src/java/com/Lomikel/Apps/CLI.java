@@ -21,32 +21,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
-// Bean Shell
-import bsh.Interpreter;
-import bsh.util.JConsole;
-import bsh.EvalError;
-
 // Java
 import java.io.InputStreamReader;
-
-// AWT
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.Color;
-import java.awt.Dimension;
-
-// Swing
-import javax.swing.JFrame;
-import javax.swing.JSplitPane;
-import javax.swing.UIManager;
-import javax.swing.ToolTipManager;
-import javax.swing.AbstractButton;
-import javax.swing.JSplitPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JToolBar;
-import javax.swing.BoxLayout;
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.ImageIcon;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -60,65 +36,11 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class CLI {
 
-  /** Start {@link Interpreter} and run forever.
-    * @param icon      The {@ImageIcon} for menu.
-    * @param toolTiple The menu tooltip.
-    * @param msg       The message so show. */
-  public CLI(ImageIcon icon,
-             String    toolTip,
-             String    msg) {
-    if (_batch) {
-      _interpreter = new Interpreter();
-      }
-    else if (_gui) {
-      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-      ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-      UIManager.put("ToolTip.font",       new Font("Dialog", Font.PLAIN, 12));
-      UIManager.put("ToolTip.foreground", new ColorUIResource(Color.red));
-      UIManager.put("ToolTip.background", new ColorUIResource(0.95f, 0.95f, 0.3f));
-      Dimension separatorDimension = new Dimension(10, 0);
-   
-      JFrame f = new JFrame();
-      
-      JToolBar north = new JToolBar();
-      north.setFloatable(true);
-      north.setLayout(new BoxLayout(north, BoxLayout.X_AXIS));
-      north.add(new AboutLabel(icon, toolTip));
-      north.addSeparator(separatorDimension);
-      north.add(new SimpleButton("Exit",
-                                 Icons.exit,
-                                 AbstractButton.CENTER,
-                                 Fonts.NONE,
-                                 Dimensions.BIG,
-                                 "Exit",
-                                 new AListener()));
-      f.getContentPane().add(north, BorderLayout.NORTH);
-
-      JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-      _console = new Console();
-      center.setLeftComponent(_console);
-      f.getContentPane().add(center, BorderLayout.CENTER);
-      
-      f.setSize(1200, 600);  
-      f.setVisible(true);      
-
-      _interpreter = new Interpreter(_console);
-      }
-    else {
-      _interpreter = new Interpreter(new InputStreamReader(System.in), System.out, System.err, true);
-      }
-    if (!_quiet) {
-      if (_gui) {
-        _console.setText(msg);
-        }
-      else {
-        _interpreter.print(msg);
-        }
-      }
-    setupInterpreter();
-    if (!_batch) {
-      new Thread(_interpreter).start();
-      }
+  /** Create. */
+  public CLI(String scriptSrc,
+             String scriptArgs) {
+    _scriptSrc  = scriptSrc;
+    _scriptArgs = scriptArgs;
     }
 
   /** Start and pass arguments on.
@@ -126,142 +48,22 @@ public class CLI {
   public static void main(String[] args) {
     Init.init();
     parseArgs(args, "java -jar Lomikel.exe.jar");
-    new CLI(Icons.lomikel,
-            "<html><h3>http://cern.ch/hrivnac/Activities/Packages/Lomikel</h3></html>",
-            "Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n");
-    }
-
-  /** Load standard init files and setup standard environment. */
-  public void setupInterpreter() {
-    // Set global reference and imports
-    try {
-      _interpreter.set("cli", this);
-      log.info("cli set");
+    if (_api.equals("bsh") ) {
+      log.info("Starting Lomikel BeanShell CLI");
+      new BSCLI(Icons.lomikel,
+                "<html><h3>http://cern.ch/hrivnac/Activities/Packages/Lomikel</h3></html>",
+                "Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n",
+                null,
+                null);
       }
-    catch (EvalError e) {
-      log.error("Cannot set cli", e);
-      log.debug("Cannot set cli", e);
+    else if (_api.equals("groovy") ) {
+      log.info("Starting Lomikel Groovy CLI");
+      new GCLI(null,
+               null);
       }
-    try {
-      interpreter().eval("import com.Lomikel.HBaser.HBaseClient");
-      log.info("HBaseClient imported");
-      }
-    catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.HBaser.HBaseClient");
-      log.debug("Cannot import com.Lomikel.HBaser.HBaseClient", e);
-      }
-    try {
-      interpreter().eval("import com.Lomikel.Januser.StringGremlinClient");
-      log.info("StringGremlinClient imported");
-      }
-    catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Januser.StringGremlinClient");
-      log.debug("Cannot import com.Lomikel.Januser.StringGremlinClient", e);
-      }      
-    try {
-      interpreter().eval("import com.Lomikel.Januser.DirectGremlinClient");
-      log.info("DirectGremlinClient imported");
-      }
-    catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Januser.DirectGremlinClient");
-      log.debug("Cannot import com.Lomikel.Januser.DirectGremlinClient", e);
-      }      
-    try {
-      interpreter().eval("import com.Lomikel.Januser.Hertex");
-      log.info("Hertex imported");
-      }
-    catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Januser.Hertex");
-      log.debug("Cannot import com.Lomikel.Januser.Hertex", e);
-      }      
-    try {
-      interpreter().eval("import com.Lomikel.Januser.Sertex");
-      log.info("Sertex imported");
-      }
-    catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Januser.Sertex");
-      log.debug("Cannot import com.Lomikel.Januser.Sertex", e);
-      }      
-    try {
-      interpreter().eval("import com.Lomikel.Phoenixer.PhoenixClient");
-      log.info("PhoenixClient imported");
-      }
-    catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Phoenixer.PhoenixClient");
-      log.debug("Cannot import com.Lomikel.Phoenixer.PhoenixClient", e);
-      }
-    try {
-      interpreter().eval("import com.Lomikel.Phoenixer.DirectPhoenixClient");
-      log.info("DirectPhoenixClient imported");
-      }
-    catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Phoenixer.DirectPhoenixClient");
-      log.debug("Cannot import com.Lomikel.Phoenixer.DirectPhoenixClient", e);
-      }
-    try {
-      interpreter().eval("import com.Lomikel.Phoenixer.PhoenixProxyClient");
-      log.info("PhoenixProxyClient imported");
-      }
-    catch (EvalError e) {
-      log.error("Cannot import com.Lomikel.Phoenixer.PhoenixProxyClient");
-      log.debug("Cannot import com.Lomikel.Phoenixer.PhoenixProxyClient", e);
-      }
-    String init = "";
-    // Source init.bsh
-    log.debug("Sourcing init.bsh");
-    try {
-      init = new StringFile("init.bsh").toString();
-      _interpreter.eval(init);
-      }
-    catch (LomikelException e) {
-      log.warn("init.bsh file cannot be read.");
-      log.debug("init.bsh file cannot be read.", e);
-      }
-    catch (EvalError e) {
-      log.error("Can't evaluate standard BeanShell expression", e);
-      }
-    // Load site profile
-    if (_profile != null) {
-      log.info("Loading profile: " + _profile);  
-      try {
-        init = new StringResource(_profile + ".bsh").toString();
-        _interpreter.eval(init);
-        }
-      catch (LomikelException e) {
-        log.warn("Profile " + _profile + " cannot be loaded.");
-        log.debug("Profile " + _profile + " cannot be loaded.", e);
-        }
-      catch (EvalError e) {
-        log.error("Can't evaluate standard BeanShell expression", e);
-        }
-      }
-    // Loading state
-    log.debug("Sourcing .state.bsh");
-    try {
-      init = new StringFile(".state.bsh").toString();
-      _interpreter.eval(init);
-      }
-    catch (LomikelException e) {
-      log.warn(".state.bsh file cannot be read.");
-      log.debug(".state.bsh file cannot be read.", e);
-      }
-    catch (EvalError e) {
-      log.error("Can't evaluate standard BeanShell expression", e);
-      }
-    // Source command line source
-    if (_source != null) {
-      log.info("Sourcing " + _source);
-      try {
-        init = new StringFile(_source).toString();
-        _interpreter.eval(init);
-        }
-      catch (LomikelException e) {
-        log.warn(_source + " file cannot be read.");
-        log.debug(_source + " file cannot be read.", e);
-        }
-      catch (EvalError e) {
-        log.error("Can't evaluate standard BeanShell expression", e);
-        }
+    else {
+      log.fatal("Unknown api language " + _api);
+      System.exit(-1);
       }
     }
     
@@ -291,10 +93,15 @@ public class CLI {
     options.addOption("g", "gui",   false, "run in a graphical window");
     options.addOption("b", "batch", false, "run in a batch");
     options.addOption(OptionBuilder.withLongOpt("source")
-                                   .withDescription("source bsh file (init.bsh is also read)")
+                                   .withDescription("source script file (init.<language> is also sourced)")
                                    .hasArg()
                                    .withArgName("file")
                                    .create("s"));
+    options.addOption(OptionBuilder.withLongOpt("api")
+                                   .withDescription("cli language: [bsh|groovy]")
+                                   .hasArg()
+                                   .withArgName("language")
+                                   .create("a"));
     try {
       CommandLine cline = parser.parse(options, args );
       if (cline.hasOption("help")) {
@@ -309,6 +116,12 @@ public class CLI {
         }
       if (cline.hasOption("batch")) {
         _batch = true;
+        }
+      if (cline.hasOption("api")) {
+        _api = cline.getOptionValue("api");
+        }
+      else {
+        _api = "bsh";
         }
       if (cline.hasOption("source")) {
         _source = cline.getOptionValue("source");
@@ -334,31 +147,21 @@ public class CLI {
     _source = source;
     }
     
-  /** Give {@link Interpreter}.
-    * @return The {@link Interprer}. */
-  public Interpreter interpreter() {
-    return _interpreter;
-    }  
-    
-  /** Give {@link JConsole}.
-    * @return The {@link JConsole}. */
-  public static JConsole console() {
-    return _console;
-    }  
-    
   protected static String _profile;
+  
+  protected static String _source = null;
+    
+  protected static String _scriptArgs;  
+    
+  protected static String _scriptSrc;
+  
+  protected static String _api = null;
   
   protected static boolean _quiet = false;
   
   protected static boolean _gui = false;
   
   protected static boolean _batch = false;
-  
-  protected static String _source = null;
-    
-  private Interpreter _interpreter;
-  
-  private static Console _console;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(CLI.class);
