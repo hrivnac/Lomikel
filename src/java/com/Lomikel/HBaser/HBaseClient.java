@@ -315,6 +315,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           comparator = fc.length == 3 ? fc[2] : "default";
           value  = entry.getValue();
           if (family.equals("random") && column.equals("random")) {
+            onlyKeys = false;
             filters.add(new RandomRowFilter(Float.parseFloat(value)));
             }
           else if (family.equals("key") && column.equals("startKey")) {
