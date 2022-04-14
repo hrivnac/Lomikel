@@ -44,6 +44,11 @@ public class GCLI extends CLI{
   public GCLI(String scriptSrc,
               String scriptArgs) {
     super(scriptSrc, scriptArgs);
+    }
+    
+  
+  @Override
+  public String execute() {
     _sharedData = new Binding();
     if (_batch) {
       _shell = new GroovyShell(_sharedData);
@@ -54,11 +59,13 @@ public class GCLI extends CLI{
     else {
       _shell = new GroovyShell(_sharedData);
       }
-    setupShell();
+    return setupShell();
     }
 
-  /** Load standard init files and setup standard environment. */
-  public void setupShell() {
+  /** Load standard init files and setup standard environment.
+    * @return TBD */
+  public String setupShell() {
+    String result = "";
     // Set global reference and imports
     _sharedData.setVariable("cli", this);
     log.info("cli set");
@@ -67,7 +74,7 @@ public class GCLI extends CLI{
     log.info("Sourcing init.groovy");
     try {
       init = new StringFile("init.groovy").toString();
-      _shell.evaluate(init);
+      result += _shell.evaluate(init);
       }
     catch (LomikelException e) {
       log.warn("init.groovy file cannot be read.");
@@ -78,7 +85,7 @@ public class GCLI extends CLI{
       log.info("Loading profile: " + _profile);  
       try {
         init = new StringResource(_profile + ".groovy").toString();
-        _shell.evaluate(init);
+        result += _shell.evaluate(init);
         }
       catch (LomikelException e) {
         log.warn("Profile " + _profile + " cannot be loaded.");
@@ -89,7 +96,7 @@ public class GCLI extends CLI{
     log.debug("Sourcing .state.groovy");
     try {
       init = new StringFile(".state.groovy").toString();
-      _shell.evaluate(init);
+      result += _shell.evaluate(init);
       }
     catch (LomikelException e) {
       log.warn(".state.groovy file cannot be read.");
@@ -100,7 +107,7 @@ public class GCLI extends CLI{
       log.info("Sourcing " + _source);
       try {
         init = new StringFile(_source).toString();
-        _shell.evaluate(init);
+        result += _shell.evaluate(init);
         }
       catch (LomikelException e) {
         log.warn(_source + " file cannot be read.");
@@ -113,13 +120,14 @@ public class GCLI extends CLI{
       String script = "";
       try {
         script = new StringResource(_scriptSrc).toString();
-        shell().evaluate(_scriptArgs + script);
+        result += shell().evaluate(_scriptArgs + script);
         }
       catch (LomikelException e) {
         log.error("Cannot read " + _scriptSrc);
         log.debug("Cannot read " + _scriptSrc, e);
         }
       }
+    return result;
     }
     
   /** Parse the cli arguments.

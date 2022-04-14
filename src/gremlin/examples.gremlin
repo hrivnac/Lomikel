@@ -91,6 +91,9 @@ g.V().has(label, neq('dataset')).count()
 // formatted valueMap
 ...valueMap().toList().each{l ->  l.each {k,v -> println "${k}\t${v}"};};null
 
+// Show random datasets
+g.V().hasLabel('dataset').coin(0.01)
+
 // More complex navigation
 // =======================
 

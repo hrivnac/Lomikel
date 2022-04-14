@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class CLI {
+public abstract class CLI {
 
   /** Create. */
   public CLI(String scriptSrc,
@@ -48,24 +48,30 @@ public class CLI {
   public static void main(String[] args) {
     Init.init();
     parseArgs(args, "java -jar Lomikel.exe.jar");
-    if (_api.equals("bsh") ) {
+    CLI cli = null;
+    if (_api.equals("bsh")) {
       log.info("Starting Lomikel BeanShell CLI");
-      new BSCLI(Icons.lomikel,
-                "<html><h3>http://cern.ch/hrivnac/Activities/Packages/Lomikel</h3></html>",
-                "Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n",
-                null,
-                null);
+      cli = new BSCLI(Icons.lomikel,
+                      "<html><h3>http://cern.ch/hrivnac/Activities/Packages/Lomikel</h3></html>",
+                      "Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n",
+                      null,
+                      null);
       }
     else if (_api.equals("groovy") ) {
       log.info("Starting Lomikel Groovy CLI");
-      new GCLI(null,
-               null);
+      cli = new GCLI(null,
+                     null);
       }
     else {
       log.fatal("Unknown api language " + _api);
       System.exit(-1);
       }
+    System.out.println(cli.execute());
+    System.exit(0);
     }
+    
+  /** TBD */
+  public abstract String execute();
     
   /** Parse the cli arguments.
     * @param args    The cli arguments.
@@ -137,15 +143,20 @@ public class CLI {
     
   /** Set site profile.
     * @param profile The Resource path to the site profile. */
-  public void setProfile(String profile) {
+  public static void setProfile(String profile) {
     _profile = profile;
     }
     
   /** Set script source.
     * @param source The filename of the script source. */
-  public void setSource(String source) {
+  public static void setSource(String source) {
     _source = source;
     }
+    
+ /** TBD */
+ public static String api() {
+   return _api;
+   }
     
   protected static String _profile;
   

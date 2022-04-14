@@ -71,6 +71,13 @@ public class BSCLI extends CLI {
                String    scriptSrc,
                String    scriptArgs) {
     super(scriptSrc, scriptArgs);
+    _icon    = icon;
+    _toolTip = toolTip;
+    _msg     = msg;
+    }
+    
+  @Override
+  public String execute() {
     if (_batch) {
       _interpreter = new Interpreter();
       }
@@ -87,7 +94,7 @@ public class BSCLI extends CLI {
       JToolBar north = new JToolBar();
       north.setFloatable(true);
       north.setLayout(new BoxLayout(north, BoxLayout.X_AXIS));
-      north.add(new AboutLabel(icon, toolTip));
+      north.add(new AboutLabel(_icon, _toolTip));
       north.addSeparator(separatorDimension);
       north.add(new SimpleButton("Exit",
                                  Icons.exit,
@@ -113,20 +120,23 @@ public class BSCLI extends CLI {
       }
     if (!_quiet) {
       if (_gui) {
-        _console.setText(msg);
+        _console.setText(_msg);
         }
       else {
-        _interpreter.print(msg);
+        _interpreter.print(_msg);
         }
       }
-    setupInterpreter();
+    String result = setupInterpreter();
     if (!_batch) {
       new Thread(_interpreter).start();
       }
+    return result;
     }
 
-  /** Load standard init files and setup standard environment. */
-  public void setupInterpreter() {
+  /** Load standard init files and setup standard environment. 
+    * @return TBD */
+  public String setupInterpreter() {
+    String result = "";
     // Set global reference and imports
     try {
       interpreter().set("cli", this);
@@ -141,7 +151,7 @@ public class BSCLI extends CLI {
     log.info("Sourcing init.bsh");
     try {
       init = new StringFile("init.bsh").toString();
-      _interpreter.eval(init);
+      result += _interpreter.eval(init);
       }
     catch (LomikelException e) {
       log.warn("init.bsh file cannot be read.");
@@ -155,7 +165,7 @@ public class BSCLI extends CLI {
       log.info("Loading profile: " + _profile);  
       try {
         init = new StringResource(_profile + ".bsh").toString();
-        _interpreter.eval(init);
+        result += _interpreter.eval(init);
         }
       catch (LomikelException e) {
         log.warn("Profile " + _profile + " cannot be loaded.");
@@ -169,7 +179,7 @@ public class BSCLI extends CLI {
     log.debug("Sourcing .state.bsh");
     try {
       init = new StringFile(".state.bsh").toString();
-      _interpreter.eval(init);
+      result += _interpreter.eval(init);
       }
     catch (LomikelException e) {
       log.warn(".state.bsh file cannot be read.");
@@ -183,7 +193,7 @@ public class BSCLI extends CLI {
       log.info("Sourcing " + _source);
       try {
         init = new StringFile(_source).toString();
-        _interpreter.eval(init);
+        result += _interpreter.eval(init);
         }
       catch (LomikelException e) {
         log.warn(_source + " file cannot be read.");
@@ -199,7 +209,7 @@ public class BSCLI extends CLI {
       String script = "";
       try {
         script = new StringResource(_scriptSrc).toString();
-        interpreter().eval(_scriptArgs + script);
+        result += interpreter().eval(_scriptArgs + script);
         }
       catch (LomikelException e) {
         log.error("Cannot read " + _scriptSrc);
@@ -210,6 +220,7 @@ public class BSCLI extends CLI {
         log.debug("Cannot evaluate " + _scriptArgs + script, e);
         }
       }
+    return result;
     }
     
   /** Parse the cli arguments.
@@ -233,6 +244,12 @@ public class BSCLI extends CLI {
     return _console;
     }  
      
+  private ImageIcon _icon;
+  
+  private String    _toolTip;
+  
+  private String    _msg;
+    
   private Interpreter _interpreter;
   
   private static Console _console;
