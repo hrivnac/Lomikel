@@ -61,10 +61,11 @@ import org.apache.log4j.Logger;
 public class BSCLI extends CLI {
 
   /** Start {@link Interpreter} and run forever.
-    * @param icon      The {@ImageIcon} for menu.
-    * @param toolTiple The menu tooltip.
-    * @param msg       The message so show. 
-    * TBD */
+    * @param icon       The {@ImageIcon} for menu.
+    * @param toolTiple  The menu tooltip.
+    * @param msg        The message so show. 
+    * @param scriptSrc  The additional script to be executed.
+    * @param scriptArgs The arguments for the additional script. */
   public BSCLI(ImageIcon icon,
                String    toolTip,
                String    msg,
@@ -78,10 +79,10 @@ public class BSCLI extends CLI {
     
   @Override
   public String execute() {
-    if (_batch) {
+    if (batch()) {
       _interpreter = new Interpreter();
       }
-    else if (_gui) {
+    else if (gui()) {
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
       UIManager.put("ToolTip.font",       new Font("Dialog", Font.PLAIN, 12));
@@ -118,23 +119,33 @@ public class BSCLI extends CLI {
     else {
       _interpreter = new Interpreter(new InputStreamReader(System.in), System.out, System.err, true);
       }
-    if (!_quiet) {
-      if (_gui) {
+    if (!quiet()) {
+      if (gui()) {
         _console.setText(_msg);
         }
-      else {
+      else {    
         _interpreter.print(_msg);
         }
       }
     String result = setupInterpreter();
-    if (!_batch) {
+    if (!batch()) {
       new Thread(_interpreter).start();
       }
     return result;
     }
+    
+  @Override
+  public void close() {
+    try {
+      _interpreter.eval("exit();");
+      }
+    catch (EvalError e) {
+      log.error("Can't close", e);
+      }
+    }
 
   /** Load standard init files and setup standard environment. 
-    * @return TBD */
+    * @return The output of the setup. */
   public String setupInterpreter() {
     String result = "";
     // Set global reference and imports
@@ -146,12 +157,15 @@ public class BSCLI extends CLI {
       log.error("Cannot set cli", e);
       log.debug("Cannot set cli", e);
       }
-    String init = "";
+    StringFile     sf;
+    StringResource sr;
     // Source init.bsh
-    log.info("Sourcing init.bsh");
     try {
-      init = new StringFile("init.bsh").toString();
-      result += _interpreter.eval(init);
+      sf = new StringFile("init.bsh");
+      if (sf.content() != null) {
+        log.info("Sourcing init.bsh");
+        result += _interpreter.eval(sf.content());
+        }
       }
     catch (LomikelException e) {
       log.warn("init.bsh file cannot be read.");
@@ -161,25 +175,29 @@ public class BSCLI extends CLI {
       log.error("Can't evaluate standard BeanShell expression", e);
       }
     // Load site profile
-    if (_profile != null) {
-      log.info("Loading profile: " + _profile);  
+    if (profile() != null) {
       try {
-        init = new StringResource(_profile + ".bsh").toString();
-        result += _interpreter.eval(init);
+        sr = new StringResource(profile() + ".bsh");
+        if (sr.content() != null) { 
+          log.info("Loading profile: " + profile());  
+          result += _interpreter.eval(sr.content());
+          }
         }
       catch (LomikelException e) {
-        log.warn("Profile " + _profile + " cannot be loaded.");
-        log.debug("Profile " + _profile + " cannot be loaded.", e);
+        log.warn("Profile " + profile() + " cannot be loaded.");
+        log.debug("Profile " + profile() + " cannot be loaded.", e);
         }
       catch (EvalError e) {
         log.error("Can't evaluate standard BeanShell expression", e);
         }
       }
     // Loading state
-    log.debug("Sourcing .state.bsh");
     try {
-      init = new StringFile(".state.bsh").toString();
-      result += _interpreter.eval(init);
+      sf = new StringFile(".state.bsh");
+      if (sf.content() != null) {
+        log.info("Sourcing .state.bsh");
+        result += _interpreter.eval(sf.content());
+        }
       }
     catch (LomikelException e) {
       log.warn(".state.bsh file cannot be read.");
@@ -189,35 +207,38 @@ public class BSCLI extends CLI {
       log.error("Can't evaluate standard BeanShell expression", e);
       }
     // Source command line source
-    if (_source != null) {
-      log.info("Sourcing " + _source);
+    if (source() != null) {
       try {
-        init = new StringFile(_source).toString();
-        result += _interpreter.eval(init);
+        sf = new StringFile(source());
+        if (sf.content() != null) {
+          log.info("Sourcing " + source());
+          result += _interpreter.eval(sf.content());
+          }
         }
       catch (LomikelException e) {
-        log.warn(_source + " file cannot be read.");
-        log.debug(_source + " file cannot be read.", e);
+        log.warn(source() + " file cannot be read.");
+        log.debug(source() + " file cannot be read.", e);
         }
       catch (EvalError e) {
         log.error("Can't evaluate standard BeanShell expression", e);
         }
       }
     // Source embedded script
-    if (_scriptSrc != null) {
-      log.info("Sourcing " + _scriptSrc);
-      String script = "";
+    if (scriptSrc() != null) {
       try {
-        script = new StringResource(_scriptSrc).toString();
-        result += interpreter().eval(_scriptArgs + script);
+        sr = new StringResource(scriptSrc());
+        if (sr.content() != null) {
+          log.info("Sourcing " + scriptSrc());
+          result += interpreter().eval(scriptArgs() + sr.content());
+          }
         }
       catch (LomikelException e) {
-        log.error("Cannot read " + _scriptSrc);
-        log.debug("Cannot read " + _scriptSrc, e);
+        log.error("Cannot read " + scriptSrc());
+        log.debug("Cannot read " + scriptSrc(), e);
         }
       catch (EvalError e) {
-        log.error("Cannot evaluate " + _scriptArgs + script);
-        log.debug("Cannot evaluate " + _scriptArgs + script, e);
+        log.error("Cannot evaluate " + scriptArgs() + " " + scriptSrc());
+        log.debug("Cannot evaluate " + scriptArgs() + " " + scriptSrc(), e);
         }
       }
     return result;

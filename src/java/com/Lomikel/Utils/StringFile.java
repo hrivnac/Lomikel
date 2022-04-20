@@ -54,17 +54,24 @@ public class StringFile {
         throw new LomikelException("File " + file.getPath() + " cannot be read !", e);
         }
       }
+    }  
+    
+  /** Give the contained {@link String}.
+    * @return The contained {@link String}.
+    *         <tt>null</tt>, if non-existent file. */
+  public String content() {
+    return _content;
     }
-
+    
   /** Give the contained {@link String}.
     * @return The contained {@link String}.
     *         Empty, if non-existent file. */
   @Override
   public String toString() {
-    return _content;
+    return _content == null ? "" : _content;
     }
      
-  private String _content = "";   
+  private String _content = null;   
 
   /** Logging . */
   private static Logger log = Logger.getLogger(StringFile.class);

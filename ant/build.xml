@@ -246,7 +246,7 @@
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
-        <attribute name="Main-Class" value="com.Lomikel.Apps.CLI"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
       </jar>
     </target>

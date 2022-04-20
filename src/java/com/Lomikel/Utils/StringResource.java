@@ -42,13 +42,6 @@ public class StringResource {
       }
     }
 
-  /** Give the contained {@link String}.
-    * @return The contained {@link String}. */
-  @Override
-  public String toString() {
-    return _content;
-    }
-
   /** Write the contained {@link String} to a file.
     * @param fn The filename to write the content 
     * @throws LomikelException If resource can't be read. */      
@@ -63,8 +56,23 @@ public class StringResource {
       throw new LomikelException("Cannot write into file " + fn + " !", e);
       }
     }
+    
+  /** Give the contained {@link String}.
+    * @return The contained {@link String}.
+    *         <tt>null</tt>, if non-existent file. */
+  public String content() {
+    return _content;
+    }
+    
+  /** Give the contained {@link String}.
+    * @return The contained {@link String}.
+    *         Empty, if non-existent file. */
+  @Override
+  public String toString() {
+    return _content == null ? "" : _content;
+    }
      
-  private String _content = "";   
+  private String _content = null;   
 
   /** Logging . */
   private static Logger log = Logger.getLogger(StringResource.class);

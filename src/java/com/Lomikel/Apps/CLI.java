@@ -23,12 +23,13 @@ import org.apache.commons.cli.ParseException;
 
 // Java
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 // Log4J
 import org.apache.log4j.Logger;
 
 /** Simple Command Line.
-  * with usual interval operations.
   * @opt attributes
   * @opt operations
   * @opt types
@@ -36,42 +37,21 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public abstract class CLI {
 
-  /** Create. */
+  /** Create. 
+    * @param scriptSrc  The additional script to be executed.
+    * @param scriptArgs The arguments for the additional script. */
   public CLI(String scriptSrc,
              String scriptArgs) {
     _scriptSrc  = scriptSrc;
     _scriptArgs = scriptArgs;
     }
 
-  /** Start and pass arguments on.
-    * @param args The arguments. */
-  public static void main(String[] args) {
-    Init.init();
-    parseArgs(args, "java -jar Lomikel.exe.jar");
-    CLI cli = null;
-    if (_api.equals("bsh")) {
-      log.info("Starting Lomikel BeanShell CLI");
-      cli = new BSCLI(Icons.lomikel,
-                      "<html><h3>http://cern.ch/hrivnac/Activities/Packages/Lomikel</h3></html>",
-                      "Welcome to Lomikel CLI " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n",
-                      null,
-                      null);
-      }
-    else if (_api.equals("groovy") ) {
-      log.info("Starting Lomikel Groovy CLI");
-      cli = new GCLI(null,
-                     null);
-      }
-    else {
-      log.fatal("Unknown api language " + _api);
-      System.exit(-1);
-      }
-    System.out.println(cli.execute());
-    System.exit(0);
-    }
-    
-  /** TBD */
+  /** Execute command line in required way.
+    * @return The execution reesult. */
   public abstract String execute();
+  
+  /** Close. */
+  public abstract void close();
     
   /** Parse the cli arguments.
     * @param args    The cli arguments.
@@ -94,10 +74,12 @@ public abstract class CLI {
     if (options == null) {
       options = new Options();
       }
-    options.addOption("h", "help",  false, "show help");
-    options.addOption("q", "quiet", false, "minimal direct feedback");
-    options.addOption("g", "gui",   false, "run in a graphical window");
-    options.addOption("b", "batch", false, "run in a batch");
+    options.addOption("h", "help",     false, "show help");
+    options.addOption("q", "quiet",    false, "minimal direct feedback");
+    options.addOption("g", "gui",      false, "run in a graphical window");
+    options.addOption("b", "batch",    false, "run in a batch");
+    options.addOption("w", "web",      false, "run as a web service");
+    options.addOption("n", "notebook", false, "run in an notebook");
     options.addOption(OptionBuilder.withLongOpt("source")
                                    .withDescription("source script file (init.<language> is also sourced)")
                                    .hasArg()
@@ -110,10 +92,6 @@ public abstract class CLI {
                                    .create("a"));
     try {
       CommandLine cline = parser.parse(options, args );
-      if (cline.hasOption("help")) {
-        new HelpFormatter().printHelp(helpMsg, options);
-        System.exit(0);
-        }
       if (cline.hasOption("quiet")) {
         _quiet = true;
         }
@@ -123,22 +101,32 @@ public abstract class CLI {
       if (cline.hasOption("batch")) {
         _batch = true;
         }
+      if (cline.hasOption("web")) {
+        _web   = true;
+        _batch = true;
+        }
+      if (cline.hasOption("notebook")) {
+        _notebook = true;
+        }
       if (cline.hasOption("api")) {
         _api = cline.getOptionValue("api");
-        }
-      else {
-        _api = "bsh";
         }
       if (cline.hasOption("source")) {
         _source = cline.getOptionValue("source");
         }
+      if (cline.hasOption("help")) {
+        StringWriter out    = new StringWriter();
+        PrintWriter  writer = new PrintWriter(out);
+        new HelpFormatter().printHelp(writer, 80, helpMsg, "", options, 0, 0, "", true);
+        writer.flush();
+        _help = out.toString();
+        }
       return cline;
       }
-    catch (ParseException e) {
+    catch (ParseException e) { 
       new HelpFormatter().printHelp(helpMsg, options);
-      System.exit(-1);
+      return null;
       }
-    return null;
     }
     
   /** Set site profile.
@@ -153,26 +141,93 @@ public abstract class CLI {
     _source = source;
     }
     
- /** TBD */
- public static String api() {
-   return _api;
+  /** Give the script arguments.
+    * @return The  script arguments. */
+  public static String scriptArgs() {
+    return _scriptArgs;
+   }
+     
+  /** Give the script source.
+    * @return The script source. */
+  public static String scriptSrc() {
+    return _scriptSrc;
+   }
+     
+  /** Give the profile.
+    * @return The profile. */
+  public static String profile() {
+    return _profile;
+   }
+     
+  /** Give the source.
+    * @return The source. */
+  public static String source() {
+    return _source;
+   }
+       
+  /** Give the script language.
+    * @return The script language. */
+  public static String api() {
+    return _api;
+   }
+   
+  /** Tell whether running in a quiet mode.
+    * @return Whether running in a quiet mode. */
+  public static boolean quiet() {
+    return _quiet;
+   }
+   
+   /** Give the help.
+    * @return The help. */
+  public static String help() {
+    return _help;
+   }
+  
+  /** Tell whether running in gui.
+    * @return Whether rinning in a gui. */
+  public static boolean gui() {
+    return _gui;
+   }
+   
+  /** Tell whether running as a batch.
+    * @return Whether running as a batch. */
+  public static boolean batch() {
+    return _batch;
+   }
+   
+  /** Tell whether running as a Web Service.
+    * @return Whether running as a Web Service. */
+  public static boolean web() {
+    return _web;
+   }
+   
+  /** Tell whether running in a notebook.
+    * @return Whether running in a notebook. */
+  public static boolean notebook() {
+    return _notebook;
    }
     
-  protected static String _profile;
-  
-  protected static String _source = null;
-    
-  protected static String _scriptArgs;  
-    
-  protected static String _scriptSrc;
-  
-  protected static String _api = null;
-  
-  protected static boolean _quiet = false;
-  
-  protected static boolean _gui = false;
-  
-  protected static boolean _batch = false;
+  private static String  _scriptArgs = null;  
+                         
+  private static String  _scriptSrc  = null;
+                         
+  private static String  _profile    = null;
+                         
+  private static String  _source     = null;
+                         
+  private static String  _api        = "bsh";
+                                    
+  private static String  _help       = "";
+                                    
+  private static boolean _quiet      = false;
+                                     
+  private static boolean _gui        = false;
+                                     
+  private static boolean _batch      = false;
+                                     
+  private static boolean _web        = false;
+                                     
+  private static boolean _notebook   = false;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(CLI.class);

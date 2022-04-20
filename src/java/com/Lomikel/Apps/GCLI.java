@@ -40,7 +40,8 @@ import org.apache.log4j.Logger;
 public class GCLI extends CLI{
 
   /** Create. 
-    * TBD */
+    * @param scriptSrc  The additional script to be executed.
+    * @param scriptArgs The arguments for the additional script. */
   public GCLI(String scriptSrc,
               String scriptArgs) {
     super(scriptSrc, scriptArgs);
@@ -50,10 +51,10 @@ public class GCLI extends CLI{
   @Override
   public String execute() {
     _sharedData = new Binding();
-    if (_batch) {
+    if (batch()) {
       _shell = new GroovyShell(_sharedData);
       }
-    else if (_gui) {
+    else if (gui()) {
       _shell = new GroovyShell(_sharedData);
       }
     else {
@@ -62,8 +63,12 @@ public class GCLI extends CLI{
     return setupShell();
     }
 
+  @Override
+  public void close() {// TBD
+    }
+    
   /** Load standard init files and setup standard environment.
-    * @return TBD */
+    * @return The output of the setup. */
   public String setupShell() {
     String result = "";
     // Set global reference and imports
@@ -81,15 +86,15 @@ public class GCLI extends CLI{
       log.debug("init.groovy file cannot be read.", e);
       }
     // Load site profile
-    if (_profile != null) {
-      log.info("Loading profile: " + _profile);  
+    if (profile() != null) {
+      log.info("Loading profile: " + profile());  
       try {
-        init = new StringResource(_profile + ".groovy").toString();
+        init = new StringResource(profile() + ".groovy").toString();
         result += _shell.evaluate(init);
         }
       catch (LomikelException e) {
-        log.warn("Profile " + _profile + " cannot be loaded.");
-        log.debug("Profile " + _profile + " cannot be loaded.", e);
+        log.warn("Profile " + profile() + " cannot be loaded.");
+        log.debug("Profile " + profile() + " cannot be loaded.", e);
         }
       }
     // Loading state
@@ -103,28 +108,28 @@ public class GCLI extends CLI{
       log.debug(".state.groovy file cannot be read.", e);
       }
     // Source command line source
-    if (_source != null) {
-      log.info("Sourcing " + _source);
+    if (source() != null) {
+      log.info("Sourcing " + source());
       try {
-        init = new StringFile(_source).toString();
+        init = new StringFile(source()).toString();
         result += _shell.evaluate(init);
         }
       catch (LomikelException e) {
-        log.warn(_source + " file cannot be read.");
-        log.debug(_source + " file cannot be read.", e);
+        log.warn(source() + " file cannot be read.");
+        log.debug(source() + " file cannot be read.", e);
         }
       }
     // Source embedded script
-    if (_scriptSrc != null) {
-      log.info("Sourcing " + _scriptSrc);
+    if (scriptSrc() != null) {
+      log.info("Sourcing " + scriptSrc());
       String script = "";
       try {
-        script = new StringResource(_scriptSrc).toString();
-        result += shell().evaluate(_scriptArgs + script);
+        script = new StringResource(scriptSrc()).toString();
+        result += shell().evaluate(scriptArgs() + script);
         }
       catch (LomikelException e) {
-        log.error("Cannot read " + _scriptSrc);
-        log.debug("Cannot read " + _scriptSrc, e);
+        log.error("Cannot read " + scriptSrc());
+        log.debug("Cannot read " + scriptSrc(), e);
         }
       }
     return result;

@@ -55,6 +55,7 @@ public abstract class GremlinClient {
                       .addContactPoint(hostname)
                       .port(port)
                       .serializer(serializer)
+                      .maxContentLength(2097152)
                       .create();
     }
   
