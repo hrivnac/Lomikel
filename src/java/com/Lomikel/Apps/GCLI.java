@@ -47,7 +47,6 @@ public class GCLI extends CLI{
     super(scriptSrc, scriptArgs);
     }
     
-  
   @Override
   public String execute() {
     _sharedData = new Binding();
@@ -74,12 +73,15 @@ public class GCLI extends CLI{
     // Set global reference and imports
     _sharedData.setVariable("cli", this);
     log.info("cli set");
-    String init = "";
+    StringFile     sf;
+    StringResource sr;
     // Source init.groovy
-    log.info("Sourcing init.groovy");
     try {
-      init = new StringFile("init.groovy").toString();
-      result += _shell.evaluate(init);
+      sf = new StringFile("init.groovy");
+      if (sf.content() != null) {
+        log.info("Sourcing init.groovy");
+        result += _shell.evaluate(sf.content());
+        }
       }
     catch (LomikelException e) {
       log.warn("init.groovy file cannot be read.");
@@ -87,10 +89,12 @@ public class GCLI extends CLI{
       }
     // Load site profile
     if (profile() != null) {
-      log.info("Loading profile: " + profile());  
       try {
-        init = new StringResource(profile() + ".groovy").toString();
-        result += _shell.evaluate(init);
+        sr = new StringResource(profile() + ".groovy");
+        if (sr.content() != null) { 
+          log.info("Loading profile: " + profile());  
+          result += _shell.evaluate(sr.content());
+          }
         }
       catch (LomikelException e) {
         log.warn("Profile " + profile() + " cannot be loaded.");
@@ -98,10 +102,12 @@ public class GCLI extends CLI{
         }
       }
     // Loading state
-    log.debug("Sourcing .state.groovy");
     try {
-      init = new StringFile(".state.groovy").toString();
-      result += _shell.evaluate(init);
+      sf = new StringFile(".state.groovy");
+      if (sf.content() != null) {
+        log.debug("Sourcing .state.groovy");
+        result += _shell.evaluate(sf.content());
+        }
       }
     catch (LomikelException e) {
       log.warn(".state.groovy file cannot be read.");
@@ -109,10 +115,12 @@ public class GCLI extends CLI{
       }
     // Source command line source
     if (source() != null) {
-      log.info("Sourcing " + source());
       try {
-        init = new StringFile(source()).toString();
-        result += _shell.evaluate(init);
+        sf = new StringFile(source());
+        if (sf.content() != null) {
+          log.info("Sourcing " + source());
+          result += _shell.evaluate(sf.content());
+          }
         }
       catch (LomikelException e) {
         log.warn(source() + " file cannot be read.");
@@ -121,11 +129,12 @@ public class GCLI extends CLI{
       }
     // Source embedded script
     if (scriptSrc() != null) {
-      log.info("Sourcing " + scriptSrc());
-      String script = "";
       try {
-        script = new StringResource(scriptSrc()).toString();
-        result += shell().evaluate(scriptArgs() + script);
+        sr = new StringResource(scriptSrc());
+        if (sr.content() != null) {
+          log.info("Sourcing " + scriptSrc());
+          result += shell().evaluate(scriptArgs() + sr.content());
+          }
         }
       catch (LomikelException e) {
         log.error("Cannot read " + scriptSrc());
