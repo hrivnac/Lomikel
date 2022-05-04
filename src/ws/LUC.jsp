@@ -26,7 +26,6 @@
     out.println(LUC.cli().help());
     }
   out.println(LUC.doit(args));
-  LUC.cli().close();
   %>
 
 

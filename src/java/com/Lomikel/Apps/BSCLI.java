@@ -79,7 +79,7 @@ public class BSCLI extends CLI {
     
   @Override
   public String execute() {
-    if (batch()) {
+    if (batch() || web()) {
       _interpreter = new Interpreter();
       }
     else if (gui()) {
@@ -128,7 +128,7 @@ public class BSCLI extends CLI {
         }
       }
     String result = setupInterpreter();
-    if (!batch()) {
+    if (!batch() && !web()) {
       new Thread(_interpreter).start();
       }
     return result;
