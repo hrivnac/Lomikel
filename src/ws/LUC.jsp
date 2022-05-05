@@ -1,4 +1,7 @@
-<%@ page language="java" contentType="application/json; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java"
+         contentType="application/json; charset=UTF-8"
+         pageEncoding="UTF-8"
+         trimDirectiveWhitespaces="true" %>
 
 <%@ page import="com.Lomikel.Apps.LUC" %>
 <%@ page import="java.net.URLDecoder" %>
@@ -27,5 +30,3 @@
     }
   out.println(LUC.doit(args));
   %>
-
-
