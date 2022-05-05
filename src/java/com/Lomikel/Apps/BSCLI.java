@@ -81,6 +81,7 @@ public class BSCLI extends CLI {
   public String execute() {
     if (batch() || web()) {
       _interpreter = new Interpreter();
+      _interpreter.setExitOnEOF(true);
       }
     else if (gui()) {
       JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -136,12 +137,7 @@ public class BSCLI extends CLI {
     
   @Override
   public void close() {
-    try {
-      _interpreter.eval("exit();");
-      }
-    catch (EvalError e) {
-      log.error("Can't close", e);
-      }
+    // TBD
     }
 
   /** Load standard init files and setup standard environment. 

@@ -39,6 +39,9 @@ public class LUC {
     * @param args The arguments. */
   public static void main(String[] args) {
     System.out.println(doit(args));
+    if (cli().batch()) {
+      System.exit(0);
+      }
     }
     
   /** Start and pass arguments on.
