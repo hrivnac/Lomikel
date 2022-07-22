@@ -29,20 +29,20 @@ def get_or_create_edge(g, lbl1, name1, value1, lbl2, name2, value2, edge) {
     }
 
     
-def getDataLink(v) {
-  switch (v.values('technology').next()) {
-    case 'HBase':
-      return 'HBase'
-      break
-    case 'Graph':
-      return 'Graph'
-      break
-    case 'Phoenix':
-      import groovy.sql.Sql
-      return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver')
-                .rows(v.values('query').next())
-      break
-    default:
-      return 'unknown DataLink ' + v
-      }
-    }
+//def getDataLink(v) {
+//  switch (v.values('technology').next()) {
+//    case 'HBase':
+//      return 'HBase'
+//      break
+//    case 'Graph':
+//      return 'Graph'
+//      break
+//    case 'Phoenix':
+//      import groovy.sql.Sql
+//      return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver')
+//                .rows(v.values('query').next())
+//      break
+//    default:
+//      return 'unknown DataLink ' + v
+//      }
+//    }
