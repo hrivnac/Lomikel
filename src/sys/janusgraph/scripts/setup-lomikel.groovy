@@ -29,3 +29,22 @@ def get_or_create_edge(g, lbl1, name1, value1, lbl2, name2, value2, edge) {
                has(name2, value2).
            coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
     }
+
+def getDataLink(v) {
+  switch (v.values('technology').next()) {
+    case 'HBase':
+      println 'HBase'
+      break
+    case 'Graph':
+      println 'Graph'
+      break
+    case 'Phoenix':
+      import groovy.sql.Sql
+      return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver')
+                .firstRow(v.values('query').next())
+      break
+    default:
+      return 'unknown DataLink ' + v
+      }
+    }
+    
