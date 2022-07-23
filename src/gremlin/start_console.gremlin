@@ -3,6 +3,10 @@ import groovy.sql.Sql
 
 class Lomikel {
 
+  def static init() {
+    println "Lomikel initialised"
+    }
+
   def static hi() {
     return "Hello World from Lomikel console !"
     }
