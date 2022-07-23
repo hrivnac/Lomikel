@@ -28,7 +28,6 @@ class Lomikel {
                  has(name2, value2).
              coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
       }
-  
       
   def static getDataLink(v) {
     switch (v.values('technology').next()) {
