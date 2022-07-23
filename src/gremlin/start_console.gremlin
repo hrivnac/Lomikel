@@ -4,7 +4,7 @@ import groovy.sql.Sql
 class Lomikel {
 
   def static init() {
-    println "Lomikel initialised"
+    println "class Lomikel initialised"
     }
 
   def static hi() {
