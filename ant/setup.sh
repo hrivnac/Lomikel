@@ -15,7 +15,7 @@ if [[ ! "x" = "x${hbase_classpath}" ]]; then
   export CLASSPATH="${hbase_classpath}"
   fi
 if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
-  export GREMLIN_CLASSPATH="${lomikel_jar}:${bsh_jar}:${janusgraph_dir}/*.jar:${home}/extlib/*.jar:${phoenix_jar}:"
+  export GREMLIN_CLASSPATH="${groovy_sql_jar}:${lomikel_jar}:${bsh_jar}:${janusgraph_dir}/*.jar:${home}/extlib/*.jar:${phoenix_jar}:"
 else
   export GREMLIN_CLASSPATH=""
   fi
@@ -36,4 +36,3 @@ else
   fi
 
 echo "commands: gremlin_console, gremlin_Local, gremlin_IJCLab, gremlin_CERN"
-
