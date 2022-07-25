@@ -15,8 +15,7 @@ if [[ ! "x" = "x${hbase_classpath}" ]]; then
   export CLASSPATH="${hbase_classpath}"
   fi
 if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
-  #export GREMLIN_CLASSPATH="/opt/hadoop/conf/etc/analytix/hadoop.analytix:/opt/hadoop/conf/etc/analytix/hbase.analytix"
-  export GREMLIN_CLASSPATH="${lomikel_jar}:${bsh_jar}:${janusgraph_dir}/*.jar:${home}/extlib/*.jar:${home}/lib/Atlascope-full-${version}.jar:${phoenix_jar}:"
+  export GREMLIN_CLASSPATH="${lomikel_jar}:${bsh_jar}:${janusgraph_dir}/*.jar:${home}/extlib/*.jar:${phoenix_jar}:"
 else
   export GREMLIN_CLASSPATH=""
   fi

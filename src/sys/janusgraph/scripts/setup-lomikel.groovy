@@ -1,7 +1,11 @@
 class Lomikel_CERN {
 
+  def static init() {
+    println "class Lomikel CERN initialised"
+    }
+
   def static hi() {
-    return "Hello World from Lomikel server !"
+    return "Hello World from Lomikel CERN server !"
     }
     
   def static get_or_create(lbl, name, value) {
