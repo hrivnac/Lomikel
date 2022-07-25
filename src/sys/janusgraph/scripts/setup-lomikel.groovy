@@ -46,6 +46,8 @@ class Lomikel {
         return 'unknown DataLink ' + v
         }
       }
+      
+    }
     
 def globals = [:]
 
