@@ -1,6 +1,4 @@
-import groovy.sql.Sql
-
-class LomikelCERN {
+class Lomikel_CERN {
 
   def static hi() {
     return "Hello World from Lomikel server !"
