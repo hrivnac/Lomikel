@@ -30,7 +30,7 @@ class Lomikel {
                                   set("storage.hbase.table", table).
                                   open()
         g = graph.traversal()
-        return Eval.me('g', g, daba[3])
+        return Eval.me('g', g, v.values('query').next())
         break
       case 'Phoenix':
         return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
