@@ -37,14 +37,14 @@ class Lomikel {
         return 'HBase'
         break
       case 'Graph':
-        (backend, hostname, port, table) = v.values('url').next().split(':') // hbase:188.184.87.217:8182:janusgraph
-        graph = JanusGraphFactory.build().
-                                  set("storage.backend",     backend).
-                                  set("storage.hostname",    hostname).
-                                  set("storage.port",        port).
-                                  set("storage.hbase.table", table).
-                                  open()
-        g = graph.traversal()
+        def (backend, hostname, port, table) = v.values('url').next().split(':') // hbase:188.184.87.217:8182:janusgraph
+        def graph = JanusGraphFactory.build().
+                                      set('storage.backend',     backend ).
+                                      set('storage.hostname',    hostname).
+                                      set('storage.port',        port    ).
+                                      set('storage.hbase.table', table   ).
+                                      open()
+        def g = graph.traversal()
         return Eval.me('g', g, v.values('query').next())
         break
       case 'Phoenix':
