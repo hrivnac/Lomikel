@@ -15,7 +15,7 @@ if [[ ! "x" = "x${hbase_classpath}" ]]; then
   export CLASSPATH="${hbase_classpath}"
   fi
 if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
-  export GREMLIN_CLASSPATH="${groovy_sql_jar}:${lomikel_jar}:${bsh_jar}:${janusgraph_dir}/*.jar:${home}/extlib/*.jar:${phoenix_jar}:"
+  export GREMLIN_CLASSPATH="${groovy_sql_jar}:${janusgraph_dir}/*.jar:${hadoop_phoenix_conf}:${hbase_phoenix_conf}:${phoenix_old_jar}"
 else
   export GREMLIN_CLASSPATH=""
   fi
