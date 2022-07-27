@@ -43,5 +43,5 @@ class Lomikel_CERN {
               
     }
     
-LomikelCERN.init(g)
+Lomikel_CERN.init(g)
 
