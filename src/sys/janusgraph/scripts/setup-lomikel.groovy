@@ -89,7 +89,10 @@ globals << [g : Lomikel_CERN.g]
 println "e"
 
 w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
-Lomikel_CERN.getDataLink(w)
 
 println "f"
+
+Lomikel_CERN.getDataLink(w)
+
+println "g"
 
