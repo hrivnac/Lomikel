@@ -2,17 +2,7 @@ import groovy.sql.Sql
   
 // -----------------------------------------------------------------------------
 
-println "a"
-
-class Lomikel_CERN {
-
-  def static init() {
-    graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
-    g = graph.traversal()
-    println "class Lomikel CERN initialised"
-    }
-
-  def static hi() {
+  def hi() {
     return "Hello World from Lomikel CERN server !"
     }
     
@@ -25,7 +15,7 @@ class Lomikel_CERN {
                                     property(name, value));
     }
                
-  def static get_or_create_edge(g, lbl1, name1, value1, lbl2, name2, value2, edge) {
+  def get_or_create_edge(g, lbl1, name1, value1, lbl2, name2, value2, edge) {
     return g.V().has('lbl', lbl1).
                  has(name1, value1).
                  as('v').
@@ -61,39 +51,8 @@ class Lomikel_CERN {
   //      }
   //    }
       
-  def static graph
-  def static g
-              
-  }
   
 // -----------------------------------------------------------------------------
-    
-  def getDataLink(v) {
-    switch (v.values('technology').next()) {
-      case 'HBase':
-        return 'HBase'
-        break
-      case 'Graph':
-        def (backend, hostname, port, table) = v.values('url').next().split(':') // hbase:188.184.87.217:8182:janusgraph
-        def graph1 = JanusGraphFactory.build().
-                                       set("storage.backend",     backend).
-                                       set("storage.hostname",    hostname).
-                                       set("storage.port",        port).
-                                       set("storage.hbase.table", table).
-                                       open()
-        def g1 = graph1.traversal()
-        return Eval.me('g', g1, v.values('query').next())
-        break
-      case 'Phoenix':
-        return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
-                   rows(v.values('query').next())
-        break
-      default:
-        return 'unknown DataLink ' + v
-        }
-      }
-
-Lomikel_CERN.init()
 
 def globals = [:]
 
@@ -105,9 +64,7 @@ globals << [hook : [
 globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()]
 globals << [g : graph.traversal()]
 
-w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
+//w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
 
-println w
-
-getDataLink(w)
+//getDataLink(w)
 
