@@ -1,3 +1,13 @@
+def globals = [:]
+
+globals << [hook : [
+  onStartUp: { ctx -> ctx.logger.info("Executed once at startup of Gremlin Server.")},
+  onShutDown: { ctx -> ctx.logger.info("Executed once at shutdown of Gremlin Server.")}
+  ] as LifeCycleHook]
+  
+globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()]
+globals << [g : graph.traversal()]
+
 // -----------------------------------------------------------------------------
 
   def hi() {
@@ -51,16 +61,6 @@
       
   
 // -----------------------------------------------------------------------------
-
-def globals = [:]
-
-globals << [hook : [
-  onStartUp: { ctx -> ctx.logger.info("Executed once at startup of Gremlin Server.")},
-  onShutDown: { ctx -> ctx.logger.info("Executed once at shutdown of Gremlin Server.")}
-  ] as LifeCycleHook]
-  
-globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()]
-globals << [g : graph.traversal()]
 
 //w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
 
