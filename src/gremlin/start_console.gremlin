@@ -1,5 +1,7 @@
 import groovy.sql.Sql
 //:record start MyGremlin.log
+  
+// -----------------------------------------------------------------------------
 
 class Lomikel {
 

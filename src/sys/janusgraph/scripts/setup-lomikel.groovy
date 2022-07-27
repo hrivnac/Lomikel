@@ -1,5 +1,3 @@
-import groovy.sql.Sql
-
 class Lomikel_CERN {
 
   def static init() {
@@ -34,6 +32,8 @@ class Lomikel_CERN {
   def static g
               
   }
+  
+// -----------------------------------------------------------------------------
     
 Lomikel_CERN.init()
 

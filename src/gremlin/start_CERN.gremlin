@@ -3,6 +3,8 @@ import groovy.sql.Sql
 :remote connect tinkerpop.server conf/CERN.yaml session
 :remote config timeout 100000
 :remote console
+  
+// -----------------------------------------------------------------------------
 
 class Lomikel {
 
