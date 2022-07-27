@@ -36,7 +36,39 @@ class Lomikel_CERN {
       
   // w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
   // w = g.addV().property('lbl', 'datalink').property('technology', 'Graph'  ).property('url', 'hbase:188.184.87.217:8182:janusgraph').property('query', "g.V().limit(1)").next()
-  def static getDataLink(v) {
+  //def static getDataLink(v) {
+  //  switch (v.values('technology').next()) {
+  //    case 'HBase':
+  //      return 'HBase'
+  //      break
+  //    case 'Graph':
+  //      def (backend, hostname, port, table) = v.values('url').next().split(':') // hbase:188.184.87.217:8182:janusgraph
+  //      def graph1 = JanusGraphFactory.build().
+  //                                     set("storage.backend",     backend).
+  //                                     set("storage.hostname",    hostname).
+  //                                     set("storage.port",        port).
+  //                                     set("storage.hbase.table", table).
+  //                                     open()
+  //      def g1 = graph1.traversal()
+  //      return Eval.me('g', g1, v.values('query').next())
+  //      break
+  //    case 'Phoenix':
+  //      return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
+  //                 rows(v.values('query').next())
+  //      break
+  //    default:
+  //      return 'unknown DataLink ' + v
+  //      }
+  //    }
+      
+  def static graph
+  def static g
+              
+  }
+  
+// -----------------------------------------------------------------------------
+    
+  def getDataLink(v) {
     switch (v.values('technology').next()) {
       case 'HBase':
         return 'HBase'
@@ -60,14 +92,6 @@ class Lomikel_CERN {
         return 'unknown DataLink ' + v
         }
       }
-      
-  def static graph
-  def static g
-              
-  }
-  
-// -----------------------------------------------------------------------------
-    
 
 Lomikel_CERN.init()
 
@@ -78,12 +102,12 @@ globals << [hook : [
   onShutDown: { ctx -> ctx.logger.info("Executed once at shutdown of Gremlin Server.")}
   ] as LifeCycleHook]
   
-globals << [graph : Lomikel_CERN.graph]
-globals << [g : Lomikel_CERN.g]
+globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()]
+globals << [g : graph.traversal()]
 
-w = Lomikel_CERN.g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
+w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
 
 println w
 
-//Lomikel_CERN.getDataLink(w)
+getDataLink(w)
 
