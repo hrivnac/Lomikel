@@ -2,6 +2,8 @@ import groovy.sql.Sql
   
 // -----------------------------------------------------------------------------
 
+println "a"
+
 class Lomikel_CERN {
 
   def static init() {
@@ -66,7 +68,11 @@ class Lomikel_CERN {
   
 // -----------------------------------------------------------------------------
     
+println "b"
+
 Lomikel_CERN.init()
+
+println "c"
 
 def globals = [:]
 
@@ -75,10 +81,15 @@ globals << [hook : [
   onShutDown: { ctx -> ctx.logger.info("Executed once at shutdown of Gremlin Server.")}
   ] as LifeCycleHook]
   
+println "d"  
+  
 globals << [graph : Lomikel_CERN.graph]
 globals << [g : Lomikel_CERN.g]
 
+println "e"
 
 w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
 Lomikel_CERN.getDataLink(w)
+
+println "f"
 
