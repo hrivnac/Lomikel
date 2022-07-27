@@ -10,9 +10,7 @@ globals << [g : graph.traversal()]
 
 class LomikelCERN {
 
-  def static init(graph0, g0) {
-    graph = graph0
-    g = g0
+  def static init() {
     println "class Lomikel CERN initialised"
     }
 
@@ -63,11 +61,12 @@ class LomikelCERN {
       default:
         return 'unknown DataLink ' + v
         }
-      }
+    }
       
-  def static graph
-  def static g
+  graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()]
+  g = graph.traversal()]
+
 
   }
   
-LomikelCERN.init(graph, g)
+LomikelCERN.init()
