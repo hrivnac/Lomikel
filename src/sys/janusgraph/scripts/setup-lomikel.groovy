@@ -10,7 +10,9 @@ globals << [g : graph.traversal()]
 
 class Lomikel_CERN {
 
-  def static init() {
+  def static init(ggraph, gg) {
+    graph = ggraph
+    g     = gg
     println "class Lomikel CERN initialised"
     }
 
@@ -35,8 +37,11 @@ class Lomikel_CERN {
                  has(name2, value2).
              coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
       }
+      
+    def static graph
+    def static g
               
     }
     
-LomikelCERN.init()
+LomikelCERN.init(g)
 
