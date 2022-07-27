@@ -3,6 +3,8 @@ import groovy.sql.Sql
 :remote connect tinkerpop.server conf/Local.yaml session
 :remote config timeout 100000
 :remote console
+  
+// -----------------------------------------------------------------------------
 
 class Lomikel {
 
@@ -11,7 +13,7 @@ class Lomikel {
     }
 
   def static hi() {
-    return "Hello World from Lomikel console !"
+    return "Hello World from Lomikel !"
     }
         
   // w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
