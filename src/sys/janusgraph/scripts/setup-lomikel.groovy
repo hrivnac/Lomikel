@@ -38,10 +38,10 @@ class Lomikel_CERN {
              coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
       }
       
-    def static graph
-    def static g
+  def static graph
+  def static g
               
     }
     
-Lomikel_CERN.init(g)
+Lomikel_CERN.init(graph, g)
 
