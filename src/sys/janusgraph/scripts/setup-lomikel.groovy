@@ -1,13 +1,3 @@
-def globals = [:]
-
-globals << [hook : [
-  onStartUp: { ctx -> ctx.logger.info("Executed once at startup of Gremlin Server.")},
-  onShutDown: { ctx -> ctx.logger.info("Executed once at shutdown of Gremlin Server.")}
-  ] as LifeCycleHook]
-  
-globals << [graph : JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()]
-globals << [g : graph.traversal()]
-
 class Lomikel_CERN {
 
   def static init() {
@@ -35,34 +25,7 @@ class Lomikel_CERN {
                  has(name2, value2).
              coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
       }
-      
-  // w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
-  // w = g.addV().property('lbl', 'datalink').property('technology', 'Graph'  ).property('url', 'hbase:188.184.87.217:8182:janusgraph').property('query', "g.V().limit(1)").next()
-  def static getDataLink(v) {
-    switch (v.values('technology').next()) {
-      case 'HBase':
-        return 'HBase'
-        break
-      case 'Graph':
-        def (backend, hostname, port, table) = v.values('url').next().split(':') // hbase:188.184.87.217:8182:janusgraph
-        def graph = JanusGraphFactory.build().
-                                      set('storage.backend',     backend ).
-                                      set('storage.hostname',    hostname).
-                                      set('storage.port',        port    ).
-                                      set('storage.hbase.table', table   ).
-                                      open()
-        def g = graph.traversal()
-        return Eval.me('g', g, v.values('query').next())
-        break
-      case 'Phoenix':
-        return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
-                   rows(v.values('query').next())
-        break
-      default:
-        return 'unknown DataLink ' + v
-        }
-      }
-        
+              
     }
 
 LomikelCERN.init()
