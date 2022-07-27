@@ -10,7 +10,9 @@ globals << [g : graph.traversal()]
 
 class LomikelCERN {
 
-  def static init() {
+  def static init(graph0, g0) {
+    graph = graph0
+    g = g0
     println "class Lomikel CERN initialised"
     }
 
@@ -62,7 +64,10 @@ class LomikelCERN {
         return 'unknown DataLink ' + v
         }
       }
+      
+  def static graph
+  def static g
 
   }
   
-LomikelCERN.init()
+LomikelCERN.init(graph, g)
