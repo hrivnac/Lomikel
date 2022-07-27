@@ -51,9 +51,8 @@ class Lomikel_CERN {
         return Eval.me('g', g1, v.values('query').next())
         break
       case 'Phoenix':
-        //Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
-        //           rows(v.values('query').next())
-                   return "pokud"
+        return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
+                   rows(v.values('query').next())
         break
       default:
         return 'unknown DataLink ' + v
