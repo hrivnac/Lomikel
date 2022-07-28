@@ -3,7 +3,7 @@ port: @SERVER.PORT@
 #username: admin
 #password: admin
 connectionPool: {
-  maxContentLength: 2097152
+  maxContentLength: 10485760
 #  enableSsl: true,
 #  sslEnabledProtocols: [TLSv1.2]
   }
@@ -15,3 +15,4 @@ serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessa
              config: {serializeResultToString: false,
                       ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
                                      org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
+                                              
