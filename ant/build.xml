@@ -64,7 +64,7 @@
     <pathelement path="${groovy_sql_jar}"/>
     <pathelement path="${hadoop_phoenix_conf}"/>
     <pathelement path="${hbase_phoenix_conf}"/>
-    <pathelement path="/usr/hdp/phoenix-5.0/phoenix-client-hbase-2.3-5.1.0.jar"/>
+    <pathelement path="/usr/hdp/phoenix-5.1/phoenix-client-hbase-2.3-5.1.0.jar"/>
     <!--path refid="classpath.build"/-->
     </path>
     
