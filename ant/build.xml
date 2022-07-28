@@ -503,12 +503,7 @@
     <echo file="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" append="true">storage.batch-loading=true</echo>
     <echo>... plugin</echo>
     <mkdir dir="${janusgraph_dir}/ext/lomikel.connector"/>
-    <delete includeEmptyDirs="true">
-      <fileset dir="${janusgraph_dir}/ext/lomikel.connector" includes="Lomikel-*.jar"/>
-      </delete>
- 		<copy todir="${janusgraph_dir}/ext/lomikel.connector" overwrite="true">
-			<fileset dir="../lib" includes="Lomikel-${version}.jar"/>
-      </copy>
+    <copy file="../lib/Lomikel-full-${version}.jar" tofile="${janusgraph_dir}/ext/lomikel.connector/Lomikel-full.jar" overwrite="true"/>
     <exec executable="../src/sh/updateJanusExt.sh">
       <arg line="${janusgraph_dir}/ext/plugins.txt"/>
       </exec>
