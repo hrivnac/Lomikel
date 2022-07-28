@@ -523,7 +523,7 @@
   <target name="janus-start"
           description="Start JanusGraph Server">
     <echo>Starting JanusGraph Server</echo>
-    <exec executable="${janusgraph_dir}/bin/gremlin-server.sh">
+    <exec executable="${janusgraph_dir}/bin/janusgraph-server.sh">
       <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/Local.yaml"/>
       <env key="HBASE_CONF_DIR"  value="${phoenix_conf_dir}"/>
       <env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/>
@@ -533,7 +533,7 @@
       <arg line="start"/>
       </exec>
     <echo>Starting JanusGraph Server (CORS)</echo>
-    <exec executable="${janusgraph_dir}/bin/gremlin-server.sh">
+    <exec executable="${janusgraph_dir}/bin/janusgraph-server.sh">
       <env key="JANUSGRAPH_PID_FILE" value="${janusgraph_dir}/run/janusgraphCORS.pid"/>
       <env key="JANUSGRAPH_LOGDIR"   value="${janusgraph_dir}/logsCORS"/>
       <env key="JANUSGRAPH_YAML"     value="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"/>
