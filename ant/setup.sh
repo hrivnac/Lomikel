@@ -31,9 +31,9 @@ if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
 else
   HBASE_CONF_DIR=''
   fi
-alias gremlin_Local='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
+alias gremlin_Local='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
 alias gremlin_IJCLab='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
 alias gremlin_CERN='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CERN.gremlin"'
-alias gremlin_console='${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
+alias gremlin_console='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
 
 echo "commands: gremlin_console, gremlin_Local, gremlin_IJCLab, gremlin_CERN"
