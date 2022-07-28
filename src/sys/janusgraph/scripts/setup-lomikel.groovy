@@ -53,7 +53,7 @@ class LomikelCERN {
         break
       case 'Phoenix':
         return groovy.sql.Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
-                   rows(v.values('query').next())
+                   rows(v.values('query').next()).toString()
         break
       default:
         return 'unknown DataLink ' + v
