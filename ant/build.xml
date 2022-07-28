@@ -527,21 +527,15 @@
       <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/Local.yaml"/>
       <env key="HBASE_CONF_DIR"  value="${phoenix_conf_dir}"/>
       <env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/>
-      <!--env key="CLASSPATH"       value="${groovy_sql_jar}:${hadoop_phoenix_conf}:${hbase_phoenix_conf}:${phoenix_jar}"/-->
-      <!--env key="HBASE_CONF_DIR"  value="/opt/hadoop/conf/etc/analytix/hbase.analytix"/-->
-      <!--env key="CLASSPATH"       value="/opt/hadoop/conf/etc/analytix/hadoop.analytix:/opt/hadoop/conf/etc/analytix/hbase.analytix"/-->
       <arg line="start"/>
       </exec>
     <echo>Starting JanusGraph Server (CORS)</echo>
     <exec executable="${janusgraph_dir}/bin/janusgraph-server.sh">
-      <env key="PID_FILE"            value="${janusgraph_dir}/run/janusgraphCORS.pid"/>
-      <env key="LOG_DIR"             value="${janusgraph_dir}/logsCORS"/>
-      <env key="JANUSGRAPH_YAML"     value="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"/>
-      <env key="HBASE_CONF_DIR"      value="${phoenix_conf_dir}"/>
-      <env key="CLASSPATH"           value="${classpath_phoenix.run.content}"/>
-      <!--env key="CLASSPATH"           value="${groovy_sql_jar}:${hadoop_phoenix_conf}:${hbase_phoenix_conf}:${phoenix_jar}"/-->
-      <!--env key="HBASE_CONF_DIR"      value="/opt/hadoop/conf/etc/analytix/hbase.analytix"/-->
-      <!--env key="CLASSPATH"           value="/opt/hadoop/conf/etc/analytix/hadoop.analytix:/opt/hadoop/conf/etc/analytix/hbase.analytix"/-->
+      <env key="PID_FILE"        value="${janusgraph_dir}/run/janusgraphCORS.pid"/>
+      <env key="LOG_DIR"         value="${janusgraph_dir}/logsCORS"/>
+      <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"/>
+      <env key="HBASE_CONF_DIR"  value="${phoenix_conf_dir}"/>
+      <env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/>
       <arg line="start"/>
       </exec>
     </target>
