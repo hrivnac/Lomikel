@@ -62,6 +62,7 @@
       <exclude name="*.exe.jar"/>
       </fileset>
     <pathelement path="${phoenix_jar}"/>
+    <pathelement path="${phoenix_old_jar}"/>
     <pathelement path="${groovy_sql_jar}"/>
     <path refid="classpath.build"/>
     </path>
