@@ -2,9 +2,10 @@ hosts: [188.184.87.217]
 port: 8183
 #username: admin
 #password: admin
-#connectionPool: {
+connectionPool: {
+  maxContentLength: 10485760
 #  enableSsl: true
-#  }
+  }
 #serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0,
 #             config: {#serializeResultToString: true,
 #                      ioRegistries: [#org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
