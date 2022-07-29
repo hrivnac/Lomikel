@@ -57,10 +57,10 @@
     </path>
     
   <path id="classpath_phoenix.run">
-    <fileset dir="../lib">
+    <!--fileset dir="../lib">
       <include name="*.jar"/>
       <exclude name="*.exe.jar"/>
-      </fileset>
+      </fileset-->
     <pathelement path="${groovy_sql_jar}"/>
     <pathelement path="${hadoop_phoenix_conf}"/>
     <pathelement path="${hbase_phoenix_conf}"/>
