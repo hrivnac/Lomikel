@@ -65,7 +65,7 @@
     <pathelement path="${hadoop_phoenix_conf}"/>
     <pathelement path="${hbase_phoenix_conf}"/>
     <pathelement path="${phoenix_jar}"/>
-    <!--path refid="classpath.build"/-->
+    <path refid="classpath.build"/>
     </path>
     
   <path id="classpath.janusgraph">
