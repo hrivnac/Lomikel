@@ -202,49 +202,49 @@
       <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${logging_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.3.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-codec-1.14.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-codec-1.15.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-collections-3.2.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-configuration-1.10.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-lang-2.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-lang3-3.3.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-logging-1.1.1.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-lang-2.6.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-lang3-3.11.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-logging-1.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/exp4j-0.4.8.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/guava-18.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-console-3.4.6.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-core-3.4.6.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-driver-3.4.6.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-groovy-3.4.6.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-shaded-3.4.6.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-2.5.7-indy.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-2.5.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-console-2.5.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-groovysh-2.5.7-indy.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-2.5.7-indy.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-2.5.7-indy.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-2.5.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-templates-2.5.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-xml-2.5.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hppc-0.7.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.10.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.12.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/ivy-2.3.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-driver-0.5.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/guava-29.0-jre.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-console-3.5.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-core-3.5.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-driver-3.5.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-groovy-3.5.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-shaded-3.5.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-2.5.14-indy.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-2.5.14.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-console-2.5.14.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-groovysh-2.5.14-indy.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-2.5.14-indy.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-2.5.14-indy.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-2.5.14.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-templates-2.5.14.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-xml-2.5.14.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hppc-0.8.2.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.13.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.14.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/ivy-2.4.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-driver-0.6.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javapoet-1.8.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javatuples-1.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jbcrypt-0.4.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-log-0.14.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-manifests-1.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcl-over-slf4j-1.7.25.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcl-over-slf4j-1.7.30.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-2.14.6.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jts-core-1.16.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-1.2.16.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-all-4.1.45.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/picocli-3.9.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-api-1.7.12.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-log4j12-1.7.12.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snakeyaml-1.11.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spatial4j-0.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.4.6.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jts-core-1.17.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-1.2.17.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-all-4.1.72.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/picocli-4.3.2.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-api-1.7.30.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-log4j12-1.7.30.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snakeyaml-1.28.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spatial4j-0.8.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.5.3.jar" excludes="META-INF/*"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
