@@ -167,13 +167,17 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       else {
         log.info("Searching for schema " + schemaName);
         }
-      Map<String, Map<String, String>> schemas = scan(schemaName,
-                                                      null,
-                                                      null,
-                                                      0,
-                                                      false,
-                                                      false);
-      if (schemas.size() == 0) {
+      Map<String, Map<String, String>> schemas;
+      try {
+        schemas = scan(schemaName,
+                       null,
+                       null,
+                       0,
+                       false,
+                       false);
+        }
+      catch (Exception e) {}
+      if (schemas == null || schemas.size() == 0) {
         log.error("No schema found");
         }
       else if (schemas.size() > 1) {
