@@ -167,7 +167,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       else {
         log.info("Searching for schema " + schemaName);
         }
-      Map<String, Map<String, String>> schemas;
+      Map<String, Map<String, String>> schemas = null;
       try {
         schemas = scan(schemaName,
                        null,
