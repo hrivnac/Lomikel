@@ -1,6 +1,5 @@
 import com.Lomikel.HBaser.HBaseClient
 import groovy.sql.Sql
-//:record start MyGremlin.log
   
 // -----------------------------------------------------------------------------
 
@@ -34,7 +33,7 @@ class Lomikel {
       
   // w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181'      ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
   // w = g.addV().property('lbl', 'datalink').property('technology', 'Graph'  ).property('url', 'hbase:188.184.87.217:8182:janusgraph'     ).property('query', "g.V().limit(1)").next()
-  // w = g.addV().property('lbl', 'datalink').property('technology', 'HBase'  ).property('url', '134.158.74.54:2183:ztf:schema').property('query', "client.setLimit(10); client.setEvaluation('dec < 10'); return client.scan(null, null, null, 0, false, false)").next()
+  // w = g.addV().property('lbl', 'datalink').property('technology', 'HBase'  ).property('url', '134.158.74.54:2183:ztf:schema').property('query', "client.setLimit(10); return client.scan(null, null, null, 0, false, false)").next()
   // TBD: allow overwriting by FinkHBaseClient
   // TBD: client.results2String(results) on server
   def static getDataLink(v) {

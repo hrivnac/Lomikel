@@ -5,14 +5,14 @@ globals << [hook : [
   onShutDown: { ctx -> ctx.logger.info("Executed once at shutdown of Gremlin Server.")}
   ] as LifeCycleHook]
   
-class LomikelCERN {
+class LomikelServer {
 
   def static init() {
-    println "class Lomikel CERN initialised"
+    println "class Lomikel Server initialised"
     }
 
   def static hi() {
-    return "Hello World from Lomikel CERN !"
+    return "Hello World from Lomikel Server !"
     }
   
   def static get_or_create(g, lbl, name, value) {
@@ -35,10 +35,14 @@ class LomikelCERN {
 
   // w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181' ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
   // w = g.addV().property('lbl', 'datalink').property('technology', 'Graph'  ).property('url', 'hbase:188.184.87.217:8182:janusgraph').property('query', "g.V().limit(1)").next()
+  // w = g.addV().property('lbl', 'datalink').property('technology', 'HBase'  ).property('url', '134.158.74.54:2183:ztf:schema').property('query', "client.setLimit(10); return client.scan(null, null, null, 0, false, false)").next()
   def static getDataLink(v) {
     switch (v.values('technology').next()) {
       case 'HBase':
-        return 'HBase'
+        def (hostname, port, table, schema) = v.values('url').next().split(':') // 134.158.74.54:2181:ztf:schema_0.7.0_0.3.8
+        def client = new HBaseClient(hostname, port)
+        client.connect(table, schema)
+        return Eval.me('client', client, v.values('query').next())
         break
       case 'Graph':
         def (backend, hostname, port, table) = v.values('url').next().split(':') // hbase:188.184.87.217:8182:janusgraph
@@ -66,8 +70,8 @@ class LomikelCERN {
 
   }
   
-LomikelCERN.init()
+LomikelServer.init()
 
-globals << [graph : LomikelCERN.graph]
-globals << [g : LomikelCERN.g]
+globals << [graph : LomikelServer.graph]
+globals << [g : LomikelServer.g]
 
