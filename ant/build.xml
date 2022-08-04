@@ -527,7 +527,7 @@
       <env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/>
       <arg line="start"/>
       </exec>
-    <echo>Starting JanusGraph Server (CORS)</echo>
+    <!--echo>Starting JanusGraph Server (CORS)</echo>
     <exec executable="${janusgraph_dir}/bin/janusgraph-server.sh">
       <env key="PID_FILE"        value="${janusgraph_dir}/run/janusgraphCORS.pid"/>
       <env key="LOG_DIR"         value="${janusgraph_dir}/logsCORS"/>
@@ -535,7 +535,7 @@
       <env key="HBASE_CONF_DIR"  value="${phoenix_conf_dir}"/>
       <env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/>
       <arg line="start"/>
-      </exec>
+      </exec-->
     </target>
   
    <target name="janus-stop"
