@@ -129,7 +129,7 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
 
     private static final Pattern pattern = Pattern.compile("(.*);q=(.*)");
 
-    public HttpGremlinEndpointHandlerCORS(final Map<String, MessageSerializer> serializers,
+    public HttpGremlinEndpointHandlerCORS(final Map<String, MessageSerializer<?>> serializers,
                                           final GremlinExecutor gremlinExecutor,
                                           final GraphManager graphManager,
                                           final Settings settings) {
