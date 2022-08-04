@@ -74,16 +74,17 @@ public class DirectGremlinClient extends    GremlinClient
    
   @Override
   public void connect() {
-    _graph = EmptyGraph.instance();
-    try {
-      cluster().connect();
-      _g = _graph.traversal().withRemote(DriverRemoteConnection.using(cluster(), "g"));
-      _client = cluster().connect().alias("g");
-      }
-    catch (Exception e) {
-      log.error("Cannot connect", e);
-      }
-    log.info("Connected");
+    log.error("Does not work"); // TBD: make it working
+    //_graph = EmptyGraph.instance();
+    //try {
+    //  cluster().connect();
+    //  _g = _graph.traversal().withRemote(DriverRemoteConnection.using(cluster(), "g"));
+    //  _client = cluster().connect().alias("g");
+    //  }
+    //catch (Exception e) {
+    //  log.error("Cannot connect", e);
+    //  }
+    //log.info("Connected");
     }
        
   /** Submit Gremlin request as a {@link Traversal}.
