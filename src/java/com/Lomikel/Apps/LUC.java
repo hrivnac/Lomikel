@@ -6,19 +6,12 @@ import com.Lomikel.Apps.CLI;
 import com.Lomikel.Apps.BSCLI;
 import com.Lomikel.Apps.GCLI;
 import com.Lomikel.GUI.Icons;
-import com.Lomikel.Utils.StringResource;
-import com.Lomikel.Utils.LomikelException;
 
 // Bean Shell
-import bsh.Interpreter;
-import bsh.EvalError;
 
 // CLI
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.CommandLine;
 
 // Swing
-import javax.swing.ImageIcon;
 
 // Log4J
 import org.apache.log4j.Logger;

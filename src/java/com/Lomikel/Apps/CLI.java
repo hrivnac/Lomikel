@@ -1,16 +1,5 @@
 package com.Lomikel.Apps;
 
-import com.Lomikel.Utils.Init;
-import com.Lomikel.Utils.Info;
-import com.Lomikel.Utils.StringFile;
-import com.Lomikel.Utils.StringResource;
-import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.GUI.AboutLabel;
-import com.Lomikel.GUI.SimpleButton;
-import com.Lomikel.GUI.Icons;
-import com.Lomikel.GUI.Dimensions;
-import com.Lomikel.GUI.Fonts;
-import com.Lomikel.GUI.AListener;
 
 // CLI
 import org.apache.commons.cli.CommandLineParser;
@@ -22,7 +11,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
 // Java
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
