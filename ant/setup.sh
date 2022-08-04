@@ -14,7 +14,7 @@ if [[ ! "x" = "x${java_home}" ]]; then
 if [[ ! "x" = "x${hbase_classpath}" ]]; then
   export CLASSPATH="${hbase_classpath}"
   fi
-export GREMLIN_CLASSPATH="${groovy_sql_jar}:${janusgraph_dir}/*.jar"  
+export GREMLIN_CLASSPATH="${groovy_sql_jar}"  
 if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
   export GREMLIN_CLASSPATH="${GREMLIN_CLASSPATH}:${hadoop_phoenix_conf}:${hbase_phoenix_conf}:${phoenix_jar}"
   fi
@@ -30,9 +30,9 @@ if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
 else
   HBASE_CONF_DIR=''
   fi
-alias gremlin_Local='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
-alias gremlin_IJCLab='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
-alias gremlin_CERN='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CERN.gremlin"'
+alias gremlin_Local='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
+alias gremlin_IJCLab='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
+alias gremlin_CERN='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CERN.gremlin"'
 alias gremlin_console='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
 
 echo "commands: gremlin_console, gremlin_Local, gremlin_IJCLab, gremlin_CERN"

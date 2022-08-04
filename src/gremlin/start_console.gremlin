@@ -56,7 +56,7 @@ class Lomikel {
         return Eval.me('g', g, v.values('query').next())
         break
       case 'Phoenix':
-        return groovy.sql.Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
+        return Sql.newInstance(v.values('url').next(), 'org.apache.phoenix.jdbc.PhoenixDriver').
                       rows(v.values('query').next())
         break
       default:
