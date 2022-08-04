@@ -115,7 +115,7 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
     /**
      * Serializers for the response.
      */
-    private final Map<String, MessageSerializer> serializers;
+    private final Map<String, MessageSerializer<?>> serializers;
 
     /**
      * This is just a generic mapper to interpret the JSON of a POSTed request.  It is not used for the serialization
