@@ -156,6 +156,7 @@
            target="8">
       <src path="../src/java"/>
       <src path="../build"/>
+      <exclude name="com/Lomikel/TinkerPopPatch/**"/>
       <classpath>
         <path refid="classpath.build"/>
         </classpath>
