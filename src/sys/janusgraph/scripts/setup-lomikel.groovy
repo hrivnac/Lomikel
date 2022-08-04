@@ -40,7 +40,7 @@ class LomikelServer {
     switch (v.values('technology').next()) {
       case 'HBase':
         def (hostname, port, table, schema) = v.values('url').next().split(':') // 134.158.74.54:2181:ztf:schema_0.7.0_0.3.8
-        def client = new HBaseClient(hostname, port)
+        def client = new com.Lomikel.HBaser.HBaseClient(hostname, port)
         client.connect(table, schema)
         return Eval.me('client', client, v.values('query').next())
         break
