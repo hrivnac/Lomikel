@@ -123,7 +123,7 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
             final boolean keepAlive = HttpUtil.isKeepAlive(req);
 
             if ("/favicon.ico".equals(req.uri())) {
-                HttpHandlerUtil.sendError(ctx, NOT_FOUND, "Gremlin Server doesn't have a favicon.ico", keepAlive);
+                HttpHandlerUtilCORS.sendError(ctx, NOT_FOUND, "Gremlin Server doesn't have a favicon.ico", keepAlive);
                 ReferenceCountUtil.release(msg);
                 return;
             }
@@ -133,16 +133,16 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
             }
 
             if (req.method() != GET && req.method() != POST) {
-                HttpHandlerUtil.sendError(ctx, METHOD_NOT_ALLOWED, METHOD_NOT_ALLOWED.toString(), keepAlive);
+                HttpHandlerUtilCORS.sendError(ctx, METHOD_NOT_ALLOWED, METHOD_NOT_ALLOWED.toString(), keepAlive);
                 ReferenceCountUtil.release(msg);
                 return;
             }
 
             final Quartet<String, Map<String, Object>, String, Map<String, String>> requestArguments;
             try {
-                requestArguments = HttpHandlerUtil.getRequestArguments(req);
+                requestArguments = HttpHandlerUtilCORS.getRequestArguments(req);
             } catch (IllegalArgumentException iae) {
-                HttpHandlerUtil.sendError(ctx, BAD_REQUEST, iae.getMessage(), keepAlive);
+                HttpHandlerUtilCORS.sendError(ctx, BAD_REQUEST, iae.getMessage(), keepAlive);
                 ReferenceCountUtil.release(msg);
                 return;
             }
@@ -150,7 +150,7 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
             final String acceptString = Optional.ofNullable(req.headers().get("Accept")).orElse("application/json");
             final Pair<String, MessageTextSerializer<?>> serializer = chooseSerializer(acceptString);
             if (null == serializer) {
-                HttpHandlerUtil.sendError(ctx, BAD_REQUEST, String.format("no serializer for requested Accept header: %s", acceptString),
+                HttpHandlerUtilCORS.sendError(ctx, BAD_REQUEST, String.format("no serializer for requested Accept header: %s", acceptString),
                         keepAlive);
                 ReferenceCountUtil.release(msg);
                 return;
@@ -193,7 +193,7 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
                           response.headers().add(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
                           }
 
-                        HttpHandlerUtil.sendAndCleanupConnection(ctx, keepAlive, response);
+                        HttpHandlerUtilCORS.sendAndCleanupConnection(ctx, keepAlive, response);
                     }
                 });
 
@@ -203,7 +203,7 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
                 try {
                     bindings = createBindings(requestArguments.getValue1(), requestArguments.getValue3());
                 } catch (IllegalStateException iae) {
-                    HttpHandlerUtil.sendError(ctx, BAD_REQUEST, iae.getMessage(), keepAlive);
+                    HttpHandlerUtilCORS.sendError(ctx, BAD_REQUEST, iae.getMessage(), keepAlive);
                     ReferenceCountUtil.release(msg);
                     return;
                 }
@@ -251,9 +251,9 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
 
                 evalFuture.exceptionally(t -> {
                     if (t.getMessage() != null)
-                        HttpHandlerUtil.sendError(ctx, INTERNAL_SERVER_ERROR, t.getMessage(), Optional.of(t), keepAlive);
+                        HttpHandlerUtilCORS.sendError(ctx, INTERNAL_SERVER_ERROR, t.getMessage(), Optional.of(t), keepAlive);
                     else
-                        HttpHandlerUtil.sendError(ctx, INTERNAL_SERVER_ERROR, String.format("Error encountered evaluating script: %s", requestArguments.getValue0())
+                        HttpHandlerUtilCORS.sendError(ctx, INTERNAL_SERVER_ERROR, String.format("Error encountered evaluating script: %s", requestArguments.getValue0())
                                 , Optional.of(t), keepAlive);
                     promise.setFailure(t);
                     return null;
@@ -270,11 +270,11 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
                 // context on whether to close the connection or not, based on keepalive.
                 final Throwable t = ExceptionHelper.getRootCause(ex);
                 if (t instanceof TooLongFrameException) {
-                    HttpHandlerUtil.sendError(ctx, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE, t.getMessage() + " - increase the maxContentLength", keepAlive);
+                    HttpHandlerUtilCORS.sendError(ctx, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE, t.getMessage() + " - increase the maxContentLength", keepAlive);
                 } else if (t != null){
-                    HttpHandlerUtil.sendError(ctx, INTERNAL_SERVER_ERROR, t.getMessage(), keepAlive);
+                    HttpHandlerUtilCORS.sendError(ctx, INTERNAL_SERVER_ERROR, t.getMessage(), keepAlive);
                 } else {
-                    HttpHandlerUtil.sendError(ctx, INTERNAL_SERVER_ERROR, ex.getMessage(), keepAlive);
+                    HttpHandlerUtilCORS.sendError(ctx, INTERNAL_SERVER_ERROR, ex.getMessage(), keepAlive);
                 }
             }
         }
@@ -285,7 +285,7 @@ public class HttpGremlinEndpointHandlerCORS extends ChannelInboundHandlerAdapter
         logger.error("Error processing HTTP Request", cause);
 
         if (ctx.channel().isActive()) {
-            HttpHandlerUtil.sendError(ctx, INTERNAL_SERVER_ERROR, cause.getMessage(), false);
+            HttpHandlerUtilCORS.sendError(ctx, INTERNAL_SERVER_ERROR, cause.getMessage(), false);
         }
     }
 
