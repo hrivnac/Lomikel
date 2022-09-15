@@ -33,7 +33,7 @@ class Lomikel {
     return [graph0, g0]
     }
     
-  def gimme(v, g1) {
+  def static gimme(v, g1, depth = 0) {
     def em = v.elementMap().next()
     def label = em[label]
     def v1 = g1.addV(label)

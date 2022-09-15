@@ -37,7 +37,7 @@ class LomikelServer {
   // w = g.addV().property('lbl', 'datalink').property('technology', 'Graph'  ).property('url', 'hbase:188.184.87.217:8182:janusgraph').property('query', "g.V().limit(1)").next()
   // w = g.addV().property('lbl', 'datalink').property('technology', 'HBase'  ).property('url', '134.158.74.54:2183:ztf:schema').property('query', "client.setLimit(10); return client.scan(null, null, null, 0, false, false)").next()
   def static getDataLink(v, q = null) {
-    def url   = v.values('url'  ).next()
+    def url   = v.values('url').next()
     def query
     if (q != null) {
       query = q
@@ -68,7 +68,7 @@ class LomikelServer {
         break
       case 'Phoenix':
         return groovy.sql.Sql.newInstance(url, 'org.apache.phoenix.jdbc.PhoenixDriver').
-                   rows(query).toString()
+                              rows(query).toString()
         break
       default:
         return 'unknown DataLink ' + v
