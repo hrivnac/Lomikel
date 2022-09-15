@@ -33,15 +33,17 @@ class Lomikel {
     return [graph0, g0]
     }
     
+  // (g1, graph1) = Lomikel.myGraph()
+  // Lomikel.gimme(g.V().limit(1), g1)
   def static gimme(v, g1, depth = 0) {
     def em = v.elementMap().next()
     def label = em[label]
-    def v1 = g1.addVertex(label)
+    def v1 = g1.addVertex(label.toString())
     em.entrySet().
        stream().
        filter{it.key.toString() != 'id' && it.key.toString() != 'label'}.
        each{v1.property(it.key, it.value)}
-    return v1.next()
+    return v1
     }
   
   def static get_or_create(g, lbl, name, value) {
