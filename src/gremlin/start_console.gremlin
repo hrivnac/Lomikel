@@ -36,7 +36,7 @@ class Lomikel {
   def static gimme(v, g1, depth = 0) {
     def em = v.elementMap().next()
     def label = em[label]
-    def v1 = g1.addV(label)
+    def v1 = g1.addVertex(label)
     em.entrySet().
        stream().
        filter{it.key.toString() != 'id' && it.key.toString() != 'label'}.
