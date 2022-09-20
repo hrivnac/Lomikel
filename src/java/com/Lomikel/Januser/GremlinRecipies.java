@@ -184,10 +184,12 @@ public class GremlinRecipies {
      List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).toList();
      if (!vertexes.isEmpty()) {
        log.debug(""  + vertexes.size() + " existing vertexes " + label + " found");
+       _found = true;
        }
      else {
        log.debug("No existing vertexes " + label + " found - searching backend databases");
        vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues).toList();
+       _found = false;
        }
      return vertexes;
      }
@@ -307,6 +309,14 @@ public class GremlinRecipies {
                        next();
     addEdge(vertex, datalink, "from");
     }
+    
+  /** Give status of the most recent creation operation.
+    * @return Whether the most recent <tt>#getOrCreate</tt>
+    * or <tt>#checkEdge</tt> operation created new object. */
+  public boolean created() {
+    return !_found;
+    }  
+    
     
   private GraphTraversalSource _g;
     
