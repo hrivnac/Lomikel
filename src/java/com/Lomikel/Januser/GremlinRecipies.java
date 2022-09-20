@@ -49,6 +49,7 @@ public class GremlinRecipies {
     * @param client The attached  {@link ModifyingGremlinClient}. */
   public GremlinRecipies(ModifyingGremlinClient client) {
     _client = client;
+    _g      = client.g();
     }
   
   /** Extract implicite schema. */
@@ -293,10 +294,10 @@ public class GremlinRecipies {
     * @param query       The query to get data from the external database.
     */
   public void attachDataLink(Vertex vertex,
-                              String name,
-                              String technology,
-                              String url,
-                              String query) {
+                             String name,
+                             String technology,
+                             String url,
+                             String query) {
   Vertex datalink = _g.addV("datalink").
                        property("lbl",        "datalink").
                        property("name",       name).
