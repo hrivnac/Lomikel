@@ -264,7 +264,8 @@ system.graph('food').drop()
 
 // clean everything
 graph.close()
-org.janusgraph.core.util.JanusGraphCleanup.clear(graph)
+org.janusgraph.core.JanusGraphFactory.drop(graph)
+
 
 // IO
 // ==

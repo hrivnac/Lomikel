@@ -285,6 +285,28 @@ public class GremlinRecipies {
     return v;
     }
     
+  /** Attach <em>datalink</em> {@link Vertex} to an existing {@link Vertex}.
+    * @param vertex      The master {@link Vertex}.
+    * @param name        The name of the datalink.
+    * @param technology  The external database technology.
+    * @param url         The url of the external database.
+    * @param query       The query to get data from the external database.
+    */
+  public void attachDataLink(Vertex vertex,
+                              String name,
+                              String technology,
+                              String url,
+                              String query) {
+  Vertex datalink = g.addV("datalink").
+                      property("lbl",        "datalink").
+                      property("name",       name).
+                      property("technology", technology).
+                      property("url",        url).
+                      property("query",      query).
+                      next();
+    addEdge(vertex, datalink, "from");
+    }
+    
   private GraphTraversalSource _g;
     
   private ModifyingGremlinClient _client;
