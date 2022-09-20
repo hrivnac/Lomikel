@@ -297,13 +297,13 @@ public class GremlinRecipies {
                               String technology,
                               String url,
                               String query) {
-  Vertex datalink = g.addV("datalink").
-                      property("lbl",        "datalink").
-                      property("name",       name).
-                      property("technology", technology).
-                      property("url",        url).
-                      property("query",      query).
-                      next();
+  Vertex datalink = _g.addV("datalink").
+                       property("lbl",        "datalink").
+                       property("name",       name).
+                       property("technology", technology).
+                       property("url",        url).
+                       property("query",      query).
+                       next();
     addEdge(vertex, datalink, "from");
     }
     
