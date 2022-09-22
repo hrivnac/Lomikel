@@ -64,7 +64,7 @@ class LomikelServer {
                                       set('storage.hbase.table', table   ).
                                       open()
         def g = graph.traversal()
-        query = query.toString()
+        query = query
         return Eval.me('g', g, query)
         break
       case 'Phoenix':
