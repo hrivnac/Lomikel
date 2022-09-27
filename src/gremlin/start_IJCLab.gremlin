@@ -1,5 +1,5 @@
 //:record start MyGremlin.log
-:remote connect tinkerpop.server conf/IJCLab.yaml session
+:remote connect tinkerpop.server conf/IJCLabCORS.yaml session
 :remote config timeout 100000
 :remote console
 
