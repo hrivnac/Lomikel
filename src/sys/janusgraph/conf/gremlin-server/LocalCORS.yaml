@@ -1,7 +1,7 @@
 host: @SERVER.HOST@
 port: @SERVER.PORT.CORS@
 evaluationTimeout: 300000
-channelizer: com.Lomikel.TinkerPopPatch.HttpChannelizerCORS
+channelizer: com.Lomikel.TinkerPopPatch.WsAndHttpChannelizerCORS
 #channelizer: org.apache.tinkerpop.gremlin.server.channel.WsAndHttpChannelizer
 #channelizer: org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer
 graphs: {
