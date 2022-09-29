@@ -76,7 +76,7 @@ class LomikelServer {
           return 'DataLink ' + v + ' unknown'
           }
         }
-      catch (Exception e) }
+      catch (Exception e) {
       return 'DataLink ' + v + ' not found'
       }
     }
