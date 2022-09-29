@@ -16,7 +16,7 @@ if [[ ! "x" = "x${hbase_classpath}" ]]; then
   fi
 export GREMLIN_CLASSPATH="${groovy_sql_jar}"  
 if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
-  export GREMLIN_CLASSPATH="${GREMLIN_CLASSPATH}:${hadoop_phoenix_conf}:${hbase_phoenix_conf}:${phoenix_jar}"
+  export GREMLIN_CLASSPATH="${GREMLIN_CLASSPATH}:${groovy_sql_jar}:${hadoop_phoenix_conf}:${hbase_phoenix_conf}:${phoenix_jar}"
   fi
   
 export janusgraph_dir
@@ -30,9 +30,11 @@ if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
 else
   HBASE_CONF_DIR=''
   fi
-alias gremlin_Local='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
+alias gremlin_console_Local='HBASE_CONF_DIR=${HBASE_CONF_DIR}  CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
+alias gremlin_console_IJCLab='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local-IJCLab.properties ${home}"'
+alias gremlin_console_CERN='HBASE_CONF_DIR=${HBASE_CONF_DIR}   CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local-CERN.properties ${home}"'
+alias gremlin_Local='CLASSPATH=""  ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
 alias gremlin_IJCLab='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
-alias gremlin_CERN='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CERN.gremlin"'
-alias gremlin_console='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
+alias gremlin_CERN='CLASSPATH=""   ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CERN.gremlin"'
 
-echo "commands: gremlin_console, gremlin_Local, gremlin_IJCLab, gremlin_CERN"
+echo "commands: gremlin_console_Local, gremlin_console_IJCLab, gremlin_console_CERN, gremlin_Local, gremlin_IJCLab, gremlin_CERN"
