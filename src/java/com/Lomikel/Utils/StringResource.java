@@ -22,10 +22,19 @@ public class StringResource {
     
   /** Create.
     * @param resource The resource path. 
+    * @param cl       The {@link Class} defining the resourece.
     * @throws LomikelException If resource can't be read. */      
   public StringResource(String resource) throws LomikelException {
+    this(resource, StringResource.class);
+    }
+    
+  /** Create.
+    * @param resource The resource path. 
+    * @throws LomikelException If resource can't be read. */      
+  public StringResource(String resource,
+                        Class cl) throws LomikelException {
     try {
-      InputStream       is  = StringResource.class.getClassLoader().getResourceAsStream(resource);
+      InputStream       is  = cl.getClassLoader().getResourceAsStream(resource);
       InputStreamReader isr = new InputStreamReader(is);
       BufferedReader    br  = new BufferedReader(isr);
       StringBuffer buffer = new StringBuffer();
