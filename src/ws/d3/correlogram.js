@@ -4,7 +4,6 @@ function showCorrelogram(otable) {
   var min = otable[0].value;
   var max = otable[0].value;
   for (o of otable) {
-    dim++;
     otable1.push({x:o.y, y:o.x, value:o.value, info:o.info})
     //if (min > o.value) {
     //  min = o.value
