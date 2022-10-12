@@ -25,8 +25,8 @@ function showCorrelogram(otable) {
     otable.push({x:d, y:d, value:0, info:""})
     }
 
-  const width0 = dim * 80 + 30;
-  const height0 = dim * 80 + 30;
+  const width0 = dim * 40 + 30; // 430
+  const height0 = dim * 40 + 30; // 430
   const margin = { top:(height0 / num / 2),
                    right:(width0 / num / 2 + 50),
                    bottom:(height0 / num / 2),
