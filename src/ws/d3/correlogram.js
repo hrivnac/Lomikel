@@ -1,7 +1,6 @@
 function showCorrelogram(otable) {
       
   otable1 = [];
-  var dim = 0;
   var min = otable[0].value;
   var max = otable[0].value;
   for (o of otable) {
@@ -25,8 +24,8 @@ function showCorrelogram(otable) {
     otable.push({x:d, y:d, value:0, info:""})
     }
 
-  const width0 = dim * 40 + 30; // 430
-  const height0 = dim * 40 + 30; // 430
+  const width0  = num * 80 + 30; // 430
+  const height0 = num * 80 + 30; // 430
   const margin = { top:(height0 / num / 2),
                    right:(width0 / num / 2 + 50),
                    bottom:(height0 / num / 2),
