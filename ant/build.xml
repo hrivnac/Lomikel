@@ -138,6 +138,13 @@
 			<fileset file="${javaxservlet_jar}"/>
 			<fileset file="${math3_jar}"/>
 			<fileset file="${healpix_jar}"/>
+			<fileset file="${groovy_jar}"/>
+			<fileset file="${groovysh_jar}"/>
+			<fileset file="${groovy_ant_jar}"/>
+			<fileset file="${groovy_sql_jar}"/>
+			<fileset file="${hbasecommon_jar}"/>
+			<fileset file="${hbaseclient_jar}"/>
+			<fileset file="${hadoopcommon_jar}"/>
       </copy>
     </target>
 
@@ -202,6 +209,7 @@
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${logging_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${groovysh_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.3.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-codec-1.15.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-collections-3.2.2.jar" excludes="META-INF/*"/>
@@ -219,7 +227,6 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-2.5.14-indy.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-2.5.14.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-console-2.5.14.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-groovysh-2.5.14-indy.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-2.5.14-indy.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-2.5.14-indy.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-2.5.14.jar" excludes="META-INF/*"/>
@@ -308,6 +315,7 @@
       <lib file="${hbasecommon_jar}"/>
       <lib file="${hbaseclient_ja}"/>
       <lib file="${hadoopcommon_jar}"/>
+      <lib file="${groovysh_jar}"/>
       <lib file="${janusgraph_dir}/lib/caffeine-2.3.1.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-codec-1.14.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-collections-3.2.2.jar"/>
@@ -325,7 +333,6 @@
       <lib file="${janusgraph_dir}/lib/groovy-2.5.7-indy.jar"/>
       <lib file="${janusgraph_dir}/lib/groovy-cli-picocli-2.5.7.jar"/>
       <lib file="${janusgraph_dir}/lib/groovy-console-2.5.7.jar"/>
-      <lib file="${janusgraph_dir}/lib/groovy-groovysh-2.5.7-indy.jar"/>
       <lib file="${janusgraph_dir}/lib/groovy-json-2.5.7-indy.jar"/>
       <lib file="${janusgraph_dir}/lib/groovy-jsr223-2.5.7-indy.jar"/>
       <lib file="${janusgraph_dir}/lib/groovy-swing-2.5.7.jar"/>
@@ -626,7 +633,7 @@
       <fileset dir="." includes="**/*"/>
       </delete>
    </target>
- 
+   
   <!-- Dist =================================================================-->
 
   <target name="dist"
@@ -651,6 +658,13 @@
 			<fileset file="${javaxservlet_jar}"/>
 			<fileset file="${math3_jar}"/>
 			<fileset file="${healpix_jar}"/>
+			<fileset file="${groovy_jar}"/>
+			<fileset file="${groovysh_jar}"/>
+			<fileset file="${groovy_ant_jar}"/>
+			<fileset file="${groovy_sql_jar}"/>
+			<fileset file="${hadoopcommon_jar}"/>
+			<fileset file="${hbasecommon_jar}"/>
+			<fileset file="${hbaseclient_jar}"/>
       </copy>
     <mkdir dir="../dist/ws-${version}"/>
     <copy todir="../dist/ws-${version}">
