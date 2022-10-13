@@ -486,10 +486,8 @@
     <replace file="${janusgraph_dir}/conf/LocalCORS.yaml"                        token="@SERVER.PORT.CORS@"               value="${gremlin_port_cors}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"             token="@SERVER.HOST@"                    value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"             token="@SERVER.PORT@"                    value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"             token="@ELASTICSEARCH.HOSTNAME@"         value="${elasticsearch_hostname}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"         token="@SERVER.HOST@"                    value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"         token="@SERVER.PORT.CORS@"               value="${gremlin_port_cors}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"         token="@ELASTICSEARCH.HOSTNAME@"         value="${elasticsearch_hostname}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@STORAGE.HOSTNAME@"               value="${zookeeper}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@STORAGE.PORT@"                   value="${hbase_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@STORAGE.HBASE.TABLE@"            value="${janus_table}"/>
@@ -502,6 +500,7 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@EVENTS.TABLE@"                   value="${events_table}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@EVENTS.SCHEMA@"                  value="${events_schema}"/>
+    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@ELASTICSEARCH.HOSTNAME@"         value="${elasticsearch_hostname}"/>
     <copy file="${janusgraph_dir}/conf/gremlin-server/Local.properties"          tofile="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" overwrite="true"/>
     <echo file="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" append="true">storage.batch-loading=true</echo>
     <echo>... plugin</echo>
