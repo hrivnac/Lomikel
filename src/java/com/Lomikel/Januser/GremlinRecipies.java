@@ -328,10 +328,10 @@ public class GremlinRecipies {
     * @return        The cloned {@link Vertex}. */
   public Vertex gimme(Vertex               v,
                       GraphTraversalSource g1,
-                      int                depthIn,
-                      int                depthOut) {
+                      int                  depthIn,
+                      int                  depthOut) {
     for (String key : v.keys()) {
-      log.info(key);
+      System.out.println(key);
       }
     return v;
     }
