@@ -5,7 +5,8 @@ import groovy.sql.Sql
 
 class Lomikel {
 
-  def static init() {
+  def static init(c) {
+    config = c
     println "class Lomikel initialised"
     }
 
@@ -23,9 +24,9 @@ class Lomikel {
       }
     else {
       graph0 = JanusGraphFactory.build().
-                                 set('storage.backend',     'hbase').
-                                 set('storage.hostname',    '188.184.87.217').
-                                 set('storage.port',        8182).
+                                 set('storage.backend',     config.getString('storage.backend')).
+                                 set('storage.hostname',    config.getString('storage.hostname')).
+                                 set('storage.port',        config.getString('storage.port')).
                                  set('storage.hbase.table', myName).
                                  open()
       }
@@ -110,7 +111,9 @@ class Lomikel {
         return 'DataLink ' + v + ' not found'
         }
       }
-  
+
+  def static config    
+      
   }
   
 // -----------------------------------------------------------------------------
