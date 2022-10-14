@@ -330,10 +330,11 @@ public class GremlinRecipies {
                       GraphTraversalSource g1,
                       int                  depthIn,
                       int                  depthOut) {
+    Vertex v1 = g1.addV(v.label());
     for (String key : v.keys()) {
-      System.out.println(key);
+      v1.property(key, v.property(k));
       }
-    return v;
+    return v1;
     }
     
   public void gimme() {
