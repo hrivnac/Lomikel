@@ -336,6 +336,8 @@ public class GremlinRecipies {
     return v;
     }
     
+  public void gimme() {
+  }
      
   private GraphTraversalSource _g;
     
