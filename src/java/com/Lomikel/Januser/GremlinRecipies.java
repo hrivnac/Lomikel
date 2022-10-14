@@ -326,10 +326,10 @@ public class GremlinRecipies {
     * @param depthIn The depth of the parent {@link Vertex}es to clone
     *                (<tt>0</tt> will clone the full up-tree).
     * @return        The cloned {@link Vertex}. */
-  public Vertex gimme(org.janusgraph.graphdb.vertices.CacheVertex               v,
+  public Vertex gimme(Vertex               v,
                       GraphTraversalSource g1,
-                      short                depthIn,
-                      short                depthOut) {
+                      int                depthIn,
+                      int                depthOut) {
     for (String key : v.keys()) {
       log.info(key);
       }

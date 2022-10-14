@@ -348,5 +348,5 @@ https://gist.github.com/jeremysears/3ceada192827983837ee1551c50688c7
 // =======
 
 graph1 = Lomikel.myGraph("test")
-g1=graph1.traversal()
+g1 = graph1.traversal()
 Lomikel.gimme(g.V().has('lbl', 'source').has('objectId', 'ZTF18abimyys'), g1)
