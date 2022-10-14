@@ -330,8 +330,8 @@ public class GremlinRecipies {
                       GraphTraversalSource g1,
                       short                depthIn,
                       short                depthOut) {
-    for (VertexProperty vp : v.properties()) {
-      log.info(vp);
+    for (String key : v.keys()) {
+      log.info(key);
       }
     return v;
     }
