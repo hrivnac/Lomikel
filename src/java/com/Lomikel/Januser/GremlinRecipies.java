@@ -332,7 +332,7 @@ public class GremlinRecipies {
                       int                  depthOut) {
     Vertex v1 = g1.addV(v.label()).next();
     for (String key : v.keys()) {
-      v1.property(key, v.property(key));
+      v1.property(key, v.property(key).next());
       }
     return v1;
     }
