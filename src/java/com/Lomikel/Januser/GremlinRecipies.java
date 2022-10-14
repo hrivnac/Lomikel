@@ -317,7 +317,26 @@ public class GremlinRecipies {
     return !_found;
     }  
     
+  /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
+    * including connected {@link Vertex}es.
+    * @param v The {@link Vertex} to clone.
+    * @param g1 The {@link GraphTraversalSource} to clone {@link Vertex} to.
+    * @param depthIn The depth of the children {@link Vertex}es to clone
+    *                (<tt>0</tt> will clone the full down-tree).
+    * @param depthIn The depth of the parent {@link Vertex}es to clone
+    *                (<tt>0</tt> will clone the full up-tree).
+    * @return        The cloned {@link Vertex}. */
+  public Vertex gimme(Vertex               v,
+                      GraphTraversalSource g1,
+                      short                depthIn,
+                      short                depthOut) {
+    for (VertexProperty vp : v.properties()) {
+      log.info(vp);
+      }
+    return v;
+    }
     
+     
   private GraphTraversalSource _g;
     
   private ModifyingGremlinClient _client;
