@@ -330,15 +330,40 @@ public class GremlinRecipies {
                       GraphTraversalSource g1,
                       int                  depthIn,
                       int                  depthOut) {
+    if (depthIn < 0) {
+      depthIn = Integer.MAX_VALUE;
+      }
+    if (depthOut < 0) {
+      depthOut = Integer.MAX_VALUE;
+      }
     Vertex v1 = g1.addV(v.label()).next();
     for (String key : v.keys()) {
       v1.property(key, v.property(key).value());
       }
+    Iterator<Edge> edges;
+    Edge e;
+    Vertex ve;
+    Vertex ve1;
+    if (depthIn > 0) {
+      edges = v.edges(Direction.IN);
+      while (edges.hasNext()) {
+        e = edges.next();
+        ve = e.inVertex();
+        ve1 = gimme(ve, g1, depthIn - 1, 0);
+        ve1.addEdge(e.label(), v1);
+        }
+      }
+    if (depthOut > 0) {
+      edges = v.edges(Direction.OUT);
+      while (edges.hasNext()) {
+        e = edges.next();
+        ve = e.outVertex();
+        ve1 = gimme(ve, g1, 0, depthOut - 1);
+        v1.addEdge(e.label(), ve1);
+        }
+      }
     return v1;
     }
-    
-  public void gimme() {
-  }
      
   private GraphTraversalSource _g;
     
