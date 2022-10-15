@@ -332,7 +332,6 @@ public class GremlinRecipies {
                       GraphTraversalSource g1,
                       int                  depthIn,
                       int                  depthOut) {
-    System.out.println("cloning " + v.label());
     if (depthIn < 0) {
       depthIn = Integer.MAX_VALUE;
       }
@@ -349,12 +348,10 @@ public class GremlinRecipies {
     Vertex ve;
     Vertex ve1;
     if (depthIn > 0) {
-      System.out.println("going in");
       edges = v.edges(Direction.IN);
       while (edges.hasNext()) {
         e = edges.next();
         ve = e.outVertex();
-        System.out.println("+ " + e.label() + " " + ve.label());
         ve1 = gimme(ve, g1, depthIn - 1, 0);
         e1 = ve1.addEdge(e.label(), v1);
         for (String key : e.keys()) {
@@ -363,12 +360,10 @@ public class GremlinRecipies {
         }
       }
     if (depthOut > 0) {
-      System.out.println("going out");
       edges = v.edges(Direction.OUT);
       while (edges.hasNext()) {
         e = edges.next();
         ve = e.inVertex();
-        System.out.println("+ " + e.label() + " " + ve.label());
         ve1 = gimme(ve, g1, 0, depthOut - 1);
         e1 = v1.addEdge(e.label(), ve1);
         for (String key : e.keys()) {

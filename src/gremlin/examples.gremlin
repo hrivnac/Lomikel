@@ -351,4 +351,5 @@ graph1 = Lomikel.myGraph("test")
 g1 = graph1.traversal()
 import com.Lomikel.Januser.GremlinRecipies;
 gr = new GremlinRecipies(g)
-x = gr.gimme(g.V().has('lbl', 'source').has('objectId', 'ZTF18abimyys').next(), g1, 0, 0)
+alert = g.V().has('lbl', 'source').has('objectId', 'ZTF18abimyys').out().limit(1).next()
+x = gr.gimme(alert, g1, -1, -1)
