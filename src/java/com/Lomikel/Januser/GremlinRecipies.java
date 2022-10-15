@@ -319,13 +319,15 @@ public class GremlinRecipies {
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
     * including connected {@link Vertex}es.
-    * @param v The {@link Vertex} to clone.
-    * @param g1 The {@link GraphTraversalSource} to clone {@link Vertex} to.
-    * @param depthIn The depth of the children {@link Vertex}es to clone
-    *                (<tt>0</tt> will clone the full down-tree).
-    * @param depthIn The depth of the parent {@link Vertex}es to clone
-    *                (<tt>0</tt> will clone the full up-tree).
-    * @return        The cloned {@link Vertex}. */
+    * @param v        The {@link Vertex} to clone.
+    * @param g1       The {@link GraphTraversalSource} to clone {@link Vertex} to.
+    * @param depthIn  The depth of the parent {@link Vertex}es to clone
+    *                 (negative value will clone the full up-tree).
+    *                 The parents will not have their children cloned.
+    * @param depthOut The depth of the child {@link Vertex}es to clone
+    *                 (negative value will clone the full down-tree).
+    *                 The children willnot have their parents cloned.
+    * @return         The cloned {@link Vertex}. */
   public Vertex gimme(Vertex               v,
                       GraphTraversalSource g1,
                       int                  depthIn,
@@ -342,6 +344,7 @@ public class GremlinRecipies {
       }
     Iterator<Edge> edges;
     Edge e;
+    Edge e1;
     Vertex ve;
     Vertex ve1;
     if (depthIn > 0) {
@@ -350,7 +353,10 @@ public class GremlinRecipies {
         e = edges.next();
         ve = e.inVertex();
         ve1 = gimme(ve, g1, depthIn - 1, 0);
-        ve1.addEdge(e.label(), v1);
+        e1 = ve1.addEdge(e.label(), v1);
+        for (String key : e.keys()) {
+          e1.property(key, e.property(key).value());
+          }
         }
       }
     if (depthOut > 0) {
@@ -359,7 +365,10 @@ public class GremlinRecipies {
         e = edges.next();
         ve = e.outVertex();
         ve1 = gimme(ve, g1, 0, depthOut - 1);
-        v1.addEdge(e.label(), ve1);
+        e1 = v1.addEdge(e.label(), ve1);
+        for (String key : e.keys()) {
+          e1.property(key, e.property(key).value());
+          }
         }
       }
     return v1;
