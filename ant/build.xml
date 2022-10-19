@@ -458,7 +458,7 @@
           description="Patch and Restart JanuGraph">
     <antcall target="janus-stop"/>
     <antcall target="janus-patch"/>
-    <antcall target="janus-start"/>
+    <antcall target="janus-start-cors"/>
     </target>
  
   <!-- Patch JanusGraph =====================================================-->

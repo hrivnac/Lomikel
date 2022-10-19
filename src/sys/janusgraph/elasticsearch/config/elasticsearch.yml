@@ -1,6 +1,6 @@
 # for IJCLab
 path.data: ../db/es/data
-path.logs: ../logs
+path.logs: logs
 xpack.security.enabled: false
 cluster.name: janus-graph-el
 http.port: 20200
