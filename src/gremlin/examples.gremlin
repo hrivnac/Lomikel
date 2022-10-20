@@ -343,26 +343,3 @@ graph.tx().commit();
 
 https://kelvinlawrence.net/book/Gremlin-Graph-Guide.html
 https://gist.github.com/jeremysears/3ceada192827983837ee1551c50688c7
-
-// Lomikel
-// =======
-
-// create personal graph in memory
-// (Lomikel is a groovy class for accesss and manipulation of graphs)
-graph1 = Lomikel.myGraph()
-// create (or access) named graph "test" in the master HBase
-// it is also possible to create graph in another HBase
-//graph1 = Lomikel.myGraph('test')
-// get access to this graph
-g1 = graph1.traversal()
-// create an instance of GremlinRecipies - a class with usefull methods for operations on graphs
-gr = new GremlinRecipies(g)
-// get any Vertex
-alert = g.V().has('lbl', 'source').has('objectId', 'ZTF18abimyys').out().limit(1).next()
-// clone that vertex from the master graph (g) to personal graph (g1)
-// last two (integer) arguments specify how far up/down should cloning go
-// cloning doesn't clone loops, up goes all the way up (without going down), down goes just down 
-// -1 means clone everything (it may be dangerous)
-x = gr.gimme(alert, g1, -1, -1)
-// commit new structure
-graph1.tx().commit()

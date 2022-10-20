@@ -742,8 +742,8 @@
   <!-- Post =================================================================-->
 
   <target name="post"
-          depends="init"
-          description="Post documentation">
+          depends="jar,doc,war,dist"
+          description="Post documentation and distribution">
     <delete includeEmptyDirs="true">
       <fileset dir="${doc}" includes="**/*"/>
       </delete>
@@ -808,7 +808,7 @@
   <target name="uml"
           depends="init"
           description="Create UML Graph">
-    <pathconvert targetos="unix" property="classpath.run" refid="classpath.run"/>
+    <!--pathconvert targetos="unix" property="classpath.run" refid="classpath.run"/>
 	  <apply executable="javadoc" dest="../build" parallel="true">
 		  <arg value="-classpath"/>
 		  <arg value="${classpath.run}"/>
@@ -831,7 +831,7 @@
 		  <srcfile/>
 		  <fileset dir="../doc"/>
 		  <mapper type="glob" from="*.dot" to="*.jpg"/>
-      </apply>
+      </apply-->
     </target>
 
   <!-- Find Bugs ============================================================-->  
