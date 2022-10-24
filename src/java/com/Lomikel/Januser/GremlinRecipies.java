@@ -321,13 +321,20 @@ public class GremlinRecipies {
   public void structurise(GraphTraversal<Vertex, Vertex> gt) {
     Vertex v;
     Property<Vertex> p;
+    Object id;
+    Map<Object id, Map<String, Object> vMap = new HashMap<>();
+    Map<String, Object> pMap;
     while (gt.hasNext()) {
       v = gt.next();
+      id = v.id();
+      pMap = new HashMap<>();
+      vMap.put(id, pMap);
       for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
         p = i.next();
-        System.out.println(p);
+        pMap.put(p.key(), p.value());
         }
       }
+    System.out.orintln(vMap);
     }   
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
