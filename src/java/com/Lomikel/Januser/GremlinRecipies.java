@@ -319,9 +319,9 @@ public class GremlinRecipies {
     }  
     
   /** TBD */
-  public void structurise(GraphStep step) {
-    while (step.hasNext()) {
-      System.out.println(step.next());
+  public void structurise(GraphTraversal gt) {
+    while (gt.hasNext()) {
+      System.out.println(gt.next());
       }
     }
     
