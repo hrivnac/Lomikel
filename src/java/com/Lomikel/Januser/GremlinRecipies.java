@@ -3,8 +3,6 @@ package com.Lomikel.Januser;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.DefaultGraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
@@ -316,11 +314,9 @@ public class GremlinRecipies {
     * @return Whether the most recent <tt>#getOrCreate</tt>
     * or <tt>#checkEdge</tt> operation created new object. */
   public boolean created() {
-    return !_found;      vSet = new HashSet<>();
-      vMap.put(v.label(), vSet);
-
+    return !_found;
     }  
-    
+
   /** TBD */
   public void structurise(GraphTraversal gt) {
     Vertex v;
@@ -332,7 +328,7 @@ public class GremlinRecipies {
         log.info(p);
         }
       }
-    }
+    }   
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
     * including connected {@link Vertex}es.
