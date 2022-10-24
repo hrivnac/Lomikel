@@ -322,7 +322,7 @@ public class GremlinRecipies {
     Vertex v;
     Property<Vertex> p;
     Object id;
-    Map<Object, Map<String, Object> vMap = new HashMap<>();
+    Map<Object, Map<String, Object>> vMap = new HashMap<>();
     Map<String, Object> pMap;
     while (gt.hasNext()) {
       v = gt.next();
