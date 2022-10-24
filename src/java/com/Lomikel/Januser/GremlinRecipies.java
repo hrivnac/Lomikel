@@ -316,13 +316,21 @@ public class GremlinRecipies {
     * @return Whether the most recent <tt>#getOrCreate</tt>
     * or <tt>#checkEdge</tt> operation created new object. */
   public boolean created() {
-    return !_found;
+    return !_found;      vSet = new HashSet<>();
+      vMap.put(v.label(), vSet);
+
     }  
     
   /** TBD */
   public void structurise(GraphTraversal gt) {
+    Vertex v;
+    Property<Vertex> p;
     while (gt.hasNext()) {
-      System.out.println(gt.next().getClass());
+      v = gt.next();
+      for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
+        p = i.next();
+        log.info(p);
+        }
       }
     }
     
