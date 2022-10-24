@@ -321,7 +321,7 @@ public class GremlinRecipies {
   /** TBD */
   public void structurise(GraphStep step) {
     while (step.hasNext()) {
-      System.out.println(o.next());
+      System.out.println(step.next());
       }
     }
     
