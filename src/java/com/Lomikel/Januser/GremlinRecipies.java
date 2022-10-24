@@ -317,6 +317,11 @@ public class GremlinRecipies {
     return !_found;
     }  
     
+  /** TBD */
+  public void structurise(Object o) {
+    System.out.println(o);
+    }
+    
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
     * including connected {@link Vertex}es.
     * @param v        The {@link Vertex} to clone.
