@@ -318,7 +318,7 @@ public class GremlinRecipies {
     }  
 
   /** TBD */
-  public void structurise(GraphTraversal gt) {
+  public void structurise(GraphTraversal<Vertex, Vertex> gt) {
     System.out.println(gt);
     Vertex v;
     Property<Vertex> p;
