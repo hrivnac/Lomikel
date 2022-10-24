@@ -3,6 +3,7 @@ package com.Lomikel.Januser;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.DefaultGraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
@@ -321,7 +322,7 @@ public class GremlinRecipies {
   /** TBD */
   public void structurise(GraphTraversal gt) {
     while (gt.hasNext()) {
-      System.out.println(gt.next());
+      System.out.println(gt.next().getClass());
       }
     }
     
