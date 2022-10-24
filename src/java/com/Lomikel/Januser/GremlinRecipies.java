@@ -334,7 +334,7 @@ public class GremlinRecipies {
         pMap.put(p.key(), p.value());
         }
       }
-    System.out.orintln(vMap);
+    System.out.println(vMap);
     }   
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
