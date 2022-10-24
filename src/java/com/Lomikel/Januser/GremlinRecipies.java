@@ -325,7 +325,7 @@ public class GremlinRecipies {
       v = gt.next();
       for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
         p = i.next();
-        log.info(p);
+        System.out.println(p);
         }
       }
     }   
