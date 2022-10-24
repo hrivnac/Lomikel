@@ -319,16 +319,15 @@ public class GremlinRecipies {
 
   /** TBD */
   public void structurise(GraphTraversal<Vertex, Vertex> gt) {
-    System.out.println(gt);
     Vertex v;
     Property<Vertex> p;
-    //while (gt.hasNext()) {
-    //  v = gt.next();
-    //  for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
-    //    p = i.next();
-    //    log.info(p);
-    //    }
-    //  }
+    while (gt.hasNext()) {
+      v = gt.next();
+      for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
+        p = i.next();
+        log.info(p);
+        }
+      }
     }   
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
