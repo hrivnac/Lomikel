@@ -17,3 +17,11 @@ alert = g.V().has('lbl', 'source').has('objectId', 'ZTF18abimyys').out().limit(1
 x = gr.gimme(alert, g1, -1, -1)
 // commit new structure
 graph1.tx().commit()
+
+// scan first 10 candidates
+// compute difference bewtween 'rb' (that can be any formula using Vertex properties, giving double)
+// if the result >= 0 then add an Edge with name 'rrbb' and a property 'difference' with the result value
+// (commit after each 1000000 new Edges, so do not commit)
+gr.structurise(g.V().has('lbl', 'candidate').limit(10), "rb[0]-rb[1]", 0, "rrbb", "difference", 1000000)
+// check
+g.E().has('difference').valueMap()

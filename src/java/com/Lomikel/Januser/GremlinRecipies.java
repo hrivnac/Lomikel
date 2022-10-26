@@ -323,12 +323,24 @@ public class GremlinRecipies {
     return !_found;
     }  
 
-  /** TBD */
+  /** Create {@link Edge} structure evaluating relations between pairs of {@link Vertex}es.
+    * @param gt               The {@link GraphTraversal} to be pair-wise evaluated.
+    * @param formula          The formula giving double value. It can contain any variables
+    *                         from both {@link Vertex}es, they can be accessed as <code>variable[0]</code>
+    *                         <code>variable[1]</code>. 
+    * @param threshold        The threshold of the formula result for creation of the {@link Edge}
+    *                         between {@link Vertex}es. 
+    * @param edgeName         The name of the created {@link Edge}.
+    * @param edgePropertyName The name of the {@link Edge} property carrying formula result.
+    * @param commitN          The number of new {@link Edge}s for intermediate commit.
+    *                         If total number of new {@link Edge}s is lower then <code>commitN</code>,
+    *                         no commit is done. */
   public void structurise(GraphTraversal<Vertex, Vertex> gt,
                           String formula,
                           double threshold,
                           String edgeName,
-                          String edgePropertyName) {
+                          String edgePropertyName,
+                          short  commitN) {
     Optional<Graph> o = gt.asAdmin().getGraph();
     if (!o.isPresent()) {
       log.error("Graph is not available");
@@ -368,6 +380,7 @@ public class GremlinRecipies {
     double score = 0;
     Vertex v1;
     Vertex v2;
+    int n = 0;
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
@@ -385,8 +398,15 @@ public class GremlinRecipies {
         catch (LomikelException e) {
           log.error("Cannot evaluate " + formula, e);
           }
+        if (n++ % commitN == 0) {
+          commit();
+          }
         }
       }
+    if (n <= commitN) {
+      commit();
+      }
+    log.info("" + n + " new Edges " + edgeName + " created");
     }   
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},

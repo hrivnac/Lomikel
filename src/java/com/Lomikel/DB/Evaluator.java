@@ -142,11 +142,10 @@ public class Evaluator {
   /** Set array variable.
     * @param name   The name of variables.
     * @param values The values of variables. */
-  public void setVariable(String name,
+  public void setVariable(String   name,
                           String[] values) {
     String fname = varName(name);
     int length = values.length;
-    System.out.println(name + " " + values + " " + fname + " " + _schema.type(name));
     try {
       switch (_schema.type(name)) {
         case "float":
