@@ -340,7 +340,7 @@ public class GremlinRecipies {
       return;
       }
     GremlinSchema schema = new GremlinSchema("schema", (StandardJanusGraph)graph);
-    System.out.println(schema);
+    System.out.println("Schema: " + schema);
     GremlinEvaluator evaluator = null;
     try {
       evaluator = new GremlinEvaluator(schema);
@@ -350,7 +350,7 @@ public class GremlinRecipies {
       return;
       }
     evaluator.setVariables(formula);
-    System.out.println(evaluator);
+    System.out.println("Evaluator: " + evaluator);
     Vertex v;
     Property<Vertex> p;
     Object id;
