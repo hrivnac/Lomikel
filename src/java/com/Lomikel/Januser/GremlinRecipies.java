@@ -365,14 +365,20 @@ public class GremlinRecipies {
         }
       }
     Map<String, String> values;
-    double score;
+    double score = 0;
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
-        for (String var : evaluator.variables()) {
+        for (String var : evaluator.variables()) { // TBD: pass as first argument to evaluator.eval
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
           }
-        //score = evaluator.evalDouble(values, formula);
+        try {
+          score = evaluator.evalDouble(null, formula);
+          }
+        catch (LomikelException e) {
+          log.error("Cannot evaluate " + formula, e);
+          }
+        System.out.println(score);
         }
       }
     }   
