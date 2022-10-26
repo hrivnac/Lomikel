@@ -65,7 +65,7 @@ public class Evaluator {
     * @throws LomikelException If formula cannot be evaluated with supplied variables. */
   public double evalDouble(Map<String, String> values,
                            String              formula) throws LomikelException {
-    String r = eval(values, formula, "boolean");
+    String r = eval(values, formula, "double");
     return Double.parseDouble(r);
     }
 
