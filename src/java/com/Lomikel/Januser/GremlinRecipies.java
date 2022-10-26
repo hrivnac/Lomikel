@@ -379,13 +379,12 @@ public class GremlinRecipies {
           if (score >= threshold) {
             v1 = g().V(entry1.getKey()).next();
             v2 = g().V(entry2.getKey()).next();
-            System.out.println(v1 + " " + v2);
+            v1.addEdge(edgeName, v2, edgePropertyName, score);
             }
           }
         catch (LomikelException e) {
           log.error("Cannot evaluate " + formula, e);
           }
-        System.out.println(score);
         }
       }
     }   
