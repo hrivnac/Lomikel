@@ -81,14 +81,14 @@ public class Evaluator {
           
   /** Declare variable. Set to <tt>0</tt>.
     * @param name The name of variables.*/
-  private void setVariable(String name) {
+  public void setVariable(String name) {
     setVariable(name, "0");
     }
 
   /** Set variable.
     * @param name  The name of variables.
     * @param value The value of variables. */
-  private void setVariable(String name,
+  public void setVariable(String name,
                            String value) {
     String fname = varName(name);
     try {
