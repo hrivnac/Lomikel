@@ -369,10 +369,8 @@ public class GremlinRecipies {
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
-        for (Map.Entry<String, Object> e1 : entry1.getValue().entrySet()) {  
-          for (Map.Entry<String, Object> e2 : entry2.getValue().entrySet()) {          
-            System.out.println(e1 + " " + e2);
-            }
+        for (String var : evaluator.variables()) {
+          System.out.println(entry1.getValue().get(var) + " " + entry2.getValue().get(var));
           }
         //score = evaluator.evalDouble(values, formula);
         }
