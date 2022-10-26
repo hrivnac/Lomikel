@@ -1,6 +1,7 @@
 package com.Lomikel.Januser;
 
 import com.Lomikel.DB.Schema;
+import com.Lomikel.Utils.LomikelException;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -14,9 +15,11 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 
 // Janus Graph
 import org.janusgraph.graphdb.vertices.StandardVertex;
+import org.janusgraph.graphdb.database.StandardJanusGraph;
 
 // HBase
 import org.apache.hadoop.hbase.client.Get;
@@ -29,6 +32,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -321,14 +325,32 @@ public class GremlinRecipies {
 
   /** TBD */
   public void structurise(GraphTraversal<Vertex, Vertex> gt,
-                          Object fcion,
+                          String formula,
                           double threshold,
                           String edgeName,
                           String edgePropertyName) {
-    //Schema schema = new GremlinSchema("schema", );
-    System.out.println(gt.asAdmin().getGraph());
-    //GremlinEvaluator evaluator = new GremlinEvaluator(schema);
-    //evaluator.setVariables(formula);
+    Optional<Graph> o = gt.asAdmin().getGraph();
+    if (!o.isPresent()) {
+      log.error("Graph is not available");
+      return;
+      }
+    Graph graph = o.get();
+    if (!(graph instanceof StandardJanusGraph)) {
+      log.error("" + graph + " is not StandardJanusGraph");
+      return;
+      }
+    GremlinSchema schema = new GremlinSchema("schema", (StandardJanusGraph)graph);
+    System.out.println(schema);
+    GremlinEvaluator evaluator = null;
+    try {
+      evaluator = new GremlinEvaluator(schema);
+      }
+    catch (LomikelException e) {
+      log.error("Cannot create GremlonEvaluatir", e);
+      return;
+      }
+    evaluator.setVariables(formula);
+    System.out.println(evaluator);
     Vertex v;
     Property<Vertex> p;
     Object id;
@@ -344,7 +366,7 @@ public class GremlinRecipies {
         pMap.put(p.key(), p.value());
         }
       }
-    System.out.println(vMap);
+    //System.out.println(vMap);
     }   
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
