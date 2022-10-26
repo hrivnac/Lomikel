@@ -79,8 +79,12 @@ public class Evaluator {
                      String              formula,
                      String              type) throws LomikelException {
     try {
-      for (String variable : _variables) {
-        setVariable(variable, values.get(variable));
+      if (values != null) {
+        for (String variable : _variables) {
+          if (values.containsKey(variable)) {
+            setVariable(variable, values.get(variable));
+            }
+          }
         }
       _interpreter.eval(type + " result = " + formula + ";");
       Object o = _interpreter.get("result");
