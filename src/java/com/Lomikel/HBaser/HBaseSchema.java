@@ -65,6 +65,9 @@ public class HBaseSchema extends Schema<ByteArray> {
       case "long": 
         value = String.valueOf(Bytes.toLong(ev));
         break;
+      case "short": 
+        value = String.valueOf(Bytes.toShort(ev));
+        break;
       case "fits": 
         value = "*fits*";
         break;
@@ -147,6 +150,9 @@ public class HBaseSchema extends Schema<ByteArray> {
         break;
       case "long": 
         value = Bytes.toBytes(Long.parseLong(decodedValue));
+        break;
+      case "short": 
+        value = Bytes.toBytes(Short.parseShort(decodedValue));
         break;
       case "fits": 
         value  = new byte[0]; // TBD: should disappear

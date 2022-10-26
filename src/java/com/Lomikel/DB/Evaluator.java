@@ -11,6 +11,8 @@ import bsh.EvalError;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -95,16 +97,24 @@ public class Evaluator {
     try {
       switch (_schema.type(name)) {
         case "float":
+        case "java.lang.Float":
           _interpreter.set(fname, Float.parseFloat(value));
           break;
         case "double":
+        case "java.lang.Double":
           _interpreter.set(fname, Double.parseDouble(value));
           break;
         case "integer":
+        case "java.lang.Integer":
           _interpreter.set(fname, Integer.parseInt(value));
           break;
         case "long":
+        case "java.lang.Long":
           _interpreter.set(fname, Long.parseLong(value));
+          break;
+        case "short":
+        case "java.lang.Short":
+          _interpreter.set(fname, Short.parseShort(value));
           break;
         default: // includes "string"          
         _interpreter.set(fname, value);
@@ -112,6 +122,42 @@ public class Evaluator {
       }
     catch (EvalError e) {
       log.error("Cannot assign " + name + " = '" + value);
+      }
+    }
+    
+  public void setVariable(String name,
+                          String[] values) {
+    String fname = varName(name);
+    int length = values.length;
+    System.out.println(name + " " + values + " " + fname + " " + _schema.type(name));
+    try {
+      switch (_schema.type(name)) {
+        case "float":
+        case "java.lang.Float":
+          _interpreter.set(fname, Stream.of(values).mapToDouble(Float::parseFloat).toArray());
+          break;
+        case "double":
+        case "java.lang.Double":
+          _interpreter.set(fname, Stream.of(values).mapToDouble(Double::parseDouble).toArray());
+          break;
+        case "integer":
+        case "java.lang.Integer":
+          _interpreter.set(fname, Stream.of(values).mapToInt(Integer::parseInt).toArray());
+          break;
+        case "long":
+        case "java.lang.Long":
+          _interpreter.set(fname, Stream.of(values).mapToLong(Long::parseLong).toArray());
+          break;
+        case "short":
+        case "java.lang.Short":
+          _interpreter.set(fname, Stream.of(values).mapToInt(Short::parseShort).toArray());
+          break;
+        default: // includes "string"          
+          _interpreter.set(fname, values);
+        }
+      }
+    catch (EvalError e) {
+      log.error("Cannot assign " + name + " = '" + values);
       }
     }
     
