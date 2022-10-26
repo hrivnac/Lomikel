@@ -1,5 +1,7 @@
 package com.Lomikel.Januser;
 
+import com.Lomikel.DB.Schema;
+
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
@@ -272,7 +274,7 @@ public class GremlinRecipies {
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
     * @param values The properties values (<tt>null</tt> will skip search for that value).
-    * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
+    * @return       The resulting  {@link GraphTraversal} carrying {@link Vnew String(value)ertex}es. */
   private GraphTraversal<Vertex, Vertex> addProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
                                                        Object[]                       values) {
@@ -318,7 +320,15 @@ public class GremlinRecipies {
     }  
 
   /** TBD */
-  public void structurise(GraphTraversal<Vertex, Vertex> gt) {
+  public void structurise(GraphTraversal<Vertex, Vertex> gt,
+                          Object fcion,
+                          double threshold,
+                          String edgeName,
+                          String edgePropertyName) {
+    //Schema schema = new GremlinSchema("schema", );
+    System.out.println(gt.asAdmin().getGraph());
+    //GremlinEvaluator evaluator = new GremlinEvaluator(schema);
+    //evaluator.setVariables(formula);
     Vertex v;
     Property<Vertex> p;
     Object id;
