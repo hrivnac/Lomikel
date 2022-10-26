@@ -373,7 +373,7 @@ public class GremlinRecipies {
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
           }
         try {
-          score = evaluator.evalDouble(null, formula);
+          score = evaluator.evalDouble(new HashMap<String, String>(), formula);
           }
         catch (LomikelException e) {
           log.error("Cannot evaluate " + formula, e);
