@@ -58,6 +58,17 @@ public class Evaluator {
     return Boolean.parseBoolean(r);
     }
 
+  /** Evaluate double formula with supplied variables and values.
+    * @param values  The names and values of variables.
+    * @param formula The formula to be evaluated. It should use supplied
+    *                variables, which will be filled with supplied values.
+    * @throws LomikelException If formula cannot be evaluated with supplied variables. */
+  public boolean evalDouble(Map<String, String> values,
+                             String              formula) throws LomikelException {
+    String r = eval(values, formula, "boolean");
+    return Double.parseDouble(r);
+    }
+
   /** Evaluate formula with supplied variables and values.
     * @param values  The names and values of variables.
     * @param formula The formula to be evaluated. It should use supplied
@@ -125,6 +136,9 @@ public class Evaluator {
       }
     }
     
+  /** Set array variable.
+    * @param name   The name of variables.
+    * @param values The values of variables. */
   public void setVariable(String name,
                           String[] values) {
     String fname = varName(name);
