@@ -108,7 +108,6 @@ public class Evaluator {
   public void setVariable(String name,
                           String value) {
     String fname = varName(name);
-    System.out.println(name + " " + value + " " + fname + " " + _schema.type(name));
     try {
       switch (_schema.type(name)) {
         case "float":

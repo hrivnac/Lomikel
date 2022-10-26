@@ -366,6 +366,8 @@ public class GremlinRecipies {
       }
     Map<String, String> values;
     double score = 0;
+    Vertex v1;
+    Vertex v2;
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
@@ -374,6 +376,11 @@ public class GremlinRecipies {
           }
         try {
           score = evaluator.evalDouble(null, formula);
+          if (score >= threshold) {
+            v1 = g().V(entry1.getKey()).next();
+            v2 = g().V(entry2.getKey()).next();
+            System.out.println(v1 + " " + v2);
+            }
           }
         catch (LomikelException e) {
           log.error("Cannot evaluate " + formula, e);
