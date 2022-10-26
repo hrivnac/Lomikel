@@ -340,7 +340,6 @@ public class GremlinRecipies {
       return;
       }
     GremlinSchema schema = new GremlinSchema("schema", (StandardJanusGraph)graph);
-    System.out.println("Schema: " + schema);
     GremlinEvaluator evaluator = null;
     try {
       evaluator = new GremlinEvaluator(schema);
@@ -350,11 +349,10 @@ public class GremlinRecipies {
       return;
       }
     evaluator.setVariables(formula);
-    System.out.println("Evaluator: " + evaluator);
     Vertex v;
     Property<Vertex> p;
     Object id;
-    Map<Object, Map<String, Object>> vMap = new HashMap<>();
+    Map<Object, Map<String, Object>> vMap = new HashMap<>(); // id -> (key -> value)
     Map<String, Object> pMap;
     while (gt.hasNext()) {
       v = gt.next();
@@ -366,7 +364,15 @@ public class GremlinRecipies {
         pMap.put(p.key(), p.value());
         }
       }
-    //System.out.println(vMap);
+    Map<String, String> values;
+    double score;
+    for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
+      for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
+        values = new HashMap<>();
+        System.out.println(entry1.getValue());
+        //score = evaluator.evalDouble(values, formula);
+        }
+      }
     }   
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},

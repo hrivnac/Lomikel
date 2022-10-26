@@ -41,7 +41,6 @@ public class GremlinSchema extends Schema<String> {
     for (PropertyKey key: keys) {
       map().put(key.name(), key.dataType().getName());
       }  
-    System.out.println("GremlinScheme: " + map());
     }
 
   @Override
