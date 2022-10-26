@@ -89,8 +89,9 @@ public class Evaluator {
     * @param name  The name of variables.
     * @param value The value of variables. */
   public void setVariable(String name,
-                           String value) {
+                          String value) {
     String fname = varName(name);
+    System.out.println(name + " " + value + " " + fname + " " + _schema.type(name));
     try {
       switch (_schema.type(name)) {
         case "float":
