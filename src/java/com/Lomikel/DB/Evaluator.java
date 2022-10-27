@@ -108,8 +108,12 @@ public class Evaluator {
   public void setVariable(String name,
                           String value) {
     String fname = varName(name);
+    String type = "double";
+    if (_schema.type(name) != null) {
+      type = _schema.type(name);
+      }
     try {
-      switch (_schema.type(name)) {
+      switch (type) {
         case "float":
         case "java.lang.Float":
           _interpreter.set(fname, Float.parseFloat(value));
@@ -146,9 +150,13 @@ public class Evaluator {
                           String[] values) {
     String fname = varName(name);
     int length = values.length;
+    String type = "double";
+    if (_schema.type(name) != null) {
+      type = _schema.type(name);
+      }
     try {
       System.out.println(name + " " + _schema.type(name));
-      switch (_schema.type(name)) {
+      switch (type) {
         case "float":
         case "java.lang.Float":
           _interpreter.set(fname, Stream.of(values).mapToDouble(Float::parseFloat).toArray());
@@ -185,6 +193,7 @@ public class Evaluator {
     }
     
   /** Add variables to the list of used variables.
+    * Only add variables available in {@link Schema}.
     * @param formula The formula to be used for list of used variables. */
   public void setVariables(String formula) {
     Set<String> cn = _schema.columnNames();
@@ -195,6 +204,9 @@ public class Evaluator {
       }
     }
     
+  /** Add variables to the list of used variables.
+    * Add variables even if they are not available in {@link Schema}.
+    * @param formula The formula to be used for list of used variables. */
   public void forceVariables(String variables) {
     for (String v : variables.split(" ")) {
       _variables.add(v.trim());
