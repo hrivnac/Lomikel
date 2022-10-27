@@ -337,6 +337,7 @@ public class GremlinRecipies {
     *                         no commit is done. */
   public void structurise(GraphTraversal<Vertex, Vertex> gt,
                           String formula,
+                          String variables,
                           double threshold,
                           String edgeName,
                           String edgePropertyName,
@@ -361,6 +362,9 @@ public class GremlinRecipies {
       return;
       }
     evaluator.setVariables(formula);
+    if (variables != null) {
+      evaluator.forceVariables(variables);
+      }
     Vertex v;
     Property<Vertex> p;
     Object id;

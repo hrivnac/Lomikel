@@ -194,6 +194,12 @@ public class Evaluator {
         }
       }
     }
+    
+  public void forceVariables(String variables) {
+    for (String : v = variables.split(" ")) {
+      _variables.add(v.trim());
+      }
+    }
            
   /** Set aux fuctions for evaluation.
     * @param javaClass The aux Java class name.
