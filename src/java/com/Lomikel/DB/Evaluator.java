@@ -104,7 +104,9 @@ public class Evaluator {
 
   /** Set variable.
     * @param name  The name of variables.
-    * @param value The value of variables. */
+    * @param value The value of variables.
+    *               Undefined types are considered <code>double</code>,
+    *               unknown types are taken as <code>string</code>. */
   public void setVariable(String name,
                           String value) {
     String fname = varName(name);
@@ -145,7 +147,9 @@ public class Evaluator {
     
   /** Set array variable.
     * @param name   The name of variables.
-    * @param values The values of variables. */
+    * @param values The values of variables.
+    *               Undefined types are considered <code>double</code>,
+    *               unknown types are taken as <code>string</code>. */
   public void setVariable(String   name,
                           String[] values) {
     String fname = varName(name);
@@ -155,7 +159,6 @@ public class Evaluator {
       type = _schema.type(name);
       }
     try {
-      System.out.println(name + " " + _schema.type(name));
       switch (type) {
         case "float":
         case "java.lang.Float":

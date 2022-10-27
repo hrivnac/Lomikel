@@ -328,6 +328,7 @@ public class GremlinRecipies {
     * @param formula          The formula giving double value. It can contain any variables
     *                         from both {@link Vertex}es, they can be accessed as <code>variable[0]</code>
     *                         <code>variable[1]</code>. 
+    * @param variables        The blank-separated list of variables, if they are not available from {@link Schema}.
     * @param threshold        The threshold of the formula result for creation of the {@link Edge}
     *                         between {@link Vertex}es. 
     * @param edgeName         The name of the created {@link Edge}.
