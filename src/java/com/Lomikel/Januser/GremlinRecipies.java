@@ -6,6 +6,7 @@ import com.Lomikel.Utils.LomikelException;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.DefaultGraphTraversal;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
