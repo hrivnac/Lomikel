@@ -147,6 +147,7 @@ public class Evaluator {
     String fname = varName(name);
     int length = values.length;
     try {
+      System.out.println(name + " " + _schema.type(name));
       switch (_schema.type(name)) {
         case "float":
         case "java.lang.Float":
