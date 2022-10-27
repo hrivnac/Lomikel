@@ -196,7 +196,7 @@ public class Evaluator {
     }
     
   public void forceVariables(String variables) {
-    for (String : v = variables.split(" ")) {
+    for (String v : variables.split(" ")) {
       _variables.add(v.trim());
       }
     }
