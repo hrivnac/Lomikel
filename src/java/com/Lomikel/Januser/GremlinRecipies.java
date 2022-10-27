@@ -335,7 +335,7 @@ public class GremlinRecipies {
     * @param commitN          The number of new {@link Edge}s for intermediate commit.
     *                         If total number of new {@link Edge}s is lower then <code>commitN</code>,
     *                         no commit is done. */
-  public void structurise(GraphTraversal<Vertex, Vertex> gt,
+  public void structurise(DefaultGraphTraversal<Vertex, Vertex> gt,
                           String formula,
                           double threshold,
                           String edgeName,
