@@ -213,7 +213,7 @@
       <zipfileset includes="**/*" src="${hbasecommon_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbaseclient_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${groovysh_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-beanutils-core-1.9.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-beanutils-1.9.3.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-cli-1.2.jar" excludes="META-INF/*"/>
       <!--zipfileset includes="**/*" src="/opt/lib/commons-cli-1.4.jar" excludes="META-INF/*"/--><!-- to allow in Jupyter -->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-codec-1.10.jar" excludes="META-INF/*"/>
