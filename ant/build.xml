@@ -218,7 +218,7 @@
       <!--zipfileset includes="**/*" src="/opt/lib/commons-cli-1.4.jar" excludes="META-INF/*"/--><!-- to allow in Jupyter -->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-codec-1.10.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-collections-3.2.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-compress-1.4.1.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-compress-1.18.jar" excludes="META-INF/*"/>
       <!--zipfileset includes="**/*" src="${hbase_dir}/lib/commons-configuration-1.6.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-crypto-1.0.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-daemon-1.0.13.jar" excludes="META-INF/*"/>
