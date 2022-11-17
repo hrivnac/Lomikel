@@ -205,7 +205,7 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar>
-    <jar jarfile="../lib/Lomikel.exe.jar" index="yes">
+    <!--jar jarfile="../lib/Lomikel.exe.jar" index="yes">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${orgjson_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${javaxmail_jar}" excludes="META-INF/*"/>
@@ -215,18 +215,18 @@
       <zipfileset includes="**/*" src="${groovysh_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-beanutils-1.9.3.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-cli-1.2.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="/opt/lib/commons-cli-1.4.jar" excludes="META-INF/*"/--><!-- to allow in Jupyter -->
+      <zipfileset includes="**/*" src="/opt/lib/commons-cli-1.4.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-codec-1.10.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-collections-3.2.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-compress-1.18.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${hbase_dir}/lib/commons-configuration-1.6.jar" excludes="META-INF/*"/-->
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-configuration-1.6.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-crypto-1.0.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-daemon-1.0.13.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${hbase_dir}/lib/commons-digester-1.8.jar" excludes="META-INF/*"/-->
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-digester-1.8.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-io-2.5.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${hbase_dir}/lib/commons-lang-2.6.jar" excludes="META-INF/*"/-->
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-lang-2.6.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-lang3-3.6.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${hbase_dir}/lib/commons-math-2.2.jar" excludes="META-INF/*"/-->
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-math-2.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-math3-3.6.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-net-3.6.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/gson-2.2.4.jar" excludes="META-INF/*"/>
@@ -338,7 +338,7 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
-      </jar>
+      </jar-->
     </target>
     
   <!-- WAR ==================================================================-->
