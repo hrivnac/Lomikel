@@ -337,12 +337,12 @@ public class GremlinRecipies {
     *                         If total number of new {@link Edge}s is lower then <code>commitN</code>,
     *                         no commit is done. */
   public void structurise(GraphTraversal<Vertex, Vertex> gt,
-                          String formula,
-                          String variables,
-                          double threshold,
-                          String edgeName,
-                          String edgePropertyName,
-                          int    commitN) {
+                          String                         formula,
+                          String                         variables,
+                          double                         threshold,
+                          String                         edgeName,
+                          String                         edgePropertyName,
+                          int                            commitN) {
     Optional<Graph> o = gt.asAdmin().getGraph();
     if (!o.isPresent()) {
       log.error("Graph is not available");

@@ -648,7 +648,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       return;
       }
     try {
-      _evaluator = new Evaluator(schema());
+      _evaluator = new HBaseEvaluator(schema());
       _evaluator.setVariables(formula);
       _formula   = formula;
       }
@@ -849,7 +849,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     
   private BinaryDataRepository _repository = new BinaryDataRepository();  
 
-  private Evaluator _evaluator;
+  private HBaseEvaluator _evaluator;
   
   private String _formula;
   
