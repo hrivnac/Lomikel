@@ -1,0 +1,10 @@
+# for IJCLab
+path.data: ../db/es/data
+path.logs: logs
+xpack.security.enabled: false
+cluster.name: janus-graph-el
+http.port: 20200
+network.bind_host: 0.0.0.0
+network.publish_host: 134.158.74.85
+transport.host: 127.0.0.1
+http.host: 0.0.0.0

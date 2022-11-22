@@ -1,0 +1,4 @@
+# for Local
+path.data: ../db/es/data
+path.logs: logs
+xpack.security.enabled: false
