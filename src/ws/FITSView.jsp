@@ -50,7 +50,9 @@
       content = dr.get(id);
       }
     else if (data != null) {
-      content = Base64.getDecoder().decode(URLDecoder.decode(data.replaceAll("%25", "%"), "UTF-8"));
+      //content = Base64.getDecoder().decode(URLDecoder.decode(data.replaceAll("%25", "%"), "UTF-8"));
+      //content = Base64.getDecoder().decode(URLDecoder.decode(data, "UTF-8"));
+      content = Base64.getDecoder().decode(data);
       }
     lfn = Info.tmp() + "/FITS/" + id;
     new File(Info.tmp() +"/FITS").mkdirs();
