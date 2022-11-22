@@ -4,7 +4,6 @@
   String alwaysColumns  = null;
   String column4latests = null;
   String timestampField = "timestamp";
-  String raField        = "ra";
-  String decField       = "dec";
+  String dirField       = "direction";
   String vertexName     = "values('title').toList().toString().replace(']', '').replace('[', '').replaceAll(' ', '').replaceAll(',', '.')";
   %>

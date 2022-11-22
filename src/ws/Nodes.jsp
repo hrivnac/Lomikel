@@ -293,9 +293,15 @@
       }  
     loadPane("plot", "d3/scatterplot.jsp?" + params, true, 400 * 1.2);
     }
+  function ra(direction) {
+    return parseFloat(direction.split(" ")[2].replaceAll(")", "")) + 180;
+    }
+  function dec(direction) {
+    return parseFloat(direction.split(" ")[1].replaceAll("(", ""));
+    }
   function showSky() {
-    if ("<%=raField%>".trim() == "" || "<%=decField%>".trim() == "") {
-      window.alert("raField or decField not defined");
+    if ("<%=dirField%>".trim() == "") {
+      window.alert("dirField not defined");
       return;
       }
     var z = "";
@@ -335,14 +341,14 @@
     params += "&tdata=[";
     first = true;
     for (i = 0; i < tdata.length; i++) {
-      if (tdata[i]['<%=raField%>'] && tdata[i]['<%=decField%>']) {
+      if (tdata[i]['<%=dirField%>']) {
         if (!first) {
           params += ",";
           }
         else {
           first = false;
           }
-        params += "{\"x\":\"" + tdata[i]['<%=raField%>'] + "\",\"y\":\"" + tdata[i]['<%=decField%>'] + "\"";
+        params += "{\"x\":\"" + ra(tdata[i]['<%=dirField%>']) + "\",\"y\":\"" + dec(tdata[i]['<%=dirField%>']) + "\"";
         if (z != "" && tdata[i][z]) {
           params += ",\"z\":\"" + tdata[i][z] + "\"";
           }
