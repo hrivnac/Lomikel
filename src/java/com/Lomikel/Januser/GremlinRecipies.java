@@ -26,6 +26,7 @@ import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Get;
 
 // Java
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -437,7 +438,11 @@ public class GremlinRecipies {
       }
     Vertex v1 = g1.addV(v.label()).next();
     for (String key : v.keys()) {
-      v1.property(key, v.property(key).value());
+      //v1.property(key, v.property(key).value());
+      Iterator<VertexProperty<Double>> it = v.properties(key);
+      while (it.hasNext()) {
+        v1.property(key, it.next().value());
+        }
       }
     Iterator<Edge> edges;
     Edge e;

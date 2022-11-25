@@ -27,11 +27,12 @@
 <%@include file="Params.jsp" %>
 
 <%
-  String id = request.getParameter("id");
+  String id  = request.getParameter("id");
   %>
   
 <script type="text/javascript">
-  id = <%=id%>;
+  // BUG: cannot have ':' inside values
+  id  = <%=id%>;
   var node = findObjectByKey(nodes, 'id', id);
   var tit = node.title.split(':')[0];
   var columns = [];
@@ -42,8 +43,8 @@
     node1 = nodes[i];
     id1 = node1.id;
     if (node1.title.split(':')[0] == tit) {
-	    txt = callGremlinValues(gr + ".V('" + id1 + "').elementMap().toList().toString()")[0];
-	    txt = txt.substring(2, txt.length - 2);
+	    txt = callGremlinValues(gr + ".V('" + id1 + "').valueMap().next().toString()")[0];	    
+	    txt = txt.substring(1, txt.length - 1);
 	    txt1 = "";
 	    inside = 0;
 	    for (var j = 0; j < txt.length; j++) {
@@ -68,10 +69,29 @@
         }
 	    tdata += "{";
 	    firstval = true;
+      columnes = [];
+      values   = [];
       for (t of txt.split(",")) {
         [column, value] = t.trim().split(":");
-        if (!columns.includes(column)) {
-          columns.push(column);
+        value = value.substring(1, value.length - 1);
+        if (value.includes(";")) {
+          valus = value.split(";");
+          k = 0;
+          for (v of valus) {
+            columnes.push(column + k++);
+            values.push(v.trim());
+            }
+          }
+        else {
+          columnes.push(column);
+          values.push(value.trim());
+          }
+        }
+      for (var j = 0; j < columnes.length; j++) {
+        c = columnes[j];
+        v = values[j];
+        if (!columns.includes(c)) {
+          columns.push(c);
           }
         if (!firstval) {
           tdata += ",";
@@ -79,7 +99,7 @@
         else {
           firstval = false;
           }
-        tdata += "\"" + column + "\":\"" + value.replace(';', ',') + "\"";
+        tdata += "\"" + c + "\":\"" + v + "\"";
         }
       tdata += "}";
       }

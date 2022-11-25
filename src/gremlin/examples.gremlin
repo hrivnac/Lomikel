@@ -266,7 +266,6 @@ system.graph('food').drop()
 graph.close()
 org.janusgraph.core.JanusGraphFactory.drop(graph)
 
-
 // IO
 // ==
 
