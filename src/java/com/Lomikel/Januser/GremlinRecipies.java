@@ -185,16 +185,13 @@ public class GremlinRecipies {
        log.error("Wrong number of search values: " + propertyValues.length + ", should be: " + propertyNames.length);
        return null;
        }
-     //List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).fold()
-     //                                                                                               .coalesce(unfold(),
-     //                                                                                                         addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues)).toList();
      List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).toList();
      if (!vertexes.isEmpty()) {
-       log.debug(""  + vertexes.size() + " existing vertexes " + label + " found");
+       //log.debug(""  + vertexes.size() + " existing vertexes " + label + " found");
        _found = true;
        }
      else {
-       log.debug("No existing vertexes " + label + " found - searching backend databases");
+       //log.debug("No existing vertexes " + label + " found - searching backend databases");
        vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues).toList();
        _found = false;
        }
@@ -232,6 +229,18 @@ public class GremlinRecipies {
       }
     return _found;
     }
+    
+  /** Drop all {@link Vertex}es with specified label.
+    * @param label The label of {@link Vertex}es to drop.
+    * @param n     Number of {@link Vettexes} to drop in one commit. */
+  public void drop(String label,
+                   int    n) {
+    long m =  g.V().has("lbl", label).count().next()
+    while (m > 0) {
+      g().V().has("lbl", label).limit(n).drop();
+      commit();
+      m -= n;
+      }
     
   /** Give {@link GraphTraversalSource}.
     * @return {@link GraphTraversalSource}. */
