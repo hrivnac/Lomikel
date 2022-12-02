@@ -238,8 +238,8 @@ public class GremlinRecipies {
     long m = g().V().has("lbl", label).count().next();
     while (m > 0) {
       System.out.println("" + m + " " + label + "s to drop");
-      //g().V().has("lbl", label).limit(n).drop().iterate();
-      //commit();
+      g().V().has("lbl", label).limit(n).drop().iterate();
+      commit();
       m -= n;
       }
     }
