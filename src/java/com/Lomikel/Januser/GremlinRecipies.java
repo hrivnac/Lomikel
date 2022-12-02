@@ -235,7 +235,7 @@ public class GremlinRecipies {
     * @param n     Number of {@link Vettexes} to drop in one commit. */
   public void drop(String label,
                    int    n) {
-    long m =  g.V().has("lbl", label).count().next()
+    long m =  g.V().has("lbl", label).count().next();
     while (m > 0) {
       g().V().has("lbl", label).limit(n).drop();
       commit();
