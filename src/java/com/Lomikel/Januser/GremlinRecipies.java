@@ -230,20 +230,6 @@ public class GremlinRecipies {
     return _found;
     }
     
-  /** Drop all {@link Vertex}es with specified label.
-    * @param label The label of {@link Vertex}es to drop.
-    * @param n     Number of {@link Vettexes} to drop in one commit. */
-  public void drop(String label,
-                   int    n) {
-    long m = g().V().has("lbl", label).count().next();
-    while (m > 0) {
-      log.info("" + m + " " + label + "s to drop");
-      g().V().has("lbl", label).limit(n).drop().iterate();
-      commit();
-      m -= n;
-      }
-    }
-    
   /** Give {@link GraphTraversalSource}.
     * @return {@link GraphTraversalSource}. */
   public GraphTraversalSource g() {
