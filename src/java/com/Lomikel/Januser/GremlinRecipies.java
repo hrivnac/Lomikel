@@ -352,7 +352,6 @@ public class GremlinRecipies {
       return;
       }
     GremlinSchema schema = new GremlinSchema("schema", (StandardJanusGraph)graph);
-    System.out.println(schema);
     GremlinEvaluator evaluator = null;
     try {
       evaluator = new GremlinEvaluator(schema);

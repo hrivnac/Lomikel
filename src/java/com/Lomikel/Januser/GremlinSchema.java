@@ -11,7 +11,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.janusgraph.graphdb.database.StandardJanusGraph;
 import org.janusgraph.core.schema.JanusGraphManagement;
 import org.janusgraph.core.PropertyKey;
-import org.janusgraph.core.Cardinality;
 import org.janusgraph.graphdb.database.management.ManagementSystem;
 
 // Java
@@ -40,7 +39,7 @@ public class GremlinSchema extends Schema<String> {
     ManagementSystem system = (ManagementSystem)graph.openManagement(); // the only implemeting class // TBD: check
     Iterable<PropertyKey> keys = system.getRelationTypes(PropertyKey.class);
     for (PropertyKey key: keys) {
-      map().put(key.name(), key.dataType().getName() + (key.cardinality() == Cardinality.SINGLE ? "" : (":" + key.cardinality().toString())));
+      map().put(key.name(), key.dataType().getName());
       }  
     }
 
@@ -64,7 +63,7 @@ public class GremlinSchema extends Schema<String> {
         
   @Override
   public String toString() {
-    return "Gremlin" + super.toString();
+    return "HBase" + super.toString();
     }
 
   /** Logging . */
