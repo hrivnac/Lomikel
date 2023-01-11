@@ -39,7 +39,7 @@ public class GremlinSchema extends Schema<String> {
     ManagementSystem system = (ManagementSystem)graph.openManagement(); // the only implemeting class // TBD: check
     Iterable<PropertyKey> keys = system.getRelationTypes(PropertyKey.class);
     for (PropertyKey key: keys) {
-      map().put(key.name(), key.dataType().getName());
+      map().put(key.name(), key.dataType().getName() + (key.cardinality() == Cardinality.SINGLE ? "" : (":" + key.cardinality().toString())));
       }  
     }
 
@@ -63,7 +63,7 @@ public class GremlinSchema extends Schema<String> {
         
   @Override
   public String toString() {
-    return "HBase" + super.toString();
+    return "Gremlin" + super.toString();
     }
 
   /** Logging . */
