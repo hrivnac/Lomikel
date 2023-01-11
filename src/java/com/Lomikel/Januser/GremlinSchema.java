@@ -11,6 +11,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.janusgraph.graphdb.database.StandardJanusGraph;
 import org.janusgraph.core.schema.JanusGraphManagement;
 import org.janusgraph.core.PropertyKey;
+import org.janusgraph.core.Cardinality;
 import org.janusgraph.graphdb.database.management.ManagementSystem;
 
 // Java
