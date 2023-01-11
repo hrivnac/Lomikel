@@ -11,8 +11,8 @@ g1 = graph1.traversal()
 // or if you want create an index on them
 mgmt1 = graph1.openManagement()
 PCA = mgmt1.makeVertexLabel('PCA').make()
-pcas = mgmt1.makePropertyKey('pcas').dataType(Double.class).cardinality(Cardinality.LIST).make() 
-mgmt1.addProperties(PCA, pcas)
+pca = mgmt1.makePropertyKey('pca').dataType(Double.class).cardinality(Cardinality.LIST).make() 
+mgmt1.addProperties(PCA, pca)
 mgmt1.commit()
 // create an instance of GremlinRecipies - a class with usefull methods for operations on graphs
 gr = new GremlinRecipies(g)
@@ -26,8 +26,9 @@ g.V().has('lbl', 'source').limit(10).each {source ->
   }
 // commit new structure
 graph1.tx().commit()
-// Get GremlinRecipies for the private graph 'g1'.  
-gr1 = new GremlinRecipies(g1)// scan all candidates
+// Get GremlinRecipies for the private graph 'g1'
+gr1 = new GremlinRecipies(g1)
+// scan all candidates
 // compute difference bewtween 'rb' (that can be any formula using Vertex properties, giving double)
 // if the result >= 0.01 then add an Edge with name 'distance' and a property 'difference' with the result value
 // (commit after each Integer.MAX_VALUE new Edges, so do not commit)
