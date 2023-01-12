@@ -30,11 +30,11 @@ graph1.tx().commit()
 gr1 = new GremlinRecipies(g1)
 // scan all PCAs
 // compute difference bewtween 'pca00' (that can be any formula using Vertex properties, giving double)
-// if the result <= 0.01 then add an Edge with name 'distance' and a property 'difference' with the result value,
+// if the result <= 0.5 then add an Edge with name 'distance' and a property 'difference' with the result value,
 // do it only for 5 distances with the minimal value
 // (commit after each Integer.MAX_VALUE new Edges, so do not commit)
 // note: g1 does not have schema and indexes - so used variables should be specified 
-gr1.structurise(g1.V().has('lbl', 'PCA'), 'pca00[0]-pca00[1]', 'pca00', 0.01, 5, 'distance', 'difference', Integer.MAX_VALUE)
+gr1.structurise(g1.V().has('lbl', 'PCA'), 'pca00[0]-pca00[1]', 'pca00', 0.5, 5, 'distance', 'difference', Integer.MAX_VALUE)
 // check. get some statistics about new Edges
 g1.E().has('lbl', 'distance').values('difference').union(min(), max(), sum(), mean(), count())
 // write your new Graph into a file

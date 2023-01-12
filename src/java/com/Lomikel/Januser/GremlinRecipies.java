@@ -378,6 +378,7 @@ public class GremlinRecipies {
       evaluator.forceVariables(variables);
       }
     // Accumulate Vertex ids
+    log.info("Accumulating Vertex ids...");
     Vertex v;
     Property<Vertex> p;
     Object id;
@@ -396,6 +397,7 @@ public class GremlinRecipies {
         }
       }
     // Calculate scores
+    log.info("Calculating scores...");
     Map<String, String> values;
     Map<String, Double> scores = new HashMap<>(); // id id -> score 
     double score = 0;
@@ -409,7 +411,7 @@ public class GremlinRecipies {
     //for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
     //  for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
-        for (String var : evaluator.variables()) { // TBD: pass as first argument to evaluator.eval
+        for (String var : evaluator.variables()) {
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
           }
         try {
@@ -424,8 +426,10 @@ public class GremlinRecipies {
         }
       }
     // Sort scores
+    log.info("Sorting scores...");
     scores = MapUtil.sortByValue(scores);
     // Create Edges
+    log.info("Creating Edges...");
     Vertex v1;
     Vertex v2;
     String[] ids;
