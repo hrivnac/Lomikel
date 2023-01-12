@@ -28,6 +28,7 @@ import org.apache.hadoop.hbase.client.Get;
 
 // Java
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -398,6 +399,7 @@ public class GremlinRecipies {
     Map<String, String> values;
     Map<String, Double> scores = new HashMap<>(); // id id -> score 
     double score = 0;
+    List<Map.Entry<Object, Map<String, Object>>> entries = new ArrayList<Map.Entry<Object, Map<String, Object>>>(vMap.entrySet());
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
