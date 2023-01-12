@@ -407,7 +407,7 @@ public class GremlinRecipies {
         }
       }
     // Sort scores
-    scores = MapUtil.sortByValue(scores);
+    scores = MapUtil.sortByValue(scores).descendingMap();
     // Create Edges
     Vertex v1;
     Vertex v2;
