@@ -396,6 +396,7 @@ public class GremlinRecipies {
           }
         }
       }
+    log.info("" + vMap.size() + " ids accumulated");
     // Calculate scores
     log.info("Calculating scores...");
     Map<String, String> values;
@@ -406,10 +407,9 @@ public class GremlinRecipies {
     Map.Entry<Object, Map<String, Object>> entry2;
     for (int i = 0; i < entries.size(); i++) {
       for (int j = i + 1; j < entries.size(); j++) {
+        log.info("" + i + " * " + j);
         entry1 = entries.get(i);
         entry2 = entries.get(j);
-    //for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
-    //  for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
         for (String var : evaluator.variables()) {
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
@@ -425,6 +425,7 @@ public class GremlinRecipies {
           }
         }
       }
+    log.info("" + scores.size() + " scores calculated");
     // Sort scores
     log.info("Sorting scores...");
     scores = MapUtil.sortByValue(scores);
