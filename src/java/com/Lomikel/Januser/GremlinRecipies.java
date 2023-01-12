@@ -399,7 +399,9 @@ public class GremlinRecipies {
     Map<String, String> values;
     Map<String, Double> scores = new HashMap<>(); // id id -> score 
     double score = 0;
-    List<Map.Entry<Object, Map<String, Object>>> entries = new ArrayList<Map.Entry<Object, Map<String, Object>>>(vMap.entrySet());
+    List<Map.Entry<Object, Map<String, Object>>> entries = new ArrayList<>(vMap.entrySet());
+    Map.Entry<Object, Map<String, Object>> entry1;
+    Map.Entry<Object, Map<String, Object>> entry2;
     for (int i = 0; i < entries.size(); i++) {
       for (int j = i + 1; j < entries.size(); j++) {
         entry1 = entries.get(i);
