@@ -346,6 +346,9 @@ public class GremlinRecipies {
                           String                         edgeName,
                           String                         edgePropertyName,
                           int                            commitN) {
+    if (clusterSize == 0) {
+      clusterSize = Integer.MAX_VALUE;
+      }
     Optional<Graph> o = gt.asAdmin().getGraph();
     if (!o.isPresent()) {
       log.error("Graph is not available");
@@ -414,6 +417,9 @@ public class GremlinRecipies {
     String[] ids;
     int n = 0;
     for (Map.Entry<String, Double> entry : scores.entrySet()) {
+      if (n >= clusterSize) {
+        break;
+        }
       ids = entry.getKey().split(" ");
       score = entry.getValue();
       v1 = g().V(ids[0]).next();
