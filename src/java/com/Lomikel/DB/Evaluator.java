@@ -195,6 +195,13 @@ public class Evaluator {
     return _variables.toArray(new String[0]);
     }
     
+  /** Shows whether a variable exists.
+    * @param var The name of a variable.
+    * @return    Whether that variable exists. */
+  public boolean hasVariable(String var) {
+    return _variables.contains(var);
+    }
+    
   /** Add variables to the list of used variables.
     * Only add variables available in {@link Schema}.
     * @param formula The formula to be used for list of used variables. */
