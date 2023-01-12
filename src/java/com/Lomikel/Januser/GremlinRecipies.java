@@ -329,6 +329,9 @@ public class GremlinRecipies {
     * @param variables        The blank-separated list of variables, if they are not available from {@link Schema}.
     * @param threshold        The threshold of the formula result for creation of the {@link Edge}
     *                         between {@link Vertex}es. 
+    *                         <tt>0</tt> means no threshold.
+    * @param clusterSize      The (max) number of {@link Vertex}es connected by created {@link Edge}s.
+    *                         <tt>0</tt> means no limit.
     * @param edgeName         The name of the created {@link Edge}.
     * @param edgePropertyName The name of the {@link Edge} property carrying formula result.
     * @param commitN          The number of new {@link Edge}s for intermediate commit.
@@ -338,6 +341,7 @@ public class GremlinRecipies {
                           String                         formula,
                           String                         variables,
                           double                         threshold,
+                          int                            clusterSize,
                           String                         edgeName,
                           String                         edgePropertyName,
                           int                            commitN) {
@@ -380,10 +384,8 @@ public class GremlinRecipies {
         }
       }
     Map<String, String> values;
+    Map<String, Double> scores = new HasMap<>(); // id id -> score 
     double score = 0;
-    Vertex v1;
-    Vertex v2;
-    int n = 0;
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
@@ -393,17 +395,29 @@ public class GremlinRecipies {
         try {
           score = evaluator.evalDouble(null, formula);
           if (score >= threshold) {
-            v1 = g().V(entry1.getKey()).next();
-            v2 = g().V(entry2.getKey()).next();
-            v1.addEdge(edgeName, v2, "lbl", edgeName, edgePropertyName, score);
+            scores.put(entry1.getKey() + " " + entry2.getKey(), score);
+            //v1 = g().V(entry1.getKey()).next();
+            //v2 = g().V(entry2.getKey()).next();
+            //v1.addEdge(edgeName, v2, "lbl", edgeName, edgePropertyName, score);
             }
           }
         catch (LomikelException e) {
           log.error("Cannot evaluate " + formula, e);
           }
-        if (n++ % commitN == 0) {
-          commit();
-          }
+        }
+      }
+    Vertex v1;
+    Vertex v2;
+    String[] ids;
+    int n = 0;
+    for (Map.Entry<String, Double> entry : scores.entrySet()) {
+      ids = entry.getKey().split(" ");
+      score = entry.getValue();
+      v1 = g().V(ids[0]).next();
+      v2 = g().V(ids[1]).next();
+      v1.addEdge(edgeName, v2, "lbl", edgeName, edgePropertyName, score);
+      if (n++ % commitN == 0) {
+        commit();
         }
       }
     if (n <= commitN) {
