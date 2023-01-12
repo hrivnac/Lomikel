@@ -352,7 +352,6 @@ public class GremlinRecipies {
       return;
       }
     GremlinSchema schema = new GremlinSchema("schema", (StandardJanusGraph)graph);
-    log.info(schema);
     GremlinEvaluator evaluator = null;
     try {
       evaluator = new GremlinEvaluator(schema);
@@ -361,7 +360,6 @@ public class GremlinRecipies {
       log.error("Cannot create GremlonEvaluatir", e);
       return;
       }
-    log.info(evaluator);
     evaluator.setVariables(formula);
     if (variables != null) {
       evaluator.forceVariables(variables);
@@ -390,8 +388,6 @@ public class GremlinRecipies {
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
         for (String var : evaluator.variables()) { // TBD: pass as first argument to evaluator.eval
-          log.info(var + "  " + entry1.getValue().get(var));
-          log.info(var + "  " + entry2.getValue().get(var));
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
           }
         try {
