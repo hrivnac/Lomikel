@@ -386,9 +386,12 @@ public class GremlinRecipies {
       id = v.id();
       pMap = new HashMap<>();
       vMap.put(id, pMap);
-      for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
-        p = i.next();
-        pMap.put(p.key(), p.value());
+      //for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
+      //  p = i.next();
+      //  pMap.put(p.key(), p.value());
+      //  }
+      for (String var : evaluator.variables()) {
+        pMap.put(var, v.propertties(var).value());
         }
       }
     // Calculate scores
