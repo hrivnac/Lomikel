@@ -388,7 +388,8 @@ public class GremlinRecipies {
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
         for (String var : evaluator.variables()) { // TBD: pass as first argument to evaluator.eval
-          System.out.println(entry1.getValue() + " " + entry2.getValue());
+          log.info(var + "  " + entry1.getValue().get(var));
+          log.info(var + "  " + entry2.getValue().get(var));
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
           }
         try {
