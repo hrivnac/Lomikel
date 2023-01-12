@@ -387,7 +387,7 @@ public class GremlinRecipies {
       }
     // Calculate scores
     Map<String, String> values;
-    TreeMap<String, Double> scores = new TreeMap<>(); // id id -> score 
+    Map<String, Double> scores = new HashMap<>(); // id id -> score 
     double score = 0;
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
@@ -407,7 +407,7 @@ public class GremlinRecipies {
         }
       }
     // Sort scores
-    scores = MapUtil.sortByValue(scores).descendingMap();
+    scores = MapUtil.sortByValue(scores, true);
     // Create Edges
     Vertex v1;
     Vertex v2;
