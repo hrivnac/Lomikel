@@ -413,16 +413,16 @@ public class GremlinRecipies {
         for (String var : evaluator.variables()) {
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
           }
-        //try {
-        //  score = evaluator.evalDouble(null, formula);
-        //  if (score <= threshold) {
-        //    scores.put(entry1.getKey() + " " + entry2.getKey(), score);
-        //    log.info("" + i + " * " + j + " : " + score);
-        //    }
-        //  }
-        //catch (LomikelException e) {
-        //  log.error("Cannot evaluate " + formula, e);
-        //  }
+        try {
+          score = evaluator.evalDouble(null, formula);
+          if (score <= threshold) {
+            //scores.put(entry1.getKey() + " " + entry2.getKey(), score);
+            log.info("" + i + " * " + j + " : " + score);
+            }
+          }
+        catch (LomikelException e) {
+          log.error("Cannot evaluate " + formula, e);
+          }
         }
       }
     log.info("" + scores.size() + " scores calculated");
