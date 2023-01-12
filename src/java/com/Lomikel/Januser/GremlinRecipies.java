@@ -391,7 +391,7 @@ public class GremlinRecipies {
       //  pMap.put(p.key(), p.value());
       //  }
       for (String var : evaluator.variables()) {
-        pMap.put(var, v.values(var).value());
+        pMap.put(var, v.values(var));
         }
       }
     // Calculate scores
