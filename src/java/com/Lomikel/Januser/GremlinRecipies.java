@@ -352,6 +352,7 @@ public class GremlinRecipies {
       return;
       }
     GremlinSchema schema = new GremlinSchema("schema", (StandardJanusGraph)graph);
+    log.info(schema);
     GremlinEvaluator evaluator = null;
     try {
       evaluator = new GremlinEvaluator(schema);
@@ -360,6 +361,7 @@ public class GremlinRecipies {
       log.error("Cannot create GremlonEvaluatir", e);
       return;
       }
+    log.info(evaluator);
     evaluator.setVariables(formula);
     if (variables != null) {
       evaluator.forceVariables(variables);
