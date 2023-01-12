@@ -1,6 +1,7 @@
 package com.Lomikel.Januser;
 
 import com.Lomikel.DB.Schema;
+import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.LomikelException;
 
 // Tinker Pop
@@ -368,6 +369,7 @@ public class GremlinRecipies {
     if (variables != null) {
       evaluator.forceVariables(variables);
       }
+    // Accumulate Vertex ids
     Vertex v;
     Property<Vertex> p;
     Object id;
@@ -383,6 +385,7 @@ public class GremlinRecipies {
         pMap.put(p.key(), p.value());
         }
       }
+    // Calculate scores
     Map<String, String> values;
     Map<String, Double> scores = new HashMap<>(); // id id -> score 
     double score = 0;
@@ -396,9 +399,6 @@ public class GremlinRecipies {
           score = evaluator.evalDouble(null, formula);
           if (score >= threshold) {
             scores.put(entry1.getKey() + " " + entry2.getKey(), score);
-            //v1 = g().V(entry1.getKey()).next();
-            //v2 = g().V(entry2.getKey()).next();
-            //v1.addEdge(edgeName, v2, "lbl", edgeName, edgePropertyName, score);
             }
           }
         catch (LomikelException e) {
@@ -406,6 +406,9 @@ public class GremlinRecipies {
           }
         }
       }
+    // Sort scores
+    scores = MapUtil.sortByValue(scores);
+    // Create Edges
     Vertex v1;
     Vertex v2;
     String[] ids;
