@@ -387,7 +387,7 @@ public class GremlinRecipies {
       }
     // Calculate scores
     Map<String, String> values;
-    Map<String, Double> scores = new HashMap<>(); // id id -> score 
+    TreeMap<String, Double> scores = new TreeMap<>(); // id id -> score 
     double score = 0;
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
