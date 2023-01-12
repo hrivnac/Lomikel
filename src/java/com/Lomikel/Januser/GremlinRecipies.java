@@ -352,6 +352,7 @@ public class GremlinRecipies {
     if (clusterSize == 0) {
       clusterSize = Integer.MAX_VALUE;
       }
+    formula = "Math.abs(" + formula + ")";
     Optional<Graph> o = gt.asAdmin().getGraph();
     if (!o.isPresent()) {
       log.error("Graph is not available");
@@ -371,7 +372,7 @@ public class GremlinRecipies {
       log.error("Cannot create GremlonEvaluatir", e);
       return;
       }
-    evaluator.setVariables("Math.abs("+ formula + ")");
+    evaluator.setVariables(formula);
     if (variables != null) {
       evaluator.forceVariables(variables);
       }
