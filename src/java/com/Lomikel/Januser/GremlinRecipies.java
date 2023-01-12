@@ -371,7 +371,7 @@ public class GremlinRecipies {
       log.error("Cannot create GremlonEvaluatir", e);
       return;
       }
-    evaluator.setVariables(formula);
+    evaluator.setVariables("Math.abs("+ formula + ")");
     if (variables != null) {
       evaluator.forceVariables(variables);
       }
@@ -399,16 +399,14 @@ public class GremlinRecipies {
     double score = 0;
     for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
       for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
-        if (entry1.getKey() != entry2.getKey()) {
-          values = new HashMap<>();
-          for (String var : evaluator.variables()) { // TBD: pass as first argument to evaluator.eval
-            evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
-            }
-          try {
-            score = evaluator.evalDouble(null, formula);
-            if (score <= threshold) {
-              scores.put(entry1.getKey() + " " + entry2.getKey(), score);
-              }
+        values = new HashMap<>();
+        for (String var : evaluator.variables()) { // TBD: pass as first argument to evaluator.eval
+          evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
+          }
+        try {
+          score = evaluator.evalDouble(null, formula);
+          if (score <= threshold) {
+            scores.put(entry1.getKey() + " " + entry2.getKey(), score);
             }
           }
         catch (LomikelException e) {
