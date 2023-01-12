@@ -407,7 +407,6 @@ public class GremlinRecipies {
     Map.Entry<Object, Map<String, Object>> entry2;
     for (int i = 0; i < entries.size(); i++) {
       for (int j = i + 1; j < entries.size(); j++) {
-        log.info("" + i + " * " + j);
         entry1 = entries.get(i);
         entry2 = entries.get(j);
         values = new HashMap<>();
@@ -418,6 +417,7 @@ public class GremlinRecipies {
           score = evaluator.evalDouble(null, formula);
           if (score <= threshold) {
             scores.put(entry1.getKey() + " " + entry2.getKey(), score);
+            log.info("" + i + " * " + j + " : " + score);
             }
           }
         catch (LomikelException e) {
