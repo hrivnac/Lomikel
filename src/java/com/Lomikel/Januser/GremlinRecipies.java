@@ -328,7 +328,7 @@ public class GremlinRecipies {
     *                         from both {@link Vertex}es, they can be accessed as <code>variable[0]</code>
     *                         <code>variable[1]</code>. 
     * @param variables        The blank-separated list of variables, if they are not available from {@link Schema}.
-    * @param threshold        The threshold of the formula result for creation of the {@link Edge}
+    * @param threshold        The (high) threshold of the formula result for creation of the {@link Edge}
     *                         between {@link Vertex}es. 
     *                         <tt>0</tt> means no threshold.
     * @param clusterSize      The (max) number of {@link Vertex}es connected by created {@link Edge}s.
@@ -346,6 +346,9 @@ public class GremlinRecipies {
                           String                         edgeName,
                           String                         edgePropertyName,
                           int                            commitN) {
+    if (threshold == 0) {
+      thereshold = Double.MAX_VALUE;
+      }
     if (clusterSize == 0) {
       clusterSize = Integer.MAX_VALUE;
       }
@@ -400,7 +403,7 @@ public class GremlinRecipies {
           }
         try {
           score = evaluator.evalDouble(null, formula);
-          if (score >= threshold) {
+          if (score <= threshold) {
             scores.put(entry1.getKey() + " " + entry2.getKey(), score);
             }
           }
@@ -410,7 +413,7 @@ public class GremlinRecipies {
         }
       }
     // Sort scores
-    scores = MapUtil.sortByValue(scores, true);
+    scores = MapUtil.sortByValue(scores);
     // Create Edges
     Vertex v1;
     Vertex v2;
