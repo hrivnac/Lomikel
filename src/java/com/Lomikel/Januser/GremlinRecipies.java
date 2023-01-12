@@ -416,7 +416,7 @@ public class GremlinRecipies {
         try {
           score = evaluator.evalDouble(null, formula);
           if (score <= threshold) {
-            //scores.put(entry1.getKey() + " " + entry2.getKey(), score);
+            scores.put(entry1.getKey() + " " + entry2.getKey(), score);
             log.info("" + i + " * " + j + " : " + score);
             }
           }
