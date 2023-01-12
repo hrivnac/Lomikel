@@ -400,8 +400,12 @@ public class GremlinRecipies {
     Map<String, Double> scores = new HashMap<>(); // id id -> score 
     double score = 0;
     List<Map.Entry<Object, Map<String, Object>>> entries = new ArrayList<Map.Entry<Object, Map<String, Object>>>(vMap.entrySet());
-    for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
-      for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
+    for (int i = 0; i < entries.size(); i++) {
+      for (int j = i + 1; j < entries.size(); j++) {
+        entry1 = entries.get(i);
+        entry2 = entries.get(j);
+    //for (Map.Entry<Object, Map<String, Object>> entry1 : vMap.entrySet()) {  
+    //  for (Map.Entry<Object, Map<String, Object>> entry2 : vMap.entrySet()) {
         values = new HashMap<>();
         for (String var : evaluator.variables()) { // TBD: pass as first argument to evaluator.eval
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
