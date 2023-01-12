@@ -391,6 +391,7 @@ public class GremlinRecipies {
       //  pMap.put(p.key(), p.value());
       //  }
       for (String var : evaluator.variables()) {
+        log.info(var + " " + v.values(var));
         pMap.put(var, v.values(var));
         }
       }
