@@ -347,7 +347,7 @@ public class GremlinRecipies {
                           String                         edgePropertyName,
                           int                            commitN) {
     if (threshold == 0) {
-      thereshold = Double.MAX_VALUE;
+      threshold = Double.MAX_VALUE;
       }
     if (clusterSize == 0) {
       clusterSize = Integer.MAX_VALUE;
