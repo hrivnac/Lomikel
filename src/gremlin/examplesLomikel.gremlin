@@ -44,5 +44,5 @@ graph2.io(IoCore.gryo()).readGraph('myfile.kryo')
 
 
 
-
+gr = new GremlinRecipies(g)
 gr.structurise(g.V().has('lbl', 'PCA'), 'pca00[0]-pca00[1]', 'pca00', 0.0001, 0, 'distance', 'difference', Integer.MAX_VALUE)

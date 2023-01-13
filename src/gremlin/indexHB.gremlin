@@ -13,6 +13,7 @@ name  = mgmt.getPropertyKey('name')
 
 // Indexes                                                          
 mgmt.buildIndex('byLbl',   Vertex.class).addKey(lbl)              .buildCompositeIndex()
+mgmt.buildIndex('byLblE',  Edge.class  ).addKey(lbl)              .buildCompositeIndex()
 //mgmt.buildIndex('byTitle', Vertex.class).addKey(lbl).addKey(title).buildCompositeIndex()
 //mgmt.buildIndex('byName',  Vertex.class).addKey(lbl).addKey(name ).buildCompositeIndex()
                                                       
@@ -20,18 +21,22 @@ mgmt.commit()
 
 // Wait for index                                           
 ManagementSystem.awaitGraphIndexStatus(graph, 'byLbl'  ).status(SchemaStatus.REGISTERED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblE' ).status(SchemaStatus.REGISTERED).timeout(10, java.time.temporal.ChronoUnit.MINUTES).call()
 //ManagementSystem.awaitGraphIndexStatus(graph, 'byTitle').status(SchemaStatus.REGISTERED).call()
 //ManagementSystem.awaitGraphIndexStatus(graph, 'byName' ).status(SchemaStatus.REGISTERED).call()
 
 // Reindex existing data
 mgmt = graph.openManagement()
 mgmt.updateIndex(mgmt.getGraphIndex('byLbl'  ), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLblE' ), SchemaAction.REINDEX).get()
 //mgmt.updateIndex(mgmt.getGraphIndex('byTitle'), SchemaAction.REINDEX).get()
 //mgmt.updateIndex(mgmt.getGraphIndex('byName' ), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
+mgmt.getGraphIndexes(Edge.class)
 mgmt.commit()
 
 // Enable index                                           
 ManagementSystem.awaitGraphIndexStatus(graph, 'byLbl'  ).status(SchemaStatus.ENABLED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblE' ).status(SchemaStatus.ENABLED).call()
 //ManagementSystem.awaitGraphIndexStatus(graph, 'byTitle').status(SchemaStatus.ENABLED).call()
 //ManagementSystem.awaitGraphIndexStatus(graph, 'byName' ).status(SchemaStatus.ENABLED).call()
