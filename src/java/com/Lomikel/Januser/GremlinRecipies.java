@@ -415,9 +415,9 @@ public class GremlinRecipies {
           }
         try {
           score = evaluator.evalDouble(null, formula);
-          log.info("" + i + " * " + j + " : " + score);
           if (score <= threshold) {
             scores.put(entry1.getKey() + " " + entry2.getKey(), score);
+            log.info("" + i + " * " + j + " : " + score);
             }
           }
         catch (LomikelException e) {
