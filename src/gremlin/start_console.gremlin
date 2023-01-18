@@ -99,7 +99,7 @@ class Lomikel {
         }
       }
 
-  def static drop(graph, label, n) {
+  def static dropV(graph, label, n) {
     def g = graph.traversal()
     def m = g.V().has('lbl', label).count().next()
     while (m > 0) {
@@ -109,7 +109,18 @@ class Lomikel {
       m -= n
       }
     }
-  
+    
+   def static dropE(graph, label, n) {
+    def g = graph.traversal()
+    def m = g.E().has('lbl', label).count().next()
+    while (m > 0) {
+      println('' + m + ' ' + label + 's to drop')
+      g.E().has('lbl', label).limit(n).drop().iterate()
+      graph.traversal().tx().commit()
+      m -= n
+      }
+    }
+ 
   def static config    
        
   }

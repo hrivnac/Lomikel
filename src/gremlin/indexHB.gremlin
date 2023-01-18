@@ -21,7 +21,7 @@ mgmt.commit()
 
 // Wait for index                                           
 ManagementSystem.awaitGraphIndexStatus(graph, 'byLbl'  ).status(SchemaStatus.REGISTERED).call()
-ManagementSystem.awaitGraphIndexStatus(graph, 'byLblE' ).status(SchemaStatus.REGISTERED).timeout(10, java.time.temporal.ChronoUnit.MINUTES).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLblE' ).status(SchemaStatus.REGISTERED).call()
 //ManagementSystem.awaitGraphIndexStatus(graph, 'byTitle').status(SchemaStatus.REGISTERED).call()
 //ManagementSystem.awaitGraphIndexStatus(graph, 'byName' ).status(SchemaStatus.REGISTERED).call()
 
