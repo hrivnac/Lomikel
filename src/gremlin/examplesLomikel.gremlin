@@ -78,4 +78,4 @@ difference = 'Math.sqrt(' +
  'Math.pow(pca24[0]-pca24[1], 2.0)' +
  ')'
 gr = new GremlinRecipies(g)
-gr.structurise(g.V().has('lbl', 'PCA'), difference, variables, 0.001, 0, 'distance', 'difference', 100)
+gr.structurise(g.V().has('lbl', 'PCA'), difference, variables, 2, 0, 'distance', 'difference', 100)

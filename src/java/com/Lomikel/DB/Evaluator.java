@@ -33,6 +33,8 @@ public class Evaluator {
     _schema = schema;
     _interpreter = new Interpreter();
     try {
+      log.info("Importing com.Lomikel.DB.EvaluatorFunctions");
+      _interpreter.eval("import com.Lomikel.DB.EvaluatorFunctions;");
       for (String javaClass : _auxJavaClasses) {
         log.info("Importing " + javaClass);
         _interpreter.eval("import " + javaClass + ".*;");
