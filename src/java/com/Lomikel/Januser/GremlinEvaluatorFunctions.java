@@ -38,7 +38,12 @@ public class GremlinEvaluatorFunctions {
     double distance = Arrays.stream(values).mapToDouble(d -> Math.pow(d[0] - d[1], 2)).sum();
     return Math.sqrt(distance);
     }
-                                         
+    
+   public static double qdistance0(duble v1, double v2, double v3, double v4) {
+    double distance = Math.pow(v1-v2, 2) + Math.pow(v3-v4, 2);
+    return Math.sqrt(distance);
+    }
+                                        
   /** Logging . */
   private static Logger log = Logger.getLogger(GremlinEvaluatorFunctions.class);
                                                 

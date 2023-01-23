@@ -79,5 +79,6 @@ difference = 'Math.sqrt(' +
  ')'
 variables = 'pca00 pca01 pca02'
 difference = 'EvaluatorFunctions.qdifference(new double[][]{pca00, pca01, pca02})'
-gr = new GremlinRecipies(g)
-gr.structurise(g.V().has('lbl', 'PCA'), difference, variables, 2, 0, 'distance', 'difference', 100)
+new GremlinRecipies(g).structurise(g.V().has('lbl', 'PCA'), 'qdistance(new double[][]{pca00, pca01, pca02})', 'pca00 pca01 pca02', 2, 0, 'a', 'b', 100)
+new GremlinRecipies(g).structurise(g.V().has('lbl', 'PCA'), 'com.Lomikel.Januser.qdistance(new double[][]{{1, 2}, {3, 4}, {5, 6}})', 'pca00 pca01 pca02', 2, 0, 'a', 'b', 100)
+
