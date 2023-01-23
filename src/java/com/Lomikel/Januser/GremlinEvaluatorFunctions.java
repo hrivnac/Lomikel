@@ -38,6 +38,13 @@ public class GremlinEvaluatorFunctions {
     double distance = Arrays.stream(values).mapToDouble(d -> Math.pow(d[0] - d[1], 2)).sum();
     return Math.sqrt(distance);
     }
+    
+  /** Give linear distance.
+    * TBD */
+  public static double ldistance(double[][] values) {
+    double distance = Arrays.stream(values).mapToDouble(d -> Math.abs(d[0] - d[1])).sum();
+    return distance;
+    }
                                         
   /** Logging . */
   private static Logger log = Logger.getLogger(GremlinEvaluatorFunctions.class);

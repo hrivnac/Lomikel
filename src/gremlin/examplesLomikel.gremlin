@@ -50,35 +50,6 @@ graph2.io(IoCore.gryo()).readGraph('myfile.kryo')
 
 
 variables = 'pca00 pca01 pca02 pca03 pca04 pca05 pca06 pca07 pca08 pca09 pca10 pca11 pca12 pca13 pca14 pca15 pca16 pca17 pca18 pca19 pca20 pca21 pca22 pca23 pca24'
-difference = 'Math.sqrt(' +
- 'Math.pow(pca00[0]-pca00[1], 2.0)+' +
- 'Math.pow(pca01[0]-pca01[1], 2.0)+' +
- 'Math.pow(pca02[0]-pca02[1], 2.0)+' +
- 'Math.pow(pca03[0]-pca03[1], 2.0)+' +
- 'Math.pow(pca04[0]-pca04[1], 2.0)+' +
- 'Math.pow(pca05[0]-pca05[1], 2.0)+' +
- 'Math.pow(pca06[0]-pca06[1], 2.0)+' +
- 'Math.pow(pca07[0]-pca07[1], 2.0)+' +
- 'Math.pow(pca08[0]-pca08[1], 2.0)+' +
- 'Math.pow(pca09[0]-pca09[1], 2.0)+' +
- 'Math.pow(pca10[0]-pca10[1], 2.0)+' +
- 'Math.pow(pca11[0]-pca11[1], 2.0)+' +
- 'Math.pow(pca12[0]-pca12[1], 2.0)+' +
- 'Math.pow(pca13[0]-pca13[1], 2.0)+' +
- 'Math.pow(pca14[0]-pca14[1], 2.0)+' +
- 'Math.pow(pca15[0]-pca15[1], 2.0)+' +
- 'Math.pow(pca16[0]-pca16[1], 2.0)+' +
- 'Math.pow(pca17[0]-pca17[1], 2.0)+' +
- 'Math.pow(pca18[0]-pca18[1], 2.0)+' +
- 'Math.pow(pca19[0]-pca19[1], 2.0)+' +
- 'Math.pow(pca20[0]-pca20[1], 2.0)+' +
- 'Math.pow(pca21[0]-pca21[1], 2.0)+' +
- 'Math.pow(pca22[0]-pca22[1], 2.0)+' +
- 'Math.pow(pca23[0]-pca23[1], 2.0)+' +
- 'Math.pow(pca24[0]-pca24[1], 2.0)' +
- ')'
-variables = 'pca00 pca01 pca02'
-difference = 'EvaluatorFunctions.qdifference(new double[][]{pca00, pca01, pca02})'
-new GremlinRecipies(g).structurise(g.V().has('lbl', 'PCA'), 'qdistance(new double[][]{pca00, pca01, pca02})', 'pca00 pca01 pca02', 2, 0, 'a', 'b', 100)
-new GremlinRecipies(g).structurise(g.V().has('lbl', 'PCA'), 'com.Lomikel.Januser.GremlinEvaluatorFunctions.qdistance0(1,2,3,4)', 'pca00 pca01 pca02', 2, 0, 'a', 'b', 100)
+difference = 'qdistance(new double[][]{' + variables.replaceAll(' ', ',') + '})'
+new GremlinRecipies(g).structurise(g.V().has('lbl', 'PCA'), difference, variables, 2, 0, 'distance', 'difference', 100)
 
