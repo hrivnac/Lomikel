@@ -30,7 +30,7 @@ public class HBaseEvaluator extends Evaluator {
   public HBaseEvaluator(HBaseSchema schema) throws LomikelException {
     super(schema);
     log.info("\tas HBaseEvaluator");
-    setEvaluatorFunctions("import com.Lomikel.HBaser.HBaseEvaluatorFunctions", "com/Lomikel/HBaser/HBaseEvaluatorFunctions.bsh");
+    setEvaluatorFunctions("com.Lomikel.HBaser.HBaseEvaluatorFunctions", "com/Lomikel/HBaser/HBaseEvaluatorFunctions.bsh");
     setEvaluatorFunctions(null, "com/Lomikel/WebService/HBaseColumnsProcessor.bsh");  
     }
     

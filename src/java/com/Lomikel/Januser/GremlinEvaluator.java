@@ -30,7 +30,7 @@ public class GremlinEvaluator extends Evaluator {
   public GremlinEvaluator(GremlinSchema schema) throws LomikelException {
     super(schema);
     log.info("\tas GremlinEvaluator");
-    setEvaluatorFunctions("import com.Lomikel.Januser.GremlinEvaluatorFunctions", "com/Lomikel/Januser/GremlinEvaluatorFunctions.bsh");
+    setEvaluatorFunctions("com.Lomikel.Januser.GremlinEvaluatorFunctions", "com/Lomikel/Januser/GremlinEvaluatorFunctions.bsh");
     }
                                           
   /** Logging . */
