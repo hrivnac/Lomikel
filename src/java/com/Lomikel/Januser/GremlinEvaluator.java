@@ -29,6 +29,8 @@ public class GremlinEvaluator extends Evaluator {
     * @throws CommonpException If can't be initiated. */
   public GremlinEvaluator(GremlinSchema schema) throws LomikelException {
     super(schema);
+    log.info("\tas GremlinEvaluator");
+    setEvaluatorFunctions("import com.Lomikel.Januser.GremlinEvaluatorFunctions", "com/Lomikel/Januser/GremlinEvaluatorFunctions.bsh");
     }
                                           
   /** Logging . */

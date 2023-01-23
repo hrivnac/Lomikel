@@ -29,6 +29,9 @@ public class HBaseEvaluator extends Evaluator {
     * @throws CommonpException If can't be initiated. */
   public HBaseEvaluator(HBaseSchema schema) throws LomikelException {
     super(schema);
+    log.info("\tas HBaseEvaluator");
+    setEvaluatorFunctions("import com.Lomikel.HBaser.HBaseEvaluatorFunctions", "com/Lomikel/HBaser/HBaseEvaluatorFunctions.bsh");
+    setEvaluatorFunctions(null, "com/Lomikel/WebService/HBaseColumnsProcessor.bsh");  
     }
     
   @Override

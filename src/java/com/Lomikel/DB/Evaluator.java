@@ -32,16 +32,23 @@ public class Evaluator {
     log.info("Creating Evaluator");
     _schema = schema;
     _interpreter = new Interpreter();
+    }
+    
+    
+  /** Set Java and BeanShell Evaluator Functions.
+    * @param javaEF The Java Evaluatior Functions class name. May be <tt>null</tt>.
+    * @param bshEF  The BeanShell Evaluatior Functions script name. May be <tt>null</tt>. 
+    * @throws CommonpException If can't be set. */
+  public void setEvaluatorFunctions(String javaEF,
+                                    String bshEF) throws LomikelException {
     try {
-      log.info("Importing com.Lomikel.DB.EvaluatorFunctions");
-      _interpreter.eval("import com.Lomikel.DB.EvaluatorFunctions;");
-      for (String javaClass : _auxJavaClasses) {
-        log.info("Importing " + javaClass);
-        _interpreter.eval("import " + javaClass + ".*;");
+      if (javaEF != null) {
+        log.info("Importing " + javaEF);
+        _interpreter.eval("import " + javaEF + ".*;");
         }
-      for (String bshScript : _auxBshScripts) {
-        log.info("Importing " + bshScript);
-        _interpreter.eval(new StringResource(bshScript).toString());
+      if (bshEF != null) {
+        log.info("Importing " + bshEF);
+        _interpreter.eval(new StringResource(bshEF).toString());
         }
       }
     catch (EvalError e) {
@@ -224,21 +231,6 @@ public class Evaluator {
       _variables.add(v.trim());
       }
     }
-           
-  /** Set aux fuctions for evaluation.
-    * @param javaClass The aux Java class name.
-    *                  May be <code>null</code>.
-    * @param bshScript The aux Bsh script name (as resources). 
-    *                  May be <code>null</code>. */
-  public static void setAuxFuctions(String javaClass,
-                                    String bshScript) {
-    if (javaClass != null) {
-      _auxJavaClasses.add(javaClass);
-      }
-    if (bshScript != null) {
-      _auxBshScripts.add(bshScript);
-      }
-    }
     
   /** Give variable name from the database name.
     * @param fullName The fill name of the database column.
@@ -252,10 +244,6 @@ public class Evaluator {
   private Set<String> _variables = new TreeSet<>();
     
   private Interpreter _interpreter;     
-  
-  private static Set<String> _auxJavaClasses = new TreeSet<>();
-  
-  private static Set<String> _auxBshScripts  = new TreeSet<>();
                                          
   /** Logging . */
   private static Logger log = Logger.getLogger(Evaluator.class);

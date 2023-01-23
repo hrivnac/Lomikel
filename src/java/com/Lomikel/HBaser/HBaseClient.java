@@ -825,6 +825,11 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _representations;
     }
     
+  /** TBD */
+  public HBaseEvaluator evaluator() {
+    return _evaluator;
+    }
+    
   private Table _table;
   
   private Configuration _conf;
