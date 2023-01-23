@@ -411,8 +411,6 @@ public class GremlinRecipies {
         entry2 = entries.get(j);
         values = new HashMap<>();
         for (String var : evaluator.variables()) {
-          log.info(var);
-          log.info(entry1);
           evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
           }
         try {
