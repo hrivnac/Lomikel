@@ -39,7 +39,7 @@ public class GremlinEvaluatorFunctions {
     return Math.sqrt(distance);
     }
     
-   public static double qdistance0(duble v1, double v2, double v3, double v4) {
+   public static double qdistance0(double v1, double v2, double v3, double v4) {
     double distance = Math.pow(v1-v2, 2) + Math.pow(v3-v4, 2);
     return Math.sqrt(distance);
     }
