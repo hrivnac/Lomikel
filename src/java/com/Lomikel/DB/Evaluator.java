@@ -44,7 +44,7 @@ public class Evaluator {
     try {
       if (javaEF != null) {
         log.info("Importing " + javaEF);
-        _interpreter.eval("import " + javaEF + ".*;");
+        _interpreter.eval("import static " + javaEF + ".*;");
         }
       if (bshEF != null) {
         log.info("Importing " + bshEF);
@@ -65,7 +65,12 @@ public class Evaluator {
                              String              formula) throws LomikelException {
     String r = eval(values, formula, "boolean");
     return Boolean.parseBoolean(r);
+    }    
+   public static double qdistance0(double v1, double v2, double v3, double v4) {
+    double distance = Math.pow(v1-v2, 2) + Math.pow(v3-v4, 2);
+    return Math.sqrt(distance);
     }
+
 
   /** Evaluate double formula with supplied variables and values.
     * @param values  The names and values of variables.
