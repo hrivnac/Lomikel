@@ -34,7 +34,7 @@ public class GremlinEvaluatorFunctions {
   
   /** Give quadratic distance.
     * TBD */
-  public double qdistance(double[][] values) {
+  public static double qdistance(double[][] values) {
     double distance = Arrays.stream(values).mapToDouble(d -> Math.pow(d[0] - d[1], 2)).sum();
     return Math.sqrt(distance);
     }
