@@ -11,7 +11,6 @@ import bsh.EvalError;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 // Log4J
@@ -33,7 +32,6 @@ public class Evaluator {
     _schema = schema;
     _interpreter = new Interpreter();
     }
-    
     
   /** Set Java and BeanShell Evaluator Functions.
     * @param javaEF The Java Evaluatior Functions class name. May be <tt>null</tt>.

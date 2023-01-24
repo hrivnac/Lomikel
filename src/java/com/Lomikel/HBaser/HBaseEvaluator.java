@@ -1,17 +1,7 @@
 package com.Lomikel.HBaser;
 
 import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.Utils.StringResource;
 import com.Lomikel.DB.Evaluator;
-
-// Bean Shell
-import bsh.Interpreter;
-import bsh.EvalError;
-
-// Java
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Map;
 
 // Log4J
 import org.apache.log4j.Logger;

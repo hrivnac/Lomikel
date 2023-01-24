@@ -1,6 +1,5 @@
 package com.Lomikel.Apps;
 
-
 // CLI
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.BasicParser;

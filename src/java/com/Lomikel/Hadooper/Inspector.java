@@ -1,10 +1,6 @@
 package com.Lomikel.Hadooper;
 
-import com.Lomikel.Utils.Init;
-import com.Lomikel.Utils.Info;
-import com.Lomikel.Utils.StringResource;
 import com.Lomikel.Utils.DateTimeManagement;
-import com.Lomikel.Utils.LomikelException;
 
 // Hadoop
 import org.apache.hadoop.conf.Configuration;
@@ -18,9 +14,6 @@ import org.apache.hadoop.fs.Path;
 // Java
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Vector;
-import java.util.Map;
-import java.util.HashMap;
 
 // Log4J
 import org.apache.log4j.Logger;

@@ -7,12 +7,6 @@ import com.Lomikel.Apps.BSCLI;
 import com.Lomikel.Apps.GCLI;
 import com.Lomikel.GUI.Icons;
 
-// Bean Shell
-
-// CLI
-
-// Swing
-
 // Log4J
 import org.apache.log4j.Logger;
 

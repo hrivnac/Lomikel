@@ -2,19 +2,13 @@ package com.Lomikel.Januser;
 
 import com.Lomikel.DB.Schema;
 import com.Lomikel.DB.CellContent;
-import com.Lomikel.Utils.ByteArray;
-
-// HBase
-import org.apache.hadoop.hbase.util.Bytes;
 
 // JanusGraph
 import org.janusgraph.graphdb.database.StandardJanusGraph;
-import org.janusgraph.core.schema.JanusGraphManagement;
 import org.janusgraph.core.PropertyKey;
 import org.janusgraph.graphdb.database.management.ManagementSystem;
 
 // Java
-import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 

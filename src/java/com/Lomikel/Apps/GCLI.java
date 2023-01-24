@@ -11,8 +11,6 @@ import org.apache.commons.cli.CommandLine;
 import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
 
-// Java
-
 // Log4J
 import org.apache.log4j.Logger;
 

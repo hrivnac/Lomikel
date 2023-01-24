@@ -46,10 +46,3 @@ g1.E().has('lbl', 'distance').order().by('difference').limit(1).bothV().in().has
 graph1.io(IoCore.gryo()).writeGraph('myfile.kryo')
 // to read it later (maybe into another graph)
 graph2.io(IoCore.gryo()).readGraph('myfile.kryo')
-
-
-
-variables = 'pca00 pca01 pca02 pca03 pca04 pca05 pca06 pca07 pca08 pca09 pca10 pca11 pca12 pca13 pca14 pca15 pca16 pca17 pca18 pca19 pca20 pca21 pca22 pca23 pca24'
-difference = 'qdistance(new double[][]{' + variables.replaceAll(' ', ',') + '})'
-new GremlinRecipies(g).structurise(g.V().has('lbl', 'PCA'), difference, variables, 2, 0, 'distance', 'difference', 100)
-

@@ -825,7 +825,8 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _representations;
     }
     
-  /** TBD */
+  /** Give attached {@link HBaseEvaluator}.
+    * @return The attached {@link HBaseEvaluator}. */
   public HBaseEvaluator evaluator() {
     return _evaluator;
     }
