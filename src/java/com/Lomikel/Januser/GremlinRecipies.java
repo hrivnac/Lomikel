@@ -464,7 +464,7 @@ public class GremlinRecipies {
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
     * including connected {@link Vertex}es.
     * @param v        The {@link Vertex} to clone.
-    * @param g1       The {@link GraphTraversalSource} to clone {@link Vertex} to.
+    * @param g1       The {@link GraphTraversalSource} to clone {@link Vertex} to.gr = new GremlinRecipies(g)
     * @param depthIn  The depth of the parent {@link Vertex}es to clone
     *                 (negative value will clone the full up-tree).
     *                 The parents will not have their children cloned.
