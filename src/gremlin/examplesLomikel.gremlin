@@ -46,3 +46,4 @@ g1.E().has('lbl', 'distance').order().by('difference').limit(1).bothV().in().has
 graph1.io(IoCore.gryo()).writeGraph('myfile.kryo')
 // to read it later (maybe into another graph)
 graph2.io(IoCore.gryo()).readGraph('myfile.kryo')
+

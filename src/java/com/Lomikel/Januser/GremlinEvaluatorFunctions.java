@@ -16,26 +16,36 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class GremlinEvaluatorFunctions {
     
-  /** Do-nothink Demo */
+  /** Do-nothing Demo */
   public static boolean demo() {
     return true;
     }
   
-  /** Give quadratic distance of two points in multiple dimensions.
-    * @param values The array of values of all coordinates for two points.
-    *               <code>{{x1_of_point1, x1_of_point2}, {x2_of_point1, x2_of_point2},...}</code>.
-    * @return       The quadratic distance of two points in multiple dimensions. */
-  public static double qdistance(double[][] values) {
+  /** Give quadratic   distance of two points in multiple dimensions.
+    * @param values   The array of values of all coordinates for two points.
+    *                 <code>{{x1_of_point1, x1_of_point2}, {x2_of_point1, x2_of_point2},...}</code>.
+    * @param weighted Whether the distance should be weighted by the number of dimensions.
+    * @return         The quadratic distance of two points in multiple dimensions. */
+  public static double qdistance(double[][] values,
+                                 boolean    weighted) {
     double distance = Arrays.stream(values).mapToDouble(d -> Math.pow(d[0] - d[1], 2)).sum();
+    if (weighted) {
+      distance = distance / values.length;
+      }
     return Math.sqrt(distance);
     }
     
   /** Give abs-linear distance of two points in multiple dimensions.
-    * @param values The array of values of all coordinates for two points.
-    *               <code>{{x1_of_point1, x1_of_point2}, {x2_of_point1, x2_of_point2},...}</code>.
-    * @return       The abs-linear distance of two points in multiple dimensions. */
-  public static double ldistance(double[][] values) {
+    * @param values   The array of values of all coordinates for two points.
+    *                 <code>{{x1_of_point1, x1_of_point2}, {x2_of_point1, x2_of_point2},...}</code>.
+    * @param weighted Whether the distance should be weighted by the number of dimensions.
+    * @return         The abs-linear distance of two points in multiple dimensions. */
+  public static double ldistance(double[][] values,
+                                 boolean    weighted) {
     double distance = Arrays.stream(values).mapToDouble(d -> Math.abs(d[0] - d[1])).sum();
+    if (weighted) {
+      distance = distance / values.length;
+      }
     return distance;
     }
                                         

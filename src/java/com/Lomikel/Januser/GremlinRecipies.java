@@ -454,6 +454,13 @@ public class GremlinRecipies {
     log.info("" + n + " new Edges " + edgeName + " created");
     }   
     
+  /** TBD */
+  public Set<String> findClusters(String vLbl,
+                                  String eLbl) {
+    g().V().has("lbl", vLbl).forEachRemaining(v -> log.info(v));
+    return null;
+    }
+    
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
     * including connected {@link Vertex}es.
     * @param v        The {@link Vertex} to clone.

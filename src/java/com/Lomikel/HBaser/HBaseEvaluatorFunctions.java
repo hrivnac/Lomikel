@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBaseEvaluatorFunctions {
     
-  /** Do-nothink Demo */
+  /** Do-nothing Demo */
   public static boolean demo() {
     return true;
     }
