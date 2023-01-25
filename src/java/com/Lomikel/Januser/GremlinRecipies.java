@@ -244,6 +244,9 @@ public class GremlinRecipies {
     if (_client != null) {
       _client.commit();
       }
+    else {
+      g().getGraph().tx().commit();
+      }
     }
     
   /** Close, if operating via {@link ModifyingGremlinClient},
@@ -251,9 +254,6 @@ public class GremlinRecipies {
   private void close() {
     if (_client != null) {
       _client.close();
-      }
-    else {
-      g().getGraph().tx().commit();
       }
     }
     
