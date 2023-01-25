@@ -241,9 +241,7 @@ public class GremlinRecipies {
   /** Commit, if operating via {@link ModifyingGremlinClient},
     * do nothing otherwise. */
   private void commit() {
-    log.info("commit");
     if (_client != null) {
-    log.info("commit1");
       _client.commit();
       }
     }
@@ -253,6 +251,9 @@ public class GremlinRecipies {
   private void close() {
     if (_client != null) {
       _client.close();
+      }
+    else {
+      g().getGraph().tx().commit();
       }
     }
     
