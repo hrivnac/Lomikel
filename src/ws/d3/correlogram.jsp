@@ -27,6 +27,8 @@
   </table>
 -->
 
+<div id="corr_area"></div>
+
 <%
   String tdata = request.getParameter("tdata");
   %>
