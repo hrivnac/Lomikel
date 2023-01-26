@@ -36,7 +36,7 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
               {sets:[m1, m2], size:n12}];
   var chart = venn.VennDiagram();
   if (vennPopupWindow) {
-    vennPopupWindow.datum(sets).call(chart);
+    vennPopupWindow.document.getElementById("vennPopup").datum(sets).call(chart);
     }
   else {
     d3.select("#venn").datum(sets).call(chart);
