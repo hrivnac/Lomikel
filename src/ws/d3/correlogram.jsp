@@ -36,6 +36,5 @@
 <script src="venn.js"        type="text/javascript"></script>
   
 <script type="text/javascript">
-  window.open("vennPopup.jsp");
   showCorrelogram(<%=tdata%>);
   </script>

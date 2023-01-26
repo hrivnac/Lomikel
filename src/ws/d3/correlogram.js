@@ -1,4 +1,4 @@
-function showCorrelogram(otable) {
+function showCorrelogram(otable, vennPopupWindow) {
       
   otable1 = [];
   var min = otable[0].value;
@@ -144,8 +144,12 @@ function showCorrelogram(otable) {
                             d3.select(this).attr("n12"),
                             d3.select(this).attr("m1").replaceAll('.', ' '),
                             d3.select(this).attr("m2").replaceAll('.', ' '));
-            //document.getElementById("vennTxt").innerHTML = info;
-            document.getElementById("vennPopupTxt").innerHTML = info;
+            if (vennPopupWindow) {
+              vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
+              }
+            else {
+              document.getElementById("vennTxt").innerHTML = info;
+              }
             }
           });
       
@@ -181,8 +185,12 @@ function showCorrelogram(otable) {
                             d3.select(this).attr("n12"),
                             d3.select(this).attr("m1").replaceAll('.', ' '),
                             d3.select(this).attr("m2").replaceAll('.', ' '));
-            //document.getElementById("vennTxt").innerHTML = info;
-            document.getElementById("vennPopupTxt").innerHTML = info;
+            if (vennPopupWindow) {
+              vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
+              }
+            else {
+            document.getElementById("vennTxt").innerHTML = info;
+              }
             }
           });
 
