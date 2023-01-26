@@ -143,7 +143,8 @@ function showCorrelogram(otable, vennPopupWindow) {
                             d3.select(this).attr("n2"),
                             d3.select(this).attr("n12"),
                             d3.select(this).attr("m1").replaceAll('.', ' '),
-                            d3.select(this).attr("m2").replaceAll('.', ' '));
+                            d3.select(this).attr("m2").replaceAll('.', ' '),
+                            vennPopupWindow);
             if (vennPopupWindow) {
               vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
               }
@@ -184,7 +185,8 @@ function showCorrelogram(otable, vennPopupWindow) {
                             d3.select(this).attr("n2"),
                             d3.select(this).attr("n12"),
                             d3.select(this).attr("m1").replaceAll('.', ' '),
-                            d3.select(this).attr("m2").replaceAll('.', ' '));
+                            d3.select(this).attr("m2").replaceAll('.', ' '),
+                            vennPopupWindow);
             if (vennPopupWindow) {
               vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
               }
