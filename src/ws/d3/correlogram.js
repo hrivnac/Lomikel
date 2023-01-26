@@ -144,7 +144,8 @@ function showCorrelogram(otable) {
                             d3.select(this).attr("n12"),
                             d3.select(this).attr("m1").replaceAll('.', ' '),
                             d3.select(this).attr("m2").replaceAll('.', ' '));
-            document.getElementById("vennTxt").innerHTML = info;
+            //document.getElementById("vennTxt").innerHTML = info;
+            document.getElementById("vennPopupTxt").innerHTML = info;
             }
           });
       
@@ -180,7 +181,8 @@ function showCorrelogram(otable) {
                             d3.select(this).attr("n12"),
                             d3.select(this).attr("m1").replaceAll('.', ' '),
                             d3.select(this).attr("m2").replaceAll('.', ' '));
-            document.getElementById("vennTxt").innerHTML = info;
+            //document.getElementById("vennTxt").innerHTML = info;
+            document.getElementById("vennPopupTxt").innerHTML = info;
             }
           });
 

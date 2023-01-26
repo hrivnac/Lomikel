@@ -15,6 +15,7 @@
 
 <script src="../venn-v.0.2.14/venn.js" type="text/javascript"></script>
 
+<!--
 <table>
   <tr>
     <td rowspan="2"><div id="corr_area"></div></td>
@@ -24,6 +25,7 @@
     <td><div id="vennTxt"></div></td>
     </tr>
   </table>
+-->
 
 <%
   String tdata = request.getParameter("tdata");
@@ -34,5 +36,6 @@
 <script src="venn.js"        type="text/javascript"></script>
   
 <script type="text/javascript">
+  window.open("vennPopup.jsp");
   showCorrelogram(<%=tdata%>);
   </script>
