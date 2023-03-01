@@ -41,6 +41,8 @@ gr1.structurise(g1.V().has('lbl', 'PCA'), 'pca00[0]-pca00[1]', 'pca00', 0.5, 5, 
 g1.E().has('lbl', 'distance').values('difference').union(min(), max(), sum(), mean(), count())
 // get the closest sources 
 g1.E().has('lbl', 'distance').order().by('difference').limit(1).bothV().in().has('lbl', 'source').values('objectId')
+// get all clusters containing at least 10 PCAs which are closer then 1.5
+FinkBrowser.findPCAClusters(g1, 'distance', 'difference', 10, 1.5);[]
 
 // write your new Graph into a file
 graph1.io(IoCore.gryo()).writeGraph('myfile.kryo')
