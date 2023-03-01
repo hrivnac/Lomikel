@@ -333,10 +333,9 @@ public class GremlinRecipies {
     *                         <code>variable[1]</code>. 
     * @param variables        The blank-separated list of variables, if they are not available from {@link Schema}.
     * @param threshold        The (high) threshold of the formula result for creation of the {@link Edge}
-    *                         between {@link Vertex}es. 
+    *                         between {@link Vertex}es. I.e. the maximum distance between two {@link Vertex}es
+    *                         to be included in the cluster.
     *                         <tt>0</tt> means no threshold.
-    * @param clusterSize      The (max) number of {@link Vertex}es connected by created {@link Edge}s.
-    *                         <tt>0</tt> means no limit.
     * @param edgeName         The name of the created {@link Edge}.
     * @param edgePropertyName The name of the {@link Edge} property carrying formula result.
     * @param commitN          The number of new {@link Edge}s for intermediate commit.
@@ -346,15 +345,11 @@ public class GremlinRecipies {
                           String                         formula,
                           String                         variables,
                           double                         threshold,
-                          int                            clusterSize,
                           String                         edgeName,
                           String                         edgePropertyName,
                           int                            commitN) {
     if (threshold == 0) {
       threshold = Double.MAX_VALUE;
-      }
-    if (clusterSize == 0) {
-      clusterSize = Integer.MAX_VALUE;
       }
     formula = "Math.abs(" + formula + ")";
     Optional<Graph> o = gt.asAdmin().getGraph();
@@ -439,9 +434,6 @@ public class GremlinRecipies {
     String[] ids;
     int n = 0;
     for (Map.Entry<String, Double> entry : scores.entrySet()) {
-      if (n >= clusterSize) {
-        break;
-        }
       ids = entry.getKey().split(" ");
       score = entry.getValue();
       v1 = g().V(ids[0]).next();
