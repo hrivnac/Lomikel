@@ -73,6 +73,10 @@ g.V().groupCount().by(label)
 g.V().has('run', 'number', 358031).out().values('nevents').mean()
 g.V().has('run', 'number', 358031).out().values('nevents').max()
 g.V().has('run', 'number', 358031).out().values('nevents').min()
+g.V().has('run', 'number', 358031).out().values('difference').union(min(), max(), sum(), mean(), count())
+
+// show standard deviation
+g.V().has('lbl', 'PCA').values('pca00').fold().as(v).mean(local).as('mean').select(v).unfold().math('(_-mean)^2').mean().math('sqrt(_)')
 
 // show datasets with more events or number of events in an interval
 // see also is(), inside(), outside(), within(), without(), between()
