@@ -67,7 +67,8 @@ public class GremlinEvaluatorFunctions {
     return distance;
     }
   
-  /** TBD */
+  /** Set the weights for distance methods.
+    * @param weights The array with weights. */
   public static void setDistanceWeights(double[] weights) {
     _weights = weights;
     }
