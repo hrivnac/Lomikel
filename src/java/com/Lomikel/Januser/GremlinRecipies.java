@@ -479,10 +479,11 @@ public class GremlinRecipies {
     if (depthOut < 0) {
       depthOut = Integer.MAX_VALUE;
       }
+    long id;
     if (inclCycles) {
-      long id = (Long)(v.id());
+      id = (Long)(v.id());
       if (_replicatedIds.containsKey(id)) {
-        return g1.V(replicatedIds.get(id)).next();
+        return g1.V(_replicatedIds.get(id)).next();
         }
       }
     Vertex v1 = g1.addV(v.label()).next();
@@ -527,7 +528,7 @@ public class GremlinRecipies {
     return v1;
     }
     
-  private Map<Long, Long> _replicatedIds = new TreeMap<>();
+  private Map<Long, Long> _replicatedIds = new TreeMap<>(); // original id -> replicated id
      
   private GraphTraversalSource _g;
     
