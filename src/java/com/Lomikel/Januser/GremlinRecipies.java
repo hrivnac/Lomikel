@@ -479,9 +479,9 @@ public class GremlinRecipies {
       depthOut = Integer.MAX_VALUE;
       }
     if (inclCycles) {
-      int id = v.id().next();
+      int id = v.id();
       if (_replicatedIds.contains(id)) {
-        return g.V(id).next();
+        return g1.V(id).next();
         }
       else {
         _replicatedIds.add(id);
