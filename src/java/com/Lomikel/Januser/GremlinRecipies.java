@@ -487,7 +487,7 @@ public class GremlinRecipies {
       }
     Vertex v1 = g1.addV(v.label()).next();
     if (inclCycles) {
-      _replicatedIds.put((Long)(v1.id()));
+      _replicatedIds.put(id, (Long)(v1.id()));
       }
     for (String key : v.keys()) {
       Iterator<VertexProperty<Double>> it = v.properties(key);
