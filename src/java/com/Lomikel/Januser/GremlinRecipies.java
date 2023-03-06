@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -480,14 +481,14 @@ public class GremlinRecipies {
       }
     if (inclCycles) {
       long id = (Long)(v.id());
-      if (_replicatedIds.contains(id)) {
-        return g1.V(id).next();
-        }
-      else {
-        _replicatedIds.add(id);
+      if (_replicatedIds.containsKey(id)) {
+        return g1.V(replicatedIds.get(id)).next();
         }
       }
     Vertex v1 = g1.addV(v.label()).next();
+    if (inclCycles) {
+      _replicatedIds.put((Long)(v1.id()));
+      }
     for (String key : v.keys()) {
       Iterator<VertexProperty<Double>> it = v.properties(key);
       while (it.hasNext()) {
@@ -526,7 +527,7 @@ public class GremlinRecipies {
     return v1;
     }
     
-  private Set<Long> _replicatedIds = new TreeSet<>();
+  private Map<Long, Long> _replicatedIds = new TreeMap<>();
      
   private GraphTraversalSource _g;
     
