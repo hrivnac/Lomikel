@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -451,28 +452,43 @@ public class GremlinRecipies {
     
   /** Clone a {@link Vertex} to another {@link GraphTraversalSource},
     * including connected {@link Vertex}es.
-    * @param v        The {@link Vertex} to clone.
-    * @param g1       The {@link GraphTraversalSource} to clone {@link Vertex} to.gr = new GremlinRecipies(g)
-    * @param depthIn  The depth of the parent {@link Vertex}es to clone
-    *                 (negative value will clone the full up-tree).
-    *                 The parents will not have their children cloned.
-    * @param depthOut The depth of the child {@link Vertex}es to clone
-    *                 (negative value will clone the full down-tree).
-    *                 The children willnot have their parents cloned.
-    * @return         The cloned {@link Vertex}. */
+    * @param v          The {@link Vertex} to clone.
+    * @param g1         The {@link GraphTraversalSource} to clone {@link Vertex} to.
+    * @param depthIn    The depth of the parent {@link Vertex}es to clone
+    *                   (negative value will clone the full up-tree).
+    *                   The parents will not have their children cloned
+    *                   unless <code>inclCycles = true</code>.
+    * @param depthOut   The depth of the child {@link Vertex}es to clone
+    *                   (negative value will clone the full down-tree).
+    *                   The children will not have their parents cloned
+    *                   unless <code>inclCycles = true</code>.
+    * @param inclCycles Whether include cycles. If <code>false</code>,
+    *                   function will only traverse in one direction (in or out),
+    *                   without going back. If <true>true</code>, each step will
+    *                   both directions.
+    * @return           The cloned {@link Vertex}. */
   public Vertex gimme(Vertex               v,
                       GraphTraversalSource g1,
                       int                  depthIn,
-                      int                  depthOut) {
+                      int                  depthOut,
+                      boolean              inclCycles) {
     if (depthIn < 0) {
       depthIn = Integer.MAX_VALUE;
       }
     if (depthOut < 0) {
       depthOut = Integer.MAX_VALUE;
       }
+    if (inclCycles) {
+      int id = v.id().next();
+      if (_replicatedIds.contains(id)) {
+        return g.V(id).next();
+        }
+      else {
+        _replicatedIds.add(id);
+        }
+      }
     Vertex v1 = g1.addV(v.label()).next();
     for (String key : v.keys()) {
-      //v1.property(key, v.property(key).value());
       Iterator<VertexProperty<Double>> it = v.properties(key);
       while (it.hasNext()) {
         v1.property(key, it.next().value());
@@ -488,7 +504,7 @@ public class GremlinRecipies {
       while (edges.hasNext()) {
         e = edges.next();
         ve = e.outVertex();
-        ve1 = gimme(ve, g1, depthIn - 1, 0);
+        ve1 = gimme(ve, g1, depthIn - 1, inclCycles ? depthOut : 0);
         e1 = ve1.addEdge(e.label(), v1);
         for (String key : e.keys()) {
           e1.property(key, e.property(key).value());
@@ -500,7 +516,7 @@ public class GremlinRecipies {
       while (edges.hasNext()) {
         e = edges.next();
         ve = e.inVertex();
-        ve1 = gimme(ve, g1, 0, depthOut - 1);
+        ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1);
         e1 = v1.addEdge(e.label(), ve1);
         for (String key : e.keys()) {
           e1.property(key, e.property(key).value());
@@ -509,6 +525,8 @@ public class GremlinRecipies {
       }
     return v1;
     }
+    
+  private Set<Long> _replicatedIds = new TreeSet<>();
      
   private GraphTraversalSource _g;
     
