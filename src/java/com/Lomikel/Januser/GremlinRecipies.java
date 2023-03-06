@@ -504,7 +504,7 @@ public class GremlinRecipies {
       while (edges.hasNext()) {
         e = edges.next();
         ve = e.outVertex();
-        ve1 = gimme(ve, g1, depthIn - 1, inclCycles ? depthOut : 0);
+        ve1 = gimme(ve, g1, depthIn - 1, inclCycles ? depthOut : 0, inclCycles);
         e1 = ve1.addEdge(e.label(), v1);
         for (String key : e.keys()) {
           e1.property(key, e.property(key).value());
@@ -516,7 +516,7 @@ public class GremlinRecipies {
       while (edges.hasNext()) {
         e = edges.next();
         ve = e.inVertex();
-        ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1);
+        ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1, inclCycles);
         e1 = v1.addEdge(e.label(), ve1);
         for (String key : e.keys()) {
           e1.property(key, e.property(key).value());
