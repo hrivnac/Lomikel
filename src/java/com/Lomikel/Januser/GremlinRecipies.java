@@ -27,6 +27,7 @@ import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Get;
 
 // Java
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
@@ -467,17 +468,23 @@ public class GremlinRecipies {
     *                   function will only traverse in one direction (in or out),
     *                   without going back. If <true>true</code>, each step will
     *                   both directions.
-    * @return           The cloned {@link Vertex}. */
+    * @param onlyLabels Restrict replication to some labels. Can be <code>null</code>.
+    * @return           The cloned {@link Vertex} or <code> null</code>. */
   public Vertex gimme(Vertex               v,
                       GraphTraversalSource g1,
                       int                  depthIn,
                       int                  depthOut,
-                      boolean              inclCycles) {
+                      boolean              inclCycles,
+                      String[]             onlyLabels) {
     if (depthIn < 0) {
       depthIn = Integer.MAX_VALUE;
       }
     if (depthOut < 0) {
       depthOut = Integer.MAX_VALUE;
+      }
+    String label = v.label();
+    if (onlyLabels != null && !Arrays.asList(onlyLabels).contains(label)) {
+      return null;
       }
     long id = 0;
     if (inclCycles) {
@@ -486,7 +493,7 @@ public class GremlinRecipies {
         return g1.V(_replicatedIds.get(id)).next();
         }
       }
-    Vertex v1 = g1.addV(v.label()).next();
+    Vertex v1 = g1.addV(label).next();
     if (inclCycles) {
       _replicatedIds.put(id, (Long)(v1.id()));
       }
@@ -507,9 +514,11 @@ public class GremlinRecipies {
         e = edges.next();
         ve = e.outVertex();
         ve1 = gimme(ve, g1, depthIn - 1, inclCycles ? depthOut : 0, inclCycles);
-        e1 = ve1.addEdge(e.label(), v1);
-        for (String key : e.keys()) {
-          e1.property(key, e.property(key).value());
+        if (ve1 != null) {
+          e1 = ve1.addEdge(e.label(), v1);
+          for (String key : e.keys()) {
+            e1.property(key, e.property(key).value());
+            }
           }
         }
       }
@@ -519,9 +528,11 @@ public class GremlinRecipies {
         e = edges.next();
         ve = e.inVertex();
         ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1, inclCycles);
-        e1 = v1.addEdge(e.label(), ve1);
-        for (String key : e.keys()) {
-          e1.property(key, e.property(key).value());
+        if (ve1 != null) {
+          e1 = v1.addEdge(e.label(), ve1);
+          for (String key : e.keys()) {
+            e1.property(key, e.property(key).value());
+            }
           }
         }
       }
