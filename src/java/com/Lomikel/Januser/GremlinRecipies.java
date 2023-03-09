@@ -515,7 +515,7 @@ public class GremlinRecipies {
         ve = e.outVertex();
         ve1 = gimme(ve, g1, depthIn - 1, inclCycles ? depthOut : 0, inclCycles, onlyLabels);
         if (ve1 != null) {
-          if (!checkEdge(ve1, v1)) {
+          if (!checkEdge(ve1, v1, e.label())) {
             e1 = ve1.addEdge(e.label(), v1);
             for (String key : e.keys()) {
               e1.property(key, e.property(key).value());
@@ -531,7 +531,7 @@ public class GremlinRecipies {
         ve = e.inVertex();
         ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1, inclCycles, onlyLabels);
         if (ve1 != null) {
-          if (!checkEdge(ve1, v1)) {
+          if (!checkEdge(ve1, v1, e.label())) {
             e1 = v1.addEdge(e.label(), ve1);
             for (String key : e.keys()) {
               e1.property(key, e.property(key).value());
