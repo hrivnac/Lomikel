@@ -533,7 +533,7 @@ public class GremlinRecipies {
         ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1, inclCycles, onlyLabels);
         if (ve1 != null) {
           //e1 = v1.addEdge(e.label(), ve1);
-          if (addEdge(v1, ve1, e.label()) {
+          if (addEdge(v1, ve1, e.label())) {
             for (String key : e.keys()) {
               e1.property(key, e.property(key).value());
               }
