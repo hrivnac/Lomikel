@@ -207,13 +207,16 @@ public class GremlinRecipies {
     * unless it exists.
     * @param v1       The first {@link Vertex}.
     * @param v2       The second {@link Vertex}.
-    * @param relation The {@link Edge} name. */
+    * @param relation The {@link Edge} name.
+    * @return         Whether the {@link Edge} was added (as it didn'r eexiust yet). */
   public void addEdge(Vertex v1,
                       Vertex v2,
                       String relation) {
-    if (!checkEdge(v1, v2, relation)) {
+    boolean exists = checkEdge(v1, v2, relation)'
+    if (!exists) {
       v1.addEdge(relation, v2);
       }
+    return !exists;
     }
     
   /** Check whether an {@link Edge} exists.
@@ -529,9 +532,11 @@ public class GremlinRecipies {
         ve = e.inVertex();
         ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1, inclCycles, onlyLabels);
         if (ve1 != null) {
-          e1 = v1.addEdge(e.label(), ve1);
-          for (String key : e.keys()) {
-            e1.property(key, e.property(key).value());
+          //e1 = v1.addEdge(e.label(), ve1);
+          if (addEdge(v1, ve1, e.label()) {
+            for (String key : e.keys()) {
+              e1.property(key, e.property(key).value());
+              }
             }
           }
         }
