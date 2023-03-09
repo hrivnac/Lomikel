@@ -209,9 +209,9 @@ public class GremlinRecipies {
     * @param v2       The second {@link Vertex}.
     * @param relation The {@link Edge} name.
     * @return         Whether the {@link Edge} was added (as it didn'r eexiust yet). */
-  public void addEdge(Vertex v1,
-                      Vertex v2,
-                      String relation) {
+  public boolean addEdge(Vertex v1,
+                         Vertex v2,
+                         String relation) {
     boolean exists = checkEdge(v1, v2, relation);
     if (!exists) {
       v1.addEdge(relation, v2);
