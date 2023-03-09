@@ -212,7 +212,7 @@ public class GremlinRecipies {
   public void addEdge(Vertex v1,
                       Vertex v2,
                       String relation) {
-    boolean exists = checkEdge(v1, v2, relation)'
+    boolean exists = checkEdge(v1, v2, relation);
     if (!exists) {
       v1.addEdge(relation, v2);
       }
