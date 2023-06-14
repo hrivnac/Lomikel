@@ -1,0 +1,78 @@
+// Open HBase database (ip, port)
+com.Lomikel.HBaser.HBaseClient client = new com.Lomikel.HBaser.HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+// Connect to table with defined schema
+client.connect("ztf", "schema_2.2_2.0.0");
+// Set maximum number of results
+client.setLimit(5);
+
+// Get the loaded schema as family:column=type,...
+result = client.schema();
+print(result);
+
+// Get two columns for two known alerts (specified by their keys) 
+// Result: Map<String, Map<String, String>>
+results = client.scan("ZTF17aaaaaal_2458860.665162,ZTF17aaaaaal_2458899.6333102",
+                      null,
+                      "i:candid,b:cutoutScience_stampData",
+                      0,
+                      false,
+                      false);
+print(client.results2String(results)); 
+
+// Get binary cell received in previous command
+print(client.repository().get("binary:ZTF17aaaaaal_2458860.665162:cutoutScience_stampData"));
+
+// Get all alerts with key containing 'xyd' or starting with 'ZTF19aaaiw'
+// Available comparators: exact, prefix (default), substring, regex
+results = client.scan(null,
+                      "key:key:xyd:substring,key:key:ZTF19aaaiw:prefix",
+                      "i:candid",
+                      0,
+                      true,
+                      true);
+print(client.results2String(results)); 
+
+// Get all alerts with column match
+// It only works for string columns
+// May use Evaluator for numerical columns
+// Available comparators: exact, prefix, substring (default), regex
+results = client.scan(null,
+                      "d:cdsxmatch:YSO:exact,random:random:0.5",
+                      "i:candid,d:cdsxmatch",
+                      0,
+                      true,
+                      true);
+print(client.results2String(results)); 
+
+// Get timeline dependece of i:dec
+results = client.timeline("i:dec", null);
+print(client.results2String(results)); 
+
+// Get all recent (last 100000 minutes) objectIds
+results = client.latests("i:objectId",
+                         null,
+                         100000,
+                         true);
+print(results); 
+
+// Apply predefined function to filter results
+client.setEvaluation("isWithinGeoLimits(80, 85, -4.0, 0.0)", "ra,dec");
+results = client.scan(null,
+                      null,
+                      null,
+                      0,
+                      false,
+                      false);
+print(client.results2String(results)); 
+
+// Apply formula to filter results
+client.setEvaluation("dec < 55");
+results = client.scan(null,
+                      null,
+                      null,
+                      0,
+                      false,
+                      false);
+print(client.results2String(results)); 
+
+client.close();
