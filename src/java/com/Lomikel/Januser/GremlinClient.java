@@ -43,11 +43,7 @@ public abstract class GremlinClient {
        
   /** Close client. */
   public abstract void close();
-// Bean Shell
 
-// Java
-
- 
   /** Create {@link Cluster}.  
     * @param hostname The Gremlin hostname.
     * @param table    The Gremlin port.

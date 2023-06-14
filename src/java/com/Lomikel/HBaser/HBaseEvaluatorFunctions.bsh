@@ -26,7 +26,7 @@ public static boolean isWithinGeoLimits(double raMin,
                                         double raMax,
                                         double decMin,
                                         double decMax) {
-  return HBaseEvaluatorFunctions.isWithinGeoLimits(ra(), dec(), raMin, raMax, decMin, decMax);
+  return HBaseEvaluatorFunctions.isWithinGeoLimits(ra, dec, raMin, raMax, decMin, decMax);
   }
 
 /** Evaluate, if <tt>ra,dec</tt> are within specified angular from concrete direction.
@@ -37,7 +37,7 @@ public static boolean isWithinGeoLimits(double raMin,
 public static boolean isNear(double ra0,
                              double dec0,
                              double delta) {
-  return HBaseEvaluatorFunctions.isNear(ra(), dec(), ra0, dec0, delta);
+  return HBaseEvaluatorFunctions.isNear(ra, dec, ra0, dec0, delta);
   }
 
 
