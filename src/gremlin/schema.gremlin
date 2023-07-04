@@ -4,14 +4,9 @@
 mgmt = graph.openManagement()
 
 // Vertexes
-testVertex = mgmt.makeVertexLabel('testVertex').make()
 datalink   = mgmt.makeVertexLabel('datalink'  ).make()
 
 // Edges
-props    = mgmt.makeEdgeLabel('props'   ).multiplicity(SIMPLE  ).make()
-has      = mgmt.makeEdgeLabel('has'     ).multiplicity(ONE2MANY).make()
-contains = mgmt.makeEdgeLabel('contains').multiplicity(MULTI   ).make()
-overlaps = mgmt.makeEdgeLabel('overlaps').multiplicity(SIMPLE  ).make()
 
 // Properties
 title         = mgmt.makePropertyKey('title'        ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
@@ -22,11 +17,6 @@ phoenix       = mgmt.makePropertyKey('phoenix'      ).dataType(Boolean.class).ca
 url           = mgmt.makePropertyKey('url'          ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 query         = mgmt.makePropertyKey('query'        ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 technology    = mgmt.makePropertyKey('technology'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-x             = mgmt.makePropertyKey('x'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
-y             = mgmt.makePropertyKey('y'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
-z             = mgmt.makePropertyKey('z'            ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
-ra            = mgmt.makePropertyKey('ra'           ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
-dec           = mgmt.makePropertyKey('dec'          ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
 timestamp     = mgmt.makePropertyKey('timestamp'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make() // LocalDateTime
 importDate    = mgmt.makePropertyKey('importDate'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 importSource  = mgmt.makePropertyKey('importSource' ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
@@ -37,15 +27,6 @@ sizeOut       = mgmt.makePropertyKey('sizeOut'      ).dataType(Long.class   ).ca
 // union = intersection + differenceIn + differenceOut
 
 // Vertex properties
-mgmt.addProperties(testVertex,
-                   lbl,
-                   title,
-                   x,
-                   y,
-                   z,
-                   ra,
-                   dec,
-                   timestamp)
 mgmt.addProperties(datalink,
                    lbl,
                    name,
@@ -54,12 +35,6 @@ mgmt.addProperties(datalink,
                    query)
                                     
 // Edge properties
-mgmt.addProperties(props,
-                   lbl)
-mgmt.addProperties(has,
-                   lbl)
-mgmt.addProperties(contains,
-                   lbl)
 mgmt.addProperties(overlaps,
                    lbl,
                    intersection,
@@ -67,7 +42,7 @@ mgmt.addProperties(overlaps,
                    sizeOut)
 
 // Connections   
-mgmt.addConnection(overlaps, testVertex, testVertex)
+...
 
 // Info
 mgmt.printSchema()

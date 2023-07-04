@@ -57,16 +57,22 @@
     </path>
     
   <path id="classpath_phoenix.run">
-    <fileset dir="../lib">
+    <!--fileset dir="../lib">
       <include name="*.jar"/>
       <exclude name="*.exe.jar"/>
-      </fileset>
+      </fileset-->
+    <pathelement path="${groovy_jar}"/>
     <pathelement path="${groovy_sql_jar}"/>
     <pathelement path="${hadoop_phoenix_conf}"/>
     <pathelement path="${hbase_phoenix_conf}"/>
     <pathelement path="${phoenix_jar}"/>
     <!--path refid="classpath.build"/-->
     </path>
+
+  <path id="classpath.groovy">
+    <fileset dir="${groovy_dir}/lib" includes="*.jar" excludes="groovy-ant-*.jar"/>
+    <fileset dir="${phoenix_dir}"    includes="${phoenix_jar_name}"/>
+    </path>    
     
   <path id="classpath.janusgraph">
     <fileset dir="${janusgraph_dir}/lib">
@@ -86,6 +92,22 @@
   <property name="classpath.build.content"       refid="classpath.build"/>
   <property name="classpath.run.content"         refid="classpath.run"/>
   <property name="classpath_phoenix.run.content" refid="classpath_phoenix.run"/>
+
+  <taskdef name="groovy"
+           classname="org.codehaus.groovy.ant.Groovy">
+    <classpath>
+      <fileset file="${groovy_jar}"/>
+      <fileset file="${groovy_ant_jar}"/>
+      </classpath>
+    </taskdef>
+
+  <taskdef name="groovyc"
+           classname="org.codehaus.groovy.ant.Groovyc">
+    <classpath>
+      <fileset file="${groovy_jar}"/>
+      <fileset file="${groovy_ant_jar}"/>
+      </classpath>
+    </taskdef>
 
   <taskdef resource="edu/umd/cs/findbugs/anttask/tasks.properties"
            classpath="${spotbugs}/lib/spotbugs-ant.jar" />
@@ -229,11 +251,9 @@
       <zipfileset includes="**/*" src="${groovysh_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-beanutils-core-1.8.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-cli-1.2.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="/opt/lib/commons-cli-1.4.jar" excludes="META-INF/*"/--><!-- to allow in Jupyter -->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-codec-1.10.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-collections-3.2.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-compress-1.4.1.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${hbase_dir}/lib/commons-configuration-1.6.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-crypto-1.0.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-daemon-1.0.13.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-digester-1.8.jar" excludes="META-INF/*"/>
@@ -244,7 +264,6 @@
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-math3-3.6.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-net-3.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/gson-2.2.4.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${hbase_dir}/lib/guava-11.0.2.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/guice-3.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/guice-servlet-3.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hadoop-annotations-2.8.5.jar" excludes="META-INF/*"/>
@@ -288,7 +307,6 @@
       <zipfileset includes="**/*" src="${hbase_dir}/lib/leveldbjni-all-1.8.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/libthrift-0.12.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/metrics-core-3.2.6.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${hbase_dir}/lib/netty-all-4.0.23.Final.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/nimbus-jose-jwt-4.41.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/okhttp-2.4.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/okio-1.4.0.jar" excludes="META-INF/*"/>
@@ -773,7 +791,7 @@
 
   <!-- Check ================================================================-->
     
-   <target name="check-sockets"
+  <target name="check-sockets"
           description="Check Sockets">
     <echo>Check Sockets</echo>
     <java classname="net.hep.atlas.Database.Atlascope.Sockets.SocketTest"
@@ -783,11 +801,23 @@
         </classpath>
       </java>
     </target>
+    
+  <target name="check-phoenix"
+          description="Check Phoenix using Groovy">
+    <echo>Check Phoenix using Groovy</echo>
+    <groovy>
+      <fileset file="../src/groovy/testPhoenix.groovy"/>
+      <classpath>
+        <path refid="classpath_phoenix.run"/>
+        <pathelement location="${groovy_sql_jar}"/>
+        </classpath>
+      </groovy>
+    </target>
   
   <!-- JavaDoc ==============================================================-->
 
   <target name="doc"
-          depends="jar,j2h,viz,uml"
+          depends="jar,j2h,viz"
           description="Construct documentation">
  		<copy todir="../doc">
 			<fileset dir="../src" includes="*.html"/>
@@ -913,37 +943,6 @@
     <vizant antfile="../ant/build.xml" outfile="../doc/build.dot"/>
     </target>
     
-  <!-- UmlGraph =============================================================-->  
-
-  <target name="uml"
-          depends="init"
-          description="Create UML Graph">
-    <!--pathconvert targetos="unix" property="classpath.run" refid="classpath.run"/>
-	  <apply executable="javadoc" dest="../build" parallel="true">
-		  <arg value="-classpath"/>
-		  <arg value="${classpath.run}"/>
-		  <arg value="-source"/>
-		  <arg value="1.8"/>
-		  <arg value="-docletpath"/>
-		  <arg value="../extlib/UmlGraph.jar"/>
-		  <arg line="-doclet org.umlgraph.doclet.UmlGraph"/>
-		  <arg value="-all"/>
-		  <arg value="-noguillemot"/>
-		  <arg line="-output ../doc/index.dot"/>
-		  <fileset dir="../src"/>
-		  <fileset dir="../build/com"/>
-		  <mapper type="glob" from="*.java" to="*.dot"/>
-	    </apply>
-	  <apply executable="dot" dest="../doc" parallel="false">
-		  <arg value="-Tjpg"/>
-		  <arg value="-o"/>
-		  <targetfile/>
-		  <srcfile/>
-		  <fileset dir="../doc"/>
-		  <mapper type="glob" from="*.dot" to="*.jpg"/>
-      </apply-->
-    </target>
-
   <!-- Find Bugs ============================================================-->  
 
   <target name="findbugs"
