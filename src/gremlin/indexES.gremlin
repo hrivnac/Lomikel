@@ -12,9 +12,9 @@ title= mgmt.getPropertyKey('title')
 name = mgmt.getPropertyKey('name')
 
 // Indexes
-//mgmt.buildIndex('byLblES',   Vertex.class).addKey(lbl, Mapping.TEXT.asParameter())                                                .buildMixedIndex('search')
-//mgmt.buildIndex('byTitleES', Vertex.class).addKey(lbl, Mapping.TEXT.asParameter()).addKey(title, Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
-//mgmt.buildIndex('byNameES',  Vertex.class).addKey(lbl, Mapping.TEXT.asParameter()).addKey(name , Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
+//mgmt.buildIndex('byLblES',   Vertex.class).addKey(lbl, Mapping.STRING.asParameter())                                                .buildMixedIndex('search')
+//mgmt.buildIndex('byTitleES', Vertex.class).addKey(lbl, Mapping.STRING.asParameter()).addKey(title, Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
+//mgmt.buildIndex('byNameES',  Vertex.class).addKey(lbl, Mapping.STRING.asParameter()).addKey(name , Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
 
 mgmt.commit()
 
