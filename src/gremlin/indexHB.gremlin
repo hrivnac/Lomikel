@@ -33,6 +33,7 @@ mgmt.updateIndex(mgmt.getGraphIndex('byLblE' ), SchemaAction.REINDEX).get()
 //mgmt.updateIndex(mgmt.getGraphIndex('byName' ), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
 mgmt.getGraphIndexes(Edge.class)
+mgmt.printIndexes()
 mgmt.commit()
 
 // Enable index                                           

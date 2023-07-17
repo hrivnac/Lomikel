@@ -29,6 +29,8 @@ mgmt = graph.openManagement()
 //mgmt.updateIndex(mgmt.getGraphIndex('byTitleES'), SchemaAction.REINDEX).get()
 //mgmt.updateIndex(mgmt.getGraphIndex('byNameES' ), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
+mgmt.getGraphIndexes(Edge.class)
+mgmt.printIndexes()
 mgmt.commit()
 
 // Enable index                                           
