@@ -374,10 +374,13 @@ public class GremlinRecipies {
       log.error("Cannot create GremlonEvaluatir", e);
       return;
       }
+        log.info(java.util.Arrays.toString(evaluator.variables()));
     evaluator.setVariables(formula);
+        log.info(java.util.Arrays.toString(evaluator.variables()));
     if (variables != null) {
       evaluator.forceVariables(variables);
       }
+        log.info(java.util.Arrays.toString(evaluator.variables()));
     // Accumulate Vertex ids
     log.info("Accumulating Vertex ids...");
     Vertex v;
@@ -411,7 +414,6 @@ public class GremlinRecipies {
         entry1 = entries.get(i);
         entry2 = entries.get(j);
         values = new HashMap<>();
-        log.info(java.util.Arrays.toString(evaluator.variables()));
         for (String var : evaluator.variables()) {
           log.info(var);
           log.info(entry1);
