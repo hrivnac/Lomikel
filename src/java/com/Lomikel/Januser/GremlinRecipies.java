@@ -374,6 +374,7 @@ public class GremlinRecipies {
       log.error("Cannot create GremlonEvaluatir", e);
       return;
       }
+        log.info(formula);
         log.info(java.util.Arrays.toString(evaluator.variables()));
     evaluator.setVariables(formula);
         log.info(java.util.Arrays.toString(evaluator.variables()));
