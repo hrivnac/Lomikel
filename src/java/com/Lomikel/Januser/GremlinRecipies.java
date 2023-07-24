@@ -381,7 +381,7 @@ public class GremlinRecipies {
     // Accumulate Vertex ids
     log.info("Accumulating Vertex ids...");
     Vertex v;
-    Property<Vertex> p;
+    Property<Double> p;
     Object id;
     Map<Object, Map<String, Double>> vMap = new HashMap<>(); // id -> (key -> value)
     Map<String, Double> pMap;
