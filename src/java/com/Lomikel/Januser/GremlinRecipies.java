@@ -393,7 +393,7 @@ public class GremlinRecipies {
       for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
         p = i.next();
         if (evaluator.hasVariable(p.key())) {
-          log.info(p.value());
+          log.info(p.value().getClass());
           //pMap.put(p.key(), p.value());
           }
         }
