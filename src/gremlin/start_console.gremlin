@@ -99,6 +99,15 @@ class Lomikel {
         }
       }
 
+  def static standardDeviation(g, lbl, variableNames) {
+    def sdMap = [:]
+    variableNames.split().stream().each {v ->
+      g.V().has('lbl', lbl).values(v).fold().as(v).mean(local).as('mean').select(v).unfold().math('(_-mean)^2').mean().math('sqrt(_)').map{sd -> println  v + ': ' + sd
+                                                                                                                        sdMap += [(v):sd]}.next()
+      }
+    return sdMap
+    }
+      
   def static dropV(graph, label, n) {
     def g = graph.traversal()
     def m = g.V().has('lbl', label).count().next()

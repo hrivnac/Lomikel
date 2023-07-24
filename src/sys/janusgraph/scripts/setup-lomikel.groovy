@@ -80,6 +80,15 @@ class LomikelServer {
       return 'DataLink ' + v + ' not found'
       }
     }
+
+  def static standardDeviation(g, lbl, variableNames) {
+    def sdMap = [:]
+    variableNames.split().stream().each {v ->
+      g.V().has('lbl', lbl).values(v).fold().as(v).mean(local).as('mean').select(v).unfold().math('(_-mean)^2').mean().math('sqrt(_)').map{sd -> println  v + ': ' + sd
+                                                                                                                        sdMap += [(v):sd]}.next()
+      }
+    return sdMap
+    }
       
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
   def static g = graph.traversal()
