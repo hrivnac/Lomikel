@@ -383,8 +383,8 @@ public class GremlinRecipies {
     Vertex v;
     Property<Vertex> p;
     Object id;
-    Map<Object, Map<String, Object>> vMap = new HashMap<>(); // id -> (key -> value)
-    Map<String, Object> pMap;
+    Map<Object, Map<String, Double>> vMap = new HashMap<>(); // id -> (key -> value)
+    Map<String, Double> pMap;
     while (gt.hasNext()) {
       v = gt.next();
       id = v.id();
@@ -403,9 +403,9 @@ public class GremlinRecipies {
     Map<String, String> values;
     Map<String, Double> scores = new HashMap<>(); // id id -> score 
     double score = 0;
-    List<Map.Entry<Object, Map<String, Object>>> entries = new ArrayList<>(vMap.entrySet());
-    Map.Entry<Object, Map<String, Object>> entry1;
-    Map.Entry<Object, Map<String, Object>> entry2;
+    List<Map.Entry<Object, Map<String, Double>>> entries = new ArrayList<>(vMap.entrySet());
+    Map.Entry<Object, Map<String, Double>> entry1;
+    Map.Entry<Object, Map<String, Double>> entry2;
     for (int i = 0; i < entries.size(); i++) {
       for (int j = i + 1; j < entries.size(); j++) {
         entry1 = entries.get(i);
@@ -413,7 +413,7 @@ public class GremlinRecipies {
         values = new HashMap<>();
         for (String var : evaluator.variables()) {
           if (entry1.getValue().containsKey(var) && entry2.getValue().containsKey(var)) {
-            evaluator.setVariable(var, new String[]{entry1.getValue().get(var).toString(), entry2.getValue().get(var).toString()});
+            evaluator.setVariable(var, new double[]{entry1.getValue().get(var), entry2.getValue().get(var)});
             }
           }
         try {

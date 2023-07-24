@@ -157,6 +157,13 @@ public class Evaluator {
       }
     }
     
+  /** TBD */
+  public void setVariable(String name,
+                          double value) {
+    String fname = varName(name);
+    _interpreter.set(fname, value);
+    }
+    
   /** Set array variable.
     * @param name   The name of variables.
     * @param values The values of variables.
@@ -199,6 +206,13 @@ public class Evaluator {
     catch (EvalError e) {
       log.error("Cannot assign " + name + " = '" + values);
       }
+    }
+    
+  /** TBD */
+  public void setVariable(String   name,
+                          double[] values) {
+    String fname = varName(name);    
+    _interpreter.set(fname, values);
     }
     
   /** Give the array of used variables.
