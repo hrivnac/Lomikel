@@ -394,7 +394,7 @@ public class GremlinRecipies {
         p = i.next();
         if (evaluator.hasVariable(p.key())) {
           log.info(p.value());
-          double ddd = d.value();
+          double ddd = p.value();
           //pMap.put(p.key(), p.value());
           }
         }
