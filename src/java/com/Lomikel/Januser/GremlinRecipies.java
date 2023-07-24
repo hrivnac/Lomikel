@@ -334,7 +334,7 @@ public class GremlinRecipies {
     * @param formula          The formula giving double value. It can contain any variables
     *                         from both {@link Vertex}es, they can be accessed as <code>variable[0]</code>
     *                         <code>variable[1]</code>. 
-    * @param variables        The blank-separated list of variables, if they are not available from {@link Schema}.
+    * @param variables        The blank-separated list of (double) variables used in relation evaluation.
     * @param threshold        The (high) threshold of the formula result for creation of the {@link Edge}
     *                         between {@link Vertex}es. I.e. the maximum distance between two {@link Vertex}es
     *                         to be included in the cluster.
@@ -374,7 +374,7 @@ public class GremlinRecipies {
       log.error("Cannot create GremlonEvaluatir", e);
       return;
       }
-    evaluator.setVariables(formula);
+    //evaluator.setVariables(formula);
     if (variables != null) {
       evaluator.forceVariables(variables);
       }
@@ -400,7 +400,6 @@ public class GremlinRecipies {
     log.info("" + vMap.size() + " ids accumulated");
     // Calculate scores
     log.info("Calculating scores...");
-    Map<String, String> values;
     Map<String, Double> scores = new HashMap<>(); // id id -> score 
     double score = 0;
     List<Map.Entry<Object, Map<String, Double>>> entries = new ArrayList<>(vMap.entrySet());
@@ -410,7 +409,6 @@ public class GremlinRecipies {
       for (int j = i + 1; j < entries.size(); j++) {
         entry1 = entries.get(i);
         entry2 = entries.get(j);
-        values = new HashMap<>();
         for (String var : evaluator.variables()) {
           if (entry1.getValue().containsKey(var) && entry2.getValue().containsKey(var)) {
             evaluator.setVariable(var, new double[]{entry1.getValue().get(var), entry2.getValue().get(var)});
