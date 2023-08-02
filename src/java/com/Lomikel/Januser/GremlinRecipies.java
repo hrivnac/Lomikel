@@ -378,8 +378,8 @@ public class GremlinRecipies {
     if (variables != null) {
       evaluator.forceVariables(variables);
       }
-    // Accumulate Vertex ids
-    log.info("Accumulating Vertex ids...");
+    // Accumulate Vertexes
+    log.info("Accumulating Vertexes...");
     Vertex v;
     Property<Double> p;
     Object id;
