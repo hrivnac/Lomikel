@@ -4,6 +4,7 @@ import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.DateTimeManagement;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
+import com.Lomikel.Utils.ByteArray;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Schema;
 import com.Lomikel.DB.Client;
@@ -660,13 +661,21 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   /** Add a row into table.
     * @param key    The row key.
     * @param values The column values as family:column:value.
+    *               Use schema if defined.
     * @throws IOException If anything goes wrong. */
-  public void put(String key,
+  public void put(String   key,
                   String[] values) throws IOException {
     Put put = new Put(Bytes.toBytes(key));
+    String value;
     for (String v : values) {
       String[] w = v.split(":");
-      put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), Bytes.toBytes(w[2]));
+      value = w[2];
+      if (schema() != null) {
+        put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), schema().encode(w[0] +  ":" +  w[1], value).bytes());
+        }
+      else {
+        put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), Bytes.toBytes(value));
+        }
       }
     table().put(put);
     }
