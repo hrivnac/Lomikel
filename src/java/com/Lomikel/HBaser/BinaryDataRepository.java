@@ -18,6 +18,7 @@ public class BinaryDataRepository {
 
   /** Create. */
 	public BinaryDataRepository() {
+	  log.info("Storing binary data in static memory");
 	  _data = new HashMap<>();
 	  }
 	  
@@ -45,7 +46,7 @@ public class BinaryDataRepository {
 	  * @param  id      The entry id.
     * @return content The entry content, encoded in {@link Base64}. */
 	public String get64(String id) {
-	  return Base64.getEncoder().encodeToString(_data.get(id));
+	  return Base64.getEncoder().encodeToString(get(id));
 	  }
 	  
 	@Override

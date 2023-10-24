@@ -709,19 +709,25 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     }
     
   /** Set result timestamp format.
-    * @param format The result timestamp format.
-    *               The default is the native HBase format (ms). */
+    * @param dateFormat The result timestamp format.
+    *                  The default is the native HBase format (ms). */
   public void setDateFormat(String dateFormat) {
     log.info("Setting Date format " + dateFormat);
     _dateFormat = dateFormat;
     }
     
  /** Give the table {@link BinaryDataRepository}.
-    * @param schema The used {@link BinaryDataRepository}. */
+    * @return The used {@link BinaryDataRepository}. */
   public BinaryDataRepository repository() {
     return _repository;
     }
-        
+    
+  /** Set the table {@link BinaryDataRepository}.
+    * @param repository The used {@link BinaryDataRepository}. */
+  public void setRepository(BinaryDataRepository repository) {
+    _repository = repository;
+    }
+       
   /** Increment <tt>byte[]</tt>.
     * @param value The origibal value.
     * @return      The incremented value. */
