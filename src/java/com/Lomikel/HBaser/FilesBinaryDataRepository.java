@@ -52,7 +52,7 @@ public class FilesBinaryDataRepository extends BinaryDataRepository {
 	                byte[] content) {
 	  try {
 	    File file = new File(_repdir + "/" + id);
-      file.deleteOnExit();      
+      //file.deleteOnExit();      
       FileOutputStream fos = new FileOutputStream(file);
       fos.write(content);
       fos.close();	
