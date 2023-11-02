@@ -320,26 +320,6 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     } 
   
   // Aux -----------------------------------------------------------------------
-    
-  /** Give {@link Class} representing a {@link Vertex} of a label.
-    * @param lbl The {@link Vertex} label (i.e. <em>lbl</em>) value of
-    *            the {@link Vertex} to be represented.
-    * @return    The representation of requested {@link Vertex}. */
-  public static void registerVertexType(String lbl,
-                                        Class  representant) {
-    log.info(lbl + "  will be represented by " + representant);
-    _representations.put(lbl, representant);
-    }  
-    
-  @Override
-  public Class representation(String lbl) {
-    return _representations.get(lbl);
-    }
-    
-  @Override
-  public Map<String, Class> representations() {
-    return _representations;
-    }
  
   /** Give {@link Connection}.
     * @return The {@link Connection}. */
@@ -355,8 +335,6 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
   private static SimpleDateFormat PHOENIX_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     
   static final String JDBC_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";
-  
-  private static Map<String, Class> _representations = new TreeMap<>();
   
   /** Logging . */
   private static Logger log = Logger.getLogger(PhoenixClient.class);

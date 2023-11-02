@@ -81,8 +81,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   public HBaseClient(String zookeepers,
                      String clientPort) throws LomikelException {
     Init.init();
-    _zookeepers = zookeepers;
-    _clientPort = clientPort;
+    setup(zookeepers, clientPort);
     log.info("Opening " + zookeepers + " on port " + clientPort);
     _conf = HBaseConfiguration.create();
     if (zookeepers != null) {
@@ -127,6 +126,10 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   public HBaseClient(String url) throws LomikelException {
     this(url.replaceAll("http://", "").split(":")[0], url.replaceAll("http://", "").split(":")[1]);
     }
+    
+  /** Dummy constructor for subclassing. */
+  // TBD: refactor
+  protected HBaseClient() {}  
     
   @Override
    public Table connect(String tableName) throws LomikelException {
@@ -755,6 +758,15 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _table;
     }
 
+  /** Set connection parameters.
+   * @param zookeepers The zookeepers to use. 
+   * @param clientPort The client port to use. */
+  protected void setup(String zookeepers,
+                       String clientPort) {
+    _zookeepers = zookeepers;
+    _clientPort = clientPort;
+    }
+    
   /** Give the used zookeepers.
     * @return The used zookeepers. */
   protected String zookeepers() {
@@ -819,27 +831,6 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _rs;
     }
     
-  /** Register {@link Class} representing a {@link Vector}
-    * of a label.
-    * @param lbl          The {@link Vertex} label (i.e. <em>lbl</em>) value of
-    *                     the {@link Vertex} to be represented.
-    * @param representant The representation of a {@link Vertex}. */
-  public static void registerVertexType(String lbl,
-                                        Class  representant) {
-    log.info(lbl + "  will be represented by " + representant);
-    _representations.put(lbl, representant);
-    }  
-    
-  @Override
-  public Class representation(String lbl) {
-    return _representations.get(lbl);
-    }
-    
-  @Override
-  public Map<String, Class> representations() {
-    return _representations;
-    }
-    
   /** Give attached {@link HBaseEvaluator}.
     * @return The attached {@link HBaseEvaluator}. */
   public HBaseEvaluator evaluator() {
@@ -873,8 +864,6 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   private HBaseEvaluator _evaluator;
   
   private String _formula;
-  
-  private static Map<String, Class> _representations = new TreeMap<>();
   
   /** Logging . */
   private static Logger log = Logger.getLogger(HBaseClient.class);

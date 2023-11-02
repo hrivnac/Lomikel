@@ -53,6 +53,7 @@
      <fileset dir="${hbase_dir}">
       <include name="lib/*.jar"/>
       </fileset>
+    <pathelement path="${phoenix_jar}"/>
     <path refid="classpath.build"/>
     </path>
     

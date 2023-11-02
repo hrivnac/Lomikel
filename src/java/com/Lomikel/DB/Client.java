@@ -313,12 +313,26 @@ public abstract class Client<T, S extends Schema> {
     * @param lbl The {@link Vertex} label (i.e. <em>lbl</em>) value of
     *            the {@link Vertex} to be represented.
     * @return    The representation of requested {@link Vertex}. */
-  public abstract Class representation(String lbl);
+  public static void registerVertexType(String lbl,
+                                        Class  representant) {
+    log.info(lbl + "  will be represented by " + representant);
+    _representations.put(lbl, representant);
+    }      
+    
+  /** Give {@link Class} representing a {@link Vertex} of a label.
+    * @param lbl The {@link Vertex} label (i.e. <em>lbl</em>) value of
+    *            the {@link Vertex} to be represented.
+    * @return    The representation of requested {@link Vertex}. */
+  public Class representation(String lbl) {
+    return _representations.get(lbl);
+    }
     
   /** Give all {@link Class} representing a {@link Vertex} of a label.
     *            the {@link Vertex} to be represented.
-    * @return    All representation of requested {@link Vertexs}. */
-  public abstract Map<String, Class> representations();
+    * @return    All representation of requested {@link Vertex}s. */
+  public  Map<String, Class> representations() {
+    return _representations;
+    }
     
   /** Give Graph property name derived from the Phoenix column name.
     * It uses {@link Schema#reMap}.
@@ -338,6 +352,9 @@ public abstract class Client<T, S extends Schema> {
   private int _limit = 0;
   
   private boolean _reversed = false;
+      
+  private static Map<String, Class> _representations = new TreeMap<>();
+
   
   /** Logging . */
   private static Logger log = Logger.getLogger(Client.class);
