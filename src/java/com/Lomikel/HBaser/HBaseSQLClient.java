@@ -77,6 +77,31 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class HBaseSQLClient extends HBaseClient {
+  
+  /** Create and connect to HBase.
+    * @param zookeepers The comma-separated list of zookeper ids.
+    * @param clientPort The client port. 
+    * @throws LomikelException If anything goes wrong. */
+  public HBaseSQLClient(String zookeepers,
+                        String clientPort) throws LomikelException {
+    super(zookeepers, clientPort);
+    }
+        
+  /** Create and connect to HBase.
+    * @param zookeepers The comma-separated list of zookeper ids.
+    * @param clientPort The client port. 
+    * @throws LomikelException If anything goes wrong. */
+  public HBaseSQLClient(String zookeepers,
+                        int    clientPort) throws LomikelException {
+    super(zookeepers, clientPort);
+    }
+    
+  /** Create and connect to HBase.
+    * @param url The HBase url.
+    * @throws LomikelException If anything goes wrong. */
+  public HBaseSQLClient(String url) throws LomikelException {
+    super(url);
+    }
          
   /** Get row(s) using SQL query.
     * @param sql The (Phoenix) SQL query.
