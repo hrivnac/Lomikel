@@ -126,11 +126,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   public HBaseClient(String url) throws LomikelException {
     this(url.replaceAll("http://", "").split(":")[0], url.replaceAll("http://", "").split(":")[1]);
     }
-    
-  /** Dummy constructor for subclassing. */
-  // TBD: refactor
-  protected HBaseClient() {}  
-    
+        
   @Override
    public Table connect(String tableName) throws LomikelException {
      return connect(tableName, "schema");
