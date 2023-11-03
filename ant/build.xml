@@ -386,6 +386,7 @@
         <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="${phoenix_jar}"/>
         </manifest>
       </jar>
     </target>

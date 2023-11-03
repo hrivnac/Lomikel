@@ -520,7 +520,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           }
         }
       if (iftime) {
-        if (_dateFormat == null) {
+        if (dateFormat() == null) {
           result.put("key:time", String.valueOf(r.rawCells()[0].getTimestamp()));
           }
         else {
@@ -831,6 +831,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * @return The attached {@link HBaseEvaluator}. */
   public HBaseEvaluator evaluator() {
     return _evaluator;
+    }
+   
+  /** Give the date format string.
+    * @return the date format string or <tt>null</tt>. */
+  public String dateFormat() {
+    return _dateFormat;
     }
     
   private Table _table;

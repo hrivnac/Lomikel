@@ -51,6 +51,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
 // Java
@@ -104,19 +105,35 @@ public class HBaseSQLClient extends HBaseClient {
     }
          
   /** Get row(s) using SQL query.
-    * @param sql The (Phoenix) SQL query.
-    * @return    The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
-  public Map<String, Map<String, String>> scan(String sql) {
+    * @param sql     The (Phoenix) SQL query.
+    * @param ifkey   Whether add also entries keys (as <tt>key:key</tt>).
+    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  // TBD: handle binary columns
+  // TBD: handle iftime
+  public Map<String, Map<String, String>> scan(String    sql,
+                                               boolean   ifkey) {
     Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;
     if (_conn == null) {
       log.info("Opening " + zookeepers() + " on port " + clientPort() + " via Phoenix");
       try {
+        Class.forName("org.apache.phoenix.jdbc.PhoenixDriver");
+        //Class.forName("org.apache.phoenix.queryserver.client.Driver");
+        }
+      catch (ClassNotFoundException e) {
+        log.error("Cannot find Phoenix JDBC driver", e);
+        return results;
+        }
+      try {
         _conn = DriverManager.getConnection("jdbc:phoenix:" + zookeepers() + ":" + clientPort()); 
+        //_conn = DriverManager.getConnection("jdbc:phoenix:thin:url=http://" + zookeepers() + ":" + clientPort() + ";serializa‌​tion=PROTOBUF"); 
         }
       catch (SQLException e) {
         log.error("Cannot open connection", e);
         return results;
+        }
+      if (schema() instanceof HBaseSchema && schema().size() > 0) {
+        setSchema((HBaseSchema)schema().simpleSchema());
         }
       }
     Statement stmt;
@@ -129,15 +146,52 @@ public class HBaseSQLClient extends HBaseClient {
       }
     try {
       ResultSet rs = stmt.executeQuery(sql);
+      ResultSetMetaData rsmd = rs.getMetaData();
+      int n = rsmd.getColumnCount();
       while (rs.next()) {
-        //String name = rs.getString("title");
-        //System.out.println(name);
+        result = new TreeMap<>();
+        if (addResult(rs, rsmd, result, ifkey)) {
+          results.put(rs.getString("rowkey"), result);
+          }
         }
       }
     catch (SQLException e ) {
-      log.error("Cannot execute: " + sql);
+      log.error("Cannot execute: " + sql, e);
       } 
     return results;
+    }
+    
+  /** Add {@link Result} into result {@link Map}.
+    * @param rs      The {@link ResultSet} to add (the current row).
+    * @param rsmd    The {@link ResultSetMetaData}.
+    * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
+    * @param ifkey   Whether add also entries keys (as <tt>key:key</tt>).
+    * @return        Whether the result has been added. */
+  private boolean addResult(ResultSet           rs,
+                            ResultSetMetaData   rsmd,
+                            Map<String, String> result,
+                            boolean             ifkey) throws SQLException {
+    String columnName;
+    int n = rsmd.getColumnCount();
+    boolean isSchema = false;
+    if (rs.getString("ROWKEY").startsWith("schema")) {
+      isSchema = true;
+      }
+    for (int i = 1; i <= n; i++) {
+      columnName = rsmd.getColumnName(i);
+      if (columnName.equals("ROWKEY")) {
+        if (ifkey) {
+          result.put("key:key", rs.getString(i));
+          }
+        }
+      else if (!isSchema && schema() != null && schema().type(columnName) != null) {
+        result.put(rsmd.getColumnName(i), schema().decode(columnName, rs.getBytes(i)));
+        }
+      else {
+        result.put(columnName, rs.getString(i));
+        }
+      }
+    return true;
     }
     
   @Override

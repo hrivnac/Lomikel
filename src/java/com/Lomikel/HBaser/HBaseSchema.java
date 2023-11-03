@@ -9,6 +9,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 // Java
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Set;
 
 // Log4J
@@ -169,6 +170,16 @@ public class HBaseSchema extends Schema<ByteArray> {
     return new ByteArray(value);
     }
         
+  /** Strip families from column names.
+    * @return The {@link HBaseSchema} without family names. */
+  public HBaseSchema simpleSchema() {
+    Map<String, String> newMap = new TreeMap<>();
+    for (Map.Entry<String, String> entry : map().entrySet()) {
+      newMap.put(entry.getKey().split(":")[1], entry.getValue());
+      }
+    return new HBaseSchema(name(), newMap);
+    }    
+    
   @Override
   public String toString() {
     return "HBase" + super.toString();
