@@ -133,7 +133,7 @@ public class HBaseSQLClient extends HBaseClient {
         return results;
         }
       if (schema() instanceof HBaseSchema && schema().size() > 0) {
-        setSchema((HBaseSchema)schema().simpleSchema());
+        _simpleSchema = (HBaseSchema)schema().simpleSchema();
         }
       }
     Statement stmt;
@@ -184,8 +184,8 @@ public class HBaseSQLClient extends HBaseClient {
           result.put("key:key", rs.getString(i));
           }
         }
-      else if (!isSchema && schema() != null && schema().type(columnName) != null) {
-        result.put(rsmd.getColumnName(i), schema().decode(columnName, rs.getBytes(i)));
+      else if (!isSchema && _simpleSchema != null && _simpleSchema.type(columnName) != null) {
+        result.put(rsmd.getColumnName(i), _simpleSchema.decode(columnName, rs.getBytes(i)));
         }
       else {
         result.put(columnName, rs.getString(i));
@@ -206,6 +206,8 @@ public class HBaseSQLClient extends HBaseClient {
     _conn = null;
     super.close();
     }
+    
+  private HBaseSchema _simpleSchema; 
     
   private Connection _conn = null;  
   
