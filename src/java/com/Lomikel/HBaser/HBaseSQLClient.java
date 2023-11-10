@@ -106,6 +106,9 @@ public class HBaseSQLClient extends HBaseClient {
          
   /** Get row(s) using SQL query.
     * @param sql     The (Phoenix) SQL query.
+    *                The <code>ROWKEY</code> should be included in the <code>SELECT<code>
+    *                part (explicitely or implicitely).
+    *                The small and mixed case variables should be closed in quotation marks. 
     * @param ifkey   Whether add also entries keys (as <tt>key:key</tt>).
     * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   // TBD: handle binary columns

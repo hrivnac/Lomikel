@@ -373,6 +373,7 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snakeyaml-1.28.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spatial4j-0.8.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.5.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.5.3.jar" excludes="META-INF/*"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -386,8 +387,11 @@
         <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="${phoenix_jar}"/>
+        <attribute name="Class-Path" value="/home/opt/phoenix-hbase-2.2-5.1.3-bin/phoenix-client-embedded-hbase-2.2-5.1.3.jar"/>
         </manifest>
+      <service type="java.sql.Driver">
+        <provider classname="org.apache.phoenix.jdbc.PhoenixDriver"/>
+        </service>
       </jar>
     </target>
     
