@@ -5,6 +5,7 @@ import com.Lomikel.DB.CellContent;
 // Java
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -103,6 +104,70 @@ public abstract class Schema<T> {
   protected Map<String, String> reMap() {
     return _reMap;
     }
+    
+  /** Give SQL table creation command for this schema.
+    * @param tableName The name of created SQL table.
+    * @return          The SQL table creation command for this schema. */
+  public String toSQL(String tableName) {
+    String sql = "DROP TABLE " + tableName + ";\n";
+    sql += "CREATE TABLE " + tableName + " (";
+    sql += "ROWKEY VARCHAR NOT NULL PRIMARY KEY,ROWTIME VARCHAR,";
+    sql += map().entrySet()
+                .stream()
+                .map(e -> e.getKey().split(":")[1].toUpperCase() + " " + type2SQL(e.getValue()))
+                .collect(Collectors.joining(","));
+    sql += ");";
+    return sql;
+    }
+    
+  /** Give SQL type of schema type.
+    * @param type The schema type name.
+    * @return     The correspomnding SQL type. */
+  protected String type2SQL(String type) {
+    if (type == null) {
+      type = "string";
+      }
+    switch (type) {
+      case "float": 
+        return "FLOAT";
+      case "double": 
+        return "DOUBLE";
+      case "integer": 
+        return "INTEGER";
+       case "long": 
+        return "BIGINT";
+      case "short": 
+        return "SMALLINT";
+      case "fits": 
+        //return "VARBINARY";
+      case "fits/image": 
+        //return "VARBINARY";
+      case "binary": 
+        //return "VARBINARY";
+      default: // includes "string"
+        return "VARCHAR";
+      } 
+    }
+    
+  /** Tell, whether the column is a numerical type.
+    * @param column The column name.
+    * @return        Whether the column is a numerical type. */
+  public boolean isNumber(String column) {
+    String type = type(column);
+    if (type == null) {
+      return false;
+      }
+    switch (type) {
+      case "float": 
+      case "double": 
+      case "integer": 
+      case "long": 
+      case "short": 
+        return true;
+      default:
+        return false;
+      } 
+   }
     
   @Override
   public String toString() {

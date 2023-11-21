@@ -839,6 +839,82 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _dateFormat;
     }
     
+  /** Give SQL table creation command for this HBase table.
+    * It creates the SQL tabel with the same properties are the current HBase table.
+    * Using the default table name.
+    * @return The SQL table creation command for this HBase table. */
+  public String sqlTableCreationCommand() {
+    return sqlTableCreationCommand(null);
+    }
+    
+  /** Give SQL table creation command for this HBase table.
+    * It creates the SQL tabel with the same properties are the current HBase table.
+    * @param sqlTableTame The SQL table name. Empty or <tt>null</tt> will use the default name.
+    * @return The SQL table creation command for this HBase table. */
+  public String sqlTableCreationCommand(String sqlTableName) {
+    String stn = tableName();
+    if (sqlTableName != null && !sqlTableName.trim().equals("")) {
+      stn = sqlTableName;
+      }
+    return schema().toSQL(stn);
+    }
+
+  /** Results presented as an SQL command.
+    * The command can be used for SQL tables created with {@link Schema#toSQL} method.
+    * Using the default table name.
+    * @param results The {@link Map} of results.
+    * @return        The result as a {@link List}. */
+  public String results2SQL(Map<String, Map<String, String>> results) {
+    return results2SQL(results, null);
+    }
+    
+  /** Results presented as an SQL command.
+    * The command can be used for SQL tables created with {@link Schema#toSQL} method.
+    * @param results      The {@link Map} of results.
+    * @param sqlTableTame The SQL table name. Empty or <tt>null</tt> will use the default name.
+    * @return        The result as a {@link List}. */
+  public String results2SQL(Map<String, Map<String, String>> results,
+                            String sqlTableName) {
+    String stn = tableName();
+    if (sqlTableName != null && !sqlTableName.trim().equals("")) {
+      stn = sqlTableName;
+      }
+    String sql = "";
+    List<String> names  = new ArrayList<>();
+    List<String> values = new ArrayList<>();
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      sql += "UPSERT INTO " + stn;
+      names.clear();
+      values.clear();
+      names.add("ROWKEY");
+      values.add("'" + entry.getKey() + "'");
+      for (Map.Entry<String, String> cell : entry.getValue().entrySet()) {
+        if (cell.getKey().equals("key:key")) {
+          // already added
+          }
+        else if (cell.getKey().equals("key:time")) {
+          names.add("ROWTIME");
+          values.add("'" + cell.getValue() + "'");
+          }
+        else if (cell.getValue().split(":")[0].equals("binary")) {
+          names.add(cell.getKey().split(":")[1]);
+          values.add("'" + repository().get64(cell.getValue()) + "'");
+          }
+        else {
+          names.add(cell.getKey().split(":")[1]);
+          if (schema().isNumber(cell.getKey())) {
+            values.add(cell.getValue());
+            }
+          else {
+            values.add("'" + cell.getValue() + "'");
+            }
+          }
+        }
+      sql += " (" + String.join(",", names) + ") VALUES(" + String.join(",", values) + ");\n";
+      }
+    return sql;
+    }
+    
   private Table _table;
   
   private Configuration _conf;

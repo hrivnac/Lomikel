@@ -210,6 +210,15 @@ public class HBaseSQLClient extends HBaseClient {
     super.close();
     }
     
+    
+  /** Give SQL view creation command for this HBase table.
+    * It creates the Phoenix SQL view of the the current HBase table.
+    * @return The SQL view creation command for this HBase table. */
+  public String sqlViewCreationCommand() {
+    HBaseSchema hs = (HBaseSchema)schema();
+    return hs.toSQLView(table().getName().getNameAsString());
+    }
+    
   private HBaseSchema _simpleSchema; 
     
   private Connection _conn = null;  

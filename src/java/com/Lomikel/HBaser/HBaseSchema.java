@@ -11,6 +11,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -180,6 +181,22 @@ public class HBaseSchema extends Schema<ByteArray> {
     return new HBaseSchema(name(), newMap);
     }    
     
+  /** Give SQL view creation command for this schema.
+    * To be used in Phoenix representation of the HBase table. 
+    * @param viewName The name of created SQL view.
+    * @return The SQL table creation command for this schema. */
+  public String toSQLView(String viewName) {
+    String sql = "DROP VIEW " + viewName + ";\n";
+    sql += "CREATE VIEW \"" + viewName + "\" (";
+    sql += "ROWKEY VARCHAR PRIMARY_KEY,";
+    sql += map().entrySet()
+                .stream()
+                .map(e -> "\"" + e.getKey().split(":")[0] + "\".\"" + e.getKey().split(":")[1] + "\" VARCHAR")
+                .collect(Collectors.joining(","));
+    sql += ");";
+    return sql;
+    }
+     
   @Override
   public String toString() {
     return "HBase" + super.toString();
