@@ -77,6 +77,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: put SQL into addResult(...) to make it scalable
 public class HBaseSQLClient extends HBaseClient {
   
   /** Create and connect to HBase.
@@ -117,31 +118,9 @@ public class HBaseSQLClient extends HBaseClient {
                                                boolean   ifkey) {
     Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;
-    if (_conn == null) {
-      log.info("Opening " + zookeepers() + " on port " + clientPort() + " via Phoenix");
-      try {
-        Class.forName("org.apache.phoenix.jdbc.PhoenixDriver");
-        //Class.forName("org.apache.phoenix.queryserver.client.Driver");
-        }
-      catch (ClassNotFoundException e) {
-        log.error("Cannot find Phoenix JDBC driver", e);
-        return results;
-        }
-      try {
-        _conn = DriverManager.getConnection("jdbc:phoenix:" + zookeepers() + ":" + clientPort()); 
-        //_conn = DriverManager.getConnection("jdbc:phoenix:thin:url=http://" + zookeepers() + ":" + clientPort() + ";serializa‌​tion=PROTOBUF"); 
-        }
-      catch (SQLException e) {
-        log.error("Cannot open connection", e);
-        return results;
-        }
-      if (schema() instanceof HBaseSchema && schema().size() > 0) {
-        _simpleSchema = (HBaseSchema)schema().simpleSchema();
-        }
-      }
     Statement stmt;
     try {
-      stmt = _conn.createStatement();
+      stmt = conn().createStatement();
       }
     catch (SQLException e) {
       log.error("Cannot create statement", e);
@@ -197,6 +176,146 @@ public class HBaseSQLClient extends HBaseClient {
     return true;
     }
     
+  /** Give SQL view creation command for this HBase table.
+    * It creates the Phoenix SQL view of the the current HBase table.
+    * @return The SQL view creation command for this HBase table. */
+  public String sqlViewCreationCommand() {
+    HBaseSchema hs = (HBaseSchema)schema();
+    return hs.toSQLView(table().getName().getNameAsString());
+    }
+   
+  /** Give SQL table creation command for this HBase table.
+    * It creates the SQL tabel with the same properties are the current HBase table.
+    * Using the default table name.
+    * @return The SQL table creation command for this HBase table. */
+  public String sqlTableCreationCommand() {
+    return sqlTableCreationCommand(null);
+    }
+    
+  /** Give SQL table creation command for this HBase table.
+    * It creates the SQL tabel with the same properties are the current HBase table.
+    * @param sqlTableTame The SQL table name. Empty or <tt>null</tt> will use the default name.
+    * @return The SQL table creation command for this HBase table. */
+  public String sqlTableCreationCommand(String sqlTableName) {
+    String stn = tableName();
+    if (sqlTableName != null && !sqlTableName.trim().equals("")) {
+      stn = sqlTableName;
+      }
+    return schema().toSQL(stn);
+    }
+
+  /** Results presented as an SQL command.
+    * The command can be used for SQL tables created with {@link Schema#toSQL} method.
+    * Using the default table name.
+    * @param results The {@link Map} of results.
+    * @return        The result as a {@link List}. */
+  public void results2SQL(Map<String, Map<String, String>> results) {
+    results2SQL(results, null);
+    }
+    
+  /** Results presented as an SQL command.
+    * The command can be used for SQL tables created with {@link Schema#toSQL} method.
+    * @param results      The {@link Map} of results.
+    * @param sqlTableTame The SQL table name. Empty or <tt>null</tt> will use the default name. */
+  public void results2SQL(Map<String, Map<String, String>> results,
+                          String                           sqlTableName) {
+    String stn = tableName();
+    if (sqlTableName != null && !sqlTableName.trim().equals("")) {
+      stn = sqlTableName;
+      }
+    log.info("Upserting into " + stn);
+    String sql;
+    List<String> names  = new ArrayList<>();
+    List<String> values = new ArrayList<>();
+    short n = 0;
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      sql = "UPSERT INTO " + stn;
+      names.clear();
+      values.clear();
+      names.add("ROWKEY");
+      values.add("'" + entry.getKey() + "'");
+      for (Map.Entry<String, String> cell : entry.getValue().entrySet()) {
+        if (cell.getKey().equals("key:key")) {
+          // already added
+          }
+        else if (cell.getKey().equals("key:time")) {
+          names.add("ROWTIME");
+          values.add("'" + cell.getValue() + "'");
+          }
+        else if (cell.getValue().split(":")[0].equals("binary")) {
+          names.add(cell.getKey().split(":")[1]);
+          values.add("'" + repository().get64(cell.getValue()) + "'");
+          }
+        else {
+          names.add(cell.getKey().split(":")[1]);
+          if (schema().isNumber(cell.getKey())) {
+            values.add(cell.getValue());
+            }
+          else {
+            values.add("'" + cell.getValue() + "'");
+            }
+          }
+        }
+      sql += " (" + String.join(",", names) + ") VALUES(" + String.join(",", values) + ")";
+      upsert(sql);
+      n++;
+      }
+    try {
+      conn().commit();
+      log.info("" + n + " upserts commited");
+      }
+    catch (SQLException e) {
+      log.error("Cannot commit", e);
+      }
+    }
+
+  /** Upsert into connected SQL Phoenix database.
+    * @param sql The SQL <tt>upsert</tt> command. */
+  private void upsert(String sql) {
+    Statement stmt;
+    try {
+      stmt = conn().createStatement();
+      }
+    catch (SQLException e) {
+      log.error("Cannot create statement", e);
+      return;
+      }
+    try {
+      stmt.executeUpdate(sql);
+      }
+    catch (SQLException e ) {
+      log.error("Cannot execute: " + sql, e);
+      } 
+    }    
+    
+  /** Give JDBC {@link Connection} to Phoenix database.
+    * @return The JDBC {@link Connection} to Phoenix database. */
+  private Connection conn() {
+    if (_conn == null) {
+      log.info("Opening " + zookeepers() + " on port " + clientPort() + " via Phoenix");
+      try {
+        Class.forName("org.apache.phoenix.jdbc.PhoenixDriver");
+        //Class.forName("org.apache.phoenix.queryserver.client.Driver");
+        }
+      catch (ClassNotFoundException e) {
+        log.error("Cannot find Phoenix JDBC driver", e);
+        return null;
+        }
+      try {
+        _conn = DriverManager.getConnection("jdbc:phoenix:" + zookeepers() + ":" + clientPort()); 
+        //_conn = DriverManager.getConnection("jdbc:phoenix:thin:url=http://" + zookeepers() + ":" + clientPort() + ";serializa‌​tion=PROTOBUF"); 
+        }
+      catch (SQLException e) {
+        log.error("Cannot open connection", e);
+        return null;
+        }
+      if (schema() instanceof HBaseSchema && schema().size() > 0) {
+        _simpleSchema = (HBaseSchema)schema().simpleSchema();
+        }
+      }
+    return _conn;
+    }
+    
   @Override
   public void close() {
     log.debug("Closing");
@@ -208,15 +327,6 @@ public class HBaseSQLClient extends HBaseClient {
       }
     _conn = null;
     super.close();
-    }
-    
-    
-  /** Give SQL view creation command for this HBase table.
-    * It creates the Phoenix SQL view of the the current HBase table.
-    * @return The SQL view creation command for this HBase table. */
-  public String sqlViewCreationCommand() {
-    HBaseSchema hs = (HBaseSchema)schema();
-    return hs.toSQLView(table().getName().getNameAsString());
     }
     
   private HBaseSchema _simpleSchema; 
