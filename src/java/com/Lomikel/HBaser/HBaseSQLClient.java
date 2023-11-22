@@ -71,13 +71,13 @@ import java.util.Arrays;
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>HBaseSQLClient</code> adds SQL-search possibility to {@link HBaseClient}. 
+/** <code>HBaseSQLClient</code> adds SQL-search possibility and SQL Phoenix upsert
+  * possibility to {@link HBaseClient}. 
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-// TBD: put SQL into addResult(...) to make it scalable
 public class HBaseSQLClient extends HBaseClient {
   
   /** Create and connect to HBase.
@@ -106,6 +106,7 @@ public class HBaseSQLClient extends HBaseClient {
     }
          
   /** Get row(s) using SQL query.
+    * The Phoenix SQL View should be already created using {@link #sqlTableCreationCommand}. 
     * @param sql     The (Phoenix) SQL query.
     *                The <code>ROWKEY</code> should be included in the <code>SELECT<code>
     *                part (explicitely or implicitely).
@@ -114,6 +115,7 @@ public class HBaseSQLClient extends HBaseClient {
     * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   // TBD: handle binary columns
   // TBD: handle iftime
+  // TBD: handle WHERE
   public Map<String, Map<String, String>> scan(String    sql,
                                                boolean   ifkey) {
     Map<String, Map<String, String>> results = new TreeMap<>();
@@ -204,6 +206,53 @@ public class HBaseSQLClient extends HBaseClient {
     return schema().toSQL(stn);
     }
 
+  /** Replicate row(s) into Phoenix SQL table.
+    * @param key          The row key. Disables other search terms.
+    *                     It can be <tt>null</tt>.
+    * @param search       The search terms as <tt>family:column:value,...</tt>.
+    *                     Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                     <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                     {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                     among <tt>exact,prefix,substring,regex</tt>.
+    *                     The default for key is <tt>prefix</tt>,
+    *                     the default for columns is <tt>substring</tt>.
+    *                     The randomiser can be added with <tt>random:random:chance</tt>.
+    *                     It can be <tt>null</tt>.
+    *                     All searches are executed as prefix searches.    
+    * @param filter       The names of required values as <tt>family:column,...</tt>.
+    *                     <tt>*</tt> = all.
+    * @param start        The time period start timestamp in <tt>ms</tt>.
+    *                     <tt>0</tt> means since the beginning.
+    * @param stop         The time period stop timestamp in <tt>ms</tt>.
+    *                     <tt>0</tt> means till now.
+    * @param ifkey        Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime       Whether give also entries timestamps (as <tt>key:time</tt>).
+    * @param sqlTableName The SQL table name. Empty or <tt>null</tt> will use the default name.
+    * @return             The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, String>> scan2SQL(String    key,
+                                                   String    search,
+                                                   String    filter,
+                                                   long      start,
+                                                   long      stop,
+                                                   boolean   ifkey,
+                                                   boolean   iftime,
+                                                   String    sqlTableName) {
+    log.info("Upserting results into SQL Phoenix table " + _sqlTableName + ", not returning results");
+    _sqlTableName = sqlTableName;
+    Map<String, Map<String, String>> results = scan(key, search, filter, start, stop, ifkey, iftime);
+    _sqlTableName = null;
+    return results;
+    }
+    
+  /** Depending on <tt>_upsert</tt>, upsert results into Phoenix SQL table and clean the {@link Map}. */  
+  @Override
+  protected void processResults(Map<String, Map<String, String>> results) {
+    if (_sqlTableName != null) {
+      results2SQL(results, _sqlTableName);
+      results.clear();
+      }
+    }
+
   /** Results presented as an SQL command.
     * The command can be used for SQL tables created with {@link Schema#toSQL} method.
     * Using the default table name.
@@ -216,7 +265,7 @@ public class HBaseSQLClient extends HBaseClient {
   /** Results presented as an SQL command.
     * The command can be used for SQL tables created with {@link Schema#toSQL} method.
     * @param results      The {@link Map} of results.
-    * @param sqlTableTame The SQL table name. Empty or <tt>null</tt> will use the default name. */
+    * @param sqlTableName The SQL table name. Empty or <tt>null</tt> will use the default name. */
   public void results2SQL(Map<String, Map<String, String>> results,
                           String                           sqlTableName) {
     String stn = tableName();
@@ -241,6 +290,10 @@ public class HBaseSQLClient extends HBaseClient {
         else if (cell.getKey().equals("key:time")) {
           names.add("ROWTIME");
           values.add("'" + cell.getValue() + "'");
+          }
+        else if (!schema().contains(cell.getKey())) {
+          log.warn("The column " + cell.getKey() + " is not covered by " + schema().name() + ", so ignored.");
+          // column not in schema
           }
         else if (cell.getValue().split(":")[0].equals("binary")) {
           names.add(cell.getKey().split(":")[1]);
@@ -332,6 +385,8 @@ public class HBaseSQLClient extends HBaseClient {
   private HBaseSchema _simpleSchema; 
     
   private Connection _conn = null;  
+  
+  private String _sqlTableName = null;
   
   /** Logging . */
   private static Logger log = Logger.getLogger(HBaseSQLClient.class);

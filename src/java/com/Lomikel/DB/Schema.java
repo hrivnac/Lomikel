@@ -168,6 +168,13 @@ public abstract class Schema<T> {
         return false;
       } 
    }
+   
+  /** Whether schema contains a column.
+    * @param name The name of the column.
+    * @return Whether schema contains a column. */
+  public boolean contains(String name) {
+    return _schemaMap.containsKey(name);
+    }
     
   @Override
   public String toString() {

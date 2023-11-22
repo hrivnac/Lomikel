@@ -289,6 +289,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           log.info("" + r.size() + " entries found");
           addResult(r, result, filter, ifkey, iftime);
           results.put(k, result);
+          processResults(results);
           }
         catch (IOException e) {
           log.error("Cannot search", e);
@@ -449,6 +450,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           result = new TreeMap<>();
           if (addResult(r, result, filter, ifkey, iftime)) {
             results.put(Bytes.toString(r.getRow()), result);
+            processResults(results);
             }
           }
         log.info("" + i + " entries found");
@@ -529,6 +531,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         }
       }
     return true;
+    }
+    
+  /** Process results after each insertion of new result.
+    * Empty, may be imlemented in subclasses.
+    * @param results The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  protected void processResults(Map<String, Map<String, String>> results) {
     }
     
   /** Evaluate {@link Result} using registered formula.
