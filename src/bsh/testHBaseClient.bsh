@@ -76,3 +76,49 @@ results = client.scan(null,
 print(client.results2String(results)); 
 
 client.close();
+
+// -----------------------------------------------------------------------------
+
+// Get all schemas
+com.Lomikel.HBaser.HBaseSQLClient client = new com.Lomikel.HBaser.HBaseSQLClient("hbase-1.lal.in2p3.fr", 2183);
+client.connect("ztf");
+results = client.scan(null,
+                      "key:key:schema:prefix",
+                      null,
+                      0,
+                      0,
+                      false,
+                      false);
+print(client.results2String(results)); 
+cient.close();
+
+// -----------------------------------------------------------------------------
+
+com.Lomikel.HBaser.HBaseSQLClient client = new com.Lomikel.HBaser.HBaseSQLClient("hbase-1.lal.in2p3.fr", 2183);
+client.connect("ztf", "schema_2.2_2.0.0");
+
+// Create Phoenix view of the HBase table
+//   should be executed in sqlline.py
+client.sqlViewCreationCommand();
+// Use SQL query to scan it
+results = client.scan("select ROWKEY,\"candid\",\"ra\",\"xpos\" from \"ztf\" limit 1", true);
+print(results); 
+
+// Create Phoenix table for the HBase table
+//   a table per schema 
+//   should be executed in sqlline.py
+client.sqlTableCreationCommand();
+// Replicate rows into Phoenix table
+client.scan2SQL(null,
+               "key:key:ZTF:prefix",
+               "*",
+               0,
+               0,
+               true,
+               true,
+               "ZTF_SCHEMA_2__2_2__0__0");
+
+client.close();
+
+// -----------------------------------------------------------------------------
+

@@ -136,7 +136,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   public Table connect(String tableName,
                        String schemaName) throws LomikelException {
      return connect(tableName, schemaName, 0);
-     }
+     }     
      
   @Override
   public Table connect(String tableName,
@@ -161,20 +161,26 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       log.info("Not using schema");
       }
     else {
-      if (schemaName.equals("")) {
-        log.info("Using the most recent schema");
-        }
-      else {
-        log.info("Searching for schema " + schemaName);
-        }
       Map<String, Map<String, String>> schemas = null;
       try {
-        schemas = scan(schemaName,
-                       null,
-                       null,
-                       0,
-                       false,
-                       false);
+        if (schemaName.equals("")) {
+          log.info("Using the most recent schema");
+          schemas = scan(null,
+                         null,
+                         "key:key:schema:prefix",
+                         0,
+                         false,
+                         false);
+          }
+        else {
+          log.info("Searching for schema " + schemaName);
+          schemas = scan(schemaName,
+                         null,
+                         null,
+                         0,
+                         false,
+                         false);
+          }
         }
       catch (Exception e) {}
       if (schemas == null || schemas.size() == 0) {

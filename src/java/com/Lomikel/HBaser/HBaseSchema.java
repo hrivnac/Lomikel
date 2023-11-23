@@ -188,7 +188,7 @@ public class HBaseSchema extends Schema<ByteArray> {
   public String toSQLView(String viewName) {
     String sql = "DROP VIEW " + viewName + ";\n";
     sql += "CREATE VIEW \"" + viewName + "\" (";
-    sql += "ROWKEY VARCHAR PRIMARY_KEY,";
+    sql += "ROWKEY VARCHAR PRIMARY KEY,";
     sql += map().entrySet()
                 .stream()
                 .map(e -> "\"" + e.getKey().split(":")[0] + "\".\"" + e.getKey().split(":")[1] + "\" VARCHAR")

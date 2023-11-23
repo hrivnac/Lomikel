@@ -183,7 +183,7 @@ public class HBaseSQLClient extends HBaseClient {
     * @return The SQL view creation command for this HBase table. */
   public String sqlViewCreationCommand() {
     HBaseSchema hs = (HBaseSchema)schema();
-    return hs.toSQLView(table().getName().getNameAsString());
+    return hs.toSQLView(tableName());
     }
    
   /** Give SQL table creation command for this HBase table.
@@ -191,19 +191,7 @@ public class HBaseSQLClient extends HBaseClient {
     * Using the default table name.
     * @return The SQL table creation command for this HBase table. */
   public String sqlTableCreationCommand() {
-    return sqlTableCreationCommand(null);
-    }
-    
-  /** Give SQL table creation command for this HBase table.
-    * It creates the SQL tabel with the same properties are the current HBase table.
-    * @param sqlTableTame The SQL table name. Empty or <tt>null</tt> will use the default name.
-    * @return The SQL table creation command for this HBase table. */
-  public String sqlTableCreationCommand(String sqlTableName) {
-    String stn = tableName();
-    if (sqlTableName != null && !sqlTableName.trim().equals("")) {
-      stn = sqlTableName;
-      }
-    return schema().toSQL(stn);
+    return schema().toSQL(tableName() + "_" + schema().name().replaceAll("\\.", "__"));
     }
 
   /** Replicate row(s) into Phoenix SQL table.
