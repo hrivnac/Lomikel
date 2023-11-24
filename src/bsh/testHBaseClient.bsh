@@ -95,7 +95,7 @@ client.close();
 // -----------------------------------------------------------------------------
 
 com.Lomikel.HBaser.HBaseSQLClient client = new com.Lomikel.HBaser.HBaseSQLClient("hbase-1.lal.in2p3.fr", 2183);
-client.connect("ztf", "schema_2.2_2.0.0");
+client.connect("ztf", "");
 
 // Create Phoenix view of the HBase table
 //   should be executed in sqlline.py
@@ -116,7 +116,7 @@ client.scan2SQL(null,
                0,
                true,
                true,
-               "ZTF_SCHEMA_2__2_2__0__0");
+               "ZTF_SCHEMA_3__1_5__2__0");
 
 client.close();
 

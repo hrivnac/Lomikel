@@ -261,6 +261,9 @@ public class HBaseSQLClient extends HBaseClient {
       stn = sqlTableName;
       }
     log.info("Upserting into " + stn);
+    if (_sqlCompatibleSchema == null) {
+      _sqlCompatibleSchema = (HBaseSchema)schema().sqlCompatibleSchema();
+      }
     String sql;
     List<String> names  = new ArrayList<>();
     List<String> values = new ArrayList<>();
@@ -279,7 +282,7 @@ public class HBaseSQLClient extends HBaseClient {
           names.add("ROWTIME");
           values.add("'" + cell.getValue() + "'");
           }
-        else if (!schema().contains(cell.getKey())) {
+        else if (!_sqlCompatibleSchema.contains(cell.getKey())) {
           log.warn("The column " + cell.getKey() + " is not covered by " + schema().name() + ", so ignored.");
           // column not in schema
           }
@@ -289,7 +292,7 @@ public class HBaseSQLClient extends HBaseClient {
           }
         else {
           names.add(cell.getKey().split(":")[1]);
-          if (schema().isNumber(cell.getKey())) {
+          if (_sqlCompatibleSchema.isNumber(cell.getKey())) {
             values.add(cell.getValue());
             }
           else {
@@ -351,7 +354,7 @@ public class HBaseSQLClient extends HBaseClient {
         return null;
         }
       if (schema() instanceof HBaseSchema && schema().size() > 0) {
-        _simpleSchema = (HBaseSchema)schema().simpleSchema();
+        _simpleSchema        = (HBaseSchema)schema().simpleSchema();
         }
       }
     return _conn;
@@ -371,6 +374,8 @@ public class HBaseSQLClient extends HBaseClient {
     }
     
   private HBaseSchema _simpleSchema; 
+  
+  private HBaseSchema _sqlCompatibleSchema;
     
   private Connection _conn = null;  
   

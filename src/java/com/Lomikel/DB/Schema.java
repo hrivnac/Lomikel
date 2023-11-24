@@ -105,21 +105,6 @@ public abstract class Schema<T> {
     return _reMap;
     }
     
-  /** Give SQL table creation command for this schema.
-    * @param tableName The name of created SQL table.
-    * @return          The SQL table creation command for this schema. */
-  public String toSQL(String tableName) {
-    String sql = "DROP TABLE " + tableName + ";\n";
-    sql += "CREATE TABLE " + tableName + " (";
-    sql += "ROWKEY VARCHAR NOT NULL PRIMARY KEY,ROWTIME VARCHAR,";
-    sql += map().entrySet()
-                .stream()
-                .map(e -> e.getKey().split(":")[1].toUpperCase() + " " + type2SQL(e.getValue()))
-                .collect(Collectors.joining(","));
-    sql += ");";
-    return sql;
-    }
-    
   /** Give SQL type of schema type.
     * @param type The schema type name.
     * @return     The correspomnding SQL type. */

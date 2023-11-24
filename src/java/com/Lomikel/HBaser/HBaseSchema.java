@@ -179,20 +179,52 @@ public class HBaseSchema extends Schema<ByteArray> {
       newMap.put(entry.getKey().split(":")[1], entry.getValue());
       }
     return new HBaseSchema(name(), newMap);
-    }    
+    }  
     
+  /** Omit SQL uncompatible columns (containing forbidden charachters).
+    * @return The SQL compatible {@link HBaseSchema}. */
+  public HBaseSchema sqlCompatibleSchema() {
+    Map<String, String> newMap = new TreeMap<>();
+    for (Map.Entry<String, String> entry : map().entrySet()) {
+      if (!entry.getKey().split(":")[1].contains("-")) {
+        newMap.put(entry.getKey(), entry.getValue());
+        }
+      else {
+        log.warn("Omitting " + entry.getKey());
+        }
+      }
+    return new HBaseSchema(name(), newMap);
+    }    
+       
   /** Give SQL view creation command for this schema.
     * To be used in Phoenix representation of the HBase table. 
     * @param viewName The name of created SQL view.
     * @return The SQL table creation command for this schema. */
   public String toSQLView(String viewName) {
-    String sql = "DROP VIEW " + viewName + ";\n";
+    String sql = "DROP VIEW \"" + viewName + "\";\n";
     sql += "CREATE VIEW \"" + viewName + "\" (";
     sql += "ROWKEY VARCHAR PRIMARY KEY,";
-    sql += map().entrySet()
-                .stream()
-                .map(e -> "\"" + e.getKey().split(":")[0] + "\".\"" + e.getKey().split(":")[1] + "\" VARCHAR")
-                .collect(Collectors.joining(","));
+    sql += sqlCompatibleSchema().map()
+                                .entrySet()
+                                .stream()
+                                .map(e -> "\"" + e.getKey().split(":")[0] + "\".\"" + e.getKey().split(":")[1] + "\" VARCHAR")
+                                .collect(Collectors.joining(","));
+    sql += ");";
+    return sql;
+    }
+    
+  /** Give SQL table creation command for this schema.
+    * @param tableName The name of created SQL table.
+    * @return          The SQL table creation command for this schema. */
+  public String toSQL(String tableName) {
+    String sql = "DROP TABLE \"" + tableName + "\";\n";
+    sql += "CREATE TABLE " + tableName + " (";
+    sql += "ROWKEY VARCHAR NOT NULL PRIMARY KEY,ROWTIME VARCHAR,";
+    sql += sqlCompatibleSchema().map()
+                                .entrySet()
+                                .stream()
+                                .map(e -> e.getKey().split(":")[1].toUpperCase() + " " + type2SQL(e.getValue()))
+                                .collect(Collectors.joining(","));
     sql += ");";
     return sql;
     }
