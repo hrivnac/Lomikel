@@ -129,7 +129,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         
   @Override
    public Table connect(String tableName) throws LomikelException {
-     return connect(tableName, "schema");
+     return connect(tableName, "");
      }
              
   @Override
@@ -162,12 +162,13 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       }
     else {
       Map<String, Map<String, String>> schemas = null;
+      setLimit(Integer.MAX_VALUE);
       try {
         if (schemaName.equals("")) {
           log.info("Using the most recent schema");
           schemas = scan(null,
-                         null,
                          "key:key:schema:prefix",
+                         "*",
                          0,
                          false,
                          false);
@@ -176,13 +177,15 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           log.info("Searching for schema " + schemaName);
           schemas = scan(schemaName,
                          null,
-                         null,
+                         "*",
                          0,
                          false,
                          false);
           }
         }
-      catch (Exception e) {}
+      catch (Exception e) {
+        log.error("Searching for schema " + schemaName + " failed", e);
+        }
       if (schemas == null || schemas.size() == 0) {
         log.error("No schema found");
         }
@@ -191,10 +194,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         Set<Map.Entry<String, Map<String, String>>> schemasSet = schemas.entrySet();
         List<Map.Entry<String, Map<String, String>>> schemasList = new ArrayList<>(schemasSet);
         Map.Entry<String, Map<String, String>> schemaEntry = schemasList.get(schemasList.size() - 1);
-        setSchema(new HBaseSchema(schemaName, schemaEntry.getValue()));
+        setSchema(new HBaseSchema(schemaEntry.getKey(),
+                                  schemaEntry.getValue()));
         }
       else {
-        setSchema(new HBaseSchema(schemaName, schemas.entrySet().iterator().next().getValue()));
+        setSchema(new HBaseSchema(schemas.entrySet().iterator().next().getKey(),
+                                  schemas.entrySet().iterator().next().getValue()));
         }
       }
     return _table;
@@ -444,6 +449,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         }
       // Reversed
       scan.setReversed(isReversed());
+      log.info("scan = " + scan);
       // Results
       try {
         _rs = table().getScanner(scan);

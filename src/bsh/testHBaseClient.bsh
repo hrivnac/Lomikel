@@ -90,7 +90,7 @@ results = client.scan(null,
                       false,
                       false);
 print(client.results2String(results)); 
-cient.close();
+client.close();
 
 // -----------------------------------------------------------------------------
 
