@@ -260,7 +260,6 @@ public class HBaseSQLClient extends HBaseClient {
     if (sqlTableName != null && !sqlTableName.trim().equals("")) {
       stn = sqlTableName;
       }
-    log.info("Upserting into " + stn);
     if (_sqlCompatibleSchema == null) {
       _sqlCompatibleSchema = (HBaseSchema)schema().sqlCompatibleSchema();
       }
@@ -303,15 +302,18 @@ public class HBaseSQLClient extends HBaseClient {
       sql += " (" + String.join(",", names) + ") VALUES(" + String.join(",", values) + ")";
       upsert(sql);
       n++;
+      _n++;
       }
     try {
       conn().commit();
-      log.info("" + n + " upserts commited");
+      log.info("" + n + " upserts commited, total = " + _n);
       }
     catch (SQLException e) {
       log.error("Cannot commit", e);
       }
     }
+    
+  private int _n = 0;
 
   /** Upsert into connected SQL Phoenix database.
     * @param sql The SQL <tt>upsert</tt> command. */
