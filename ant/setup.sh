@@ -11,31 +11,24 @@ if [[ ! "x" = "x${java_home}" ]]; then
   export JAVA_HOME="${java_home}"
   export PATH="${JAVA_HOME}/bin:${PATH}"
   fi
-if [[ ! "x" = "x${hbase_classpath}" ]]; then
-  export CLASSPATH="${hbase_classpath}"
+if [[ ! "x" = "x${graphviz}" ]]; then
+  export PATH="${graphviz}/bin:${PATH}"
   fi
 export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}" 
 if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
   export GREMLIN_CLASSPATH="${GREMLIN_CLASSPATH}:${hadoop_phoenix_conf}:${hbase_phoenix_conf}:${phoenix_jar}"
   fi
-  
+    
 export janusgraph_dir
 export hbase_dir
 export gremlin_dir
 export zookeeper
 export hbase_table
-
-if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
-  HBASE_CONF_DIR='${phoenix_conf_dir}'
-else
-  HBASE_CONF_DIR=''
-  fi
-alias gremlin_console_Local='HBASE_CONF_DIR=${HBASE_CONF_DIR}  CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
-alias gremlin_console_IJCLab='HBASE_CONF_DIR=${HBASE_CONF_DIR} CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local-IJCLab.properties ${home}"'
-alias gremlin_console_CERN='HBASE_CONF_DIR=${HBASE_CONF_DIR}   CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local-CERN.properties ${home}"'
+ 
+alias gremlin_console_Local='CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
+alias gremlin_console_IJCLab='CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local-IJCLab.properties ${home}"'
 alias gremlin_Local='CLASSPATH=""  ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
 alias gremlin_IJCLab='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
-alias gremlin_CERN='CLASSPATH=""   ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CERN.gremlin"'
 alias lomikel='CLASSPATH="../lib/Lomikel-${version}.jar:${phoenix_jar}" java com.Lomikel.Apps.LUC'
 
 echo "commands: gremlin_console_Local, gremlin_console_IJCLab, gremlin_console_CERN, gremlin_Local, gremlin_IJCLab, gremlin_CERN, lomikel"

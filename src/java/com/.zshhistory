@@ -13,3 +13,5 @@
 : 1591111692:0;mv JHTools Lomikel
 : 1591111726:0;popd
 : 1601552281:0;cd ../..
+: 1701874667:0;cp -R ~/work/LSST/FinkBrowser/src/java/com/astrolabsoftware ./
+: 1701874673:0;cd astrolabsoftware

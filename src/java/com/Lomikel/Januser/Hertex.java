@@ -148,7 +148,7 @@ public class Hertex extends Wertex {
                                          String                 rowkey,
                                          GraphTraversalSource   g,
                                          String                 fields) {
-    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyName(representant(lbl)), rowkey);
+    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyName(representant(lbl)), rowkey).toList();
     List<Vertex> newVertexes = new ArrayList<>();
     for (Vertex v : vertexes) {
       newVertexes.add(enhance(v, fields));

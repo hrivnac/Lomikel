@@ -29,7 +29,12 @@
     <pathelement path="${hadoopcommon_jar}"/>
     <pathelement path="${javaxmail_jar}"/>
     <pathelement path="${javaxservlet_jar}"/>
+    <pathelement path="${healpix_jar}"/>
     <pathelement path="${bsh_jar}"/>
+    <pathelement path="${parquetavro_jar}"/>    
+    <pathelement path="${parquethadoop_jar}"/>    
+    <pathelement path="${jacksoncore_jar}"/>    
+    <pathelement path="${jacksonmapper_jar}"/>    
     <pathelement path="${cli_jar}"/>
     <fileset dir="${janusgraph_dir}/lib">
       <include name="*.jar"/>
@@ -58,10 +63,6 @@
     </path>
     
   <path id="classpath_phoenix.run">
-    <!--fileset dir="../lib">
-      <include name="*.jar"/>
-      <exclude name="*.exe.jar"/>
-      </fileset-->
     <pathelement path="${groovy_jar}"/>
     <pathelement path="${groovy_sql_jar}"/>
     <pathelement path="${hadoop_phoenix_conf}"/>
@@ -95,7 +96,11 @@
   <property name="classpath_phoenix.run.content" refid="classpath_phoenix.run"/>
 
   <taskdef name="groovy"
-           classname="org.codehaus.groovy.ant.Groovy">
+           classname="org.codehaus.groovy.ant.Groovy">    <!--fileset dir="../lib">
+      <include name="*.jar"/>
+      <exclude name="*.exe.jar"/>
+      </fileset-->
+
     <classpath>
       <fileset file="${groovy_jar}"/>
       <fileset file="${groovy_ant_jar}"/>
@@ -118,15 +123,12 @@
   <target name="info"
           depends="init"
           description="Create Info class">
-    <!-- TBD: allow in clients !-->
     <mkdir dir="../build/com/Lomikel/Utils"/>
     <copy file="../src/java/com/Lomikel/Utils/Info.pre"
           tofile="../build/com/Lomikel/Utils/Info.java"/>
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@version@"     value="${version}"/>
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@TSTAMP@"      value="${TSTAMP}"/>
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@user.name@"   value="${user.name}"/>
-    <replace file="../build/com/Lomikel/Utils/Info.java" token="@zookeeper@"   value="${zookeeper}"/>
-    <replace file="../build/com/Lomikel/Utils/Info.java" token="@hbase_table@" value="${hbase_table}"/>
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@TMP@"         value="${tmp_dir}"/>
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@MANAGER@"     value="${manager}"/>
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@TARGET@"      value="${target}"/>
@@ -168,6 +170,9 @@
 			<fileset file="${hbasecommon_jar}"/>
 			<fileset file="${hbaseclient_jar}"/>
 			<fileset file="${hadoopcommon_jar}"/>
+			<fileset file="${parquetavro_jar}"/>
+			<fileset file="${parquethadoop_jar}"/>
+			<fileset file="${phoenix_jar}"/>
       </copy>
     </target>
 
@@ -227,12 +232,16 @@
       <fileset dir="../src/java" includes="com/Lomikel/**/*.png"/>
       <fileset dir="../src/java" includes="com/Lomikel/**/*.gif"/>
       <fileset dir="../src/java" includes="com/Lomikel/**/*.css"/>
+      <fileset dir="../src/java" includes="com/Lomikel/**/*.groovy"/>
+      <fileset dir="../src/bsh"    includes="*.bsh"/>
+      <fileset dir="../src/groovy" includes="*.groovy"/>
       <zipfileset includes="**/*" src="${log4j_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${slf4j_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${slf4jlog4j_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${logging_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${healpix_jar}" excludes="META-INF/*"/>
       <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
         <provider classname="com.Lomikel.GremlinPlugin.LomikelConnector"/>
         </service>
@@ -387,7 +396,6 @@
         <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="/home/opt/phoenix-hbase-2.2-5.1.3-bin/phoenix-client-embedded-hbase-2.2-5.1.3.jar"/>
         </manifest>
       <service type="java.sql.Driver">
         <provider classname="org.apache.phoenix.jdbc.PhoenixDriver"/>
@@ -449,6 +457,7 @@
       <lib file="${hbaseclient_ja}"/>
       <lib file="${hadoopcommon_jar}"/>
       <lib file="${groovysh_jar}"/>
+      <lib file="${healpix_jar}"/>
       <lib file="${janusgraph_dir}/lib/caffeine-2.3.1.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-codec-1.14.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-collections-3.2.2.jar"/>
@@ -498,7 +507,7 @@
         </manifest>
       </war>
     </target>
-
+ 
   <!-- Deploy WS ============================================================-->
     
   <target name="deploy"
@@ -642,6 +651,11 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@EVENTS.TABLE@"                   value="${events_table}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@EVENTS.SCHEMA@"                  value="${events_schema}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@ELASTICSEARCH.HOSTNAME@"         value="${elasticsearch_hostname}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-finkbrowser.groovy"           token="@STORAGE.HOSTNAME@"     value="${zookeeper}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-finkbrowser.groovy"           token="@STORAGE.JANUS.TABLE@"  value="${janus_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-finkbrowser.groovy"           token="@STORAGE.HBASE.TABLE@"  value="${hbase_table}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-finkbrowser.groovy"           token="@STORAGE.HBASE.SCHEMA@" value="${hbase_schema}"/>
+    <replace file="${janusgraph_dir}/scripts/setup-finkbrowser.groovy"           token="@STORAGE.HBASE.PORT@"   value="${hbase_port}"/>
     <copy file="${janusgraph_dir}/conf/gremlin-server/Local.properties"          tofile="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" overwrite="true"/>
     <echo file="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties" append="true">storage.batch-loading=true</echo>
     <echo>... plugin</echo>
@@ -654,6 +668,7 @@
     <touch file="${janusgraph_dir}/scripts/setup-atlascope.groovy"/>
     <chmod file="${janusgraph_dir}/scripts/setup-finkbrowser.groovy" perm="a+x"/>
     <chmod file="${janusgraph_dir}/scripts/setup-atlascope.groovy" perm="a+x"/>
+    <echo>Restart JanusGraph !</echo>
     </target>
   
   <!-- Start/Stop JanusGraph ================================================-->
@@ -773,26 +788,6 @@
   <target name="dist"
           depends="jar"
           description="Construct distribution">
-    <copy todir="../dist">
-			<fileset dir="../lib" includes="*.jar"/>
-      </copy>
-    <mkdir dir="../dist/jars-${version}"/>
-    <copy todir="../dist/jars-${version}">
-			<fileset dir="../extlib/import" includes="*.jar"/>
-      </copy>
-    <mkdir dir="../dist/ws-${version}"/>
-    <copy todir="../dist/ws-${version}">
-			<fileset dir="../src/ws">
-			  <include name="*/**"/>
-			  </fileset>
-      </copy>
-    <copy todir="../dist/ws-${version}">
-			<fileset dir="../extlib/ws" includes="*/**" excludes="*-src/**"/>
-      </copy>
-    <mkdir dir="../dist/src-${version}/gremlin"/>
-    <copy todir="../dist/src-${version}/gremlin">
-			<fileset dir="../src/gremlin" includes="*/**"/>
-      </copy>
   </target>
 
   <!-- Check ================================================================-->
@@ -825,16 +820,36 @@
   <target name="doc"
           depends="jar,j2h,viz"
           description="Construct documentation">
+    <mkdir dir="../doc"/>
  		<copy todir="../doc">
 			<fileset dir="../src" includes="*.html"/>
 			<fileset dir="../src" includes="*.jpeg"/>
  			<fileset dir="../src" includes="*.jpg"/>
      </copy>
- 		<copy todir="../doc/docsrc">
-			<fileset dir="../docsrc" includes="*"/>
-      </copy>
+    <mkdir dir="../doc/JavaDoc"/>
  		<copy todir="../doc/JavaDoc">
 			<fileset dir="../src/java" includes="**/doc-files/*"/>
+      </copy>
+    <mkdir dir="../doc/Gremlin"/>
+ 		<copy todir="../doc/Gremlin">
+			<fileset dir="../src/gremlin" includes="*.gremlin"/>
+			<fileset dir="${lomikel_src}/gremlin" includes="examples.gremlin"/>
+			<fileset dir="${lomikel_src}/gremlin" includes="examplesLomikel.gremlin"/>
+      </copy>
+    <mkdir dir="../doc/BeanShell"/>
+ 		<copy todir="../doc/BeanShell">
+			<fileset dir="../src/bsh" includes="*.bsh"/>
+      </copy>
+    <mkdir dir="../doc/Python"/>
+ 		<copy todir="../doc/Python">
+			<fileset dir="../src/python" includes="*.py"/>
+			<fileset dir="../src/python" includes="*.jy"/>
+			<fileset dir="../src/python" includes="*.sage"/>
+      </copy>
+    <mkdir dir="../doc/Jupyter"/>
+ 		<copy todir="../doc/Jupyter">
+			<fileset dir="../src/Jupyter" includes="*.nb"/>
+			<globmapper from="*.nb" to="*.nb-txt"/>
       </copy>
     <javadoc packagenames="*"
              doclet="org.jboss.apiviz.APIviz"
@@ -877,6 +892,8 @@
       <link href="https://tinkerpop.apache.org/javadocs/current/full"/>
       <link href="http://www.beanshell.org/javadoc"/>
       <link href="https://commons.apache.org/proper/commons-cli/apidocs"/>
+      <link href="https://cds-astro.github.io/cds-healpix-java/apidocs"/>
+      <link href="https://avro.apache.org/docs/1.8.2/api/java"/>
       <classpath>
         <path refid="classpath.run"/>
         </classpath>

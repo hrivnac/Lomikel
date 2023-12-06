@@ -215,7 +215,7 @@ public class Sertex extends Wertex {
                                          String[]               rowkeys,
                                          GraphTraversalSource   g,
                                          String                 fields) {
-    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys);
+    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyNames(representant(lbl)), rowkeys).toList();
     List<Vertex> newVertexes = new ArrayList<>();
     for (Vertex v : vertexes) {
       newVertexes.add(enhance(v, fields));

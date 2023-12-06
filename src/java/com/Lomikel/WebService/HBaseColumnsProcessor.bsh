@@ -1,6 +1,9 @@
 /** TBD */
-// BUG: what if not exist in client ?
-//public double ra()
+public double ra() {
+  return ra;
+  }
  
 /** TBD */
-//public double dec()
+public double dec() {
+  return dec;
+  }

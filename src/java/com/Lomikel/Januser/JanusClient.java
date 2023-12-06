@@ -46,12 +46,7 @@ public class JanusClient implements ModifyingGremlinClient {
       }
     System.exit(0);
     } 
-    
-  /** Create with default parameters. */
-  public JanusClient() {
-    this(Info.zookeeper(), Info.hbase_table());
-    }
-   
+       
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
     * @param table    The HBase table. */

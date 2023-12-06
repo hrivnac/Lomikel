@@ -47,6 +47,15 @@ import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
 // Hadoop
 import org.apache.hadoop.conf.Configuration;
 
+// HealPix
+import cds.healpix.Healpix;
+import cds.healpix.HealpixNested;
+import cds.healpix.HealpixNestedFixedRadiusConeComputer;
+import cds.healpix.HealpixNestedBMOC;
+import cds.healpix.FlatHashIterator;
+import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
+import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
+
 // Java
 import java.util.List;  
 import java.util.ArrayList;  
