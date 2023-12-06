@@ -1,5 +1,6 @@
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.HBaser.HBaseClient
+import com.Lomikel.HBaser.FinkHBaseClient
 import groovy.sql.Sql
   
 // -----------------------------------------------------------------------------

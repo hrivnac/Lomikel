@@ -14,10 +14,7 @@ if [[ ! "x" = "x${java_home}" ]]; then
 if [[ ! "x" = "x${graphviz}" ]]; then
   export PATH="${graphviz}/bin:${PATH}"
   fi
-export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}" 
-if [[ `uname -a  |awk '{print $2}' | awk -F. '{print $2}'` = "cern" ]]; then
-  export GREMLIN_CLASSPATH="${GREMLIN_CLASSPATH}:${hadoop_phoenix_conf}:${hbase_phoenix_conf}:${phoenix_jar}"
-  fi
+export GREMLIN_CLASSPATH=`pwd`/"${groovy_sql_jar}":`pwd`/"${bsh_jar}" 
     
 export janusgraph_dir
 export hbase_dir

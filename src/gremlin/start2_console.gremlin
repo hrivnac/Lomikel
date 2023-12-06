@@ -1,7 +1,7 @@
-import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient
+import com.Lomikel.HBaser.FinkHBaseClient
 import groovy.sql.Sql
 
-class FinkBrowser {
+class Lomikel {
 
   def static init(config) {
     clientH = new HBaseClient(config.getString("storage.hostname"), config.getString("backend.hbase.port"))
