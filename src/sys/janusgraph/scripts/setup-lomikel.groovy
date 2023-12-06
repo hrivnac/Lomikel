@@ -155,6 +155,25 @@ class LomikelServer {
     return g.V().has('objectId', objectId).out().out().has('lbl', 'candidate')
     }  
     
+  def static registerAlertOfInterest(g, alertType, objectId, jd, url) {   
+    return g.V().
+             has('AlertsOfInterest', 'lbl', 'AlertsOfInterest').
+             has('alertType', alertType).
+             fold().
+             coalesce(unfold(), 
+                      addV('AlertsOfInterest').
+                      property('lbl', 'AlertsOfInterest').
+                      property('alertType', alertType).
+                      property('technology', 'HBase').
+                      property('url', url)).
+             addE('contains').
+             to(__.addV('alert').
+                   property('lbl', 'alert').
+                   property('objectId', objectId).
+                   property('jd', jd)).
+             next()
+    }
+    
   def static help() {
     return getDataLink_help()  + "\n" +
            geosearch_help()    + "\n" +
