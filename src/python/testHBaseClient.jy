@@ -1,0 +1,19 @@
+import sys
+
+# ../dist/FinkBrowser.exe.jar
+sys.path.append(sys.argv[1])
+
+from com.astrolabsoftware.FinkBrowser.HBaser import FinkHBaseClient
+from com.astrolabsoftware.FinkBrowser.Utils  import Init
+
+Init.init()
+
+#client = FinkHBaseClient("localhost", 2181)
+client = FinkHBaseClient("134.158.74.54", 2181);
+client.connect("ztf_season1", "schema_0.7.0_0.3.8")
+client.setLimit(10)
+
+print(client.scan(None, "key:key:ZTF17", None, 100000, True, True))
+
+client.close()
+
