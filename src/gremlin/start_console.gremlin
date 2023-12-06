@@ -15,26 +15,19 @@ class Lomikel {
   def static hi() {
     return "Hello World from Lomikel console !"
     }
-    
-  def static myGraph(myName) {
-    def graph0
-    def g0
-    if (myName == null) {
-      graph0 = JanusGraphFactory.build().
-                                 set('storage.backend', 'inmemory').
-                                 open()
+  
+  def static geosearch(g, ra, dec, ang, jdmin, jdmax, limit) {
+    def lat = dec
+    def lon = ra - 180
+    def dist = ang * 6371.0087714 * Math.PI / 180
+    def nDir = g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).count().next()
+    def nJD  = g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).count().next()
+    if (limit < nJD) {
+      nJD = limit
       }
-    else {
-      graph0 = JanusGraphFactory.build().
-                                 set('storage.backend',     config.getString('storage.backend')).
-                                 set('storage.hostname',    config.getString('storage.hostname')).
-                                 set('storage.port',        config.getString('storage.port')).
-                                 set('storage.hbase.table', myName).
-                                 open()
-      }
-    return graph0
+    return g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD)
     }
-      
+          
   def static get_or_create(g, lbl, name, value) {
     return g.V().has('lbl', lbl).
                  has(name, value).
@@ -130,18 +123,6 @@ class Lomikel {
       m -= n
       }
     }
-  
-  def static geosearch(g, ra, dec, ang, jdmin, jdmax, limit) {
-    def lat = dec
-    def lon = ra - 180
-    def dist = ang * 6371.0087714 * Math.PI / 180
-    def nDir = g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).count().next()
-    def nJD  = g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).count().next()
-    if (limit < nJD) {
-      nJD = limit
-      }
-    return g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD)
-    }
 
   def static drop_by_date(graph, importDate, nCommit, tWait) {
     def g = graph.traversal()
@@ -207,7 +188,7 @@ class Lomikel {
     return clusters
     }
     
-  def static regusterAlertOfInterest(g, alertType, objectId, jd, url) {   
+  def static registerAlertOfInterest(g, alertType, objectId, jd, url) {   
     return g.V().
              has('AlertsOfInterest', 'lbl', 'AlertsOfInterest').
              has('alertType', alertType).
@@ -224,6 +205,25 @@ class Lomikel {
                    property('objectId', objectId).
                    property('jd', jd)).
              next()
+    }
+    
+  def static myGraph(myName) {
+    def graph0
+    def g0
+    if (myName == null) {
+      graph0 = JanusGraphFactory.build().
+                                 set('storage.backend', 'inmemory').
+                                 open()
+      }
+    else {
+      graph0 = JanusGraphFactory.build().
+                                 set('storage.backend',     config.getString('storage.backend')).
+                                 set('storage.hostname',    config.getString('storage.hostname')).
+                                 set('storage.port',        config.getString('storage.port')).
+                                 set('storage.hbase.table', myName).
+                                 open()
+      }
+    return graph0
     }
              
   def static config    

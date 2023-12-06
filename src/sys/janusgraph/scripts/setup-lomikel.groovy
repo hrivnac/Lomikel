@@ -5,6 +5,8 @@ globals << [hook : [
   onShutDown: { ctx -> ctx.logger.info("Executed once at shutdown of Gremlin Server.")}
   ] as LifeCycleHook]
   
+// -----------------------------------------------------------------------------
+  
 class LomikelServer {
 
   def static init() {
@@ -14,10 +16,6 @@ class LomikelServer {
   def static hi() {
     return "Hello World from Lomikel Server !"
     }
-  
-   def static geosearch_help() {
-     return 'geosearch(g, ra, dec, ang[deg], jdmin, jdmax, limit)'
-     }
     
   def static geosearch(g, ra, dec, ang, jdmin, jdmax, limit) {
     def lat = dec
@@ -105,10 +103,6 @@ class LomikelServer {
       }
     return sdMap
     }
-  
-  def static drop_by_date_help() {
-    return 'drop_by_date(graph, importDate, nCommit, tWait)'
-    }
     
   def static drop_by_date(graph, importDate, nCommit, tWait) {
     def g = graph.traversal()
@@ -133,10 +127,6 @@ class LomikelServer {
       println(tot + ' = ' + per + '% at ' + freq + 'Hz, ' + rest + 'h to go')
       }
     }
-    
-  def static importStatus_help() {
-    return 'importStatus(g)'
-    }
       
   def static importStatus(g) {
     def txt = ''
@@ -145,10 +135,6 @@ class LomikelServer {
     txt += 'Importing:\n'
     g.V().has('lbl', 'Import').hasNot('complete').order().by('importSource').valueMap('importSource', 'importDate').each{txt += '\t' + it + '\n'}
     return txt
-    }
-    
-  def static candidates_help() {
-    return 'candidates(g, objectId)'
     }
     
   def static candidates(g, objectId) {
@@ -173,19 +159,13 @@ class LomikelServer {
                    property('jd', jd)).
              next()
     }
-    
-  def static help() {
-    return getDataLink_help()  + "\n" +
-           geosearch_help()    + "\n" +
-           drop_by_date_help() + "\n" +
-           importStatus_help() + "\n" +
-           candidates_help()
-    }
       
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
   def static g = graph.traversal()
 
   }
+  
+// -----------------------------------------------------------------------------
   
 LomikelServer.init()
 

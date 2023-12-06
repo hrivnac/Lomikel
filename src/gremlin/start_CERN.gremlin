@@ -1,5 +1,0 @@
-//:record start MyGremlin.log
-:remote connect tinkerpop.server conf/CERNCORS.yaml session
-:remote config timeout 100000
-:remote console
- 
