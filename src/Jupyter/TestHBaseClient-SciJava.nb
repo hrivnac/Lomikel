@@ -1,0 +1,14 @@
+import com.astrolabsoftware.FinkBrowser.Utils.Init
+import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient
+Init.init()
+FinkHBaseClient client = new FinkHBaseClient("134.158.74.54", 2181);
+client.connect("ztf_season1", "schema_0.7.0_0.3.8");
+client.setLimit(10);
+client.setEvaluation("dec < 10");
+results = client.scan(null,
+                      null,
+                      null,
+                      0,
+                      false,
+                      false);
+System.out.println(client.results2String(results)); 

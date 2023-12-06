@@ -1,0 +1,6 @@
+FinkHBaseClient client = new FinkHBaseClient("localhost", 2181);
+client.connect("test_portal_tiny.3", "schema_0.7.0_0.3.6");
+client.createJDTable("ZTF");
+client.connect("test_portal_tiny.3", "schema_0.7.0_0.3.6");
+client.createPixelTable("ZTF");
+client.close();
