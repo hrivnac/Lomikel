@@ -78,6 +78,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: reuse Phoenixer
 public class HBaseSQLClient extends HBaseClient {
   
   /** Create and connect to HBase.

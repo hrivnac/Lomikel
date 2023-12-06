@@ -172,9 +172,9 @@ public class GremlinRecipies {
     * @param propertyValue The value of {@link Vertex} property.
     * @return              The created {@link Vertex}es.
     *                      If multiple {@link Vertex}es exist, only thee first one is given. */
-  public List<Vertex> getOrCreate(String label,
-                                  String propertyName,
-                                  Object propertyValue) {
+  public GraphTraversal<Vertex, Vertex> getOrCreate(String label,
+                                                    String propertyName,
+                                                    Object propertyValue) {
      return getOrCreate(label, new String[]{propertyName}, new Object[]{propertyValue});
      }
                 
@@ -183,21 +183,19 @@ public class GremlinRecipies {
     * @param propertyNames  The name of {@link Vertex} properties.
     * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
     * @return               The created {@link Vertex}es. */
-  public List<Vertex> getOrCreate(String   label,
-                                  String[] propertyNames,
-                                  Object[] propertyValues) {
+  public GraphTraversal<Vertex, Vertex> getOrCreate(String   label,
+                                                    String[] propertyNames,
+                                                    Object[] propertyValues) {
      if (propertyNames.length != propertyValues.length) {
        log.error("Wrong number of search values: " + propertyValues.length + ", should be: " + propertyNames.length);
        return null;
        }
-     List<Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues).toList();
-     if (!vertexes.isEmpty()) {
-       //log.debug(""  + vertexes.size() + " existing vertexes " + label + " found");
+     GraphTraversal<Vertex, Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
+     if (!vertexes.hasNext()) {
        _found = true;
        }
      else {
-       //log.debug("No existing vertexes " + label + " found - searching backend databases");
-       vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues).toList();
+       vertexes = addProperties(g().addV(label).property("lbl", label), propertyNames, propertyValues);
        _found = false;
        }
      return vertexes;
