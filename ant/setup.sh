@@ -26,6 +26,6 @@ alias gremlin_console_Local='CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/
 alias gremlin_console_IJCLab='CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local-IJCLab.properties ${home}"'
 alias gremlin_Local='CLASSPATH=""  ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
 alias gremlin_IJCLab='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
-alias lomikel='CLASSPATH="../lib/Lomikel-${version}.jar:${phoenix_jar}" java com.Lomikel.Apps.LUC'
+alias lomikel='CLASSPATH="../lib/Lomikel.exe.jar:${phoenix_jar}" java com.Lomikel.Apps.LUC'
 
 echo "commands: gremlin_console_Local, gremlin_console_IJCLab, gremlin_console_CERN, gremlin_Local, gremlin_IJCLab, gremlin_CERN, lomikel"

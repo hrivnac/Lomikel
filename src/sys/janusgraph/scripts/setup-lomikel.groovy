@@ -158,6 +158,7 @@ class LomikelServer {
                    property('objectId', objectId).
                    property('jd', jd)).
              next()
+    graph.tx().commit()
     }
       
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()

@@ -1,4 +1,5 @@
 import com.Lomikel.Januser.GremlinRecipies;
+import com.Lomikel.Phoenixer.PhoenixProxyClient;
 import com.Lomikel.HBaser.HBaseClient
 import com.Lomikel.HBaser.FinkHBaseClient
 import groovy.sql.Sql
@@ -205,6 +206,7 @@ class Lomikel {
                    property('objectId', objectId).
                    property('jd', jd)).
              next()
+    graph.tx().commit()
     }
     
   def static myGraph(myName) {
