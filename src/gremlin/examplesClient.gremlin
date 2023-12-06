@@ -1,0 +1,33 @@
+g.V().has('lbl', 'source').
+      has('objectId', 'ZTF18abimyys').
+      out().
+      has('lbl', 'alert').
+      valueMap()
+      
+g.V().has('lbl', 'source').
+      has('objectId', 'ZTF18abimyys').
+      out().
+      has('lbl', 'alert').
+      elementMap()
+      
+g.V().has('lbl', 'source').
+      has('objectId', 'ZTF18abimyys').
+      out().
+      has('lbl', 'alert').
+      elementMap().
+      unfold()
+        
+g.V().has('lbl', 'source').
+      has('objectId', 'ZTF18abimyys').
+      out().
+      has('lbl', 'alert').
+      out().
+      has('lbl', 'candidate').
+      valueMap()
+
+FinkBrowserServer.geosearch(g, 230, 30, 0.2, 2459601.03, 2459601.04, 10).elementMap().unfold()  
+FinkBrowserServer.geosearch(g, 230, 30, 0.2, 2459601.03, 2459601.04, 10).in().elementMap().unfold()  
+FinkBrowserServer.geosearch(g, 230, 30, 0.2, 2459601.03, 2459601.04, 10).in().in().elementMap().unfold()  
+FinkBrowserServer.geosearch(g, 230, 30, 0.2, 2459601.03, 2459601.04, 10).in().in().out().elementMap().unfold()
+ 
+FinkBrowserServer.candidates(g, 'ZTF18aagsirm')

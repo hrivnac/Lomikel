@@ -1,0 +1,53 @@
+icom = 100
+
+importDates = g.V().has('lbl', 'Imports').out().has('lbl', 'Import').has('complete', true).or(hasNot('connected'), has('connected', false)).values('importDate').toSet();[]
+println('' + importDates.size() + ' imports to connect')
+
+sources = [:]
+g.V().has('lbl', 'source').elementMap().toStream().each{sources += [(it['objectId']):it[id]]}
+println('' + sources.size() + ' sources already exist')
+
+for (importDate in importDates) {
+  idVs = g.V().has('importDate', importDate).has('objectId').id().toSet();[]
+  if (idVs.size() == 0) {
+    println('Empty import on ' + importDate)
+    g.V().has('lbl', 'Imports').out().has('lbl', 'Import').has('importDate', importDate).property('connected', true).iterate()
+    g.getGraph().tx().commit()
+    }
+  else {
+    println('' + idVs.size() + ' vertexes to connect to source for imports on ' + importDate)
+    t0 = System.currentTimeMillis()
+    i  = 0
+    ia = 0
+    ir = 0
+    for (idV in idVs) {
+      a = g.V(idV).next()
+      objectId = g.V(idV).values('objectId').next()
+      idSource = sources[objectId]
+      if (idSource == null) {
+        ia++
+        idSource = g.addV('source').property('lbl', 'source').property('objectId', objectId).sideEffect(addE('has').to(a)).id().next()
+        sources += [(objectId):(idSource)]
+        }
+      else {
+        ir++
+        g.V(idSource).addE('has').to(a).iterate() 
+        }
+      g.V(idV).properties('objectId', objectId).drop().iterate()
+      if (++i % icom == 0) {
+        g.getGraph().tx().commit()
+        t = (System.currentTimeMillis() - t0) / 1000
+        println('' + i + ' vertexes connected to source in ' + t + 's, freq = ' + (int)(i / t) + 'Hz')
+        }
+      }
+    if (i > 0) {
+      g.getGraph().tx().commit()
+      t = (System.currentTimeMillis() - t0) / 1000
+      println('' + i + ' vertexes connected to source in ' + t + 's, freq = ' + (int)(i / t) + 'Hz')
+      println('' + ia + ' sources added, ' + ir + ' sources reused')
+      g.V().has('lbl', 'Imports').out().has('lbl', 'Import').has('importDate', importDate).property('connected', true).iterate()
+      g.getGraph().tx().commit()
+      }
+    }        
+  }
+  

@@ -1,0 +1,94 @@
+g.V().has('lbl', 'AstroLabNet'     ).drop()
+g.V().has('lbl', 'site'            ).drop()
+g.V().has('lbl', 'AlertsCollection').drop()
+
+astrolabnet = g.addV('AstroLabNet').
+                property('lbl', 'AstroLabNet').
+                next()
+ijclab = g.addV('site').
+           property('lbl',              'site').
+           property('title',            'IJCLab').
+           property('Livy',             'http://vm-75222.lal.in2p3.fr:21111').
+           //property('Spark',          'http://vm-75222.lal.in2p3.fr:20001').
+           property('Spark',            'https://wuip.lal.in2p3.fr:8444').
+           //property('SparkHistory',   'http://vm-75222.lal.in2p3.fr:20008').
+           property('SparkHistory',     'https://wuip.lal.in2p3.fr:8443').
+           property('Ganglia',          'http://vm-75222.lal.in2p3.fr/ganglia').
+           property('Hadoop',           'http://vm-74078.lal.in2p3.fr:8188/cluster').
+           property('HBase',            'http://134.158.74.54:16010').
+           property('Prometheus',       'http://134.158.75.113:24490/graph').
+           property('Mesos',            'https://wuip.lal.in2p3.fr:20505').
+           property('Grafana',          'https://supervision.lal.in2p3.fr').
+           property('Zeppelin',         'https://wuip.lal.in2p3.fr:24443').
+           property('Tomcat',           'http://134.158.74.221:8080').
+           property('HBase_ZTF_Season1','HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&limit=100').
+           next()
+loc = g.addV('site').
+        property('lbl',               'site').
+        property('title',             'Local').
+        property('Hadoop',            'http://localhost:9870').
+        property('HBase',             'http://localhost:16010').
+        property('HBase_Test_Tiny_3', 'HBaseTable.jsp?hbase=http://localhost:2181&htable=test_portal_tiny.3&group=i:objectId&schema=schema_0.7.0_0.3.6&limit=10').
+        next()
+                            
+ijclabGraph = g.addV().
+                property('lbl',        'datalink').
+                property('technology', 'Graph'  ).
+                property('url',        'hbase:188.184.87.217:8182:janusgraph').
+                next()
+ijclabHBase = g.addV().
+                property('lbl',        'datalink').
+                property('technology', 'HBase').
+                property('url',        '134.158.74.54:2183:ztf:schema').
+                next()
+                
+latestAlertsLoc = g.addV('AlertsCollection').
+                    property('lbl',   'AlertsCollection').
+                    property('title', 'Latest Local Alerts').
+                    property('hbase', 'HBaseTable.jsp?hbase=http://localhost:2181&htable=test_portal_tiny.3&group=i:objectId&schema=schema_0.7.0_0.3.6&latest=1000000').
+                    next()
+latestAlertsIJCLab100    = g.addV('AlertsCollection').
+                             property('lbl', 'AlertsCollection').
+                             property('title', 'Latest IJCLab Alerts(100min)').
+                             property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&latest=100').
+                             next()
+latestAlertsIJCLab1000   = g.addV('AlertsCollection').
+                             property('lbl', 'AlertsCollection').
+                             property('title', 'Latest IJCLab Alerts(1000min)').
+                             property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&latest=1000').
+                             next()
+latestAlertsIJCLab10000  = g.addV('AlertsCollection').
+                             property('lbl', 'AlertsCollection').
+                             property('title', 'Latest IJCLab Alerts(10000min)').
+                             property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&latest=10000').
+                             next()
+latestAlertsIJCLab100000 = g.addV('AlertsCollection').
+                             property('lbl', 'AlertsCollection').
+                             property('title', 'Latest IJCLab Alerts(100000min)').
+                             property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&latest=100000').
+                             next()
+bestAlertsIJCLab = g.addV('AlertsCollection').
+                     property('lbl', 'AlertsCollection').
+                     property('title', 'Best IJCLab Alerts').
+                     property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&limit=100&filters=key:key:ZTF19acmdpyr&selects=*').
+                     next()
+bestAlertsLoc = g.addV('AlertsCollection').
+                  property('lbl', 'AlertsCollection').
+                  property('title', 'Best Local Alerts').
+                  property('hbase', 'HBaseTable.jsp?hbase=http://localhost:2181&htable=test_portal_tiny.3&group=i:objectId&schema=schema_0.7.0_0.3.6&limit=100&filters=key:key:ZTF17&selects=*').
+                  next()
+
+g.V(astrolabnet).addE('has').to(ijclab).iterate()
+g.V(astrolabnet).addE('has').to(loc).iterate()
+g.V(ijclab).addE('from').to(ijclabGraph).iterate()
+g.V(ijclab).addE('from').to(ijclabHBase).iterate()
+g.V(loc).addE('holds').to(latestAlertsLoc).iterate()
+g.V(loc).addE('holds').to(bestAlertsLoc).iterate()
+g.V(ijclab).addE('holds').to(latestAlertsIJCLab100).iterate()
+g.V(ijclab).addE('holds').to(latestAlertsIJCLab1000).iterate()
+g.V(ijclab).addE('holds').to(latestAlertsIJCLab10000).iterate()
+g.V(ijclab).addE('holds').to(latestAlertsIJCLab100000).iterate()
+g.V(ijclab).addE('holds').to(bestAlertsIJCLab).iterate()
+//g.V().hasLabel('alert').limit(10).addE('contains').from(g.V().hasLabel('AlertsCollection').has('title', 'Latest Local Alerts'))
+
+graph.traversal().tx().commit()

@@ -1,0 +1,11 @@
+g.V().has('direction', geoWithin(Geoshape.circle(57, -2, 0.0001*6371.0087714*180/Math.PI))).profile()
+g.V().has('direction', geoWithin(Geoshape.circle(57, -2, 0.0001*6371.0087714*180/Math.PI)))
+g.V().has('jd', inside(2459314.7213079, 2459314.722002344)).profile()
+g.V().has('jd', inside(2459314.7213079, 2459314.722002344))
+
+nDir = g.V().has('direction', geoWithin(Geoshape.circle(57, -2, 0.0001*6371.0087714*180/Math.PI))).count().next()
+nJD = g.V().has('direction', geoWithin(Geoshape.circle(57, -2, 0.0001*6371.0087714*180/Math.PI))).limit(nDir).has('jd', inside(2459300.7629977, 2459317.7015982)).count().next()
+g.V().has('direction', geoWithin(Geoshape.circle(57, -2, 0.0001*6371.0087714*180/Math.PI))).limit(nDir).has('jd', inside(2459300.7629977, 2459317.7015982)).limit(nJD)
+
+geosearch(55.5, 178, 1, 2459300.7629977, 2459317.7015982, 10)
+//geosearch(g, 55.5, 178, 1, 2459300.7629977, 2459317.7015982, 10)

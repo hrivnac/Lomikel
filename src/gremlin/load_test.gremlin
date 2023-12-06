@@ -1,0 +1,23 @@
+// Import testing alerts
+// =====================
+
+new File(home + '/data/test/alerts.csv').eachLine {
+  (a1, a2, a3) = it.split(',')
+  alert1 = g.V().has('alert','id', a1).
+                 fold().
+                 coalesce(unfold(),
+                          addV('alert').property('id', a1)).next()
+  alert2 = g.V().has('alert','id', a2).
+                 fold().
+                 coalesce(unfold(),
+                          addV('alert').property('id', a2)).next()
+  alert3 = g.V().has('alert','id', a3).
+                 fold().
+                 coalesce(unfold(),
+                 addV('alert').property('id', a3)).next()
+  g.addE('is').from(alert2).to(alert1).iterate()
+  g.addE('is').from(alert3).to(alert1).iterate()
+  g.addE('knows').from(alert2).to(alert3).iterate()
+  }
+  
+graph.tx().commit()

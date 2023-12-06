@@ -1,0 +1,16 @@
+// Get any alert vertex from Graph
+v = g.V().has('lbl', 'alert').limit(1).next()
+// dress it as (a subtype of) Hertex (= HBase backed Vertex)
+// which _is_a_ Vertex so it has all Vertex properties
+h = Wertex.enhance(v)
+// Get all properties
+h.properties()
+// Get properties from Graph
+h.property('simag2')
+// Get properties from HBase
+h.property('i:simag2')
+
+// Create a new alert vertex (without connection to HBase data)
+a = Alert.getOrCreate('ZTF19acmbwur_2458789.0311458', g, false);
+// Create a new alert vertex (with connection to HBase data)
+a = Alert.getOrCreate('ZTF19acmbwur_2458789.0311458', g, true);
