@@ -141,7 +141,7 @@ class LomikelServer {
     return g.V().has('objectId', objectId).out().out().has('lbl', 'candidate')
     }  
     
-  def static registerAlertOfInterest(g, alertType, objectId, jd, url) {   
+  def static registerAlertOfInterest(alertType, objectId, jd, url) {   
     return g.V().
              has('AlertsOfInterest', 'lbl', 'AlertsOfInterest').
              has('alertType', alertType).
