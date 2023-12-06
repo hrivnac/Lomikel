@@ -2,6 +2,7 @@ package com.Lomikel.GremlinPlugin;
 
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.HBaser.HBaseClient;
+import com.Lomikel.HBaser.FinkHBaseClient;
 import com.Lomikel.Phoenixer.PhoenixProxyClient;
 
 // TinkerPop
