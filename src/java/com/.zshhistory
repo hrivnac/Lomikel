@@ -18,3 +18,5 @@
 : 1701955531:0;ls
 : 1701955544:0;cp -r ~/work/LSST/FinkBrowser/src/java/com/astrolabsoftware ./
 : 1701955547:0;cd astrolabsoftware
+: 1701957378:0;ls
+: 1701957381:0;cd astrolabsoftware
