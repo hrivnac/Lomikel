@@ -12,28 +12,16 @@ title= mgmt.getPropertyKey('title')
 name = mgmt.getPropertyKey('name')
 
 // Indexes
-//mgmt.buildIndex('byLblES',   Vertex.class).addKey(lbl, Mapping.STRING.asParameter())                                                .buildMixedIndex('search')
-//mgmt.buildIndex('byTitleES', Vertex.class).addKey(lbl, Mapping.STRING.asParameter()).addKey(title, Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
-//mgmt.buildIndex('byNameES',  Vertex.class).addKey(lbl, Mapping.STRING.asParameter()).addKey(name , Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
 
 mgmt.commit()
 
 // Wait for index                                           
-//ManagementSystem.awaitGraphIndexStatus(graph, 'byLblES'  ).status(SchemaStatus.REGISTERED).call()
-//ManagementSystem.awaitGraphIndexStatus(graph, 'byTitleES').status(SchemaStatus.REGISTERED).call()
-//ManagementSystem.awaitGraphIndexStatus(graph, 'byNameES' ).status(SchemaStatus.REGISTERED).call()
 
 // Reindex existing data
 mgmt = graph.openManagement()
-//mgmt.updateIndex(mgmt.getGraphIndex('byLblES'  ), SchemaAction.REINDEX).get()
-//mgmt.updateIndex(mgmt.getGraphIndex('byTitleES'), SchemaAction.REINDEX).get()
-//mgmt.updateIndex(mgmt.getGraphIndex('byNameES' ), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
 mgmt.getGraphIndexes(Edge.class)
 mgmt.printIndexes()
 mgmt.commit()
 
 // Enable index                                           
-//ManagementSystem.awaitGraphIndexStatus(graph, 'byLblES'  ).status(SchemaStatus.ENABLED).call()
-//ManagementSystem.awaitGraphIndexStatus(graph, 'byTitleES').status(SchemaStatus.ENABLED).call()
-//ManagementSystem.awaitGraphIndexStatus(graph, 'byNameES' ).status(SchemaStatus.ENABLED).call()
