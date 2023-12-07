@@ -21,32 +21,29 @@ public class HBaseColumnsProcessor {
     * @return      The derived value of x-axes. */
   public String getTimestamp(Map<String, String> entry) {
     String date = getDate(entry);
-    //return entry.get("key:time");
-    return Long.toString(DateTimeManagement.string2time(date, "yyyy MM dd HH:mm:ss.SSS"));
+    return entry.get("key:time");
     }
     
   /** Give the date corresponding to a table row.
     * @param entry One row of the table.
     * @return      The corresponding date. */
   public String getDate(Map<String, String> entry) {
-    //String date = getTimestamp(entry);
-    //return DateTimeManagement.time2String(Long.parseLong(date), "yyyy MM dd HH:mm:ss.nnnnnnnnn");
-    String days = entry.get("i:jd");
-    return DateTimeManagement.julianDate2String(Double.valueOf(days), "yyyy MM dd HH:mm:ss.SSS");
+    String date = getTimestamp(entry);
+    return DateTimeManagement.time2String(Long.parseLong(date), "yyyy MM dd HH:mm:ss.nnnnnnnnn");
     }
 
   /** Give the <code>ra</code> polar coordinate in degrees.
     * @return The <code>ra</code> polar coordinate in degrees.
     *         The default is <tt>0</tt>. */
   public String ra() {
-    return "i:ra";
+    return null;
     }
     
   /** Give the <code>dec</code> polar coordinate in degrees.
     * @return The <code>dec</code> polar coordinate in degrees.
     *         The default is <tt>0</tt>. */
   public String dec() {
-    return "i:dec";
+    return null;
     }
     
   /** Logging . */

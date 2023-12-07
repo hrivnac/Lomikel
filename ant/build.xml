@@ -175,6 +175,18 @@
 			<fileset file="${phoenix_jar}"/>
       </copy>
     </target>
+    
+  <target name="classpath.hadoop"
+          description="Prepare Hadoop Classpath">   
+    <exec executable="../src/sh/hadoopclasspath.sh"
+          outputproperty="classpath.hadoop">
+      <arg value="classpath"/>
+      </exec>
+    <script language="javascript">
+      var before = project.getProperty("classpath.hadoop");
+      project.setProperty("classes.hadoop", before.replaceAll(":", ","));
+      </script>
+    </target>
 
   <!-- Compile ==============================================================-->
 
@@ -225,14 +237,22 @@
       </path>
     <property name="classpath.libs" refid="libs"/>
     <jar jarfile="../lib/Lomikel-${version}.jar" index="yes">
-      <fileset dir="../build"    includes="**/*.class"/>
-      <fileset dir="../src/java" includes="com/Lomikel/**/*.properties"/>
-      <fileset dir="../src/java" includes="com/Lomikel/**/*.bsh"/>
-      <fileset dir="../src/java" includes="com/Lomikel/**/*.txt"/>
-      <fileset dir="../src/java" includes="com/Lomikel/**/*.png"/>
-      <fileset dir="../src/java" includes="com/Lomikel/**/*.gif"/>
-      <fileset dir="../src/java" includes="com/Lomikel/**/*.css"/>
-      <fileset dir="../src/java" includes="com/Lomikel/**/*.groovy"/>
+      <fileset dir="../build"      includes="**/*.class"/>
+      <fileset dir="../src/java"   includes="com/Lomikel/**/*.properties"/>
+      <fileset dir="../src/java"   includes="com/Lomikel/**/*.bsh"/>
+      <fileset dir="../src/java"   includes="com/Lomikel/**/*.txt"/>
+      <fileset dir="../src/java"   includes="com/Lomikel/**/*.png"/>
+      <fileset dir="../src/java"   includes="com/Lomikel/**/*.gif"/>
+      <fileset dir="../src/java"   includes="com/Lomikel/**/*.css"/>
+      <fileset dir="../src/java"   includes="com/Lomikel/**/*.groovy"/>
+      <fileset dir="../build"      includes="com/astrolabsoftware/FinkBrowser/**/*.class"/>
+      <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.properties"/>
+      <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.bsh"/>
+      <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.txt"/>
+      <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.png"/>
+      <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.gif"/>
+      <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.css"/>
+      <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.groovy"/>
       <fileset dir="../src/bsh"    includes="*.bsh"/>
       <fileset dir="../src/groovy" includes="*.groovy"/>
       <zipfileset includes="**/*" src="${log4j_jar}" excludes="META-INF/*"/>
@@ -749,6 +769,75 @@
       </java>
     </target>
     
+  <!-- Populate =============================================================-->
+
+  <target name="check-utilities"
+          description="Check Alert Utilities">
+    <echo>Check Alert Utilities</echo>
+    <java classname="com.astrolabsoftware.FinkBrowser.Januser.AlertUtilities"
+          fork="true">
+      <arg value="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties"/>
+      <arg value="2459314.7213079"/>
+      <arg value="2459314.722002344"/>
+      <arg value="candidate"/>
+      <arg value="2"/>
+      <classpath>
+        <path refid="classpath.janusgraph"/>
+        </classpath>
+      </java>
+    </target>
+
+  <target name="import-avro"
+          description="Import Avro alerts to Graph">
+    <echo>Import Avro alerts to Graph</echo>
+    <java classname="com.astrolabsoftware.FinkBrowser.Avro.AvroImporter"
+          fork="true">
+      <arg value="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties"/>
+      <arg value="${alerts_avrodir}"/>
+      <arg value="${alerts_fitsdir}"/>
+      <arg value="${alerts_reportLimit}"/>
+      <arg value="${alerts_commitLimit}"/>
+      <arg value="${alerts_strategy}"/>
+      <classpath>
+        <path refid="classpath.janusgraph"/>
+        </classpath>
+      </java>
+    </target>
+    
+  <target name="import-avro-hdfs"
+          depends="classpath.hadoop"
+          description="Import Avro alerts from HDFS to Graph">
+    <echo>Import Avro alerts from HDFS to Graph</echo>
+    <exec executable="${hadoop_dir}/bin/hadoop">
+      <arg value="com.astrolabsoftware.FinkBrowser.Avro.HDFSAvroImporter"/>
+      <arg value="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties"/>
+      <arg value="${alerts_avrodir}"/>
+      <arg value="${alerts_fitsdir}"/>
+      <arg value="${alerts_reportLimit}"/>
+      <arg value="${alerts_commitLimit}"/>
+      <arg value="${alerts_strategy}"/>
+      <arg value="${alerts_hbase}"/>
+      <arg value="${alerts_datatype}"/>
+      <env key="HADOOP_CLASSPATH" path="${classpath.janusgraph.content}"/>
+      </exec>
+    </target>
+
+  <target name="import-parquet"
+          depends="classpath.hadoop"
+          description="Import Parquet alerts to Graph">
+    <echo>Import Parquet alerts to Graph</echo>
+    <exec executable="${hadoop_dir}/bin/hadoop">
+      <arg value="com.astrolabsoftware.FinkBrowser.Parquet.ParquetImporter"/>
+      <arg value="${janusgraph_dir}/conf/gremlin-server/Local-batch.properties"/>
+      <arg value="${alerts_parquetdir}"/>
+      <arg value="${alerts_reportLimit}"/>
+      <arg value="${alerts_commitLimit}"/>
+      <arg value="${alerts_strategy}"/>
+      <arg value="${alerts_hbase}"/>
+      <env key="HADOOP_CLASSPATH" path="${classpath.janusgraph.content}"/>
+      </exec>
+    </target>
+            
   <!-- Clean ================================================================-->
 
   <target name="clean"
@@ -859,20 +948,25 @@
       <Header><![CDATA[<center>]]>Lomikel version: ${version}<![CDATA[</center>]]></Header>
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
       <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Activities/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
-      <group title="Apps"           packages="com.Lomikel.Apps"/>
-      <group title="DB"             packages="com.Lomikel.DB"/>
-      <group title="Hadooper"       packages="com.Lomikel.Hadooper"/>
-      <group title="HBaser"         packages="com.Lomikel.HBaser"/>
-      <group title="Januser"        packages="com.Lomikel.Januser"/>
-      <group title="Phoenixer"      packages="com.Lomikel.Phoenixer"/>
-      <group title="Graph"          packages="com.Lomikel.Graph"/>
-      <group title="Utils"          packages="com.Lomikel.Utils*"/>
-      <group title="Sockets"        packages="com.Lomikel.Sockets*"/>
-      <group title="GremlinPlugin"  packages="com.Lomikel.GremlinPlugin*"/>
-      <group title="GUI"            packages="com.Lomikel.GUI*"/>
-      <group title="TinkerPopPatch" packages="com.Lomikel.TinerPopPatch*"/>
-      <group title="WebService"     packages="com.Lomikel.WebService*"/>
-      <group title="LehmanUtils"    packages="de.lehmannet.om.util*"/>
+      <group title="Apps"            packages="com.Lomikel.Apps"/>
+      <group title="DB"              packages="com.Lomikel.DB"/>
+      <group title="Hadooper"        packages="com.Lomikel.Hadooper"/>
+      <group title="HBaser"          packages="com.Lomikel.HBaser"/>
+      <group title="Januser"         packages="com.Lomikel.Januser"/>
+      <group title="Phoenixer"       packages="com.Lomikel.Phoenixer"/>
+      <group title="Graph"           packages="com.Lomikel.Graph"/>
+      <group title="Utils"           packages="com.Lomikel.Utils*"/>
+      <group title="Sockets"         packages="com.Lomikel.Sockets*"/>
+      <group title="GremlinPlugin"   packages="com.Lomikel.GremlinPlugin*"/>
+      <group title="GUI"             packages="com.Lomikel.GUI*"/>
+      <group title="TinkerPopPatch"  packages="com.Lomikel.TinerPopPatch*"/>
+      <group title="WebService"      packages="com.Lomikel.WebService*"/>
+      <group title="Fink Avro"       packages="com.astrolabsoftware.FinkBrowsrr.Avro*"/>
+      <group title="Fink Parquet"    packages="com.astrolabsoftware.FinkBrowsrr.Parquet*"/>
+      <group title="Fink HBaser"     packages="com.astrolabsoftware.FinkBrowser.HBaser*"/>
+      <group title="Fink Januser"    packages="com.astrolabsoftware.FinkBrowser.Januser*"/>
+      <group title="Fink WebService" packages="com.astrolabsoftware.FinkBrowser.WebService*"/>
+      <group title="LehmanUtils"     packages="de.lehmannet.om.util*"/>
       <link href="http://docs.oracle.com/javase/8/docs/api" packagelistLoc="${javadoc}" offline="true"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>

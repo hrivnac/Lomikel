@@ -17,7 +17,7 @@ class LomikelServer {
     return "Hello World from Lomikel Server !"
     }
     
-  def static geosearch(g, ra, dec, ang, jdmin, jdmax, limit) {
+  def static geosearch(ra, dec, ang, jdmin, jdmax, limit) {
     def lat = dec
     def lon = ra - 180
     def dist = ang * 6371.0087714 * Math.PI / 180
@@ -29,7 +29,7 @@ class LomikelServer {
     return g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD)
     }
   
-  def static get_or_create(g, lbl, name, value) {
+  def static get_or_create(lbl, name, value) {
     return g.V().has('lbl', lbl).
                  has(name, value).
                  fold().
@@ -38,7 +38,7 @@ class LomikelServer {
                                     property(name, value));
     }
     
-  def static get_or_create_edge(g, lbl1, name1, value1, lbl2, name2, value2, edge) {
+  def static get_or_create_edge(lbl1, name1, value1, lbl2, name2, value2, edge) {
     return g.V().has('lbl', lbl1).
                  has(name1, value1).
                  as('v').
@@ -95,7 +95,7 @@ class LomikelServer {
       }
     }
 
-  def static standardDeviation(g, lbl, variableNames) {
+  def static standardDeviation(lbl, variableNames) {
     def sdMap = [:]
     variableNames.split().stream().each {v ->
       g.V().has('lbl', lbl).values(v).fold().as(v).mean(local).as('mean').select(v).unfold().math('(_-mean)^2').mean().math('sqrt(_)').map{sd -> println  v + ': ' + sd
@@ -104,7 +104,7 @@ class LomikelServer {
     return sdMap
     }
     
-  def static drop_by_date(graph, importDate, nCommit, tWait) {
+  def static drop_by_date(importDate, nCommit, tWait) {
     def g = graph.traversal()
     //importDate = 'Mon Feb 14 05:51:20 UTC 2022'
     //nCommit = 500
@@ -128,7 +128,7 @@ class LomikelServer {
       }
     }
       
-  def static importStatus(g) {
+  def static importStatus() {
     def txt = ''
     txt += 'Imported:\n'
     g.V().has('lbl', 'Import').has('nAlerts', neq(0)).order().by('importSource').valueMap('importSource', 'importDate', 'nAlerts').each{txt += '\t' + it + '\n'}
@@ -137,7 +137,7 @@ class LomikelServer {
     return txt
     }
     
-  def static candidates(g, objectId) {
+  def static candidates(objectId) {
     return g.V().has('objectId', objectId).out().out().has('lbl', 'candidate')
     }  
     

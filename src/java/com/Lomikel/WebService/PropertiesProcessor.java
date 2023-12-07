@@ -17,17 +17,14 @@ public class PropertiesProcessor {
     * @param entry One row of the table.
     * @return      The corresponding timestamp. */
   public String getTimestamp(String entry) {
-    String date = getDate(entry);
-    return Long.toString(DateTimeManagement.string2time(date, "yyyy MM dd HH:mm:ss.SSS"));
-    //return entry;
+    return entry;
     }
   
   /** Give the date corresponding to a timestamp.
     * @param timestamp The timestamp.
     * @return      The corresponding date. */
   public String getDate(String jd) {
-    return DateTimeManagement.julianDate2String(Double.valueOf(jd), "yyyy MM dd HH:mm:ss.SSS");
-    //return DateTimeManagement.time2String(Long.parseLong(timestamp), "HH:mm:ss.nnnnnnnnn dd/MM/yyyy ");
+    return DateTimeManagement.time2String(Long.parseLong(jd), "HH:mm:ss.nnnnnnnnn dd/MM/yyyy ");
     }
     
   /** Logging . */
