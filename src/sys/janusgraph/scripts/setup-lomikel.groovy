@@ -162,7 +162,7 @@ class LomikelServer {
     }
     
   def static exportAlertsOfInterest(alertType, fn) {  
-    def gr = new GremlinRecipies(g)
+    def gr = GremlinRecipies(g)
     def graph1 = Lomikel.myGraph()
     def g1 = graph1.traversal()
     g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).each {v ->
