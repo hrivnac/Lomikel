@@ -163,7 +163,7 @@ class LomikelServer {
     
   def static exportAlertsOfInterest(alertType, fn) {  
     def gr = GremlinRecipies(g)
-    def graph1 = Lomikel.myGraph()
+    def graph1 = myGraph()
     def g1 = graph1.traversal()
     g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).each {v ->
       gr.gimme(v, g1, -1, -1, true, null)
