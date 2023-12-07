@@ -228,7 +228,7 @@ class Lomikel {
     return graph0
     }
         
-  def static exportAlertsOfInterest(alertType, fn) {  
+  def static exportAlertsOfInterest(g, alertType, fn) {  
     def gr = new GremlinRecipies(g)
     def graph1 = Lomikel.myGraph()
     def g1 = graph1.traversal()
