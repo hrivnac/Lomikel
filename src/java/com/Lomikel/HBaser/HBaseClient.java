@@ -4,7 +4,6 @@ import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.DateTimeManagement;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
-import com.Lomikel.Utils.ByteArray;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Schema;
 import com.Lomikel.DB.Client;
@@ -48,11 +47,6 @@ import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
 import org.apache.hadoop.conf.Configuration;
 
 // HealPix
-import cds.healpix.Healpix;
-import cds.healpix.HealpixNested;
-import cds.healpix.HealpixNestedFixedRadiusConeComputer;
-import cds.healpix.HealpixNestedBMOC;
-import cds.healpix.FlatHashIterator;
 import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
 import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 

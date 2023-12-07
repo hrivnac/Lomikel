@@ -1,6 +1,5 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
-// Lomikel
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.HBaser.HBaseClient;

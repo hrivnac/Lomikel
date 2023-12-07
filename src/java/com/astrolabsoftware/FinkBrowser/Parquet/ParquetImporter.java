@@ -1,6 +1,5 @@
 package com.astrolabsoftware.FinkBrowser.Parquet;
 
-// Lomikel
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Januser.JanusClient;
 import com.Lomikel.Januser.GremlinRecipies;

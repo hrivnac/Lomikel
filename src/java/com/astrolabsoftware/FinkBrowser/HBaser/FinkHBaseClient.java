@@ -1,6 +1,5 @@
 package com.astrolabsoftware.FinkBrowser.HBaser;
 
-// Lomikel
 import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.HBaser.HBaseSQLClient;
 import com.Lomikel.Utils.DateTimeManagement;

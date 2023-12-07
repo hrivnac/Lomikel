@@ -4,6 +4,14 @@
 <title>Lomikel</title>
 </head>
 
+<style>
+  iframe {
+    border: 1px solid black;
+    width: 100%;
+    background: #dddddd;
+    }
+  </style>
+
 <body>
 
 <table><tr>
@@ -42,7 +50,15 @@
     <a href="https://www.baeldung.com/java-org-json">org.json</a>,
     <a href="https://d3js.org">d3.js</a>,
     <a href="http://www.benfrederickson.com/venn-diagrams-with-d3.js">Venn Diagrams</a>,
-    <a href="https://github.com/ofrohn/d3-celestial">d3-celestial</a></li>
+    <a href="https://github.com/ofrohn/d3-celestial">d3-celestial</a>,
+    <a href="https://github.com/cds-astro/cds-healpix-java">HealPix</a>,
+    <a href="http://www.jython.org">Jython</a> (for Jython client, optional),
+    <a href="http://www.jpype.org">JPype</a> (for CPython client, optional),
+    <a href="https://pypi.org/project/gremlinpython">Gremlin Python</a> (for Phython client, optional),
+    <a href="http://sagemath.org">Sage</a> (to perform math analyses, optional),
+    <a href="http://matplotlib.org">MatPlotLib</a> (to perform math analyses, optional),
+    <a href="http://jupyter.org">Jupyter</a> (to run in a Notebook),
+    <a href="https://github.com/scijava/scijava-jupyter-kernel">SciJava Jupyter kernel</a> (for Java Notebook)
 <li>Tools:
     <a href="https://ant.apache.org">Ant</a>,
     <a href="http://www.java2html.com">J2H</a>,
@@ -69,14 +85,14 @@
 </ul>
 
 <h4><a name="CLI">Command Line</a></h4>
-<pre>
+<pre style="color:blue; font-size:60%; background-color:#eeeeee">
 $ java -jar ../lib/Lomikel.exe.jar -h
 usage: java -jar Lomikel.exe.jar
  -b,--batch           run in a batch
  -g,--gui             run in a graphical windowile
  -h,--help            show help
  -q,--quiet           minimal direct feedback
- -s,--source <file>   source bsh file (init.bsh is also read)
+ -s,--source &lt;file&gt; source bsh file (init.bsh is also read)
 </pre>
 
 <h4><a name="Bugs-ToDos">Bugs, Inconsistencies and ToDos</a></h4>
@@ -245,13 +261,15 @@ usage: java -jar Lomikel.exe.jar
     <li>Transferable or physical repository for binary data on HBaseClient.</li>
     <li>HBaseSQLClient added.</li>
     <li>Possibility to replicate data in SQL database.</li>
+    <li>FinkBrowser project moved in.</li>
+    <li>Fink: AlertsOfInterest vertexes.</li>
+    <li>JSON, CSV, GraphML export.</li>
     </ul></li>
 </ul>
 
 <h4>Related Documentation</h4>
 <ul>
-<li><a href="http://cern.ch/hrivnac/Activities/Packages/FinkBrowser">Fink Browser</a></li>
-<li><a href="http://cern.ch/hrivnac/Activities/Packages/Atlascope">Atlascope</a></li>
+<li>...</li>
 </ul>
 
 <hr/>

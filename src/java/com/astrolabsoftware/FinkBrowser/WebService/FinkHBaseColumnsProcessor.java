@@ -1,6 +1,5 @@
 package com.astrolabsoftware.FinkBrowser.WebService;
 
-// Lomikel
 import com.Lomikel.Utils.DateTimeManagement;
 import com.Lomikel.WebService.HBaseColumnsProcessor;
 

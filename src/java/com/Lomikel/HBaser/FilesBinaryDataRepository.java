@@ -3,9 +3,6 @@ package com.Lomikel.HBaser;
 import com.Lomikel.Utils.Info;
 
 // Java
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Base64;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;

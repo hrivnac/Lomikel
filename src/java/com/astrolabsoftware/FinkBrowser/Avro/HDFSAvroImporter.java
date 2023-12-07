@@ -1,6 +1,5 @@
 package com.astrolabsoftware.FinkBrowser.Avro;
 
-// Lomikel
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Utils.Init;
 

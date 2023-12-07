@@ -1,7 +1,6 @@
 package com.Lomikel.Januser;
 
 import com.Lomikel.Utils.Init;
-import com.Lomikel.Utils.Info;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;

@@ -1,6 +1,5 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
-// Lomikel
 import com.Lomikel.Januser.Hertex;
 
 // Tinker Pop
