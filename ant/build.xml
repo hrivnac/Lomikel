@@ -1114,8 +1114,8 @@
     <mkdir dir="../doc/Gremlin"/>
  		<copy todir="../doc/Gremlin">
 			<fileset dir="../src/gremlin" includes="*.gremlin"/>
-			<fileset dir="${lomikel_src}/gremlin" includes="examples.gremlin"/>
-			<fileset dir="${lomikel_src}/gremlin" includes="examplesLomikel.gremlin"/>
+			<fileset dir="../src/gremlin" includes="examples.gremlin"/>
+			<fileset dir="../src/gremlin" includes="examplesLomikel.gremlin"/>
       </copy>
     <mkdir dir="../doc/BeanShell"/>
  		<copy todir="../doc/BeanShell">
