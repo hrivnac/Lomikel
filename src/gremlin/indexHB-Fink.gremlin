@@ -1,0 +1,29 @@
+// Create HBase Index - Fink
+// (uses direct indexing, big data can use also MR indexing) 
+// =========================================================
+
+graph.tx().rollback()
+
+mgmt = graph.openManagement()
+
+// Properties
+jd = mgmt.getPropertyKey('jd')
+
+//  Indexes                                                            
+mgmt.buildIndex('byJd', Vertex.class).addKey(jd).buildCompositeIndex()
+                                                                      
+mgmt.commit()
+
+// Wait for index
+ManagementSystem.awaitGraphIndexStatus(graph, 'byJd').status(SchemaStatus.REGISTERED).call()
+
+// Reindex existing data
+mgmt = graph.openManagement()
+mgmt.updateIndex(mgmt.getGraphIndex('byJd'), SchemaAction.REINDEX).get()
+mgmt.getGraphIndexes(Vertex.class)
+mgmt.getGraphIndexes(Edge.class)
+mgmt.printIndexes()
+mgmt.commit()
+
+// Enable index
+ManagementSystem.awaitGraphIndexStatus(graph, 'byJd').status(SchemaStatus.ENABLED).call()

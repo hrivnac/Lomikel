@@ -1,0 +1,29 @@
+// Create ElasticSearch Index - Fink
+// (uses direct indexing, big data can use also MR indexing) 
+// =========================================================
+
+graph.tx().rollback()
+
+mgmt = graph.openManagement()
+
+// Properties
+objectId   = mgmt.getPropertyKey('objectId')
+
+//  Indexes                      
+mgmt.buildIndex('byObjectIdES', Vertex.class).addKey(objectId, Mapping.TEXTSTRING.asParameter()).buildMixedIndex('search')
+
+mgmt.commit()
+
+// Wait for index
+ManagementSystem.awaitGraphIndexStatus(graph, 'byObjectIdES').status(SchemaStatus.REGISTERED).call()
+
+// Reindex existing data
+mgmt = graph.openManagement()
+mgmt.updateIndex(mgmt.getGraphIndex('byObjectIdES'), SchemaAction.REINDEX).get()
+mgmt.getGraphIndexes(Vertex.class)
+mgmt.getGraphIndexes(Edge.class)
+mgmt.printIndexes()
+mgmt.commit()
+
+// Enable index
+ManagementSystem.awaitGraphIndexStatus(graph, 'byObjectIdES').status(SchemaStatus.ENABLED).call()

@@ -1,0 +1,10 @@
+// ReIndex HBase using MR - Fink
+// =============================
+
+graph.tx().rollback()
+
+// Reindex existing data
+mgmt = graph.openManagement()
+mr = new org.janusgraph.hadoop.MapReduceIndexManagement(graph)
+mr.updateIndex(mgmt.getGraphIndex('byJd'), SchemaAction.REINDEX).get()
+mgmt.commit()

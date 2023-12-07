@@ -1,0 +1,9 @@
+// ReIndex HBase - Fink
+// ====================
+
+graph.tx().rollback()
+
+// Reindex existing data
+mgmt = graph.openManagement()
+mgmt.updateIndex(mgmt.getGraphIndex('byJd'), SchemaAction.REINDEX).get()
+mgmt.commit()
