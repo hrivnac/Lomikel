@@ -160,6 +160,18 @@ class LomikelServer {
              next()
     graph.tx().commit()
     }
+    
+  def static exportAlertsOfInterest(alertType, fn) {  
+    def gr = new GremlinRecipies(g)
+    def graph1 = Lomikel.myGraph()
+    def g1 = graph1.traversal()
+    g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).each {v ->
+      gr.gimme(v, g1, -1, -1, true, null)
+      }
+    def n = g1.V().count().next()
+    graph1.io(IoCore.graphml()).writeGraph(fn + '.graphml')
+    println(n + " vertices saved to " + fn + '.graphml')
+    }
       
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
   def static g = graph.traversal()

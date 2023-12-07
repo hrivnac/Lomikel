@@ -1,5 +1,5 @@
-import com.Lomikel.Januser.GremlinRecipies;
-import com.Lomikel.Phoenixer.PhoenixProxyClient;
+import com.Lomikel.Januser.GremlinRecipies
+import com.Lomikel.Phoenixer.PhoenixProxyClient
 import com.Lomikel.HBaser.HBaseClient
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient
 import groovy.sql.Sql

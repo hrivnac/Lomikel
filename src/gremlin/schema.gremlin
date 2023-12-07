@@ -4,12 +4,12 @@
 mgmt = graph.openManagement()
 
 // Vertexes
-datalink          = mgmt.makeVertexLabel('datalink'         ).make()
+datalink = mgmt.makeVertexLabel('datalink').make()
 
 // Edges
-props             = mgmt.makeEdgeLabel('props'   ).multiplicity(SIMPLE  ).make()
-has               = mgmt.makeEdgeLabel('has'     ).multiplicity(ONE2MANY).make()
-contains          = mgmt.makeEdgeLabel('contains').multiplicity(MULTI   ).make()
+props    = mgmt.makeEdgeLabel('props'   ).multiplicity(SIMPLE  ).make()
+has      = mgmt.makeEdgeLabel('has'     ).multiplicity(ONE2MANY).make()
+contains = mgmt.makeEdgeLabel('contains').multiplicity(MULTI   ).make()
 
 // Properties
 title         = mgmt.makePropertyKey('title'        ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
@@ -31,9 +31,6 @@ mgmt.addProperties(datalink,
                    technology,
                    url,
                    query)
-mgmt.addProperties(site,
-                   lbl,
-                   title)   
                                     
 // Edge properties
 mgmt.addProperties(props,
@@ -44,10 +41,6 @@ mgmt.addProperties(contains,
                    lbl)
 
 // Connections   
-mgmt.addConnection(has,        AstroLabNet,      site)
-mgmt.addConnection(props,      site,             Imports)
-mgmt.addConnection(contains,   AlertsOfInterest, alert)
-mgmt.addConnection(holds,      site,             AlertsCollection)
 
 // Info
 mgmt.printSchema()
