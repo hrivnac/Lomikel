@@ -227,7 +227,19 @@ class Lomikel {
       }
     return graph0
     }
-             
+        
+  def static exportAlertsOfInterest(alertType, fn) {  
+    gr = new GremlinRecipies(g)
+    graph1 = Lomikel.myGraph()
+    g1 = graph1.traversal()
+    g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).each {v ->
+      gr.gimme(v, g1, -1, -1, true, null)
+      }
+    n = g1.V().count()
+    graph1.io(IoCore.graphml()).writeGraph(fn + '.graphml')
+    println(n + " vertices saved to " + fn + '.graphml')
+    }
+  
   def static config    
        
   }
