@@ -172,7 +172,7 @@
 			<fileset file="${hadoopcommon_jar}"/>
 			<fileset file="${parquetavro_jar}"/>
 			<fileset file="${parquethadoop_jar}"/>
-			<fileset file="${phoenix_jar}"/>
+			<!--fileset file="${phoenix_jar}"/-->
       </copy>
     </target>
     
