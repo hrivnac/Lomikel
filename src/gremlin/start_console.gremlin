@@ -235,9 +235,9 @@ class Lomikel {
     g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).each {v ->
       gr.gimme(v, g1, -1, -1, true, null)
       }
-    n = g1.V().count()
+    nsaved = g1.V().count()
     graph1.io(IoCore.graphml()).writeGraph(fn + '.graphml')
-    println(n + " vertices saved to " + fn + '.graphml')
+    println(nsaved + " vertices saved to " + fn + '.graphml')
     }
   
   def static config    
