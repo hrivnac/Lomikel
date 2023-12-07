@@ -206,7 +206,7 @@ class Lomikel {
                    property('objectId', objectId).
                    property('jd', jd)).
              next()
-    graph.tx().commit()
+    g.getGraph().tx().commit()
     }
     
   def static myGraph(myName) {
