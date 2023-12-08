@@ -160,25 +160,6 @@ class LomikelServer {
              next()
     graph.tx().commit()
     }
-    
-  def static myGraph(myName) {
-    def graph0
-    def g0
-    if (myName == null) {
-      graph0 = JanusGraphFactory.build().
-                                 set('storage.backend', 'inmemory').
-                                 open()
-      }
-    else {
-      graph0 = JanusGraphFactory.build().
-                                 set('storage.backend',     'hbase').
-                                 set('storage.hostname',    '@STORAGE.HOSTNAME@').
-                                 set('storage.port',        '@STORAGE.PORT@').
-                                 set('storage.hbase.table', myName).
-                                 open()
-      }
-    return graph0
-    }
           
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
   def static g = graph.traversal()
