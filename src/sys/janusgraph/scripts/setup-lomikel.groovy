@@ -160,6 +160,23 @@ class LomikelServer {
              next()
     graph.tx().commit()
     }
+    
+        
+  def static exportAlertsOfInterest(alertType, fn) {  
+    g.V().has('lbl', 'AlertsOfInterest').
+          has('alertType', alertType).
+          repeat(__.outE().
+                    subgraph('subGraph').
+                    inV()).
+          until(outE().
+                count().
+                is(0)).
+          cap('subGraph').
+          next().
+          io(IoCore.graphml()).
+          writeGraph(fn + '.graphml')
+    }
+    
           
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
   def static g = graph.traversal()
