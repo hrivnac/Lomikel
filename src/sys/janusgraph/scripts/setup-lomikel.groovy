@@ -174,7 +174,7 @@ class LomikelServer {
           cap('subGraph').
           next().
           io(IoCore.graphml()).
-          writeGraph(fn + '.graphml')
+          writeGraph(fn)
     }
     
           
