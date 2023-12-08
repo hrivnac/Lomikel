@@ -161,18 +161,25 @@ class LomikelServer {
     graph.tx().commit()
     }
     
-  def static exportAlertsOfInterest(alertType, fn) {  
-    def gr = GremlinRecipies(g)
-    def graph1 = myGraph()
-    def g1 = graph1.traversal()
-    g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).each {v ->
-      gr.gimme(v, g1, -1, -1, true, null)
+  def static myGraph(myName) {
+    def graph0
+    def g0
+    if (myName == null) {
+      graph0 = JanusGraphFactory.build().
+                                 set('storage.backend', 'inmemory').
+                                 open()
       }
-    def n = g1.V().count().next()
-    graph1.io(IoCore.graphml()).writeGraph(fn + '.graphml')
-    println(n + " vertices saved to " + fn + '.graphml')
+    else {
+      graph0 = JanusGraphFactory.build().
+                                 set('storage.backend',     config.getString('storage.backend')).
+                                 set('storage.hostname',    config.getString('storage.hostname')).
+                                 set('storage.port',        config.getString('storage.port')).
+                                 set('storage.hbase.table', myName).
+                                 open()
+      }
+    return graph0
     }
-      
+          
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
   def static g = graph.traversal()
 
