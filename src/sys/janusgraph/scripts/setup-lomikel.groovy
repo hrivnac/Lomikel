@@ -171,9 +171,9 @@ class LomikelServer {
       }
     else {
       graph0 = JanusGraphFactory.build().
-                                 set('storage.backend',     config.getString('storage.backend')).
-                                 set('storage.hostname',    config.getString('storage.hostname')).
-                                 set('storage.port',        config.getString('storage.port')).
+                                 set('storage.backend',     'hbase').
+                                 set('storage.hostname',    '@STORAGE.HOSTNAME@').
+                                 set('storage.port',        '@STORAGE.PORT@').
                                  set('storage.hbase.table', myName).
                                  open()
       }
