@@ -177,7 +177,7 @@ class LomikelServer {
           writeGraph(fn)
     }
     
-  def static enhance(alertType, columns) { 
+  def static enhanceAlertsOfInterest(alertType, columns) { 
     def aoi = g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).valueMap().toList()
     def (ip, port, table, schema) = aoi['url'][0][0].split(':')
     def client = new com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient(ip, port);

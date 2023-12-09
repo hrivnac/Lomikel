@@ -243,7 +243,7 @@ class Lomikel {
           writeGraph(fn)
     }
     
-  def static enhance(g, alertType, columns) { 
+  def static enhanceAlertsOfInterest(g, alertType, columns) { 
     def aoi = g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).valueMap().toList()
     def (ip, port, table, schema) = aoi['url'][0][0].split(':')
     def client = new FinkHBaseClient(ip, port);
