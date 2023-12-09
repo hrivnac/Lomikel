@@ -14,7 +14,7 @@ if [[ ! "x" = "x${java_home}" ]]; then
 if [[ ! "x" = "x${graphviz}" ]]; then
   export PATH="${graphviz}/bin:${PATH}"
   fi
-export GREMLIN_CLASSPATH=`pwd`/"${groovy_sql_jar}":`pwd`/"${bsh_jar}" 
+export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}" 
     
 export janusgraph_dir
 export hbase_dir

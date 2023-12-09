@@ -177,7 +177,35 @@ class LomikelServer {
           writeGraph(fn)
     }
     
-          
+  def static enhance(alertType, columns) { 
+    def aoi = g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).valueMap().toList()
+    def (ip, port, table, schema) = aoi['url'][0][0].split(':')
+    def client = new FinkHBaseClient(ip, port);
+    def enhanced = []
+    client.connect(table, schema);
+    g.V().has('lbl', 'AlertsOfInterest').
+          has('alertType', alertType).
+          out().
+          elementMap().
+          each {a -> try {
+                       def results = client.results2List(client.scan(a['objectId'] + '_' + a['jd'],
+                                                                     null,
+                                                                     columns,
+                                                                     0,
+                                                                     false,
+                                                                     false))                     
+                       def alert = g.V().has('lbl', 'alert').has('objectId', a['objectId']).has('jd', a['jd'])
+                       columns.split(',').each {c -> alert.property(c, results[0][c])}
+                       alert.iterate()
+                       enhanced += [a['objectId'] + '_' + a['jd']]
+                       }
+                     catch (Exception e){
+                       println('Cannot enhance ' + a['objectId'] + '_' + a['jd'] + '\n' + e)
+                       }
+                }
+    return enhanced
+    }
+    
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
   def static g = graph.traversal()
 
