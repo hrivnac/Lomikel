@@ -269,10 +269,10 @@ class Lomikel {
                        println('Cannot enhance ' + a['objectId'] + '_' + a['jd'] + '\n' + e)
                        }
                 }
+    g.getGraph().tx().commit()
     return enhanced
     }
 
-  
   def static config    
        
   }

@@ -203,6 +203,7 @@ class LomikelServer {
                        println('Cannot enhance ' + a['objectId'] + '_' + a['jd'] + '\n' + e)
                        }
                 }
+    graph.tx().commit()
     return enhanced
     }
     
