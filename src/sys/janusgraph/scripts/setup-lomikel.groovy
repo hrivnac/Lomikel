@@ -103,6 +103,28 @@ class LomikelServer {
       }
     return sdMap
     }
+      
+  def static dropV(label, n) {
+    def g = graph.traversal()
+    def m = g.V().has('lbl', label).count().next()
+    while (m > 0) {
+      println('' + m + ' ' + label + 's to drop')
+      g.V().has('lbl', label).limit(n).drop().iterate()
+      graph.traversal().tx().commit()
+      m -= n
+      }
+    }
+    
+   def static dropE(label, n) {
+    def g = graph.traversal()
+    def m = g.E().has('lbl', label).count().next()
+    while (m > 0) {
+      println('' + m + ' ' + label + 's to drop')
+      g.E().has('lbl', label).limit(n).drop().iterate()
+      graph.traversal().tx().commit()
+      m -= n
+      }
+    }
     
   def static drop_by_date(importDate, nCommit, tWait) {
     def g = graph.traversal()
@@ -140,6 +162,32 @@ class LomikelServer {
   def static candidates(objectId) {
     return g.V().has('objectId', objectId).out().out().has('lbl', 'candidate')
     }  
+    
+  def static findPCAClusters(edgeName, edgeValue, minSize, maxDist) {
+    def clusters = []
+    def ids = []
+    def sumClusters = 0
+    def i
+    def clusterPCA
+    g.V().has('lbl', 'PCA').each {v -> i = v.id()
+                                       if (!ids.contains(i)) {
+                                         clusterPCA = g.V(i).emit().repeat(union(outE(edgeName).has(edgeValue, lt(maxDist)).inV(),
+                                                                                 inE( edgeName).has(edgeValue, lt(maxDist)).outV()).dedup()).toSet().sort()
+                                         if (clusterPCA.size() >= minSize) {
+                                           def cluster = []
+                                           for (pca in clusterPCA) {
+                                             ids += [pca.id()]
+                                             cluster += [g.V(pca.id()).in().has('lbl', 'source').values('objectId').next()]
+                                             }
+                                           clusters += [cluster]
+                                           sumClusters += cluster.size()
+                                           println '+ ' + cluster.size()
+                                           }
+                                         }
+                                       }
+    println '' + sumClusters + ' sources in ' + clusters.size()  + ' clusters out of ' + g.V().has('lbl', 'PCA').count().next() + ' PCAs' 
+    return clusters
+    }
     
   def static registerAlertOfInterest(alertType, objectId, jd, url) {   
     return g.V().

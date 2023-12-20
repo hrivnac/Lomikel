@@ -208,7 +208,7 @@ class Lomikel {
              next()
     g.getGraph().tx().commit()
     }
-    
+   
   def static myGraph(myName) {
     def graph0
     def g0
@@ -265,7 +265,7 @@ class Lomikel {
                        alert.iterate()
                        enhanced += [a['objectId'] + '_' + a['jd']]
                        }
-                     catch (Exception e){
+                     catch (Exception e) {   
                        println('Cannot enhance ' + a['objectId'] + '_' + a['jd'] + '\n' + e)
                        }
                 }

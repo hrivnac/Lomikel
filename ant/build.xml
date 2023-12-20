@@ -430,6 +430,7 @@
   <target name="war"
           depends="jar"
           description="Create WAR">
+    <echo>Creating Lomikel.war</echo>
  		<copy file="../src/ws/index.jsp"             tofile="../build/index.jsp"   overwrite="true"/>
  		<copy file="../src/ws/Top.jsp"               tofile="../build/Top.jsp"     overwrite="true"/>
  		<copy file="../src/ws/TopMini.jsp"           tofile="../build/TopMini.jsp" overwrite="true"/>
@@ -528,11 +529,7 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </war>
-    </target>
-    
-  <target name="war-FinkBrowser"
-          depends="jar"
-          description="Create WAR for Fink Browser">
+    <echo>Creating FinkBrowser.war</echo>
  		<copy file="../src/ws/index.jsp"         tofile="../build/index.jsp"   overwrite="true"/>
  		<copy file="../src/ws/Top.jsp"           tofile="../build/Top.jsp"     overwrite="true"/>
  		<copy file="../src/ws/TopMini.jsp"       tofile="../build/TopMini.jsp" overwrite="true"/>
@@ -750,10 +747,13 @@
       <arg line="/bin/rm -f ${server_dir}/${user.name}-Lomikel.war"/>
       </exec>
     <exec executable="/usr/bin/sudo">
-      <arg line="/bin/rm -f ${server_dir}/${user.name}-LomikelHadoop.war"/>
+      <arg line="/bin/rm -f ${server_dir}/${user.name}-FinkBrowser.war"/>
       </exec>
     <exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/Lomikel.war ${server_dir}/${user.name}-Lomikel.war"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
+      <arg line="cp ../lib/FinkBrowser.war ${server_dir}/${user.name}-FinkBrowser.war"/>
       </exec>
     </target>
     
@@ -765,14 +765,21 @@
     <exec executable="/usr/bin/ssh">
       <arg line="root@${hostname} '/bin/rm -f ${server_dir}/${user.name}-Lomikel.war'"/>
       </exec>
+    <exec executable="/usr/bin/ssh">
+      <arg line="root@${hostname} '/bin/rm -f ${server_dir}/${user.name}-FinkBrowser.war'"/>
+      </exec>
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/${user.name}-Lomikel.war"/>
+    <copy file="../lib/FinkBrowser.war"
+          tofile="${server_dir}/${user.name}-FinkBrowser.war"/>
     </target>
     
   <target name="deploy-pure"
            if="${cp}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/${user.name}-Lomikel.war"/>
+    <copy file="../lib/FinkBrowser.war"
+          tofile="${server_dir}/${user.name}-FinkBrowser.war"/>
     </target>
   
   <target name="deploy-prod"
@@ -792,10 +799,13 @@
       <arg line="/bin/rm -f ${server_dir}/Lomikel.war"/>
       </exec>
     <exec executable="/usr/bin/sudo">
-      <arg line="/bin/rm -f ${server_dir}/LomikelHadoop.war"/>
+      <arg line="/bin/rm -f ${server_dir}/FinkBrowser.war"/>
       </exec>
     <exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/Lomikel.war ${server_dir}/Lomikel.war"/>
+      </exec>
+    <exec executable="/usr/bin/sudo">
+      <arg line="cp ../lib/Lomikel.war ${server_dir}/FinkBrowser.war"/>
       </exec>
     </target>
     
@@ -807,14 +817,21 @@
     <exec executable="/usr/bin/ssh">
       <arg line="root@${hostname} '/bin/rm -f ${server_dir}/Lomikel.war'"/>
       </exec>
+    <exec executable="/usr/bin/ssh">
+      <arg line="root@${hostname} '/bin/rm -f ${server_dir}/FinkBrowser.war'"/>
+      </exec>
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/Lomikel.war"/>
+    <copy file="../lib/FinkBrowser.war"
+          tofile="${server_dir}/FinkBrowser.war"/>
     </target>
     
   <target name="deploy-prod-pure"
           if="${cp}">
     <copy file="../lib/Lomikel.war"
           tofile="${server_dir}/Lomikel.war"/>
+    <copy file="../lib/FinkBrowser.war"
+          tofile="${server_dir}/FinkBrowser.war"/>
     </target>
  
   <!-- Patch and Restart JanuGraph ==========================================-->
