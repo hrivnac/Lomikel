@@ -208,25 +208,6 @@ class Lomikel {
              next()
     g.getGraph().tx().commit()
     }
-   
-  def static myGraph(myName) {
-    def graph0
-    def g0
-    if (myName == null) {
-      graph0 = JanusGraphFactory.build().
-                                 set('storage.backend', 'inmemory').
-                                 open()
-      }
-    else {
-      graph0 = JanusGraphFactory.build().
-                                 set('storage.backend',     config.getString('storage.backend')).
-                                 set('storage.hostname',    config.getString('storage.hostname')).
-                                 set('storage.port',        config.getString('storage.port')).
-                                 set('storage.hbase.table', myName).
-                                 open()
-      }
-    return graph0
-    }
         
   def static exportAlertsOfInterest(g, alertType, fn) {  
     g.V().has('lbl', 'AlertsOfInterest').
@@ -271,6 +252,25 @@ class Lomikel {
                 }
     g.getGraph().tx().commit()
     return enhanced
+    }
+   
+  def static myGraph(myName) {
+    def graph0
+    def g0
+    if (myName == null) {
+      graph0 = JanusGraphFactory.build().
+                                 set('storage.backend', 'inmemory').
+                                 open()
+      }
+    else {
+      graph0 = JanusGraphFactory.build().
+                                 set('storage.backend',     config.getString('storage.backend')).
+                                 set('storage.hostname',    config.getString('storage.hostname')).
+                                 set('storage.port',        config.getString('storage.port')).
+                                 set('storage.hbase.table', myName).
+                                 open()
+      }
+    return graph0
     }
 
   def static config    
