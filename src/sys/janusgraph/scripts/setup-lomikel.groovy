@@ -243,7 +243,7 @@ class LomikelServer {
                                                                      false,
                                                                      false))                     
                        def alert = g.V().has('lbl', 'alert').has('objectId', a['objectId']).has('jd', a['jd'])
-                       columns.split(',').each {c -> alert.property(c, results[0][c])}
+                       columns.split(',').each {c -> alert.property(c.split(':')[1], results[0][c])}
                        alert.iterate()
                        enhanced += [a['objectId'] + '_' + a['jd']]
                        }
