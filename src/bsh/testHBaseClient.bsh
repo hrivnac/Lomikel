@@ -1,5 +1,5 @@
 // Open HBase database (ip, port)
-com.Lomikel.HBaser.FinkHBaseClient client = new com.Lomikel.HBaser.FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+com.Lomikel.HBaser.HBaseClient client = new com.Lomikel.HBaser.HBaseClient("hbase-1.lal.in2p3.fr", 2183);
 // Connect to table with defined schema
 client.connect("ztf", "schema_2.2_2.0.0");
 // Set maximum number of results

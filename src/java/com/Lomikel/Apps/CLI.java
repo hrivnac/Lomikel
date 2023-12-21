@@ -34,7 +34,7 @@ public abstract class CLI {
     }
 
   /** Execute command line in required way.
-    * @return The execution reesult. */
+    * @return The execution result. */
   public abstract String execute();
   
   /** Close. */

@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class GCLI extends CLI{
+public class GCLI extends CLI {
 
   /** Create. 
     * @param scriptSrc  The additional script to be executed.
@@ -46,7 +46,8 @@ public class GCLI extends CLI{
     }
 
   @Override
-  public void close() {// TBD
+  public void close() {
+    // TBD
     }
     
   /** Load standard init files and setup standard environment.
@@ -74,7 +75,7 @@ public class GCLI extends CLI{
     if (profile() != null) {
       try {
         sr = new StringResource(profile() + ".groovy");
-        if (sr.content() != null) { 
+        if (sr.content() != null) { https://blog.nareshak.com/groovy-scripts-exploring-binding/
           log.info("Loading profile: " + profile());  
           result += _shell.evaluate(sr.content());
           }
