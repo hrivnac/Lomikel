@@ -279,6 +279,18 @@ graph.io(IoCore.graphml()).writeGraph('x.graphml')
 
 g.V().has('lbl', 'ATLAS').outE().subgraph('x').cap('x').next().io(IoCore.graphml()).writeGraph('x.graphml')
 
+g.V().has('lbl', 'alert').
+      repeat(__.outE().
+                subgraph('subGraph').
+                inV()).
+      until(outE().
+            count().
+            is(0)).
+      cap('subGraph').
+      next().
+      io(IoCore.graphml()).
+      writeGraph('/tmp/Alerts2022.09.30.graphml')
+
 graph.io(IoCore.graphml()).readGraph('x.graphml')
 
 // GraphSON

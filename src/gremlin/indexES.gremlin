@@ -7,9 +7,9 @@ graph.tx().rollback()
 mgmt = graph.openManagement()
 
 // Properties
-lbl  = mgmt.getPropertyKey('lbl')
-title= mgmt.getPropertyKey('title')
-name = mgmt.getPropertyKey('name')
+lbl   = mgmt.getPropertyKey('lbl')
+title = mgmt.getPropertyKey('title')
+name  = mgmt.getPropertyKey('name')
 
 // Indexes
 

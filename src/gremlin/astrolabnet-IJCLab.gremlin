@@ -38,42 +38,10 @@ ijclabHBase = g.addV().
                 property('technology', 'HBase').
                 property('url',        '134.158.74.54:2183:ztf:schema').
                 next()
-                                        
-latestAlertsIJCLab100    = g.addV('AlertsCollection').
-                             property('lbl', 'AlertsCollection').
-                             property('title', 'Latest IJCLab Alerts(100min)').
-                             property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&latest=100').
-                             next()
-latestAlertsIJCLab1000   = g.addV('AlertsCollection').
-                             property('lbl', 'AlertsCollection').
-                             property('title', 'Latest IJCLab Alerts(1000min)').
-                             property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&latest=1000').
-                             next()
-latestAlertsIJCLab10000  = g.addV('AlertsCollection').
-                             property('lbl', 'AlertsCollection').
-                             property('title', 'Latest IJCLab Alerts(10000min)').
-                             property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&latest=10000').
-                             next()
-latestAlertsIJCLab100000 = g.addV('AlertsCollection').
-                             property('lbl', 'AlertsCollection').
-                             property('title', 'Latest IJCLab Alerts(100000min)').
-                             property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&latest=100000').
-                             next()
-bestAlertsIJCLab = g.addV('AlertsCollection').
-                     property('lbl', 'AlertsCollection').
-                     property('title', 'Best IJCLab Alerts').
-                     property('hbase', 'HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&limit=100&filters=key:key:ZTF19acmdpyr&selects=*').
-                     next()
 
 g.V(astrolabnet).addE('has').to(ijclab).iterate()
 g.V(ijclab).addE('has').to(imports).iterate()
 g.V(ijclab).addE('from').to(ijclabGraph).iterate()
 g.V(ijclab).addE('from').to(ijclabHBase).iterate()
-g.V(ijclab).addE('holds').to(latestAlertsIJCLab100).iterate()
-g.V(ijclab).addE('holds').to(latestAlertsIJCLab1000).iterate()
-g.V(ijclab).addE('holds').to(latestAlertsIJCLab10000).iterate()
-g.V(ijclab).addE('holds').to(latestAlertsIJCLab100000).iterate()
-g.V(ijclab).addE('holds').to(bestAlertsIJCLab).iterate()
-//g.V().hasLabel('alert').limit(10).addE('contains').from(g.V().hasLabel('AlertsCollection').has('title', 'Latest Local Alerts'))
 
 graph.traversal().tx().commit()
