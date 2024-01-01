@@ -49,6 +49,11 @@ public class LUC {
       _cli = new GCLI(null,
                       null);
       }
+    else if (CLI.api().equals("python") ) {
+      log.info("Starting Lomikel Universal Client in Python");
+      _cli = new PYCLI(null,
+                       null);
+      }
     else {
       log.fatal("Unknown api language " + CLI.api());
       return "FATAL: Unknown api language " + CLI.api();

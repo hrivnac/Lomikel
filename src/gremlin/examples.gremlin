@@ -279,7 +279,7 @@ graph.io(IoCore.graphml()).writeGraph('x.graphml')
 
 g.V().has('lbl', 'ATLAS').outE().subgraph('x').cap('x').next().io(IoCore.graphml()).writeGraph('x.graphml')
 
-g.V().has('lbl', 'alert').
+g.V().has('lbl', 'PCA').
       repeat(__.outE().
                 subgraph('subGraph').
                 inV()).
@@ -289,7 +289,7 @@ g.V().has('lbl', 'alert').
       cap('subGraph').
       next().
       io(IoCore.graphml()).
-      writeGraph('/tmp/Alerts2022.09.30.graphml')
+      writeGraph('/tmp/pca.graphml')
 
 graph.io(IoCore.graphml()).readGraph('x.graphml')
 

@@ -73,7 +73,7 @@ public abstract class CLI {
                                    .withArgName("file")
                                    .create("s"));
     options.addOption(OptionBuilder.withLongOpt("api")
-                                   .withDescription("cli language: [bsh|groovy]")
+                                   .withDescription("cli language: [bsh|groovy|python]")
                                    .hasArg()
                                    .withArgName("language")
                                    .create("a"));
