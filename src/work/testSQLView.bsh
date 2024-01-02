@@ -1,0 +1,10 @@
+// create SQL view of HBase table
+// lomikel -b -s testSQLView.bsh
+
+com.Lomikel.HBaser.HBaseClient client = new com.Lomikel.HBaser.HBaseSQLClient("hbase-1.lal.in2p3.fr", 2183);
+client.connect("ztf", "schema_2.2_2.0.0");
+sql = client.sqlViewCreationCommand();
+
+// results = client.scan("select ROWKEY,\"candid\",\"ra\" from \"ztf\" limit 1", true);
+// print(results); 
+// print(sql);
