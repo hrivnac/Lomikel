@@ -94,7 +94,8 @@ public class PYCLI extends CLI {
         sf = new StringFile(source());
         if (sf.content() != null) {
           log.info("Sourcing " + source());
-          result += _interpreter.eval(sf.content());
+          //result += _interpreter.eval(sf.content());
+          _interpreter.exec(sf.content());
           }
         }
       catch (LomikelException e) {
