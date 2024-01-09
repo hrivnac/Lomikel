@@ -100,7 +100,7 @@ public class BSCLI extends CLI {
       f.getContentPane().add(north, BorderLayout.NORTH);
 
       JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-      _console = new Console();
+      _console = new BSConsole();
       center.setLeftComponent(_console);
       f.getContentPane().add(center, BorderLayout.CENTER);
       
@@ -120,11 +120,10 @@ public class BSCLI extends CLI {
         _interpreter.print(_msg);
         }
       }
-    String result = setupInterpreter();
     if (!batch() && !web()) {
       new Thread(_interpreter).start();
       }
-    return result;
+    return setupInterpreter();
     }
     
   @Override
@@ -210,7 +209,7 @@ public class BSCLI extends CLI {
       catch (EvalError e) {
         log.error("Can't evaluate standard BeanShell expression", e);
         }
-      }
+      }   
     // Source embedded script
     if (scriptSrc() != null) {
       try {
@@ -261,7 +260,7 @@ public class BSCLI extends CLI {
     
   private Interpreter _interpreter;
   
-  private static Console _console;
+  private static BSConsole _console;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(BSCLI.class);

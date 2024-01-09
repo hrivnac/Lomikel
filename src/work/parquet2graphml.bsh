@@ -22,7 +22,13 @@ file       = "/tmp/graph_index_0000001.graphml";
 reader  = new ParquetReader("hdfs://134.158.75.222:8020");
 clientG = new StringGremlinClient(hostG, portG);
 
+// read a list of selected interesting alert (objectId + jd) from pregenerated parquet file
+// that list can be create in any other way
+// or subscription can be created to automaticaly collect interesting incomming alerts  
+
 reader.process("/user/julien.peloton/graph_index_0000001.parquet", "parquet");
+
+// register those alerts in graph inder AlertsOfInterest collection vertex
 
 for (String rowkey : reader.props()["index"]) {
   rk = rowkey.split("_");
@@ -30,8 +36,17 @@ for (String rowkey : reader.props()["index"]) {
   clientG.interpret(cmd);
   }
 
+// fill alert vertices with attributes from HBase
+
 clientG.interpret("LomikelServer.enhanceAlertsOfInterest('" + collection + "', '" + columns + "')");
+
+// export all alerts unxder selected AlertsOfInterest into GraphML file
+// which can be read in graph-processing frameworks
+
 clientG.interpret("LomikelServer.exportAlertsOfInterest('" + collection + "', '" + file + "')");
+
+// graphml file can be created locally using JanusGraph gremlin console:
+// Lomikel.exportAlertsOfInterest(g, 'graph_index_0000001', '/tmp/x.graphml')
 
 
  

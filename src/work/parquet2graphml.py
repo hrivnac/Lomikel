@@ -30,4 +30,8 @@ for rowkey in reader.props()["index"]:
   clientG.interpret(cmd);
 
 
+clientG.interpret("LomikelServer.enhanceAlertsOfInterest('" + collection + "', '" + columns + "')");
 clientG.interpret("LomikelServer.exportAlertsOfInterest('" + collection + "', '" + file + "')")
+
+# graphml file can be created locally using JanusGraph gremlin console:
+# Lomikel.exportAlertsOfInterest(g, 'graph_index_0000001', '/tmp/x.graphml')

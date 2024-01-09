@@ -10,6 +10,7 @@ import org.apache.commons.cli.CommandLine;
 // Groovy
 import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
+import groovy.ui.Console;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -33,11 +34,13 @@ public class GCLI extends CLI {
   @Override
   public String execute() {
     _sharedData = new Binding();
-    if (batch()) {
+    if (batch() || web()) {
       _shell = new GroovyShell(_sharedData);
       }
     else if (gui()) {
-      _shell = new GroovyShell(_sharedData);
+      _console = new GConsole(_sharedData);
+      _shell = _console.getShell();
+      new Thread(_console).start();
       }
     else {
       _shell = new GroovyShell(_sharedData);
@@ -142,8 +145,10 @@ public class GCLI extends CLI {
   public GroovyShell shell() {
     return _shell;
     }  
+    
+  private GConsole _console;  
      
-  protected static Binding     _sharedData;
+  protected static Binding  _sharedData;
   
   protected static GroovyShell _shell;
  

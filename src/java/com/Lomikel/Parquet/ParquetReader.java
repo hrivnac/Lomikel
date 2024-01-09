@@ -23,21 +23,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.Configuration;
-
-// Java
-import java.io.File;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Base64;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.temporal.JulianFields;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.column.page.PageReadStore;
@@ -51,6 +36,22 @@ import org.apache.parquet.io.MessageColumnIO;
 import org.apache.parquet.io.RecordReader;
 import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.Type;
+
+// Java
+import java.io.File;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Base64;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.JulianFields;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -130,7 +131,7 @@ public class ParquetReader {
     MessageType schema = readFooter.getFileMetaData().getSchema();
     ParquetFileReader r = new ParquetFileReader(_conf, path, readFooter);
     PageReadStore pages = null;
-    Map<String, List<String>> props = new TreeMap<>();
+    Map<String, Set<String>> props = new TreeMap<>();
     while (null != (pages = r.readNextRowGroup())) {
       final long rows = pages.getRowCount();
       log.info("Reading " + rows + " rows");      
@@ -162,26 +163,26 @@ public class ParquetReader {
           jt = type.getType(i).toString().split(" "); // optionality, type, name, ...
           switch (jt[1]) {
             case "int32":
-              addToList(jt[2], "" + g.getInteger(i, j));
+              addToSet(jt[2], "" + g.getInteger(i, j));
               break;
             case "int64":
-              addToList(jt[2], "" + g.getLong(i, j));
+              addToSet(jt[2], "" + g.getLong(i, j));
               break;
             case "int96":
-              addToList(jt[2], "" + int96toTimestamp(g.getInt96(i, j).getBytes()));
+              addToSet(jt[2], "" + int96toTimestamp(g.getInt96(i, j).getBytes()));
               break;
             case "float":
-              addToList(jt[2], "" + g.getFloat(i, j));
+              addToSet(jt[2], "" + g.getFloat(i, j));
               break;
             case "double":
-              addToList(jt[2], "" + g.getDouble(i, j));
+              addToSet(jt[2], "" + g.getDouble(i, j));
               break;
             case "binary":
               if (jt.length == 4 && jt[3].equals("(STRING)")) {
-                addToList(jt[2], g.getString(i, j));
+                addToSet(jt[2], g.getString(i, j));
                 }
               else {
-                addToList(jt[2], Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
+                addToSet(jt[2], Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
                 }
               break;
             case "group":
@@ -202,19 +203,19 @@ public class ParquetReader {
     }
 
   /** Add value to {@link Map} of values.
-    * @param name  The name of value to add to the {@link List} of its values.
+    * @param name  The name of value to add to the {@link Set} of its values.
     * @param value The value to add to the {@link List} of values.*/
-  private void addToList(String                    name,
-                         String                    value) {
-    List<String> list;
+  private void addToSet(String name,
+                        String value) {
+    Set<String> set;
     if (_props.containsKey(name)) {
-      list = _props.get(name);
+      set = _props.get(name);
       }
     else {
-      list = new ArrayList<>();
+      set = new HashSet<>();
       }
-    list.add(value);
-    _props.put(name, list);
+    set.add(value);
+    _props.put(name, set);
     }
     
   /** Transform timestamp from int96 to {@link LocalDateTime}.
@@ -241,12 +242,12 @@ public class ParquetReader {
     }
  
   /** Give all read properties.
-    * @return The read properties as name -&gt; list of values. */
-  public Map<String, List<String>> props() {
+    * @return The read properties as name -&gt; set of values. */
+  public Map<String, Set<String>> props() {
     return _props;
     }
     
-  private Map<String, List<String>> _props = new TreeMap<>();       
+  private Map<String, Set<String>> _props = new TreeMap<>();       
   
   private static Configuration _conf;
   

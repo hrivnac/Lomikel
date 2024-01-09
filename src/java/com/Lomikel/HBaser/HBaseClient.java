@@ -165,7 +165,8 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       }
     else {
       Map<String, Map<String, String>> schemas = null;
-      setLimit(Integer.MAX_VALUE);
+      setLimit(      Integer.MAX_VALUE);
+      setSearchLimit(Integer.MAX_VALUE);
       try {
         if (schemaName.equals("")) {
           log.info("Using the most recent schema");
@@ -259,7 +260,8 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
              ", search: " + searchMsg + 
              ", filter: " + filter +
              ", interval: " + start + " ms - " + stop + " ms" +
-             ", id/time: " + ifkey + "/" + iftime);
+             ", id/time: " + ifkey + "/" + iftime +
+             ", searchLimit/resultLimit: " + searchLimit() + "/" + limit());
     long time = System.currentTimeMillis();
     if (stop == 0) {
       stop = System.currentTimeMillis();
@@ -455,17 +457,16 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         _rs = table().getScanner(scan);
         int i = 0;
         for (Result r : _rs) {
-          if (i == limit()) {
+          if (i <= limit()) {
             break;
             }
-          i++;
           result = new TreeMap<>();
           if (addResult(r, result, filter, ifkey, iftime)) {
             results.put(Bytes.toString(r.getRow()), result);
             processResults(results);
+            i++;
             }
           }
-        log.info("" + i + " entries found");
         }
       catch (IOException e) {
         log.error("Cannot search", e);
@@ -707,7 +708,6 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     log.info("Setting search limit " + limit);
     _limit0 = limit;
     }
-    
     
   /** Give the limit for the number of searched results (before eventual evaluation).
     * @retrun The limit for the number of searched esults. */
