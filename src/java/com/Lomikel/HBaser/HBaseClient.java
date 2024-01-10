@@ -457,7 +457,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         _rs = table().getScanner(scan);
         int i = 0;
         for (Result r : _rs) {
-          if (i <= limit()) {
+          if (i >= limit()) {
             break;
             }
           result = new TreeMap<>();
