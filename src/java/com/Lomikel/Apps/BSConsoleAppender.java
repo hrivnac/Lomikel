@@ -20,10 +20,10 @@ public class BSConsoleAppender extends AppenderSkeleton {
     String loggerName = event.getLoggerName();
     loggerName = loggerName.substring(loggerName.lastIndexOf(".") + 1, loggerName.length());
     if (event.getLevel().equals(Level.INFO)) {
-      Console.setText(loggerName + ": " + event.getMessage().toString());
+      BSConsole.setText(loggerName + ": " + event.getMessage().toString());
       }
     else if (event.getLevel().isGreaterOrEqual(Level.WARN)) {
-      Console.setError(loggerName + ": " + event.getMessage().toString());
+      BSConsole.setError(loggerName + ": " + event.getMessage().toString());
       }
     }
 
