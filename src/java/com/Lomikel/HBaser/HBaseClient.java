@@ -497,6 +497,11 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       return false;
       }
     String key = Bytes.toString(r.getRow());
+    // when schema is already loaded => ignore schema rows
+    if (key.startsWith("schema") && schema() != null) {
+      return false;
+      }
+    // evaluate non-schema rows
     if (!key.startsWith("schema") &&_evaluator != null && !evaluateResult(r)) {
       return false;
       }
