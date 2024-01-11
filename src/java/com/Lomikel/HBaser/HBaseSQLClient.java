@@ -322,7 +322,9 @@ public class HBaseSQLClient extends HBaseClient {
   public void close() {
     log.debug("Closing");
     try {
-      _conn.close();
+      if (_conn != null) {
+        _conn.close();
+        }
       }
     catch (SQLException e) {
       log.warn("Cannot close JDBC", e);

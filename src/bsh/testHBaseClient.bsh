@@ -37,7 +37,7 @@ print(client.results2String(results));
 // May use Evaluator for numerical columns
 // Available comparators: exact, prefix, substring (default), regex
 results = client.scan(null,
-                      "d:cdsxmatch:YSO:exact,random:random:0.5",
+                      "d:cdsxmatch:YSO:exact,
                       "i:candid,d:cdsxmatch",
                       0,
                       true,

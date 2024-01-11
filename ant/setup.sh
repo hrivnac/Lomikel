@@ -15,7 +15,7 @@ if [[ ! "x" = "x${graphviz}" ]]; then
   export PATH="${graphviz}/bin:${PATH}"
   fi
 export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}" 
-export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${phoenix_jar}":`${hadoop_dir}/bin/hadoop classpath --glob`
+export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${phoenix_jar}":`${hbase_dir}/bin/hbase classpath --glob`:`${hadoop_dir}/bin/hadoop classpath --glob`
     
 export janusgraph_dir
 export hbase_dir

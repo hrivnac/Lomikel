@@ -320,11 +320,15 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         log.error("Cannot set time range " + start + " - " + stop);
         }
       // Search
-      if (searchMap != null && !searchMap.isEmpty()) {
+      if (searchMap == null) {
+        searchMap = new SearchMap();
+        }
+      // if (searchMap != null && !searchMap.isEmpty()) {
+      if (searchMap != null) {
         List<Filter> filters = new ArrayList<>();
         String firstKey = null;
         String lastKey  = null;
-        boolean onlyKeys = true;
+        boolean onlyKeys = !searchMap.isEmpty(); // if empty searchMap => no keys, so not onlyKeys
         SortedSet<String> allKeys = new TreeSet<>();
         for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap.map()).entrySet()) {
           fc = entry.getKey().split(":");
