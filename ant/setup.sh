@@ -14,10 +14,16 @@ if [[ ! "x" = "x${java_home}" ]]; then
 if [[ ! "x" = "x${graphviz}" ]]; then
   export PATH="${graphviz}/bin:${PATH}"
   fi
-export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}" 
-export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${phoenix_jar}":`${hbase_dir}/bin/hbase classpath --glob`:`${hadoop_dir}/bin/hadoop classpath --glob`
+HADOOP_CLASSPATH=`${hadoop_dir}/bin/hadoop classpath --glob`
+HBASE_CLASSPATH=`${hbase_dir}/bin/hbase classpath --glob`
+for JAR in ${janusgraph_dir}/*.jar; do
+  JANUSGRAPH_CLASSPATH=${JANUSGRAPH_CLASSPATH}:${JAR} 
+  done
+export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${phoenix_jar}:${HBASE_CLASSPATH}:${HADOOP_CLASSPATH}:${JANUSGRAPH_CLASSPATH}"
+export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}"
     
 export janusgraph_dir
+export hadoop_dir
 export hbase_dir
 export gremlin_dir
 export zookeeper

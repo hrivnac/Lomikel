@@ -89,18 +89,6 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     _conf = HBaseConfiguration.create();
     if (zookeepers != null) {
       _conf.set("hbase.zookeeper.quorum", zookeepers);
-      _conf.set("hbase.client.scanner.timeout.period", "100000");
-      //_conf.set("hbase.client.pause", "50"); 
-      //_conf.set("hbase.client.retries.number", "30"); 
-      //_conf.set("hbase.client.operation.timeout", "30000"); 
-      //_conf.set("hbase.client.retries.number", "3");
-      //_conf.set("hbase.client.pause", "1000");
-      //_conf.set("hbase.client.ipc.pool.type", "RoundRobin");
-      //_conf.set("hbase.client.ipc.pool.size", "128");
-      //_conf.set("hbase.rpc.timeout", "20000"); 
-      //_conf.set("hbase.cells.scanned.per.heartbeat.check", "10000");
-      //_conf.set("zookeeper.session.timeout", "10000");
-      //_conf.set("zookeeper.recovery.retry", "3");
       }
     if (clientPort != null) {
       _conf.set("hbase.zookeeper.property.clientPort", clientPort);
@@ -139,19 +127,35 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   public Table connect(String tableName,
                        String schemaName) throws LomikelException {
      return connect(tableName, schemaName, 0);
-     }     
+     }  
      
   @Override
   public Table connect(String tableName,
                        String schemaName,
                        int    timeout) throws LomikelException {
+     return connect(tableName, schemaName, timeout, 0);
+     }     
+     
+  @Override
+  public Table connect(String tableName,
+                       String schemaName,
+                       int    timeout,
+                       int    retries) throws LomikelException {
     // Table setup
     log.info("Connecting to " + tableName);
     setTableName(tableName);
     if (timeout > 0) {
-      String tout = String.valueOf(timeout);
-      _conf.set("hbase.rpc.timeout",                   tout);
-      _conf.set("hbase.client.scanner.timeout.period", tout);
+      log.info("\tglobal timeout = " + timeout);
+      _conf.setInt("hbase.rpc.timeout",                   timeout);
+      _conf.setInt("hbase.client.scanner.timeout.period", timeout);
+      _conf.setInt("hbase.client.operation.timeout",      timeout); 
+      _conf.setInt("zookeeper.session.timeout",           timeout);
+      _conf.setInt("hbase.client.pause",                  timeout); 
+      }
+    if (retries > 0) {
+      log.info("\tglobal retries = " + retries);
+      _conf.setInt("zookeeper.recovery.retry",            retries);
+      _conf.setInt("hbase.client.retries.number",         retries);
       }
     try {
       _table = _connection.getTable(TableName.valueOf(tableName()));
@@ -868,6 +872,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _dateFormat;
     }
  
+  /** Give the ${link Configuration}.
+    * @return The ${link Configuration}. */
+  public Configuration conf() {
+    return _conf;
+    }
+    
   private Table _table;
   
   private Configuration _conf;

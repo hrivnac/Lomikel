@@ -52,6 +52,19 @@ public abstract class Client<T, S extends Schema> {
                             String schemaName,
                             int    timeout) throws LomikelException;
    
+  /** Connect to the table.
+    * @param tableName  The table name.
+    * @param schemaName The name of the {@link Schema} row.
+    *                   <tt>null</tt> means to ignore schema,
+    *                   empty {@link String} will take the latest one. 
+    * @param timeout    The timeout in ms (may be <tt>0</tt>).
+    * @param timeout    The retries (may be <tt>0</tt>).
+    * @return           The assigned table.
+    * @throws LomikelException If anything goes wrong. */
+  public abstract T connect(String tableName,
+                            String schemaName,
+                            int    timeout,
+                            int    retries) throws LomikelException;
   @Override
   protected void finalize() throws Throwable {
     close();
@@ -170,7 +183,7 @@ public abstract class Client<T, S extends Schema> {
     * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
     *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
     *                  <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
-    *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
+    *                  {@link Comparator} can be chosen as <tt>family:column:value:comparator-value</tt>
     *                  among <tt>exact,prefix,substring,regex</tt>.
     *                  The default for key is <tt>prefix</tt>,
     *                  the default for columns is <tt>substring</tt>.

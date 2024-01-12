@@ -86,9 +86,12 @@
 
 <h4><a name="CLI">Command Line</a></h4>
 <pre style="color:blue; font-size:60%; background-color:#eeeeee">
-$ java -jar ../lib/Lomikel.exe.jar -h
+<a href="Lomikel.exe.jar">Lomikel.exe.jar</a>
+# you only need Phoenix, Hadoop and HBase if you use them
+$ alias lomikel='CLASSPATH=Lomikel.exe.jar:${PHOENIX_JAR}:`${HBASE_HOME}/bin/hbase classpath --glob`:`${HADOOP_HOME}/bin/hadoop classpath --glob` java com.Lomikel.Apps.LUC'
+$ lomikel -h
 usage: java -jar Lomikel.exe.jar
- -a,--api             script8ng language to use (default bsh, also available: python, groovy)
+ -a,--api             scripting language to use (default bsh, also available: python, groovy)
  -b,--batch           run in a batch
  -g,--gui             run in a graphical windowile
  -h,--help            show help

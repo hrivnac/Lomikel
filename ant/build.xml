@@ -283,7 +283,8 @@
       <zipfileset includes="**/*" src="${groovysh_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${parquethadoop_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${jython_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-beanutils-core-1.8.0.jar" excludes="META-INF/*"/>
+      
+      <!--zipfileset includes="**/*" src="${hbase_dir}/lib/commons-beanutils-core-1.8.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-cli-1.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-codec-1.10.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-collections-3.2.2.jar" excludes="META-INF/*"/>
@@ -300,7 +301,8 @@
       <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-net-3.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/gson-2.2.4.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/guice-3.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/guice-servlet-3.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/guice-servlet-3.0.jar" excludes="META-INF/*"/-->
+      
       <!--zipfileset includes="**/*" src="${hbase_dir}/lib/hadoop-annotations-2.8.5.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hadoop-auth-2.8.5.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hadoop-client-2.8.5.jar" excludes="META-INF/*"/>
@@ -355,7 +357,8 @@
       <zipfileset includes="**/*" src="${hbase_dir}/lib/xz-1.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/zookeeper-3.4.10.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/htrace-core4-4.2.0-incubating.jar" excludes="META-INF/*"/-->
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.3.1.jar" excludes="META-INF/*"/>
+      
+      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.3.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-codec-1.15.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-collections-3.2.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-configuration-1.10.jar" excludes="META-INF/*"/>
@@ -406,8 +409,7 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-log4j12-1.7.30.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snakeyaml-1.28.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spatial4j-0.8.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.5.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.5.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.5.3.jar" excludes="META-INF/*"/-->
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -1091,6 +1093,13 @@
   <target name="dist"
           depends="jar"
           description="Construct distribution">
+    <mkdir dir="../dist"/>
+    <copy todir="../dist">
+			<fileset dir="../lib" includes="*.jar"/>
+			<fileset dir="../extlib/import" includes="*.jar"/>
+			<file file="${phoenix_jar}"/>
+      </copy>
+    <exec executable="../src/sh/packExtJars.sh"/>
   </target>
 
   <!-- Check ================================================================-->
@@ -1222,6 +1231,7 @@
       </delete>
  		<copy todir="${doc}" force="true">
 			<fileset dir="../doc" includes="**/*"/>
+			<fileset dir="../lib" includes="Lomikel.exe.jar"/>
       </copy>
     </target>
 
