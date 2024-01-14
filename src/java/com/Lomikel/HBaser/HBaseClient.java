@@ -89,6 +89,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     _conf = HBaseConfiguration.create();
     if (zookeepers != null) {
       _conf.set("hbase.zookeeper.quorum", zookeepers);
+      _conf.setInt("hbase.client.scanner.timeout.period", 100000);
       }
     if (clientPort != null) {
       _conf.set("hbase.zookeeper.property.clientPort", clientPort);
@@ -492,11 +493,11 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * @param ifkey   Whether add also entries keys (as <tt>key:key</tt>).
     * @param iftime  Whether add also entries timestamps (as <tt>key:time</tt>).
     * @return        Whether the result has been added. */
-  private boolean addResult(Result              r,
-                            Map<String, String> result,
-                            String              filter,
-                            boolean             ifkey,
-                            boolean             iftime) {
+  protected boolean addResult(Result              r,
+                              Map<String, String> result,
+                              String              filter,
+                              boolean             ifkey,
+                              boolean             iftime) {
     if (r == null) {
       return false;
       }
