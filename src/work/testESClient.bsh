@@ -14,7 +14,7 @@ FinkHBaseESClient chb = new FinkHBaseESClient("hbase-1.lal.in2p3.fr", 2183);
 
 chb.connect("ztf", "schema_2.2_2.0.0");
 chb.setLimit(10);
-chb.connectElasticSearch("http://134.158.74.85:20200", "radec");
+chb.connectElasticSearch("http://134.158.74.85:20200", "testradec");
 chb.scan(null,
          "key:key:ZTF17aaaaaa:prefix,d:cdsxmatch:YSO:exact",
          "i:candid,i:ra,i:dec",

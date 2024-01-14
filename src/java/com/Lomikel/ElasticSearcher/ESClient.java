@@ -67,7 +67,7 @@ public class ESClient {
     log.info("Inserting " + jsonCmd);
     SmallHttpClient httpClient = new SmallHttpClient();
     String answer = httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
-    log.info(answer);
+    //log.info(answer);
     }
     
   /** Search <em>ra,dec</em> <em>GeoPoint</em>s from index.
