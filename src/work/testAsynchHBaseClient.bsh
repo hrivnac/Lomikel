@@ -18,3 +18,14 @@ while (c.scanning() || c.size() > 0) {
     }
   }
 c.stop();
+
+c.setLimit(1000);
+c.restrictedScan(null,
+                 null,
+                 "i:ra,i:dec",
+                 0,
+                 0,
+                 true,
+                 true,
+                 10);
+
