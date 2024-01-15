@@ -164,14 +164,14 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     catch (IOException e) {
       throw new LomikelException("Cannot connect to " + _table);
       }
+    setLimit(      Integer.MAX_VALUE);
+    setSearchLimit(Integer.MAX_VALUE);
     // Schema search
     if (schemaName == null) {
       log.info("Not using schema");
       }
     else {
       Map<String, Map<String, String>> schemas = null;
-      setLimit(      Integer.MAX_VALUE);
-      setSearchLimit(Integer.MAX_VALUE);
       try {
         if (schemaName.equals("")) {
           log.info("Using the most recent schema");

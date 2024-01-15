@@ -80,8 +80,8 @@ client.close();
 // -----------------------------------------------------------------------------
 
 // Get all schemas
-com.Lomikel.HBaser.HBaseSQLClient client = new com.Lomikel.HBaser.HBaseSQLClient("hbase-1.lal.in2p3.fr", 2183);
-client.connect("ztf");
+com.Lomikel.HBaser.HBaseClient client = new com.Lomikel.HBaser.HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client.connect("ztf", null);
 results = client.scan(null,
                       "key:key:schema:prefix",
                       null,

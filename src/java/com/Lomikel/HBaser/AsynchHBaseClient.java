@@ -111,14 +111,16 @@ public class AsynchHBaseClient extends HBaseClient
       while (true) {
         if (_doscan) {
           log.info("Starting asynchronous scan");
-          super.scan(_scanKey,
-                     _scanSearch,
-                     _scanFilter,
-                     _scanDelay,
-                     _scanIfkey,
-                     _scanIftime);
-          _doscan   = false;
           _scanning = true;
+          scan(_scanKey,
+               _scanSearch,
+               _scanFilter,
+               _scanStart,
+               _scanStop,
+               _scanIfkey,
+               _scanIftime);
+          _doscan   = false;
+          _scanning = false;
           }
         Thread.sleep(1000);
         }
@@ -128,25 +130,43 @@ public class AsynchHBaseClient extends HBaseClient
       }
     }
     
-  /** Start scan assynchronously. */
-  @Override
-  public Map<String, Map<String, String>> scan(String  key,
-                                               String  search,
-                                               String  filter,
-                                               long    delay,
-                                               boolean ifkey,
-                                               boolean iftime) {
-    if (key != null && key.startsWith("schema")) {
-      return super.scan(key, search, filter, delay, ifkey, iftime);
-      }
-    else if (_doscan == true || _scanning == true) {
+  /** Start scan assynchronously.
+    * @param key     The row key. Disables other search terms.
+    *                It can be <tt>null</tt>.
+    * @param search  The search terms as <tt>family:column:value,...</tt>.
+    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                among <tt>exact,prefix,substring,regex</tt>.
+    *                The default for key is <tt>prefix</tt>,
+    *                the default for columns is <tt>substring</tt>.
+    *                The randomiser can be added with <tt>random:random:chance</tt>.
+    *                It can be <tt>null</tt>.
+    *                All searches are executed as prefix searches.    
+    * @param filter  The names of required values as <tt>family:column,...</tt>.
+    *                <tt>*</tt> = all.
+    * @param start   The time period start timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means since the beginning.
+    * @param stop    The time period stop timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means till now.
+    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>). */
+  public void startScan(String  key,
+                        String  search,
+                        String  filter,
+                        long    start,
+                        long    stop,
+                        boolean ifkey,
+                        boolean iftime) {
+    if (_doscan == true || _scanning == true) {
       log.error("Already scanning, new request ignored");
       }
     else {
       _scanKey    = key;
       _scanSearch = search;
       _scanFilter = filter;
-      _scanDelay  = delay;
+      _scanStart  = start;
+      _scanStop   = stop;
       _scanIfkey  = ifkey;
       _scanIftime = iftime;
       _doscan     = true;
@@ -154,7 +174,6 @@ public class AsynchHBaseClient extends HBaseClient
       }
     _thread = new Thread(this);
     _thread.start();
-    return null;
     }
   
   /** Add results into {@link ConcurrentLinkedQueue}
@@ -208,6 +227,10 @@ public class AsynchHBaseClient extends HBaseClient
   public void stop() {
     _thread.interrupt();
     }
+    
+  public boolean scanning() {
+    return _scanning;
+    }
         
   private ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
   
@@ -216,7 +239,8 @@ public class AsynchHBaseClient extends HBaseClient
   private String  _scanKey;
   private String  _scanSearch;
   private String  _scanFilter;
-  private long    _scanDelay; 
+  private long    _scanStart;
+  private long    _scanStop;
   private boolean _scanIfkey; 
   private boolean _scanIftime;
     
