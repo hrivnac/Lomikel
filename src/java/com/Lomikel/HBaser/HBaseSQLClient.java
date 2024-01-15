@@ -188,7 +188,8 @@ public class HBaseSQLClient extends HBaseClient {
     return results;
     }
     
-  /** Depending on <tt>_upsert</tt>, upsert results into Phoenix SQL table and clean the {@link Map}. */  
+  /** Depending on <tt>_upsert</tt>, upsert results into Phoenix SQL table
+    * and clean the {@link Map}. */  
   @Override
   protected void processResults(Map<String, Map<String, String>> results) {
     if (_sqlTableName != null) {
@@ -268,8 +269,6 @@ public class HBaseSQLClient extends HBaseClient {
       log.error("Cannot commit", e);
       }
     }
-    
-  private int _n = 0;
 
   /** Upsert into connected SQL Phoenix database.
     * @param sql The SQL <tt>upsert</tt> command. */
@@ -332,6 +331,8 @@ public class HBaseSQLClient extends HBaseClient {
     _conn = null;
     super.close();
     }
+    
+  private int _n = 0;
     
   private HBaseSchema _simpleSchema; 
   

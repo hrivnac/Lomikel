@@ -1,7 +1,7 @@
 // test ES client and connection to ES client from HBaseClient
 
 import com.Lomikel.ElasticSearcher.ESClient;
-import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseESClient;
+import com.Lomikel.HBaser.HBaseESClient;
 
 ESClient ces = new ESClient("http://134.158.74.85:20200");
 
@@ -10,7 +10,7 @@ ces.putGeoPoint("testradec", "point 1", 45.12, -79.34);
 ces.searchGeoPoint("testradec", 45.12, -79.34, 500);
 
 
-FinkHBaseESClient chb = new FinkHBaseESClient("hbase-1.lal.in2p3.fr", 2183);
+HBaseESClient chb = new HBaseESClient("hbase-1.lal.in2p3.fr", 2183);
 
 chb.connect("ztf", "schema_2.2_2.0.0");
 chb.setLimit(10);
