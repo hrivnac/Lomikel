@@ -1,31 +1,33 @@
 // test asynchronous HBaseClient
 
+import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.HBaser.AsynchHBaseClient;
 
-AsynchHBaseClient c = new AsynchHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+HBaseClient c = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
 c.connect("ztf", "schema_3.1_5.6.2");
 c.setLimit(10000);
-c.startScan(null,
-            null,
-            "i:ra,i:dec",
-            0,
-            0,
-            true,
-            true);
-while (c.scanning() || c.size() > 0) {
-  if (c.size() > 0) {
-    print(c.size() + ":\t" + c.poll());
+AsynchHBaseClient ac = new AsynchHBaseClient(c);
+ac.startScan(null,
+             null,
+             "i:ra,i:dec",
+             0,
+             0,
+             true,
+             true);
+while (ac.scanning() || ac.size() > 0) {
+  if (ac.size() > 0) {
+    print(ac.size() + ":\t" + ac.poll());
     }
   }
-c.stop();
+ac.stop();
 
 c.setLimit(1000);
-c.restrictedScan(null,
-                 null,
-                 "i:ra,i:dec",
-                 0,
-                 0,
-                 true,
-                 true,
-                 10);
+ac.restrictedScan(null,
+                  null,
+                  "i:ra,i:dec",
+                  0,
+                  0,
+                  true,
+                  true,
+                  10);
 

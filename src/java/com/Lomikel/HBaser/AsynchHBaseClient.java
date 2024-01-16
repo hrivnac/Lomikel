@@ -21,40 +21,23 @@ import org.apache.log4j.Logger;
 /** <code>AsynchHBaseClient</code> provides {@link HBaseClient} scan asynchronously.
   * Only some methods are available for asynchronous processing.
   * Only one asynchronous scanning {@link Thread} is allowed.
+  * Results are available as {@link List}s instead of {@link Map}s. 
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-// TBD: document: 1) scan gives empty Map, results should be polled; 2) results are not Map, but List
-public class AsynchHBaseClient extends HBaseClient 
-                               implements Runnable {
+public class AsynchHBaseClient implements Runnable, HBaseProcessor {
   
   /** Create and connect to HBase.
     * @param zookeepers The comma-separated list of zookeper ids.
     * @param clientPort The client port. 
     * @throws LomikelException If anything goes wrong. */
-  public AsynchHBaseClient(String zookeepers,
-                           String clientPort) throws LomikelException {
-    super(zookeepers, clientPort);
+  public AsynchHBaseClient(HBaseClient hbc) throws LomikelException {
+    _hbc = hbc;
+    _hbc.setProcessor(this);
     }
-        
-  /** Create and connect to HBase.
-    * @param zookeepers The comma-separated list of zookeper ids.
-    * @param clientPort The client port. 
-    * @throws LomikelException If anything goes wrong. */
-  public AsynchHBaseClient(String zookeepers,
-                           int    clientPort) throws LomikelException {
-    super(zookeepers, clientPort);
-    }
-    
-  /** Create and connect to HBase.
-    * @param url The HBase url.
-    * @throws LomikelException If anything goes wrong. */
-  public AsynchHBaseClient(String url) throws LomikelException {
-    super(url);
-    }
-    
+            
   @Override
   public void run() {
     try {
@@ -62,13 +45,13 @@ public class AsynchHBaseClient extends HBaseClient
         if (_doscan) {
           log.info("Starting asynchronous scan");
           _scanning = true;
-          scan(_scanKey,
-               _scanSearch,
-               _scanFilter,
-               _scanStart,
-               _scanStop,
-               _scanIfkey,
-               _scanIftime);
+          _hbc.scan(_scanKey,
+                    _scanSearch,
+                    _scanFilter,
+                    _scanStart,
+                    _scanStop,
+                    _scanIfkey,
+                    _scanIftime);
           _doscan   = false;
           _scanning = false;
           }
@@ -129,7 +112,7 @@ public class AsynchHBaseClient extends HBaseClient
   /** Add results into {@link ConcurrentLinkedQueue}
     * and clean the {@link Map}. */  
   @Override
-  protected void processResults(Map<String, Map<String, String>> results) {
+  public void processResults(Map<String, Map<String, String>> results) {
     boolean isSchema = false; // BUG: in other subclasses of HBaseClient ?
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (entry.getKey().startsWith("schema")) {
@@ -242,6 +225,8 @@ public class AsynchHBaseClient extends HBaseClient
   public boolean scanning() {
     return _scanning;
     }
+    
+  private HBaseClient _hbc;
         
   private ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
   

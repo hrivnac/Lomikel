@@ -561,9 +561,18 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     }
     
   /** Process results after each insertion of new result.
-    * Empty, may be imlemented in subclasses.
+    * May be imlemented in subclasses or setup via {@link #setProcessor}.
     * @param results The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   protected void processResults(Map<String, Map<String, String>> results) {
+    if (_processor != null) {
+      _processor.processResults(results);
+      }
+    }
+    
+  /** Set {@link HBaseProcessor}.
+    * @param resultsProcessor The {@link HBaseProcessor} to set. */
+  public void setProcessor(HBaseProcessor processor) {
+    _processor = processor;
     }
     
   /** Evaluate {@link Result} using registered formula.
@@ -904,6 +913,8 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   private BinaryDataRepository _repository = new BinaryDataRepository();  
 
   private HBaseEvaluator _evaluator;
+  
+  private HBaseProcessor _processor;
   
   private String _formula;
   
