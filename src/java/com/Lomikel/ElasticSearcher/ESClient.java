@@ -1,7 +1,6 @@
 package com.Lomikel.ElasticSearcher;
 
 import com.Lomikel.Utils.SmallHttpClient;
-import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
 
 // org.json      

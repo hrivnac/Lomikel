@@ -1,7 +1,6 @@
 package com.Lomikel.Apps;
 
 // Groovy
-import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
 import groovy.ui.Console;
 

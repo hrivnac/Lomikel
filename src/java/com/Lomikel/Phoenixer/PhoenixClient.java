@@ -78,6 +78,14 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     setSchema(PhoenixSchema.getSchema(schemaName));
     return tableName;
     }
+    
+  @Override
+  public String connect(String tableName,
+                        String schemaName,
+                        int    timeout,
+                        int    retries) throws LomikelException {
+    return connect(tableName, schemaName, timeout);
+    }
 	  
   @Override
   public void close() {

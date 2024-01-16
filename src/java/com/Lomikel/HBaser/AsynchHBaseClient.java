@@ -1,51 +1,9 @@
 package com.Lomikel.HBaser;
 
-import com.Lomikel.Utils.Init;
-import com.Lomikel.Utils.DateTimeManagement;
-import com.Lomikel.Utils.MapUtil;
-import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.DB.Schema;
-import com.Lomikel.DB.Client;
-import com.Lomikel.DB.SearchMap;
-import com.Lomikel.ElasticSearcher.ESClient;
 
 // HBase
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.TableName ;
-import org.apache.hadoop.hbase.client.Admin;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.Table;
-import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
-import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.filter.Filter;  
-import org.apache.hadoop.hbase.filter.FilterList;  
-import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;  
-import org.apache.hadoop.hbase.filter.RandomRowFilter;  
-import org.apache.hadoop.hbase.filter.RowFilter;  
-import org.apache.hadoop.hbase.filter.PrefixFilter;  
-import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
-import org.apache.hadoop.hbase.filter.BinaryPrefixComparator;
-import org.apache.hadoop.hbase.filter.BinaryComparator;
-import org.apache.hadoop.hbase.filter.RegexStringComparator;
-import org.apache.hadoop.hbase.filter.SubstringComparator;
-import org.apache.hadoop.hbase.filter.MultiRowRangeFilter;
-import org.apache.hadoop.hbase.filter.MultiRowRangeFilter.RowRange;
-
-// Hadoop
-import org.apache.hadoop.conf.Configuration;
 
 // HealPix
 import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
@@ -54,18 +12,8 @@ import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 // Java
 import java.util.List;  
 import java.util.ArrayList;  
-import java.util.Set;
-import java.util.SortedSet;  
-import java.util.TreeSet;  
 import java.util.Map;  
-import java.util.HashMap;  
-import java.util.TreeMap;  
-import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.util.Date;
-import java.util.Arrays;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -78,6 +26,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: document: 1) scan gives empty Map, results should be polled; 2) results are not Map, but List
 public class AsynchHBaseClient extends HBaseClient 
                                implements Runnable {
   
@@ -231,12 +180,12 @@ public class AsynchHBaseClient extends HBaseClient
                                                   int     timelimit) {
     log.info("Starting scan restricted to " + timelimit + "s");
     startScan(key,
-             search,
-             filter,
-             start,
-             stop,
-             ifkey,
-             iftime);
+              search,
+              filter,
+              start,
+              stop,
+              ifkey,
+              iftime);
     long endtime = timelimit + System.currentTimeMillis() / 1000; 
     try {
       while (size() == 0 || scanning()) {
@@ -288,6 +237,8 @@ public class AsynchHBaseClient extends HBaseClient
     _thread.interrupt();
     }
     
+  /** Tell, whether it is actually scanning.
+    * @return Whether it is actually scanning. */
   public boolean scanning() {
     return _scanning;
     }

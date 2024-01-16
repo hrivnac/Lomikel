@@ -1,6 +1,5 @@
 package com.Lomikel.Parquet;
 
-import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.LomikelException;
 
 // Parquet
@@ -35,14 +34,10 @@ import org.apache.parquet.io.ColumnIOFactory;
 import org.apache.parquet.io.MessageColumnIO;
 import org.apache.parquet.io.RecordReader;
 import org.apache.parquet.schema.MessageType;
-import org.apache.parquet.schema.Type;
 
 // Java
-import java.io.File;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;

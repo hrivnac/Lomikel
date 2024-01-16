@@ -10,7 +10,6 @@ import org.apache.commons.cli.CommandLine;
 // Groovy
 import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
-import groovy.ui.Console;
 
 // Log4J
 import org.apache.log4j.Logger;
