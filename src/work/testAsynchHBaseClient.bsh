@@ -22,6 +22,7 @@ while (ac.scanning() || ac.size() > 0) {
 ac.stop();
 
 c.setLimit(1000);
+ac.setLoopWait(500);
 ac.restrictedScan(null,
                   null,
                   "i:ra,i:dec",

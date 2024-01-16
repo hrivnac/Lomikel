@@ -55,7 +55,7 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
           _doscan   = false;
           _scanning = false;
           }
-        Thread.sleep(1000);
+        Thread.sleep(_loopWait);
         }
       }
     catch (Exception e) {
@@ -172,12 +172,12 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
     long endtime = timelimit + System.currentTimeMillis() / 1000; 
     try {
       while (size() == 0 || scanning()) {
-        Thread.sleep(1000);
         log.info("" + size() + " results received, " + (endtime - (System.currentTimeMillis() / 1000)) + "s to end");
-        if (System.currentTimeMillis() / 1000 > endtime) {
+        if (System.currentTimeMillis() / 1000 >= endtime) {
           log.warn("Scanning ended due to time limit");
           break;
           }
+        Thread.sleep(_loopWait);
         }
       }
    catch (InterruptedException e) {
@@ -226,6 +226,13 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
     return _scanning;
     }
     
+  /** Set the time parallel thread waits between actions.
+    * @param t The time parallel thread waits between actions.
+    *          The default is <tt>1s</tt>. */
+  public void setLoopWait(int t) {
+    _loopWait = t;
+    }
+    
   private HBaseClient _hbc;
         
   private ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
@@ -242,6 +249,8 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
     
   private boolean _doscan   = false;  
   private boolean _scanning = false;
+  
+  private int     _loopWait = 1000; // 1s = 1000ms
   
   /** Logging . */
   private static Logger log = Logger.getLogger(AsynchHBaseClient.class);
