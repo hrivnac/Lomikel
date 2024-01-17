@@ -59,7 +59,7 @@ public class AsynchHBaseClient extends    HBaseClient
   public void run() {
     try {
       while (true) {
-        if (_doscan) {
+       if (_doscan) {
           log.info("Starting asynchronous scan");
           _scanning = true;
           setProcessor(new AsynchHBaseProcessor(_queue));
@@ -78,6 +78,8 @@ public class AsynchHBaseClient extends    HBaseClient
         }
       }
     catch (Exception e) {
+      _doscan   = false;
+      _scanning = false;
       log.info("Stopped");
       }
     }
@@ -161,6 +163,7 @@ public class AsynchHBaseClient extends    HBaseClient
                                                boolean iftime,
                                                int     timelimit) {
     log.info("Starting scan restricted to " + timelimit + "s");
+    // run() will start scanning
     startScan(key,
               search,
               filter,
@@ -170,9 +173,11 @@ public class AsynchHBaseClient extends    HBaseClient
               iftime);
     long endtime = timelimit + System.currentTimeMillis() / 1000; 
     try {
-      while (size() == 0) {
+      // wait for first result or stopping
+      while (size() == 0 && _doscan) {
         Thread.sleep(_loopWait / 10);
         }
+      // continue scanning till endtime or completion 
       while (scanning()) {
         log.info("" + size() + " results received, " + (endtime - (System.currentTimeMillis() / 1000)) + "s to end");
         if (System.currentTimeMillis() / 1000 >= endtime) {
@@ -185,7 +190,7 @@ public class AsynchHBaseClient extends    HBaseClient
    catch (InterruptedException e) {
      log.warn("Scanning interrupted");
      }
-   stop();
+   _thread.interrupt();
    log.info(size() + " results accumulated");
    return poll(size());
    }
@@ -219,11 +224,6 @@ public class AsynchHBaseClient extends    HBaseClient
     * @return The number of available results. */
   public int size() {
     return _queue.size();
-    }
-    
-  /** Stop the {@link Thread}. */ 
-  public void stop() {
-    _thread.interrupt();
     }
     
   /** Tell, whether it is actually scanning.
