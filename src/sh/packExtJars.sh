@@ -15,6 +15,7 @@ for J in `ls ${janusgraph_dir}/lib/*jar`; do
   done
   
 for X in HBaseJars JanusJars; do
+  rm -f ${X}.tar*
   tar cvf ../dist/${X}.tar ${X}
   gzip ../dist/${X}.tar
   rm -rf ${X}

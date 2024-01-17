@@ -13,45 +13,64 @@ import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 import java.util.List;  
 import java.util.ArrayList;  
 import java.util.Map;  
+import java.util.TreeMap;  
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 // Log4J
 import org.apache.log4j.Logger;
 
-/** <code>AsynchHBaseClient</code> provides {@link HBaseClient} scan asynchronously.
+/** <code>AsynchHBaseClient</code> provides {@link HBaseClient} scanning asynchronously.
   * Only some methods are available for asynchronous processing.
   * Only one asynchronous scanning {@link Thread} is allowed.
-  * Results are available as {@link List}s instead of {@link Map}s. 
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class AsynchHBaseClient implements Runnable, HBaseProcessor {
-  
+public class AsynchHBaseClient extends    HBaseClient
+                               implements Runnable {
   /** Create and connect to HBase.
     * @param zookeepers The comma-separated list of zookeper ids.
     * @param clientPort The client port. 
     * @throws LomikelException If anything goes wrong. */
-  public AsynchHBaseClient(HBaseClient hbc) throws LomikelException {
-    _hbc = hbc;
-    _hbc.setProcessor(this);
+  public AsynchHBaseClient(String zookeepers,
+                           String clientPort) throws LomikelException {
+    super(zookeepers, clientPort);
     }
-            
+        
+  /** Create and connect to HBase.
+    * @param zookeepers The comma-separated list of zookeper ids.
+    * @param clientPort The client port. 
+    * @throws LomikelException If anything goes wrong. */
+  public AsynchHBaseClient(String zookeepers,
+                           int    clientPort) throws LomikelException {
+    super(zookeepers, clientPort);
+    }
+    
+  /** Create and connect to HBase.
+    * @param url The HBase url.
+    * @throws LomikelException If anything goes wrong. */
+  public AsynchHBaseClient(String url) throws LomikelException {
+    super(url);
+    }
+              
   @Override
+  // BUG: prevent other calls during scan(...)
   public void run() {
     try {
       while (true) {
         if (_doscan) {
           log.info("Starting asynchronous scan");
           _scanning = true;
-          _hbc.scan(_scanKey,
-                    _scanSearch,
-                    _scanFilter,
-                    _scanStart,
-                    _scanStop,
-                    _scanIfkey,
-                    _scanIftime);
+          setProcessor(new AsynchHBaseProcessor(_queue));
+          scan(_scanKey,
+               _scanSearch,
+               _scanFilter,
+               _scanStart,
+               _scanStop,
+               _scanIfkey,
+               _scanIftime);
+          setProcessor(null);
           _doscan   = false;
           _scanning = false;
           }
@@ -100,7 +119,7 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
       _scanFilter = filter;
       _scanStart  = start;
       _scanStop   = stop;
-      _scanIfkey  = ifkey;
+      _scanIfkey  = true;
       _scanIftime = iftime;
       _doscan     = true;
       log.info("Scheduling asynchronous scan");
@@ -108,27 +127,7 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
     _thread = new Thread(this);
     _thread.start();
     }
-  
-  /** Add results into {@link ConcurrentLinkedQueue}
-    * and clean the {@link Map}. */  
-  @Override
-  public void processResults(Map<String, Map<String, String>> results) {
-    boolean isSchema = false; // BUG: in other subclasses of HBaseClient ?
-    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      if (entry.getKey().startsWith("schema")) {
-        isSchema = true;
-        break;
-        }
-      _queue.add(entry.getValue());
-      }
-    if (isSchema) {
-      isSchema = false;
-      }
-    else {
-      results.clear();
-      }
-    }
-    
+      
   /** Scan with timelimit.
     * @param key        The row key. Disables other search terms.
     *                   It can be <tt>null</tt>.
@@ -152,15 +151,15 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
     * @param iftime     Whether give also entries timestamps (as <tt>key:time</tt>).
     * @param timelimit  The scanning timelimit [s] after which the processus will be interrupted and
     *                   only so far acquired results will be returned. 
-    * @return           The {@link List} of {@link Map}s of results as <tt>{family:column-&gt;value}</tt>. */
-  public List<Map<String, String>> restrictedScan(String  key,
-                                                  String  search,
-                                                  String  filter,
-                                                  long    start,
-                                                  long    stop,
-                                                  boolean ifkey,
-                                                  boolean iftime,
-                                                  int     timelimit) {
+    * @return           The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, String>> scan(String  key,
+                                               String  search,
+                                               String  filter,
+                                               long    start,
+                                               long    stop,
+                                               boolean ifkey,
+                                               boolean iftime,
+                                               int     timelimit) {
     log.info("Starting scan restricted to " + timelimit + "s");
     startScan(key,
               search,
@@ -171,7 +170,10 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
               iftime);
     long endtime = timelimit + System.currentTimeMillis() / 1000; 
     try {
-      while (size() == 0 || scanning()) {
+      while (size() == 0) {
+        Thread.sleep(_loopWait / 10);
+        }
+      while (scanning()) {
         log.info("" + size() + " results received, " + (endtime - (System.currentTimeMillis() / 1000)) + "s to end");
         if (System.currentTimeMillis() / 1000 >= endtime) {
           log.warn("Scanning ended due to time limit");
@@ -190,21 +192,25 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
     
   /** Give next result (if available).
     * @return The available result. */
-  public Map<String, String> poll() {
-    return _queue.poll();
+  public Map<String, Map<String, String>> poll() {
+    return poll(1);
     }
     
   /** Give next several results (when available).
     * @param n The number of requested results.
     * @return The available results. */
-  public List<Map<String, String>> poll(int n) {
-    List<Map<String, String>> results = new ArrayList<>();
+  public Map<String, Map<String, String>> poll(int n) {
+    Map<String, String> result;
+    Map<String, Map<String, String>> results = new TreeMap<>();
+    String key;
     if (n > size()) {
       n = size();
       log.warn("Only " + size() + " results available");
       }
     for (int i = 0; i < n; i++) {
-      results.add(_queue.poll());
+      result = _queue.poll();
+      key = result.get("key:key");
+      results.put(key, result);
       }
     return results;
     }
@@ -232,8 +238,6 @@ public class AsynchHBaseClient implements Runnable, HBaseProcessor {
   public void setLoopWait(int t) {
     _loopWait = t;
     }
-    
-  private HBaseClient _hbc;
         
   private ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
   

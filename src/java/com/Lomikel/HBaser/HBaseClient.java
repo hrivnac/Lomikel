@@ -304,7 +304,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         result = new TreeMap<>();
         try {
           r = table().get(get);
-          log.info("" + r.size() + " entries found");
+          log.debug("" + r.size() + " entries found");
           addResult(r, result, filter, ifkey, iftime);
           results.put(k, result);
           processResults(results);
@@ -481,7 +481,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         log.error("Cannot search", e);
         }
       }
-    log.info(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
+    log.debug(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
     return results;
     }    
     
