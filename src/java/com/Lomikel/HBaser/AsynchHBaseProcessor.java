@@ -50,7 +50,7 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
       }
     }
 
-  private ConcurrentLinkedQueue<Map<String, String>> _queue;
+  private ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
   
   /** Logging . */
   private static Logger log = Logger.getLogger(AsynchHBaseProcessor.class);

@@ -175,11 +175,16 @@ public class AsynchHBaseClient extends    HBaseClient
     try {
       // wait for first result or stopping
       while (size() == 0 && _doscan) {
+        //log.info("" + size() + " results received, " + (endtime - (System.currentTimeMillis() / 1000)) + "s to end");
+        if (System.currentTimeMillis() / 1000 >= endtime) {
+          log.warn("Scanning ended due to time limit");
+          break;
+          }
         Thread.sleep(_loopWait / 10);
         }
       // continue scanning till endtime or completion 
       while (scanning()) {
-        log.info("" + size() + " results received, " + (endtime - (System.currentTimeMillis() / 1000)) + "s to end");
+        //log.info("" + size() + " results received, " + (endtime - (System.currentTimeMillis() / 1000)) + "s to end");
         if (System.currentTimeMillis() / 1000 >= endtime) {
           log.warn("Scanning ended due to time limit");
           break;

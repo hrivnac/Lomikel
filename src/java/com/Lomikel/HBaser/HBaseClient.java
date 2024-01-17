@@ -317,6 +317,17 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     // Scan
     else {
       Scan scan = new Scan();
+      // Filter
+      if (filter != null && !filter.trim().contains("*") && !filter.trim().equals("")) {
+        for (String f : filter.split(",")) {
+          if (f.contains(":")) {
+            fc = f.split(":");
+            family = fc[0];
+            column = fc[1];
+            scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+            }
+          }
+        }
       // Time range
       try {
         scan.setTimeRange(start, stop);
@@ -339,9 +350,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           fc = entry.getKey().split(":");
           family = fc[0];
           column = fc[1];
+          if (family != null && !family.equals("key")) {
+            scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column)); // adding search terms to columns
+            }
           comparator = fc.length == 3 ? fc[2] : "default";
           value  = entry.getValue();
-          if (family.equals("random") && column.equals("random")) {
+          if (family.equals("key") && column.equals("random")) {
             onlyKeys = false;
             filters.add(new RandomRowFilter(Float.parseFloat(value)));
             }
@@ -435,17 +449,6 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           filterList = new FilterList(_operator, filters);  
           }
         scan.setFilter(filterList);
-        }
-      // Filter
-      if (filter != null && !filter.trim().contains("*") && !filter.trim().equals("")) {
-        for (String f : filter.split(",")) {
-          if (f.contains(":")) {
-            fc = f.split(":");
-            family = fc[0];
-            column = fc[1];
-            scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
-            }
-          }
         }
       // Limit
       int limit0 = _limit0;
