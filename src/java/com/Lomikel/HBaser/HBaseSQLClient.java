@@ -187,111 +187,10 @@ public class HBaseSQLClient extends HBaseClient {
     _sqlTableName = null;
     return results;
     }
-    
-  /** Depending on <tt>_upsert</tt>, upsert results into Phoenix SQL table
-    * and clean the {@link Map}. */  
-  @Override
-  protected void processResults(Map<String, Map<String, String>> results) {
-    if (_sqlTableName != null) {
-      results2SQL(results, _sqlTableName);
-      results.clear();
-      }
-    }
-
-  /** Results presented as an SQL command.
-    * The command can be used for SQL tables created with {@link Schema#toSQL} method.
-    * Using the default table name.
-    * @param results The {@link Map} of results.
-    * @return        The result as a {@link List}. */
-  public void results2SQL(Map<String, Map<String, String>> results) {
-    results2SQL(results, null);
-    }
-    
-  /** Results presented as an SQL command.
-    * The command can be used for SQL tables created with {@link Schema#toSQL} method.
-    * @param results      The {@link Map} of results.
-    * @param sqlTableName The SQL table name. Empty or <tt>null</tt> will use the default name. */
-  public void results2SQL(Map<String, Map<String, String>> results,
-                          String                           sqlTableName) {
-    String stn = tableName();
-    if (sqlTableName != null && !sqlTableName.trim().equals("")) {
-      stn = sqlTableName;
-      }
-    if (_sqlCompatibleSchema == null) {
-      _sqlCompatibleSchema = (HBaseSchema)schema().sqlCompatibleSchema();
-      }
-    String sql;
-    List<String> names  = new ArrayList<>();
-    List<String> values = new ArrayList<>();
-    short n = 0;
-    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      sql = "UPSERT INTO " + stn;
-      names.clear();
-      values.clear();
-      names.add("ROWKEY");
-      values.add("'" + entry.getKey() + "'");
-      for (Map.Entry<String, String> cell : entry.getValue().entrySet()) {
-        if (cell.getKey().equals("key:key")) {
-          // already added
-          }
-        else if (cell.getKey().equals("key:time")) {
-          names.add("ROWTIME");
-          values.add("'" + cell.getValue() + "'");
-          }
-        else if (!_sqlCompatibleSchema.contains(cell.getKey())) {
-          log.warn("The column " + cell.getKey() + " is not covered by " + schema().name() + ", so ignored.");
-          // column not in schema
-          }
-        else if (cell.getValue().split(":")[0].equals("binary")) {
-          names.add(cell.getKey().split(":")[1]);
-          values.add("'" + repository().get64(cell.getValue()) + "'");
-          }
-        else {
-          names.add(cell.getKey().split(":")[1]);
-          if (_sqlCompatibleSchema.isNumber(cell.getKey())) {
-            values.add(cell.getValue());
-            }
-          else {
-            values.add("'" + cell.getValue() + "'");
-            }
-          }
-        }
-      sql += " (" + String.join(",", names) + ") VALUES(" + String.join(",", values) + ")";
-      upsert(sql);
-      n++;
-      _n++;
-      }
-    try {
-      conn().commit();
-      log.info("" + n + " upserts commited, total = " + _n);
-      }
-    catch (SQLException e) {
-      log.error("Cannot commit", e);
-      }
-    }
-
-  /** Upsert into connected SQL Phoenix database.
-    * @param sql The SQL <tt>upsert</tt> command. */
-  private void upsert(String sql) {
-    Statement stmt;
-    try {
-      stmt = conn().createStatement();
-      }
-    catch (SQLException e) {
-      log.error("Cannot create statement", e);
-      return;
-      }
-    try {
-      stmt.executeUpdate(sql);
-      }
-    catch (SQLException e ) {
-      log.error("Cannot execute: " + sql, e);
-      } 
-    }    
-    
+        
   /** Give JDBC {@link Connection} to Phoenix database.
     * @return The JDBC {@link Connection} to Phoenix database. */
-  private Connection conn() {
+  public Connection conn() {
     if (_conn == null) {
       log.info("Opening " + zookeepers() + " on port " + clientPort() + " via Phoenix");
       try {
@@ -313,6 +212,7 @@ public class HBaseSQLClient extends HBaseClient {
       if (schema() instanceof HBaseSchema && schema().size() > 0) {
         _simpleSchema        = (HBaseSchema)schema().simpleSchema();
         }
+      setProcessor(new HBaseSQLClientProcessor(this));      
       }
     return _conn;
     }
@@ -332,11 +232,19 @@ public class HBaseSQLClient extends HBaseClient {
     super.close();
     }
     
-  private int _n = 0;
+  /** Give simple {@link HBaseSchema}.
+    * @return The simple {@link HBaseSchema}. */
+  public HBaseSchema simpleSchema() {
+    return _simpleSchema;
+    }
+    
+  /** Give SQL table name.
+    * @return The SQL table name. */
+  public String sqlTableName() {
+    return _sqlTableName;
+    }
     
   private HBaseSchema _simpleSchema; 
-  
-  private HBaseSchema _sqlCompatibleSchema;
     
   private Connection _conn = null;  
   
