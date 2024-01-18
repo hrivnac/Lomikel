@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class AsynchHBaseProcessor implements HBaseProcessor {
     
+  /** Create and assigne {@link ConcurrentLinkedQueue}.
+    * @param queue The {@link ConcurrentLinkedQueue} to be assigned. */
   public AsynchHBaseProcessor(ConcurrentLinkedQueue<Map<String, String>> queue) {
     _queue = queue;
     }

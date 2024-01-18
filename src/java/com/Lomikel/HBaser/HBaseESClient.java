@@ -54,40 +54,9 @@ public class HBaseESClient extends HBaseClient {
     * @param idxName The name of the index to be filled. */
   public void connectElasticSearch(String url,
                                    String idxName) {
-    _esclient = new ESClient(url);
-    _idxName = idxName;
+    setProcessor(new HBaseESClientProcessor(new ESClient(url), idxName));
     }
     
-  /** Depending on <tt>_esclient</tt>, upsert results into <em>ElasticSearch</em>
-    * and clean the {@link Map}. */  
-  @Override
-  protected void processResults(Map<String, Map<String, String>> results) {
-    if (_esclient != null) {
-      results2ES(results);
-      results.clear();
-      }
-    }
-    
-  /** Register results into {@link ESClient}.
-    * @param results The {@link Map} of results. */
-  protected void results2ES(Map<String, Map<String, String>> results) {
-    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
-      try {
-        _esclient.putGeoPoint(_idxName,
-                              entry.getKey(),
-                              Double.valueOf(entry.getValue().get("i:ra")),
-                              Double.valueOf(entry.getValue().get("i:dec")));
-        }
-      catch (LomikelException e) {
-        log.error("Cannot insert result " + entry, e);
-        }
-      }
-    }
-
-  private String _idxName;
-    
-  private ESClient _esclient;
-  
   /** Logging . */
   private static Logger log = Logger.getLogger(HBaseESClient.class);
 
