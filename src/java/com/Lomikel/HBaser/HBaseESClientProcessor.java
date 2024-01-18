@@ -1,0 +1,66 @@
+package com.Lomikel.HBaser;
+
+import com.Lomikel.Utils.LomikelException;
+import com.Lomikel.ElasticSearcher.ESClient;
+
+// HealPix
+import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
+import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
+
+// Java
+import java.util.Map;  
+
+// Log4J
+import org.apache.log4j.Logger;
+
+/** <code>HBaseESProcessor</code> implements {@link HBaseProcessor} for {@link ESClient}. 
+  * @opt attributes
+  * @opt operations
+  * @opt types
+  * @opt visibility
+  * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+public class HBaseESClientProcessor implements HBaseProcessor{
+    
+  /** Create and attach {@link ESCLient} and index name.
+    * @param esclient The {@link ESClient} to be attached.
+    * @param idxName  The index name to be used. */
+  public HBaseESClientProcessor(ESClient esclient,
+                                String   idxName) {
+    _esclient = esclient;
+    _idxName  = idxName;
+    }
+       
+  /** Depending on <tt>_esclient</tt>, upsert results into <em>ElasticSearch</em>
+    * and clean the {@link Map}. */  
+  @Override
+  public void processResults(Map<String, Map<String, String>> results) {
+    if (_esclient != null) {
+      results2ES(results);
+      results.clear();
+      }
+    }
+    
+  /** Register results into {@link ESClient}.
+    * @param results The {@link Map} of results. */
+  protected void results2ES(Map<String, Map<String, String>> results) {
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      try {
+        _esclient.putGeoPoint(_idxName,
+                              entry.getKey(),
+                              Double.valueOf(entry.getValue().get("i:ra")),
+                              Double.valueOf(entry.getValue().get("i:dec")));
+        }
+      catch (LomikelException e) {
+        log.error("Cannot insert result " + entry, e);
+        }
+      }
+    }
+
+  private String _idxName;
+    
+  private ESClient _esclient;
+  
+  /** Logging . */
+  private static Logger log = Logger.getLogger(HBaseESClientProcessor.class);
+
+  }
