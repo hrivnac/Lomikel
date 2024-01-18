@@ -22,12 +22,9 @@ import org.apache.log4j.Logger;
 public class HBaseESClientProcessor implements HBaseProcessor{
     
   /** Create and attach {@link ESCLient} and index name.
-    * @param esclient The {@link ESClient} to be attached.
-    * @param idxName  The index name to be used. */
-  public HBaseESClientProcessor(ESClient esclient,
-                                String   idxName) {
+    * @param esclient The {@link ESClient} to be attached. */
+  public HBaseESClientProcessor(ESClient esclient) {
     _esclient = esclient;
-    _idxName  = idxName;
     }
        
   /** Depending on <tt>_esclient</tt>, upsert results into <em>ElasticSearch</em>
@@ -45,18 +42,21 @@ public class HBaseESClientProcessor implements HBaseProcessor{
   protected void results2ES(Map<String, Map<String, String>> results) {
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       try {
-        _esclient.putGeoPoint(_idxName,
+        _esclient.putGeoPoint("radec",
+                              "location",
                               entry.getKey(),
                               Double.valueOf(entry.getValue().get("i:ra")),
                               Double.valueOf(entry.getValue().get("i:dec")));
+        _esclient.putDouble("jd",
+                            "date",
+                            entry.getKey(),
+                            Double.valueOf(entry.getValue().get("i:jd")));
         }
       catch (LomikelException e) {
         log.error("Cannot insert result " + entry, e);
         }
       }
     }
-
-  private String _idxName;
     
   private ESClient _esclient;
   

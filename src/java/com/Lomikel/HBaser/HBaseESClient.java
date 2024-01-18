@@ -50,11 +50,9 @@ public class HBaseESClient extends HBaseClient {
     
   /** Connect {@link ESClient}. The <tt>scan</tt> will
     * will it instead of delivering results.
-    * @param url The {@link ESClient} url.
-    * @param idxName The name of the index to be filled. */
-  public void connectElasticSearch(String url,
-                                   String idxName) {
-    setProcessor(new HBaseESClientProcessor(new ESClient(url), idxName));
+    * @param url The {@link ESClient} url. */
+  public void connectElasticSearch(String url) {
+    setProcessor(new HBaseESClientProcessor(new ESClient(url)));
     }
     
   /** Logging . */
