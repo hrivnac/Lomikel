@@ -1,2 +1,8 @@
 #!/bin/sh
-curl -X DELETE 'http://127.0.0.1:9200/*'
+X = ${1}
+if [[ "${X}" == "" ]]; then
+   curl 'http://${elascticsearch_hostname}/_cat/indices?v'
+else if [[ "${X}" == "janus" ]]; then
+ 
+ 
+curl -X DELETE 'http://${elascticsearch_hostname}/*'

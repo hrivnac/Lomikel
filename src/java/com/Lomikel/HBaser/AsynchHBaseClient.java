@@ -9,7 +9,12 @@ import org.apache.hadoop.hbase.client.Scan;
 import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
 import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 
+// org.json      
+import org.json.JSONObject;
+import org.json.JSONArray;
+
 // Java
+import java.util.Collection;  
 import java.util.List;  
 import java.util.ArrayList;  
 import java.util.Map;  
@@ -130,6 +135,56 @@ public class AsynchHBaseClient extends    HBaseClient
     _thread.start();
     }
       
+  public String[][] simpleScan(String  key,
+                               String  search,
+                               String  filter,
+                               long    start,
+                               long    stop,
+                               boolean ifkey,
+                               boolean iftime,
+                               int     timelimit) {
+    Map<String, Map<String, String>> r0 = scan(key,
+                                               search,
+                                               filter,
+                                               start,
+                                               stop,
+                                               ifkey,
+                                               iftime,
+                                               timelimit);
+    String[][] r = new String[r0.size()][];
+    String[] x;
+    int i;
+    int j = 0;
+    for (Map<String, String> m  : r0.values()) {
+      x = new String[m.size()];
+      i = 0;
+      for (Map.Entry<String, String> e  : m.entrySet()) {
+        x[i++] = e.toString();
+        }
+      r[j++] = x;
+      }
+    return r;
+    }
+    
+   public String scan2json(String  key,
+                           String  search,
+                           String  filter,
+                           long    start,
+                           long    stop,
+                           boolean ifkey,
+                           boolean iftime,
+                           int     timelimit) {
+    Map<String, Map<String, String>> r = scan(key,
+                                              search,
+                                              filter,
+                                              start,
+                                              stop,
+                                              ifkey,
+                                              iftime,
+                                              timelimit);
+    return new JSONObject(r0).toString();
+    }
+   
   /** Scan with timelimit.
     * @param key        The row key. Disables other search terms.
     *                   It can be <tt>null</tt>.
