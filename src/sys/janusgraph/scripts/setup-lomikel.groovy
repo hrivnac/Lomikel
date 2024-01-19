@@ -210,7 +210,7 @@ class LomikelServer {
     }
     
      
-  def static registerSourcesOfInterest(alertType, objectId, , weight, url) {   
+  def static registerSourcesOfInterest(alertType, objectId, weight, url) {   
     return g.V().
              has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
              has('alertType', alertType).
