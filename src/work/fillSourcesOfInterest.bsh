@@ -1,0 +1,36 @@
+import com.Lomikel.HBaser.HBaseClient;
+import com.Lomikel.Januser.StringGremlinClient;
+import com.Lomikel.Utils.SmallHttpClient;
+import org.json.JSONArray;
+
+StringGremlinClient clientG = new StringGremlinClient("134.158.74.85", 24445);
+HBaseClient client = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+SmallHttpClient httpClient = new SmallHttpClient();
+
+client.connect("ztf", "schema_2.2_2.0.0");
+client.setLimit(1000);
+
+results = client.latests("i:objectId",
+                         null,
+                         10000,
+                         true);
+for (String oid : results) {
+  answer = httpClient.postJSON("https://fink-portal.org/api/v1/objects", '{"objectId":"' + oid + '", "output-format":"json"}', null, null);
+  ja = new JSONArray(answer);
+  Map<String, Integer> classes =  new TreeMap<>();
+  for (o : ja) {
+    cl = o.getString("v:classification");
+    if (!cl.equals("Unknown")) {
+      if (classes.containsKey(cl)) {
+        classes.put(cl, classes.get(cl) + 1);
+        }
+      else {
+        classes.put(cl, 1);
+        }
+      }
+    }     
+  for (Map.Entry<String, Integer> cls : classes.entrySet()) {
+    cmd = "LomikelServer.registerSourcesOfInterest('" + cls.getKey() + "', '" + oid + "', '" + cls.getValue() + "', 'hbase-1.lal.in2p3.fr:2183:ztf:schema_2.2_2.0.0')";
+    clientG.interpret(cmd);
+    }
+   }
