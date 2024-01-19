@@ -45,6 +45,7 @@ fullfill             = mgmt.makePropertyKey('fullfill'            ).dataType(Boo
 objectId             = mgmt.makePropertyKey('objectId'            ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
 jd                   = mgmt.makePropertyKey('jd'                  ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
 alertType            = mgmt.makePropertyKey('alertType'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+sourceType           = mgmt.makePropertyKey('sourceType'          ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
 pca00                = mgmt.makePropertyKey('pca00'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
 pca01                = mgmt.makePropertyKey('pca01'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
 pca02                = mgmt.makePropertyKey('pca02'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
@@ -223,7 +224,7 @@ mgmt.addProperties(AlertsOfInterest,
                    url)   
 mgmt.addProperties(SourcesOfInterest,
                    lbl,
-                   alertType,
+                   sourceType,
                    technology,
                    url)   
 mgmt.addProperties(AlertsCollection,
@@ -248,6 +249,9 @@ mgmt.addProperties(alert,
                    snn_snia_vs_nonia,
                    snn_sn_vs_all,
                    tracklet)
+mgmt.addProperties(source,
+                   lbl,
+                   objectId)
 mgmt.addProperties(PCA,
                    lbl,
                    objectId,
@@ -478,7 +482,7 @@ mgmt.addProperties(from,
 // Connections   
 mgmt.addConnection(has,        AstroLabNet,       site)
 mgmt.addConnection(contains,   AlertsOfInterest,  alert)
-mgmt.addConnection(contains,   SourcesOfInterest, alert)
+mgmt.addConnection(contains,   SourcesOfInterest, source)
 mgmt.addConnection(distance,   PCA,               PCA)
 mgmt.addConnection(distance,   alert,             alert)
 mgmt.addConnection(props,      site,              Imports)

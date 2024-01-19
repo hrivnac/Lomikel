@@ -209,20 +209,20 @@ class LomikelServer {
     graph.tx().commit()
     }
       
-  def static registerSourcesOfInterest(alertType, objectId, weight, url) {   
+  def static registerSourcesOfInterest(sourceType, objectId, weight, url) {   
     return g.V().
              has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
-             has('alertType', alertType).
+             has('sourceType', sourceType).
              fold().
              coalesce(unfold(), 
                       addV('SourcesOfInterest').
                       property('lbl', 'SourcesOfInterest').
-                      property('alertType', alertType).
+                      property('sourceType', sourceType).
                       property('technology', 'HBase').
                       property('url', url)).
-             addE('contains', 'weight', weight).
-             to(__.addV('alert').
-                   property('lbl', 'alert').
+             addE('contains').
+             to(__.addV('source').
+                   property('lbl', 'source').
                    property('objectId', objectId)).
              property('weight', weight).
              next()
@@ -245,7 +245,7 @@ class LomikelServer {
     }
        
   def static exportSourcesOfInterest(fn) {  
-    g.V().has('lbl', 'AlertsOfInterest').
+    g.V().has('lbl', 'SourceOfInterest').
           repeat(__.outE().
                     subgraph('subGraph').
                     inV()).

@@ -209,20 +209,20 @@ class Lomikel {
     g.getGraph().tx().commit()
     }
     
-  def static registerSourcesOfInterest(g, alertType, objectId, weight, url) {   
+  def static registerSourcesOfInterest(g, sourceType, objectId, weight, url) {   
     return g.V().
              has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
-             has('alertType', alertType).
+             has('sourceType', sourceType).
              fold().
              coalesce(unfold(), 
                       addV('SourcesOfInterest').
                       property('lbl', 'SourcesOfInterest').
-                      property('alertType', alertType).
+                      property('sourceType', sourceType).
                       property('technology', 'HBase').
                       property('url', url)).
              addE('contains').
-             to(__.addV('alert').
-                   property('lbl', 'alert').
+             to(__.addV('source').
+                   property('lbl', 'source').
                    property('objectId', objectId)).
              property('weight', weight).
              next()
