@@ -16,10 +16,11 @@ if [[ ! "x" = "x${graphviz}" ]]; then
   fi
 HADOOP_CLASSPATH=`${hadoop_dir}/bin/hadoop classpath --glob`
 HBASE_CLASSPATH=`${hbase_dir}/bin/hbase classpath --glob`
-for JAR in ${janusgraph_dir}/*.jar; do
+export JANUSGRAPH_CLASSPATH=""
+for JAR in ${janusgraph_dir}/lib/*.jar; do
   JANUSGRAPH_CLASSPATH=${JANUSGRAPH_CLASSPATH}:${JAR} 
   done
-export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${phoenix_jar}:${HBASE_CLASSPATH}:${HADOOP_CLASSPATH}:${JANUSGRAPH_CLASSPATH}"
+export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${phoenix_jar}:${JANUSGRAPH_CLASSPATH}:${HBASE_CLASSPATH}:${HADOOP_CLASSPATH}"
 export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}"
     
 export janusgraph_dir

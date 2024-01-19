@@ -24,6 +24,7 @@ technology    = mgmt.makePropertyKey('technology'   ).dataType(String.class ).ca
 timestamp     = mgmt.makePropertyKey('timestamp'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make() // LocalDateTime
 importDate    = mgmt.makePropertyKey('importDate'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 importSource  = mgmt.makePropertyKey('importSource' ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+weight        = mgmt.makePropertyKey('weight'       ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make()
 
 // Vertex properties
 mgmt.addProperties(datalink,
@@ -39,6 +40,7 @@ mgmt.addProperties(props,
 mgmt.addProperties(has,
                    lbl)
 mgmt.addProperties(contains,
+                   weight,
                    lbl)
 mgmt.addProperties(holds,
                    lbl)

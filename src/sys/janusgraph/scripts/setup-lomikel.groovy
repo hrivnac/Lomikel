@@ -210,7 +210,7 @@ class LomikelServer {
     }
     
      
-  def static registerSourcesOfInterest(alertType, objectId, url) {   
+  def static registerSourcesOfInterest(alertType, objectId, , weight, url) {   
     return g.V().
              has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
              has('alertType', alertType).
@@ -221,7 +221,7 @@ class LomikelServer {
                       property('alertType', alertType).
                       property('technology', 'HBase').
                       property('url', url)).
-             addE('contains').
+             addE('contains', 'weight', weight).
              to(__.addV('alert').
                    property('lbl', 'alert').
                    property('objectId', objectId)).
