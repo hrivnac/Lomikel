@@ -220,10 +220,11 @@ class Lomikel {
                       property('alertType', alertType).
                       property('technology', 'HBase').
                       property('url', url)).
-             addE('contains', 'weight', weight).
+             addE('contains').
              to(__.addV('alert').
                    property('lbl', 'alert').
                    property('objectId', objectId)).
+             property('weight', weight).
              next()
     g.getGraph().tx().commit()
     }
