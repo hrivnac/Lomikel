@@ -5,12 +5,9 @@ graph.tx().rollback()
 
 // Reindex existing data
 mgmt = graph.openManagement()
-mgmt.updateIndex(mgmt.getGraphIndex('byImportDate'), SchemaAction.REINDEX).get()
-mgmt.updateIndex(mgmt.getGraphIndex('byObjectId'  ), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byCandid'    ), SchemaAction.REINDEX).get()
 mgmt.updateIndex(mgmt.getGraphIndex('byJd'        ), SchemaAction.REINDEX).get()
 mgmt.updateIndex(mgmt.getGraphIndex('byRaDec'     ), SchemaAction.REINDEX).get()
-mgmt.updateIndex(mgmt.getGraphIndex('byDirection' ), SchemaAction.REINDEX).get()
-mgmt.updateIndex(mgmt.getGraphIndex('bySsnamenr'  ), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
 mgmt.printIndexes()
 mgmt.commit()

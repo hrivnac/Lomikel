@@ -11,11 +11,21 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.impl.client.HttpClients;
 
 // Java
 import java.io.InputStreamReader;
@@ -23,11 +33,16 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyStoreException;
+import java.security.KeyManagementException;
 import java.util.zip.GZIPInputStream;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.List;
 import java.util.ArrayList;
+import javax.net.ssl.SSLContext;
+import org.apache.http.config.Registry;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -213,7 +228,14 @@ public class SmallHttpClient {
                                 Map<String, String> headers,
                                 String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    DefaultHttpClient client = new DefaultHttpClient();
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null; // TBD: make it everywhere
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
     post.addHeader("Content-Type", "application/json");
@@ -535,6 +557,25 @@ public class SmallHttpClient {
       }
     reader.close();
     return buffer.toString();
+    }
+    
+  /** TBD */
+  private static CloseableHttpClient getSecureHttpsClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+    SSLContext sslContext = SSLContexts.custom()
+                                       .loadTrustMaterial(null, acceptingTrustStrategy)
+                                       .build();
+    SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);   
+    Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
+                                                                             .register("https", sslsf)
+                                                                             .register("http", new PlainConnectionSocketFactory())
+                                                                             .build();
+    BasicHttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);
+    CloseableHttpClient httpClient = HttpClients.custom()
+                                                .setSSLSocketFactory(sslsf)
+                                                .setConnectionManager(connectionManager)
+                                                .build();
+    return httpClient;
     }
       
   /** Logging . */

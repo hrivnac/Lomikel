@@ -182,7 +182,7 @@ public class AsynchHBaseClient extends    HBaseClient
                                               ifkey,
                                               iftime,
                                               timelimit);
-    return new JSONObject(r0).toString();
+    return new JSONObject(r).toString();
     }
    
   /** Scan with timelimit.

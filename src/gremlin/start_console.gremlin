@@ -208,10 +208,43 @@ class Lomikel {
              next()
     g.getGraph().tx().commit()
     }
+    
+  def static registerSourcesOfInterest(g, alertType, objectId, url) {   
+    return g.V().
+             has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
+             has('alertType', alertType).
+             fold().
+             coalesce(unfold(), 
+                      addV('SourcesOfInterest').
+                      property('lbl', 'SourcesOfInterest').
+                      property('alertType', alertType).
+                      property('technology', 'HBase').
+                      property('url', url)).
+             addE('contains').
+             to(__.addV('alert').
+                   property('lbl', 'alert').
+                   property('objectId', objectId).
+             next()
+    g.getGraph().tx().commit()
+    }
         
   def static exportAlertsOfInterest(g, alertType, fn) {  
     g.V().has('lbl', 'AlertsOfInterest').
           has('alertType', alertType).
+          repeat(__.outE().
+                    subgraph('subGraph').
+                    inV()).
+          until(outE().
+                count().
+                is(0)).
+          cap('subGraph').
+          next().
+          io(IoCore.graphml()).
+          writeGraph(fn)
+    }
+        
+  def static exportSourcesOfInterest(g, fn) {  
+    g.V().has('lbl', 'SourcesOfInterest').
           repeat(__.outE().
                     subgraph('subGraph').
                     inV()).

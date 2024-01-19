@@ -209,7 +209,26 @@ class LomikelServer {
     graph.tx().commit()
     }
     
-        
+     
+  def static registerSourcesOfInterest(alertType, objectId, url) {   
+    return g.V().
+             has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
+             has('alertType', alertType).
+             fold().
+             coalesce(unfold(), 
+                      addV('SourcesOfInterest').
+                      property('lbl', 'SourcesOfInterest').
+                      property('alertType', alertType).
+                      property('technology', 'HBase').
+                      property('url', url)).
+             addE('contains').
+             to(__.addV('alert').
+                   property('lbl', 'alert').
+                   property('objectId', objectId).
+             next()
+    graph.tx().commit()
+    }
+      
   def static exportAlertsOfInterest(alertType, fn) {  
     g.V().has('lbl', 'AlertsOfInterest').
           has('alertType', alertType).
@@ -224,7 +243,22 @@ class LomikelServer {
           io(IoCore.graphml()).
           writeGraph(fn)
     }
-    
+       
+  def static exportSourcesOfInterest(fn) {  
+    g.V().has('lbl', 'AlertsOfInterest').
+          has('alertType', alertType).
+          repeat(__.outE().
+                    subgraph('subGraph').
+                    inV()).
+          until(outE().
+                count().
+                is(0)).
+          cap('subGraph').
+          next().
+          io(IoCore.graphml()).
+          writeGraph(fn)
+    }
+   
   def static enhanceAlertsOfInterest(alertType, columns) { 
     def aoi = g.V().has('lbl', 'AlertsOfInterest').has('alertType', alertType).valueMap().toList()
     def (ip, port, table, schema) = aoi['url'][0][0].split(':')
@@ -254,7 +288,7 @@ class LomikelServer {
     graph.tx().commit()
     return enhanced
     }
-    
+ 
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
   def static g = graph.traversal()
 
