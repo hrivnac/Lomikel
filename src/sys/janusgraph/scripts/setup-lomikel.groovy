@@ -224,7 +224,7 @@ class LomikelServer {
              addE('contains').
              to(__.addV('alert').
                    property('lbl', 'alert').
-                   property('objectId', objectId).
+                   property('objectId', objectId)).
              next()
     graph.tx().commit()
     }
