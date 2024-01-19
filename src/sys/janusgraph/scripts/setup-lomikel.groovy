@@ -246,7 +246,6 @@ class LomikelServer {
        
   def static exportSourcesOfInterest(fn) {  
     g.V().has('lbl', 'AlertsOfInterest').
-          has('alertType', alertType).
           repeat(__.outE().
                     subgraph('subGraph').
                     inV()).
