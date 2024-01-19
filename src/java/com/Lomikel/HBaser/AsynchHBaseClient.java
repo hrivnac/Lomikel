@@ -135,37 +135,27 @@ public class AsynchHBaseClient extends    HBaseClient
     _thread.start();
     }
       
-  public String[][] simpleScan(String  key,
-                               String  search,
-                               String  filter,
-                               long    start,
-                               long    stop,
-                               boolean ifkey,
-                               boolean iftime,
-                               int     timelimit) {
-    Map<String, Map<String, String>> r0 = scan(key,
-                                               search,
-                                               filter,
-                                               start,
-                                               stop,
-                                               ifkey,
-                                               iftime,
-                                               timelimit);
-    String[][] r = new String[r0.size()][];
-    String[] x;
-    int i;
-    int j = 0;
-    for (Map<String, String> m  : r0.values()) {
-      x = new String[m.size()];
-      i = 0;
-      for (Map.Entry<String, String> e  : m.entrySet()) {
-        x[i++] = e.toString();
-        }
-      r[j++] = x;
-      }
-    return r;
-    }
-    
+  /** Start scan assynchronously. Present results as a <em>JSON</em> string.
+    * @param key     The row key. Disables other search terms.
+    *                It can be <tt>null</tt>.
+    * @param search  The search terms as <tt>family:column:value,...</tt>.
+    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                among <tt>exact,prefix,substring,regex</tt>.
+    *                The default for key is <tt>prefix</tt>,
+    *                the default for columns is <tt>substring</tt>.
+    *                The randomiser can be added with <tt>random:random:chance</tt>.
+    *                It can be <tt>null</tt>.
+    *                All searches are executed as prefix searches.    
+    * @param filter  The names of required values as <tt>family:column,...</tt>.
+    *                <tt>*</tt> = all.
+    * @param start   The time period start timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means since the beginning.
+    * @param stop    The time period stop timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means till now.
+    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>). */
    public String scan2json(String  key,
                            String  search,
                            String  filter,

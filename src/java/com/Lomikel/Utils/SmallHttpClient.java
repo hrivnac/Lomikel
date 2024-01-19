@@ -82,7 +82,14 @@ public class SmallHttpClient {
   public static String get(String              question,
                            Map<String, String> headers) throws LomikelException {
     String answer = "";
-    DefaultHttpClient client = new DefaultHttpClient();
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null;
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }    
     HttpGet get = new HttpGet(question);
     get.addHeader("Accept-Encoding", "gzip");
     if (headers != null) {
@@ -128,7 +135,14 @@ public class SmallHttpClient {
   public static String delete(String              question,
                               Map<String, String> headers) throws LomikelException {
     String answer = "";
-    DefaultHttpClient client = new DefaultHttpClient();
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null;
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }    
     HttpDelete delete = new HttpDelete(question);
     delete.addHeader("Accept-Encoding", "gzip");
     if (headers != null) {
@@ -178,7 +192,14 @@ public class SmallHttpClient {
                             Map<String, String> params,
                             Map<String, String> headers) throws LomikelException {
     String answer = "";
-    DefaultHttpClient client = new DefaultHttpClient();
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null;
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }    
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
     if (headers != null) {
@@ -229,7 +250,7 @@ public class SmallHttpClient {
                                 String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
     //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null; // TBD: make it everywhere
+    CloseableHttpClient client = null;
     try {
       client = getSecureHttpsClient();
       }
@@ -296,7 +317,14 @@ public class SmallHttpClient {
                                Map<String, String> headers,
                                String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    DefaultHttpClient client = new DefaultHttpClient();
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null;
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }    
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
     post.addHeader("Content-Type", "text/xml");
@@ -367,7 +395,14 @@ public class SmallHttpClient {
                            Map<String, String> params,
                            Map<String, String> headers) throws LomikelException {
     String answer = "";
-    DefaultHttpClient client = new DefaultHttpClient();
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null;
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }    
     HttpPut put = new HttpPut(url);
     put.addHeader("Accept-Encoding", "gzip");
     if (headers != null) {
@@ -417,7 +452,14 @@ public class SmallHttpClient {
                                Map<String, String> headers,
                                String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    DefaultHttpClient client = new DefaultHttpClient();
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null;
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }    
     HttpPut put = new HttpPut(url);
     put.addHeader("Accept-Encoding", "gzip");
     put.addHeader("Content-Type", "application/json");
@@ -478,7 +520,14 @@ public class SmallHttpClient {
                               Map<String, String> headers,
                               String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    DefaultHttpClient client = new DefaultHttpClient();
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null;
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }    
     HttpPut put = new HttpPut(url);
     put.addHeader("Accept-Encoding", "gzip");
     put.addHeader("Content-Type", "text/xml");
@@ -559,7 +608,11 @@ public class SmallHttpClient {
     return buffer.toString();
     }
     
-  /** TBD */
+  /** Give secure HTTP client (http or https).
+    * @return The secure HTTP client (http or https).
+    * @throws NoSuchAlgorithmException
+    * @throws KeyStoreException
+    * @throws KeyManagementException */
   private static CloseableHttpClient getSecureHttpsClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
     TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
     SSLContext sslContext = SSLContexts.custom()
