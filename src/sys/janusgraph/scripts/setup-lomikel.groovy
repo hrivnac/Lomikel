@@ -209,7 +209,7 @@ class LomikelServer {
     graph.tx().commit()
     }
       
-  def static registerSourcesOfInterest(sourceType, objectId, weight, url) {   
+  def static registerSourcesOfInterest(sourceType, objectId, weight, instances, url) {   
     return g.V().
              has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
              has('sourceType', sourceType).
@@ -225,6 +225,7 @@ class LomikelServer {
                    property('lbl', 'source').
                    property('objectId', objectId)).
              property('weight', weight).
+             property('instances', instances).
              next()
     graph.tx().commit()
     }

@@ -25,6 +25,7 @@ timestamp     = mgmt.makePropertyKey('timestamp'    ).dataType(String.class ).ca
 importDate    = mgmt.makePropertyKey('importDate'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 importSource  = mgmt.makePropertyKey('importSource' ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 weight        = mgmt.makePropertyKey('weight'       ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make()
+instances     = mgmt.makePropertyKey('instances'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
 
 // Vertex properties
 mgmt.addProperties(datalink,
@@ -41,6 +42,7 @@ mgmt.addProperties(has,
                    lbl)
 mgmt.addProperties(contains,
                    weight,
+                   instances,
                    lbl)
 mgmt.addProperties(holds,
                    lbl)
