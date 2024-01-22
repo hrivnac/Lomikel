@@ -202,6 +202,42 @@ stylesheet.nodes.AlertsCollection = {
     {name:"Show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"}
     ]
   }
+stylesheet.nodes.AlertsOfInterest = {
+  properties:{gremlin:"valueMap('title').toList()[0]"},
+  graphics: {
+    label:"alertType", 
+    title:"alertType",        
+    subtitle:" ",     
+    group:" ",        
+    shape:"image",      
+    image:"Alerts.png",        
+    borderRadius:"0", 
+    borderWidth:"1",  
+    borderDashes:[1,0],
+    value:{gremlin:"both().count().join().toString()"}        
+    },
+  actions:[
+    {name:"Show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"}
+    ]
+  }
+stylesheet.nodes.SourcesOfInterest = {
+  properties:{gremlin:"valueMap('title').toList()[0]"},
+  graphics: {
+    label:"sourceType", 
+    title:"sourceType",        
+    subtitle:" ",     
+    group:" ",        
+    shape:"image",      
+    image:"Alerts.png",        
+    borderRadius:"0", 
+    borderWidth:"1",  
+    borderDashes:[1,0],
+    value:{gremlin:"both().count().join().toString()"}        
+    },
+  actions:[
+    {name:"Show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"}
+    ]
+  }
 stylesheet.nodes.Imports = {
   properties:" ",
   graphics: {
