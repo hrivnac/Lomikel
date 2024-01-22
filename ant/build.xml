@@ -799,7 +799,7 @@
       <arg line="cp ../lib/Lomikel.war ${server_dir}/Lomikel.war"/>
       </exec>
     <exec executable="/usr/bin/sudo">
-      <arg line="cp ../lib/Lomikel.war ${server_dir}/FinkBrowser.war"/>
+      <arg line="cp ../lib/FinkBrowser.war ${server_dir}/FinkBrowser.war"/>
       </exec>
     </target>
     
