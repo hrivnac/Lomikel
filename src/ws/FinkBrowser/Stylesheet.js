@@ -311,7 +311,7 @@ stylesheet.edges.contains = {
     title:" ",
     subtitle:" ",
     arrows:{to:{enabled:true, type:"vee"}},
-    value:{"weight"},        
+    value:"weight",        
     group:" "
     },
   actions: [
@@ -319,4 +319,3 @@ stylesheet.edges.contains = {
     {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
     ]
   }
-gremlin:"valueMap('importDate', 'importSource').toList()[0]
