@@ -214,19 +214,18 @@ class LomikelServer {
              has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
              has('sourceType', sourceType).
              fold().
-             coalesce(unfold(), 
-                      addV('SourcesOfInterest').
-                      property('lbl', 'SourcesOfInterest').
-                      property('sourceType', sourceType).
-                      property('technology', 'HBase').
-                      property('url', url)).
+             coalesce(unfold(), addV('SourcesOfInterest').
+                                property('lbl', 'SourcesOfInterest').
+                                property('sourceType', sourceType).
+                                property('technology', 'HBase').
+                                property('url', url)).
              addE('contains').
-             to(__.has('source', 'lbl', 'source').
-                   has('objectId', objectId).
-                   fold().
-                   coalesce(unfold(), addV('source').
-                                      property('lbl', 'source').
-                                      property('objectId', objectId)).
+             to(g.V().has('source', 'lbl', 'source').
+                      has('objectId', objectId).
+                      fold().
+                      coalesce(unfold(), addV('source').
+                                         property('lbl', 'source').
+                                         property('objectId', objectId)).
              property('weight', weight).
              property('instances', instances).
              next()
