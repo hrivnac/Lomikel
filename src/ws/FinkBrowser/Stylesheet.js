@@ -275,7 +275,7 @@ stylesheet.edges.contains = {
     title:" ",
     subtitle:" ",
     arrows:{to:{enabled:true, type:"vee"}},
-    value:{gremlin:"values('instances').next().toString().split(' ').length"}        
+    value:{gremlin:"values('instances').next().toString().split(' ').length"},        
     group:" "
     },
   actions: [
