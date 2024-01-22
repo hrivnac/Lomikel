@@ -304,16 +304,6 @@ stylesheet.edges.holds = {
     {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
     ]
   }
-stylesheet.edges.containsx = {
-  properties:{},
-  graphics: {
-    label:" ",
-    title:" ",
-    subtitle:" ",
-    arrows:{to:{enabled:true, type:"vee"}},
-    value:{gremlin:"values('instances').next().toString().split(' ').length"},        
-    group:" "
-    },
 stylesheet.edges.contains = {
   properties:{},
   graphics: {
@@ -321,7 +311,7 @@ stylesheet.edges.contains = {
     title:" ",
     subtitle:" ",
     arrows:{to:{enabled:true, type:"vee"}},
-    value:"0",        
+    value:{gremlin:"values('instances').next().toString().length()"},        
     group:" "
     },
   actions: [
