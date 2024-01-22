@@ -556,18 +556,7 @@
     <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${bootgremlin}"/>
     <war destfile="../lib/FinkBrowser.war" webxml="../src/ws/web.xml">
       <fileset dir="../src/ws/FinkBrowser">
-        <include name="**/*.jsp"/>
-        <include name="**/*.html"/>
-        <include name="**/*.js"/>
-	    	<include name="**/*.css"/>
-	    	<include name="**/*.json"/>
-	    	<include name="**/*.jpeg"/>
-	    	<include name="**/*.gif"/>
-	    	<include name="**/*.png"/>
-	    	<include name="images/*"/>
-	    	<include name="d3/**/*"/>
-        <exclude name="Graphs-*.jsp"/>
-        <exclude name="Servers-*.jsp"/>
+        <include name="**/*"/>
         </fileset>
       <fileset dir="../src/ws">
         <include name="**/*"/>
