@@ -311,7 +311,7 @@ stylesheet.edges.contains = {
     title:" ",
     subtitle:" ",
     arrows:{to:{enabled:true, type:"vee"}},
-    value:{gremlin:"values('instances').next().toString().split('_').length"},        
+    value:{gremlin:"values('weight').next()"},        
     group:" "
     },
   actions: [
