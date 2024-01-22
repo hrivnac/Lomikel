@@ -210,7 +210,7 @@ class LomikelServer {
     }
       
   def static registerSourcesOfInterest(sourceType, objectId, weight, instances, url) {   
-    soi = g.V().
+    def soi = g.V().
             has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
             has('sourceType', sourceType).
             fold().
@@ -219,20 +219,18 @@ class LomikelServer {
                      property('lbl', 'SourcesOfInterest').
                      property('sourceType', sourceType).
                      property('technology', 'HBase').
-                     property('url', url))
+                     property('url', url)).
             next();
-    s = g.V().
+    def s = g.V().
           has('source', 'lbl', 'source').
           has('objectId', objectId).
           fold().
           coalesce(unfold(), 
                    addV('source').
                    property('lbl', 'source').
-                   property('objectId', objectId))
-          next;
-    g.V(soi).
-      addE('contains').
-      to(s)
+                   property('objectId', objectId)).
+          next();
+    g.V(soi).addE('contains').to(__.V(s)).
       property('weight', weight).
       property('instances', instances).
       iterate();
@@ -298,7 +296,7 @@ class LomikelServer {
     return enhanced
     }
  
-  def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open()
+  def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "134.158.74.54").set("storage.port", "2183").set("storage.hbase.table", "janusgraph").open()
   def static g = graph.traversal()
 
   }
