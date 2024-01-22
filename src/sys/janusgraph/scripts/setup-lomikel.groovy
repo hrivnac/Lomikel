@@ -210,25 +210,32 @@ class LomikelServer {
     }
       
   def static registerSourcesOfInterest(sourceType, objectId, weight, instances, url) {   
-    return g.V().
-             has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
-             has('sourceType', sourceType).
-             fold().
-             coalesce(unfold(), addV('SourcesOfInterest').
-                                property('lbl', 'SourcesOfInterest').
-                                property('sourceType', sourceType).
-                                property('technology', 'HBase').
-                                property('url', url)).
-             addE('contains').
-             to(g.V().has('source', 'lbl', 'source').
-                      has('objectId', objectId).
-                      fold().
-                      coalesce(unfold(), addV('source').
-                                         property('lbl', 'source').
-                                         property('objectId', objectId)).
-             property('weight', weight).
-             property('instances', instances).
-             next()
+    soi = g.V().
+            has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
+            has('sourceType', sourceType).
+            fold().
+            coalesce(unfold(), 
+                     addV('SourcesOfInterest').
+                     property('lbl', 'SourcesOfInterest').
+                     property('sourceType', sourceType).
+                     property('technology', 'HBase').
+                     property('url', url))
+            next();
+    s = g.V().
+          has('source', 'lbl', 'source').
+          has('objectId', objectId).
+          fold().
+          coalesce(unfold(), 
+                   addV('source').
+                   property('lbl', 'source').
+                   property('objectId', objectId))
+          next;
+    g.V(soi).
+      addE('contains').
+      to(s)
+      property('weight', weight).
+      property('instances', instances).
+      iterate();
     graph.tx().commit()
     }
       
