@@ -3,7 +3,7 @@
 <!-- Fink Browser SkyView -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
-<%@ page import="com.astrolabsoftware.FinkBrowser.Utils.Info" %>
+<%@ page import="com.Lomikel.Utils.Info" %>
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 

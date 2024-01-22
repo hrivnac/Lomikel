@@ -591,8 +591,7 @@
         <include name="log4j.properties"/>
         </classes>
       <lib file="../lib/Lomikel-${version}.jar"/>
-      <lib file="${janusgraph_dir}/lib/tinkergraph-gremlin-3.4.6.jar"/>
-      <lib file="${orgjson_jar}"/>
+       <lib file="${orgjson_jar}"/>
       <lib file="${javaxmail_jar}"/>
       <lib file="${javaxservlet_jar}"/>
       <lib file="${hbasecommon_jar}"/>

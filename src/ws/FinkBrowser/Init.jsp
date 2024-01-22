@@ -1,4 +1,4 @@
-<%@ page import="com.astrolabsoftware.FinkBrowser.Utils.Init" %>
+<%@ page import="com.Lomikel.Utils.Init" %>
 
 <%
   Init.initWS();
