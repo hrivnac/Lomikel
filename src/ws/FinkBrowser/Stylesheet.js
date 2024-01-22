@@ -305,7 +305,7 @@ stylesheet.edges.holds = {
     ]
   }
 stylesheet.edges.contains = {
-  properties:{},
+  properties:{gremlin:"valueMap('weight').toList()[0]},
   graphics: {
     label:" ",
     title:" ",
@@ -319,3 +319,4 @@ stylesheet.edges.contains = {
     {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
     ]
   }
+gremlin:"valueMap('importDate', 'importSource').toList()[0]
