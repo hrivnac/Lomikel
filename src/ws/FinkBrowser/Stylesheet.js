@@ -305,13 +305,13 @@ stylesheet.edges.holds = {
     ]
   }
 stylesheet.edges.contains = {
-  properties:{gremlin:"valueMap('weight').toList()[0]},
+  properties:{gremlin:"valueMap('weight').toList()[0]"},
   graphics: {
     label:" ",
     title:" ",
     subtitle:" ",
     arrows:{to:{enabled:true, type:"vee"}},
-    value:{gremlin:"values('weight').next()"},        
+    value:{"weight"},        
     group:" "
     },
   actions: [
