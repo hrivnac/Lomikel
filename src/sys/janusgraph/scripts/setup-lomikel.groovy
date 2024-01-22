@@ -221,9 +221,12 @@ class LomikelServer {
                       property('technology', 'HBase').
                       property('url', url)).
              addE('contains').
-             to(__.addV('source').
-                   property('lbl', 'source').
-                   property('objectId', objectId)).
+             to(__.has('source', 'lbl', 'source').
+                   has('objectId', objectId).
+                   fold().
+                   coalesce(unfold(), addV('source').
+                                      property('lbl', 'source').
+                                      property('objectId', objectId)).
              property('weight', weight).
              property('instances', instances).
              next()
