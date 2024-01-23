@@ -82,7 +82,7 @@ stylesheet.nodes.alert = {
     borderRadius:"0", 
     borderWidth:"2",  
     borderDashes:[1,1],
-    value:"0"        
+    value:"0.1"        
     },
   actions:[                                                                 
     {name:"Show",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")" }, target:"result"  },
@@ -101,7 +101,7 @@ stylesheet.nodes.source = {
     borderRadius:"0", 
     borderWidth:"2",  
     borderDashes:[1,1],
-    value:"0"        
+    value:"0.1"        
     },
   actions:[                                                                 
     {name:"Show",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")" }, target:"result"  },
