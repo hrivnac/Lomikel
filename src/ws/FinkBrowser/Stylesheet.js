@@ -93,7 +93,7 @@ stylesheet.nodes.source = {
   properties:{gremlin:"valueMap('lbl').toList()[0]"},
   graphics: {
     label:"objectId",
-    title:"lbl",        
+    title:"objectId",        
     subtitle:" ",
     group:{gremlin:"values('objectId').toList()[0]"},        
     shape:"image",      
