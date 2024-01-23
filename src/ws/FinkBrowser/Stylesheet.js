@@ -218,7 +218,8 @@ stylesheet.nodes.AlertsCollection = {
     value:{gremlin:"both().count().join().toString()"}        
     },
   actions:[
-    {name:"Show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"}
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"},
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"}
     ]
   }
 stylesheet.nodes.AlertsOfInterest = {
@@ -236,7 +237,8 @@ stylesheet.nodes.AlertsOfInterest = {
     value:{gremlin:"both().count().join().toString()"}        
     },
   actions:[
-    {name:"Show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"}
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"},
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"}
     ]
   }
 stylesheet.nodes.SourcesOfInterest = {
@@ -254,7 +256,8 @@ stylesheet.nodes.SourcesOfInterest = {
     value:{gremlin:"both().count().join().toString()"}        
     },
   actions:[
-    {name:"Show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"}
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"},
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"}
     ]
   }
 stylesheet.nodes.Imports = {
