@@ -77,12 +77,31 @@ stylesheet.nodes.alert = {
     title:"lbl",        
     subtitle:" ",
     group:{gremlin:"values('objectId').toList()[0]"},        
-    shape:"hexagon",      
-    image:"",        
+    shape:"image",      
+    image:"Alert.png",        
     borderRadius:"0", 
     borderWidth:"2",  
     borderDashes:[1,1],
-    value:{gremlin:"out().out().has('lbl', 'prv_candidate').count().join().toString()"}        
+    value:"0"        
+    },
+  actions:[                                                                 
+    {name:"Show",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")" }, target:"result"  },
+    {name:"Table",   url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
+    ]
+  }
+stylesheet.nodes.source = {
+  properties:{gremlin:"valueMap('lbl').toList()[0]"},
+  graphics: {
+    label:"lbl",
+    title:"lbl",        
+    subtitle:" ",
+    group:{gremlin:"values('objectId').toList()[0]"},        
+    shape:"image",      
+    image:"Star.png",        
+    borderRadius:"0", 
+    borderWidth:"2",  
+    borderDashes:[1,1],
+    value:"0"        
     },
   actions:[                                                                 
     {name:"Show",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")" }, target:"result"  },
@@ -228,7 +247,7 @@ stylesheet.nodes.SourcesOfInterest = {
     subtitle:" ",     
     group:" ",        
     shape:"image",      
-    image:"Alerts.png",        
+    image:"Stars.png",        
     borderRadius:"0", 
     borderWidth:"1",  
     borderDashes:[1,0],
