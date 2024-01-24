@@ -92,6 +92,10 @@
     <pathelement path="${bsh_jar}"/>
     </path>
 
+  <path id="umlDoclet.classpath">
+    <pathelement path="../extlib/umldoclet-2.1.1.jar"/>
+    </path>
+
   <property name="classpath.build.content"       refid="classpath.build"/>
   <property name="classpath.run.content"         refid="classpath.run"/>
   <property name="classpath_phoenix.run.content" refid="classpath_phoenix.run"/>
@@ -1092,6 +1096,9 @@
              source="1.8"
              Overview="../src/java/com/Lomikel/overview.html"
              windowtitle="Lomikel">
+      <doclet name="nl.talsmasoftware.umldoclet.UMLDoclet" pathref="umlDoclet.classpath">
+        <!--param name="additionalParamName" value="additionalParamValue"/-->
+        </doclet>
       <doctitle><![CDATA[<u>]]>Lomikel<![CDATA[</u>]]></doctitle>
       <Header><![CDATA[<center>]]>Lomikel version: ${version}<![CDATA[</center>]]></Header>
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>

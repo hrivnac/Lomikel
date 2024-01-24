@@ -190,23 +190,32 @@ class LomikelServer {
     }
     
   def static registerAlertOfInterest(alertType, objectId, jd, url) {   
-    return g.V().
-             has('AlertsOfInterest', 'lbl', 'AlertsOfInterest').
-             has('alertType', alertType).
-             fold().
-             coalesce(unfold(), 
-                      addV('AlertsOfInterest').
-                      property('lbl', 'AlertsOfInterest').
-                      property('alertType', alertType).
-                      property('technology', 'HBase').
-                      property('url', url)).
-             addE('contains').
-             to(__.addV('alert').
-                   property('lbl', 'alert').
-                   property('objectId', objectId).
-                   property('jd', jd)).
-             next()
-    graph.tx().commit()
+    def aoi = g.V().has('AlertsOfInterest', 'lbl', 'AlertsOfInterest').
+                    has('alertType', alertType).
+                    fold().
+                    coalesce(unfold(), 
+                             addV('AlertsOfInterest').
+                             property('lbl',        'AlertsOfInterest').
+                             property('alertType',  alertType         ).
+                             property('technology', 'HBase'           ).
+                             property('url',         url              )).
+                    next();
+    def a = g.V().has('alert', 'lbl', 'alert').
+                  has('objectId', objectId).
+                  has('jd',       jd).
+                  fold().
+                  coalesce(unfold(), 
+                           addV('source').
+                           property('lbl',     'alert'  ).
+                           property('objectId', objectId).
+                           property('jd',       jd      )).
+                  next();
+    g.V(aoi).addE('contains').
+             to(__.V(a)).
+             property('weight',    weight   ).
+             property('instances', instances).
+             iterate();      
+    graph.tx().commit();
     }
       
   def static registerSourcesOfInterest(sourceType, objectId, weight, instances, url) {   
@@ -215,25 +224,25 @@ class LomikelServer {
                     fold().
                     coalesce(unfold(), 
                              addV('SourcesOfInterest').
-                             property('lbl', 'SourcesOfInterest').
-                             property('sourceType', sourceType).
-                             property('technology', 'HBase').
-                             property('url', url)).
+                             property('lbl',        'SourcesOfInterest').
+                             property('sourceType', sourceType         ).
+                             property('technology', 'HBase'            ).
+                             property('url',        url                )).
                     next();
     def s = g.V().has('source', 'lbl', 'source').
                   has('objectId', objectId).
                   fold().
                   coalesce(unfold(), 
                            addV('source').
-                           property('lbl', 'source').
+                           property('lbl',      'source').
                            property('objectId', objectId)).
                   next();
     g.V(soi).addE('contains').
              to(__.V(s)).
-             property('weight', weight).
+             property('weight',    weight   ).
              property('instances', instances).
              iterate();
-    graph.tx().commit()
+    graph.tx().commit();
     }
       
   def static exportAlertsOfInterest(alertType, fn) {  

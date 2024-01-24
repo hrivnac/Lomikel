@@ -77,7 +77,7 @@ public class StringGremlinClient extends GremlinClient {
     * @throws Exception If anything goes wrong. */
   // TBD: handle exceptions
   public List<Result>	 interpret(String request) throws Exception {
-    log.info("Evaluating " + request);
+    log.debug("Evaluating " + request);
     ResultSet results = _client.submit(request);
     return results.all().get();
     }

@@ -206,28 +206,34 @@ class Lomikel {
                    property('objectId', objectId).
                    property('jd', jd)).
              next()
-    g.getGraph().tx().commit()
+    g.getGraph().tx().commit();
     }
     
   def static registerSourcesOfInterest(g, sourceType, objectId, weight, instances, url) {   
-    return g.V().
-             has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
-             has('sourceType', sourceType).
-             fold().
-             coalesce(unfold(), 
-                      addV('SourcesOfInterest').
-                      property('lbl', 'SourcesOfInterest').
-                      property('sourceType', sourceType).
-                      property('technology', 'HBase').
-                      property('url', url)).
-             addE('contains').
-             to(__.addV('source').
-                   property('lbl', 'source').
-                   property('objectId', objectId)).
-             property('weight', weight).
+    def soi = g.V().has('SourcesOfInterest', 'lbl', 'SourcesOfInterest').
+                    has('sourceType', sourceType).
+                    fold().
+                    coalesce(unfold(), 
+                             addV('SourcesOfInterest').
+                             property('lbl',        'SourcesOfInterest').
+                             property('sourceType', sourceType         ).
+                             property('technology', 'HBase'            ).
+                             property('url',        url                )).
+                    next();
+    def s = g.V().has('source', 'lbl', 'source').
+                  has('objectId', objectId).
+                  fold().
+                  coalesce(unfold(), 
+                           addV('source').
+                           property('lbl',      'source').
+                           property('objectId', objectId)).
+                  next();
+    g.V(soi).addE('contains').
+             to(__.V(s)).
+             property('weight',    weight   ).
              property('instances', instances).
-             next()
-    g.getGraph().tx().commit()
+             iterate();
+    g.getGraph().tx().commit();
     }
         
   def static exportAlertsOfInterest(g, alertType, fn) {  
