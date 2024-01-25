@@ -212,8 +212,9 @@ class LomikelServer {
                   next();
     g.V(aoi).addE('contains').
              to(__.V(a)).
-             property('weight',    weight   ).
-             property('instances', instances).
+             property('lbl',       'contains').
+             property('weight',    weight    ).
+             property('instances', instances ).
              iterate();      
     graph.tx().commit();
     }
@@ -239,8 +240,9 @@ class LomikelServer {
                   next();
     g.V(soi).addE('contains').
              to(__.V(s)).
-             property('weight',    weight   ).
-             property('instances', instances).
+             property('lbl',       'contains').
+             property('weight',    weight    ).
+             property('instances', instances ).
              iterate();
     graph.tx().commit();
     }

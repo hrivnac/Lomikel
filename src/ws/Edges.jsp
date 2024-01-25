@@ -86,7 +86,6 @@
       vLabel = callGremlinValues(gr + ".E('" + id1 + "').label().next().toString()")[0];
       tdata += ",\"from\":\""  + vFrom  + "\"";
       tdata += ",\"to\":\""    + vTo    + "\"";
-      tdata += ",\"abcd\":\"" + vLabel + "\"";
       tdata += "}";
       }
     }

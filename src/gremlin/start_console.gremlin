@@ -202,9 +202,9 @@ class Lomikel {
                       property('url', url)).
              addE('contains').
              to(__.addV('alert').
-                   property('lbl', 'alert').
-                   property('objectId', objectId).
-                   property('jd', jd)).
+                   property('lbl',      'contains').
+                   property('objectId', objectId  ).
+                   property('jd',       jd        )).
              next()
     g.getGraph().tx().commit();
     }
@@ -230,8 +230,9 @@ class Lomikel {
                   next();
     g.V(soi).addE('contains').
              to(__.V(s)).
-             property('weight',    weight   ).
-             property('instances', instances).
+             property('lbl',       'contains').
+             property('weight',    weight    ).
+             property('instances', instances ).
              iterate();
     g.getGraph().tx().commit();
     }
