@@ -42,7 +42,7 @@
     edge1 = edges[i];
     id1 = edge1.id;
     if (edge1.title.split(':')[0] == tit) {
-	    txt = callGremlinValues(gr + ".E('" + id1 + "').elementMap().toList().toString()")[0];
+	    txt = callGremlinValues(gr + ".E('" + id1 + "').valueMap().toList().toString()")[0];
 	    txt = txt.substring(2, txt.length - 2);
 	    txt1 = "";
 	    inside = 0;
@@ -81,10 +81,12 @@
           }
         tdata += "\"" + column + "\":\"" + value + "\"";
         }
-      vFrom = callGremlinValues(gr + ".E('" + id1 + "').inV().<%=vertexName%>")[0];
-      vTo   = callGremlinValues(gr + ".E('" + id1 + "').outV().<%=vertexName%>")[0];
-      tdata += ",\"from\":\"" + vFrom + "\"";
-      tdata += ",\"to\":\""   + vTo   + "\"";
+      vFrom  = callGremlinValues(gr + ".E('" + id1 + "').inV().<%=vertexName%>"    )[0];
+      vTo    = callGremlinValues(gr + ".E('" + id1 + "').outV().<%=vertexName%>"   )[0];
+      vLabel = callGremlinValues(gr + ".E('" + id1 + "').label().next().toString()")[0];
+      tdata += ",\"from\":\""  + vFrom  + "\"";
+      tdata += ",\"to\":\""    + vTo    + "\"";
+      tdata += ",\"label\":\"" + vlabel + "\"";
       tdata += "}";
       }
     }
