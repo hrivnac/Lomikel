@@ -86,12 +86,11 @@
       vLabel = callGremlinValues(gr + ".E('" + id1 + "').label().next().toString()")[0];
       tdata += ",\"from\":\""  + vFrom  + "\"";
       tdata += ",\"to\":\""    + vTo    + "\"";
-      tdata += ",\"label\":\"" + vLabel + "\"";
+      tdata += ",\"abcd\":\"" + vLabel + "\"";
       tdata += "}";
       }
     }
   tdata += "]";
-  console.log(tdata);
   tdata = JSON.parse(tdata);
   var header = "<tr>";
   for (var i = 0; i < columns.length; i++) {
