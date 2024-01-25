@@ -10,5 +10,6 @@
   HBase2Table.changeColumnsProcessor(new FinkHBaseColumnsProcessor());
   String timestampField = "jd";
   String dirField       = "direction";
-  String vertexTitle = "";
+  String vertexName     = "values('lbl').toList().toString().replace(']', '').replace('[', '').replaceAll(' ', '').replaceAll(',', '.')";
+  String vertexTitle    = "";
   %>
