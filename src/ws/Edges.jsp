@@ -84,7 +84,6 @@
       vFrom  = callGremlinValues(gr + ".E('" + id1 + "').inV().<%=vertexName%>"    )[0];
       vTo    = callGremlinValues(gr + ".E('" + id1 + "').outV().<%=vertexName%>"   )[0];
       vLabel = callGremlinValues(gr + ".E('" + id1 + "').label().next().toString()")[0];
-      console.log(vLabel);
       tdata += ",\"from\":\""  + vFrom  + "\"";
       tdata += ",\"to\":\""    + vTo    + "\"";
       tdata += ",\"label\":\"" + vLabel + "\"";
@@ -92,6 +91,7 @@
       }
     }
   tdata += "]";
+      console.log(tdata);
   tdata = JSON.parse(tdata);
   var header = "<tr>";
   for (var i = 0; i < columns.length; i++) {
