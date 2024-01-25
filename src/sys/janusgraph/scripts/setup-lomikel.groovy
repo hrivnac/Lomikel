@@ -212,9 +212,7 @@ class LomikelServer {
                   next();
     g.V(aoi).addE('contains').
              to(__.V(a)).
-             property('lbl',       'contains').
-             property('weight',    weight    ).
-             property('instances', instances ).
+             property('lbl', 'contains').
              iterate();      
     graph.tx().commit();
     }

@@ -6,4 +6,5 @@
   String timestampField = "timestamp";
   String dirField       = "direction";
   String vertexName     = "values('title').toList().toString().replace(']', '').replace('[', '').replaceAll(' ', '').replaceAll(',', '.')";
+  String vertexTitle    = "";
   %>
