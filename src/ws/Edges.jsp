@@ -91,7 +91,7 @@
       }
     }
   tdata += "]";
-      console.log(tdata);
+  console.log(tdata);
   tdata = JSON.parse(tdata);
   var header = "<tr>";
   for (var i = 0; i < columns.length; i++) {
