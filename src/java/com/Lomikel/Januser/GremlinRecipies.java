@@ -239,7 +239,7 @@ public class GremlinRecipies {
   
   /** Commit, if operating via {@link ModifyingGremlinClient},
     * do nothing otherwise. */
-  private void commit() {
+  public void commit() {
     if (_client != null) {
       _client.commit();
       }

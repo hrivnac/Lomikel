@@ -73,8 +73,8 @@ stylesheet.nodes.datalink = {
 stylesheet.nodes.alert = {
   properties:{gremlin:"valueMap('lbl').toList()[0]"},
   graphics: {
-    label:"lbl",
-    title:"lbl",        
+    label:{gremlin:"values('objectId', 'jd').toList().toString().replaceFirst('\\[', '').replaceAll(']', '').replaceFirst(', ', '_')"},
+    title:{gremlin:"values('objectId', 'jd').toList().toString().replaceFirst('\\[', '').replaceAll(']', '').replaceFirst(', ', '_')"},        
     subtitle:" ",
     group:{gremlin:"values('objectId').toList()[0]"},        
     shape:"image",      
