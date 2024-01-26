@@ -305,27 +305,23 @@ class Lomikel {
     }
     
   def static enhanceSourcesOfInterest(g, sourceType, columns) { 
-    sourceType = 'V*';
-    columns = 'i:ra,i:dec';
     // get SourceOfInterest
-    g.V().has('lbl',        'SourcesOfInterest').
-          has('sourceType', sourceType).
-          sideEffect(values('url').
-                     store('url')).
-          outE().
-          sideEffect(inV().values('objectId').
-                           store('objectId')).
-          values('instances').
-          store('instances').
-          cap('objectId', 'instances', 'url')
-          each {
-          x -> print(x);
-          }
-            x -> y = x.get();
-            objectIds  = y['objectId' ];
-            instancess = y['instances'];
-            def (ip, port, table, schema) = y['url'][0].split(':')
-            def client = new FinkHBaseClient(ip, port);
+    def soi = g.V().has('lbl',        'SourcesOfInterest').
+                    has('sourceType', sourceType).
+                    sideEffect(values('url').
+                               store('url')).
+                    outE().
+                    sideEffect(inV().values('objectId').
+                                     store('objectId')).
+                    values('instances').
+                    store('instances').
+                    cap('objectId', 'instances', 'url').
+                    next();
+          
+            def objectIds  = soi['objectId' ];
+            def instancess = soi['instances'];
+            def (ip, port, table, schema) = soi['url'][0].split(':')
+            def client = new com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient(ip, port);
             client.connect(table, schema);
             // get all sources
             for (int i = 0; i < objectIds.size(); i++) {
@@ -338,7 +334,7 @@ class Lomikel {
                                           property('lbl',     'source'  ).
                                           property('objectId', objectId)).
                                  next();
-              instances = instancess[i].replaceFirst('\\[', '').replaceAll(']', '').split(',');
+              def instances = instancess[i].replaceFirst('\\[', '').replaceAll(']', '').split(',');
               // get/create all alerts
               for (int j = 0; j < instances.size(); j++) {
                 def jd = instances[j].trim();
@@ -359,13 +355,12 @@ class Lomikel {
                                        property('objectId', objectId).
                                            property('jd',       jd      ));
                 columns.split(',').each {c -> a.property(c.split(':')[1], results[0][c])};
-                alert = a.next();          
+                def alert = a.next();          
                 g.addE('has').from(__.V(source)).to(__.V(alert)).iterate();   
                 g.getGraph().tx().commit();
                 }
               }
-            }
-    }
+     }
    
   def static myGraph(myName) {
     def graph0

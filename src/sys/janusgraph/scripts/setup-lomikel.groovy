@@ -306,21 +306,21 @@ class LomikelServer {
     
   def static enhanceSourcesOfInterest(sourceType, columns) { 
     // get SourceOfInterest
-    g.V().has('lbl',        'SourcesOfInterest').
-          has('sourceType', sourceType).
-          sideEffect(values('url').
-                     store('url')).
-          outE().
-          sideEffect(inV().values('objectId').
-                           store('objectId')).
-          values('instances').
-          store('instances').
-          cap('objectId', 'instances', 'url').
-          map {
-            x -> y = x.get();
-            objectIds  = y['objectId' ];
-            instancess = y['instances'];
-            def (ip, port, table, schema) = y['url'][0].split(':')
+    def soi = g.V().has('lbl',        'SourcesOfInterest').
+                    has('sourceType', sourceType).
+                    sideEffect(values('url').
+                               store('url')).
+                    outE().
+                    sideEffect(inV().values('objectId').
+                                     store('objectId')).
+                    values('instances').
+                    store('instances').
+                    cap('objectId', 'instances', 'url').
+                    next();
+          
+            def objectIds  = soi['objectId' ];
+            def instancess = soi['instances'];
+            def (ip, port, table, schema) = soi['url'][0].split(':')
             def client = new com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient(ip, port);
             client.connect(table, schema);
             // get all sources
@@ -334,7 +334,7 @@ class LomikelServer {
                                           property('lbl',     'source'  ).
                                           property('objectId', objectId)).
                                  next();
-              instances = instancess[i].replaceFirst('\\[', '').replaceAll(']', '').split(',');
+              def instances = instancess[i].replaceFirst('\\[', '').replaceAll(']', '').split(',');
               // get/create all alerts
               for (int j = 0; j < instances.size(); j++) {
                 def jd = instances[j].trim();
@@ -355,12 +355,11 @@ class LomikelServer {
                                        property('objectId', objectId).
                                            property('jd',       jd      ));
                 columns.split(',').each {c -> a.property(c.split(':')[1], results[0][c])};
-                alert = a.next();          
+                def alert = a.next();          
                 g.addE('has').from(__.V(source)).to(__.V(alert)).iterate();   
-                g.getGraph().tx().commit();
+                g.graph().tx().commit();
                 }
-              }
-            }
+              }           
     }
    
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "134.158.74.54").set("storage.port", "2183").set("storage.hbase.table", "janusgraph").open()
