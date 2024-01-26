@@ -311,8 +311,8 @@ class LomikelServer {
           sideEffect(values('url').
                      store('url')).
           outE().
-          sideEffect(inV.values('objectId').
-                         store('objectId')).
+          sideEffect(inV().values('objectId').
+                           store('objectId')).
           values('instances').
           store('instances').
           cap('objectId', 'instances', 'url')
