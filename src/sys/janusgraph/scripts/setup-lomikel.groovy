@@ -308,19 +308,21 @@ class LomikelServer {
     // get SourceOfInterest
     Set soi = g.V().has('lbl',        'SourcesOfInterest').
                     has('sourceType', sourceType).
-                    sideEffect(values('url').
-                               store('xurl')).
                     outE().
                     sideEffect(inV().values('objectId').
                                      store('objectId')).
                     values('instances').
                     store('instances').
-                    cap('objectId', 'instances', 'xurl').
+                    cap('objectId', 'instances').
                     next();          
             def objectIds  = soi['objectId' ];
             def instancess = soi['instances'];
-            def url        = soi['xurl'      ];
-            def (ip, port, table, schema) = url[0].split(':');
+            //def url        = soi['url'      ];
+            def url = g.V().has('lbl',        'SourcesOfInterest').
+                            has('sourceType', sourceType).
+                            values('url').
+                            next();
+            def (ip, port, table, schema) = url.split(':');
             def client = new com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient(ip, port);
             client.connect(table, schema);
             // get all sources
