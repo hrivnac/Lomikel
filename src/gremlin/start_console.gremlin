@@ -316,11 +316,10 @@ class Lomikel {
                     values('instances').
                     store('instances').
                     cap('objectId', 'instances', 'url').
-                    next();
-          
+                    next();          
             def objectIds  = soi['objectId' ];
             def instancess = soi['instances'];
-            def (ip, port, table, schema) = soi['url'][0].split(':')
+            def (ip, port, table, schema) = soi['url'][0].split(':');
             def client = new com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient(ip, port);
             client.connect(table, schema);
             // get all sources

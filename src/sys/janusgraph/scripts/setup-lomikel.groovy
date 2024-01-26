@@ -306,7 +306,7 @@ class LomikelServer {
     
   def static enhanceSourcesOfInterest(sourceType, columns) { 
     // get SourceOfInterest
-    Map soi = g.V().has('lbl',        'SourcesOfInterest').
+    Set soi = g.V().has('lbl',        'SourcesOfInterest').
                     has('sourceType', sourceType).
                     sideEffect(values('url').
                                store('url')).
@@ -316,11 +316,11 @@ class LomikelServer {
                     values('instances').
                     store('instances').
                     cap('objectId', 'instances', 'url').
-                    next();
-          
+                    next();          
             def objectIds  = soi['objectId' ];
             def instancess = soi['instances'];
-            def (ip, port, table, schema) = soi['url'][0].split(':')
+            def url        = soi['url'      ];
+            def (ip, port, table, schema) = url[0].split(':');
             def client = new com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient(ip, port);
             client.connect(table, schema);
             // get all sources
