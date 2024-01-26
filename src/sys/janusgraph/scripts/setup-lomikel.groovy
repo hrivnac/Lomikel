@@ -306,7 +306,7 @@ class LomikelServer {
     
   def static enhanceSourcesOfInterest(sourceType, columns) { 
     // get SourceOfInterest
-    def soi = g.V().has('lbl',        'SourcesOfInterest').
+    Map soi = g.V().has('lbl',        'SourcesOfInterest').
                     has('sourceType', sourceType).
                     sideEffect(values('url').
                                store('url')).
