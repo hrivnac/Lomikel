@@ -205,7 +205,7 @@ class LomikelServer {
                   has('jd',       jd).
                   fold().
                   coalesce(unfold(), 
-                           addV('source').
+                           addV('alert').
                            property('lbl',     'alert'  ).
                            property('objectId', objectId).
                            property('jd',       jd      )).
@@ -303,7 +303,66 @@ class LomikelServer {
     graph.tx().commit()
     return enhanced
     }
- 
+    
+  def static enhanceSourcesOfInterest(sourceType, columns) { 
+    // get SourceOfInterest
+    g.V().has('lbl',        'SourcesOfInterest').
+          has('sourceType', sourceType).
+          sideEffect(values('url').
+                     store('url')).
+          outE().
+          sideEffect(inV.values('objectId').
+                         store('objectId')).
+          values('instances').
+          store('instances').
+          cap('objectId', 'instances', 'url')
+          map {
+            x -> y = x.get();
+            objectIds  = y['objectId' ];
+            instancess = y['instances'];
+            def (ip, port, table, schema) = y['url'][0].split(':')
+            def client = new FinkHBaseClient(ip, port);
+            client.connect(table, schema);
+            // get all sources
+            for (int i = 0; i < objectIds.size(); i++) {
+              def objectId = objectIds[i];
+              def source = g.V().has('source', 'lbl', 'source').
+                                 has('objectId', objectId).
+                                 fold().
+                                 coalesce(unfold(), 
+                                          addV('source').
+                                          property('lbl',     'source'  ).
+                                          property('objectId', objectId)).
+                                 next();
+              instances = instancess[i].replaceFirst('\\[', '').replaceAll(']', '').split(',');
+              // get/create all alerts
+              for (int j = 0; j < instances.size(); j++) {
+                def jd = instances[j].trim();
+                def key = objectId + '_' + jd;
+                def results = client.results2List(client.scan(key,
+                                                              null,
+                                                              columns,
+                                                              0,
+                                                              false,
+                                                              false));                                                              
+                def a = g.V().has('alert', 'lbl', 'alert').
+                              has('objectId', objectId).
+                              has('jd',       jd).
+                              fold().
+                              coalesce(unfold(), 
+                                       addV('alert').
+                                       property('lbl',     'alert'  ).
+                                       property('objectId', objectId).
+                                           property('jd',       jd      ));
+                columns.split(',').each {c -> a.property(c.split(':')[1], results[0][c])};
+                alert = a.next();          
+                g.addE('has').from(__.V(source)).to(__.V(alert)).iterate();   
+                g.getGraph().tx().commit();
+                }
+              }
+            }
+    }
+   
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "134.158.74.54").set("storage.port", "2183").set("storage.hbase.table", "janusgraph").open()
   def static g = graph.traversal()
 
