@@ -25,7 +25,7 @@ public class LomikelConnector extends AbstractGremlinPlugin {
 
   /** Create. */
   public LomikelConnector() {
-    super("lomikel.connector",
+    super("Lomikel.connector",
           imports(new Class[]{GremlinRecipies.class,
                               PhoenixProxyClient.class,
                               HBaseClient.class,
