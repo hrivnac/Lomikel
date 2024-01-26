@@ -321,7 +321,7 @@ class LomikelServer {
             objectIds  = y['objectId' ];
             instancess = y['instances'];
             def (ip, port, table, schema) = y['url'][0].split(':')
-            def client = new HBaseClient(ip, port);
+            def client = new FinkHBaseClient(ip, port);
             client.connect(table, schema);
             // get all sources
             for (int i = 0; i < objectIds.size(); i++) {
