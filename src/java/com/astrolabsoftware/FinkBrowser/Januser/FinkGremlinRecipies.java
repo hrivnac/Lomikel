@@ -66,6 +66,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     super(client);
     }
     
+  /** Expand tree under <em>SourcesOfInterest</em> with alerts
+    * filles with requested HBase columns.
+    * @param sourceType The type of <em>SourcesOfInterest</em>.
+    * @param columns    The HBase columns to be filled inti alerts.
+    * @throws LomikelException If anything goes wrong. */
   public void enhanceSourcesOfInterest(String sourceType,
                                        String columns) throws LomikelException {
     Vertex soi = g().V().has("lbl",        "SourcesOfInterest").
