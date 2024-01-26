@@ -315,7 +315,7 @@ class LomikelServer {
                            store('objectId')).
           values('instances').
           store('instances').
-          cap('objectId', 'instances', 'url')
+          cap('objectId', 'instances', 'url').
           map {
             x -> y = x.get();
             objectIds  = y['objectId' ];

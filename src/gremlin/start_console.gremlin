@@ -305,18 +305,22 @@ class Lomikel {
     }
     
   def static enhanceSourcesOfInterest(g, sourceType, columns) { 
+    sourceType = 'V*';
+    columns = 'i:ra,i:dec';
     // get SourceOfInterest
     g.V().has('lbl',        'SourcesOfInterest').
           has('sourceType', sourceType).
           sideEffect(values('url').
                      store('url')).
           outE().
-          sideEffect(inV.values('objectId').
-                         store('objectId')).
+          sideEffect(inV().values('objectId').
+                           store('objectId')).
           values('instances').
           store('instances').
           cap('objectId', 'instances', 'url')
-          map {
+          each {
+          x -> print(x);
+          }
             x -> y = x.get();
             objectIds  = y['objectId' ];
             instancess = y['instances'];
