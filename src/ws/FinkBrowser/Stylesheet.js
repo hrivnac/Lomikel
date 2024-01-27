@@ -71,10 +71,10 @@ stylesheet.nodes.datalink = {
     ]
   }
 stylesheet.nodes.alert = {
-  properties:{gremlin:"valueMap('lbl').toList()[0]"},
+  properties:{gremlin:"valueMap('lbl', 'jd').toList()[0]"},
   graphics: {
-    label:{gremlin:"values('objectId', 'jd').toList().toString().replaceFirst('\\[', '').replaceAll(']', '').replaceFirst(', ', '_')"},
-    title:{gremlin:"values('objectId', 'jd').toList().toString().replaceFirst('\\[', '').replaceAll(']', '').replaceFirst(', ', '_')"},        
+    label:"jd",
+    title:"jd",        
     subtitle:" ",
     group:{gremlin:"values('objectId').toList()[0]"},        
     shape:"image",      
