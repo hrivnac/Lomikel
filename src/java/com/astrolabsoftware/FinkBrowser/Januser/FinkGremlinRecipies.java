@@ -128,9 +128,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             }
           }
         addEdge(source, alert, "has");
-        g().getGraph().tx().commit(); // TBD: should use just commit()
         }
       }
+    g().getGraph().tx().commit(); // TBD: should use just commit()
     log.info("" + n + " alerts added");
     }
     
