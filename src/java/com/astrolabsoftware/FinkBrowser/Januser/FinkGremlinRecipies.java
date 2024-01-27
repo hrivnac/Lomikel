@@ -73,6 +73,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @throws LomikelException If anything goes wrong. */
   public void enhanceSourcesOfInterest(String sourceType,
                                        String columns) throws LomikelException {
+    log.info("Expanding " + sourceType + " SourcesOfInterest and enhancing them with " + columns);
     Vertex soi = g().V().has("lbl",        "SourcesOfInterest").
                          has("sourceType", sourceType).
                          next();
@@ -92,6 +93,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String[] jds;
     String key;
     List<Map<String, String>> results;
+    int n = 0;
     while (containsIt.hasNext()) {
       contains = containsIt.next();
       source = contains.inVertex();
@@ -99,6 +101,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       weight = (Double)(contains.property("weight").value());
       jds = contains.property("instances").value().toString().replaceFirst("\\[", "").replaceAll("]", "").split(",");
       for (String jd : jds) {
+        n++;
         key = objectId + "_" + jd.trim();
         results = client.results2List(client.scan(key,
                                                   null,
@@ -128,6 +131,22 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         g().getGraph().tx().commit(); // TBD: should use just commit()
         }
       }
+    log.info("" + n + " alerts added");
+    }
+    
+  /** Clean tree under <em>SourcesOfInterest</em>.
+    * Drop alerts. Alerts are dropped even if they have other
+    * Edges.
+    * @param sourceType The type of <em>SourcesOfInterest</em>.
+    * @throws LomikelException If anything goes wrong. */
+  public void cleanSourcesOfInterest(String sourceType) throws LomikelException {
+    log.info("Cleaning " + sourceType + " SourcesOfInterest");
+    g().V().has("lbl",        "SourcesOfInterest").
+            has("sourceType", sourceType).
+            out().
+            out().
+            drop();
+    g().getGraph().tx().commit(); // TBD: should use just commit()
     }
 
   /** Logging . */
