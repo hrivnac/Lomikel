@@ -145,7 +145,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             has("sourceType", sourceType).
             out().
             out().
-            drop();
+            drop().
+            iterate();
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
 
