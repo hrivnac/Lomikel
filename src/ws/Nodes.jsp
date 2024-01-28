@@ -313,17 +313,7 @@
       }  
     loadPane("plot", "d3/scatterplot.jsp?" + params, true, 400 * 1.2);
     }
-  function ra(direction) {
-    return parseFloat(direction.split(" ")[2].replaceAll(")", "")) + 180;
-    }
-  function dec(direction) {
-    return parseFloat(direction.split(" ")[1].replaceAll("(", ""));
-    }
   function showSky() {
-    if ("<%=dirField%>".trim() == "") {
-      window.alert("dirField not defined");
-      return;
-      }
     var z = "";
     var s = "";
     var k = "";
@@ -361,7 +351,7 @@
     params += "&tdata=[";
     first = true;
     for (i = 0; i < tdata.length; i++) {
-      if (tdata[i]['ra']) {
+      if (tdata[i]['ra'] && tdata[i]['dec']) {
         if (!first) {
           params += ",";
           }
@@ -388,7 +378,6 @@
         }
       }
     params += "]";
-    console.log(params);
     loadPane("skyview", "d3/skyview.jsp?" + params, true, 600 * 1.2);
     }
   </script>
