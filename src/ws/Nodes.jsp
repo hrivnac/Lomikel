@@ -388,6 +388,7 @@
         }
       }
     params += "]";
+    console.log(params);
     loadPane("skyview", "d3/skyview.jsp?" + params, true, 600 * 1.2);
     }
   </script>
