@@ -361,14 +361,14 @@
     params += "&tdata=[";
     first = true;
     for (i = 0; i < tdata.length; i++) {
-      if (tdata[i]['<%=dirField%>']) {
+      if (tdata[i]['ra']) {
         if (!first) {
           params += ",";
           }
         else {
           first = false;
           }
-        params += "{\"x\":\"" + ra(tdata[i]['<%=dirField%>']) + "\",\"y\":\"" + dec(tdata[i]['<%=dirField%>']) + "\"";
+        params += "{\"x\":\"" + tdata[i]['ra'] + "\",\"y\":\"" + tdata[i]['dec'] + "\"";
         if (z != "" && tdata[i][z]) {
           params += ",\"z\":\"" + tdata[i][z] + "\"";
           }
