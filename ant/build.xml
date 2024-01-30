@@ -553,7 +553,7 @@
     <replace file="../build/TopMini.jsp" token="@VERSION@" value="${version}"/>
     <replace file="../build/TopMini.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
     <replace file="../build/TopMini.jsp" token="@NAME@"    value="${Finkbrowsername}"/>
-    <replace file="../build/TopMini.jsp" token="@LOGO@"    value="$Fink{browserlogo}"/>
+    <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${Finkbrowserlogo}"/>
     <replace file="../build/TopMini.jsp" token="@HOME@"    value="${Finkbrowserurl}"/>
     <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${Finkbootgremlin}"/>
     <war destfile="../lib/FinkBrowser.war" webxml="../src/ws/web.xml">

@@ -1,1 +1,1 @@
-$.getScript("GraphView.js", function() {bootstrap('text', 1);});
+$.getScript("GraphView.js", function() {bootstrap('text', 0);});
