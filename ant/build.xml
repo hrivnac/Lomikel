@@ -542,20 +542,20 @@
  		<copy file="../src/ws/TopMini.jsp"                       tofile="../build/TopMini.jsp" overwrite="true"/>
  		<copy file="../src/ws/FinkBrowser/Servers-${target}.jsp" tofile="../build/Servers.jsp" overwrite="true"/>
  		<copy file="../src/ws/FinkBrowser/Graphs-${target}.jsp"  tofile="../build/Graphs.jsp"  overwrite="true"/>
-    <replace file="../build/index.jsp"   token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/index.jsp"   token="@ICON@"    value="${browsericon}"/>
+    <replace file="../build/index.jsp"   token="@NAME@"    value="${browsernameFink}"/>
+    <replace file="../build/index.jsp"   token="@ICON@"    value="${browsericonFink}"/>
     <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
     <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/Top.jsp"     token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/Top.jsp"     token="@LOGO@"    value="${browserlogo}"/>
-    <replace file="../build/Top.jsp"     token="@HOME@"    value="${browserurl}"/>
-    <replace file="../build/Top.jsp"     token="@BOOT@"    value="${bootgremlin}"/>
+    <replace file="../build/Top.jsp"     token="@NAME@"    value="${browsernameFink}"/>
+    <replace file="../build/Top.jsp"     token="@LOGO@"    value="${browserlogoFink}"/>
+    <replace file="../build/Top.jsp"     token="@HOME@"    value="${browserurlFink}"/>
+    <replace file="../build/Top.jsp"     token="@BOOT@"    value="${bootgremlinFink}"/>
     <replace file="../build/TopMini.jsp" token="@VERSION@" value="${version}"/>
     <replace file="../build/TopMini.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/TopMini.jsp" token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${browserlogo}"/>
-    <replace file="../build/TopMini.jsp" token="@HOME@"    value="${browserurl}"/>
-    <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${bootgremlin}"/>
+    <replace file="../build/TopMini.jsp" token="@NAME@"    value="${browsernameFink}"/>
+    <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${browserlogoFink}"/>
+    <replace file="../build/TopMini.jsp" token="@HOME@"    value="${browserurlFink}"/>
+    <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${bootgremlinFink}"/>
     <war destfile="../lib/FinkBrowser.war" webxml="../src/ws/web.xml">
       <fileset dir="../src/ws/FinkBrowser">
         <include name="**/*"/>
