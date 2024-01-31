@@ -1,7 +1,6 @@
 function showSkyView(data, name, url) {
 
   // d3-scale-chromatic/src/categorical/Dark2.js
-
   function colorsF(specifier) {
     var n = specifier.length / 6 | 0, colors = new Array(n), i = 0;
     while (i < n) colors[i] = "#" + specifier.slice(i * 6, ++i * 6);
@@ -36,9 +35,7 @@ function showSkyView(data, name, url) {
   if (data[0].z) {
     zmin = data[0].z;
     zmax = zmin;
-    for (i in data) {   console.log(d.z + " " + size);
-    console.log(d.g + " " + (d.g % 10 | 0) + " " + color);
-
+    for (i in data) {
       d = data[i];
       if (d.z < zmin) {
         zmin = d.z;
