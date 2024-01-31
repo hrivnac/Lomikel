@@ -100,7 +100,7 @@ function showSkyView(data, name, url) {
           if (!nearest || distance(nearest, pt) > PROXIMITY_LIMIT) {
             quadtree.add(pt)
             Celestial.setTextStyle({fill:     d.properties.color,
-                                    font:     "normal 8px Helvetica, Arial, sans-serif",
+                                    font:     "normal 16px Helvetica, Arial, sans-serif",
                                     align:    "left",
                                     baseline: "bottom"
                                     });
