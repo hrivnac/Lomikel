@@ -1,7 +1,7 @@
 function actions(url, key) {
   
   console.log(url);
-  for w of key.split(' ')) {
+  for (w of key.split(' ')) {
     ww = w.split('=');
     if (ww[0] == 'objectId') {
       objectId = ww[1];
