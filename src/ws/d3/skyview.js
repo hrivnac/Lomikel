@@ -48,7 +48,7 @@ function showSkyView(data, name, url) {
     
   for (i in data) {
     var d = data[i];
-    var info = name + " " + (d.k ? d.k : "") + "(" + d.x + ", " + d.y +")";
+    var info = name + " " + (d.k ? d.k : "");
     var size = (d.z ? 100 - (200 - 100) * (d.z - zmin) / (zmax - zmin) : 100); // TBD: better
     var color = (d.g ? colors[d.g % 10 | 0] : 'red');
     features.push({"properties": {"info": info, "dim": size, "color": color},
