@@ -1,13 +1,13 @@
 function showSkyView(data, name, url) {
 
-  //const colors = d3.schemeCategory10;
-  // taken from d3-v6.0.0
+  // d3-scale-chromatic/src/categorical/Dark2.js
+
   function colorsF(specifier) {
     var n = specifier.length / 6 | 0, colors = new Array(n), i = 0;
     while (i < n) colors[i] = "#" + specifier.slice(i * 6, ++i * 6);
     return colors;
     }
-  const set1 = colorsF("e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999");
+  const set1 = colorsF("1b9e77d95f027570b3e7298a66a61ee6ab02a6761d666666");
   const colors = set1;
     
   var config = {
@@ -36,7 +36,9 @@ function showSkyView(data, name, url) {
   if (data[0].z) {
     zmin = data[0].z;
     zmax = zmin;
-    for (i in data) {
+    for (i in data) {   console.log(d.z + " " + size);
+    console.log(d.g + " " + (d.g % 10 | 0) + " " + color);
+
       d = data[i];
       if (d.z < zmin) {
         zmin = d.z;
@@ -46,16 +48,12 @@ function showSkyView(data, name, url) {
         }
       }
     }
-  
-  console.log(colors);  
     
   for (i in data) {
     var d = data[i];
     var info = name + " " + (d.k ? d.k : "") + "(" + d.x + ", " + d.y +")";
     var size = (d.z ? 50 - (100 - 50) * (d.z - zmin) / (zmax - zmin) : 50); // TBD: better
     var color = (d.g ? colors[d.g % 10 | 0] : 'red');
-    console.log(d.z + " " + size);
-    console.log(d.g + " " + (d.g % 10 | 0) + " " + color);
     features.push({"properties": {"info": info, "dim": size, "color": color},
                    "geometry": {"type": "Point", "coordinates": [d.x, d.y]}});
     };
