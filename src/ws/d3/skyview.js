@@ -53,9 +53,9 @@ function showSkyView(data, name, url) {
     var d = data[i];
     var info = name + " " + (d.k ? d.k : "") + "(" + d.x + ", " + d.y +")";
     var size = (d.z ? 50 - (100 - 50) * (d.z - zmin) / (zmax - zmin) : 50); // TBD: better
-    var color = (d.g ? colors[d.g % 10] : 'red');
+    var color = (d.g ? colors[d.g % 10 | 0] : 'red');
     console.log(d.z + " " + size);
-    console.log(d.g + " " + (d.g % 10) + " " + color);
+    console.log(d.g + " " + (d.g % 10 | 0) + " " + color);
     features.push({"properties": {"info": info, "dim": size, "color": color},
                    "geometry": {"type": "Point", "coordinates": [d.x, d.y]}});
     };
