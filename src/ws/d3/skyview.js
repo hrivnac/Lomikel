@@ -1,12 +1,12 @@
 function showSkyView(data, name, url) {
 
-  // d3-scale-chromatic/src/categorical/Dark2.js
+  // d3-scale-chromatic/src/categorical/Category10.js
   function colorsF(specifier) {
     var n = specifier.length / 6 | 0, colors = new Array(n), i = 0;
     while (i < n) colors[i] = "#" + specifier.slice(i * 6, ++i * 6);
     return colors;
     }
-  const set1 = colorsF("1b9e77d95f027570b3e7298a66a61ee6ab02a6761d666666");
+  const set1 = colorsF("1f77b4ff7f0e2ca02cd627289467bd8c564be377c27f7f7fbcbd2217becf");
   const colors = set1;
     
   var config = {
