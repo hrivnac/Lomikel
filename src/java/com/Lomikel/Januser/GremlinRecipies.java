@@ -208,7 +208,8 @@ public class GremlinRecipies {
                       Vertex v2,
                       String relation) {
     if (!checkEdge(v1, v2, relation)) {
-      v1.addEdge(relation, v2);
+      v1.addEdge(relation, v2).
+         property("lbl", relation);
       }
     }
     
@@ -228,6 +229,7 @@ public class GremlinRecipies {
                       Double[] values) {
     if (!checkEdge(v1, v2, relation)) {
       Edge e = v1.addEdge(relation, v2);
+      e.property("lbl", relation);
       for (int i = 0; i < names.length; i++) {
         e.property(names[i], values[i]);
         }
