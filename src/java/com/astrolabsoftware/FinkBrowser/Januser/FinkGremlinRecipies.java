@@ -153,9 +153,17 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** TBD */
   public void generateSourcesOfInterestCorrelations() {
-    GraphTraversal<Vertex, Vertex> soi1 = g().V().has("lbl", "SourcesOfInterest");
-    while (soi1.hasNext()) {
-      System.out.println(soi1.next());
+    GraphTraversal<Vertex, Vertex> soiT1 = g().V().has("lbl", "SourcesOfInterest");
+    while (soiT1.hasNext()) {
+      Vertex soi1 = soiT1.next();
+      Iterator<Edge> containsIt = soi1.edges(Direction.OUT);
+      while (containsIt.hasNext()) {
+        Edge contains = containsIt.next();
+        double weight = (Double)(contains.property("weight").value());
+        Vertex source = contains.inVertex();
+        String objectId = source.property("ObjectId").value().toString();
+        System.out.println(objectId + " " + weight);
+        }
       }
     }
 
