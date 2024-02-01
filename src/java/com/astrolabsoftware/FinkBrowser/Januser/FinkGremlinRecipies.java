@@ -156,19 +156,34 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void generateSourcesOfInterestCorrelations() {
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double> weights = new HashMap<>();
+    Set<String> sources = new HashSet<>();
+    Set<String> objectIds = new HashSet<>();
     while (soiT.hasNext()) {
       Vertex soi = soiT.next();
       String sourceType = soi.property("sourceType").value().toString();
+      sources.add(sourceType);
       Iterator<Edge> containsIt = soi.edges(Direction.OUT);
       while (containsIt.hasNext()) {
         Edge contains = containsIt.next();
         double weight = (Double)(contains.property("weight").value());
         Vertex source = contains.inVertex();
         String objectId = source.property("objectId").value().toString();
+        objectIds.add(objectId);
         weights.put(Pair.of(sourceType, objectId), weight);
         }
       }
-    System.out.println(weights);
+    Map<Pair<String, String>, Double> corr = new HashMap<>();
+    for (String soi1 : sources) {
+      for (String soi2 : sources) {
+        for (String oid : objectIds) {
+          if (weights.containsKey(Pair.of(soi1, oid)) &&
+              weights.containsKey(Pair.of(soi2, oid))) {
+            corr.put(Pair.of(soi1, soi2), weights.get(Pair.of(soi1, oid)) *
+                                          weights.get(Pair.of(soi2, oid)));
+            }
+          }
+        }
+      }
     }
 
   /** Logging . */
