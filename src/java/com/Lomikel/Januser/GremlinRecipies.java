@@ -213,10 +213,14 @@ public class GremlinRecipies {
     }
     
   /** Add an {@link Edge} between two {@link Vertex}s,
-    * unless it exists.
+    * unless it exists. Add properties.
     * @param v1       The first {@link Vertex}.
     * @param v2       The second {@link Vertex}.
-    * @param relation The {@link Edge} name. */
+    * @param relation The {@link Edge} name.
+    * @param names    The names of the properties to be added.
+    * @param values   The values of the properties to be added. **/
+  // BUG: properties are not added to alfready existing Edge
+  // TBD: check names.length == values.length
   public void addEdge(Vertex v1,
                       Vertex v2,
                       String relation,

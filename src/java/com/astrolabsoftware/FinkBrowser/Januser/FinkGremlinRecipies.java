@@ -154,7 +154,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** TBD */
   public void generateSourcesOfInterestCorrelations() {
-    log.info("Gebnerating correlations for Sources of Interest");
+    log.info("Generating correlations for Sources of Interest");
+    g().V().has("lbl", "SourcesOfInterest").bothE("overlap").drop();
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double> weights = new HashMap<>();
     Set<String> sources = new HashSet<>();
@@ -195,13 +196,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       sizeInOut.put(soi1, s1);
       }
+    int i1 = 0;
+    int i2 = 0;
     for (String soi1 : sources) {
+      i1++;
+      i2 = 0;
       for (String soi2 : sources) {
-        addEdge(g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi1).next(),
-                g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
-                "overlaps",
-                new String[]{"intersection",                "sizeIn",            "sizeOut"          },
-                new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
+        i2++;
+        if (i2 < i1) {
+          addEdge(g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi1).next(),
+                  g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
+                  "overlaps",
+                  new String[]{"intersection",                "sizeIn",            "sizeOut"          },
+                  new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
+          }
         }
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
