@@ -660,19 +660,23 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
     }
   if (nam.gremlin) {
     val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);
+    console.log("G " + nam + " " + val);
     }
   else if (nam.js) {
     val = eval(nam.js);
+    console.log("J " + nam + " " + val);
     }
   else if (eMap.get(nam)) {
     val = eMap.get(nam);
+    console.log("E " + nam + " " + val);
     }
   else {
     val = nam;
+    console.log("X " + nam + " " + val);
     }
-  console.log(typeof(val));
   if (typeof(val) == 'number') {
     val = val.toString();
+    console.log("N " + nam + " " + val);
     }
   else if (typeof(val) == 'object') {
     if (Array.isArray(val)) {
@@ -690,7 +694,7 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
           }
         }
       }
+    console.log("O " + nam + " " + val);
     }
-  console.log(val);
   return val;
   }
