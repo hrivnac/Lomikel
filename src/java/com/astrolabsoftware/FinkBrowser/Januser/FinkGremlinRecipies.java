@@ -153,7 +153,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** TBD */
-  public void generateSourcesOfInterestCorrelations() {
+  public void generateSourcesOfInterestCorrelations(boolean useWeight) {
     log.info("Generating correlations for Sources of Interest");
     g().V().has("lbl", "SourcesOfInterest").bothE("overlap").drop();
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
@@ -182,8 +182,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         for (String oid : objectIds) {
           if (weights.containsKey(Pair.of(soi1, oid)) &&
               weights.containsKey(Pair.of(soi2, oid))) {
-            c12 += weights.get(Pair.of(soi1, oid)) *
-                   weights.get(Pair.of(soi2, oid));
+            c12 += useWeight ? weights.get(Pair.of(soi1, oid)) *
+                               weights.get(Pair.of(soi2, oid))
+                             : 1;
             }
           }
         corr.put(Pair.of(soi1, soi2), c12);
