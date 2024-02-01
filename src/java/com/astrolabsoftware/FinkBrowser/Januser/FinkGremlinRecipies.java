@@ -157,7 +157,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                  to overlap. */
   public void generateSourcesOfInterestCorrelations(boolean useWeight) {
     log.info("Generating correlations for Sources of Interest " + (useWeight ? "" : "not ") + "using weights");
-    //g().V().has("lbl", "SourcesOfInterest").bothE("overlap").drop().iterate();
+    g().V().has("lbl", "SourcesOfInterest").bothE("overlap").drop().iterate();
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double> weights = new HashMap<>();
     Set<String> sources = new HashSet<>();
@@ -170,6 +170,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       Iterator<Edge> containsIt = soi.edges(Direction.OUT);
       while (containsIt.hasNext()) {
         Edge contains = containsIt.next();
+        System.out.println(contains.values());
         double weight = (Double)(contains.property("weight").value());
         Vertex source = contains.inVertex();
         String objectId = source.property("objectId").value().toString();
