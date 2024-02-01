@@ -341,3 +341,20 @@ stylesheet.edges.contains = {
     {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
     ]
   }
+stylesheet.edges.overlaps = {
+  properties:{gremlin:"valueMap('sizeIn', 'sizeOut', 'intersection').toList()[0]"},
+  graphics: {
+    label:" ",
+    title:"intersection",
+    subtitle:" ",
+    arrows:"middle",
+    value:"intersection",
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},      target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},     target:"table"   },
+    {name:"Venn",  url:{js:"'d3/venn.jsp?n1=' + sizeIn + '&n2=' + sizeOut + '&n12=' + intersection"}, target:"plot"    }
+    ]
+  }
+  
