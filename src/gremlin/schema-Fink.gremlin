@@ -483,6 +483,7 @@ mgmt.addProperties(from,
 mgmt.addConnection(has,      AstroLabNet,       site)
 mgmt.addConnection(contains, AlertsOfInterest,  alert)
 mgmt.addConnection(contains, SourcesOfInterest, source)
+mgmt.addConnection(overlaps, SourcesOfInterest, SourcesOfInterest)
 mgmt.addConnection(distance, PCA,               PCA)
 mgmt.addConnection(distance, alert,             alert)
 mgmt.addConnection(props,    site,              Imports)
