@@ -156,7 +156,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param useWeight Whether to use <em>contains</em> property <em>weight</em> to weight <em>source</em> contribution
     *                  to overlap. */
   public void generateSourcesOfInterestCorrelations() {
-    boolean useWeigth = true;
+    boolean useWeight = true;
     log.info("Generating correlations for Sources of Interest " + (useWeight ? "" : "not ") + "using weights");
     g().V().has("lbl", "SourcesOfInterest").bothE("overlap").drop().iterate();
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
