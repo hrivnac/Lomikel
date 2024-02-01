@@ -212,6 +212,24 @@ public class GremlinRecipies {
       }
     }
     
+  /** Add an {@link Edge} between two {@link Vertex}s,
+    * unless it exists.
+    * @param v1       The first {@link Vertex}.
+    * @param v2       The second {@link Vertex}.
+    * @param relation The {@link Edge} name. */
+  public void addEdge(Vertex v1,
+                      Vertex v2,
+                      String relation,
+                      String[] names,
+                      Double[] values) {
+    if (!checkEdge(v1, v2, relation)) {
+      Edge e = v1.addEdge(relation, v2);
+      for (int i = 0; i < names.length; i++) {
+        e.property(names[i], values[i]);
+        }
+      }
+    }
+    
   /** Check whether an {@link Edge} exists.
     * @param v1       The source {@link Vertex}.
     * @param v2       The destination {@link Vertex}.

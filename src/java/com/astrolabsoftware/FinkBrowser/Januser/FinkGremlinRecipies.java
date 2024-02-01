@@ -154,6 +154,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** TBD */
   public void generateSourcesOfInterestCorrelations() {
+    log.info("Gebnerating correlations for Sources of Interest");
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double> weights = new HashMap<>();
     Set<String> sources = new HashSet<>();
@@ -194,8 +195,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       sizeInOut.put(soi1, s1);
       }
-    System.out.println(corr);
-    System.out.println(sizeInOut);
+    for (String soi1 : sources) {
+      for (String soi2 : sources) {
+        addEdge(g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi1).next(),
+                g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
+                "overlaps",
+                new String[]{"intersection",                "sizeIn",            "sizeOut"          },
+                new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
+        }
+      }
+    g().getGraph().tx().commit(); // TBD: should use just commit()
     }
 
   /** Logging . */
