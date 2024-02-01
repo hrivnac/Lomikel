@@ -176,16 +176,15 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<String, Double> sizeInOut = new HashMap<>();
     for (String soi1 : sources) {
       for (String soi2 : sources) {
+        double c12 = 0;
         for (String oid : objectIds) {
           if (weights.containsKey(Pair.of(soi1, oid)) &&
               weights.containsKey(Pair.of(soi2, oid))) {
-            corr.put(Pair.of(soi1, soi2), weights.get(Pair.of(soi1, oid)) *
-                                          weights.get(Pair.of(soi2, oid)));
-            }
-          else {
-            corr.put(Pair.of(soi1, soi2), 0.0);
+            c12 += weights.get(Pair.of(soi1, oid)) *
+                   weights.get(Pair.of(soi2, oid));
             }
           }
+        corr.put(Pair.of(soi1, soi2), c12);
         }
       }
     for (String soi1 : sources) {
