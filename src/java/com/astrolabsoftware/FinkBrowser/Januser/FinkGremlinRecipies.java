@@ -184,6 +184,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       }
+    System.out.println(corr);
     }
 
   /** Logging . */
