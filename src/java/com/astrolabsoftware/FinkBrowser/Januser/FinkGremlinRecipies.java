@@ -159,29 +159,36 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     log.info("Generating correlations for Sources of Interest " + (useWeight ? "" : "not ") + "using weights");
     g().V().has("lbl", "SourcesOfInterest").bothE("overlap").drop().iterate();
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
-    Map<Pair<String, String>, Double> weights = new HashMap<>();
-    Set<String> sources = new HashSet<>();
-    Set<String> objectIds = new HashSet<>();
+    Map<Pair<String, String>, Double> weights   = new HashMap<>();
+    Set<String>                       sources   = new HashSet<>();
+    Set<String>                       objectIds = new HashSet<>();
+    Vertex soi;
+    String sourceType;
+    Iterator<Edge> containsIt;
+    Edge contains;
+    double weight;
+    Vertex source;
+    String objectId;
     while (soiT.hasNext()) {
-      Vertex soi = soiT.next();
-      String sourceType = soi.property("sourceType").value().toString();
+      soi = soiT.next();
+      sourceType = soi.property("sourceType").value().toString();
       sources.add(sourceType);
-      System.out.println(sourceType);
-      Iterator<Edge> containsIt = soi.edges(Direction.OUT);
+      containsIt = soi.edges(Direction.OUT);
       while (containsIt.hasNext()) {
-        Edge contains = containsIt.next();
-        //double weight = (Double)(contains.property("weight").value());
-        Vertex source = contains.inVertex();
-        String objectId = source.property("objectId").value().toString();
+        contains = containsIt.next();
+        weight = (Double)(contains.property("weight").value());
+        source = contains.inVertex();
+        objectId = source.property("objectId").value().toString();
         objectIds.add(objectId);
-        //weights.put(Pair.of(sourceType, objectId), weight);
+        weights.put(Pair.of(sourceType, objectId), weight);
         }
       }
-    Map<Pair<String, String>, Double> corr = new HashMap<>();
-    Map<String, Double> sizeInOut = new HashMap<>();
+    Map<Pair<String, String>, Double> corr      = new HashMap<>();
+    Map<String, Double>               sizeInOut = new HashMap<>();
+    double c12;
     for (String soi1 : sources) {
       for (String soi2 : sources) {
-        double c12 = 0;
+        c12 = 0;
         for (String oid : objectIds) {
           if (weights.containsKey(Pair.of(soi1, oid)) &&
               weights.containsKey(Pair.of(soi2, oid))) {
@@ -193,8 +200,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         corr.put(Pair.of(soi1, soi2), c12);
         }
       }
+    double s1;
     for (String soi1 : sources) {
-      double s1 = 0;
+      s1 = 0;
       for (String soi2 : sources) {
         s1 += corr.get(Pair.of(soi1, soi2));
         }
