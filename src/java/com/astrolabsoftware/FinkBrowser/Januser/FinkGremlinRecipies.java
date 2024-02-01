@@ -162,7 +162,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<Pair<String, String>, Double> weights = new HashMap<>();
     Set<String> sources = new HashSet<>();
     Set<String> objectIds = new HashSet<>();
-    System.out.println(sourceType);
     while (soiT.hasNext()) {
       Vertex soi = soiT.next();
       String sourceType = soi.property("sourceType").value().toString();
