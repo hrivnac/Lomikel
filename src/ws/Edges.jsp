@@ -99,7 +99,7 @@
   </script>
   
 <div id="toolbar">
-  <button onClick="w2popup.load({url:'Help-Nodes.html', showMax: true})" style="position:absolute; right:0">
+  <button onClick="w2popup.load({url:'Help-Edges.html', showMax: true})" style="position:absolute; right:0">
     <img src="images/Help.png" width="10"/>
     </button>
   <button onclick="showScatter('scatter')"   style="background-color:#ddddff" title="scatter plot of multiple variables"   >Scatter Plot</button>    

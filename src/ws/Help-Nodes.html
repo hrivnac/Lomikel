@@ -1,22 +1,28 @@
 @<div id="popup1" style="display: none; width: 600px; height: 400px; overflow: hidden">
   <div rel="title">
-  hbase table      
+  nodes table      
     </div>
   <div rel="body" style="padding: 10px; line-height: 150%">
     <!--div style="float: left; background-color: white; width: 150px; height: 80px; border: 1px solid silver; margin: 5px;"><img src="images/Lomikel.png"></div-->
-    <p>The <b>table</b> panel shows and manipulates data loaded from the graph elemts. It allows sorting according to any
-       column, drawing graphs derived from the table values,...</p>
-    <p>Numerical variables can be selected for generation of several plots. The <b>Evolution Plot</b>
-       shows time evolution of variables selected in <b>x</b> and <b>y</b> columns). The <b>Scatter Plot</b>
-       shows a 2D (<b>x*y</b>) plot of selected variables. The <b>z</b> column gives the cell value (may be absent),
-       it's reflected by the shown circle size. The <b>Sky View</b>b> show the cells in the sky map. <b>x,y</b> columns
-       are ignored.
+    <p>The <b>nodes table</b> panel shows and manipulates data loaded from the graph vertices. It allows sorting according to any
+       column, drawing graphs derived from the table values and visualising of elements in various ways.</p>
+    <p>Numerical variables can be selected for generation of several plots.
+       <br/>
+       The <b>Scatter Plot</b> shows a 2D (<b>x*y</b>) plot of selected variables.
+       The <b>Evolution Plot</b> shows time evolution of variables selected in <b>x</b> and <b>y</b> columns.
+       The <b>Sky View</b>b> show the cells in the sky map. It uses <b>ra,dec</b> columns, <b>x,y</b> columns are ignored.
+       <br/>
+       The <b>z</b> column gives the cell value (may be absent), it's reflected by the shown circle size.
        The <b>s</b> column gives the cell value which be be used to group results, if it is not
        selected, the groups will be created to distinguish different <b>x,y</b> columns, it's reflected by the
        circle color.
+       The <b>k</b> column gives the cell information (may be absent), it is shown on howering over the plot circle.
+       <br/>
        All plot objects can be clicked on to show their associated information and actions.</p>
     </div>
   <div rel="buttons">
     <button class="w2ui-btn" onclick="w2popup.close()">Close</button>
     </div>
   </div>  
+
+  

@@ -149,6 +149,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             iterate();
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
+    
+  /** TBD */
+  public void generateSourcesOfInterestCorrelations() {
+    System.out.println(g().V().has("lbl", "SourcesOfInterest"));
+    }
 
   /** Logging . */
   private static Logger log = Logger.getLogger(FinkGremlinRecipies.class);
