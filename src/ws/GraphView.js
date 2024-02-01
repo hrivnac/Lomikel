@@ -670,6 +670,7 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
   else {
     val = nam;
     }
+  console.log(typeof(val));
   if (typeof(val) == 'number') {
     val = val.toString();
     }
