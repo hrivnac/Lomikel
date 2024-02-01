@@ -666,7 +666,7 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
     val = eval(nam.js);
     console.log("J " + nam + " " + val);
     }
-  else if (eMap.get(nam)) {
+  else if (eMap.has(nam)) {
     val = eMap.get(nam);
     console.log("E " + nam + " " + val);
     }
