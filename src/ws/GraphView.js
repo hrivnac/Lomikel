@@ -651,32 +651,24 @@ function callInfo(element, key) {
 // (title can be used by js)
 // TBD: handle default if undefined
 function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
-  console.log(nam + " " + id + " " + ifEdge + " " + title);
-  console.log(eMap);
-  console.log(pMap);
   var set = ifEdge ? 'E' : 'V';
   for ([key, value] of pMap.entries()) {
     eval(key + '=' + '"' + value + '"');
     }
   if (nam.gremlin) {
     val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);
-    console.log("G " + nam + " " + val);
     }
   else if (nam.js) {
     val = eval(nam.js);
-    console.log("J " + nam + " " + val);
     }
   else if (eMap.has(nam)) {
     val = eMap.get(nam);
-    console.log("E " + nam + " " + val);
     }
   else {
     val = nam;
-    console.log("X " + nam + " " + val);
     }
   if (typeof(val) == 'number') {
     val = val.toString();
-    console.log("N " + nam + " " + val);
     }
   else if (typeof(val) == 'object') {
     if (Array.isArray(val)) {
@@ -694,7 +686,6 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
           }
         }
       }
-    console.log("O " + nam + " " + val);
     }
   return val;
   }

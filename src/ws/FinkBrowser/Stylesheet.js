@@ -347,7 +347,7 @@ stylesheet.edges.overlaps = {
     label:" ",
     title:"intersection",
     subtitle:" ",
-    arrows:"middle",
+    arrows:" ",
     value:"intersection",
     group:" "
     },
