@@ -1,6 +1,7 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Utils.MapUtil;
+import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.ModifyingGremlinClient;
@@ -153,18 +154,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** TBD */
   public void generateSourcesOfInterestCorrelations() {
-    GraphTraversal<Vertex, Vertex> soiT1 = g().V().has("lbl", "SourcesOfInterest");
-    while (soiT1.hasNext()) {
-      Vertex soi1 = soiT1.next();
-      Iterator<Edge> containsIt = soi1.edges(Direction.OUT);
+    GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
+    Map<Pair<String, String>, Double> weights = new HashMap<>();
+    while (soiT.hasNext()) {
+      Vertex soi = soiT.next();
+      String sourceType = soi.property("sourceType").value().toString();
+      Iterator<Edge> containsIt = soi.edges(Direction.OUT);
       while (containsIt.hasNext()) {
         Edge contains = containsIt.next();
         double weight = (Double)(contains.property("weight").value());
         Vertex source = contains.inVertex();
         String objectId = source.property("objectId").value().toString();
-        System.out.println(objectId + " " + weight);
+        weights.put(Pair.of(sourceType, objectId), weight);
         }
       }
+    System.out.println(weights);
     }
 
   /** Logging . */
