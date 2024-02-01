@@ -173,6 +173,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
     Map<Pair<String, String>, Double> corr = new HashMap<>();
+    Map<String, Double> sizeInOut = new HashMap<>();
     for (String soi1 : sources) {
       for (String soi2 : sources) {
         for (String oid : objectIds) {
@@ -181,10 +182,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             corr.put(Pair.of(soi1, soi2), weights.get(Pair.of(soi1, oid)) *
                                           weights.get(Pair.of(soi2, oid)));
             }
+          else {
+            corr.put(Pair.of(soi1, soi2), 0.0);
+            }
           }
         }
       }
+    for (String soi1 : sources) {
+      double s1 = 0;
+      for (String soi2 : sources) {
+        s1 += corr.get(Pair.of(soi1, soi2));
+        }
+      sizeInOut.put(soi1, s1);
+      }
     System.out.println(corr);
+    System.out.println(sizeInOut);
     }
 
   /** Logging . */
