@@ -153,18 +153,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.
-    * @param useWeight */
+    * @param useWeight Whether to use <em>contains</em> property <em>weight</em> to weight <em>source</em> contribution
+    *                  to overlap. */
   public void generateSourcesOfInterestCorrelations(boolean useWeight) {
     log.info("Generating correlations for Sources of Interest " + (useWeight ? "" : "not ") + "using weights");
-    //g().V().has("lbl", "SourcesOfInterest").bothE("overlap").drop();
+    //g().V().has("lbl", "SourcesOfInterest").bothE("overlap").drop().iterate();
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double> weights = new HashMap<>();
     Set<String> sources = new HashSet<>();
     Set<String> objectIds = new HashSet<>();
+    System.out.println(sourceType);
     while (soiT.hasNext()) {
       Vertex soi = soiT.next();
       String sourceType = soi.property("sourceType").value().toString();
       sources.add(sourceType);
+      System.out.println(sourceType);
       Iterator<Edge> containsIt = soi.edges(Direction.OUT);
       while (containsIt.hasNext()) {
         Edge contains = containsIt.next();
