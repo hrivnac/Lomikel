@@ -161,7 +161,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         Edge contains = containsIt.next();
         double weight = (Double)(contains.property("weight").value());
         Vertex source = contains.inVertex();
-        String objectId = source.property("ObjectId").value().toString();
+        String objectId = source.property("objectId").value().toString();
         System.out.println(objectId + " " + weight);
         }
       }
