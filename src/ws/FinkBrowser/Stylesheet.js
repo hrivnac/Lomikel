@@ -341,8 +341,24 @@ stylesheet.edges.contains = {
     {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
     ]
   }
-stylesheet.edges.overlaps = {
+stylesheet.edges.overlapsx = {
   properties:{gremlin:"valueMap('sizeIn', 'sizeOut', 'intersection').toList()[0]"},
+  graphics: {
+    label:" ",
+    title:"intersection",
+    subtitle:" ",
+    arrows:" ",
+    value:"intersection",
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},      target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},     target:"table"   },
+    {name:"Venn",  url:{js:"'d3/venn.jsp?n1=' + sizeIn + '&n2=' + sizeOut + '&n12=' + intersection"}, target:"plot"    }
+    ]
+  }
+stylesheet.edges.overlaps = {
+  properties:{gremlin:"sideEffect(inV().values('sourceType').store('in')).sideEffect(outV().values('sourceType').store('out')).sideEffect(values('intersection').store('intersection')).sideEffect(values('sizeIn').store('sizeIn')).sideEffect(values('sizeOut').store('sizeOut')).cap('in', 'out', 'intersection', 'sizeIn', 'sizeOut').toList()[0]"},
   graphics: {
     label:" ",
     title:"intersection",

@@ -83,7 +83,7 @@
         }
       lblFrom = callGremlinValues(gr + ".E('" + id1 + "').outV().values('lbl').next().toString()" )[0];
       lblTo   = callGremlinValues(gr + ".E('" + id1 + "').inV( ).values('lbl').next().toString()" )[0];
-      if (lblFrom == "SourcesOfInterest") { // TBD: put into Fink
+      if (lblFrom == "SourcesOfInterest") { // TBD: move into Fink
         vFrom  = callGremlinValues(gr + ".E('" + id1 + "').outV().values('sourceType').next().toString()" )[0];
         }
       else {
