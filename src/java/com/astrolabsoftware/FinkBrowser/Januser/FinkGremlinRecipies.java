@@ -170,13 +170,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       Iterator<Edge> containsIt = soi.edges(Direction.OUT);
       while (containsIt.hasNext()) {
         Edge contains = containsIt.next();
-        System.out.println(contains.values().next());
-        System.out.println(contains.values("weight").next());
-        double weight = (Double)(contains.values("weight").next());
+        //double weight = (Double)(contains.property("weight").value());
         Vertex source = contains.inVertex();
         String objectId = source.property("objectId").value().toString();
         objectIds.add(objectId);
-        weights.put(Pair.of(sourceType, objectId), weight);
+        //weights.put(Pair.of(sourceType, objectId), weight);
         }
       }
     Map<Pair<String, String>, Double> corr = new HashMap<>();
