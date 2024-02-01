@@ -9,6 +9,7 @@ import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
@@ -152,7 +153,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** TBD */
   public void generateSourcesOfInterestCorrelations() {
-    System.out.println(g().V().has("lbl", "SourcesOfInterest"));
+    GraphStep soiStep1 = g().V().has("lbl", "SourcesOfInterest");
+    while (soiStep1.hasNext()) {
+      System.out.println(soiStep1.next());
+      }
     }
 
   /** Logging . */
