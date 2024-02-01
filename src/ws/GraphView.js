@@ -651,6 +651,9 @@ function callInfo(element, key) {
 // (title can be used by js)
 // TBD: handle default if undefined
 function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
+  console.log(nam + " " + id + " " + ifEdge + " " + title);
+  console.log(eMap);
+  console.log(pMap);
   var set = ifEdge ? 'E' : 'V';
   for ([key, value] of pMap.entries()) {
     eval(key + '=' + '"' + value + '"');
@@ -687,5 +690,6 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
         }
       }
     }
+  console.log(val);
   return val;
   }
