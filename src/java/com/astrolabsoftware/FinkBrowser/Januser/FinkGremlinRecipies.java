@@ -153,9 +153,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** TBD */
   public void generateSourcesOfInterestCorrelations() {
-    GraphStep soiStep1 = g().V().has("lbl", "SourcesOfInterest");
-    while (soiStep1.hasNext()) {
-      System.out.println(soiStep1.next());
+    GraphTravelsal<Vertex, Vertex> soi1 = g().V().has("lbl", "SourcesOfInterest");
+    while (soi1.hasNext()) {
+      System.out.println(soi1.next());
       }
     }
 
