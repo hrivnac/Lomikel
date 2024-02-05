@@ -50,7 +50,7 @@
   vFrom  = callGremlinValues(gr + ".E('" + id + "').outV().values('sourceType').next().toString()" )[0];
   vTo    = callGremlinValues(gr + ".E('" + id + "').inV().values('sourceType').next().toString()" )[0];
   sizeIn   = callGremlinValues(gr + ".E('" + id + "').values('sizeIn').next().toString()" )[0];
-  log.info(sizeIn);
+  console.log(sizeIn);
   </script>
   <!--
 [[id:42ckrd-fyg-4pw5-cso, label:overlaps, IN:[id:16584, label:SourcesOfInterest], OUT:[id:20680, label:SourcesOfInterest], lbl:overlaps,
