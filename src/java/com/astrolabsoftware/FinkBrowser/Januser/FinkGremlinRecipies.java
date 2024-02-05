@@ -202,6 +202,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               alerts1 = instances.get(Pair.of(soi1, oid));
               alerts2 = instances.get(Pair.of(soi2, oid));
               for (String instance : alerts1) {
+                System.out.println(instance);
                 if (alerts2.contains(instance)) {
                   c12++;
                   }
