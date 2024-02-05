@@ -47,8 +47,8 @@
   id = "<%=id%>";
   var edge = findObjectByKey(edges, 'id', id);
   var n12 = edge.value[0];
-  em = callGremlinValues(gr + ".E('" + id + "').elementMap().toList().toString()")[0];
-  console.log(em[0]);  
+  v1  = callGremlinValues(gr + ".E('" + id1 + "').outV().values('sourceType').next().toString()" )[0];
+  console.log(v1);  
   </script>
   <!--
 [[id:42ckrd-fyg-4pw5-cso, label:overlaps, IN:[id:16584, label:SourcesOfInterest], OUT:[id:20680, label:SourcesOfInterest], lbl:overlaps,
