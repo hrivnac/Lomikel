@@ -14,9 +14,11 @@
 <script src="venn-v.0.2.14/venn.js" type="text/javascript"></script>
 
 <%
-  long n1    = Long.valueOf(request.getParameter("n1"));
-  long n2    = Long.valueOf(request.getParameter("n2"));
-  long n12   = Long.valueOf(request.getParameter("n12"));
+  long   n1  = Long.valueOf(request.getParameter("n1"));
+  long   n2  = Long.valueOf(request.getParameter("n2"));
+  long   n12 = Long.valueOf(request.getParameter("n12"));
+  String m1  =              request.getParameter("m1");
+  String m2  =              request.getParameter("m2");
   %>
   
 <table>
@@ -34,7 +36,7 @@
 <script src="d3/venn.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-  info = showVenn(<%=n1%>, <%=n2%>, <%=n12%>);
+  info = showVenn(<%=n1%>, <%=n2%>, <%=n12%>, <%=m1%>, <%=m2%>);
   document.getElementById("venntext").innerHTML = info;
   </script>
 
