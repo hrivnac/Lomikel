@@ -49,7 +49,4 @@
   var tit = edge.title.split(':')[0];
   console.log(edge);  
   
-  info = showVenn(<%=n1%>, <%=n2%>, <%=n12%>);
-  document.getElementById("venntext").innerHTML = info;
-  header += "</tr>";
   </script>
