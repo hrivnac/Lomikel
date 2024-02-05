@@ -48,8 +48,9 @@
   var edge = findObjectByKey(edges, 'id', id);
   var n12 = edge.value[0];
   em = callGremlinValues(gr + ".E('" + id + "').elementMap().toList().toString()")[0];
+  em = JSON.parse(em);
   console.log(em[0]);  
-  console.log(em[0]['sizeIn']);  
+  console.log(em[0].sizeIn);  
   </script>
   <!--
 [[id:42ckrd-fyg-4pw5-cso, label:overlaps, IN:[id:16584, label:SourcesOfInterest], OUT:[id:20680, label:SourcesOfInterest], lbl:overlaps,
