@@ -47,7 +47,7 @@
   id = "<%=id%>";
   var edge = findObjectByKey(edges, 'id', id);
   var n12 = edge.value[0];
-  txt = callGremlinValues(gr + ".E('" + id1 + "').elementMap().toList().toString()")[0]
+  txt = callGremlinValues(gr + ".E('" + id + "').elementMap().toList().toString()")[0]
   console.log(txt);  
   
   </script>
