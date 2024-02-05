@@ -354,7 +354,8 @@ stylesheet.edges.overlaps = {
   actions: [
     {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},      target:"result"  },
     {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},     target:"table"   },
-    {name:"Venn",  url:{js:"'d3/venn.jsp?n1=' + sizeIn + '&n2=' + sizeOut + '&n12=' + intersection"}, target:"plot"    }
+    {name:"Venn",  url:{js:"'d3/venn.jsp?n1=' + sizeIn + '&n2=' + sizeOut + '&n12=' + intersection"}, target:"plot"    },
+    {name:"Vennx", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Venn.jsp?id=\")"},     target:"plot"    }
     ]
   }
   
