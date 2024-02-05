@@ -202,6 +202,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               alerts2 = instances.get(Pair.of(soi2, oid));
               for (String instance1 : alerts1) {
                 for (String instance2 : alerts2) {
+                  System.out.println(instance1 + " " + instance2);
                   if (instance1.equals(instance2)) {
                     c12++;
                     }
@@ -213,7 +214,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               }
             }
           }
-        System.out.println(soi1 + " " + soi2 + " " + c12);
+        //System.out.println(soi1 + " " + soi2 + " " + c12);
         corr.put(Pair.of(soi1, soi2), c12);
         }
       }
