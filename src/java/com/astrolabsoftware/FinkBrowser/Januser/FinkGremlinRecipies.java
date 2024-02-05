@@ -184,7 +184,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         objectId = source.property("objectId").value().toString();
         objectIds.add(objectId);
         instances.put(Pair.of(sourceType, objectId), alerts);
-        System.out.println(alerts);
         }
       }
     Map<Pair<String, String>, Double> corr      = new HashMap<>();
@@ -203,7 +202,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               alerts2 = instances.get(Pair.of(soi2, oid));
               for (String instance : alerts1) {
                 if (alerts2.contains(instance)) {
-                  System.out.println(instance);
                   c12++;
                   }
                 }
@@ -213,6 +211,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               }
             }
           }
+        System.out.println(soi1 + " " + soi2 + " " + c12);
         corr.put(Pair.of(soi1, soi2), c12);
         }
       }
