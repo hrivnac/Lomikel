@@ -184,6 +184,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         objectId = source.property("objectId").value().toString();
         objectIds.add(objectId);
         instances.put(Pair.of(sourceType, objectId), alerts);
+        System.out.println(alerts);
         }
       }
     Map<Pair<String, String>, Double> corr      = new HashMap<>();
