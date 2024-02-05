@@ -324,6 +324,7 @@
         params += "}";        
       }
     params += "]";
+    console.log(params);
     loadPane("plot", "d3/correlogram.jsp?" + params, true, 500 * 1.2);
     }
   </script>

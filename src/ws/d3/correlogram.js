@@ -82,7 +82,7 @@ function showCorrelogram(otable, vennPopupWindow) {
        .attr("dy", "" + (i - 2) + "em")
        .style("font-size", 8)
        .style("text-align", "center")
-       .style("fill", function(d) {return "#000"})
+       .style("fill", function(d) {return "#fff"})
     }
                            
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
@@ -172,7 +172,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
      .style("fill", function(d) {if (d.x === d.y) {
-                                   return "#fff";
+                                   return "#000";
                                    }
                                  else {
                                    return color(d3.select(this).attr("p12"));
