@@ -200,14 +200,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         corr.put(Pair.of(soi1, soi2), c12);
         }
       }
-    double s1;
-    for (String soi1 : sources) {
-      s1 = 0;
-      for (String soi2 : sources) {
-        s1 += corr.get(Pair.of(soi1, soi2));
-        }
-      sizeInOut.put(soi1, s1);
-      }
+    //double s1;
+    //for (String soi1 : sources) {
+    //  s1 = 0;
+    //  for (String soi2 : sources) {
+    //    s1 += corr.get(Pair.of(soi1, soi2));
+    //    }
+    //  sizeInOut.put(soi1, s1);
+    //  }
     int i1 = 0;
     int i2 = 0;
     for (String soi1 : sources) {
@@ -220,7 +220,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                   g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
                   "overlaps",
                   new String[]{"intersection",                "sizeIn",            "sizeOut"          },
-                  new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
+                  //new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
+                  new Double[]{corr.get(Pair.of(soi1, soi2)), corr.get(Pair.of(soi1, soi1)), corr.get(Pair.of(soi2, soi2)),});
           }
         }
       }
