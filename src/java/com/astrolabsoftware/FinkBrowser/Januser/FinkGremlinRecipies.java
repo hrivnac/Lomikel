@@ -176,7 +176,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       containsIt = soi.edges(Direction.OUT);
       while (containsIt.hasNext()) {
         contains = containsIt.next();
-        alerts = new HashSet<String>();
+        alerts = new HashSet<>();
         for (String instance : contains.property("instances").value().toString().replaceFirst("\\[", "").replaceAll("]", "").split(",")) {
           alerts.add(instance.trim());
           }
@@ -200,32 +200,19 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             if (useWeight) {
               alerts1 = instances.get(Pair.of(soi1, oid));
               alerts2 = instances.get(Pair.of(soi2, oid));
-              for (String instance1 : alerts1) {
-                for (String instance2 : alerts2) {
-                  System.out.println(instance1 + " " + instance2);
-                  if (instance1.equals(instance2)) {
-                    c12++;
-                    }
-                  }
-                }
+              alerts = new HashSet<>(alerts1);
+              alerts.retainAll(alerts2);
+              c12 += alerts.size();
               }
             else {
               c12++;
               }
             }
           }
-        //System.out.println(soi1 + " " + soi2 + " " + c12);
+        System.out.println(soi1 + " " + soi2 + " " + c12);
         corr.put(Pair.of(soi1, soi2), c12);
         }
       }
-    //double s1;
-    //for (String soi1 : sources) {
-    //  s1 = 0;
-    //  for (String soi2 : sources) {
-    //    s1 += corr.get(Pair.of(soi1, soi2));
-    //    }
-    //  sizeInOut.put(soi1, s1);
-    //  }
     int i1 = 0;
     int i2 = 0;
     for (String soi1 : sources) {
