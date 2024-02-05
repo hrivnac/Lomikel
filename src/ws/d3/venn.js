@@ -1,6 +1,4 @@
 function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
-  
-  console.log(n1 + " " + n2 + " " + n12 + " " + m1 + " " + m2);
 
   if (!m1) {
     m1 = "A";
@@ -41,7 +39,6 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
     d3.select(vennPopupWindow.document.getElementById("vennPopup")).datum(sets).call(chart);
     }
   else {
-    console.log(sets);
     d3.select("#venn").datum(sets).call(chart);
     }
   
