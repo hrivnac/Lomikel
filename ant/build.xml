@@ -569,6 +569,7 @@
         <exclude name="Graphs*.jsp"/>
         <exclude name="Result.jsp"/>
         <exclude name="Plot.jsp"/>
+        <exclude name="Table.jsp"/>
         <exclude name="SkyView.jsp"/>
         <exclude name="Params.jsp"/>
         <exclude name="PropertiesProcessor.jsp"/>
