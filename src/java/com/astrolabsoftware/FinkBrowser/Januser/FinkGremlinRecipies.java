@@ -177,7 +177,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       while (containsIt.hasNext()) {
         contains = containsIt.next();
         alerts = new HashSet<String>();
-        for (String instance : contains.property("instances").value().toString().split(",")) {
+        for (String instance : contains.property("instances").value().toString().replaceFirst("\\[", "").replaceAll("[").split(",")) {
           alerts.add(instance.trim());
           }
         source = contains.inVertex();
@@ -202,8 +202,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               alerts1 = instances.get(Pair.of(soi1, oid));
               alerts2 = instances.get(Pair.of(soi2, oid));
               for (String instance : alerts1) {
-                System.out.println(instance);
                 if (alerts2.contains(instance)) {
+                  System.out.println(instance);
                   c12++;
                   }
                 }
