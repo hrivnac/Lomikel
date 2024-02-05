@@ -13,7 +13,7 @@
     <h1>Plots go here.</h1>
     <table width="80%">
       <tr>
-        <td align="center"><a href="https://hrivnac.web.cern.ch/hrivnac/Activities/Packages/Lomikel" target="_blank"><img src="images/overlaps.jpg" width="70%" style="border:5px solid blue"/></a></td>
+        <td align="center"><a href="https://hrivnac.web.cern.ch/hrivnac/Activities/Packages/Lomikel" target="_blank"><img src="images/overlap.png" width="70%" style="border:5px solid blue"/></a></td>
         </tr>
       <tr><td></td></tr>
       <tr>
