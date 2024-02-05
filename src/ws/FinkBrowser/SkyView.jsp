@@ -17,14 +17,6 @@
       <tr>
         <td align="center"><a href="https://hrivnac.web.cern.ch/hrivnac/Activities/Packages/Lomikel" target="_blank"><img src="images/overlap.png" width="70%" style="border:5px solid blue"/></a></td>
         </tr>
-      <tr><td></td></tr>
-      <tr>
-        <td align="center"><a href="https://astrolabsoftware.github.io" target="_blank"><img src="images/bandeau_web_AstroLab.jpg" width="70%" style="border:5px solid blue"/></a></td>
-        </tr>
-      <tr><td></td></tr>
-      <tr>
-        <td align="center"><a href="https://fink-broker.org" target="_blank"><img src="images/lsst.jpg" width="70%" style="border:5px solid blue"/></a></td>
-        </tr>
       </table>
     </center>
   </div>
