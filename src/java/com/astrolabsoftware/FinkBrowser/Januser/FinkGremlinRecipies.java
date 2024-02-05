@@ -200,9 +200,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             if (useWeight) {
               alerts1 = instances.get(Pair.of(soi1, oid));
               alerts2 = instances.get(Pair.of(soi2, oid));
-              for (String instance : alerts1) {
-                if (alerts2.contains(instance)) {
-                  c12++;
+              for (String instance1 : alerts1) {
+                for (String instance2 : alerts2) {
+                  if (instance1.equals(instance2)) {
+                    c12++;
+                    }
                   }
                 }
               }
