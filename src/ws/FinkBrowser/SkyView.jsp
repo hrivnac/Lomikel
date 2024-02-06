@@ -11,12 +11,6 @@
   <button onClick="w2popup.load({url:'Help-SkyView.html', showMax: true})" style="position:absolute; top:0; right:0">
     <img src="images/Help.png" width="10"/>
     </button>
-  <center>
-    <h1>Plots goes here.</h1>
-    <table width="80%">
-      <tr>
-        <td align="center"><img src="images/overlap.png" width="70%"/></td>
-        </tr>
-      </table>
-    </center>
+  <center><h1>Plots goes here.</h1></center>
+  <center><img src="images/overlap.png" width="60%"/></center>
   </div>
