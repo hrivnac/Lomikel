@@ -127,7 +127,7 @@ function showCorrelogram(otable, vennPopupWindow) {
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
                           })
-     .append("text1")
+     .append("text")
      .attr("dy", "0em")
      .attr("m1",    function(d) {return d.x})
      .attr("m2",    function(d) {return d.y})
@@ -164,7 +164,7 @@ function showCorrelogram(otable, vennPopupWindow) {
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
                           })
-     .append("text2")
+     .append("text")
      .attr("dy", "1em")
      .attr("m1",    function(d) {return d.x})
      .attr("m2",    function(d) {return d.y})
