@@ -6,12 +6,11 @@ async function loadPane(pane, url, iframe, height) {
     document.getElementById("feedback").innerHTML += "Loading " + pane + " : " + url + "<br/>"
     }
   url = encodeURI(url);
-  if (!height) {
+  //if (!height) {
     height = "100%";
-    }
+  //  }
   if (iframe) {
-    //document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
-    document.getElementById(pane).innerHTML='<iframe class="flexin" src="' + url + '">';
+    document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
     }
   else {
     $("#" + pane).load(url);

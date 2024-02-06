@@ -5,7 +5,7 @@
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
-<div id="plot" title="plots" style="none" class="flexout">
+<div id="plot" title="plots" style="none">
   <button onClick="w2popup.load({url:'Help-Plot.html', showMax: true})" style="position:absolute; top:0; right:0">
     <img src="images/Help.png" width="10"/>
     </button>
