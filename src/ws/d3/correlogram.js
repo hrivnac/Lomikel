@@ -62,8 +62,7 @@ function showCorrelogram(otable, vennPopupWindow) {
 
   const cor = svg.selectAll(".cor")
                  .data(otable)
-                 .enter()
-                 .append("g")
+                 .join("g")
                  .attr("class", "cor")
                  .attr("transform", function(d) {return `translate(${x(d.x)}, ${y(d.y)})`});
 
@@ -73,8 +72,6 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("height", ySpace / (num - 1))
      .attr("x",     -xSpace / (num - 1) / 2)
      .attr("y",     -ySpace / (num - 1) / 2) 
-     .attr("stroke", "black")
-     .attr("fill",   "white")              
   
   // diagonal with names
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
