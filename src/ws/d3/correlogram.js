@@ -40,8 +40,8 @@ function showCorrelogram(otable, vennPopupWindow) {
                 .attr("transform", `translate(${margin.left}, ${margin.top})`); 
 
   const color = d3.scaleLinear()
-                  .domain([0, 50, 100])
-                  .range(["#B22222", "#fff", "#000080"]);
+                  .domain([0, 100])
+                  .range(["black", "white"]);
 
   const size = d3.scaleSqrt()
                  .range([0, width / (num - 1) / 2])
