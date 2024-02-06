@@ -6,7 +6,9 @@ rect {stroke: lightgray;
       stoke-width: 5px;
       fill: white;
       }
-    
+
+div {position: absolute;
+    }
 .y.axis path {fill: none;
               stroke: none;
               }

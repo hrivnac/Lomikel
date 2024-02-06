@@ -55,7 +55,7 @@ function showCorrelogram(otable, vennPopupWindow) {
   const xSpace = x.range()[1] - x.range()[0]
   const ySpace = y.range()[1] - y.range()[0]
  
-  const div = d3.select("body")
+  const div = d3.select("#corr_area")
                 .append("div")	
                 .attr("class", "tooltip")				
                 .style("opacity", 0);
@@ -170,7 +170,7 @@ function showCorrelogram(otable, vennPopupWindow) {
              .duration(200)		
              .style("opacity", 0.9);		
           div.html(d3.select(this).attr("info"))	
-             .style("left", (d3.select(this).attr("popx")) + "px")		
+             .style("left", (d3.select(this).attr("popx")) + 10 + "px")		
              .style("top",  (d3.select(this).attr("popy")) + "px");	
          })
        .on("mouseout", function(d) {		
