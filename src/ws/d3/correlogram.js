@@ -121,6 +121,7 @@ function showCorrelogram(otable, vennPopupWindow) {
            }
          });
 
+  // lower left half with text
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
@@ -138,7 +139,7 @@ function showCorrelogram(otable, vennPopupWindow) {
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .text(d.value)
+     .text(function(d) {return d.value})
      .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
