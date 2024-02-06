@@ -106,8 +106,8 @@ function showCorrelogram(otable, vennPopupWindow) {
                .duration(200)		
                .style("opacity", 0.9);		
             div.html(d3.select(this).attr("info"))	
-               .style("left", (d3.select(this).attr("cx")) + "px")		
-               .style("top",  (d3.select(this).attr("cy")) + "px");	
+               .style("left", (d3.select(this).attr("popx")) + "px")		
+               .style("top",  (d3.select(this).attr("popy")) + "px");	
             }
           });
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
