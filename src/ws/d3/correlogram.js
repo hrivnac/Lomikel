@@ -102,7 +102,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .style("opacity", 0.8)
      .on("mouseover", function(d) {		
          if (d3.select(this).attr("valid")) {
-           if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed()) {
+           if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed) {
              vennPopupWindow = window.open("vennPopup.jsp",
                                            "",
                                            "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
