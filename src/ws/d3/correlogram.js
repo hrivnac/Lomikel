@@ -66,13 +66,14 @@ function showCorrelogram(otable, vennPopupWindow) {
                  .attr("class", "cor")
                  .attr("transform", function(d) {return `translate(${x(d.x)}, ${y(d.y)})`});
 
-//  cor.append("rect")
-//     .attr("width",  xSpace / (num - 1))
-//     .attr("height", ySpace / (num - 1))
-//     .attr("x",     -xSpace / (num - 1) / 2)
-//     .attr("y",     -ySpace / (num - 1) / 2)   
-//     .attr("fill",  "white")              
-      
+  cor.append("rect")
+     .attr("width",  xSpace / (num - 1))
+     .attr("height", ySpace / (num - 1))
+     .attr("x",     -xSpace / (num - 1) / 2)
+     .attr("y",     -ySpace / (num - 1) / 2) 
+     .attr("stroke", "black")           
+  
+  // diagonal with names
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
                           return xpos == ypos;
