@@ -20,7 +20,7 @@ function showCorrelogram(otable, vennPopupWindow) {
   const num = domain.length;
   
   for (d of domain) {
-    otable.push({x:d, y:d, value:0, info:""})
+    otable.push({x:d, y:d, value:0, info:"0/0"})
     }
 
   const width0  = num * 60 + 30; // 430
