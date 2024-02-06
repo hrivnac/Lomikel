@@ -73,20 +73,17 @@ function showCorrelogram(otable, vennPopupWindow) {
 //     .attr("y",     -ySpace / (num - 1) / 2)   
 //     .attr("fill",  "white")              
       
-//  for (var i = 2; i < 7; i++) {
-//    cor.filter(function(d) {const ypos = domain.indexOf(d.y);
-//                            const xpos = domain.indexOf(d.x);
-//                            return xpos == ypos;
-//                            })
-//       .append("text")
-//       .text(function(d) {return d.x.split('.')[i]})
-//       .attr("dy", "" + (i - 2) + "em")
-//       .style("font-size", 8)
-//       .style("text-align", "center")
-//       .style("fill", function(d) {return "#fff"})
-//    }
-     
-                           
+  cor.filter(function(d) {const ypos = domain.indexOf(d.y);
+                          const xpos = domain.indexOf(d.x);
+                          return xpos == ypos;
+                          })
+     .append("text")
+     .text(function(d) {return d.x})
+     .style("font-size", 8)
+     .style("text-align", "center")
+     .style("fill", function(d) {return "#fff"})
+   
+                         
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
