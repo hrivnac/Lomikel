@@ -103,26 +103,26 @@ function showCorrelogram(otable, vennPopupWindow) {
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .text(function(d) {return d.value})
+     .html(function(d) {return d.value})
      .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
-     .style("opacity", 0.8)
      .on("mouseover", function(d) {	
-          if (d3.select(this).attr("valid")) {
-            info = showVenn(d3.select(this).attr("n1"),
-                            d3.select(this).attr("n2"),
-                            d3.select(this).attr("n12"),
-                            d3.select(this).attr("m1").replaceAll('.', ' '),
-                            d3.select(this).attr("m2").replaceAll('.', ' '));
-            if (vennPopupWindow) {
-              vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
-              }
-            else {
-              document.getElementById("vennTxt").innerHTML = info;
-              }
-            }
-          });
+         if (d3.select(this).attr("valid")) {
+           info = showVenn(d3.select(this).attr("n1"),
+                           d3.select(this).attr("n2"),
+                           d3.select(this).attr("n12"),
+                           d3.select(this).attr("m1").replaceAll('.', ' '),
+                           d3.select(this).attr("m2").replaceAll('.', ' '),
+                           vennPopupWindow);
+           if (vennPopupWindow) {
+             vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
+             }
+           else {
+             document.getElementById("vennTxt").innerHTML = info;
+             }
+           }
+         });
          
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
