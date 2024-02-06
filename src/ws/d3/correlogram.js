@@ -62,17 +62,19 @@ function showCorrelogram(otable, vennPopupWindow) {
 
   const cor = svg.selectAll(".cor")
                  .data(otable)
-                 .join("g")
+                 .enter()
+                 .append("g")
                  .attr("class", "cor")
                  .attr("transform", function(d) {return `translate(${x(d.x)}, ${y(d.y)})`});
 
+  // rectangles for existing values
   cor.append("rect")
      .attr("width",  xSpace / (num - 1))
      .attr("height", ySpace / (num - 1))
      .attr("x",     -xSpace / (num - 1) / 2)
      .attr("y",     -ySpace / (num - 1) / 2) 
-     .attr("stroke", "#000")
-     .attr("fill",  "#fff")              
+     .attr("stroke", "black")
+     .attr("fill",   "white")              
   
   // diagonal with names
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
