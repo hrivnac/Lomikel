@@ -20,7 +20,7 @@ function showCorrelogram(otable, vennPopupWindow) {
   const num = domain.length;
   
   for (d of domain) {
-    otable.push({x:d, y:d, value:0, info:"0/0"})
+    otable.push({x:d, y:d, value:0, info:""})
     }
 
   const width0  = num * 60 + 30; // 430
@@ -41,7 +41,7 @@ function showCorrelogram(otable, vennPopupWindow) {
 
   const color = d3.scaleLinear()
                   .domain([0, 100])
-                  .range(["black", "white"]);
+                  .range(["black", "red"]);
 
   const size = d3.scaleSqrt()
                  .range([0, width / (num - 1) / 2])
