@@ -1,4 +1,4 @@
-function showCorrelogram(otable) {
+function showCorrelogram(otable, vennPopupWindow) {
       
   otable1 = [];
   var min = otable[0].value;
