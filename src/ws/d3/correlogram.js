@@ -103,7 +103,7 @@ function showCorrelogram(otable, vennPopupWindow) {
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .html(function(d) {return d.value})
+     .html(function(d) {return d3.select(this).attr("info")})
      .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
