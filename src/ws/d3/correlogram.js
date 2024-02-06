@@ -55,7 +55,7 @@ function showCorrelogram(otable, vennPopupWindow) {
   const xSpace = x.range()[1] - x.range()[0]
   const ySpace = y.range()[1] - y.range()[0]
  
-  const div = d3.select("#corr_area")
+  const div = d3.select("body")
                 .append("div")	
                 .attr("class", "tooltip")				
                 .style("opacity", 0);
