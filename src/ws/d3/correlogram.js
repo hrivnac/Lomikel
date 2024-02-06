@@ -55,10 +55,10 @@ function showCorrelogram(otable, vennPopupWindow) {
   const xSpace = x.range()[1] - x.range()[0]
   const ySpace = y.range()[1] - y.range()[0]
  
-  const div = d3.select("#corr_area")
-                .append("div")	
-                .attr("class", "tooltip")				
-                .style("opacity", 0);
+  const div = svg.append('foreignObject')
+                 .append('xhtml:div')
+                 .attr("class", "tooltip")				
+                 .style("opacity", 0);
 
   const cor = svg.selectAll(".cor")
                  .data(otable)
