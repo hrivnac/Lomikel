@@ -107,6 +107,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
+     .style("opacity", 0.8)
      .on("mouseover", function(d) {	
           if (d3.select(this).attr("valid")) {
             info = showVenn(d3.select(this).attr("n1"),
@@ -140,30 +141,24 @@ function showCorrelogram(otable, vennPopupWindow) {
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .style("fill", function(d) {if (d.x === d.y) {
-                                   return "#000";
-                                   }
-                                 else {
-                                   return color(d3.select(this).attr("p12"));
-                                   }
-                                 })
-      .style("opacity", 0.8)
-      .on("mouseover", function(d) {		
-          if (d3.select(this).attr("valid")) {
-            info = showVenn(d3.select(this).attr("n1"),
-                            d3.select(this).attr("n2"),
-                            d3.select(this).attr("n12"),
-                            d3.select(this).attr("m1").replaceAll('.', ' '),
-                            d3.select(this).attr("m2").replaceAll('.', ' '),
-                            vennPopupWindow);
-            if (vennPopupWindow) {
-              vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
-              }
-            else {
-              document.getElementById("vennTxt").innerHTML = info;
-              }
-            }
-          });
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
+     .style("opacity", 0.8)
+     .on("mouseover", function(d) {		
+         if (d3.select(this).attr("valid")) {
+           info = showVenn(d3.select(this).attr("n1"),
+                           d3.select(this).attr("n2"),
+                           d3.select(this).attr("n12"),
+                           d3.select(this).attr("m1").replaceAll('.', ' '),
+                           d3.select(this).attr("m2").replaceAll('.', ' '),
+                           vennPopupWindow);
+           if (vennPopupWindow) {
+             vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
+             }
+           else {
+             document.getElementById("vennTxt").innerHTML = info;
+             }
+           }
+         });
 
   var aS = d3.scaleLinear()
              .range([-margin.top + 5, height + margin.bottom - 5])
