@@ -102,7 +102,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .style("opacity", 0.8)
      .on("mouseover", function(d) {		
          if (d3.select(this).attr("valid")) {
-           if (!vennPopupWindow) {
+           if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed()) {
              vennPopupWindow = window.open("vennPopup.jsp",
                                            "",
                                            "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
@@ -138,7 +138,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .text(function(d) {return d.value})
      .style("font-size", 8)
      .style("text-align", "center")
-     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})  
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))}); 
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
@@ -159,20 +159,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .text(function(d) {return d.info})
      .style("font-size", 8)
      .style("text-align", "center")
-     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})  
-     .on("mouseover", function(d) {	
-          div.transition()		
-             .duration(200)		
-             .style("opacity", 0.9);		
-          div.html(d3.select(this).attr("info"))	
-             .style("left", (d3.select(this).attr("popx")) + 10 + "px")		
-             .style("top",  (d3.select(this).attr("popy")) + "px");	
-         })
-       .on("mouseout", function(d) {		
-           div.transition()		
-              .duration(2000)		
-              .style("opacity", 0);	
-       });
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))});
          
   // scaler   
      
