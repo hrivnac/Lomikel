@@ -139,7 +139,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
      .text(function(d) {return d.value})
      .style("font-size", 8)
      .style("text-align", "center")
-     .style("fill", function(d) {return color(d3.select(this).attr("p12"))}).
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
      .append("text")
      .attr("dy", "1em")
      .attr("m1",    function(d) {return d.x})

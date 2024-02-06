@@ -13,7 +13,7 @@
     </button>
   <center><table>
     <tr>
-      <td><img src="@LOGO@" width="50"/></td>
+      <td><img src="@LOGO@" width="40"/></td>
       <td><b><u><a href="@HOME@" target="RESULT">@NAME@</a></u> <small>@VERSION@ [@BUILD@]</small></b></td>
       <td><input type="button" onclick="reset()"   value="Reset"   style="color:red"/></td>
       </tr>
