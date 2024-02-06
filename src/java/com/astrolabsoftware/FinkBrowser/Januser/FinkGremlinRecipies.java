@@ -154,6 +154,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.
     * @param useWeight Whether to use count number of overlapping alerts (instead of just sources). */
+  // TBD: better counting with weights 
   public void generateSourcesOfInterestCorrelations(boolean useWeight) {
     log.info("Generating correlations for Sources of Interest " + (useWeight ? "" : "not ") + "using weights");
     g().V().has("lbl", "SourcesOfInterest").bothE("overlaps").drop().iterate();
@@ -192,6 +193,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<Pair<String, String>, Double> corr      = new HashMap<>();
     Map<String, Double>               sizeInOut = new HashMap<>();
     double c12;
+    double w1;
+    double w2;
+    double ww;
     Set<String> alerts1;
     Set<String> alerts2;
     for (String soi1 : sources) {
@@ -201,8 +205,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           if (weights.containsKey(Pair.of(soi1, oid)) &&
               weights.containsKey(Pair.of(soi2, oid))) {
             if (useWeight) {
-              c12 += weights.get(Pair.of(soi1, oid)) *
-                     weights.get(Pair.of(soi2, oid));
+              w1 = weights.get(Pair.of(soi1, oid));
+              w2 = weights.get(Pair.of(soi2, oid));
+              c12 += 2 * w1 * w2 / (w1 * w1 + w2 * w2);
               //alerts1 = instances.get(Pair.of(soi1, oid));
               //alerts2 = instances.get(Pair.of(soi2, oid));
               //alerts = new HashSet<>(alerts1);
@@ -214,7 +219,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               }
             }
           }
-        System.out.println(soi1 + " " + soi2 + " " + c12);
         corr.put(Pair.of(soi1, soi2), c12);
         }
       }
