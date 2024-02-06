@@ -105,7 +105,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("popy",  function(d) {return y(d.y)})
      .html(function(d) {return d3.select(this).attr("info")})
      .style("left", (x(d.x) + 50 + "px"))
-     .style("top", (y(d.y) +"px"));
+     .style("top", (y(d.y) +"px"))
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
      .on("mouseover", function(d) {	
          if (d3.select(this).attr("valid")) {
