@@ -98,11 +98,11 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("n12",   function(d) {return d.value})
      .attr("p12",   function(d) {return 100 * parseInt(d.value) / (parseInt(d3.select(this).attr("n1")) + parseInt(d3.select(this).attr("n2")) - parseInt(d.value))})
      .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
-     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=&gt;<br/>" + d.x + "</u></b></br>" +
+     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=><br/>" + d.x + "</u></b></br>" +
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .text(function(d) {return d3.select(this).attr("info")})
+     .text(function(d) {return d.y + " * " + d.x})
      .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
@@ -116,44 +116,75 @@ function showCorrelogram(otable, vennPopupWindow) {
             document.getElementById("vennTxt").innerHTML = info;
             }
           });
-     
-//  cor.filter(function(d) {const ypos = domain.indexOf(d.y);
-//                          const xpos = domain.indexOf(d.x);
-//                          return xpos < ypos;
-//                          })
-//     .append("text")
-//     .attr("dy", "1em")
-//     .attr("m1",    function(d) {return d.x})
-//     .attr("m2",    function(d) {return d.y})
-//     .attr("n1",    function(d) {return d.info.split("/")[0]})
-//     .attr("n2",    function(d) {return d.info.split("/")[1]})
-//     .attr("n12",   function(d) {return d.value})
-//     .attr("p12",   function(d) {return 100 * parseInt(d.value) / (parseInt(d3.select(this).attr("n1")) + parseInt(d3.select(this).attr("n2")) - parseInt(d.value))})
-//     .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
-//     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=&gt;<br/>" + d.x + "</u></b></br>" +
-//                                        "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
-//     .attr("popx",  function(d) {return x(d.x)})
-//     .attr("popy",  function(d) {return y(d.y)})
-//     .text(function(d) {return "yyy" + d.info})
-//     .style("font-size", 8)
-//     .style("text-align", "center")
-//     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
-//     .on("mouseover", function(d) {	
-//          if (d3.select(this).attr("valid")) {
-//            info = showVenn(d3.select(this).attr("n1"),
-//                            d3.select(this).attr("n2"),
-//                            d3.select(this).attr("n12"),
-//                            d3.select(this).attr("m1").replaceAll('.', ' '),
-//                            d3.select(this).attr("m2").replaceAll('.', ' '),
-//                            vennPopupWindow);
-//            if (vennPopupWindow) {
-//              vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
-//              }
-//            else {
-//              document.getElementById("vennTxt").innerHTML = info;
-//              }
-//            }
-//          });
+                           
+  cor.filter(function(d) {const ypos = domain.indexOf(d.y);
+                          const xpos = domain.indexOf(d.x);
+                          return xpos < ypos;
+                          })
+     .append("text")
+     .attr("dy", "1em")
+     .attr("m1",    function(d) {return d.x})
+     .attr("m2",    function(d) {return d.y})
+     .attr("n1",    function(d) {return d.info.split("/")[0]})
+     .attr("n2",    function(d) {return d.info.split("/")[1]})
+     .attr("n12",   function(d) {return d.value})
+     .attr("p12",   function(d) {return 100 * parseInt(d.value) / (parseInt(d3.select(this).attr("n1")) + parseInt(d3.select(this).attr("n2")) - parseInt(d.value))})
+     .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
+     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=><br/>" + d.x + "</u></b></br>" +
+                                        "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
+     .attr("popx",  function(d) {return x(d.x)})
+     .attr("popy",  function(d) {return y(d.y)})
+     .text(function(d) {return d.value})
+     .style("font-size", 8)
+     .style("text-align", "center")
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
+     .on("mouseover", function(d) {	
+          if (d3.select(this).attr("valid")) {
+            info = showVenn(d3.select(this).attr("n1"),
+                            d3.select(this).attr("n2"),
+                            d3.select(this).attr("n12"),
+                            d3.select(this).attr("m1").replaceAll('.', ' '),
+                            d3.select(this).attr("m2").replaceAll('.', ' '));
+            document.getElementById("vennTxt").innerHTML = info;
+            }
+          });
+  cor.filter(function(d) {const ypos = domain.indexOf(d.y);
+                          const xpos = domain.indexOf(d.x);
+                          return xpos < ypos;
+                          })
+     .append("text")
+     .attr("dy", "2em")
+     .attr("m1",    function(d) {return d.x})
+     .attr("m2",    function(d) {return d.y})
+     .attr("n1",    function(d) {return d.info.split("/")[0]})
+     .attr("n2",    function(d) {return d.info.split("/")[1]})
+     .attr("n12",   function(d) {return d.value})
+     .attr("p12",   function(d) {return 100 * parseInt(d.value) / (parseInt(d3.select(this).attr("n1")) + parseInt(d3.select(this).attr("n2")) - parseInt(d.value))})
+     .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
+     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=><br/>" + d.x + "</u></b></br>" +
+                                        "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
+     .attr("popx",  function(d) {return x(d.x)})
+     .attr("popy",  function(d) {return y(d.y)})
+     .text(function(d) {return d.info})
+     .style("font-size", 8)
+     .style("text-align", "center")
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
+     .on("mouseover", function(d) {	
+          if (d3.select(this).attr("valid")) {
+            info = showVenn(d3.select(this).attr("n1"),
+                            d3.select(this).attr("n2"),
+                            d3.select(this).attr("n12"),
+                            d3.select(this).attr("m1").replaceAll('.', ' '),
+                            d3.select(this).attr("m2").replaceAll('.', ' '),
+                            vennPopupWindow);
+            if (vennPopupWindow) {
+              vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
+              }
+            else {
+              document.getElementById("vennTxt").innerHTML = info;
+              }
+            }
+          });
       
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
@@ -168,7 +199,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("p12",   function(d) {return 100 * parseInt(d.value) / (parseInt(d3.select(this).attr("n1")) + parseInt(d3.select(this).attr("n2")) - parseInt(d.value))})
      .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
      .attr("r",     function(d) {return size(d3.select(this).attr("p12"))})
-     .attr("info",  function(d) {return "<center><b><u>" + d.x + "<br/>=&gt;<br/>" + d.y + "</u></b></br>" +
+     .attr("info",  function(d) {return "<center><b><u>" + d.x + "<br/>=><br/>" + d.y + "</u></b></br>" +
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
