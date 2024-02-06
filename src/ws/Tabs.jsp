@@ -12,11 +12,5 @@
 <%@include file="SkyView.jsp" %>
 
 <script type="text/javascript">
-  loadPane("feedback", "Feedback.jsp");
-  loadPane("top",      "Top.jsp");
-  loadPane("graph",    "GraphView.jsp");
-  loadPane("image",    "Image.jsp");
-  loadPane("plot",     "Plot.jsp");
-  loadPane("result",   "Result.jsp");
   showTab('result');
   </script>
