@@ -222,6 +222,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         corr.put(Pair.of(soi1, soi2), c12);
         }
       }
+    for (String soi1 : sources) {
+      c12 = 0;
+      for (String oid : objectIds) {
+        if (weights.containsKey(Pair.of(soi1, oid))) {
+          if (useWeight) {
+            c12 += weights.get(Pair.of(soi1, oid));
+            }
+          else {
+            c12++;
+            }
+          }
+        }
+      sizeInOut.put(soi1, c12);
+      }
     int i1 = 0;
     int i2 = 0;
     for (String soi1 : sources) {
@@ -235,7 +249,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                   "overlaps",
                   new String[]{"intersection",                "sizeIn",            "sizeOut"          },
                   //new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
-                  new Double[]{corr.get(Pair.of(soi1, soi2)), corr.get(Pair.of(soi1, soi1)), corr.get(Pair.of(soi2, soi2)),});
+                  new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
           }
         }
       }

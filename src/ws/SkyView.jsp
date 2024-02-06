@@ -11,4 +11,5 @@
     <img src="images/Help.png" width="10"/>
     </button>
   <center><h1>SkyView goes here.</h1></center>
+  <center><img src="images/GraphDB_0.jpg" width="60%"/></center>
   </div>

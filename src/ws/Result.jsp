@@ -13,6 +13,8 @@
     </button>
   <center><h1><u>Lomikel Browser</u></h1></center>
   <center><h2>from <a href="http://hrivnac.home.cern.ch/hrivnac/Activities/Packages/Lomikel">Lomikel</a></h2></center>
-  <center><img src="images/GraphDB_0.jpg" width="400"/></center>
+  <center><img src="images/GraphDB_0.jpg" width="60%"/></center>
+  <center><h2>Connect to the <u>graph server</u> and request the initial <u>graph</u></h2></center>
+  <center><h2>Select an <u>element</u> to see possible <u>actions</u></h2></center>
   </div>
                                                                 
