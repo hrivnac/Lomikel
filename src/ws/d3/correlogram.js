@@ -81,9 +81,8 @@ function showCorrelogram(otable, vennPopupWindow) {
      .text(function(d) {return d.x})
      .style("font-size", 8)
      .style("text-align", "center")
-     .style("fill", function(d) {return "#fff"})
+     .style("fill", "black"})
    
-                         
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
