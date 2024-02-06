@@ -11,7 +11,7 @@ async function loadPane(pane, url, iframe, height) {
     }
   if (iframe) {
     //document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
-    document.getElementById(pane).innerHTML='<iframe class="flex-grow"  src="' + url + '">';
+    document.getElementById(pane).innerHTML='<iframe class="flexin" src="' + url + '">';
     }
   else {
     $("#" + pane).load(url);
