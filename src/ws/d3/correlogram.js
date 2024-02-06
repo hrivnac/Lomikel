@@ -89,27 +89,26 @@ function showCorrelogram(otable, vennPopupWindow) {
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
                           })
-     .append("text")
+     .append("html")
      .attr("dy", "-2em")
      .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
      .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=><br/>" + d.x + "</u></b></br>" +
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     //.text(function(d) {return d.y})
      .html(d3.select(this).attr("info"))
      .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
      .on("mouseover", function(d) {	
-          if (d3.select(this).attr("valid")) {
-            div.transition()		
-               .duration(200)		
-               .style("opacity", 0.9);		
-            div.html(d3.select(this).attr("info"))	
-               .style("left", (d3.select(this).attr("popx")) + "px")		
-               .style("top",  (d3.select(this).attr("popy")) + "px");	
-            }
+            var g = d3.select(this);
+            var div = d3.select("body").append("div")
+                    .attr('pointer-events', 'none')
+                    .attr("class", "tooltip")
+                    .style("opacity", 1)
+                    .html("FIRST LINE <br> SECOND LINE")
+                    .style("left", (d.x + 50 + "px"))
+                    .style("top", (d.y +"px"));
           });
      
   //cor.filter(function(d) {const ypos = domain.indexOf(d.y);
