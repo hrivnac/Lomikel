@@ -102,17 +102,17 @@ function showCorrelogram(otable) {
      .style("opacity", 0.8)
      .on("mouseover", function(d) {		
          if (d3.select(this).attr("valid")) {
+           if (!vennPopupWindow) {
+             vennPopupWindow = window.open("vennPopup.jsp",
+                                           "",
+                                           "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
+             }
            info = showVenn(d3.select(this).attr("n1"),
                            d3.select(this).attr("n2"),
                            d3.select(this).attr("n12"),
                            d3.select(this).attr("m1").replaceAll('.', ' '),
                            d3.select(this).attr("m2").replaceAll('.', ' '),
                            vennPopupWindow);
-           if (!vennPopupWindow) {
-             vennPopupWindow = window.open("vennPopup.jsp",
-                                           "",
-                                           "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
-             }
            vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
            }
          });
