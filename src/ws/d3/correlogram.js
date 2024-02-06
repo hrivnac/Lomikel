@@ -1,6 +1,4 @@
 function showCorrelogram(otable, vennPopupWindow) {
-  
-  console.log(otable);
       
   otable1 = [];
   var min = otable[0].value;
@@ -118,6 +116,7 @@ function showCorrelogram(otable, vennPopupWindow) {
             document.getElementById("vennTxt").innerHTML = info;
             }
           });
+     
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
                           return xpos < ypos;
@@ -135,7 +134,7 @@ function showCorrelogram(otable, vennPopupWindow) {
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
-     .text(function(d) {return d.info})
+     .text(function(d) {return "yyy" + d.info})
      .style("font-size", 8)
      .style("text-align", "center")
      .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
