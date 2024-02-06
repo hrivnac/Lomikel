@@ -139,6 +139,10 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
      .text(d.value)
+     .style("font-size", 8)
+     .style("text-align", "center")
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
+  
      .on("mouseover", function(d) {	
          if (d3.select(this).attr("valid")) {
            info = showVenn(d3.select(this).attr("n1"),
