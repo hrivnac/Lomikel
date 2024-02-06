@@ -10,8 +10,7 @@ async function loadPane(pane, url, iframe, height) {
     height = "100%";
     }
   if (iframe) {
-    //document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
-    document.getElementById(pane).innerHTML='<iframe src="' + url + '">';
+    document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
     }
   else {
     $("#" + pane).load(url);
