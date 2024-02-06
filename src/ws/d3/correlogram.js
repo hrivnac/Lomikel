@@ -71,7 +71,8 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("height", ySpace / (num - 1))
      .attr("x",     -xSpace / (num - 1) / 2)
      .attr("y",     -ySpace / (num - 1) / 2) 
-     .attr("stroke", "black")           
+     .attr("stroke", "#000")
+     .attr("fill",  "#fff")              
   
   // diagonal with names
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
