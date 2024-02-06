@@ -201,8 +201,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           if (weights.containsKey(Pair.of(soi1, oid)) &&
               weights.containsKey(Pair.of(soi2, oid))) {
             if (useWeight) {
-              c12 += weights.get(Pair.of(soi1, oid)) *
-                     weights.get(Pair.of(soi2, oid));
+              c12 += soi1.equals(soi2) ? weights.get(Pair.of(soi1, oid)) :
+                                         weights.get(Pair.of(soi1, oid)) *
+                                         weights.get(Pair.of(soi2, oid));
               //alerts1 = instances.get(Pair.of(soi1, oid));
               //alerts2 = instances.get(Pair.of(soi2, oid));
               //alerts = new HashSet<>(alerts1);
