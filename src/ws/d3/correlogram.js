@@ -1,4 +1,4 @@
-function showCorrelogram(otable, vennPopupWindow) {
+function showCorrelogram(otable) {
       
   otable1 = [];
   var min = otable[0].value;
@@ -110,10 +110,10 @@ function showCorrelogram(otable, vennPopupWindow) {
                            vennPopupWindow);
            if (!vennPopupWindow) {
              vennPopupWindow = window.open("vennPopup.jsp",
-                                "",
-                                "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
+                                           "",
+                                           "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
              }
-             vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
+           vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
            }
          });
 
