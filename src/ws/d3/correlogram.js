@@ -114,7 +114,12 @@ function showCorrelogram(otable, vennPopupWindow) {
                             d3.select(this).attr("n12"),
                             d3.select(this).attr("m1").replaceAll('.', ' '),
                             d3.select(this).attr("m2").replaceAll('.', ' '));
-            document.getElementById("vennTxt").innerHTML = info;
+            if (vennPopupWindow) {
+              vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
+              }
+            else {
+              document.getElementById("vennTxt").innerHTML = info;
+              }
             }
           });
          
@@ -155,7 +160,7 @@ function showCorrelogram(otable, vennPopupWindow) {
               vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
               }
             else {
-            document.getElementById("vennTxt").innerHTML = info;
+              document.getElementById("vennTxt").innerHTML = info;
               }
             }
           });
