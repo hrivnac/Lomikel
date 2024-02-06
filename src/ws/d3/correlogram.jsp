@@ -15,7 +15,7 @@
 
 <script src="../venn-v.0.2.14/venn.js" type="text/javascript"></script>
 
-<div id="corr_area" width="100%" height="100%" ></div>
+<div id="corr_area"></div>
 
 <%
   String tdata = request.getParameter("tdata");
