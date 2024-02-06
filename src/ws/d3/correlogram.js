@@ -1,5 +1,11 @@
 function showCorrelogram(otable, vennPopupWindow) {
-      
+
+if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed) {
+  vennPopupWindow = window.open("vennPopup.jsp",
+                                "",
+                                "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
+  }
+    
   otable1 = [];
   var min = otable[0].value;
   var max = otable[0].value;
@@ -102,11 +108,6 @@ function showCorrelogram(otable, vennPopupWindow) {
      .style("opacity", 0.8)
      .on("mouseover", function(d) {		
          if (d3.select(this).attr("valid")) {
-           if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed) {
-             vennPopupWindow = window.open("vennPopup.jsp",
-                                           "",
-                                           "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
-             }
            info = showVenn(d3.select(this).attr("n1"),
                            d3.select(this).attr("n2"),
                            d3.select(this).attr("n12"),
