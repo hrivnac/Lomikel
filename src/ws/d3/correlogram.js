@@ -100,7 +100,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("n12",   function(d) {return d.value})
      .attr("p12",   function(d) {return 100 * parseInt(d.value) / (parseInt(d3.select(this).attr("n1")) + parseInt(d3.select(this).attr("n2")) - parseInt(d.value))})
      .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
-     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=><br/>" + d.x + "</u></b></br>" +
+     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=&gt;<br/>" + d.x + "</u></b></br>" +
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
@@ -131,7 +131,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("n12",   function(d) {return d.value})
      .attr("p12",   function(d) {return 100 * parseInt(d.value) / (parseInt(d3.select(this).attr("n1")) + parseInt(d3.select(this).attr("n2")) - parseInt(d.value))})
      .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
-     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=><br/>" + d.x + "</u></b></br>" +
+     .attr("info",  function(d) {return "<center><b><u>" + d.y + "<br/>=&gt;<br/>" + d.x + "</u></b></br>" +
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
@@ -169,7 +169,7 @@ function showCorrelogram(otable, vennPopupWindow) {
      .attr("p12",   function(d) {return 100 * parseInt(d.value) / (parseInt(d3.select(this).attr("n1")) + parseInt(d3.select(this).attr("n2")) - parseInt(d.value))})
      .attr("valid", function(d) {return domain.indexOf(d.x) != domain.indexOf(d.y) && d.info != ""})
      .attr("r",     function(d) {return size(d3.select(this).attr("p12"))})
-     .attr("info",  function(d) {return "<center><b><u>" + d.x + "<br/>=><br/>" + d.y + "</u></b></br>" +
+     .attr("info",  function(d) {return "<center><b><u>" + d.x + "<br/>=&gt;<br/>" + d.y + "</u></b></br>" +
                                         "intersection/sizeIn/sizeOut = " + d.value + "/" + d.info + "</center>"})
      .attr("popx",  function(d) {return x(d.x)})
      .attr("popy",  function(d) {return y(d.y)})
