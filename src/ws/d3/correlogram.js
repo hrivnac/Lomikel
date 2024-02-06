@@ -55,11 +55,6 @@ function showCorrelogram(otable, vennPopupWindow) {
   const xSpace = x.range()[1] - x.range()[0]
   const ySpace = y.range()[1] - y.range()[0]
  
-  const div = svg.append('foreignObject')
-                 .append('xhtml:div')
-                 .attr("class", "tooltip")				
-                 .style("opacity", 0);
-
   const cor = svg.selectAll(".cor")
                  .data(otable)
                  .join("g")
@@ -113,12 +108,12 @@ function showCorrelogram(otable, vennPopupWindow) {
                            d3.select(this).attr("m1").replaceAll('.', ' '),
                            d3.select(this).attr("m2").replaceAll('.', ' '),
                            vennPopupWindow);
-           if (vennPopupWindow) {
+           if (!vennPopupWindow) {
+             vennPopupWindow = window.open("vennPopup.jsp",
+                                "",
+                                "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
+             }
              vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
-             }
-           else {
-             document.getElementById("vennTxt").innerHTML = info;
-             }
            }
          });
 

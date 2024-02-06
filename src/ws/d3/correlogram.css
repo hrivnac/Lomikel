@@ -7,8 +7,6 @@ rect {stroke: lightgray;
       fill: white;
       }
 
-div {position: absolute;
-    }
 .y.axis path {fill: none;
               stroke: none;
               }
