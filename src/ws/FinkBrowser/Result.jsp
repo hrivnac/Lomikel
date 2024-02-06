@@ -3,9 +3,9 @@
 <!-- Fink Browser Result -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
-<%@ page import="com.Lomikel.Utils.Info" %>
-
 <%@ page errorPage="ExceptionHandler.jsp" %>
+
+<link href="Result.css" rel="stylesheet" type="text/css"/>
 
 <div id="result" title="results">
   <button onClick="w2popup.load({url:'Help-Result.html', showMax: true})" style="position:absolute; top:0; right:0">
@@ -13,5 +13,5 @@
     </button>
   <center><h2>Connect to the <u>graph server</u> and request the initial <u>graph</u></h2></center>
   <center><h2>Select an <u>element</u> to see possible <u>actions</u></h2></center>
-  <center><img src="images/overlap.png" width="70%"/></center>
+  <center><img src="images/overlap.png" width="60%"/></center>
   </div>
