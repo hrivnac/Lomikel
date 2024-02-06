@@ -139,11 +139,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
      .text(function(d) {return d.value})
      .style("font-size", 8)
      .style("text-align", "center")
-     .style("fill", function(d) {return color(d3.select(this).attr("p12"))}); 
-  cor.filter(function(d) {const ypos = domain.indexOf(d.y);
-                          const xpos = domain.indexOf(d.x);
-                          return xpos < ypos;
-                          })
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))}).
      .append("text")
      .attr("dy", "1em")
      .attr("m1",    function(d) {return d.x})
@@ -160,7 +156,18 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
      .text(function(d) {return d.info})
      .style("font-size", 8)
      .style("text-align", "center")
-     .style("fill", function(d) {return color(d3.select(this).attr("p12"))});
+     .style("fill", function(d) {return color(d3.select(this).attr("p12"))})
+     .on("mouseover", function(d) {		
+         if (d3.select(this).attr("valid")) {
+           info = showVenn(d3.select(this).attr("n1"),
+                           d3.select(this).attr("n2"),
+                           d3.select(this).attr("n12"),
+                           d3.select(this).attr("m1").replaceAll('.', ' '),
+                           d3.select(this).attr("m2").replaceAll('.', ' '),
+                           vennPopupWindow);
+           vennPopupWindow.document.getElementById("vennPopupTxt").innerHTML = info;
+           }
+         });
          
   // scaler   
      
