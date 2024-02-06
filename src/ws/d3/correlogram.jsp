@@ -38,8 +38,5 @@
 <script src="venn.js"        type="text/javascript"></script>
   
 <script type="text/javascript">
-  vennPopupWindow = window.open("vennPopup.jsp",
-                                "",
-                                "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
-  showCorrelogram(<%=tdata%>, vennPopupWindow);
+  showCorrelogram(<%=tdata%>);
   </script>
