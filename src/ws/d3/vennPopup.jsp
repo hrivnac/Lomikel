@@ -14,3 +14,5 @@
       </td>
     </tr>
   </table>
+<input type='button' value='close' onclick='self.close()'>
+
