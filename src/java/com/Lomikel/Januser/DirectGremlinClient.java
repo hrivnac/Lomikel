@@ -114,8 +114,10 @@ public class DirectGremlinClient extends    GremlinClient
     
   @Override
   public void commit() {
-    _graph.tx().commit();
-    log.info("Commited");
+    if (_graph.features().graph().supportsTransactions()) {
+      _graph.tx().commit();
+      log.info("Commited");
+      }
     }
     
   @Override

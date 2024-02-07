@@ -39,7 +39,7 @@ for (String oid : results) {
     val = cls.getValue();
     weight = val.size();
     print("\t" + key + " in " + weight + " alerts");
-    cmd = "LomikelServer.registerSourcesOfInterest('" + key + "', '" + oid + "', '" + weight + "', '" + cls.getValue() + "', 'hbase-1.lal.in2p3.fr:2183:ztf:schema_2.2_2.0.0')";
+    cmd = "new FinkGremlinRecipies(g).registerSourcesOfInterest('" + key + "', '" + oid + "', '" + weight + "', '" + cls.getValue() + "', 'hbase-1.lal.in2p3.fr:2183:ztf:schema_2.2_2.0.0')";
     clientG.interpret(cmd);
     }
   }

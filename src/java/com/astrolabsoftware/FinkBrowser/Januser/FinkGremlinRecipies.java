@@ -11,6 +11,7 @@ import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
@@ -68,8 +69,63 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     super(client);
     }
     
+  /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
+    * @param sourceType The type of <em>SourcesOfInterest</em> {@link Vertex}.
+    *                   It will be created if not yet exists.
+    * @param objectId   The objectId of the new <em>Source</em> {@link Vertex}.
+    *                   It will be created if not yet exists.
+    * @param weight     The weight of the connection.
+    *                   Usualy the number of <em>Alerts</em> of this type. 
+    * @param instance   The <em>jd</em> of related <em>Alerts</em>.
+    * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
+    *                   as <tt>ip:port:table:schema</tt>. */
+  public void registerSourcesOfInterest(String      sourceType,
+                                        String      objectId,
+                                        double      weight,
+                                        Set<Double> instances,
+                                        String      hbaseUrl) {   
+    log.info("Registering " + objectId + " as " + sourceType);
+    Vertex soi = g().V().has("SourcesOfInterest", "lbl", "SourcesOfInterest").
+                         has("sourceType", sourceType).
+                         fold().
+                         coalesce(unfold(), 
+                                  addV("SourcesOfInterest").
+                                  property("lbl",        "SourcesOfInterest").
+                                  property("sourceType", sourceType         ).
+                                  property("technology", "HBase"            ).
+                                  property("url",        hbaseUrl           )).
+                         next();
+    Vertex s = g().V().has("source", "lbl", "source").
+                       has("objectId", objectId).
+                       fold().
+                       coalesce(unfold(), 
+                                addV("source").
+                                property("lbl",      "source").
+                                property("objectId", objectId)).
+                       next();
+    g().V(soi).addE("contains").
+               to(V(s)).
+               property("lbl",       "contains").
+               property("weight",    weight    ).
+               property("instances", instances ).
+               iterate();
+    commit();
+    }
+    
+        
+  /** Expand tree under all <em>SourcesOfInterest</em> with alerts
+    * filled with requested HBase columns.
+    * @param columns    The HBase columns to be filled inti alerts.
+    * @throws LomikelException If anything goes wrong. */
+  public void enhanceSourcesOfInterest(String columns) throws LomikelException {
+    log.info("Expanding all SourcesOfInterest and enhancing them with " + columns);
+    for (Object soi : g().V().has("lbl", "SourcesOfInterest").values("sourceType").toSet()) {
+      enhanceSourcesOfInterest(soi.toString(), columns);
+      }
+    }
+
   /** Expand tree under <em>SourcesOfInterest</em> with alerts
-    * filles with requested HBase columns.
+    * filled with requested HBase columns.
     * @param sourceType The type of <em>SourcesOfInterest</em>.
     * @param columns    The HBase columns to be filled inti alerts.
     * @throws LomikelException If anything goes wrong. */
@@ -110,18 +166,17 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                                   columns,
                                                   0,
                                                   false,
-                                                  false));
-        
+                                                  false));        
         alert = g().V().has("alert", "lbl", "alert").
-                has("objectId", objectId).
-                has("jd",       jd).
-                fold().
-                coalesce(unfold(), 
-                         addV("alert").
-                         property("lbl",     "alert"  ).
-                         property("objectId", objectId).
-                         property("jd",       jd      )).
-                next();
+                        has("objectId", objectId).
+                        has("jd",       jd).
+                        fold().
+                        coalesce(unfold(), 
+                                 addV("alert").
+                                 property("lbl",     "alert"  ).
+                                 property("objectId", objectId).
+                                 property("jd",       jd      )).
+                        next();
         for (Map<String, String> result : results) {
           for (Map.Entry<String, String> entry : result.entrySet()) {
             if (!entry.getKey().split(":")[0].equals("key")) {
@@ -138,7 +193,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Clean tree under <em>SourcesOfInterest</em>.
     * Drop alerts. Alerts are dropped even if they have other
-    * Edges.
+    * {@link Edge}s.
     * @param sourceType The type of <em>SourcesOfInterest</em>.
     * @throws LomikelException If anything goes wrong. */
   public void cleanSourcesOfInterest(String sourceType) throws LomikelException {

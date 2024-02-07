@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // TBD: parametrise
+// TBD: put Fink into Fink
 public class LomikelConnector extends AbstractGremlinPlugin {
 
   /** Create. */
