@@ -10,5 +10,5 @@
     <img src="images/Help.png" width="10"/>
     </button>
   <center><h1>Table goes here.</h1></center>
-  <center><img src="images/overlap.png" width="60%"/></center>
+  <center><img src="images/LomikelOverlap.png" width="60%"/></center>
   </div>
