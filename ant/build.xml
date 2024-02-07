@@ -1058,6 +1058,7 @@
 			<fileset dir="../src" includes="*.html"/>
 			<fileset dir="../src" includes="*.jpeg"/>
  			<fileset dir="../src" includes="*.jpg"/>
+ 			<fileset dir="../src" includes="*.png"/>
      </copy>
     <mkdir dir="../doc/JavaDoc"/>
  		<copy todir="../doc/JavaDoc">
