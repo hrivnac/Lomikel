@@ -56,6 +56,7 @@ import org.apache.log4j.Logger;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: check precodition for methods, wgich doesn't work with 'client' creation
 public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Create and attach to {@link GraphTraversalSource}.
@@ -144,7 +145,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void enhanceSourcesOfInterest(String columns) throws LomikelException {
     log.info("Expanding all SourcesOfInterest and enhancing them with " + columns);
     for (Object soi : g().V().has("lbl", "SourcesOfInterest").values("sourceType").toSet()) {
-      enhanceSourcesOfInterest(soi.toString(), columns);
+      enhanceSourcesOfInterest(soi.toString().trim(), columns);
       }
     }
 
@@ -208,7 +209,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                 alert.property(entry.getKey().split(":")[1], entry.getValue());
                 }
               catch (SchemaViolationException e) {
-                log.error("Cannot enhance " + objectId + "_" + jd + ": " + entry.getKey() + " => " + entry.getValue(), e);
+                log.error("Cannot enhance " + objectId + "_" + jd + ": " + entry.getKey() + " => " + entry.getValue() + "\n\t" + e.getMessage());
                 }
               }
             }
