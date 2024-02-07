@@ -1,4 +1,0 @@
-import com.Lomikel.Januser.StringGremlinClient;
-StringGremlinClient client = new StringGremlinClient("134.158.74.85", 24445);
-client.interpret("new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).cleanSourcesOfInterest('V*')");
-client.interpret("new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).enhanceSourcesOfInterest('V*', 'i:ra,i:dec')");
