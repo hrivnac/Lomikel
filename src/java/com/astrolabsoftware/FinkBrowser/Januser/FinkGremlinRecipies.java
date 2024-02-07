@@ -25,6 +25,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 
 // Janus Graph
+import org.janusgraph.core.SchemaViolationException;
 import org.janusgraph.graphdb.vertices.StandardVertex;
 import org.janusgraph.graphdb.database.StandardJanusGraph;
 
@@ -67,6 +68,29 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param client The attached  {@link ModifyingGremlinClient}. */
   public FinkGremlinRecipies(ModifyingGremlinClient client) {
     super(client);
+    }
+    
+  /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
+    * @param sourceType The type of <em>SourcesOfInterest</em> {@link Vertex}.
+    *                   It will be created if not yet exists.
+    * @param objectId   The objectId of the new <em>Source</em> {@link Vertex}.
+    *                   It will be created if not yet exists.
+    * @param weight     The weight of the connection.
+    *                   Usualy the number of <em>Alerts</em> of this type. 
+    * @param instanceS  The <em>jd</em> of related <em>Alerts</em> as strings separated by comma.
+    *                   Potential square brackets are removed.
+    * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
+    *                   as <tt>ip:port:table:schema</tt>. */
+  public void registerSourcesOfInterest(String      sourceType,
+                                        String      objectId,
+                                        double      weight,
+                                        String      instancesS,
+                                        String      hbaseUrl) {   
+    Set<Double> instances = new HashSet<>();
+    for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
+      instances.add(Double.parseDouble(instance));
+      }
+    registerSourcesOfInterest(sourceType, objectId, weight, instances, hbaseUrl);
     }
     
   /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
@@ -180,7 +204,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         for (Map<String, String> result : results) {
           for (Map.Entry<String, String> entry : result.entrySet()) {
             if (!entry.getKey().split(":")[0].equals("key")) {
-              alert.property(entry.getKey().split(":")[1], entry.getValue());
+              try {
+                alert.property(entry.getKey().split(":")[1], entry.getValue());
+                }
+              catch (SchemaViolationException e) {
+                log.error("Cannot enhance " + objectId + "_" + jd + ": " + entry.getKey() + " => " + entry.getValue(), e);
+                }
               }
             }
           }
