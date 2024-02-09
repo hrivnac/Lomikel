@@ -366,9 +366,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     log.info("Generating correlations for Alerts of Interest");
     g().V().has("lbl", "AlertsOfInterest").bothE("overlaps").drop().iterate();
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
-    Map<Pair<String, String>, Integer> weights   = new HashMap<>();
-    Map<String, Integer>               sizes     = new HashMap<>();
-    Set<String>                        sources   = new HashSet<>();
+    Map<Pair<String, String>, Integer> weights = new HashMap<>();
+    Map<String, Integer>               sizesA  = new HashMap<>();
+    Map<String, Integer>               sizesS  = new HashMap<>();
+    Set<String>                        types   = new HashSet<>();
     Vertex aoi;
     Iterator<Edge> containsAIt;
     Iterator<Edge> containsSIt;
@@ -378,12 +379,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex soi;
     String alertType;
     String sourceType;
-    Pair types;
+    Pair rel;
     int weight;
     while (aoiT.hasNext()) { // AlertsOfInterest
       aoi = aoiT.next();
       alertType = aoi.property("alertType").value().toString();
-      sources.add(alertType);
+      types.add(alertType);
       containsAIt = aoi.edges(Direction.OUT);
       while (containsAIt.hasNext()) { // AlertsOfInterest.contains
         containsA = containsAIt.next();
@@ -397,27 +398,35 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           soi = containsS.outVertex();
           if (soi.property("lbl").value().toString().equals("SourcesOfInterest")) {
             sourceType = soi.property("sourceType").value().toString();
-            sources.add(sourceType);
-            types = Pair.of(alertType, sourceType);
-            if (!weights.containsKey(types)) {
-              weights.put(types, 1);
+            types.add(sourceType);
+            rel = Pair.of(alertType, sourceType);
+            if (!weights.containsKey(rel)) {
+              weights.put(rel, 1);
               }
-            weight = weights.get(types);
-            weights.put(types, weight + 1);
+            weight = weights.get(rel);
+            weights.put(rel, weight + 1);
             }
           }
         }
       }
     int sz;
-    for (String a : sources) {
+    for (String a : types) {
       sz = 0;
-      for (String s : sources) {
+      for (String s : types) {
         sz += weights.containsKey(Pair.of(a, s)) ? weights.get(Pair.of(a, s)) : 0;
         }
-      sizes.put(a, sz);
+      sizesA.put(a, sz);
+      }
+    for (String s : types) {
+      sz = 0;
+      for (String a : types) {
+        sz += weights.containsKey(Pair.of(a, s)) ? weights.get(Pair.of(a, s)) : 0;
+        }
+      sizesS.put(s, sz);
       }
     System.out.println(weights);
-    System.out.println(sizes);
+    System.out.println(sizesA);
+    System.out.println(sizesS);
     }
     
 
