@@ -237,15 +237,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
     
-  /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.
-    * @param useWeight Whether to use count number of overlapping alerts (instead of just sources). */
-  // TBD: better counting with weights 
-  public void generateSourcesOfInterestCorrelations(boolean useWeight) {
-    log.info("Generating correlations for Sources of Interest " + (useWeight ? "" : "not ") + "using weights");
+  /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.*/
+  public void generateSourcesOfInterestCorrelations() {
+    log.info("Generating correlations for Sources of Interest");
     g().V().has("lbl", "SourcesOfInterest").bothE("overlaps").drop().iterate();
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double>      weights   = new HashMap<>();
-    //Map<Pair<String, String>, Set<String>> instances = new HashMap<>();
     Set<String>                            sources   = new HashSet<>();
     Set<String>                            objectIds = new HashSet<>();
     Vertex soi;
@@ -253,7 +250,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Iterator<Edge> containsIt;
     Edge contains;
     double weight;
-    //Set<String> alerts;
     Vertex source;
     String objectId;
     while (soiT.hasNext()) {
@@ -264,23 +260,15 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       while (containsIt.hasNext()) {
         contains = containsIt.next();
         weight = (Double)(contains.property("weight").value());
-        //alerts = new HashSet<>();
-        //for (String instance : contains.property("instances").value().toString().replaceFirst("\\[", "").replaceAll("]", "").split(",")) {
-        //  alerts.add(instance.trim());
-        //  }
         source = contains.inVertex();
         objectId = source.property("objectId").value().toString();
         objectIds.add(objectId);
         weights.put(Pair.of(sourceType, objectId), weight);
-        //instances.put(Pair.of(sourceType, objectId), alerts);
         }
       }
     Map<Pair<String, String>, Double> corr      = new HashMap<>();
     Map<String, Double>               sizeInOut = new HashMap<>();
     double c12;
-    double w1;
-    double w2;
-    double ww;
     Set<String> alerts1;
     Set<String> alerts2;
     for (String soi1 : sources) {
@@ -289,19 +277,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         for (String oid : objectIds) {
           if (weights.containsKey(Pair.of(soi1, oid)) &&
               weights.containsKey(Pair.of(soi2, oid))) {
-            if (useWeight) {
-              w1 = weights.get(Pair.of(soi1, oid));
-              w2 = weights.get(Pair.of(soi2, oid));
-              c12 += 2 * w1 * w2 / (w1 * w1 + w2 * w2);
-              //alerts1 = instances.get(Pair.of(soi1, oid));
-              //alerts2 = instances.get(Pair.of(soi2, oid));
-              //alerts = new HashSet<>(alerts1);
-              //alerts.retainAll(alerts2);
-              //c12 += alerts.size();
-              }
-            else {
-              c12++;
-              }
+            c12++;
             }
           }
         corr.put(Pair.of(soi1, soi2), c12);
@@ -311,12 +287,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       c12 = 0;
       for (String oid : objectIds) {
         if (weights.containsKey(Pair.of(soi1, oid))) {
-          if (useWeight) {
-            c12 += weights.get(Pair.of(soi1, oid));
-            }
-          else {
-            c12++;
-            }
+          c12++;
           }
         }
       sizeInOut.put(soi1, c12);
@@ -333,7 +304,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                   g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
                   "overlaps",
                   new String[]{"intersection",                "sizeIn",            "sizeOut"          },
-                  //new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
                   new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
           }
         }
@@ -387,8 +357,40 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                  property("lbl",       "contains").
                  property("weight",    1         ).
                  iterate();
-      g().getGraph().tx().commit(); // TBD: should use just commit()
       }
+    g().getGraph().tx().commit(); // TBD: should use just commit()
+    }
+    
+  /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.*/
+  public void generateAlertsOfInterestCorrelations() {
+    log.info("Generating correlations for Alerts of Interest");
+    g().V().has("lbl", "AlertsOfInterest").bothE("overlaps").drop().iterate();
+    GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
+    Vertex aoi;
+    Iterator<Edge> containsIt;
+    Edge contains;
+    Vertex soi;
+    String alertType;
+    String sourceType;
+    while (aoiT.hasNext()) {
+      aoi = aoiT.next();
+      alertType = aoi.property("sourceType").value().toString();
+      containsIt = aoi.edges(Direction.OUT). // contains
+                       next().               // (just one)
+                       inVertex().           // alert
+                       edges(Direction.IN).  // has
+                       next().               // (just one)
+                       outVertex().          // source
+                       edges(Direction.IN);  // contains
+      while (containsIt.hasNext()) {
+        contains = containsIt.next();
+        soi = contains.outVertex();
+        if (soi.property("lbl").value().toString().equals("SourcesOfInterest")) {
+          sourceType = soi.property("sourceType").value().toString();
+          System.out.println(alertType + " " + sourceType);
+          }
+        }
+      }  
     }
     
 
