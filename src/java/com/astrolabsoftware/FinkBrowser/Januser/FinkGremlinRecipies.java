@@ -434,8 +434,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           addEdge(alertT.next(),
                   sourceT.next(),
                   "overlaps",
-                  new String[]{"intersection",                     "sizeIn",              "sizeOut"            },
-                  new Double[]{(double)weights.get(Pair.of(a, s)), (double)sizesA.get(a), (double)sizesS.get(s)});
+                  new String[]{"intersection",
+                               "sizeIn",
+                               "sizeOut"            },
+                  new Double[]{weights.containsKey(Pair.of(a, s)) ? (double)weights.get(Pair.of(a, s)) : 0,
+                              (double)sizesA.get(a),
+                              (double)sizesS.get(s)});
           }
         }
       }
