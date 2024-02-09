@@ -374,7 +374,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String sourceType;
     while (aoiT.hasNext()) {
       aoi = aoiT.next();
-      alertType = aoi.property("sourceType").value().toString();
+      alertType = aoi.property("alertType").value().toString();
       containsIt = aoi.edges(Direction.OUT). // contains
                        next().               // (just one)
                        inVertex().           // alert
