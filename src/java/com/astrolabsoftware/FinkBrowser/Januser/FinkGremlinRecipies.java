@@ -348,13 +348,26 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex alert;
     double jd;
     String objectId;
+    String instances;
     String key;
+    Vertex aoi;
     while (alertT.hasNext()) {
       alert = alertT.next();
       jd = (Double)(alert.property("jd").value());
       objectId = alert.edges(Direction.IN).next().outVertex().property("objectId").value().toString();
+      instances =  alert.edges(Direction.IN).next().outVertex().edges(Direction.IN).next().property("instances").value().toString();
       key = objectId + "_" + jd;
-      System.out.println(key);
+      //aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
+      //                     has("alertType", alertType).
+      //                     fold().
+      //                     coalesce(unfold(), 
+      //                              addV("AlertsOfInterest").
+      //                              property("lbl",        "alertsOfInterest").
+      //                              property("alertType",  alertType         ).
+      //                              property("technology", "HBase"           ).
+      //                              property("url",        hbaseUrl          )).
+      //                     next();
+      System.out.println(key + " " + instances);
       }
     }
     
