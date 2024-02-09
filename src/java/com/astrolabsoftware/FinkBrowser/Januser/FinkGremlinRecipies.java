@@ -412,7 +412,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     for (String a : sources) {
       sz = 0;
       for (String s : sources) {
-        sz += weights.get(Pair.of(a, s));
+        sz += weights.containsKey(Pair.of(a, s)) ? weights.get(Pair.of(a, s)) : 0;
         }
       sizes.put(a, sz);
       }
