@@ -439,6 +439,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       }
+    g().getGraph().tx().commit(); // TBD: should use just commit()
     }
     
 
