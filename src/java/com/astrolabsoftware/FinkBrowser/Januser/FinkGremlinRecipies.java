@@ -347,10 +347,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
     Vertex alert;
     double jd;
+    String objectId;
+    String key;
     while (alertT.hasNext()) {
       alert = alertT.next();
       jd = (Double)(alert.property("jd").value());
-      System.out.println(jd);
+      objectId = alert.edges(Direction.IN).next().outVertex().property("objectId").value().toString();
+      key = objectId + "_" + jd;
+      System.out.println(key);
       }
     }
     
