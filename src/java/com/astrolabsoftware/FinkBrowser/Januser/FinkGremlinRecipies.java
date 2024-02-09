@@ -377,7 +377,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                            fold().
                            coalesce(unfold(), 
                                     addV("AlertsOfInterest").
-                                    property("lbl",        "alertsOfInterest").
+                                    property("lbl",        "AlertsOfInterest").
                                     property("alertType",  sourceType        ).
                                     property("technology", "HBase"           ).
                                     property("url",        hbaseUrl          )).
@@ -387,7 +387,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                  property("lbl",       "contains").
                  property("weight",    1         ).
                  iterate();
-      commit();
       }
     }
     
