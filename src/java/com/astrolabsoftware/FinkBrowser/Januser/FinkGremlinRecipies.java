@@ -353,6 +353,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Edge contains;
     String instances;
     String sourceType;
+    String hbaseUrl = "";
     String key;
     Vertex aoi;
     while (alertT.hasNext()) {
@@ -366,21 +367,27 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         contains = containsIt.next();
         instances = contains.property("instances").value().toString();
         if (instances.contains(jd)) { // just one SourceOfInterest contains each alert
-          sourceType = contains.outVertex().property("sourceType").toString();
+          sourceType = contains.outVertex().property("sourceType").value().toString();
+          hbaseUrl   = contains.outVertex().property("url").value().toString();
           }
         }
       key = objectId + "_" + jd;
-      //aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-      //                     has("alertType", alertType).
-      //                     fold().
-      //                     coalesce(unfold(), 
-      //                              addV("AlertsOfInterest").
-      //                              property("lbl",        "alertsOfInterest").
-      //                              property("alertType",  alertType         ).
-      //                              property("technology", "HBase"           ).
-      //                              property("url",        hbaseUrl          )).
-      //                     next();
-      System.out.println(key + " " + sourceType);
+      aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
+                           has("alertType", sourceType).
+                           fold().
+                           coalesce(unfold(), 
+                                    addV("AlertsOfInterest").
+                                    property("lbl",        "alertsOfInterest").
+                                    property("alertType",  sourceType        ).
+                                    property("technology", "HBase"           ).
+                                    property("url",        hbaseUrl          )).
+                           next();
+      g().V(aoi).addE("contains").
+                 to(V(alert)).
+                 property("lbl",       "contains").
+                 property("weight",    1         ).
+                 iterate();
+      commit();
       }
     }
     
