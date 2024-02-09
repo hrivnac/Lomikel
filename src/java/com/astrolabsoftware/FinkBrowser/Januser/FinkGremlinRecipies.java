@@ -367,27 +367,31 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().V().has("lbl", "AlertsOfInterest").bothE("overlaps").drop().iterate();
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
     Vertex aoi;
-    Iterator<Edge> containsIt;
-    Edge contains;
+    Iterator<Edge> containsAIt;
+    Iterator<Edge> containsSIt;
+    Edge containsA;
+    Edge containsS;
     Vertex soi;
     String alertType;
     String sourceType;
-    while (aoiT.hasNext()) {
+    while (aoiT.hasNext()) { // AlertsOfInterest
       aoi = aoiT.next();
       alertType = aoi.property("alertType").value().toString();
-      containsIt = aoi.edges(Direction.OUT). // contains
-                       next().               // (just one)
-                       inVertex().           // alert
-                       edges(Direction.IN).  // has
-                       next().               // (just one)
-                       outVertex().          // source
-                       edges(Direction.IN);  // contains
-      while (containsIt.hasNext()) {
-        contains = containsIt.next();
-        soi = contains.outVertex();
-        if (soi.property("lbl").value().toString().equals("SourcesOfInterest")) {
-          sourceType = soi.property("sourceType").value().toString();
-          System.out.println(alertType + " " + sourceType);
+      containsAIt = aoi.edges(Direction.OUT);
+      while (containsAIt.hasNext()) { // AlertsOfInterest.contains
+        containsA = containsIt.next();
+        alert = contains.inVertex();
+        containsSIt = alert.edges(Direction.IN).  // has
+                            next().               // (just one)
+                            outVertex().          // source
+                            edges(Direction.IN);  // contains
+        while (containsSIt.hasNext()) {
+          containsS = containsSIt.next();
+          soi = containsS.outVertex();
+          if (soi.property("lbl").value().toString().equals("SourcesOfInterest")) {
+            sourceType = soi.property("sourceType").value().toString();
+            System.out.println(alertType + " " + sourceType);
+            }
           }
         }
       }  
