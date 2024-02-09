@@ -428,9 +428,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     GraphTraversal<Vertex, Vertex> sourceT;
     for (String a : types) {
       for (String s : types) {
+        System.out.println(a + " " + s);
         alertT  = g().V().has("lbl", "AlertsOfInterest").has("alertType",  a);
         sourceT = g().V().has("lbl", "SourceOfInterest").has("sourceType", s);
+        System.out.println(alertT.hasNext()  + " " + sourceT.hasNext());
         if (alertT.hasNext() && sourceT.hasNext()) {
+          System.out.println("x");
           addEdge(alertT.next(),
                   sourceT.next(),
                   "overlaps",
