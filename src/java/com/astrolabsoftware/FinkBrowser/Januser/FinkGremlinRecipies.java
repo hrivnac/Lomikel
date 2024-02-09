@@ -367,6 +367,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().V().has("lbl", "AlertsOfInterest").bothE("overlaps").drop().iterate();
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
     Map<Pair<String, String>, Integer> weights   = new HashMap<>();
+    Map<String, Integer>               sizes     = new HashMap<>();
     Set<String>                        sources   = new HashSet<>();
     Vertex aoi;
     Iterator<Edge> containsAIt;
@@ -406,8 +407,17 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             }
           }
         }
-      }  
+      }
+    int sz;
+    for (String a : sources) {
+      sz = 0;
+      for (String s : sources) {
+        sz += weights.get(Pair.of(a, s));
+        }
+      sizes.put(a, sz);
+      }
     System.out.println(weights);
+    System.out.println(sizes);
     }
     
 
