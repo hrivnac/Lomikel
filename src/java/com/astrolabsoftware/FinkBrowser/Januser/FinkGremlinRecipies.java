@@ -366,6 +366,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     log.info("Generating correlations for Alerts of Interest");
     g().V().has("lbl", "AlertsOfInterest").bothE("overlaps").drop().iterate();
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
+    Map<Pair<String, String>, Integer> weights   = new HashMap<>();
+    Set<String>                        sources   = new HashSet<>();
     Vertex aoi;
     Iterator<Edge> containsAIt;
     Iterator<Edge> containsSIt;
@@ -375,9 +377,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex soi;
     String alertType;
     String sourceType;
+    Pair types;
+    int weight;
     while (aoiT.hasNext()) { // AlertsOfInterest
       aoi = aoiT.next();
       alertType = aoi.property("alertType").value().toString();
+      sources.add(alertType);
       containsAIt = aoi.edges(Direction.OUT);
       while (containsAIt.hasNext()) { // AlertsOfInterest.contains
         containsA = containsAIt.next();
@@ -391,11 +396,18 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           soi = containsS.outVertex();
           if (soi.property("lbl").value().toString().equals("SourcesOfInterest")) {
             sourceType = soi.property("sourceType").value().toString();
-            System.out.println(alertType + " " + sourceType);
+            sources.add(sourceType);
+            types = Pair.of(alertType, sourceType);
+            if (!weights.containsKey(types)) {
+              weights.put(types, 1);
+              }
+            weight = weights.get(types);
+            weights.put(types, weight + 1);
             }
           }
         }
       }  
+    System.out.println(weights);
     }
     
 
