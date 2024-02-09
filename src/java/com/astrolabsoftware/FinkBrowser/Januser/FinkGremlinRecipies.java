@@ -387,6 +387,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                  property("lbl",       "contains").
                  property("weight",    1         ).
                  iterate();
+      g().getGraph().tx().commit(); // TBD: should use just commit()
       }
     }
     
