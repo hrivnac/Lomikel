@@ -346,16 +346,29 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     log.info("Assembling AlertsOfInterest");
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
     Vertex alert;
-    double jd;
+    String jd;
+    Vertex source;
     String objectId;
+    Iterator<Edge> containsIt;
+    Edge contains;
     String instances;
+    String sourceType;
     String key;
     Vertex aoi;
     while (alertT.hasNext()) {
       alert = alertT.next();
-      jd = (Double)(alert.property("jd").value());
-      objectId = alert.edges(Direction.IN).next().outVertex().property("objectId").value().toString();
-      instances =  alert.edges(Direction.IN).next().outVertex().edges(Direction.IN).next().property("instances").value().toString();
+      jd = alert.property("jd").value().toString();
+      source = alert.edges(Direction.IN).next().outVertex();
+      objectId = source.property("objectId").value().toString();
+      containsIt =  source.edges(Direction.IN);
+      sourceType = null;
+      while (containsIt.hasNext()) {
+        contains = containsIt.next();
+        instances = contains.property("instances").value().toString();
+        if (instances.contains(jd)) { // just one SourceOfInterest contains each alert
+          sourceType = contains.outVertex().property("sourceType").toString();
+          }
+        }
       key = objectId + "_" + jd;
       //aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
       //                     has("alertType", alertType).
@@ -367,7 +380,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       //                              property("technology", "HBase"           ).
       //                              property("url",        hbaseUrl          )).
       //                     next();
-      System.out.println(key + " " + instances);
+      System.out.println(key + " " + sourceType);
       }
     }
     
