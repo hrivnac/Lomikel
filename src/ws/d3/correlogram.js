@@ -47,7 +47,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
 
   const color = d3.scaleLinear()
                   .domain([0, 100])
-                  .range(["grey", "red"]);
+                  .range(["black", "red"]);
 
   const size = d3.scaleSqrt()
                  .range([0, width / (num - 1) / 2])
@@ -89,7 +89,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   // upper right half with circles
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
-                          return xpos != ypos;
+                          return xpos > ypos;
                           })
      .append("circle")
      .attr("m1",    function(d) {return d.x})
@@ -121,7 +121,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   // lower left half with text
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
-                          return xpos != ypos;
+                          return xpos < ypos;
                           })
      .append("text")
      .attr("dy", "0em")
@@ -153,7 +153,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
          });
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
-                          return xpos != ypos;
+                          return xpos < ypos;
                           })
      .append("text")
      .attr("dy", "1em")

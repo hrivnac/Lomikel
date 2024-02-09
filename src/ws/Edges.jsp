@@ -114,9 +114,10 @@
   <button onClick="w2popup.load({url:'Help-Edges.html', showMax: true})" style="position:absolute; right:0">
     <img src="images/Help.png" width="10"/>
     </button>
-  <button onclick="showScatter('scatter')"   style="background-color:#ddddff" title="scatter plot of multiple variables"   >Scatter Plot</button>    
-  <button onclick="showCorrelogram()"        style="background-color:#ddddff" title="correlogram">Correlogram</button>    
-  </div>
+  <button onclick="showScatter('scatter')" style="background-color:#ddddff" title="scatter plot of multiple variables"   >Scatter Plot</button>    
+  <button onclick="showCorrelogramFT()"    style="background-color:#ddddff" title="correlogram">Correlogram from-to</button>    
+  <button onclick="showCorrelogramTF()"    style="background-color:#ddddff" title="correlogram">Correlogram to-from</button>    
+   </div>
 <table id='tbl'
        data-sortable='true'
        data-search='true'
@@ -308,7 +309,13 @@
       }  
     loadPane("plot", "d3/scatterplot.jsp?" + params, true, 600 * 1.2);
     }
-  function showCorrelogram() {
+  function showCorrelogramFT() {
+    showCorrelogram("from", "to", "sizeIn", "sizeOut");
+    }
+  function showCorrelogramTF() {
+    showCorrelogram("to", "from", "sizeOut", "sizeIn");
+    }
+  function showCorrelogram(x, y, sumx, sumy) {
     var params = "tdata=[";
     first = true;
     for (i = 0; i < tdata.length; i++) {
@@ -318,9 +325,9 @@
       else {
         first = false;
         }
-        params += "{\"x\":\"" + tdata[i]['from'] + "\",\"y\":\"" + tdata[i]['to'] + "\"";
+        params += "{\"x\":\"" + tdata[i][x] + "\",\"y\":\"" + tdata[i][y] + "\"";
         params += ",\"value\":\"" + tdata[i]['intersection'] + "\"";
-        params += ",\"info\":\"" + tdata[i]['sizeIn'] + "/" + tdata[i]['sizeOut'] + "\"";
+        params += ",\"info\":\"" + tdata[i][sumx] + "/" + tdata[i][sumy] + "\"";
         params += "}";        
       }
     params += "]";
