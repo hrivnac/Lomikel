@@ -371,6 +371,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Iterator<Edge> containsSIt;
     Edge containsA;
     Edge containsS;
+    Vertex alert;
     Vertex soi;
     String alertType;
     String sourceType;
@@ -379,8 +380,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       alertType = aoi.property("alertType").value().toString();
       containsAIt = aoi.edges(Direction.OUT);
       while (containsAIt.hasNext()) { // AlertsOfInterest.contains
-        containsA = containsIt.next();
-        alert = contains.inVertex();
+        containsA = containsAIt.next();
+        alert = containsA.inVertex();
         containsSIt = alert.edges(Direction.IN).  // has
                             next().               // (just one)
                             outVertex().          // source
