@@ -153,7 +153,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
          });
   cor.filter(function(d) {const ypos = domain.indexOf(d.y);
                           const xpos = domain.indexOf(d.x);
-                          return xpos < ypos;
+                          return xpos != ypos;
                           })
      .append("text")
      .attr("dy", "1em")
