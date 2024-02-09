@@ -89,7 +89,7 @@
       else {
         vFrom  = callGremlinValues(gr + ".E('" + id1 + "').outV().elementMap().next().toString()" )[0];
         }
-      if (lblTo == "AlertsOfInterest" || lblFrom == "SourcesOfInterest") {
+      if (lblTo == "AlertsOfInterest" || lblTo == "SourcesOfInterest") {
         vTo    = callGremlinValues(gr + ".E('" + id1 + "').inV().values('alertType', 'sourceType').toSet().toArray().join('')")[0];
         }
       else {
