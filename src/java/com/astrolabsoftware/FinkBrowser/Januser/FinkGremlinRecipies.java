@@ -340,6 +340,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
+    
+  /** TBD */
+  public void assembleAlertsOfInterest() {
+    log.info("Assembling AlertsOfInterest");
+    GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
+    Vertex alert;
+    double jd;
+    while (alertT.hasNext()) {
+      alert = alertT.next();
+      jd = (Double)(alert.property("jd").value());
+      System.out.println(jd);
+      }
+    }
+    
 
   /** Logging . */
   private static Logger log = Logger.getLogger(FinkGremlinRecipies.class);
