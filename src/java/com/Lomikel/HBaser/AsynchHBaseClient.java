@@ -11,12 +11,8 @@ import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 
 // org.json      
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 // Java
-import java.util.Collection;  
-import java.util.List;  
-import java.util.ArrayList;  
 import java.util.Map;  
 import java.util.TreeMap;  
 import java.util.concurrent.ConcurrentLinkedQueue;

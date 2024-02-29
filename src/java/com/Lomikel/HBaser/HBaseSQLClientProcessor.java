@@ -1,27 +1,15 @@
 package com.Lomikel.HBaser;
 
-import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Schema;
 
-// HBase
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Result;
-
 // SQL
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
 // Java
 import java.util.List;  
 import java.util.ArrayList;  
 import java.util.Map;  
-import java.util.TreeMap;  
 
 // Log4J
 import org.apache.log4j.Logger;

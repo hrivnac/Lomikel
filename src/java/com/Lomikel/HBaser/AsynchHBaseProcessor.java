@@ -1,17 +1,10 @@
 package com.Lomikel.HBaser;
 
-import com.Lomikel.Utils.LomikelException;
-
-// HBase
-import org.apache.hadoop.hbase.client.Scan;
-
 // HealPix
 import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
 import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 
 // Java
-import java.util.List;  
-import java.util.ArrayList;  
 import java.util.Map;  
 import java.util.concurrent.ConcurrentLinkedQueue;
 

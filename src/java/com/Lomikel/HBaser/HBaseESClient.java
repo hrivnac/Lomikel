@@ -8,7 +8,6 @@ import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
 import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 
 // Java
-import java.util.Map;  
 
 // Log4J
 import org.apache.log4j.Logger;

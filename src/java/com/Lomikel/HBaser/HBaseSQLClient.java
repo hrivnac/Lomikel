@@ -1,7 +1,6 @@
 package com.Lomikel.HBaser;
 
 import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.DB.Schema;
 
 // HBase
 import org.apache.hadoop.hbase.client.Get;
@@ -18,8 +17,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
 // Java
-import java.util.List;  
-import java.util.ArrayList;  
 import java.util.Map;  
 import java.util.TreeMap;  
 
