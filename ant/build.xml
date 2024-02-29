@@ -128,6 +128,10 @@
   <target name="info"
           depends="init"
           description="Create Info class">
+    <script language="javascript">
+      project.setProperty("hostaddress", Packages.java.net.InetAddress.getLocalHost().getHostAddress());
+      project.setProperty("hostname", Packages.java.net.InetAddress.getLocalHost().getCanonicalHostName());
+      </script>
     <mkdir dir="../build/com/Lomikel/Utils"/>
     <copy file="../src/java/com/Lomikel/Utils/Info.pre"
           tofile="../build/com/Lomikel/Utils/Info.java"/>
@@ -137,6 +141,7 @@
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@TMP@"         value="${tmp_dir}"/>
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@MANAGER@"     value="${manager}"/>
     <replace file="../build/com/Lomikel/Utils/Info.java" token="@TARGET@"      value="${target}"/>
+    <replace file="../build/com/Lomikel/Utils/Info.java" token="@HOST@"        value="${hostname}(${hostaddress})"/>
     </target>
 
   <!-- Init =================================================================-->

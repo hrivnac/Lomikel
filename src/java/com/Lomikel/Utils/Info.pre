@@ -16,7 +16,7 @@ public class Info {
   /** Give builder release. 
     * @return The version and build time of the package. */
   public static String release() {
-    return _version + " [" + _build + " by " + _builder + " for " + _target + "]";
+    return _version + " [" + _build + " by " + _builder + " for " + _target + " at " + _host + "]";
     }
 
   /** Get run-time Configuration. 
@@ -50,6 +50,7 @@ public class Info {
   protected static final String _tmp            = "@TMP@";
   protected static final String _manager        = "@MANAGER@";
   protected static final String _target         = "@TARGET@";
+  protected static final String _host           = "@HOST@";
 
   /** Logging . */
   private static Logger log = Logger.getLogger(Info.class);
