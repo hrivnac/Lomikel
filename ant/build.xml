@@ -1033,12 +1033,12 @@
   <target name="run-Lomikel"
           depends="init"
           description="Run local Lomikel Server">
-    <echo>Go to http://localhost:${jetty-port}/Lomikel</echo>
-    <java jar="${jetty-runner}" fork="true">
+    <echo>Go to http://localhost:${jetty_port}/Lomikel</echo>
+    <java jar="${jetty_runner}" fork="true">
       <arg value="--path"/>
       <arg value="/Lomikel"/>
       <arg value="--port"/>
-      <arg value="${jetty-port}"/>
+      <arg value="${jetty_port}"/>
       <arg value="--log"/>
       <arg value="LomikelServer.log"/>
       <arg value="--out"/>
@@ -1050,12 +1050,12 @@
   <target name="run-FinkBrowser"
           depends="init"
           description="Run local FinkBrowser Server">
-    <echo>Go to http://localhost:${jetty-port}/FinkBrowser</echo>
-    <java jar="${jetty-runner}" fork="true">
+    <echo>Go to http://localhost:${jetty_port}/FinkBrowser</echo>
+    <java jar="${jetty_runner}" fork="true">
       <arg value="--path"/>
       <arg value="/FinkBrowser"/>
       <arg value="--port"/>
-      <arg value="${jetty-port}"/>
+      <arg value="${jetty_port}"/>
       <arg value="--log"/>
       <arg value="FinkBrowserServer.log"/>
       <arg value="--out"/>

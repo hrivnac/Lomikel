@@ -152,7 +152,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Expand tree under <em>SourcesOfInterest</em> with alerts
     * filled with requested HBase columns.
     * @param sourceType The type of <em>SourcesOfInterest</em>.
-    * @param columns    The HBase columns to be filled inti alerts.
+    * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
   public void enhanceSourcesOfInterest(String sourceType,
                                        String columns) throws LomikelException {
@@ -186,12 +186,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       for (String jd : jds) {
         n++;
         key = objectId + "_" + jd.trim();
-        results = client.results2List(client.scan(key,
-                                                  null,
-                                                  columns,
-                                                  0,
-                                                  false,
-                                                  false));        
         alert = g().V().has("alert", "lbl", "alert").
                         has("objectId", objectId).
                         has("jd",       jd).
@@ -202,14 +196,22 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                  property("objectId", objectId).
                                  property("jd",       jd      )).
                         next();
-        for (Map<String, String> result : results) {
-          for (Map.Entry<String, String> entry : result.entrySet()) {
-            if (!entry.getKey().split(":")[0].equals("key")) {
-              try {
-                alert.property(entry.getKey().split(":")[1], entry.getValue());
-                }
-              catch (SchemaViolationException e) {
-                log.error("Cannot enhance " + objectId + "_" + jd + ": " + entry.getKey() + " => " + entry.getValue() + "\n\t" + e.getMessage());
+        if (columns != null) {
+          results = client.results2List(client.scan(key,
+                                                    null,
+                                                    columns,
+                                                    0,
+                                                    false,
+                                                    false));        
+          for (Map<String, String> result : results) {
+            for (Map.Entry<String, String> entry : result.entrySet()) {
+              if (!entry.getKey().split(":")[0].equals("key")) {
+                try {
+                  alert.property(entry.getKey().split(":")[1], entry.getValue());
+                  }
+                catch (SchemaViolationException e) {
+                  log.error("Cannot enhance " + objectId + "_" + jd + ": " + entry.getKey() + " => " + entry.getValue() + "\n\t" + e.getMessage());
+                  }
                 }
               }
             }
