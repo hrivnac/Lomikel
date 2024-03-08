@@ -1,5 +1,4 @@
-new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).enhanceSourcesOfInterest('*');
+new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).enhanceSourcesOfInterest(null);
 new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).assembleAlertsOfInterest();
-
-
-new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).generateSourcesOfInterestCorrelations(false)
+new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).generateAlertsOfInterestCorrelations()
+#new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).generateSourcesOfInterestCorrelations(false)

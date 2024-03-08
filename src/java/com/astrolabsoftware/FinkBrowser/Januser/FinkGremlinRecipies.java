@@ -81,17 +81,23 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param instanceS  The <em>jd</em> of related <em>Alerts</em> as strings separated by comma.
     *                   Potential square brackets are removed.
     * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
-    *                   as <tt>ip:port:table:schema</tt>. */
+    *                   as <tt>ip:port:table:schema</tt>. 
+    * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
+    *                   filled with requested HBase columns.
+    * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
+    *                   Ignored if enhancement not requested. */
   public void registerSourcesOfInterest(String      sourceType,
                                         String      objectId,
                                         double      weight,
                                         String      instancesS,
-                                        String      hbaseUrl) {   
+                                        String      hbaseUrl,
+                                        boolean     enhance,
+                                        String      columns) {   
     Set<Double> instances = new HashSet<>();
     for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
       instances.add(Double.parseDouble(instance));
       }
-    registerSourcesOfInterest(sourceType, objectId, weight, instances, hbaseUrl);
+    registerSourcesOfInterest(sourceType, objectId, weight, instances, hbaseUrl, enhance, columns);
     }
     
   /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
@@ -101,14 +107,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   It will be created if not yet exists.
     * @param weight     The weight of the connection.
     *                   Usualy the number of <em>Alerts</em> of this type. 
-    * @param instance   The <em>jd</em> of related <em>Alerts</em>.
+    * @param instances  The <em>jd</em> of related <em>Alerts</em>.
     * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
-    *                   as <tt>ip:port:table:schema</tt>. */
+    *                   as <tt>ip:port:table:schema</tt>.
+    * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
+    *                   filled with requested HBase columns.
+    * @param columns The HBase columns to be filled into alerts. May be <tt>null</tt>.
+    *                   Ignored if enhancement not requested. */
   public void registerSourcesOfInterest(String      sourceType,
                                         String      objectId,
                                         double      weight,
                                         Set<Double> instances,
-                                        String      hbaseUrl) {   
+                                        String      hbaseUrl,
+                                        boolean     enhance,
+                                        String      columns) {   
     log.info("Registering " + objectId + " as " + sourceType);
     Vertex soi = g().V().has("SourcesOfInterest", "lbl", "SourcesOfInterest").
                          has("sourceType", sourceType).
@@ -134,13 +146,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                property("weight",    weight    ).
                property("instances", instances ).
                iterate();
-    commit();
+    if (enhance) {
+      try {
+        enhanceSource(s, instances, columns, hbaseUrl);
+        }
+      catch (LomikelException e) {
+        log.error("Cannot enhance source", e);
+        }
+      }
+    commit(); // not needed if enhancing
     }
-    
         
   /** Expand tree under all <em>SourcesOfInterest</em> with alerts
     * filled with requested HBase columns.
-    * @param columns    The HBase columns to be filled inti alerts.
+    * @param columns The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
   public void enhanceSourcesOfInterest(String columns) throws LomikelException {
     log.info("Expanding all SourcesOfInterest and enhancing them with " + columns);
@@ -222,7 +241,71 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().getGraph().tx().commit(); // TBD: should use just commit()
     log.info("" + n + " alerts added");
     }
-    
+ 
+  /** Expand tree under <em>SourcesOfInterest</em> with alerts
+    * filled with requested HBase columns.
+    * @param sourceType The type of <em>SourcesOfInterest</em>.
+    * @param instances  The <em>jd</em> of related <em>Alerts</em>.
+    * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
+    * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
+    *                   as <tt>ip:port:table:schema</tt>.
+    * @throws LomikelException If anything goes wrong. */
+  public void enhanceSource(Vertex      source,
+                            Set<Double> instances,
+                            String      columns,
+                            String      hbaseUrl) throws LomikelException {
+    String[] url = hbaseUrl.split(":");
+    String ip     = url[0];
+    String port   = url[1];
+    String table  = url[2];
+    String schema = url[3];
+    FinkHBaseClient client = new FinkHBaseClient(ip, port);
+    client.connect(table, schema);
+    String objectId = source.property("objectId").value().toString();
+    String[] jds = instances.toString().replaceFirst("\\[", "").replaceAll("]", "").split(",");
+    int n = 0;
+    String key;
+    Vertex alert;
+    List<Map<String, String>> results;
+    for (String jd : jds) {
+      n++;
+      key = objectId + "_" + jd.trim();
+      alert = g().V().has("alert", "lbl", "alert").
+                      has("objectId", objectId).
+                      has("jd",       jd).
+                      fold().
+                      coalesce(unfold(), 
+                               addV("alert").
+                               property("lbl",     "alert"  ).
+                               property("objectId", objectId).
+                               property("jd",       jd      )).
+                      next();
+      if (columns != null) {
+        results = client.results2List(client.scan(key,
+                                                  null,
+                                                  columns,
+                                                  0,
+                                                  false,
+                                                  false));        
+        for (Map<String, String> result : results) {
+          for (Map.Entry<String, String> entry : result.entrySet()) {
+            if (!entry.getKey().split(":")[0].equals("key")) {
+              try {
+                alert.property(entry.getKey().split(":")[1], entry.getValue());
+                }
+              catch (SchemaViolationException e) {
+                log.error("Cannot enhance " + objectId + "_" + jd + ": " + entry.getKey() + " => " + entry.getValue() + "\n\t" + e.getMessage());
+                }
+              }
+            }
+          }
+        }
+      addEdge(source, alert, "has");
+      }
+    g().getGraph().tx().commit(); // TBD: should use just commit()
+    log.info("" + n + " alerts added");
+    }
+   
   /** Clean tree under <em>SourcesOfInterest</em>.
     * Drop alerts. Alerts are dropped even if they have other
     * {@link Edge}s.
@@ -313,7 +396,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
     
-  /** TBD */
+  /** Assemble AlertsOfInterest from existing alerts. */
   public void assembleAlertsOfInterest() {
     log.info("Assembling AlertsOfInterest");
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
