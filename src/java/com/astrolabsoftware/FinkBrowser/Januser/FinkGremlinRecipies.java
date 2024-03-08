@@ -148,7 +148,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                iterate();
     if (enhance) {
       try {
-        enhanceSource(s, instances, columns, hbaseUrl);
+        fhclient(hbaseUrl);
+        enhanceSource(s, instances.toString().replaceFirst("\\[", "").replaceAll("]", "").split(","), columns);
         }
       catch (LomikelException e) {
         log.error("Cannot enhance source", e);
@@ -179,90 +180,31 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex soi = g().V().has("lbl",        "SourcesOfInterest").
                          has("sourceType", sourceType).
                          next();
-    String[] url = soi.property("url").value().toString().split(":");
-    String ip     = url[0];
-    String port   = url[1];
-    String table  = url[2];
-    String schema = url[3];
-    FinkHBaseClient client = new FinkHBaseClient(ip, port);
-    client.connect(table, schema);
+    fhclient(soi.property("url").value().toString());
     Iterator<Edge> containsIt = soi.edges(Direction.OUT);
     Edge contains;
     Vertex source;
-    Vertex alert;
     String objectId;
-    double weight;
     String[] jds;
-    String key;
-    List<Map<String, String>> results;
-    int n = 0;
     while (containsIt.hasNext()) {
       contains = containsIt.next();
       source = contains.inVertex();
       objectId = source.property("objectId").value().toString();
-      weight = (Double)(contains.property("weight").value());
       jds = contains.property("instances").value().toString().replaceFirst("\\[", "").replaceAll("]", "").split(",");
-      for (String jd : jds) {
-        n++;
-        key = objectId + "_" + jd.trim();
-        alert = g().V().has("alert", "lbl", "alert").
-                        has("objectId", objectId).
-                        has("jd",       jd).
-                        fold().
-                        coalesce(unfold(), 
-                                 addV("alert").
-                                 property("lbl",     "alert"  ).
-                                 property("objectId", objectId).
-                                 property("jd",       jd      )).
-                        next();
-        if (columns != null) {
-          results = client.results2List(client.scan(key,
-                                                    null,
-                                                    columns,
-                                                    0,
-                                                    false,
-                                                    false));        
-          for (Map<String, String> result : results) {
-            for (Map.Entry<String, String> entry : result.entrySet()) {
-              if (!entry.getKey().split(":")[0].equals("key")) {
-                try {
-                  alert.property(entry.getKey().split(":")[1], entry.getValue());
-                  }
-                catch (SchemaViolationException e) {
-                  log.error("Cannot enhance " + objectId + "_" + jd + ": " + entry.getKey() + " => " + entry.getValue() + "\n\t" + e.getMessage());
-                  }
-                }
-              }
-            }
-          }
-        addEdge(source, alert, "has");
-        }
+      enhanceSource(source, jds, columns);
       }
-    g().getGraph().tx().commit(); // TBD: should use just commit()
-    log.info("" + n + " alerts added");
     }
  
   /** Expand tree under <em>SourcesOfInterest</em> with alerts
     * filled with requested HBase columns.
     * @param sourceType The type of <em>SourcesOfInterest</em>.
-    * @param instances  The <em>jd</em> of related <em>Alerts</em>.
+    * @param jds        The <em>jd</em> of related <em>Alerts</em>.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
-    * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
-    *                   as <tt>ip:port:table:schema</tt>.
     * @throws LomikelException If anything goes wrong. */
-  public void enhanceSource(Vertex      source,
-                            Set<Double> instances,
-                            String      columns,
-                            String      hbaseUrl) throws LomikelException {
-    String[] url = hbaseUrl.split(":");
-    String ip     = url[0];
-    String port   = url[1];
-    String table  = url[2];
-    String schema = url[3];
-    FinkHBaseClient client = new FinkHBaseClient(ip, port);
-    client.connect(table, schema);
+  public void enhanceSource(Vertex   source,
+                            String[] jds,
+                            String   columns) throws LomikelException {
     String objectId = source.property("objectId").value().toString();
-    String[] jds = instances.toString().replaceFirst("\\[", "").replaceAll("]", "").split(",");
     int n = 0;
     String key;
     Vertex alert;
@@ -281,12 +223,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                property("jd",       jd      )).
                       next();
       if (columns != null) {
-        results = client.results2List(client.scan(key,
-                                                  null,
-                                                  columns,
-                                                  0,
-                                                  false,
-                                                  false));        
+        results = fhclient().results2List(fhclient().scan(key,
+                                                          null,
+                                                          columns,
+                                                          0,
+                                                          false,
+                                                          false));        
         for (Map<String, String> result : results) {
           for (Map.Entry<String, String> entry : result.entrySet()) {
             if (!entry.getKey().split(":")[0].equals("key")) {
@@ -531,6 +473,31 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
     
+  private FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
+    if (hbaseUrl == null || hbaseUrl.equals(_fhclientUrl)) {
+      return _fhclient;
+      }
+    _fhclientUrl = hbaseUrl;
+    String[] url = hbaseUrl.split(":");
+    String ip     = url[0];
+    String port   = url[1];
+    String table  = url[2];
+    String schema = url[3];
+    _fhclient = new FinkHBaseClient(ip, port);
+    _fhclient.connect(table, schema);
+    return _fhclient;
+    }
+    
+  private FinkHBaseClient fhclient() throws LomikelException {
+    if (_fhclient == null) {
+      throw new LomikelException("FinkHBaseClient not initialised");
+      }
+    return _fhclient;
+    }
+    
+  private FinkHBaseClient _fhclient;
+  
+  private String _fhclientUrl;
 
   /** Logging . */
   private static Logger log = Logger.getLogger(FinkGremlinRecipies.class);
