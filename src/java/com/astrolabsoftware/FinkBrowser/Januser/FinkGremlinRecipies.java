@@ -211,16 +211,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                 property("lbl",      "source").
                                 property("objectId", objectId)).
                        next();
-    //g().V(soi).addE("contains").
-    //           to(V(s)).
-    //           property("lbl",       "contains").
-    //           property("weight",    weight    ).
-    //           property("instances", instances ).
-    //           iterate();
     addEdge(g().V(soi).next(),
             g().V(s).next(),
             "contains",
-            new String[]{"weight",  "instances"         },
+            new String[]{"weight",  "instances"                                                     },
             new String[]{""+weight, instances.toString().replaceFirst("\\[", "").replaceAll("]", "")});
     if (enhance) {
       try {
@@ -455,11 +449,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                     property("technology", "HBase"           ).
                                     property("url",        hbaseUrl          )).
                            next();
-      //g().V(aoi).addE("contains").
-      //           to(V(alert)).
-      //           property("lbl",       "contains").
-      //           property("weight",    1         ).
-      //           iterate();
       addEdge(g().V(aoi).next(),
               g().V(alert).next(),
               "contains",
