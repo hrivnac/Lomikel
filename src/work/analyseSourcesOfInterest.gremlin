@@ -1,0 +1,5 @@
+new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).fillSourcesOfInterest('hbase-1.lal.in2p3.fr:2183:ztf:schema_2.2_2.0.0', 50, 10000, null)
+# new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).enhanceSourcesOfInterest(null);
+new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).assembleAlertsOfInterest();
+new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).generateAlertsOfInterestCorrelations()
+#new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies(g).generateSourcesOfInterestCorrelations(false)
