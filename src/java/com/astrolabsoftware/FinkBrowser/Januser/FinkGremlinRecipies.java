@@ -1,5 +1,6 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
+import com.Lomikel.Utils.SmallHttpClient;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
@@ -33,6 +34,10 @@ import org.janusgraph.graphdb.database.StandardJanusGraph;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Get;
 
+// org.json
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 // Java
 import java.util.Arrays;
 import java.util.Iterator;
@@ -41,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -69,6 +75,65 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param client The attached  {@link ModifyingGremlinClient}. */
   public FinkGremlinRecipies(ModifyingGremlinClient client) {
     super(client);
+    }
+    
+  public void fillSourcesOfInterest(String hbaseUrl,
+                                    int    hbaseLimit,
+                                    int    timeLimit,
+                                    String columns) throws LomikelException {
+    log.info("Filling SourcesOfInterest from " + hbaseUrl + ", hbaseLimit = " + hbaseLimit + ", timeLimit = " + timeLimit);
+    log.info("\tenhancing with " + columns);
+    SmallHttpClient httpClient = new SmallHttpClient();
+    fhclient(hbaseUrl);
+    fhclient().setLimit(hbaseLimit);
+    Set<String> results = fhclient().latests("i:objectId",
+                                             null,
+                                             timeLimit,
+                                             true);
+    String request;
+    String answer;
+    JSONArray ja;
+    JSONObject jo;
+    Map<String, Set<Double>> classes;
+    String cl;
+    double jd;
+    Set<Double> jds;
+    String key;
+    Set<Double> val;
+    int weight;
+    for (String oid : results) {
+      request = new JSONObject().put("objectId", oid).put("output-format", "json").toString();
+      answer = httpClient.postJSON(FINK_OBJECTS_WS,
+                                   request,
+                                   null,
+                                   null);
+      ja = new JSONArray(answer);
+      classes =  new TreeMap<>();
+      for (int i = 0; i < ja.length(); i++) {
+        jo = ja.getJSONObject(i);
+        cl = jo.getString("v:classification");
+        jd = jo.getDouble("i:jd");
+        if (!cl.equals("Unknown")) {
+          if (classes.containsKey(cl)) {
+            jds = classes.get(cl);
+            jds.add(jd);
+            }
+          else {
+            jds = new TreeSet<Double>();
+            jds.add(jd);
+            classes.put(cl, jds);
+            }
+          }
+        }
+      log.info(oid + ":");
+      for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
+        key = cls.getKey();
+        val = cls.getValue();
+        weight = val.size();
+        log.info("\t" + key + " in " + weight + " alerts");
+        registerSourcesOfInterest(key, oid, weight, cls.getValue(), hbaseUrl, true, columns);
+        }
+      }
     }
     
   /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
@@ -505,6 +570,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   private FinkHBaseClient _fhclient;
   
   private String _fhclientUrl;
+  
+  private static String FINK_OBJECTS_WS = "https://fink-portal.org/api/v1/objects";
 
   /** Logging . */
   private static Logger log = Logger.getLogger(FinkGremlinRecipies.class);
