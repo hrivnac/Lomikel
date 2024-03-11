@@ -127,6 +127,12 @@ g.E().groupCount().by(label).unfold().project('Label', 'Count').by(keys).by(valu
 g.V().has('lbl', 'xxx').limit(1).emit().repeat(group('x').by(loops()).by(label().fold().index()).out()).cap('x').unfold()
 g.V().has('lbl', 'xxx').limit(1).emit().repeat(group('x').by(loops()).by(values('yyy').fold().index()).out()).cap('x').unfold()
 
+// show label statistics
+g.V().group().by(label).by(count())
+g.V().group().by(values('lbl')).by(count())
+g.E().group().by(label).by(count())
+g.E().group().by(values('lbl')).by(count())
+
 // Searches
 // ========
 

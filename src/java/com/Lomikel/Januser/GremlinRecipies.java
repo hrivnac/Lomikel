@@ -236,6 +236,29 @@ public class GremlinRecipies {
       }
     }
     
+  /** Add an {@link Edge} between two {@link Vertex}s,
+    * unless it exists. Add properties.
+    * @param v1       The first {@link Vertex}.
+    * @param v2       The second {@link Vertex}.
+    * @param relation The {@link Edge} name.
+    * @param names    The names of the properties to be added.
+    * @param values   The values of the properties to be added. **/
+  // BUG: properties are not added to alfready existing Edge
+  // TBD: check names.length == values.length
+  public void addEdge(Vertex v1,
+                      Vertex v2,
+                      String relation,
+                      String[] names,
+                      String[] values) {
+    if (!checkEdge(v1, v2, relation)) {
+      Edge e = v1.addEdge(relation, v2);
+      e.property("lbl", relation);
+      for (int i = 0; i < names.length; i++) {
+        e.property(names[i], values[i]);
+        }
+      }
+    }
+    
   /** Check whether an {@link Edge} exists.
     * @param v1       The source {@link Vertex}.
     * @param v2       The destination {@link Vertex}.
