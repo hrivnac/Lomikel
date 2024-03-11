@@ -635,7 +635,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * number will be apllied to them and not to the time.
     * @param columnName     The name of the column.
     * @param substringValue The column value substring to search for.
-    * @param minutes        How far into the past it should search. 
+    * @param minutes        How far into the past it should search (in minutes). 
     * @param getValues      Whether to get column values or row keys.
     * @return               The {@link Set} of different values of that column. */
   public Set<String> latests(String  columnName,
