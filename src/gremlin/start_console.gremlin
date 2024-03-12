@@ -17,6 +17,12 @@ class Lomikel {
     return "Hello World from Lomikel console !"
     }
   
+  def static stat() {
+    g.V().group().by(values('lbl')).by(count())
+    g.E().group().by(values('lbl')).by(count())
+    }
+    
+    
   def static geosearch(g, ra, dec, ang, jdmin, jdmax, limit) {
     def lat = dec
     def lon = ra - 180
