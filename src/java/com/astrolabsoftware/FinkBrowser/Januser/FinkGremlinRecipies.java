@@ -418,6 +418,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Assemble AlertsOfInterest from all existing alerts. */
   public void assembleAlertsOfInterest() {
     log.info("Assembling AlertsOfInterest");
+    g.V().has("lbl", "AlertsOfInterest").not(has("alertType")).drop().iterate();
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
     Vertex alert;
     while (alertT.hasNext()) {
