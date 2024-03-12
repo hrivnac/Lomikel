@@ -1,6 +1,7 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Utils.SmallHttpClient;
+import com.Lomikel.Utils.NotifierEmail;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
