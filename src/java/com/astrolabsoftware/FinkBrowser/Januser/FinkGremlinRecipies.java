@@ -77,6 +77,15 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     super(client);
     }
     
+  public void processSourcesOfInterest(String hbaseUrl,
+                                       int    hbaseLimit,
+                                       int    timeLimit,
+                                       String columns,
+                                       String manager) {
+    fillSourcesOfInterest(schema, hbaseLimit, timeLimit, columns);
+    generateAlertsOfInterestCorrelations();
+    NotifierMail.setManager(manager);
+    
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts.
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param hbaseLimit The maximal number of alerts getting from HBase.
