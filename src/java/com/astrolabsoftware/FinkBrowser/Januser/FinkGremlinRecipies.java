@@ -1,7 +1,7 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Utils.SmallHttpClient;
-import com.Lomikel.Utils.NotifierMail;
+import com.Lomikel.Utils.NotifierURL;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
@@ -20,6 +20,8 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.not;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.values;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.count;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -90,13 +92,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                        String manager) throws LomikelException {
     fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, columns);
     generateAlertsOfInterestCorrelations();
-    //try {
-    //  NotifierMail.setManager(manager);
-    //  NotifierMail.postMail("a","b");
-    //  }
-    //catch (MessagingException e) {
-    //  log.warn("Cannot send email to " + manager, e);
-    //  }
+    Set stat = g().V().group().by(values("lbl")).by(count()).toSet();
+    stat.addAll(g().E().group().by(values("lbl")).by(count()).toSet());
+    NotifierURL.notify(stat.toString());
     }
     
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts.
