@@ -17,7 +17,7 @@ class Lomikel {
     return "Hello World from Lomikel console !"
     }
   
-  def static stat() {
+  def static stat(g) {
     g.V().group().by(values('lbl')).by(count())
     g.E().group().by(values('lbl')).by(count())
     }
