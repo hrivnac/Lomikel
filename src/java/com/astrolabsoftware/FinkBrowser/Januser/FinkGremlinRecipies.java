@@ -15,6 +15,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.has;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.not;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat;
@@ -38,6 +40,9 @@ import org.apache.hadoop.hbase.client.Get;
 // org.json
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+// Java Mail
+import javax.mail.MessagingException;
 
 // Java
 import java.util.Arrays;
@@ -82,11 +87,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                        int    hbaseLimit,
                                        int    timeLimit,
                                        String columns,
-                                       String manager) {
+                                       String manager) throws LomikelException {
     fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, columns);
     generateAlertsOfInterestCorrelations();
-    NotifierMail.setManager(manager);
-    NotifierMail.postMail("a","b");
+    try {
+      NotifierMail.setManager(manager);
+      NotifierMail.postMail("a","b");
+      }
+    catch (MessagingException e) {
+      log.warn("Cannot send email to " + manager, e);
+      }
     }
     
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts.
@@ -430,7 +440,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Assemble AlertsOfInterest from all existing alerts. */
   public void assembleAlertsOfInterest() {
     log.info("Assembling AlertsOfInterest");
-    g.V().has("lbl", "AlertsOfInterest").not(has("alertType")).drop().iterate();
+    g().V().has("lbl", "AlertsOfInterest").not(has("alertType")).drop().iterate();
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
     Vertex alert;
     while (alertT.hasNext()) {
