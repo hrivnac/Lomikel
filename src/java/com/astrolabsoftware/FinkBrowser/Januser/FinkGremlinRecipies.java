@@ -109,35 +109,40 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     int weight;
     for (String oid : results) {
       request = new JSONObject().put("objectId", oid).put("output-format", "json").toString();
-      answer = httpClient.postJSON(FINK_OBJECTS_WS,
-                                   request,
-                                   null,
-                                   null);
-      ja = new JSONArray(answer);
-      classes =  new TreeMap<>();
-      for (int i = 0; i < ja.length(); i++) {
-        jo = ja.getJSONObject(i);
-        cl = jo.getString("v:classification");
-        jd = jo.getDouble("i:jd");
-        if (!cl.equals("Unknown")) {
-          if (classes.containsKey(cl)) {
-            jds = classes.get(cl);
-            jds.add(jd);
-            }
-          else {
-            jds = new TreeSet<Double>();
-            jds.add(jd);
-            classes.put(cl, jds);
+      try {
+        answer = httpClient.postJSON(FINK_OBJECTS_WS,
+                                     request,
+                                     null,
+                                     null);
+        ja = new JSONArray(answer);
+        classes =  new TreeMap<>();
+        for (int i = 0; i < ja.length(); i++) {
+          jo = ja.getJSONObject(i);
+          cl = jo.getString("v:classification");
+          jd = jo.getDouble("i:jd");
+          if (!cl.equals("Unknown")) {
+            if (classes.containsKey(cl)) {
+              jds = classes.get(cl);
+              jds.add(jd);
+              }
+            else {
+              jds = new TreeSet<Double>();
+              jds.add(jd);
+              classes.put(cl, jds);
+              }
             }
           }
+        log.info(oid + ":");
+        for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
+          key = cls.getKey();
+          val = cls.getValue();
+          weight = val.size();
+          log.info("\t" + key + " in " + weight + " alerts");
+          registerSourcesOfInterest(key, oid, weight, cls.getValue(), hbaseUrl, true, columns);
+          }
         }
-      log.info(oid + ":");
-      for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
-        key = cls.getKey();
-        val = cls.getValue();
-        weight = val.size();
-        log.info("\t" + key + " in " + weight + " alerts");
-        registerSourcesOfInterest(key, oid, weight, cls.getValue(), hbaseUrl, true, columns);
+      catch (LomikelException e) {
+        log.error("Cannot get classification for " + oid);
         }
       }
     }
