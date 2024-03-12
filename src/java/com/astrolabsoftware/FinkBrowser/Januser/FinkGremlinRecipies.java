@@ -266,7 +266,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
  
   /** Expand tree under <em>SourcesOfInterest</em> with alerts
-    * filled with requested HBase columns.
+    * filled with requested HBase columns. It also assembles
+    * related AlertsOfInterest.
     * @param sourceType The type of <em>SourcesOfInterest</em>.
     * @param jds        The <em>jd</em> of related <em>Alerts</em>.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
@@ -313,6 +314,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       addEdge(source, alert, "has");
+      assembleAlertsOfInterest(alert);
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     log.info("" + n + " alerts added");
@@ -408,47 +410,48 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
     
-  /** Assemble AlertsOfInterest from existing alerts. */
+  /** Assemble AlertsOfInterest from all existing alerts. */
   public void assembleAlertsOfInterest() {
     log.info("Assembling AlertsOfInterest");
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
     Vertex alert;
-    String jd;
-    Vertex source;
-    String objectId;
-    Iterator<Edge> containsIt;
+    while (alertT.hasNext()) {
+      alert = alertT.next();
+      assembleAlertsOfInterest(alert);
+      }
+    }
+    
+  /** Assemble AlertsOfInterest from an alert.
+    * @param alert The existing alert.*/
+  public void assembleAlertsOfInterest(Vertex alert) {
+    String jd = alert.property("jd").value().toString();
+    Vertex source = alert.edges(Direction.IN).next().outVertex();
+    String objectId = source.property("objectId").value().toString();
+    Iterator<Edge> containsIt =  source.edges(Direction.IN);
+    String sourceType = null;
     Edge contains;
     String instances = "";
-    String sourceType;
     String hbaseUrl = "";
     String key;
     Vertex aoi;
-    while (alertT.hasNext()) {
-      alert = alertT.next();
-      jd = alert.property("jd").value().toString();
-      source = alert.edges(Direction.IN).next().outVertex();
-      objectId = source.property("objectId").value().toString();
-      containsIt =  source.edges(Direction.IN);
-      sourceType = null;
-      while (containsIt.hasNext()) {
-        contains = containsIt.next();
-        instances = contains.property("instances").value().toString();
-        if (instances.contains(jd)) { // just one SourceOfInterest contains each alert
-          sourceType = contains.outVertex().property("sourceType").value().toString();
-          hbaseUrl   = contains.outVertex().property("url").value().toString();
-          }
+    while (containsIt.hasNext()) {
+      contains = containsIt.next();
+      instances = contains.property("instances").value().toString();
+      if (instances.contains(jd)) { // just one SourceOfInterest contains each alert
+        sourceType = contains.outVertex().property("sourceType").value().toString();
+        hbaseUrl   = contains.outVertex().property("url").value().toString();
         }
       key = objectId + "_" + jd;
       aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                           has("alertType", sourceType).
-                           fold().
-                           coalesce(unfold(), 
-                                    addV("AlertsOfInterest").
-                                    property("lbl",        "AlertsOfInterest").
-                                    property("alertType",  sourceType        ).
-                                    property("technology", "HBase"           ).
-                                    property("url",        hbaseUrl          )).
-                           next();
+                    has("alertType", sourceType).
+                    fold().
+                    coalesce(unfold(), 
+                             addV("AlertsOfInterest").
+                             property("lbl",        "AlertsOfInterest").
+                             property("alertType",  sourceType        ).
+                             property("technology", "HBase"           ).
+                             property("url",        hbaseUrl          )).
+                    next();
       addEdge(g().V(aoi).next(),
               g().V(alert).next(),
               "contains",
