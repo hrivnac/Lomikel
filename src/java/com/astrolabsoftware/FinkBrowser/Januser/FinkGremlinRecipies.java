@@ -90,13 +90,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                        String manager) throws LomikelException {
     fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, columns);
     generateAlertsOfInterestCorrelations();
-    try {
-      NotifierMail.setManager(manager);
-      NotifierMail.postMail("a","b");
-      }
-    catch (MessagingException e) {
-      log.warn("Cannot send email to " + manager, e);
-      }
+    //try {
+    //  NotifierMail.setManager(manager);
+    //  NotifierMail.postMail("a","b");
+    //  }
+    //catch (MessagingException e) {
+    //  log.warn("Cannot send email to " + manager, e);
+    //  }
     }
     
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts.
