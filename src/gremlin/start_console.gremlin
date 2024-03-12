@@ -18,10 +18,10 @@ class Lomikel {
     }
   
   def static stat(g) {
-    g.V().group().by(values('lbl')).by(count())
-    g.E().group().by(values('lbl')).by(count())
+    def v = '\nV: ' + g.V().group().by(values('lbl')).by(count()).toSet()
+    def e = '\nE: ' + g.E().group().by(values('lbl')).by(count()).toSet()
+    return v + e
     }
-    
     
   def static geosearch(g, ra, dec, ang, jdmin, jdmax, limit) {
     def lat = dec
