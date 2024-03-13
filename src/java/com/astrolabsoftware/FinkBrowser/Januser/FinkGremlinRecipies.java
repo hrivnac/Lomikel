@@ -85,12 +85,18 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     super(client);
     }
     
+  /** Execute full chain of new sources correlations analyses.
+    * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
+    * @param hbaseLimit The maximal number of alerts getting from HBase.
+    * @param timeLimit  How far into the past the search should search (in minutes).
+    * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
+    * @throws LomikelException If anhything fails. */
   public void processSourcesOfInterest(String hbaseUrl,
                                        int    hbaseLimit,
                                        int    timeLimit,
-                                       String columns,
-                                       String manager) throws LomikelException {
+                                       String columns) throws LomikelException {
     fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, columns);
+    generateSourcesOfInterestCorrelations();
     generateAlertsOfInterestCorrelations();
     Set stat = g().V().group().by(values("lbl")).by(count()).toSet();
     stat.addAll(g().E().group().by(values("lbl")).by(count()).toSet());
@@ -120,13 +126,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String answer;
     JSONArray ja;
     JSONObject jo;
-    Map<String, Set<Double>> classes;
+    Map<String, Set<Double>> classes; // class/sourceType -> [jd]
     String cl;
     double jd;
     Set<Double> jds;
     String key;
     Set<Double> val;
     int weight;
+    // loop over all sources
     for (String oid : results) {
       request = new JSONObject().put("objectId", oid).put("output-format", "json").toString();
       try {
@@ -136,6 +143,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                      null);
         ja = new JSONArray(answer);
         classes =  new TreeMap<>();
+        // get all alerts (jd) and their classes
         for (int i = 0; i < ja.length(); i++) {
           jo = ja.getJSONObject(i);
           cl = jo.getString("v:classification");
@@ -158,7 +166,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           val = cls.getValue();
           weight = val.size();
           log.info("\t" + key + " in " + weight + " alerts");
-          registerSourcesOfInterest(key, oid, weight, cls.getValue(), hbaseUrl, true, columns);
+          registerSourcesOfInterest(key, oid, weight, val, hbaseUrl, true, columns);
           }
         }
       catch (LomikelException e) {
@@ -239,8 +247,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     addEdge(g().V(soi).next(),
             g().V(s).next(),
             "contains",
-            new String[]{"weight",  "instances"                                                     },
-            new String[]{""+weight, instances.toString().replaceFirst("\\[", "").replaceAll("]", "")});
+            new String[]{"weight",    "instances"                                                     },
+            new String[]{"" + weight, instances.toString().replaceFirst("\\[", "").replaceAll("]", "")});
     if (enhance) {
       try {
         fhclient(hbaseUrl);
@@ -404,7 +412,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             c12++;
             }
           }
-        corr.put(Pair.of(soi1, soi2), c12);
+        if (c12 > 0) {
+          corr.put(Pair.of(soi1, soi2), c12);
+          }
         }
       }
     for (String soi1 : sources) {
@@ -424,11 +434,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       for (String soi2 : sources) {
         i2++;
         if (i2 < i1) {
-          addEdge(g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi1).next(),
-                  g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
-                  "overlaps",
-                  new String[]{"intersection",                "sizeIn",            "sizeOut"          },
-                  new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
+          if (corr.containsKey(Pair.of(soi1, soi2))) {
+            addEdge(g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi1).next(),
+                    g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
+                    "overlaps",
+                    new String[]{"intersection",                "sizeIn",            "sizeOut"          },
+                    new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
+            }
           }
         }
       }
@@ -556,16 +568,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       for (String s : types) {
         alertT  = g().V().has("lbl", "AlertsOfInterest" ).has("alertType",  a);
         sourceT = g().V().has("lbl", "SourcesOfInterest").has("sourceType", s);
-        if (alertT.hasNext() && sourceT.hasNext()) {
+        if (alertT.hasNext() && sourceT.hasNext() && weights.containsKey(Pair.of(a, s))) {
           addEdge(alertT.next(),
                   sourceT.next(),
                   "overlaps",
                   new String[]{"intersection",
                                "sizeIn",
                                "sizeOut"            },
-                  new Double[]{weights.containsKey(Pair.of(a, s)) ? (double)weights.get(Pair.of(a, s)) : 0,
-                              (double)sizesA.get(a),
-                              (double)sizesS.get(s)});
+                  new Double[]{(double)weights.get(Pair.of(a, s)),
+                               (double)sizesA.get(a),
+                               (double)sizesS.get(s)});
           }
         }
       }
