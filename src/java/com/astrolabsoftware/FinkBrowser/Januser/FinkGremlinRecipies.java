@@ -96,6 +96,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                        int    timeLimit,
                                        String columns) throws LomikelException {
     fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, columns);
+    g().E().has("lbl", "overlaps").drop().iterate();
+    g().V().has("lbl", "AlertsOfInterest").not(has("alertType")).drop().iterate();
+    g().V().has("lbl", "SourcesOfInterest").not(has("sourceType")).drop().iterate();
     generateSourcesOfInterestCorrelations();
     generateAlertsOfInterestCorrelations();
     Set stat = g().V().group().by(values("lbl")).by(count()).toSet();
@@ -372,7 +375,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.*/
   public void generateSourcesOfInterestCorrelations() {
     log.info("Generating correlations for Sources of Interest");
-    g().V().has("lbl", "SourcesOfInterest").bothE("overlaps").drop().iterate();
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double>      weights   = new HashMap<>();
     Set<String>                            sources   = new HashSet<>();
@@ -450,7 +452,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Assemble AlertsOfInterest from all existing alerts. */
   public void assembleAlertsOfInterest() {
     log.info("Assembling AlertsOfInterest");
-    g().V().has("lbl", "AlertsOfInterest").not(has("alertType")).drop().iterate();
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
     Vertex alert;
     while (alertT.hasNext()) {
@@ -502,7 +503,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
   public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
-    g().V().has("lbl", "AlertsOfInterest").bothE("overlaps").drop().iterate();
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
     Map<Pair<String, String>, Integer> weights = new HashMap<>();
     Map<String, Integer>               sizesA  = new HashMap<>();
