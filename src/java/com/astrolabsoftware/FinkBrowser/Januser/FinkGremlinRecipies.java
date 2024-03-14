@@ -101,9 +101,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().V().has("lbl", "SourcesOfInterest").not(has("sourceType")).drop().iterate();
     generateSourcesOfInterestCorrelations();
     generateAlertsOfInterestCorrelations();
-    Set stat = g().V().group().by(values("lbl")).by(count()).toSet();
-    stat.addAll(g().E().group().by(values("lbl")).by(count()).toSet());
-    NotifierURL.notify(stat.toString());
     }
     
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts.
