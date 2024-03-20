@@ -317,13 +317,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       n++;
       key = objectId + "_" + jd.trim();
       alert = g().V().has("alert", "lbl", "alert").
-                      has("objectId", objectId).
+                      //has("objectId", objectId).
                       has("jd",       jd).
                       fold().
                       coalesce(unfold(), 
                                addV("alert").
                                property("lbl",     "alert"  ).
-                               property("objectId", objectId).
+                               //property("objectId", objectId).
                                property("jd",       jd      )).
                       next();
       if (columns != null) {

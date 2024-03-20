@@ -236,7 +236,6 @@ mgmt.addProperties(AlertsCollection,
                    title)   
 mgmt.addProperties(alert,
                    lbl,
-                   objectId,
                    jd)
 //                   alertVersion,
 //                   importDate,
