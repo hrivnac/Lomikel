@@ -246,7 +246,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                        next();
     addEdge(g().V(soi).next(),
             g().V(s).next(),
-            "contains",
+            "deepcontains",
             new String[]{"weight",    "instances"                                                     },
             new String[]{"" + weight, instances.toString().replaceFirst("\\[", "").replaceAll("]", "")});
     if (enhance) {
@@ -491,8 +491,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       addEdge(g().V(aoi).next(),
               g().V(alert).next(),
               "holds",
-              new String[]{"weight", "instances"},
-              new String[]{"1",      instances  });
+              new String[]{},
+              new String[]{});
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
@@ -527,7 +527,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         containsSIt = alert.edges(Direction.IN).  // has
                             next().               // (just one)
                             outVertex().          // source
-                            edges(Direction.IN);  // contains
+                            edges(Direction.IN);  // deepcontains
         while (containsSIt.hasNext()) {
           containsS = containsSIt.next();
           soi = containsS.outVertex();

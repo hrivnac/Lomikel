@@ -327,6 +327,21 @@ stylesheet.edges.holds = {
     ]
   }
 stylesheet.edges.contains = {
+  properties:{},
+  graphics: {
+    label:" ",
+    title:" ",
+    subtitle:" ",
+    arrows:{to:{enabled:true, type:"vee"}},
+    value:"1.0",        
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},   target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
+    ]
+  }
+stylesheet.edges.deepcontains = {
   properties:{gremlin:"valueMap('weight').toList()[0]"},
   graphics: {
     label:" ",
