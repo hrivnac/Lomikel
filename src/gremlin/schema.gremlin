@@ -19,19 +19,22 @@ contains     = mgmt.makeEdgeLabel('contains'    ).multiplicity(MULTI   ).make()
 deepcontains = mgmt.makeEdgeLabel('deepcontains').multiplicity(MULTI   ).make()
 
 // Properties
-title         = mgmt.makePropertyKey('title'        ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-lbl           = mgmt.makePropertyKey('lbl'          ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-name          = mgmt.makePropertyKey('name'         ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-hbase         = mgmt.makePropertyKey('hbase'        ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
-phoenix       = mgmt.makePropertyKey('phoenix'      ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
-url           = mgmt.makePropertyKey('url'          ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-query         = mgmt.makePropertyKey('query'        ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-technology    = mgmt.makePropertyKey('technology'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-timestamp     = mgmt.makePropertyKey('timestamp'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make() // LocalDateTime
-importDate    = mgmt.makePropertyKey('importDate'   ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-importSource  = mgmt.makePropertyKey('importSource' ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
-weight        = mgmt.makePropertyKey('weight'       ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make()
-instances     = mgmt.makePropertyKey('instances'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+title         = mgmt.makePropertyKey('title'       ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+lbl           = mgmt.makePropertyKey('lbl'         ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+name          = mgmt.makePropertyKey('name'        ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+hbase         = mgmt.makePropertyKey('hbase'       ).dataType(Boolean.class ).cardinality(Cardinality.SINGLE).make()
+phoenix       = mgmt.makePropertyKey('phoenix'     ).dataType(Boolean.class ).cardinality(Cardinality.SINGLE).make()
+url           = mgmt.makePropertyKey('url'         ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+query         = mgmt.makePropertyKey('query'       ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+technology    = mgmt.makePropertyKey('technology'  ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+timestamp     = mgmt.makePropertyKey('timestamp'   ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() // LocalDateTime
+importDate    = mgmt.makePropertyKey('importDate'  ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+importSource  = mgmt.makePropertyKey('importSource').dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+weight        = mgmt.makePropertyKey('weight'      ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+instances     = mgmt.makePropertyKey('instances'   ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+direction     = mgmt.makePropertyKey('direction'   ).dataType(Geoshape.class).cardinality(Cardinality.SINGLE).make()
+dec           = mgmt.makePropertyKey('dec'         ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+ra            = mgmt.makePropertyKey('ra'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
 
 // Vertex properties
 mgmt.addProperties(datalink,
