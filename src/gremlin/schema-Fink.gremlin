@@ -482,8 +482,8 @@ mgmt.addProperties(overlaps,
                    intersection,
                    sizeIn,
                    sizeOut)
-mgmt.addProperties(from,
-                   lbl)
+//mgmt.addProperties(from,
+//                   lbl)
 //mgmt.addProperties(distance,
 //                   lbl,
 //                   difference)
