@@ -76,7 +76,7 @@ mgmt.addConnection(deepcontains, SourcesOfInterest, source)
 mgmt.addConnection(overlaps,     SourcesOfInterest, SourcesOfInterest)
 mgmt.addConnection(overlaps,     AlertsOfInterest,  SourcesOfInterest)
 mgmt.addConnection(overlaps,     AlertsOfInterest,  AlertsOfInterest)
-mgmt.addConnection(colelcts,     AlertsCollection,  alert)
+mgmt.addConnection(collects,     AlertsCollection,  alert)
 
 // Info
 mgmt.printSchema()
