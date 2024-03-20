@@ -473,27 +473,27 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     while (containsIt.hasNext()) {
       contains = containsIt.next();
       instances = contains.property("instances").value().toString();
-      log.info(jd + " : " + instances);
+      // BUG: jd should not be compared as strings
       if (instances.contains(jd)) { // just one SourceOfInterest contains each alert
         sourceType = contains.outVertex().property("sourceType").value().toString();
         hbaseUrl   = contains.outVertex().property("url").value().toString();
+        key = objectId + "_" + jd;
+        aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
+                      has("alertType", sourceType).
+                      fold().
+                      coalesce(unfold(), 
+                               addV("AlertsOfInterest").
+                               property("lbl",        "AlertsOfInterest").
+                               property("alertType",  sourceType        ).
+                               property("technology", "HBase"           ).
+                               property("url",        hbaseUrl          )).
+                      next();
+        addEdge(g().V(aoi).next(),
+                g().V(alert).next(),
+                "holds",
+                new String[]{},
+                new String[]{});
         }
-      key = objectId + "_" + jd;
-      aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                    has("alertType", sourceType).
-                    fold().
-                    coalesce(unfold(), 
-                             addV("AlertsOfInterest").
-                             property("lbl",        "AlertsOfInterest").
-                             property("alertType",  sourceType        ).
-                             property("technology", "HBase"           ).
-                             property("url",        hbaseUrl          )).
-                    next();
-      addEdge(g().V(aoi).next(),
-              g().V(alert).next(),
-              "holds",
-              new String[]{},
-              new String[]{});
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
