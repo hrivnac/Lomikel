@@ -15,8 +15,11 @@ datalink = mgmt.makeVertexLabel('datalink').make()
 props        = mgmt.makeEdgeLabel('props'       ).multiplicity(SIMPLE  ).make()
 has          = mgmt.makeEdgeLabel('has'         ).multiplicity(ONE2MANY).make()
 holds        = mgmt.makeEdgeLabel('holds'       ).multiplicity(ONE2MANY).make()
-contains     = mgmt.makeEdgeLabel('contains'    ).multiplicity(MULTI   ).make()
+sends        = mgmt.makeEdgeLabel('sends'       ).multiplicity(ONE2MANY).make()
+contains     = mgmt.makeEdgeLabel('contains'    ).multiplicity(ONE2MANY).make()
 deepcontains = mgmt.makeEdgeLabel('deepcontains').multiplicity(MULTI   ).make()
+collects     = mgmt.makeEdgeLabel('collects'    ).multiplicity(MULTI   ).make()
+overlaps     = mgmt.makeEdgeLabel('overlaps'    ).multiplicity(SIMPLE).make()
 
 // Properties
 title         = mgmt.makePropertyKey('title'       ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()

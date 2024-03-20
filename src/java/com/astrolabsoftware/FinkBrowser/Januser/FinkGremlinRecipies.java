@@ -346,7 +346,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             }
           }
         }
-      addEdge(source, alert, "has");
+      addEdge(source, alert, "sends");
       assembleAlertsOfInterest(alert);
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
@@ -490,7 +490,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                       next();
         addEdge(g().V(aoi).next(),
                 g().V(alert).next(),
-                "holds",
+                "contains",
                 new String[]{},
                 new String[]{});
         }
@@ -507,9 +507,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<String, Integer>               sizesS  = new HashMap<>();
     Set<String>                        types   = new HashSet<>();
     Vertex aoi;
-    Iterator<Edge> holdsAIt;
+    Iterator<Edge> containsAIt;
     Iterator<Edge> containsSIt;
-    Edge holdsA;
+    Edge containsA;
     Edge containsS;
     Vertex alert;
     Vertex soi;
@@ -521,10 +521,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       aoi = aoiT.next();
       alertType = aoi.property("alertType").value().toString();
       types.add(alertType);
-      holdsAIt = aoi.edges(Direction.OUT);
-      while (holdsAIt.hasNext()) { // AlertsOfInterest.contains
-        holdsA = holdsAIt.next();
-        alert = holdsA.inVertex();
+      containsAIt = aoi.edges(Direction.OUT);
+      while (containsAIt.hasNext()) { // AlertsOfInterest.contains
+        containsA = containsAIt.next();
+        alert = containsA.inVertex();
         containsSIt = alert.edges(Direction.IN).  // has
                             next().               // (just one)
                             outVertex().          // source

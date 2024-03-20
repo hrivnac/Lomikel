@@ -15,9 +15,10 @@ alert             = mgmt.makeVertexLabel('alert'            ).make()
 props        = mgmt.getEdgeLabel('props'       )
 has          = mgmt.getEdgeLabel('has'         )
 holds        = mgmt.getEdgeLabel('holds'       )
+sends        = mgmt.getEdgeLabel('sends'       )
 contains     = mgmt.getEdgeLabel('contains'    )
 deepcontains = mgmt.getEdgeLabel('deepcontains')
-overlaps = mgmt.makeEdgeLabel('overlaps').multiplicity(SIMPLE  ).make()
+overlaps     = mgmt.getEdgeLabel('overlaps'    )
 
 // Properties
 title        = mgmt.getPropertyKey('title'        )
@@ -69,13 +70,13 @@ mgmt.addProperties(overlaps,
                    sizeOut)
 
 // Connections   
-mgmt.addConnection(has,          source,            alert)
-mgmt.addConnection(holds,        AlertsOfInterest,  alert)
+mgmt.addConnection(sends,        source,            alert)
+mgmt.addConnection(contains,     AlertsOfInterest,  alert)
 mgmt.addConnection(deepcontains, SourcesOfInterest, source)
 mgmt.addConnection(overlaps,     SourcesOfInterest, SourcesOfInterest)
 mgmt.addConnection(overlaps,     AlertsOfInterest,  SourcesOfInterest)
 mgmt.addConnection(overlaps,     AlertsOfInterest,  AlertsOfInterest)
-mgmt.addConnection(contains,     AlertsCollection,  alert)
+mgmt.addConnection(colelcts,     AlertsCollection,  alert)
 
 // Info
 mgmt.printSchema()
