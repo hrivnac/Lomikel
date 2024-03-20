@@ -7,34 +7,34 @@ graph.tx().rollback()
 mgmt = graph.openManagement()
 
 // Properties
-candid     = mgmt.getPropertyKey('candid'    )
+//candid     = mgmt.getPropertyKey('candid'    )
 jd         = mgmt.getPropertyKey('jd'        )
-ra         = mgmt.getPropertyKey('ra'        )
-dec        = mgmt.getPropertyKey('dec'       )
+//ra         = mgmt.getPropertyKey('ra'        )
+//dec        = mgmt.getPropertyKey('dec'       )
 
 //  Indexes                                                            
-mgmt.buildIndex('byCandid', Vertex.class).addKey(candid)        .buildCompositeIndex()
+//mgmt.buildIndex('byCandid', Vertex.class).addKey(candid)        .buildCompositeIndex()
 mgmt.buildIndex('byJd',     Vertex.class).addKey(jd)            .buildCompositeIndex()
-mgmt.buildIndex('byRaDec',  Vertex.class).addKey(ra).addKey(dec).buildCompositeIndex()
+//mgmt.buildIndex('byRaDec',  Vertex.class).addKey(ra).addKey(dec).buildCompositeIndex()
                                                                       
 mgmt.commit()
 
 // Wait for index
-ManagementSystem.awaitGraphIndexStatus(graph, 'byCandid').status(SchemaStatus.REGISTERED).call()
+//ManagementSystem.awaitGraphIndexStatus(graph, 'byCandid').status(SchemaStatus.REGISTERED).call()
 ManagementSystem.awaitGraphIndexStatus(graph, 'byJd'    ).status(SchemaStatus.REGISTERED).call()
-ManagementSystem.awaitGraphIndexStatus(graph, 'byRaDec' ).status(SchemaStatus.REGISTERED).call()
+//ManagementSystem.awaitGraphIndexStatus(graph, 'byRaDec' ).status(SchemaStatus.REGISTERED).call()
 
 // Reindex existing data
 mgmt = graph.openManagement()
-mgmt.updateIndex(mgmt.getGraphIndex('byCandid'), SchemaAction.REINDEX).get()
+//mgmt.updateIndex(mgmt.getGraphIndex('byCandid'), SchemaAction.REINDEX).get()
 mgmt.updateIndex(mgmt.getGraphIndex('byJd'    ), SchemaAction.REINDEX).get()
-mgmt.updateIndex(mgmt.getGraphIndex('byRaDec' ), SchemaAction.REINDEX).get()
+//mgmt.updateIndex(mgmt.getGraphIndex('byRaDec' ), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
 mgmt.getGraphIndexes(Edge.class)
 mgmt.printIndexes()
 mgmt.commit()
 
 // Enable index
-ManagementSystem.awaitGraphIndexStatus(graph, 'byCandid').status(SchemaStatus.ENABLED).call()
+//ManagementSystem.awaitGraphIndexStatus(graph, 'byCandid').status(SchemaStatus.ENABLED).call()
 ManagementSystem.awaitGraphIndexStatus(graph, 'byJd'    ).status(SchemaStatus.ENABLED).call()
-ManagementSystem.awaitGraphIndexStatus(graph, 'byRaDec' ).status(SchemaStatus.ENABLED).call()
+//ManagementSystem.awaitGraphIndexStatus(graph, 'byRaDec' ).status(SchemaStatus.ENABLED).call()

@@ -5,29 +5,30 @@ mgmt = graph.openManagement()
 
 // Vertexes
 datalink          = mgmt.getVertexLabel('datalink')
-AstroLabNet       = mgmt.makeVertexLabel('AstroLabNet'      ).make()
-site              = mgmt.makeVertexLabel('site'             ).make()
 AlertsOfInterest  = mgmt.makeVertexLabel('AlertsOfInterest' ).make()
 SourcesOfInterest = mgmt.makeVertexLabel('SourcesOfInterest').make()
 AlertsCollection  = mgmt.makeVertexLabel('AlertsCollection' ).make()
 source            = mgmt.makeVertexLabel('source'           ).make()
 alert             = mgmt.makeVertexLabel('alert'            ).make()
-PCA               = mgmt.makeVertexLabel('PCA'              ).make()
-candidate         = mgmt.makeVertexLabel('candidate'        ).make()
-prv_candidates    = mgmt.makeVertexLabel('prv_candidates'   ).make()
-prv_candidate     = mgmt.makeVertexLabel('prv_candidate'    ).make()
-cutout            = mgmt.makeVertexLabel('cutout'           ).make()
-Imports           = mgmt.makeVertexLabel('Imports'          ).make()
-Import            = mgmt.makeVertexLabel('Import'           ).make()
+//AstroLabNet       = mgmt.makeVertexLabel('AstroLabNet'      ).make()
+//site              = mgmt.makeVertexLabel('site'             ).make()
+//PCA               = mgmt.makeVertexLabel('PCA'              ).make()
+//candidate         = mgmt.makeVertexLabel('candidate'        ).make()
+//prv_candidates    = mgmt.makeVertexLabel('prv_candidates'   ).make()
+//prv_candidate     = mgmt.makeVertexLabel('prv_candidate'    ).make()
+//cutout            = mgmt.makeVertexLabel('cutout'           ).make()
+//Imports           = mgmt.makeVertexLabel('Imports'          ).make()
+//Import            = mgmt.makeVertexLabel('Import'           ).make()
 
 // Edges
-props    = mgmt.getEdgeLabel('props'    )
-has      = mgmt.getEdgeLabel('has'      )
-contains = mgmt.getEdgeLabel('contains' )
-holds    = mgmt.getEdgeLabel('holds'    )
-distance = mgmt.makeEdgeLabel('distance').multiplicity(MULTI   ).make()
+props        = mgmt.getEdgeLabel('props'        )
+has          = mgmt.getEdgeLabel('has'          )
+holds        = mgmt.getEdgeLabel('holds'        )
+contains     = mgmt.getEdgeLabel('contains'     )
+deepcontains = mgmt.getEdgeLabel('deepcontains' )
 overlaps = mgmt.makeEdgeLabel('overlaps').multiplicity(SIMPLE  ).make()
-from     = mgmt.makeEdgeLabel('from'    ).multiplicity(SIMPLE  ).make()
+//from     = mgmt.makeEdgeLabel('from'    ).multiplicity(SIMPLE  ).make()
+//distance = mgmt.makeEdgeLabel('distance').multiplicity(MULTI   ).make()
 
 // Properties
 title                = mgmt.getPropertyKey('title'                )
@@ -41,182 +42,185 @@ technology           = mgmt.getPropertyKey('technology'           )
 timestamp            = mgmt.getPropertyKey('timestamp'            )
 importDate           = mgmt.getPropertyKey('importDate'           )
 importSource         = mgmt.getPropertyKey('importSource'         )
-fullfill             = mgmt.makePropertyKey('fullfill'            ).dataType(Boolean.class ).cardinality(Cardinality.SINGLE).make()
 objectId             = mgmt.makePropertyKey('objectId'            ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
 jd                   = mgmt.makePropertyKey('jd'                  ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
 alertType            = mgmt.makePropertyKey('alertType'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
 sourceType           = mgmt.makePropertyKey('sourceType'          ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-pca00                = mgmt.makePropertyKey('pca00'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca01                = mgmt.makePropertyKey('pca01'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca02                = mgmt.makePropertyKey('pca02'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca03                = mgmt.makePropertyKey('pca03'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca04                = mgmt.makePropertyKey('pca04'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca05                = mgmt.makePropertyKey('pca05'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca06                = mgmt.makePropertyKey('pca06'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca07                = mgmt.makePropertyKey('pca07'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca08                = mgmt.makePropertyKey('pca08'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca09                = mgmt.makePropertyKey('pca09'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca10                = mgmt.makePropertyKey('pca10'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca11                = mgmt.makePropertyKey('pca11'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca12                = mgmt.makePropertyKey('pca12'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca13                = mgmt.makePropertyKey('pca13'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca14                = mgmt.makePropertyKey('pca14'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca15                = mgmt.makePropertyKey('pca15'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca16                = mgmt.makePropertyKey('pca16'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca17                = mgmt.makePropertyKey('pca17'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca18                = mgmt.makePropertyKey('pca18'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca19                = mgmt.makePropertyKey('pca19'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca20                = mgmt.makePropertyKey('pca20'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca21                = mgmt.makePropertyKey('pca21'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca22                = mgmt.makePropertyKey('pca22'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca23                = mgmt.makePropertyKey('pca23'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-pca24                = mgmt.makePropertyKey('pca24'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-difference           = mgmt.makePropertyKey('difference'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-aimage               = mgmt.makePropertyKey('aimage'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-aimagerat            = mgmt.makePropertyKey('aimagerat'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-alertVersion         = mgmt.makePropertyKey('alertVersion'        ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-bimage               = mgmt.makePropertyKey('bimage'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-bimagerat            = mgmt.makePropertyKey('bimagerat'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-candid               = mgmt.makePropertyKey('candid'              ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make()
-cdsxmatch            = mgmt.makePropertyKey('cdsxmatch'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-chinr                = mgmt.makePropertyKey('chinr'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-chipsf               = mgmt.makePropertyKey('chipsf'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-class_1              = mgmt.makePropertyKey('class_1'             ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-class_2              = mgmt.makePropertyKey('class_2'             ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-classtar             = mgmt.makePropertyKey('classtar'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-clrcoeff             = mgmt.makePropertyKey('clrcoeff'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-clrcounc             = mgmt.makePropertyKey('clrcounc'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-clrmed               = mgmt.makePropertyKey('clrmed'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-clrrms               = mgmt.makePropertyKey('clrrms'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-complete             = mgmt.makePropertyKey('complete'            ).dataType(Boolean.class ).cardinality(Cardinality.SINGLE).make() 
-connected            = mgmt.makePropertyKey('connected'           ).dataType(Boolean.class ).cardinality(Cardinality.SINGLE).make() 
-cutoutDifferenceFn   = mgmt.makePropertyKey('cutoutDifferenceFn'  ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-cutoutDifference     = mgmt.makePropertyKey('cutoutDifference'    ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-cutoutScienceFn      = mgmt.makePropertyKey('cutoutScienceFn'     ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-cutoutScience        = mgmt.makePropertyKey('cutoutScience'       ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-cutoutTemplateFn     = mgmt.makePropertyKey('cutoutTemplateFn'    ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-cutoutTemplate       = mgmt.makePropertyKey('cutoutTemplate'      ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-dec                  = mgmt.makePropertyKey('dec'                 ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
-decnr                = mgmt.makePropertyKey('decnr'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-diffmaglim           = mgmt.makePropertyKey('diffmaglim'          ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-direction            = mgmt.makePropertyKey('direction'           ).dataType(Geoshape.class).cardinality(Cardinality.SINGLE).make()
-distnr               = mgmt.makePropertyKey('distnr'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-distpsnr1            = mgmt.makePropertyKey('distpsnr1'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-distpsnr2            = mgmt.makePropertyKey('distpsnr2'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-distpsnr3            = mgmt.makePropertyKey('distpsnr3'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-DR3Name              = mgmt.makePropertyKey('DR3Name'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-drb                  = mgmt.makePropertyKey('drb'                 ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-drbversion           = mgmt.makePropertyKey('drbversion'          ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-dsdiff               = mgmt.makePropertyKey('dsdiff'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-dsnrms               = mgmt.makePropertyKey('dsnrms'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-elong                = mgmt.makePropertyKey('elong'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-exptime              = mgmt.makePropertyKey('exptime'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-e_Plx                = mgmt.makePropertyKey('e_Plx'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-gcvs                 = mgmt.makePropertyKey('gcvs'                ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-fid                  = mgmt.makePropertyKey('fid'                 ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-field                = mgmt.makePropertyKey('field'               ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-fileName             = mgmt.makePropertyKey('fileName'            ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-fink_broker_version  = mgmt.makePropertyKey('fink_broker_version' ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-fink_science_version = mgmt.makePropertyKey('fink_science_version').dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-fwhm                 = mgmt.makePropertyKey('fwhm'                ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-isdiffpos            = mgmt.makePropertyKey('isdiffpos'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-jdendhist            = mgmt.makePropertyKey('jdendhist'           ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-jdendref             = mgmt.makePropertyKey('jdendref'            ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-jdstarthist          = mgmt.makePropertyKey('jdstarthist'         ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-jdstartref           = mgmt.makePropertyKey('jdstartref'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-magapbig             = mgmt.makePropertyKey('magapbig'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-magap                = mgmt.makePropertyKey('magap'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-magdiff              = mgmt.makePropertyKey('magdiff'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-magfromlim           = mgmt.makePropertyKey('magfromlim'          ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-maggaiabright        = mgmt.makePropertyKey('maggaiabright'       ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-maggaia              = mgmt.makePropertyKey('maggaia'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-magnr                = mgmt.makePropertyKey('magnr'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-magpsf               = mgmt.makePropertyKey('magpsf'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-magzpsci             = mgmt.makePropertyKey('magzpsci'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-magzpscirms          = mgmt.makePropertyKey('magzpscirms'         ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-magzpsciunc          = mgmt.makePropertyKey('magzpsciunc'         ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-mindtoedge           = mgmt.makePropertyKey('mindtoedge'          ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-ml_score_1           = mgmt.makePropertyKey('ml_score_1'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
-ml_score_2           = mgmt.makePropertyKey('ml_score_2'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
-mulens               = mgmt.makePropertyKey('mulens'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make()
-n                    = mgmt.makePropertyKey('n'                   ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make()
-nalerthist           = mgmt.makePropertyKey('nalerthist'          ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make()
-nbad                 = mgmt.makePropertyKey('nbad'                ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-ncovhist             = mgmt.makePropertyKey('ncovhist'            ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-ndethist             = mgmt.makePropertyKey('ndethist'            ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-neargaiabright       = mgmt.makePropertyKey('neargaiabright'      ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-neargaia             = mgmt.makePropertyKey('neargaia'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-nframesref           = mgmt.makePropertyKey('nframesref'          ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-nid                  = mgmt.makePropertyKey('nid'                 ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-nmatches             = mgmt.makePropertyKey('nmatches'            ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-nmtchps              = mgmt.makePropertyKey('nmtchps'             ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-nneg                 = mgmt.makePropertyKey('nneg'                ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-objectidps1          = mgmt.makePropertyKey('objectidps1'         ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
-objectidps2          = mgmt.makePropertyKey('objectidps2'         ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
-objectidps3          = mgmt.makePropertyKey('objectidps3'         ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
-pdiffimfilename      = mgmt.makePropertyKey('pdiffimfilename'     ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-pid                  = mgmt.makePropertyKey('pid'                 ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
-programid            = mgmt.makePropertyKey('programid'           ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-programpi            = mgmt.makePropertyKey('programpi'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-publisher            = mgmt.makePropertyKey('publisher'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
-Plx                  = mgmt.makePropertyKey('Plx'                 ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
-ra                   = mgmt.makePropertyKey('ra'                  ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
-ranr                 = mgmt.makePropertyKey('ranr'                ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-rb                   = mgmt.makePropertyKey('rb'                  ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-rbversion            = mgmt.makePropertyKey('rbversion'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-rcid                 = mgmt.makePropertyKey('rcid'                ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-rf_kn_vs_nonkn       = mgmt.makePropertyKey('rf_kn_vs_nonkn'      ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-rf_snia_vs_nonia     = mgmt.makePropertyKey('rf_snia_vs_nonia'    ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-rfid                 = mgmt.makePropertyKey('rfid'                ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
-roid                 = mgmt.makePropertyKey('roid'                ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make()
-schemavsn            = mgmt.makePropertyKey('schemavsn'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-scorr                = mgmt.makePropertyKey('scorr'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
-seeratio             = mgmt.makePropertyKey('seeratio'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sgmag1               = mgmt.makePropertyKey('sgmag1'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sgmag2               = mgmt.makePropertyKey('sgmag2'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sgmag3               = mgmt.makePropertyKey('sgmag3'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sgscore1             = mgmt.makePropertyKey('sgscore1'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sgscore2             = mgmt.makePropertyKey('sgscore2'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sgscore3             = mgmt.makePropertyKey('sgscore3'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sharpnr              = mgmt.makePropertyKey('sharpnr'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sigmagapbig          = mgmt.makePropertyKey('sigmagapbig'         ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sigmagap             = mgmt.makePropertyKey('sigmagap'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sigmagnr             = mgmt.makePropertyKey('sigmagnr'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sigmapsf             = mgmt.makePropertyKey('sigmapsf'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-simag1               = mgmt.makePropertyKey('simag1'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-simag2               = mgmt.makePropertyKey('simag2'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-simag3               = mgmt.makePropertyKey('simag3'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-sky                  = mgmt.makePropertyKey('sky'                 ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-snn_snia_vs_nonia    = mgmt.makePropertyKey('snn_snia_vs_nonia'   ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
-snn_sn_vs_all        = mgmt.makePropertyKey('snn_sn_vs_all'       ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
-srmag1               = mgmt.makePropertyKey('srmag1'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-srmag2               = mgmt.makePropertyKey('srmag2'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-srmag3               = mgmt.makePropertyKey('srmag3'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-ssdistnr             = mgmt.makePropertyKey('ssdistnr'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-ssmagnr              = mgmt.makePropertyKey('ssmagnr'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-ssnamenr             = mgmt.makePropertyKey('ssnamenr'            ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-ssnrms               = mgmt.makePropertyKey('ssnrms'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-stampData            = mgmt.makePropertyKey('stampData'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() // byte[]
-sumrat               = mgmt.makePropertyKey('sumrat'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-szmag1               = mgmt.makePropertyKey('szmag1'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-szmag2               = mgmt.makePropertyKey('szmag2'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-szmag3               = mgmt.makePropertyKey('szmag3'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-tblid                = mgmt.makePropertyKey('tblid'               ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-tooflag              = mgmt.makePropertyKey('tooflag'             ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
-tracklet             = mgmt.makePropertyKey('tracklet'            ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-xpos                 = mgmt.makePropertyKey('xpos'                ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-ypos                 = mgmt.makePropertyKey('ypos'                ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-vsx                  = mgmt.makePropertyKey('vsx'                 ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
-zpclrcov             = mgmt.makePropertyKey('zpclrcov'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
-zpmed                = mgmt.makePropertyKey('zpmed'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+intersection         = mgmt.makePropertyKey('intersection'        ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+sizeIn               = mgmt.makePropertyKey('sizeIn'              ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+sizeOut              = mgmt.makePropertyKey('sizeOut'             ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+//fullfill             = mgmt.makePropertyKey('fullfill'            ).dataType(Boolean.class ).cardinality(Cardinality.SINGLE).make()
+//pca00                = mgmt.makePropertyKey('pca00'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca01                = mgmt.makePropertyKey('pca01'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca02                = mgmt.makePropertyKey('pca02'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca03                = mgmt.makePropertyKey('pca03'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca04                = mgmt.makePropertyKey('pca04'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca05                = mgmt.makePropertyKey('pca05'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca06                = mgmt.makePropertyKey('pca06'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca07                = mgmt.makePropertyKey('pca07'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca08                = mgmt.makePropertyKey('pca08'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca09                = mgmt.makePropertyKey('pca09'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca10                = mgmt.makePropertyKey('pca10'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca11                = mgmt.makePropertyKey('pca11'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca12                = mgmt.makePropertyKey('pca12'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca13                = mgmt.makePropertyKey('pca13'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca14                = mgmt.makePropertyKey('pca14'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca15                = mgmt.makePropertyKey('pca15'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca16                = mgmt.makePropertyKey('pca16'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca17                = mgmt.makePropertyKey('pca17'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca18                = mgmt.makePropertyKey('pca18'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca19                = mgmt.makePropertyKey('pca19'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca20                = mgmt.makePropertyKey('pca20'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca21                = mgmt.makePropertyKey('pca21'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca22                = mgmt.makePropertyKey('pca22'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca23                = mgmt.makePropertyKey('pca23'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//pca24                = mgmt.makePropertyKey('pca24'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//difference           = mgmt.makePropertyKey('difference'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//aimage               = mgmt.makePropertyKey('aimage'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//aimagerat            = mgmt.makePropertyKey('aimagerat'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//alertVersion         = mgmt.makePropertyKey('alertVersion'        ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//bimage               = mgmt.makePropertyKey('bimage'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//bimagerat            = mgmt.makePropertyKey('bimagerat'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//candid               = mgmt.makePropertyKey('candid'              ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make()
+//cdsxmatch            = mgmt.makePropertyKey('cdsxmatch'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//chinr                = mgmt.makePropertyKey('chinr'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//chipsf               = mgmt.makePropertyKey('chipsf'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//class_1              = mgmt.makePropertyKey('class_1'             ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//class_2              = mgmt.makePropertyKey('class_2'             ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//classtar             = mgmt.makePropertyKey('classtar'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//clrcoeff             = mgmt.makePropertyKey('clrcoeff'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//clrcounc             = mgmt.makePropertyKey('clrcounc'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//clrmed               = mgmt.makePropertyKey('clrmed'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//clrrms               = mgmt.makePropertyKey('clrrms'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//complete             = mgmt.makePropertyKey('complete'            ).dataType(Boolean.class ).cardinality(Cardinality.SINGLE).make() 
+//connected            = mgmt.makePropertyKey('connected'           ).dataType(Boolean.class ).cardinality(Cardinality.SINGLE).make() 
+//cutoutDifferenceFn   = mgmt.makePropertyKey('cutoutDifferenceFn'  ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//cutoutDifference     = mgmt.makePropertyKey('cutoutDifference'    ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//cutoutScienceFn      = mgmt.makePropertyKey('cutoutScienceFn'     ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//cutoutScience        = mgmt.makePropertyKey('cutoutScience'       ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//cutoutTemplateFn     = mgmt.makePropertyKey('cutoutTemplateFn'    ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//cutoutTemplate       = mgmt.makePropertyKey('cutoutTemplate'      ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//dec                  = mgmt.makePropertyKey('dec'                 ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+//decnr                = mgmt.makePropertyKey('decnr'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//diffmaglim           = mgmt.makePropertyKey('diffmaglim'          ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//direction            = mgmt.makePropertyKey('direction'           ).dataType(Geoshape.class).cardinality(Cardinality.SINGLE).make()
+//distnr               = mgmt.makePropertyKey('distnr'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//distpsnr1            = mgmt.makePropertyKey('distpsnr1'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//distpsnr2            = mgmt.makePropertyKey('distpsnr2'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//distpsnr3            = mgmt.makePropertyKey('distpsnr3'           ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//DR3Name              = mgmt.makePropertyKey('DR3Name'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//drb                  = mgmt.makePropertyKey('drb'                 ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//drbversion           = mgmt.makePropertyKey('drbversion'          ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//dsdiff               = mgmt.makePropertyKey('dsdiff'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//dsnrms               = mgmt.makePropertyKey('dsnrms'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//elong                = mgmt.makePropertyKey('elong'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//exptime              = mgmt.makePropertyKey('exptime'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//e_Plx                = mgmt.makePropertyKey('e_Plx'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//gcvs                 = mgmt.makePropertyKey('gcvs'                ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//fid                  = mgmt.makePropertyKey('fid'                 ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//field                = mgmt.makePropertyKey('field'               ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//fileName             = mgmt.makePropertyKey('fileName'            ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//fink_broker_version  = mgmt.makePropertyKey('fink_broker_version' ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//fink_science_version = mgmt.makePropertyKey('fink_science_version').dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//fwhm                 = mgmt.makePropertyKey('fwhm'                ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//isdiffpos            = mgmt.makePropertyKey('isdiffpos'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//jdendhist            = mgmt.makePropertyKey('jdendhist'           ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//jdendref             = mgmt.makePropertyKey('jdendref'            ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//jdstarthist          = mgmt.makePropertyKey('jdstarthist'         ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//jdstartref           = mgmt.makePropertyKey('jdstartref'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//magapbig             = mgmt.makePropertyKey('magapbig'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//magap                = mgmt.makePropertyKey('magap'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//magdiff              = mgmt.makePropertyKey('magdiff'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//magfromlim           = mgmt.makePropertyKey('magfromlim'          ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//maggaiabright        = mgmt.makePropertyKey('maggaiabright'       ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//maggaia              = mgmt.makePropertyKey('maggaia'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//magnr                = mgmt.makePropertyKey('magnr'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//magpsf               = mgmt.makePropertyKey('magpsf'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//magzpsci             = mgmt.makePropertyKey('magzpsci'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//magzpscirms          = mgmt.makePropertyKey('magzpscirms'         ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//magzpsciunc          = mgmt.makePropertyKey('magzpsciunc'         ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//mindtoedge           = mgmt.makePropertyKey('mindtoedge'          ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//ml_score_1           = mgmt.makePropertyKey('ml_score_1'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+//ml_score_2           = mgmt.makePropertyKey('ml_score_2'          ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+//mulens               = mgmt.makePropertyKey('mulens'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make()
+//n                    = mgmt.makePropertyKey('n'                   ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make()
+//nalerthist           = mgmt.makePropertyKey('nalerthist'          ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make()
+//nbad                 = mgmt.makePropertyKey('nbad'                ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//ncovhist             = mgmt.makePropertyKey('ncovhist'            ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//ndethist             = mgmt.makePropertyKey('ndethist'            ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//neargaiabright       = mgmt.makePropertyKey('neargaiabright'      ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//neargaia             = mgmt.makePropertyKey('neargaia'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//nframesref           = mgmt.makePropertyKey('nframesref'          ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//nid                  = mgmt.makePropertyKey('nid'                 ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//nmatches             = mgmt.makePropertyKey('nmatches'            ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//nmtchps              = mgmt.makePropertyKey('nmtchps'             ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//nneg                 = mgmt.makePropertyKey('nneg'                ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//objectidps1          = mgmt.makePropertyKey('objectidps1'         ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
+//objectidps2          = mgmt.makePropertyKey('objectidps2'         ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
+//objectidps3          = mgmt.makePropertyKey('objectidps3'         ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
+//pdiffimfilename      = mgmt.makePropertyKey('pdiffimfilename'     ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//pid                  = mgmt.makePropertyKey('pid'                 ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
+//programid            = mgmt.makePropertyKey('programid'           ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//programpi            = mgmt.makePropertyKey('programpi'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//publisher            = mgmt.makePropertyKey('publisher'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
+//Plx                  = mgmt.makePropertyKey('Plx'                 ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+//ra                   = mgmt.makePropertyKey('ra'                  ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+//ranr                 = mgmt.makePropertyKey('ranr'                ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//rb                   = mgmt.makePropertyKey('rb'                  ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//rbversion            = mgmt.makePropertyKey('rbversion'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//rcid                 = mgmt.makePropertyKey('rcid'                ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//rf_kn_vs_nonkn       = mgmt.makePropertyKey('rf_kn_vs_nonkn'      ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//rf_snia_vs_nonia     = mgmt.makePropertyKey('rf_snia_vs_nonia'    ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//rfid                 = mgmt.makePropertyKey('rfid'                ).dataType(Long.class    ).cardinality(Cardinality.SINGLE).make() 
+//roid                 = mgmt.makePropertyKey('roid'                ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make()
+//schemavsn            = mgmt.makePropertyKey('schemavsn'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//scorr                = mgmt.makePropertyKey('scorr'               ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
+//seeratio             = mgmt.makePropertyKey('seeratio'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sgmag1               = mgmt.makePropertyKey('sgmag1'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sgmag2               = mgmt.makePropertyKey('sgmag2'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sgmag3               = mgmt.makePropertyKey('sgmag3'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sgscore1             = mgmt.makePropertyKey('sgscore1'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sgscore2             = mgmt.makePropertyKey('sgscore2'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sgscore3             = mgmt.makePropertyKey('sgscore3'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sharpnr              = mgmt.makePropertyKey('sharpnr'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sigmagapbig          = mgmt.makePropertyKey('sigmagapbig'         ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sigmagap             = mgmt.makePropertyKey('sigmagap'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sigmagnr             = mgmt.makePropertyKey('sigmagnr'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sigmapsf             = mgmt.makePropertyKey('sigmapsf'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//simag1               = mgmt.makePropertyKey('simag1'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//simag2               = mgmt.makePropertyKey('simag2'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//simag3               = mgmt.makePropertyKey('simag3'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//sky                  = mgmt.makePropertyKey('sky'                 ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//snn_snia_vs_nonia    = mgmt.makePropertyKey('snn_snia_vs_nonia'   ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+//snn_sn_vs_all        = mgmt.makePropertyKey('snn_sn_vs_all'       ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+//srmag1               = mgmt.makePropertyKey('srmag1'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//srmag2               = mgmt.makePropertyKey('srmag2'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//srmag3               = mgmt.makePropertyKey('srmag3'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//ssdistnr             = mgmt.makePropertyKey('ssdistnr'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//ssmagnr              = mgmt.makePropertyKey('ssmagnr'             ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//ssnamenr             = mgmt.makePropertyKey('ssnamenr'            ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//ssnrms               = mgmt.makePropertyKey('ssnrms'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//stampData            = mgmt.makePropertyKey('stampData'           ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() // byte[]
+//sumrat               = mgmt.makePropertyKey('sumrat'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//szmag1               = mgmt.makePropertyKey('szmag1'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//szmag2               = mgmt.makePropertyKey('szmag2'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//szmag3               = mgmt.makePropertyKey('szmag3'              ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//tblid                = mgmt.makePropertyKey('tblid'               ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//tooflag              = mgmt.makePropertyKey('tooflag'             ).dataType(Integer.class ).cardinality(Cardinality.SINGLE).make() 
+//tracklet             = mgmt.makePropertyKey('tracklet'            ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//xpos                 = mgmt.makePropertyKey('xpos'                ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//ypos                 = mgmt.makePropertyKey('ypos'                ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//vsx                  = mgmt.makePropertyKey('vsx'                 ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make() 
+//zpclrcov             = mgmt.makePropertyKey('zpclrcov'            ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
+//zpmed                = mgmt.makePropertyKey('zpmed'               ).dataType(Float.class   ).cardinality(Cardinality.SINGLE).make() 
 
 // Vertex properties
-mgmt.addProperties(site,
-                   lbl,
-                   title)   
-mgmt.addProperties(AstroLabNet,
-                   lbl,
-                   title)
+//mgmt.addProperties(site,
+//                   lbl,
+//                   title)   
+//mgmt.addProperties(AstroLabNet,
+//                   lbl,
+//                   title)
 mgmt.addProperties(AlertsOfInterest,
                    lbl,
                    alertType,
@@ -233,275 +237,280 @@ mgmt.addProperties(AlertsCollection,
 mgmt.addProperties(alert,
                    lbl,
                    objectId,
-                   jd,
-                   alertVersion,
-                   importDate,
-                   cdsxmatch,
-                   fink_broker_version,
-                   fink_science_version,
-                   mulens,
-                   nalerthist,
-                   publisher,
-                   rf_kn_vs_nonkn,
-                   rf_snia_vs_nonia,
-                   roid,
-                   schemavsn,
-                   snn_snia_vs_nonia,
-                   snn_sn_vs_all,
-                   tracklet)
+                   jd)
+//                   alertVersion,
+//                   importDate,
+//                   cdsxmatch,
+//                   fink_broker_version,
+//                   fink_science_version,
+//                   mulens,
+//                   nalerthist,
+//                   publisher,
+//                   rf_kn_vs_nonkn,
+//                   rf_snia_vs_nonia,
+//                   roid,
+//                   schemavsn,
+//                   snn_snia_vs_nonia,
+//                   snn_sn_vs_all,
+//                   tracklet)
 mgmt.addProperties(source,
                    lbl,
                    objectId)
-mgmt.addProperties(PCA,
-                   lbl,
-                   objectId,
-                   pca00,
-                   pca01,
-                   pca02,
-                   pca03,
-                   pca04,
-                   pca05,
-                   pca06,
-                   pca07,
-                   pca08,
-                   pca09,
-                   pca10,
-                   pca11,
-                   pca12,
-                   pca13,
-                   pca14,
-                   pca15,
-                   pca16,
-                   pca17,
-                   pca18,
-                   pca19,
-                   pca20,
-                   pca21,
-                   pca22,
-                   pca23,
-                   pca24)
-mgmt.addProperties(candidate,
-                   lbl,
-                   aimage,
-                   aimagerat,
-                   bimage,
-                   bimagerat,
-                   candid,
-                   chinr,
-                   chipsf,
-                   classtar,
-                   clrcoeff,
-                   clrcounc,
-                   clrmed,
-                   clrrms,
-                   dec,
-                   decnr,
-                   diffmaglim,
-                   direction,
-                   distnr,
-                   distpsnr1,
-                   distpsnr2,
-                   distpsnr3,
-                   DR3Name,
-                   drb,
-                   dsdiff,
-                   dsnrms,
-                   elong,
-                   exptime,
-                   e_Plx,
-                   fid,
-                   field,
-                   fwhm,
-                   gcvs,
-                   isdiffpos,
-                   jd,
-                   jdendhist,
-                   jdendref,
-                   jdstarthist,
-                   jdstartref,
-                   magap,
-                   magapbig,
-                   magdiff,
-                   magfromlim,
-                   maggaia,
-                   maggaiabright,
-                   magnr,
-                   magpsf,
-                   magzpsci,
-                   magzpscirms,
-                   magzpsciunc,
-                   mindtoedge,
-                   nbad,
-                   ncovhist,
-                   ndethist,
-                   neargaia,
-                   neargaiabright,
-                   nframesref,
-                   nid,
-                   nmatches,
-                   nmtchps,
-                   nneg,
-                   objectidps1,
-                   objectidps2,
-                   objectidps3,
-                   pdiffimfilename,
-                   pid,
-                   programid,
-                   programpi,
-                   Plx,
-                   ra,
-                   ranr,
-                   rb,
-                   rbversion,
-                   rcid,
-                   rfid,
-                   scorr,
-                   seeratio,
-                   sgmag1,
-                   sgmag2,
-                   sgmag3,
-                   sgscore1,
-                   sgscore2,
-                   sgscore3,
-                   sharpnr,
-                   sigmagap,
-                   sigmagapbig,
-                   sigmagnr,
-                   sigmapsf,
-                   simag1,
-                   simag2,
-                   simag3,
-                   sky,
-                   srmag1,
-                   srmag2,
-                   srmag3,
-                   ssdistnr,
-                   ssmagnr,
-                   ssnamenr,
-                   ssnrms,
-                   sumrat,
-                   szmag1,
-                   szmag2,
-                   szmag3,
-                   tblid,
-                   tooflag,
-                   vsx,
-                   xpos,
-                   ypos,
-                   zpclrcov,
-                   zpmed)
-mgmt.addProperties(prv_candidate,
-                   lbl,
-                   aimage,
-                   aimagerat,
-                   bimage,
-                   bimagerat,
-                   candid,
-                   chinr,
-                   chipsf,
-                   classtar,
-                   clrcoeff,
-                   clrcounc,
-                   dec,
-                   decnr,
-                   diffmaglim,
-                   direction,
-                   distnr,
-                   DR3Name,
-                   elong,
-                   e_Plx,
-                   fid,
-                   field,
-                   fwhm,
-                   gcvs,
-                   isdiffpos,
-                   jd,
-                   magap,
-                   magapbig,
-                   magdiff,
-                   magfromlim,
-                   magnr,
-                   magpsf,
-                   magzpsci,
-                   magzpscirms,
-                   magzpsciunc,
-                   mindtoedge,
-                   nbad,
-                   nid,
-                   nneg,
-                   pdiffimfilename,
-                   pid,
-                   programid,
-                   programpi,
-                   Plx,
-                   ra,
-                   ranr,
-                   rb,
-                   rbversion,
-                   rcid,
-                   seeratio,
-                   sharpnr,
-                   sigmagap,
-                   sigmagapbig,
-                   sigmagnr,
-                   sigmapsf,
-                   sky,
-                   ssdistnr,
-                   ssmagnr,
-                   ssnamenr,
-                   sumrat,
-                   tblid,
-                   vsx,
-                   xpos,
-                   ypos)
-mgmt.addProperties(cutout,
-                   lbl,
-                   cutoutScienceFn,
-                   cutoutTemplateFn,
-                   cutoutDifferenceFn, 
-                   cutoutScience,
-                   cutoutTemplate,
-                   cutoutDifference) 
-mgmt.addProperties(Imports,
-                   lbl) 
-mgmt.addProperties(Import,
-                   lbl,
-                   importSource,
-                   importDate,
-                   complete,
-                   connected,
-                   n) 
+//mgmt.addProperties(PCA,
+//                   lbl,
+//                   objectId,
+//                   pca00,
+//                   pca01,
+//                   pca02,
+//                   pca03,
+//                   pca04,
+//                   pca05,
+//                   pca06,
+//                   pca07,
+//                   pca08,
+//                   pca09,
+//                   pca10,
+//                   pca11,
+//                   pca12,
+//                   pca13,
+//                   pca14,
+//                   pca15,
+//                   pca16,
+//                   pca17,
+//                   pca18,
+//                   pca19,
+//                   pca20,
+//                   pca21,
+//                   pca22,
+//                   pca23,
+//                   pca24)
+//mgmt.addProperties(candidate,
+//                   lbl,
+//                   aimage,
+//                   aimagerat,
+//                   bimage,
+//                   bimagerat,
+//                   candid,
+//                   chinr,
+//                   chipsf,
+//                   classtar,
+//                   clrcoeff,
+//                   clrcounc,
+//                   clrmed,
+//                   clrrms,
+//                   dec,
+//                   decnr,
+//                   diffmaglim,
+//                   direction,
+//                   distnr,
+//                   distpsnr1,
+//                   distpsnr2,
+//                   distpsnr3,
+//                   DR3Name,
+//                   drb,
+//                   dsdiff,
+//                   dsnrms,
+//                   elong,
+//                   exptime,
+//                   e_Plx,
+//                   fid,
+//                   field,
+//                   fwhm,
+//                   gcvs,
+//                   isdiffpos,
+//                   jd,
+//                   jdendhist,
+//                   jdendref,
+//                   jdstarthist,
+//                   jdstartref,
+//                   magap,
+//                   magapbig,
+//                   magdiff,
+//                   magfromlim,
+//                   maggaia,
+//                   maggaiabright,
+//                   magnr,
+//                   magpsf,
+//                   magzpsci,
+//                   magzpscirms,
+//                   magzpsciunc,
+//                   mindtoedge,
+//                   nbad,
+//                   ncovhist,
+//                   ndethist,
+//                   neargaia,
+//                   neargaiabright,
+//                   nframesref,
+//                   nid,
+//                   nmatches,
+//                   nmtchps,
+//                   nneg,
+//                   objectidps1,
+//                   objectidps2,
+//                   objectidps3,
+//                   pdiffimfilename,
+//                   pid,
+//                   programid,
+//                   programpi,
+//                   Plx,
+//                   ra,
+//                   ranr,
+//                   rb,
+//                   rbversion,
+//                   rcid,
+//                   rfid,
+//                   scorr,
+//                   seeratio,
+//                   sgmag1,
+//                   sgmag2,
+//                   sgmag3,
+//                   sgscore1,
+//                   sgscore2,
+//                   sgscore3,
+//                   sharpnr,
+//                   sigmagap,
+//                   sigmagapbig,
+//                   sigmagnr,
+//                   sigmapsf,
+//                   simag1,
+//                   simag2,
+//                   simag3,
+//                   sky,
+//                   srmag1,
+//                   srmag2,
+//                   srmag3,
+//                   ssdistnr,
+//                   ssmagnr,
+//                   ssnamenr,
+//                   ssnrms,
+//                   sumrat,
+//                   szmag1,
+//                   szmag2,
+//                   szmag3,
+//                   tblid,
+//                   tooflag,
+//                   vsx,
+//                   xpos,
+//                   ypos,
+//                   zpclrcov,
+//                   zpmed)
+//mgmt.addProperties(prv_candidate,
+//                   lbl,
+//                   aimage,
+//                   aimagerat,
+//                   bimage,
+//                   bimagerat,
+//                   candid,
+//                   chinr,
+//                   chipsf,
+//                   classtar,
+//                   clrcoeff,
+//                   clrcounc,
+//                   dec,
+//                   decnr,
+//                   diffmaglim,
+//                   direction,
+//                   distnr,
+//                   DR3Name,
+//                   elong,
+//                   e_Plx,
+//                   fid,
+//                   field,
+//                   fwhm,
+//                   gcvs,
+//                   isdiffpos,
+//                   jd,
+//                   magap,
+//                   magapbig,
+//                   magdiff,
+//                   magfromlim,
+//                   magnr,
+//                   magpsf,
+//                   magzpsci,
+//                   magzpscirms,
+//                   magzpsciunc,
+//                   mindtoedge,
+//                   nbad,
+//                   nid,
+//                   nneg,
+//                   pdiffimfilename,
+//                   pid,
+//                   programid,
+//                   programpi,
+//                   Plx,
+//                   ra,
+//                   ranr,
+//                   rb,
+//                   rbversion,
+//                   rcid,
+//                   seeratio,
+//                   sharpnr,
+//                   sigmagap,
+//                   sigmagapbig,
+//                   sigmagnr,
+//                   sigmapsf,
+//                   sky,
+//                   ssdistnr,
+//                   ssmagnr,
+//                   ssnamenr,
+//                   sumrat,
+//                   tblid,
+//                   vsx,
+//                   xpos,
+//                   ypos)
+//mgmt.addProperties(cutout,
+//                   lbl,
+//                   cutoutScienceFn,
+//                   cutoutTemplateFn,
+//                   cutoutDifferenceFn, 
+//                   cutoutScience,
+//                   cutoutTemplate,
+//                   cutoutDifference) 
+//mgmt.addProperties(Imports,
+//                   lbl) 
+//mgmt.addProperties(Import,
+//                   lbl,
+//                   importSource,
+//                   importDate,
+//                   complete,
+//                   connected,
+//                   n) 
                                     
 // Edge properties
-mgmt.addProperties(distance,
+mgmt.addProperties(overlaps,
                    lbl,
-                   difference)
+                   intersection,
+                   sizeIn,
+                   sizeOut)
 mgmt.addProperties(from,
                    lbl)
+//mgmt.addProperties(distance,
+//                   lbl,
+//                   difference)
 
 // Connections   
-mgmt.addConnection(has,      AstroLabNet,       site)
-mgmt.addConnection(contains, AlertsOfInterest,  alert)
-mgmt.addConnection(contains, SourcesOfInterest, source)
+mgmt.addConnection(has,      source,            alert)
+mgmt.addConnection(holds,    AlertsOfInterest,  alert)
+mgmt.addConnection(deepcontains, SourcesOfInterest, source)
 mgmt.addConnection(overlaps, SourcesOfInterest, SourcesOfInterest)
 mgmt.addConnection(overlaps, AlertsOfInterest,  SourcesOfInterest)
 mgmt.addConnection(overlaps, AlertsOfInterest,  AlertsOfInterest)
-mgmt.addConnection(distance, PCA,               PCA)
-mgmt.addConnection(distance, alert,             alert)
-mgmt.addConnection(props,    site,              Imports)
-mgmt.addConnection(holds,    Imports,           Import)
+//mgmt.addConnection(has,      AstroLabNet,       site)
+//mgmt.addConnection(distance, PCA,               PCA)
+//mgmt.addConnection(distance, alert,             alert)
+//mgmt.addConnection(props,    site,              Imports)
+//mgmt.addConnection(holds,    Imports,           Import)
 mgmt.addConnection(contains, AlertsCollection,  alert)
-mgmt.addConnection(holds,    site,              AlertsCollection)
-mgmt.addConnection(has,      source,            alert)
-mgmt.addConnection(has,      source,            PCA)
-mgmt.addConnection(has,      alert,             candidate)
-mgmt.addConnection(has,      alert,             cutout)
-mgmt.addConnection(has,      alert,             prv_candidates)
-mgmt.addConnection(holds,    prv_candidates,    prv_candidate)
-mgmt.addConnection(from,     alert,             datalink)
-mgmt.addConnection(from,     candidate,         datalink)
-mgmt.addConnection(from,     prv_candidate,     datalink)
-mgmt.addConnection(from,     cutout,            datalink)
+//mgmt.addConnection(holds,    site,              AlertsCollection)
+//mgmt.addConnection(has,      source,            PCA)
+//mgmt.addConnection(has,      alert,             candidate)
+//mgmt.addConnection(has,      alert,             cutout)
+//mgmt.addConnection(has,      alert,             prv_candidates)
+//mgmt.addConnection(holds,    prv_candidates,    prv_candidate)
+//mgmt.addConnection(from,     alert,             datalink)
+//mgmt.addConnection(from,     candidate,         datalink)
+//mgmt.addConnection(from,     prv_candidate,     datalink)
+//mgmt.addConnection(from,     cutout,            datalink)
 
 // Info
 mgmt.printSchema()

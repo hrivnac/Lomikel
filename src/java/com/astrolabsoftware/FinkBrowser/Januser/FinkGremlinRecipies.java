@@ -317,13 +317,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       n++;
       key = objectId + "_" + jd.trim();
       alert = g().V().has("alert", "lbl", "alert").
-                      has("objectId", objectId).
+                      //has("objectId", objectId).
                       has("jd",       jd).
                       fold().
                       coalesce(unfold(), 
                                addV("alert").
                                property("lbl",     "alert"  ).
-                               property("objectId", objectId).
+                               //property("objectId", objectId).
                                property("jd",       jd      )).
                       next();
       if (columns != null) {
@@ -490,7 +490,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                     next();
       addEdge(g().V(aoi).next(),
               g().V(alert).next(),
-              "contains",
+              "holds",
               new String[]{"weight", "instances"},
               new String[]{"1",      instances  });
       }
@@ -506,9 +506,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<String, Integer>               sizesS  = new HashMap<>();
     Set<String>                        types   = new HashSet<>();
     Vertex aoi;
-    Iterator<Edge> containsAIt;
+    Iterator<Edge> holdsAIt;
     Iterator<Edge> containsSIt;
-    Edge containsA;
+    Edge holdsA;
     Edge containsS;
     Vertex alert;
     Vertex soi;
@@ -520,10 +520,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       aoi = aoiT.next();
       alertType = aoi.property("alertType").value().toString();
       types.add(alertType);
-      containsAIt = aoi.edges(Direction.OUT);
-      while (containsAIt.hasNext()) { // AlertsOfInterest.contains
-        containsA = containsAIt.next();
-        alert = containsA.inVertex();
+      holdsAIt = aoi.edges(Direction.OUT);
+      while (holdsAIt.hasNext()) { // AlertsOfInterest.contains
+        holdsA = holdsAIt.next();
+        alert = holdsA.inVertex();
         containsSIt = alert.edges(Direction.IN).  // has
                             next().               // (just one)
                             outVertex().          // source

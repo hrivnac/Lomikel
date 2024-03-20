@@ -7,10 +7,16 @@ mgmt = graph.openManagement()
 datalink = mgmt.makeVertexLabel('datalink').make()
 
 // Edges
-props    = mgmt.makeEdgeLabel('props'   ).multiplicity(SIMPLE  ).make()
-has      = mgmt.makeEdgeLabel('has'     ).multiplicity(ONE2MANY).make()
-contains = mgmt.makeEdgeLabel('contains').multiplicity(MULTI   ).make()
-holds    = mgmt.makeEdgeLabel('holds'   ).multiplicity(ONE2MANY).make()
+// MULTI: no constraint, default
+// SIMPLE: at most one edge of such label between any pair of vertices
+// MANY2ONE: at most one outgoing edge of such label on any vertex (mother)
+// ONE2MANY: at most one incoming edge of such label on any vertex (winnerOf)
+// ONE2ONE: at most one incoming and one outgoing edge of such label on any vertex (mariedTo)
+props        = mgmt.makeEdgeLabel('props'       ).multiplicity(SIMPLE  ).make()
+has          = mgmt.makeEdgeLabel('has'         ).multiplicity(ONE2MANY).make()
+holds        = mgmt.makeEdgeLabel('holds'       ).multiplicity(ONE2MANY).make()
+contains     = mgmt.makeEdgeLabel('contains'    ).multiplicity(MULTI   ).make()
+deepcontains = mgmt.makeEdgeLabel('deepcontains').multiplicity(MULTI   ).make()
 
 // Properties
 title         = mgmt.makePropertyKey('title'        ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
@@ -40,11 +46,13 @@ mgmt.addProperties(props,
                    lbl)
 mgmt.addProperties(has,
                    lbl)
+mgmt.addProperties(holds,
+                   lbl)
 mgmt.addProperties(contains,
+                   lbl)
+mgmt.addProperties(deepcontains,
                    weight,
                    instances,
-                   lbl)
-mgmt.addProperties(holds,
                    lbl)
 
 // Connections   
