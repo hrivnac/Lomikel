@@ -18,6 +18,7 @@ holds        = mgmt.getEdgeLabel('holds'       )
 sends        = mgmt.getEdgeLabel('sends'       )
 contains     = mgmt.getEdgeLabel('contains'    )
 deepcontains = mgmt.getEdgeLabel('deepcontains')
+collects     = mgmt.getEdgeLabel('collects'    )
 overlaps     = mgmt.getEdgeLabel('overlaps'    )
 
 // Properties
