@@ -473,6 +473,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     while (containsIt.hasNext()) {
       contains = containsIt.next();
       instances = contains.property("instances").value().toString();
+      log.info(jd + " : " + instances);
       if (instances.contains(jd)) { // just one SourceOfInterest contains each alert
         sourceType = contains.outVertex().property("sourceType").value().toString();
         hbaseUrl   = contains.outVertex().property("url").value().toString();
