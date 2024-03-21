@@ -7,21 +7,21 @@ graph.tx().rollback()
 mgmt = graph.openManagement()
 
 // Properties
-lbl = mgmt.getPropertyKey('lbl')
+lbl  = mgmt.getPropertyKey('lbl')
 
 // Indexes                                                          
-mgmt.buildIndex('byLbl',  Vertex.class).addKey(lbl).buildCompositeIndex()
-mgmt.buildIndex('byLblE', Edge.class  ).addKey(lbl).buildCompositeIndex()
+mgmt.buildIndex('byLbl',  Vertex.class).addKey(lbl, Mapping.TEXT.asParameter()).buildCompositeIndex()
+mgmt.buildIndex('byLblE', Edge.class  ).addKey(lbl, Mapping.TEXT.asParameter()).buildCompositeIndex()
                                                       
 mgmt.commit()
 
 // Wait for index                                           
-ManagementSystem.awaitGraphIndexStatus(graph, 'byLbl').status(SchemaStatus.REGISTERED).call()
+ManagementSystem.awaitGraphIndexStatus(graph, 'byLbl' ).status(SchemaStatus.REGISTERED).call()
 ManagementSystem.awaitGraphIndexStatus(graph, 'byLblE').status(SchemaStatus.REGISTERED).call()
 
 // Reindex existing data
 mgmt = graph.openManagement()
-mgmt.updateIndex(mgmt.getGraphIndex('byLbl'), SchemaAction.REINDEX).get()
+mgmt.updateIndex(mgmt.getGraphIndex('byLbl' ), SchemaAction.REINDEX).get()
 mgmt.updateIndex(mgmt.getGraphIndex('byLblE'), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
 mgmt.getGraphIndexes(Edge.class)

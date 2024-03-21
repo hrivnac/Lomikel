@@ -8,8 +8,9 @@ mgmt = graph.openManagement()
 
 // Properties
 importDate = mgmt.getPropertyKey('importDate')
-objectId   = mgmt.getPropertyKey('objectId' )
-direction  = mgmt.getPropertyKey('direction')
+objectId   = mgmt.getPropertyKey('objectId'  )
+objectId   = mgmt.getPropertyKey('objectId'  )
+direction  = mgmt.getPropertyKey('direction' )
 
 //  Indexes                      
 mgmt.buildIndex('byImportDateES', Vertex.class).addKey(importDate, Mapping.TEXTSTRING.asParameter() ).buildMixedIndex('search')

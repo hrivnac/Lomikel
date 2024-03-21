@@ -225,7 +225,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         String      hbaseUrl,
                                         boolean     enhance,
                                         String      columns) {   
-    log.info("\nRegistering " + objectId + " as " + cls);
+    log.info("\t\tregistering " + objectId + " as " + cls);
     Vertex soi = g().V().has("SourcesOfInterest", "lbl", "SourcesOfInterest").
                          has("cls", cls).
                          fold().
@@ -350,7 +350,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       assembleAlertsOfInterest(alert);
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
-    log.info("\n" + n + " alerts added");
+    log.info("\t\t" + n + " alerts added");
     }
    
   /** Clean tree under <em>SourcesOfInterest</em>.
