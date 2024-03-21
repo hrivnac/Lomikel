@@ -35,8 +35,7 @@ importDate   = mgmt.getPropertyKey('importDate'   )
 importSource = mgmt.getPropertyKey('importSource' )
 objectId     = mgmt.makePropertyKey('objectId'    ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 jd           = mgmt.makePropertyKey('jd'          ).dataType(Double.class).cardinality(Cardinality.SINGLE).make() 
-alertType    = mgmt.makePropertyKey('alertType'   ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-sourceType   = mgmt.makePropertyKey('sourceType'  ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
+cls          = mgmt.makePropertyKey('cls'         ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 intersection = mgmt.makePropertyKey('intersection').dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 sizeIn       = mgmt.makePropertyKey('sizeIn'      ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
@@ -44,12 +43,12 @@ sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class).cardi
 // Vertex properties
 mgmt.addProperties(AlertsOfInterest,
                    lbl,
-                   alertType,
+                   cls,
                    technology,
                    url)   
 mgmt.addProperties(SourcesOfInterest,
                    lbl,
-                   sourceType,
+                   cls,
                    technology,
                    url)   
 mgmt.addProperties(AlertsCollection,

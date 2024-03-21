@@ -97,8 +97,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                        String columns) throws LomikelException {
     fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, columns);
     g().E().has("lbl", "overlaps").drop().iterate();
-    g().V().has("lbl", "AlertsOfInterest").not(has("alertType")).drop().iterate();
-    g().V().has("lbl", "SourcesOfInterest").not(has("sourceType")).drop().iterate();
+    g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
+    g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
     generateSourcesOfInterestCorrelations();
     generateAlertsOfInterestCorrelations();
     }
@@ -126,7 +126,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String answer;
     JSONArray ja;
     JSONObject jo;
-    Map<String, Set<Double>> classes; // class/sourceType -> [jd]
+    Map<String, Set<Double>> classes; // cls -> [jd]
     String cl;
     double jd;
     Set<Double> jds;
@@ -176,7 +176,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
-    * @param sourceType The type of <em>SourcesOfInterest</em> {@link Vertex}.
+    * @param cls        The type (class) of <em>SourcesOfInterest</em> {@link Vertex}.
     *                   It will be created if not yet exists.
     * @param objectId   The objectId of the new <em>Source</em> {@link Vertex}.
     *                   It will be created if not yet exists.
@@ -190,7 +190,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   filled with requested HBase columns.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     *                   Ignored if enhancement not requested. */
-  public void registerSourcesOfInterest(String      sourceType,
+  public void registerSourcesOfInterest(String      cls,
                                         String      objectId,
                                         double      weight,
                                         String      instancesS,
@@ -201,11 +201,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
       instances.add(Double.parseDouble(instance));
       }
-    registerSourcesOfInterest(sourceType, objectId, weight, instances, hbaseUrl, enhance, columns);
+    registerSourcesOfInterest(cls, objectId, weight, instances, hbaseUrl, enhance, columns);
     }
     
-  /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
-    * @param sourceType The type of <em>SourcesOfInterest</em> {@link Vertex}.
+  /** Register <em>source</em> in <em>SourcesOfInterest</em>.
+    * @param cls        The type (class) of <em>SourcesOfInterest</em> {@link Vertex}.
     *                   It will be created if not yet exists.
     * @param objectId   The objectId of the new <em>Source</em> {@link Vertex}.
     *                   It will be created if not yet exists.
@@ -218,21 +218,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   filled with requested HBase columns.
     * @param columns The HBase columns to be filled into alerts. May be <tt>null</tt>.
     *                   Ignored if enhancement not requested. */
-  public void registerSourcesOfInterest(String      sourceType,
+  public void registerSourcesOfInterest(String      cls,
                                         String      objectId,
                                         double      weight,
                                         Set<Double> instances,
                                         String      hbaseUrl,
                                         boolean     enhance,
                                         String      columns) {   
-    log.info("\nRegistering " + objectId + " as " + sourceType);
+    log.info("\nRegistering " + objectId + " as " + cls);
     Vertex soi = g().V().has("SourcesOfInterest", "lbl", "SourcesOfInterest").
-                         has("sourceType", sourceType).
+                         has("cls", cls).
                          fold().
                          coalesce(unfold(), 
                                   addV("SourcesOfInterest").
                                   property("lbl",        "SourcesOfInterest").
-                                  property("sourceType", sourceType         ).
+                                  property("cls",        cls         ).
                                   property("technology", "HBase"            ).
                                   property("url",        hbaseUrl           )).
                          next();
@@ -267,21 +267,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @throws LomikelException If anything goes wrong. */
   public void enhanceSourcesOfInterest(String columns) throws LomikelException {
     log.info("Expanding all SourcesOfInterest and enhancing them with " + columns);
-    for (Object soi : g().V().has("lbl", "SourcesOfInterest").values("sourceType").toSet()) {
+    for (Object soi : g().V().has("lbl", "SourcesOfInterest").values("cls").toSet()) {
       enhanceSourcesOfInterest(soi.toString().trim(), columns);
       }
     }
 
   /** Expand tree under <em>SourcesOfInterest</em> with alerts
     * filled with requested HBase columns.
-    * @param sourceType The type of <em>SourcesOfInterest</em>.
-    * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
+    * @param cls     The type (class) of <em>SourcesOfInterest</em>.
+    * @param columns The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
-  public void enhanceSourcesOfInterest(String sourceType,
+  public void enhanceSourcesOfInterest(String cls,
                                        String columns) throws LomikelException {
-    log.info("Expanding " + sourceType + " SourcesOfInterest and enhancing them with " + columns);
-    Vertex soi = g().V().has("lbl",        "SourcesOfInterest").
-                         has("sourceType", sourceType).
+    log.info("Expanding " + cls + " SourcesOfInterest and enhancing them with " + columns);
+    Vertex soi = g().V().has("lbl", "SourcesOfInterest").
+                         has("cls", cls).
                          next();
     fhclient(soi.property("url").value().toString());
     Iterator<Edge> containsIt = soi.edges(Direction.OUT);
@@ -298,10 +298,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     }
  
-  /** Expand tree under <em>SourcesOfInterest</em> with alerts
+  /** Expand tree under <em>source</em> with alerts
     * filled with requested HBase columns. It also assembles
     * related AlertsOfInterest.
-    * @param sourceType The type of <em>SourcesOfInterest</em>.
+    * @param source     The source.
     * @param jds        The <em>jd</em> of related <em>Alerts</em>.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
@@ -356,12 +356,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Clean tree under <em>SourcesOfInterest</em>.
     * Drop alerts. Alerts are dropped even if they have other
     * {@link Edge}s.
-    * @param sourceType The type of <em>SourcesOfInterest</em>.
+    * @param cls The type (class) of <em>SourcesOfInterest</em>.
     * @throws LomikelException If anything goes wrong. */
-  public void cleanSourcesOfInterest(String sourceType) throws LomikelException {
-    log.info("Cleaning " + sourceType + " SourcesOfInterest");
-    g().V().has("lbl",        "SourcesOfInterest").
-            has("sourceType", sourceType).
+  public void cleanSourcesOfInterest(String cls) throws LomikelException {
+    log.info("Cleaning " + cls + " SourcesOfInterest");
+    g().V().has("lbl", "SourcesOfInterest").
+            has("cls", cls).
             out().
             out().
             drop().
@@ -377,7 +377,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Set<String>                            sources   = new HashSet<>();
     Set<String>                            objectIds = new HashSet<>();
     Vertex soi;
-    String sourceType;
+    String cls;
     Iterator<Edge> containsIt;
     Edge contains;
     double weight;
@@ -385,8 +385,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String objectId;
     while (soiT.hasNext()) {
       soi = soiT.next();
-      sourceType = soi.property("sourceType").value().toString();
-      sources.add(sourceType);
+      cls = soi.property("cls").value().toString();
+      sources.add(cls);
       containsIt = soi.edges(Direction.OUT);
       while (containsIt.hasNext()) {
         contains = containsIt.next();
@@ -394,7 +394,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         source = contains.inVertex();
         objectId = source.property("objectId").value().toString();
         objectIds.add(objectId);
-        weights.put(Pair.of(sourceType, objectId), weight);
+        weights.put(Pair.of(cls, objectId), weight);
         }
       }
     Map<Pair<String, String>, Double> corr      = new HashMap<>();
@@ -436,8 +436,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         if (i2 < i1) {
           if (corr.containsKey(Pair.of(soi1, soi2))) {
             n++;
-            addEdge(g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi1).next(),
-                    g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
+            addEdge(g().V().has("lbl", "SourcesOfInterest").has("cls", soi1).next(),
+                    g().V().has("lbl", "SourcesOfInterest").has("cls", soi2).next(),
                     "overlaps",
                     new String[]{"intersection",                
                                  "sizeIn",            
@@ -471,7 +471,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex source = alert.edges(Direction.IN).next().outVertex();
     String objectId = source.property("objectId").value().toString();
     Iterator<Edge> containsIt =  source.edges(Direction.IN);
-    String sourceType = null;
+    String cls = null;
     Edge contains;
     String instances = "";
     String hbaseUrl = "";
@@ -482,16 +482,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       instances = contains.property("instances").value().toString();
       // BUG: jd should not be compared as strings
       if (instances.contains(jd)) { // just one SourceOfInterest contains each alert
-        sourceType = contains.outVertex().property("sourceType").value().toString();
-        hbaseUrl   = contains.outVertex().property("url").value().toString();
+        cls      = contains.outVertex().property("cls").value().toString();
+        hbaseUrl = contains.outVertex().property("url").value().toString();
         key = objectId + "_" + jd;
         aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                      has("alertType", sourceType).
+                      has("cls", cls).
                       fold().
                       coalesce(unfold(), 
                                addV("AlertsOfInterest").
                                property("lbl",        "AlertsOfInterest").
-                               property("alertType",  sourceType        ).
+                               property("cls",        cls               ).
                                property("technology", "HBase"           ).
                                property("url",        hbaseUrl          )).
                       next();
@@ -520,14 +520,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Edge containsS;
     Vertex alert;
     Vertex soi;
-    String alertType;
-    String sourceType;
+    String clsA;
+    String clsS;
     Pair rel;
     int weight;
     while (aoiT.hasNext()) { // AlertsOfInterest
       aoi = aoiT.next();
-      alertType = aoi.property("alertType").value().toString();
-      types.add(alertType);
+      clsA = aoi.property("cls").value().toString();
+      types.add(clsA);
       containsAIt = aoi.edges(Direction.OUT);
       while (containsAIt.hasNext()) { // AlertsOfInterest.contains
         containsA = containsAIt.next();
@@ -540,9 +540,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           containsS = containsSIt.next();
           soi = containsS.outVertex();
           if (soi.property("lbl").value().toString().equals("SourcesOfInterest")) {
-            sourceType = soi.property("sourceType").value().toString();
-            types.add(sourceType);
-            rel = Pair.of(alertType, sourceType);
+            clsS = soi.property("cls").value().toString();
+            types.add(clsS);
+            rel = Pair.of(clsA, clsS);
             if (!weights.containsKey(rel)) {
               weights.put(rel, 1);
               }
@@ -572,8 +572,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     int n = 0;
     for (String a : types) {
       for (String s : types) {
-        alertT  = g().V().has("lbl", "AlertsOfInterest" ).has("alertType",  a);
-        sourceT = g().V().has("lbl", "SourcesOfInterest").has("sourceType", s);
+        alertT  = g().V().has("lbl", "AlertsOfInterest" ).has("cls", a);
+        sourceT = g().V().has("lbl", "SourcesOfInterest").has("cls", s);
         if (alertT.hasNext() && sourceT.hasNext() && weights.containsKey(Pair.of(a, s))) {
           n++;
           addEdge(alertT.next(),

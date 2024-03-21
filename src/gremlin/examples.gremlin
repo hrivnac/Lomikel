@@ -133,6 +133,9 @@ g.V().group().by(values('lbl')).by(count())
 g.E().group().by(label).by(count())
 g.E().group().by(values('lbl')).by(count())
 
+// try/catch (for empty result)
+coalesce(unfold(), constant('nothing')).fold()
+
 // Searches
 // ========
 
