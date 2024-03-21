@@ -204,7 +204,7 @@ stylesheet.nodes.cutout = {
     ]
   }
 stylesheet.nodes.AlertsCollection = {
-  properties:{gremlin:"valueMap('title').toList()[0]"},
+  properties:{},
   graphics: {
     label:"title", 
     title:"title",        
@@ -223,10 +223,10 @@ stylesheet.nodes.AlertsCollection = {
     ]
   }
 stylesheet.nodes.AlertsOfInterest = {
-  properties:{gremlin:"valueMap('title').toList()[0]"},
+  properties:{},
   graphics: {
-    label:"alertType", 
-    title:"alertType",        
+    label:"cls", 
+    title:"cls",        
     subtitle:" ",     
     group:" ",        
     shape:"image",      
@@ -242,10 +242,10 @@ stylesheet.nodes.AlertsOfInterest = {
     ]
   }
 stylesheet.nodes.SourcesOfInterest = {
-  properties:{gremlin:"valueMap('title').toList()[0]"},
+  properties:{},
   graphics: {
-    label:"sourceType", 
-    title:"sourceType",        
+    label:"cls", 
+    title:"cls",        
     subtitle:" ",     
     group:" ",        
     shape:"image",      
