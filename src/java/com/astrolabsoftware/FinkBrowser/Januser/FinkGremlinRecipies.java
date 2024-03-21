@@ -225,7 +225,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         String      hbaseUrl,
                                         boolean     enhance,
                                         String      columns) {   
-    log.info("Registering " + objectId + " as " + sourceType);
+    log.info("\nRegistering " + objectId + " as " + sourceType);
     Vertex soi = g().V().has("SourcesOfInterest", "lbl", "SourcesOfInterest").
                          has("sourceType", sourceType).
                          fold().
@@ -350,7 +350,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       assembleAlertsOfInterest(alert);
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
-    log.info("" + n + " alerts added");
+    log.info("\n" + n + " alerts added");
     }
    
   /** Clean tree under <em>SourcesOfInterest</em>.
@@ -427,6 +427,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     int i1 = 0;
     int i2 = 0;
+    int n = 0;
     for (String soi1 : sources) {
       i1++;
       i2 = 0;
@@ -434,16 +435,22 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         i2++;
         if (i2 < i1) {
           if (corr.containsKey(Pair.of(soi1, soi2))) {
+            n++;
             addEdge(g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi1).next(),
                     g().V().has("lbl", "SourcesOfInterest").has("sourceType", soi2).next(),
                     "overlaps",
-                    new String[]{"intersection",                "sizeIn",            "sizeOut"          },
-                    new Double[]{corr.get(Pair.of(soi1, soi2)), sizeInOut.get(soi1), sizeInOut.get(soi2)});
+                    new String[]{"intersection",                
+                                 "sizeIn",            
+                                 "sizeOut"},
+                    new Double[]{corr.get(Pair.of(soi1, soi2)),
+                                 sizeInOut.get(soi1),
+                                 sizeInOut.get(soi2)});
             }
           }
         }
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
+    log.info("" + n + " correlations generated");
     }
     
   /** Assemble AlertsOfInterest from all existing alerts. */
@@ -562,11 +569,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     GraphTraversal<Vertex, Vertex> alertT;
     GraphTraversal<Vertex, Vertex> sourceT;
+    int n = 0;
     for (String a : types) {
       for (String s : types) {
         alertT  = g().V().has("lbl", "AlertsOfInterest" ).has("alertType",  a);
         sourceT = g().V().has("lbl", "SourcesOfInterest").has("sourceType", s);
         if (alertT.hasNext() && sourceT.hasNext() && weights.containsKey(Pair.of(a, s))) {
+          n++;
           addEdge(alertT.next(),
                   sourceT.next(),
                   "overlaps",
@@ -580,6 +589,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
+    log.info("" + n + " correlations generated");
     }
     
   /** Create a new {@link FinkHBaseClient}. Singleton when url unchanged.
