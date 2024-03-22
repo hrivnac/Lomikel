@@ -9,7 +9,6 @@ mgmt = graph.openManagement()
 // Properties
 importDate = mgmt.getPropertyKey('importDate')
 objectId   = mgmt.getPropertyKey('objectId'  )
-objectId   = mgmt.getPropertyKey('objectId'  )
 direction  = mgmt.getPropertyKey('direction' )
 
 //  Indexes                      
