@@ -38,7 +38,9 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
     
   for (d1 of domain) {
     for (d2 of domain) {
-      console.log(d1 + " " + d2 + " " + tablemap.includes(d1 + "-" + d2));
+      if (!tablemap.includes(d1 + "-" + d2)) {
+        otable1.push({x:d1, y:d2, value:"0", info:"0/0"});
+        }
       }
     }
     
