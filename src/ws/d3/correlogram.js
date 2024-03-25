@@ -18,6 +18,8 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
       ootable.push({x:x1, y:x2, value:"", info:""});
       }
     }
+    
+  log.info(ootable);
   
   otable1 = [];
   var min = otable[0].value;
@@ -84,7 +86,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
                  .data(ootable)
                  .join("g")
                  .attr("class", "corr")
-                 .attr("transform", function(d) {return `translate(${x(d.x)}, ${y(d.y)})`});
+                 .attr("transform", function(d) {console.log(d);return `translate(${x(d.x)}, ${y(d.y)})`});
 
                  
                  
