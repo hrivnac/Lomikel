@@ -13,8 +13,8 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   var max = otable[0].value;
   for (o of otable) {
     otable1.push({x:o.y, y:o.x, value:o.value, info:o.info});
-    tablemap.push({x:o.x, y:o.y};
-    tablemap.push({x:o.y, y:o.x};
+    tablemap.push({x:o.x, y:o.y});
+    tablemap.push({x:o.y, y:o.x});
     //if (min > o.value) {
     //  min = o.value
     //  }
