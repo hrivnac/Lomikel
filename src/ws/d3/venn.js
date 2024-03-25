@@ -17,7 +17,7 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
     }
     
   if (n2d == n12d) {
-    n2d = n1d * 0.9999;
+    n2d = n2d * 0.9999;
     }
     
   var p1  = 100.0 * (n1d          / (n1d + n2d - n12d)).toFixed(2);
