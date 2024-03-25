@@ -11,6 +11,14 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
   var n1d  = parseInt(n1);  
   var n2d  = parseInt(n2);  
   var n12d = parseInt(n12);  
+  
+  if (n1d == n12d) {
+    n1d = n1d * 0.9999;
+    }
+    
+  if (n2d == n12d) {
+    n2d = n1d * 0.9999;
+    }
     
   var p1  = 100.0 * (n1d          / (n1d + n2d - n12d)).toFixed(2);
   var p2  = 100.0 * (n2d          / (n1d + n2d - n12d)).toFixed(2);
