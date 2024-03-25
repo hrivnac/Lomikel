@@ -13,8 +13,8 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   var max = otable[0].value;
   for (o of otable) {
     otable1.push({x:o.y, y:o.x, value:o.value, info:o.info});
-    tablemap.push({x:o.x, y:o.y});
-    tablemap.push({x:o.y, y:o.x});
+    tablemap.push({o.x + "-" + o.y);
+    tablemap.push({o.y + "-" + :o.x});
     //if (min > o.value) {
     //  min = o.value
     //  }
@@ -31,15 +31,14 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   
   for (d of domain) {
     otable.push({x:d, y:d, value:0, info:""})
-    tablemap.push({x:d, y:d});
+    tablemap.push(x:d + "-" + y:d);
     }
     
   console.log(tablemap);  
     
   for (d1 of domain) {
     for (d2 of domain) {
-      var xy = {"x":d1, "y":d2};
-      console.log(xy + " " + tablemap.includes(xy));
+      console.log(d1 + " " + d2 + " " + tablemap.includes(d1 + "-" + d2));
       }
     }
     
