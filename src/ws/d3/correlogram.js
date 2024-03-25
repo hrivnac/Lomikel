@@ -12,7 +12,12 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   for (o of otable) {
     xy.push(o.x);
     }
-  console.log(xy);
+  ootable = [];
+  for (x of xy) {
+    for xy of xy) {
+      ootable.push({x:x, y:y, value:"", info:""});
+      }
+    }
   
   otable1 = [];
   var min = otable[0].value;
@@ -39,10 +44,10 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
 
   const width0  = num * 60 + 30; // 430
   const height0 = num * 60 + 30; // 430
-  const margin = { top:(height0 / num / 2),
-                   right:(width0 / num / 2 + 50),
-                   bottom:(height0 / num / 2),
-                   left:(width0 / num / 2)},
+  const margin = {top:(height0 / num / 2),
+                  right:(width0 / num / 2 + 50),
+                  bottom:(height0 / num / 2),
+                  left:(width0 / num / 2)},
                  width  = width0  - margin.left - margin.right,
                  height = height0 - margin.top  - margin.bottom
   
@@ -75,8 +80,16 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
                  .attr("class", "cor")
                  .attr("transform", function(d) {return `translate(${x(d.x)}, ${y(d.y)})`});
 
+  const bck = svg.selectAll(".corr")
+                 .data(ootable)
+                 .join("g")
+                 .attr("class", "corr")
+                 .attr("transform", function(d) {return `translate(${x(d.x)}, ${y(d.y)})`});
+
+                 
+                 
   // rectangles for existing values
-  cor.append("rect")
+  bck.append("rect")
      .attr("width",  xSpace / (num - 1))
      .attr("height", ySpace / (num - 1))
      .attr("x",     -xSpace / (num - 1) / 2)
