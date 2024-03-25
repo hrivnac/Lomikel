@@ -7,24 +7,24 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
   if (!m2) {
     m2 = "B";
     }
+  
+  if (n1 == n12) {
+    n1 = n1 * 0.9;
+    }
+    
+  if (n2 == n12) {
+    n2 = n2 * 0.9;
+    }
  
   var n1d  = parseFloat(n1);  
   var n2d  = parseFloat(n2);  
   var n12d = parseFloat(n12);  
-  
-  if (n1d == n12d) {
-    n1d = n1d * 0.9;
-    }
     
-  if (n2d == n12d) {
-    n2d = n2d * 0.9;
-    }
-    
-  var p1  = 100.0 * (n1d          / (n1d + n2d - n12d));
-  var p2  = 100.0 * (n2d          / (n1d + n2d - n12d));
-  var p12 = 100.0 * (n12d         / (n1d + n2d - n12d));
-  var q1  = 100.0 * ((n1d - n12d) / (n1d + n2d - n12d));
-  var q2  = 100.0 * ((n2d - n12d) / (n1d + n2d - n12d));
+  var p1  = 100.0 * (n1d          / (n1d + n2d - n12d)).toFixed(2);
+  var p2  = 100.0 * (n2d          / (n1d + n2d - n12d)).toFixed(2);
+  var p12 = 100.0 * (n12d         / (n1d + n2d - n12d)).toFixed(2);
+  var q1  = 100.0 * ((n1d - n12d) / (n1d + n2d - n12d)).toFixed(2);
+  var q2  = 100.0 * ((n2d - n12d) / (n1d + n2d - n12d)).toFixed(2);
   console.log(p1 + " " + p2 + " " + p12 + " " + q1 + " " + q2);
     
   var info = "";
