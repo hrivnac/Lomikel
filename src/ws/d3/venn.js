@@ -1,5 +1,4 @@
 function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
-  console.log(n1 + " " + n2 + " " + n12 + " " + m1 + " " + m2);
 
   if (!m1) {
     m1 = "A";
@@ -12,15 +11,13 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
   var n2d  = parseFloat(n2);  
   var n12d = parseFloat(n12);  
   
+  // to work in case n1 == n1 or n2 == n12
   if (n1 == n12) {
     n1 = n1 * 1.0001;
     }    
   if (n2 == n12) {
     n2 = n2 * 1.0001;
     }
- 
-  console.log(n1 + " " + n2 + " " + n12 + " " + m1 + " " + m2);
-    
     
   var p1  = 100.0 * (n1d          / (n1d + n2d - n12d)).toFixed(2);
   var p2  = 100.0 * (n2d          / (n1d + n2d - n12d)).toFixed(2);

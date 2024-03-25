@@ -6,6 +6,14 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
                                 "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
   }
     
+  console.log(otable);
+  
+  xy = [];
+  for (o of otable) {
+    xy.push(o.x);
+    }
+  console.log(xy);
+  
   otable1 = [];
   var min = otable[0].value;
   var max = otable[0].value;
