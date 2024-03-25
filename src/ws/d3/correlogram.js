@@ -91,7 +91,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
                  
                  
   // rectangles for existing values
-  bck.append("rect")
+  cor.append("rect")
      .attr("width",  xSpace / (num - 1))
      .attr("height", ySpace / (num - 1))
      .attr("x",     -xSpace / (num - 1) / 2)
