@@ -8,9 +8,9 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
     m2 = "B";
     }
  
-  var n1d  = parseInt(n1);  
-  var n2d  = parseInt(n2);  
-  var n12d = parseInt(n12);  
+  var n1d  = parseFloat(n1);  
+  var n2d  = parseFloat(n2);  
+  var n12d = parseFloat(n12);  
   
   if (n1d == n12d) {
     n1d = n1d * 0.9;
