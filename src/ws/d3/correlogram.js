@@ -34,12 +34,10 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
     tablemap.push(d + "-" + d);
     }
     
-  console.log(tablemap);  
-    
   for (d1 of domain) {
     for (d2 of domain) {
       if (!tablemap.includes(d1 + "-" + d2)) {
-        otable1.push({x:d1, y:d2, value:"0", info:"0/0"});
+        otable.push({x:d1, y:d2, value:"0", info:"0/0"});
         }
       }
     }
