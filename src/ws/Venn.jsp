@@ -51,6 +51,7 @@
   n12 = callGremlinValues(gr + ".E('" + id + "').values('intersection').next().toString()")[0];
   m1  = callGremlinValues(gr + ".E('" + id + "').outV().values('lbl','cls').toList().toArray().join(':')")[0];
   m2  = callGremlinValues(gr + ".E('" + id + "').inV().values('lbl','cls').toList().toArray().join(':')")[0];
+  console.log(n1 + " " + n2 + " " + n12 + " " + m1 + " " + m2);
   info = showVenn(n1, n2, n12, m1, m2);
   document.getElementById("venntext").innerHTML = info;  
   </script>
