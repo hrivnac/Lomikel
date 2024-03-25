@@ -258,7 +258,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         log.error("Cannot enhance source", e);
         }
       }
-    commit(); // not needed if enhancing
+    commit(); // TBD: not needed if enhancing
     }
         
   /** Expand tree under all <em>SourcesOfInterest</em> with alerts
@@ -373,9 +373,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void generateSourcesOfInterestCorrelations() {
     log.info("Generating correlations for Sources of Interest");
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
-    Map<Pair<String, String>, Double>      weights   = new HashMap<>();
-    Set<String>                            sources   = new HashSet<>();
-    Set<String>                            objectIds = new HashSet<>();
+    Map<Pair<String, String>, Double>      weights   = new HashMap<>(); // cls, objectId -> weight
+    Set<String>                            types     = new HashSet<>(); // [cls]
+    Set<String>                            objectIds = new HashSet<>(); // [objectId]
     Vertex soi;
     String cls;
     Iterator<Edge> containsIt;
@@ -383,11 +383,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     double weight;
     Vertex source;
     String objectId;
+    // loop over SoI
     while (soiT.hasNext()) {
       soi = soiT.next();
       cls = soi.property("cls").value().toString();
-      sources.add(cls);
+      types.add(cls);
       containsIt = soi.edges(Direction.OUT);
+      // loop over congtained sources
       while (containsIt.hasNext()) {
         contains = containsIt.next();
         weight = (Double)(contains.property("weight").value());
@@ -397,14 +399,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         weights.put(Pair.of(cls, objectId), weight);
         }
       }
-    Map<Pair<String, String>, Double> corr      = new HashMap<>();
-    Map<String, Double>               sizeInOut = new HashMap<>();
+    Map<Pair<String, String>, Double> corr      = new HashMap<>(); // cls, cls -> correlation
+    Map<String, Double>               sizeInOut = new HashMap<>(); // cls -> size
     double c12;
     Set<String> alerts1;
     Set<String> alerts2;
-    for (String soi1 : sources) {
-      for (String soi2 : sources) {
+    // double-loop over SoI 
+    for (String soi1 : types) {
+      for (String soi2 : types) {
         c12 = 0;
+        // loop over all sources and add them into weights if contained in both SoI
         for (String oid : objectIds) {
           if (weights.containsKey(Pair.of(soi1, oid)) &&
               weights.containsKey(Pair.of(soi2, oid))) {
@@ -416,8 +420,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       }
-    for (String soi1 : sources) {
+    // loop over SoI 
+    for (String soi1 : types) {
       c12 = 0;
+      // loop over all sources and add them into size in SoI
       for (String oid : objectIds) {
         if (weights.containsKey(Pair.of(soi1, oid))) {
           c12++;
@@ -428,10 +434,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     int i1 = 0;
     int i2 = 0;
     int n = 0;
-    for (String soi1 : sources) {
+    // double-loop over SoI and create overlaps Edge if non empty 
+    for (String soi1 : types) {
       i1++;
       i2 = 0;
-      for (String soi2 : sources) {
+      for (String soi2 : types) {
         i2++;
         if (i2 < i1) {
           if (corr.containsKey(Pair.of(soi1, soi2))) {
@@ -468,19 +475,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param alert The existing alert.*/
   public void assembleAlertsOfInterest(Vertex alert) {
     String jd = alert.property("jd").value().toString();
-    Vertex source = alert.edges(Direction.IN).next().outVertex();
+    Vertex source = alert.edges(Direction.IN).next().outVertex(); // BUG: should check lbl == source
     String objectId = source.property("objectId").value().toString();
-    Iterator<Edge> containsIt =  source.edges(Direction.IN);
+    Iterator<Edge> containsIt =  source.edges(Direction.IN); // BUG: should check lbl == SoI
     String cls = null;
     Edge contains;
     String instances = "";
     String hbaseUrl = "";
     String key;
     Vertex aoi;
+    // loop over all Edges to SoI
     while (containsIt.hasNext()) {
       contains = containsIt.next();
       instances = contains.property("instances").value().toString();
       // BUG: jd should not be compared as strings
+      // if alert jd presend in this Soi Edge => create AoI and connect it to alert
       if (instances.contains(jd)) { // just one SourceOfInterest contains each alert
         cls      = contains.outVertex().property("cls").value().toString();
         hbaseUrl = contains.outVertex().property("url").value().toString();
@@ -509,10 +518,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
-    Map<Pair<String, String>, Integer> weights = new HashMap<>();
-    Map<String, Integer>               sizesA  = new HashMap<>();
-    Map<String, Integer>               sizesS  = new HashMap<>();
-    Set<String>                        types   = new HashSet<>();
+    Map<Pair<String, String>, Integer> weights = new HashMap<>(); // cls, objectId -> weight
+    Map<String, Integer>               sizesA  = new HashMap<>(); // cls -> size (of alerts)
+    Map<String, Integer>               sizesS  = new HashMap<>(); // cls -> size (of sources = sum of alerts)
+    Set<String>                        types   = new HashSet<>(); // [cls]
     Vertex aoi;
     Iterator<Edge> containsAIt;
     Iterator<Edge> containsSIt;
@@ -524,18 +533,22 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String clsS;
     Pair rel;
     int weight;
-    while (aoiT.hasNext()) { // AlertsOfInterest
+    // loop over AoI
+    while (aoiT.hasNext()) {
       aoi = aoiT.next();
       clsA = aoi.property("cls").value().toString();
       types.add(clsA);
       containsAIt = aoi.edges(Direction.OUT);
-      while (containsAIt.hasNext()) { // AlertsOfInterest.contains
+      // loop over alerts in AoI
+      while (containsAIt.hasNext()) { 
         containsA = containsAIt.next();
         alert = containsA.inVertex();
+        // TBD: check lbls
         containsSIt = alert.edges(Direction.IN).  // has
                             next().               // (just one)
                             outVertex().          // source
                             edges(Direction.IN);  // deepcontains
+        // loop over sources containing those alerts and sum their contributions
         while (containsSIt.hasNext()) {
           containsS = containsSIt.next();
           soi = containsS.outVertex();
@@ -553,6 +566,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
     int sz;
+    // loop over types in alerts and sources and fill source sizes
     for (String a : types) {
       sz = 0;
       for (String s : types) {
@@ -560,6 +574,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       sizesA.put(a, sz);
       }
+    // loop over types in alerts and sources and fill alert sizes
     for (String s : types) {
       sz = 0;
       for (String a : types) {
@@ -570,6 +585,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     GraphTraversal<Vertex, Vertex> alertT;
     GraphTraversal<Vertex, Vertex> sourceT;
     int n = 0;
+    // loop over types in alerts and sources and fill overlaps
     for (String a : types) {
       for (String s : types) {
         alertT  = g().V().has("lbl", "AlertsOfInterest" ).has("cls", a);
