@@ -14,7 +14,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
     }
   ootable = [];
   for (x of xy) {
-    for xy of xy) {
+    for y of xy) {
       ootable.push({x:x, y:y, value:"", info:""});
       }
     }
