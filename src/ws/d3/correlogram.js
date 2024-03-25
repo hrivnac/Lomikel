@@ -36,7 +36,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
     
   for (d1 of domain) {
     for (d2 of domain) {
-      console.log(d1 + " " + d2 + " " + tablemap.includes({"x":d1, "y":d2});
+      console.log(d1 + " " + d2 + " " + tablemap.includes({"x":d1, "y":d2}));
       }
     }
     
