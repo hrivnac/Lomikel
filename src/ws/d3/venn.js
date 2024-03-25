@@ -9,10 +9,10 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
     }
   
   if (n1 == n12) {
-    n1 = n1 * 0.9;
+    n1 = n1 * 1.1;
     }    
   if (n2 == n12) {
-    n2 = n2 * 0.9;
+    n2 = n2 * 1.1;
     }
  
   console.log(n1 + " " + n2 + " " + n12 + " " + m1 + " " + m2);
