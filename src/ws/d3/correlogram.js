@@ -8,13 +8,13 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
     
   console.log(otable);
   
-  xy = [];
+  xvalues = [];
   for (o of otable) {
-    xy.push({x:o.x});
+    xvalues.push({x:o.x});
     }
   ootable = [];
-  for (x of xy) {
-    for (y of xy) {
+  for (x of xvalues) {
+    for (y of xvalues) {
       ootable.push({x:x, y:y, value:"", info:""});
       }
     }
