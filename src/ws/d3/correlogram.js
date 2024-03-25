@@ -31,7 +31,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   
   for (d of domain) {
     otable.push({x:d, y:d, value:0, info:""})
-    tablemap.push(x:d + "-" + y:d);
+    tablemap.push(d + "-" + d);
     }
     
   console.log(tablemap);  
