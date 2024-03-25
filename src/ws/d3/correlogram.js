@@ -108,6 +108,11 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
      .style("opacity", 0.8)
      .on("mouseover", function(d) {		
          if (d3.select(this).attr("valid")) {
+           console.log(d3.select(this).attr("n1") + " " +
+                           d3.select(this).attr("n2") + " " +
+                           d3.select(this).attr("n12") + " " +
+                           d3.select(this).attr("m1").replaceAll('.', ' ') + " " +
+                           d3.select(this).attr("m2").replaceAll('.', ' '));
            info = showVenn(d3.select(this).attr("n1"),
                            d3.select(this).attr("n2"),
                            d3.select(this).attr("n12"),
