@@ -10,7 +10,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   
   xy = [];
   for (o of otable) {
-    xy.push(o.x);
+    xy.push({o.x});
     }
   ootable = [];
   for (x of xy) {
