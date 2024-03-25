@@ -6,11 +6,15 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
                                 "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
   }
      
+  tablemap = [];
+  
   otable1 = [];
   var min = otable[0].value;
   var max = otable[0].value;
   for (o of otable) {
-    otable1.push({x:o.y, y:o.x, value:o.value, info:o.info})
+    otable1.push({x:o.y, y:o.x, value:o.value, info:o.info});
+    tablemap.push({x:o.x, y:o.y};
+    tablemap.push({x:o.y, y:o.x};
     //if (min > o.value) {
     //  min = o.value
     //  }
@@ -27,9 +31,14 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   
   for (d of domain) {
     otable.push({x:d, y:d, value:0, info:""})
+    tablemap.push({x:d, y:d};
     }
-
-  console.log(otable);  
+    
+  for (d1 of domain) {
+    for (d2 of domain) {
+      console.log(d1 + " " + d2 + " " + tablemap.includes({x.d1. x.d2});
+      }
+    }
     
   const width0  = num * 60 + 30; // 430
   const height0 = num * 60 + 30; // 430
