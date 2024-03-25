@@ -7,20 +7,20 @@ function showVenn(n1, n2, n12, m1, m2, vennPopupWindow) {
   if (!m2) {
     m2 = "B";
     }
-  
-  if (n1 == n12) {
-    n1 = n1 * 1.1;
-    }    
-  if (n2 == n12) {
-    n2 = n2 * 1.1;
-    }
- 
-  console.log(n1 + " " + n2 + " " + n12 + " " + m1 + " " + m2);
-    
     
   var n1d  = parseFloat(n1);  
   var n2d  = parseFloat(n2);  
   var n12d = parseFloat(n12);  
+  
+  if (n1 == n12) {
+    n1 = n1 * 1.0001;
+    }    
+  if (n2 == n12) {
+    n2 = n2 * 1.0001;
+    }
+ 
+  console.log(n1 + " " + n2 + " " + n12 + " " + m1 + " " + m2);
+    
     
   var p1  = 100.0 * (n1d          / (n1d + n2d - n12d)).toFixed(2);
   var p2  = 100.0 * (n2d          / (n1d + n2d - n12d)).toFixed(2);
