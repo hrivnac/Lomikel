@@ -19,7 +19,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
       }
     }
     
-  log.info(ootable);
+  console.log(ootable);
   
   otable1 = [];
   var min = otable[0].value;
