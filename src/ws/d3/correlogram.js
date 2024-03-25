@@ -5,22 +5,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
                                 "",
                                 "height=700,width=1400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes");
   }
-    
-  console.log(otable);
-  
-  xvalues = [];
-  for (o of otable) {
-    xvalues.push({x:o.x});
-    }
-  ootable = [];
-  for (x1 of xvalues) {
-    for (x2 of xvalues) {
-      ootable.push({x:x1, y:x2, value:"", info:""});
-      }
-    }
-    
-  console.log(ootable);
-  
+     
   otable1 = [];
   var min = otable[0].value;
   var max = otable[0].value;
@@ -44,6 +29,8 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
     otable.push({x:d, y:d, value:0, info:""})
     }
 
+  console.log(otable);  
+    
   const width0  = num * 60 + 30; // 430
   const height0 = num * 60 + 30; // 430
   const margin = {top:(height0 / num / 2),
@@ -81,14 +68,6 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
                  .join("g")
                  .attr("class", "cor")
                  .attr("transform", function(d) {return `translate(${x(d.x)}, ${y(d.y)})`});
-
-  const bck = svg.selectAll(".corr")
-                 .data(ootable)
-                 .join("g")
-                 .attr("class", "corr")
-                 .attr("transform", function(d) {console.log(d);return `translate(${x(d.x)}, ${y(d.y)})`});
-
-                 
                  
   // rectangles for existing values
   cor.append("rect")
