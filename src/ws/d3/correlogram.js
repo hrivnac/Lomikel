@@ -15,7 +15,7 @@ if (!vennPopupWindow || !vennPopupWindow.opener || vennPopupWindow.opener.closed
   ootable = [];
   for (x1 of xvalues) {
     for (x2 of xvalues) {
-      ootable.push({x:x1, x:x2, value:"", info:""});
+      ootable.push({x:x1, y:x2, value:"", info:""});
       }
     }
   
