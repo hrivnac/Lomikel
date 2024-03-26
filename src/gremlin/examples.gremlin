@@ -116,6 +116,16 @@ g.V().hasLabel('run').group().by('number').by(outE('fills').count()).unfold()
 // show overlapping datasets
 g.V().hasLabel('dataset').out('overlap').limit(10).path().by('name')
 
+// show overapping Vertexes
+g.E().has('lbl', 'overlaps').order().by('intersection', desc).bothV()
+
+// loops
+g.V().has(...).as('a').until(has(...)).repeat(out(...).as('b').simplePath()).path().by(...)
+...repeat(...).times(5)...
+
+// create map
+g.V()....group('aaa').by(values(...)).by((inE(...).count()).cap('xxx')
+
 // prefix search
 g.V().has('lbl', 'alert').has('rowkey', textContainsPrefix('ZTF19'))
 
