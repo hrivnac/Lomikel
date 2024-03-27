@@ -108,7 +108,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param hbaseLimit The maximal number of alerts getting from HBase.
     * @param timeLimit  How far into the past the search should search (in minutes).
     * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
-    * @throws LomikelException If anhything fails. */
+    * @throws LomikelException If anything fails. */
   public void fillSourcesOfInterest(String hbaseUrl,
                                     int    hbaseLimit,
                                     int    timeLimit,

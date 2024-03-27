@@ -10,8 +10,8 @@ mgmt = graph.openManagement()
 lbl  = mgmt.getPropertyKey('lbl')
 
 // Indexes                                                          
-mgmt.buildIndex('byLbl',  Vertex.class).addKey(lbl, Mapping.TEXT.asParameter()).buildCompositeIndex()
-mgmt.buildIndex('byLblE', Edge.class  ).addKey(lbl, Mapping.TEXT.asParameter()).buildCompositeIndex()
+mgmt.buildIndex('byLbl',  Vertex.class).addKey(lbl).buildCompositeIndex()
+mgmt.buildIndex('byLblE', Edge.class  ).addKey(lbl).buildCompositeIndex()
                                                       
 mgmt.commit()
 
