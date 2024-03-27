@@ -168,7 +168,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         n++;
         dt = (System.currentTimeMillis() - startTime) / 1000;
         freq = n / dt;
-        log.info(oid + "(" + n + " of " + size + " with " + String.format("%.2f", freq); + " Hz):");
+        log.info(oid + "(" + n + " of " + size + " with " + String.format("%.2f", freq) + " Hz):");
         for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
           key = cls.getKey();
           val = cls.getValue();
