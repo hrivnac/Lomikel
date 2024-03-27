@@ -122,6 +122,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                              null,
                                              timeLimit,
                                              true);
+    int size = results.size();
+    int n = 0;
+    long dt;
+    double freq;
+    long startTime = System.currentTimeMillis();
     String request;
     String answer;
     JSONArray ja;
@@ -160,7 +165,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               }
             }
           }
-        log.info(oid + ":");
+        n++;
+        dt = (System.currentTimeMillis() - startTime) / 1000;
+        freq = n / dt;
+        log.info(oid + "(" + n + " of " + size + " with " + String.format("%.2f", freq); + " Hz):");
         for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
           key = cls.getKey();
           val = cls.getValue();
