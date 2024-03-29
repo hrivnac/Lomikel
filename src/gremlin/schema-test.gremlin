@@ -1,0 +1,50 @@
+// Specification of schema (constrains) - test
+// ===========================================
+
+mgmt = graph.openManagement()
+
+// Vertexes
+A = mgmt.makeVertexLabel('A').make()
+B = mgmt.makeVertexLabel('B').make()
+x = mgmt.makeVertexLabel('x').make()
+y = mgmt.makeVertexLabel('y').make()
+
+// Edges
+e = mgmt.makeEdgeLabel('e').multiplicity(MULTI).make()
+
+// Properties
+lbl = mgmt.getPropertyKey('w')
+w = mgmt.makePropertyKey('w').dataType(Double.class).cardinality(Cardinality.SINGLE).make()
+t = mgmt.makePropertyKey('t').dataType(String.class).cardinality(Cardinality.SINGLE).make()
+
+// Vertex properties
+mgmt.addProperties(A,
+                   lbl,
+                   t)   
+mgmt.addProperties(B,
+                   lbl,
+                   t)   
+mgmt.addProperties(x,
+                   lbl)   
+mgmt.addProperties(y,
+                   lbl)   
+                                    
+// Edge properties
+mgmt.addProperties(e,
+                   lbl,
+                   w)
+
+// Connections   
+mgmt.addConnection(e, A, x)
+mgmt.addConnection(e, A, y)
+mgmt.addConnection(e, B, x)
+mgmt.addConnection(e, B, y)
+mgmt.addConnection(e, x, x)
+mgmt.addConnection(e, x, y)
+mgmt.addConnection(e, y, x)
+mgmt.addConnection(e, y, y)
+
+// Info
+mgmt.printSchema()
+
+mgmt.commit()
