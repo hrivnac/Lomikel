@@ -1,50 +1,57 @@
 // Create testing graph
 // ====================
-top = g.addV('Top').property('lbl', 'top').
-                    property('title', 'titleTop').
-                    property('subtitle', 'subtitleTop').next();
-a = g.addV('A').property('lbl', 'labelA').
-                property('title', 'titleA').
-                property('subtitle', 'subtitleA').next();
-b = g.addV('B').property('lbl', 'labelB').
-                property('title', 'titleB').
-                property('subtitle', 'subtitleB').next();
-c = g.addV('C').property('lbl', 'labelC').
-                property('title', 'titleC').
-                property('subtitle', 'subtitleC').next();
-d = g.addV('D').property('lbl', 'labelD').
-                property('title', 'titleD').
-                property('subtitle', 'subtitleD').next();
-e = g.addV('E').property('lbl', 'labelE').
-                property('title', 'titleE').
-                property('subtitle', 'subtitleE').next();
-f = g.addV('F').property('lbl', 'labelF').
-                property('title', 'titleF').
-                property('subtitle', 'subtitleF').next();
-aa = g.addV('AA').property('lbl', 'labalAA').
-                  property('title', 'titleAA').
-                  property('subtitle', 'subtitleAA').next();
-ab = g.addV('AB').property('lbl', 'labelAB').
-                  property('title', 'titleAB').
-                  property('subtitle', 'subtitleAB').next();
-aba = g.addV('ABA').property('lbl', 'labelABA').
-                    property('title', 'titleABA').
-                    property('subtitle', 'subtitleABA').next();
-abb = g.addV('ABB').property('lbl', 'labelABB').
-                    property('title', 'titleABB').
-                    property('subtitle', 'subtitleABB').next();
-abc = g.addV('ABC').property('lbl', 'labelABC').
-                    property('title', 'titleABC').
-                    property('subtitle', 'subtitleABC').next();
-g.V(top).addE('has').to(a).iterate();
-g.V(top).addE('has').to(b).iterate();
-g.V(top).addE('has').to(c).iterate();
-g.V(top).addE('has').to(d).iterate();
-g.V(top).addE('has').to(e).iterate();
-g.V(top).addE('has').to(f).iterate();
-g.V(a).addE('contains').to(aa).iterate();
-g.V(a).addE('contains').to(ab).iterate();
-g.V(ab).addE('contains').to(aba).iterate();
-g.V(ab).addE('contains').to(abb).iterate();
-g.V(ab).addE('contains').to(abc).iterate();
+A1 = g.addV('A').property('lbl', 'A').property('t', 'A1').next();
+A2 = g.addV('A').property('lbl', 'A').property('t', 'A2').next();
+A3 = g.addV('A').property('lbl', 'A').property('t', 'A3').next();
+A4 = g.addV('A').property('lbl', 'A').property('t', 'A4').next();
+B1 = g.addV('B').property('lbl', 'B').property('t', 'B1').next();
+B2 = g.addV('B').property('lbl', 'B').property('t', 'B2').next();
+B3 = g.addV('B').property('lbl', 'B').property('t', 'B3').next();
+B4 = g.addV('B').property('lbl', 'B').property('t', 'B4').next();
+x01 = g.addV('x').property('lbl', 'x').property('t', 'x01').next();
+x02 = g.addV('x').property('lbl', 'x').property('t', 'x02').next();
+x03 = g.addV('x').property('lbl', 'x').property('t', 'x03').next();
+x04 = g.addV('x').property('lbl', 'x').property('t', 'x04').next();
+x05 = g.addV('x').property('lbl', 'x').property('t', 'x05').next();
+x06 = g.addV('x').property('lbl', 'x').property('t', 'x06').next();
+x07 = g.addV('x').property('lbl', 'x').property('t', 'x07').next();
+x08 = g.addV('x').property('lbl', 'x').property('t', 'x08').next();
+x09 = g.addV('x').property('lbl', 'x').property('t', 'x09').next();
+x10 = g.addV('x').property('lbl', 'x').property('t', 'x10').next();
+x11 = g.addV('x').property('lbl', 'x').property('t', 'x11').next();
+y01 = g.addV('y').property('lbl', 'y').property('t', 'y01').next();
+y02 = g.addV('y').property('lbl', 'y').property('t', 'y02').next();
+y03 = g.addV('y').property('lbl', 'y').property('t', 'y03').next();
+y04 = g.addV('y').property('lbl', 'y').property('t', 'y04').next();
+y05 = g.addV('y').property('lbl', 'y').property('t', 'y05').next();
+g.V(A1).addE('e').property('lbl', 'e').property('w', '01').to(x01).iterate();
+g.V(A1).addE('e').property('lbl', 'e').property('w', '02').to(x02).iterate();
+g.V(A2).addE('e').property('lbl', 'e').property('w', '03').to(x03).iterate();
+g.V(A2).addE('e').property('lbl', 'e').property('w', '04').to(x04).iterate();
+g.V(A3).addE('e').property('lbl', 'e').property('w', '05').to(x05).iterate();
+g.V(A3).addE('e').property('lbl', 'e').property('w', '06').to(x06).iterate();
+g.V(A3).addE('e').property('lbl', 'e').property('w', '07').to(x07).iterate();
+g.V(A3).addE('e').property('lbl', 'e').property('w', '08').to(x08).iterate();
+g.V(A3).addE('e').property('lbl', 'e').property('w', '09').to(x09).iterate();
+g.V(A4).addE('e').property('lbl', 'e').property('w', '10').to(x10).iterate();
+g.V(A4).addE('e').property('lbl', 'e').property('w', '11').to(x11).iterate();
+g.V(B1).addE('e').property('lbl', 'e').property('w', '12').to(y01).iterate();
+g.V(B1).addE('e').property('lbl', 'e').property('w', '13').to(y02).iterate();
+g.V(B2).addE('e').property('lbl', 'e').property('w', '14').to(y01).iterate();
+g.V(B2).addE('e').property('lbl', 'e').property('w', '15').to(y02).iterate();
+g.V(B3).addE('e').property('lbl', 'e').property('w', '16').to(y03).iterate();
+g.V(B3).addE('e').property('lbl', 'e').property('w', '17').to(y04).iterate();
+g.V(B4).addE('e').property('lbl', 'e').property('w', '18').to(y04).iterate();
+g.V(B4).addE('e').property('lbl', 'e').property('w', '19').to(y05).iterate();
+g.V(y01).addE('e').property('lbl', 'e').property('w', '20').to(x01).iterate();
+g.V(y01).addE('e').property('lbl', 'e').property('w', '21').to(x03).iterate();
+g.V(y02).addE('e').property('lbl', 'e').property('w', '22').to(x02).iterate();
+g.V(y02).addE('e').property('lbl', 'e').property('w', '23').to(x04).iterate();
+g.V(y03).addE('e').property('lbl', 'e').property('w', '24').to(x05).iterate();
+g.V(y03).addE('e').property('lbl', 'e').property('w', '25').to(x06).iterate();
+g.V(y04).addE('e').property('lbl', 'e').property('w', '26').to(x07).iterate();
+g.V(y04).addE('e').property('lbl', 'e').property('w', '27').to(x08).iterate();
+g.V(y04).addE('e').property('lbl', 'e').property('w', '28').to(x09).iterate();
+g.V(y04).addE('e').property('lbl', 'e').property('w', '29').to(x10).iterate();
+g.V(y05).addE('e').property('lbl', 'e').property('w', '30').to(x11).iterate();
 graph.traversal().tx().commit();
