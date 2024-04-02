@@ -12,5 +12,5 @@ connectionPool: {
 #                                     org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
 serializer: {className: org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1,
              config: {serializeResultToString: false,
-                      ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0,
+                      ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3,
                                      org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
