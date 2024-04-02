@@ -2,7 +2,7 @@ package com.Lomikel.Apps;
 
 // Groovy
 import groovy.lang.Binding;
-import groovy.ui.Console;
+import groovy.console.ui.Console;
 
 // Log4J
 import org.apache.log4j.Logger;
