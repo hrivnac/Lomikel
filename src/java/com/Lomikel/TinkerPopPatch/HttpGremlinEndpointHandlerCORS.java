@@ -20,7 +20,7 @@ package com.Lomikel.TinkerPopPatch;
 import org.apache.tinkerpop.gremlin.server.handler.*;
 
 import com.codahale.metrics.Timer;
-import org.apache.tinkerpop.gremlin.driver.ser.SerializationException;
+import org.apache.tinkerpop.gremlin.util.ser.SerializationException;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
 import org.slf4j.Logger;
