@@ -134,7 +134,7 @@
   <target name="info"
           depends="init"
           description="Create Info class">
-    <script language="javascript">
+    <script language="javascript" manager="javax" classpathref="javax.classpath">
       project.setProperty("hostaddress", Packages.java.net.InetAddress.getLocalHost().getHostAddress());
       project.setProperty("hostname", Packages.java.net.InetAddress.getLocalHost().getCanonicalHostName());
       </script>
