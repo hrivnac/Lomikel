@@ -17,10 +17,12 @@
  * under the License.
  */
 package com.Lomikel.TinkerPopPatch;
-import org.apache.tinkerpop.gremlin.server.channel.*;
+package org.apache.tinkerpop.gremlin.server.channel.*;
 
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import org.apache.tinkerpop.gremlin.server.AbstractChannelizer;
+import org.apache.tinkerpop.gremlin.server.handler.HttpGremlinEndpointHandler;
 import org.apache.tinkerpop.gremlin.server.handler.WsAndHttpChannelizerHandler;
 import org.apache.tinkerpop.gremlin.server.util.ServerGremlinExecutor;
 
