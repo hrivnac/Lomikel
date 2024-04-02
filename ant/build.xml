@@ -95,6 +95,12 @@
   <path id="umlDoclet.classpath">
     <pathelement path="../extlib/umldoclet-2.1.1.jar"/>
     </path>
+    
+  <path id="javax.classpath">
+    <pathelement path="../extlib/nashorn-core-15.4.jar"/>
+    <pathelement path="../extlib/asm-9.7.jar"/>
+    <pathelement path="../extlib/asm-util-9.7.jar"/>
+    </path>
 
   <property name="classpath.build.content"       refid="classpath.build"/>
   <property name="classpath.run.content"         refid="classpath.run"/>
