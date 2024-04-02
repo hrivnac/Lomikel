@@ -47,7 +47,7 @@ public class StringGremlinClient extends GremlinClient {
     try {
       GraphSONMapper.Builder builder = GraphSONMapper.build()
                                                      .addRegistry(TinkerIoRegistryV3.instance())                                                     
-                                                     .addRegistry(JanusGraphIoRegistry.getInstance());
+                                                     .addRegistry(new JanusGraphIoRegistry());
       _mapper = builder.create().createMapper();
       MessageSerializer serializer = new GraphSONMessageSerializerV3(builder);  
       createCluster(hostname, port, serializer);
