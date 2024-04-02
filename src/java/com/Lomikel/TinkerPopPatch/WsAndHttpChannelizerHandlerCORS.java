@@ -46,7 +46,7 @@ public class WsAndHttpChannelizerHandlerCORS extends ChannelInboundHandlerAdapte
     private final WebSocketChannelizer wsChannelizer = new WebSocketChannelizer();
     private HttpGremlinEndpointHandlerCORS httpGremlinEndpointHandler;
 
-    public void init(final ServerGremlinExecutor serverGremlinExecutor, final CORSHttpGremlinEndpointHandler httpGremlinEndpointHandler) {
+    public void init(final ServerGremlinExecutor serverGremlinExecutor, final HttpGremlinEndpointHandlerCORS httpGremlinEndpointHandler) {
         //WebSocketChannelizer has everything needed for the http endpoint to work
         wsChannelizer.init(serverGremlinExecutor);
         this.httpGremlinEndpointHandler = httpGremlinEndpointHandler;
