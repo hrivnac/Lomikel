@@ -24,6 +24,7 @@
     <pathelement path="${cli_jar}"/>
     <pathelement path="${orgjson_jar}"/>
     <pathelement path="${slf4j_jar}"/>
+    <pathelement path="${groovyconsole_jar}"/>
     <pathelement path="${hbasecommon_jar}"/>
     <pathelement path="${hbaseclient_jar}"/>
     <pathelement path="${hadoopcommon_jar}"/>
