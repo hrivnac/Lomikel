@@ -17,7 +17,7 @@
  * under the License.
  */
 package com.Lomikel.TinkerPopPatch;
-package org.apache.tinkerpop.gremlin.server.channel.*;
+import org.apache.tinkerpop.gremlin.server.channel.*;
 
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
