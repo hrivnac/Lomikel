@@ -47,7 +47,7 @@ public class StringGremlinClient extends GremlinClient {
     try {
       GraphSONMapper.Builder builder = GraphSONMapper.build()
                                                      .addRegistry(TinkerIoRegistryV3.instance())                                                     
-                                                     .addRegistry(new JanusGraphIoRegistry());
+                                                     .addRegistry(JanusGraphIoRegistry.instance());
       _mapper = builder.create().createMapper();
       MessageSerializer serializer = new GraphSONMessageSerializerV3(builder);  
       createCluster(hostname, port, serializer);
@@ -89,7 +89,7 @@ public class StringGremlinClient extends GremlinClient {
   public String interpret2JSON(String request) throws Exception {
     List<Result> results = interpret(request);
     ObjectMapper mapper = GraphSONMapper.build()
-                                        .addRegistry(JanusGraphIoRegistry.getInstance())
+                                        .addRegistry(JanusGraphIoRegistry.instance())
                                         .create()
                                         .createMapper();
     StringBuffer jsonB = new StringBuffer("[");

@@ -30,7 +30,6 @@ import org.apache.tinkerpop.gremlin.server.channel.WsAndHttpChannelizer;
 import org.apache.tinkerpop.gremlin.server.util.ServerGremlinExecutor;
 
 import static org.apache.tinkerpop.gremlin.server.AbstractChannelizer.PIPELINE_HTTP_AGGREGATOR;
-import static org.apache.tinkerpop.gremlin.server.AbstractChannelizer.PIPELINE_HTTP_USER_AGENT_HANDLER;
 import static org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer.PIPELINE_AUTHENTICATOR;
 import static org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer.PIPELINE_REQUEST_HANDLER;
 
@@ -64,36 +63,28 @@ public class WsAndHttpChannelizerHandlerCORS extends ChannelInboundHandlerAdapte
     public void channelRead(final ChannelHandlerContext ctx, final Object obj) {
         final ChannelPipeline pipeline = ctx.pipeline();
         if (obj instanceof HttpMessage && !WebSocketHandlerUtilCORS.isWebSocket((HttpMessage)obj)) {
-            // If the message is for HTTP and not WS then this handler injects the HTTP user-agent and endpoint handlers
-            // in front of the HTTP aggregator to intercept the HttpMessage.
-            // This replaces the WS server protocol handler so that the pipeline initially looks like this:
+            // if the message is for HTTP and not websockets then this handler injects the endpoint handler in front
+            // of the HTTP Aggregator to intercept the HttpMessage. Therefore the pipeline looks like this at start:
             //
             // IdleStateHandler -> HttpResponseEncoder -> HttpRequestDecoder ->
             //    WsAndHttpChannelizerHandler -> HttpObjectAggregator ->
-            //    WebSocketServerCompressionHandler -> WebSocketServerProtocolHandshakeHandler ->
-            //    Utf8FrameValidator -> WebSocketServerProtocolHandler -> (more websockets)
+            //    WebSocketServerCompressionHandler -> WebSocketServerProtocolHandshakeHandler -> (more websockets)
             //
-            // and shifts to this (setting aside the authentication condition):
+            // and shifts to (setting aside the authentication condition):
             //
             // IdleStateHandler -> HttpResponseEncoder -> HttpRequestDecoder ->
             //    WsAndHttpChannelizerHandler -> HttpObjectAggregator ->
-            //    HttpUserAgentHandler -> HttpGremlinEndpointHandler ->
-            //    WebSocketServerCompressionHandler -> WebSocketServerProtocolHandshakeHandler ->
-            //    Utf8FrameValidator -> (more websockets)
-            pipeline.remove(PIPELINE_REQUEST_HANDLER);
-            if (null != pipeline.get(PIPELINE_HTTP_USER_AGENT_HANDLER)) {
-                pipeline.remove(PIPELINE_HTTP_USER_AGENT_HANDLER);
-            }
+            //    HttpGremlinEndpointHandler ->
+            //    WebSocketServerCompressionHandler - WebSocketServerProtocolHandshakeHandler -> (more websockets)
             if (null != pipeline.get(PIPELINE_AUTHENTICATOR)) {
+                pipeline.remove(PIPELINE_REQUEST_HANDLER);
                 final ChannelHandler authenticator = pipeline.get(PIPELINE_AUTHENTICATOR);
                 pipeline.remove(PIPELINE_AUTHENTICATOR);
                 pipeline.addAfter(PIPELINE_HTTP_AGGREGATOR, PIPELINE_AUTHENTICATOR, authenticator);
-                pipeline.addAfter(PIPELINE_AUTHENTICATOR, PIPELINE_HTTP_USER_AGENT_HANDLER, new HttpUserAgentHandler());
-                pipeline.addAfter(PIPELINE_HTTP_USER_AGENT_HANDLER, PIPELINE_REQUEST_HANDLER, this.httpGremlinEndpointHandler);
+                pipeline.addAfter(PIPELINE_AUTHENTICATOR, PIPELINE_REQUEST_HANDLER, this.httpGremlinEndpointHandler);
             } else {
-                pipeline.addAfter(PIPELINE_HTTP_AGGREGATOR, PIPELINE_HTTP_USER_AGENT_HANDLER, new HttpUserAgentHandler());
-                pipeline.addAfter(PIPELINE_HTTP_USER_AGENT_HANDLER, PIPELINE_REQUEST_HANDLER, this.httpGremlinEndpointHandler);
-                // Note that channelRead()'s do not propagate down the pipeline past HttpGremlinEndpointHandler
+                pipeline.remove(PIPELINE_REQUEST_HANDLER);
+                pipeline.addAfter(PIPELINE_HTTP_AGGREGATOR, PIPELINE_REQUEST_HANDLER, this.httpGremlinEndpointHandler);
             }
         }
         ctx.fireChannelRead(obj);

@@ -27,7 +27,6 @@ import org.apache.tinkerpop.gremlin.server.auth.AllowAllAuthenticator;
 import org.apache.tinkerpop.gremlin.server.handler.AbstractAuthenticationHandler;
 import org.apache.tinkerpop.gremlin.server.handler.HttpBasicAuthenticationHandler;
 import org.apache.tinkerpop.gremlin.server.handler.HttpBasicAuthorizationHandler;
-import org.apache.tinkerpop.gremlin.server.handler.HttpUserAgentHandler;
 import org.apache.tinkerpop.gremlin.server.handler.HttpGremlinEndpointHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -84,16 +83,14 @@ public class HttpChannelizerCORS extends AbstractChannelizer {
             pipeline.addLast(PIPELINE_AUTHORIZER, authorizationHandler);
         }
 
-        pipeline.addLast("http-user-agent-handler", new HttpUserAgentHandler());
         pipeline.addLast("http-gremlin-handler", httpGremlinEndpointHandler);
-        // Note that channelRead()'s do not propagate down the pipeline past HttpGremlinEndpointHandler
     }
 
     private AbstractAuthenticationHandler instantiateAuthenticationHandler(final Settings settings) {
         final String authHandlerClass = settings.authentication.authenticationHandler;
         if (authHandlerClass == null) {
             //Keep things backwards compatible
-            return new HttpBasicAuthenticationHandler(authenticator, authorizer, settings);
+            return new HttpBasicAuthenticationHandler(authenticator, settings);
         } else {
             return createAuthenticationHandler(settings);
         }
