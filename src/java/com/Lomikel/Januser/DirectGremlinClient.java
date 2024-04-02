@@ -11,12 +11,12 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 import org.apache.tinkerpop.gremlin.driver.MessageSerializer;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3;
 import org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.ResultSet;
 import org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3;
 import org.apache.tinkerpop.gremlin.structure.io.binary.TypeSerializerRegistry;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
@@ -58,7 +58,7 @@ public class DirectGremlinClient extends    GremlinClient
       Map<String, Object>  conf = new HashMap<>();
       conf.put("serializeResultToString", false);
       List<String> ioRegistries =  new ArrayList<>();
-      ioRegistries.add("org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3d0");
+      ioRegistries.add("org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3");
       ioRegistries.add("org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
       conf.put("ioRegistries", ioRegistries);
       TypeSerializerRegistry.Builder builder = TypeSerializerRegistry.build();
