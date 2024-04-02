@@ -15,11 +15,11 @@ scriptEngines: {
                org.apache.tinkerpop.gremlin.jsr223.ImportGremlinPlugin: {classImports: [java.lang.Math], methodImports: [java.lang.Math#*]},
                org.apache.tinkerpop.gremlin.jsr223.ScriptFileGremlinPlugin: {files: [scripts/setup-lomikel.groovy, scripts/functions.gremlin]}}}}
 serializers:
-  - {className: org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1,
+  - {className: org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1,
      config: {serializeResultToString: false,
               ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3,
                              org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
-  - {className: org.apache.tinkerpop.gremlin.driver.ser.GraphSONMessageSerializerV3,
+  - {className: org.apache.tinkerpop.gremlin.util.ser.GraphSONMessageSerializerV3,
      config: {serializeResultToString: false,
               ioRegistries: [org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3,
                              org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry]}}
