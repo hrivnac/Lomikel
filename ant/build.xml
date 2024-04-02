@@ -216,7 +216,7 @@
            debug="yes"
            debuglevel="lines,vars,source"
            optimize="yes"
-           source="17"
+           source="11"
            target="11">
       <src path="../src/java"/>
       <src path="../build"/>
