@@ -181,6 +181,7 @@
 			<fileset file="${healpix_jar}"/>
 			<fileset file="${groovy_jar}"/>
 			<fileset file="${groovysh_jar}"/>
+			<fileset file="${groovyconsole_jar}"/>
 			<fileset file="${groovy_ant_jar}"/>
 			<fileset file="${groovy_sql_jar}"/>
 			<fileset file="${hbasecommon_jar}"/>
