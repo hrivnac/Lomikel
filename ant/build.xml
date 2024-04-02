@@ -216,8 +216,8 @@
            debug="yes"
            debuglevel="lines,vars,source"
            optimize="yes"
-           source="8"
-           target="8">
+           source="17"
+           target="17">
       <src path="../src/java"/>
       <src path="../build"/>
       <!--exclude name="com/Lomikel/TinkerPopPatch/**"/-->
