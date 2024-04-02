@@ -56,8 +56,8 @@ public class HDFSAvroImporter extends AvroImporter {
       }
     try {
       HDFSAvroImporter importer = new HDFSAvroImporter(            args[0],
-                                                       new Integer(args[4]),
-                                                       new Integer(args[5]),
+                                                       Integer.valueOf(args[4]),
+                                                       Integer.valueOf(args[5]),
                                                                    args[6],
                                                                    args[2],
                                                                    args[3],

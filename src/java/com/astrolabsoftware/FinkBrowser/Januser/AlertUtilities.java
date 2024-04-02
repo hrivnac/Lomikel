@@ -24,7 +24,7 @@ public class AlertUtilities extends JanusClient {
   /** TBD */
   public static void main(String[] args) {
     AlertUtilities au = new AlertUtilities(args[0]);
-    List<Vertex> r = au.searchJd(new Double(args[1]), new Double(args[2]), args[3], new Integer(args[4]));
+    List<Vertex> r = au.searchJd(Double.valueOf(args[1]), Double.valueOf(args[2]), args[3], Integer.valueOf(args[4]));
     log.info(r);
     au.close();
     }

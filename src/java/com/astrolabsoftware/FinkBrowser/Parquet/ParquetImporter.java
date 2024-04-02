@@ -74,10 +74,10 @@ public class ParquetImporter extends JanusClient {
       System.exit(-1);
       }
     try {
-      ParquetImporter importer = new ParquetImporter(            args[0],
-                                                     new Integer(args[2]),
-                                                     new Integer(args[3]),
-                                                                 args[4]);
+      ParquetImporter importer = new ParquetImporter(                args[0],
+                                                     Integer.valueOf(args[2]),
+                                                     Integer.valueOf(args[3]),
+                                                                     args[4]);
       importer.timerStart();
       importer.process(args[1]);
       importer.commit();
@@ -339,7 +339,7 @@ public class ParquetImporter extends JanusClient {
         log.error("Unknown property: " + prop.getKey() + " = " + prop.getValue());
         }
       if (props.get("dec") != null && props.get("ra") != null) {
-        v.property("direction", Geoshape.point(new Double(props.get("dec").toString()), new Double(props.get("ra").toString()) - 180));
+        v.property("direction", Geoshape.point(Double.valueOf(props.get("dec").toString()), Double.valueOf(props.get("ra").toString()) - 180));
         }
       }
     return v;

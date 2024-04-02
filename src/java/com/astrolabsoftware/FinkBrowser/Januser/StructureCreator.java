@@ -74,25 +74,25 @@ public class StructureCreator extends JanusClient {
     if (args[0].trim().equals("populate")) {
       String failedKey = args[9];
       do {
-        failedKey = new StructureCreator(args[1]).populateGraphFromHBase(            args[2],
-                                                                         new Integer(args[3]),
-                                                                                     args[4],
-                                                                                     args[5],
-                                                                                     args[6],
-                                                                                     args[7],
-                                                                                     args[8],
-                                                                                     failedKey,
-                                                                                     args[10],
-                                                                         new Long(   args[11]),
-                                                                         new Long(   args[12]),
-                                                                         new Integer(args[13]),
-                                                                         new Integer(args[14]),
-                                                                         new Integer(args[15]),
-                                                                                     args[16].equals("true"),
-                                                                                     args[17].equals("true"),
-                                                                                     args[18].equals("true"),
-                                                                                     args[19],
-                                                                                     args[20]);
+        failedKey = new StructureCreator(args[1]).populateGraphFromHBase(                args[2],
+                                                                         Integer.valueOf(args[3]),
+                                                                                         args[4],
+                                                                                         args[5],
+                                                                                         args[6],
+                                                                                         args[7],
+                                                                                         args[8],
+                                                                                         failedKey,
+                                                                                         args[10],
+                                                                         Long.valueOf(   args[11]),
+                                                                         Long.valueOf(   args[12]),
+                                                                         Integer.valueOf(args[13]),
+                                                                         Integer.valueOf(args[14]),
+                                                                         Integer.valueOf(args[15]),
+                                                                                         args[16].equals("true"),
+                                                                                         args[17].equals("true"),
+                                                                                         args[18].equals("true"),
+                                                                                         args[19],
+                                                                                         args[20]);
         }
       while (!failedKey.equals(""));
       }                             
@@ -317,7 +317,7 @@ public class StructureCreator extends JanusClient {
             lonclm = cc[2].split(":");
             lat = resultMap.get(Bytes.toBytes(latclm[0])).get(Bytes.toBytes(latclm[1]));
             lon = resultMap.get(Bytes.toBytes(lonclm[0])).get(Bytes.toBytes(lonclm[1]));
-            v.property(cc[0], Geoshape.point(new Double(schema.decode(cc[1], lat)), new Double(schema.decode(cc[2], lon)) - 180));
+            v.property(cc[0], Geoshape.point(Double.valueOf(schema.decode(cc[1], lat)), Double.valueOf(schema.decode(cc[2], lon)) - 180));
             }
           }
         if (timer(label + "s created", i - 1, 100, commitLimit)) {
