@@ -8,6 +8,7 @@ import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.ModifyingGremlinClient;
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
+import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -127,8 +128,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     long dt;
     double freq;
     long startTime = System.currentTimeMillis();
-    String request;
-    String answer;
     JSONArray ja;
     JSONObject jo;
     Map<String, Set<Double>> classes; // cls -> [jd]
@@ -140,13 +139,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     int weight;
     // loop over all sources
     for (String oid : results) {
-      request = new JSONObject().put("objectId", oid).put("output-format", "json").toString();
       try {
-        answer = httpClient.postJSON(FINK_OBJECTS_WS,
-                                     request,
-                                     null,
-                                     null);
-        ja = new JSONArray(answer);
+        ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
+                                          put("output-format", "json"));
         classes =  new TreeMap<>();
         // get all alerts (jd) and their classes
         for (int i = 0; i < ja.length(); i++) {
@@ -631,7 +626,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String table  = url[2];
     String schema = url[3];
     _fhclient = new FinkHBaseClient(ip, port);
-    _fhclient.connect(table, schema);
+    _fhclient.connect(table); // latest schema
     return _fhclient;
     }
     
@@ -650,6 +645,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   private String _fhclientUrl;
   
   private static String FINK_OBJECTS_WS = "https://fink-portal.org/api/v1/objects";
+  private static String FINK_LATESTS_WS = "https://fink-portal.org/api/v1/latests";
+  private static String FINK_ANOMALY_WS = "https://fink-portal.org/api/v1/anomaly";
 
   /** Logging . */
   private static Logger log = Logger.getLogger(FinkGremlinRecipies.class);

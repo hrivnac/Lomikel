@@ -1154,27 +1154,28 @@
       <Header><![CDATA[<center>]]>Lomikel version: ${version}<![CDATA[</center>]]></Header>
       <Footer><![CDATA[<center>Written by: <a href='http://cern.ch/hrivnac'>J.Hrivnac</a></center>]]></Footer>
       <bottom><![CDATA[<a href='https://cern.ch/hrivnac/Activities/Packages/Lomikel'>Documentation</a>]]> built ${TODAY} on ${os.name} by ${user.name}</bottom>
-      <group title="Apps"            packages="com.Lomikel.Apps*"/>
-      <group title="DB"              packages="com.Lomikel.DB*"/>
-      <group title="Parquet"         packages="com.Lomikel.Parquet*"/>
-      <group title="Hadooper"        packages="com.Lomikel.Hadooper*"/>
-      <group title="HBaser"          packages="com.Lomikel.HBaser*"/>
-      <group title="Januser"         packages="com.Lomikel.Januser*"/>
-      <group title="ElasticSearcher" packages="com.Lomikel.ElasticSearcher*"/>
-      <group title="Phoenixer"       packages="com.Lomikel.Phoenixer*"/>
-      <group title="Graph"           packages="com.Lomikel.Graph*"/>
-      <group title="Utils"           packages="com.Lomikel.Utils*"/>
-      <group title="Sockets"         packages="com.Lomikel.Sockets*"/>
-      <group title="GremlinPlugin"   packages="com.Lomikel.GremlinPlugin*"/>
-      <group title="GUI"             packages="com.Lomikel.GUI*"/>
-      <group title="TinkerPopPatch"  packages="com.Lomikel.TinerPopPatch*"/>
-      <group title="WebService"      packages="com.Lomikel.WebService*"/>
-      <group title="Fink Avro"       packages="com.astrolabsoftware.FinkBrowsrr.Avro*"/>
-      <group title="Fink Parquet"    packages="com.astrolabsoftware.FinkBrowsrr.Parquet*"/>
-      <group title="Fink HBaser"     packages="com.astrolabsoftware.FinkBrowser.HBaser*"/>
-      <group title="Fink Januser"    packages="com.astrolabsoftware.FinkBrowser.Januser*"/>
-      <group title="Fink WebService" packages="com.astrolabsoftware.FinkBrowser.WebService*"/>
-      <group title="LehmanUtils"     packages="de.lehmannet.om.util*"/>
+      <group title="Apps"               packages="com.Lomikel.Apps*"/>
+      <group title="DB"                 packages="com.Lomikel.DB*"/>
+      <group title="Parquet"            packages="com.Lomikel.Parquet*"/>
+      <group title="Hadooper"           packages="com.Lomikel.Hadooper*"/>
+      <group title="HBaser"             packages="com.Lomikel.HBaser*"/>
+      <group title="Januser"            packages="com.Lomikel.Januser*"/>
+      <group title="ElasticSearcher"    packages="com.Lomikel.ElasticSearcher*"/>
+      <group title="Phoenixer"          packages="com.Lomikel.Phoenixer*"/>
+      <group title="Graph"              packages="com.Lomikel.Graph*"/>
+      <group title="Utils"              packages="com.Lomikel.Utils*"/>
+      <group title="Sockets"            packages="com.Lomikel.Sockets*"/>
+      <group title="GremlinPlugin"      packages="com.Lomikel.GremlinPlugin*"/>
+      <group title="GUI"                packages="com.Lomikel.GUI*"/>
+      <group title="TinkerPopPatch"     packages="com.Lomikel.TinerPopPatch*"/>
+      <group title="WebService"         packages="com.Lomikel.WebService*"/>
+      <group title="Fink Avro"          packages="com.astrolabsoftware.FinkBrowsrr.Avro*"/>
+      <group title="Fink Parquet"       packages="com.astrolabsoftware.FinkBrowsrr.Parquet*"/>
+      <group title="Fink HBaser"        packages="com.astrolabsoftware.FinkBrowser.HBaser*"/>
+      <group title="Fink Januser"       packages="com.astrolabsoftware.FinkBrowser.Januser*"/>
+      <group title="Fink Portal Client" packages="com.astrolabsoftware.FinkBrowser.FinkPOrtalClient*"/>
+      <group title="Fink WebService"    packages="com.astrolabsoftware.FinkBrowser.WebService*"/>
+      <group title="LehmanUtils"        packages="de.lehmannet.om.util*"/>
       <link href="http://docs.oracle.com/javase/8/docs/api" packagelistLoc="${javadoc}" offline="true"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>

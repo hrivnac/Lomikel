@@ -4,6 +4,7 @@ evaluationTimeout: 3000000
 channelizer: com.Lomikel.TinkerPopPatch.WsAndHttpChannelizerCORS
 #channelizer: org.apache.tinkerpop.gremlin.server.channel.WsAndHttpChannelizer
 #channelizer: org.apache.tinkerpop.gremlin.server.channel.WebSocketChannelizer
+graphManager: org.janusgraph.graphdb.management.JanusGraphManager
 graphs: {
   graph: conf/gremlin-server/Local.properties
   }
