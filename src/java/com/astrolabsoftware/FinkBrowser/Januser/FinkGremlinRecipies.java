@@ -60,6 +60,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Calendar;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -90,40 +93,70 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param hbaseLimit The maximal number of alerts getting from HBase.
     * @param timeLimit  How far into the past the search should search (in minutes).
+    * @param anomalies  Analyse <em>anomalies</em> taken from {@link FPC},
+    *                   otherwise analyse <em>sources</em> from HBase database.
     * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anhything fails. */
-  public void processSourcesOfInterest(String hbaseUrl,
-                                       int    hbaseLimit,
-                                       int    timeLimit,
-                                       String columns) throws LomikelException {
-    fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, columns);
+  public void processSourcesOfInterest(String  hbaseUrl,
+                                       int     hbaseLimit,
+                                       int     timeLimit,
+                                       boolean anomalies,
+                                       String  columns) throws LomikelException {
+    fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, false, columns);
     g().E().has("lbl", "overlaps").drop().iterate();
     g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
     generateSourcesOfInterestCorrelations();
     generateAlertsOfInterestCorrelations();
     }
-    
+        
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts.
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
-    * @param hbaseLimit The maximal number of alerts getting from HBase.
+    * @param nLimit     The maximal number of alerts getting from HBase or Fink Portal.
     * @param timeLimit  How far into the past the search should search (in minutes).
+    * @param anomalies  Analyse <em>anomalies</em> taken from {@link FPC},
+    *                   otherwise analyse <em>sources</em> from HBase database.
     * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
-  public void fillSourcesOfInterest(String hbaseUrl,
-                                    int    hbaseLimit,
-                                    int    timeLimit,
-                                    String columns) throws LomikelException {
-    log.info("Filling SourcesOfInterest from " + hbaseUrl + ", hbaseLimit = " + hbaseLimit + ", timeLimit = " + timeLimit);
+  public void fillSourcesOfInterest(String  hbaseUrl,
+                                    int     nLimit,
+                                    int     timeLimit,
+                                    boolean anomalies,
+                                    String  columns) throws LomikelException {
+    if (anomalies) {
+      log.info("Filling SourcesOfInterest from " + hbaseUrl + ", nLimit = " + nLimit + ", timeLimit = " + timeLimit);
+      }
+    else {
+      log.info("Filling SourcesOfInterest from anomalies , nLimit = " + nLimit + ", timeLimit = " + timeLimit);
+      }
     log.info("\tenhancing with " + columns);
-    SmallHttpClient httpClient = new SmallHttpClient();
-    fhclient(hbaseUrl);
-    fhclient().setLimit(hbaseLimit);
-    Set<String> results = fhclient().latests("i:objectId",
-                                             null,
-                                             timeLimit,
-                                             true);
-    int size = results.size();
+    Set<String> oids;
+    if (anomalies) {
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.MINUTE, -nLimit);
+      Date d = cal.getTime();
+      String sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
+      JSONArray ja = FPC.anomaly(new JSONObject().put("n",             nLimit).
+                                                  put("startdate",     sd).
+                                                  put("columns",       "i:objectId").
+                                                  put("output-format", "json"));
+      JSONObject jo;
+      oids = new HashSet<>();
+      for (int i = 0; i < ja.length(); i++) {
+        jo = ja.getJSONObject(i);
+        oids.add(jo.getString("i:objectId"));
+        }
+      }
+    else {
+      SmallHttpClient httpClient = new SmallHttpClient();
+      fhclient(hbaseUrl);
+      fhclient().setLimit(nLimit);
+      oids = fhclient().latests("i:objectId",
+                                null,
+                                timeLimit,
+                                true);
+      }
+    int size = oids.size();
     int n = 0;
     long dt;
     double freq;
@@ -138,7 +171,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Set<Double> val;
     int weight;
     // loop over all sources
-    for (String oid : results) {
+    for (String oid : oids) {
       try {
         ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
                                           put("output-format", "json"));
