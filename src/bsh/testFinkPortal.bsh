@@ -10,14 +10,14 @@ FINK_LATESTS_WS = "https://fink-portal.org/api/v1/latests";
 FINK_ANOMALY_WS = "https://fink-portal.org/api/v1/anomaly";
 
 Calendar cal = Calendar.getInstance();
-cal.add(Calendar.HOUR, -3);
+cal.add(Calendar.HOUR, -30);
 d = cal.getTime();
 sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
 
-request = new JSONObject().put("objectId",      "ZTF17aaaehup").
-                           put("output-format", "json");
-ja = FPC.objects(request);
-print(ja);
+//request = new JSONObject().put("objectId",      "ZTF17aaaehup").
+//                           put("output-format", "json");
+//ja = FPC.objects(request);
+//print(ja);
 
 request = new JSONObject().put("class",         "Star").
                            put("n",             "1000").
@@ -27,7 +27,7 @@ request = new JSONObject().put("class",         "Star").
 ja = FPC.latests(request);
 print(ja);
 
-request = new JSONObject().put("n",             "1").
-                           put("output-format", "json");
-ja = FPC.anomaly(request);
-print(ja);
+//request = new JSONObject().put("n",             "1").
+//                           put("output-format", "json");
+//ja = FPC.anomaly(request);
+//print(ja);
