@@ -19,15 +19,15 @@ sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
 //ja = FPC.objects(request);
 //print(ja);
 
-request = new JSONObject().put("class",         "Star").
-                           put("n",             "1000").
-                           put("columns",       "i:objectId").
-                           put("startdate",     sd).
-                           put("output-format", "json");
-ja = FPC.latests(request);
-print(ja);
-
-//request = new JSONObject().put("n",             "1").
+//request = new JSONObject().put("class",         "Star").
+//                           put("n",             "1000").
+//                           put("columns",       "i:objectId").
+//                           put("startdate",     sd).
 //                           put("output-format", "json");
-//ja = FPC.anomaly(request);
+//ja = FPC.latests(request);
 //print(ja);
+
+request = new JSONObject().put("n",             "1").
+                           put("output-format", "json");
+ja = FPC.anomaly(request);
+print(ja);
