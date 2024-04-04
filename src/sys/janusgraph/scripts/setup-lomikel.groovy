@@ -282,12 +282,11 @@ class LomikelServer {
     return enhanced
     }
     
-  def static sourceNeighborhood(iod0) {
-    s0 = g.V().has('lbl', 'source').has('objectId', oid0).next();
-    m0 = g.V(s0).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
-    n = m0.size();
-    println(oid0 + ':\t' + m0);
-    distances = [:]
+  def static sourceNeighborhood(oid0) {
+    def s0 = g.V().has('lbl', 'source').has('objectId', oid0).next();
+    def m0 = g.V(s0).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
+    def n = m0.size();
+    def distances = [:]
     g.V().has('lbl', 'source').each{s -> 
                                     oid = g.V(s).values('objectId').next();
                                     m = g.V(s).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
@@ -300,7 +299,6 @@ class LomikelServer {
                                     dist = Math.sqrt(dist) / n;
                                     if (dist > 0) {
                                       distances[oid] = dist;
-                                      //println(oid + ':\t' + dist  + '\t' + m);   
                                       }                                
                                     }   
     return distances.sort{it.value};
