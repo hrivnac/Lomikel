@@ -282,7 +282,7 @@ class LomikelServer {
     return enhanced
     }
     
-  def sourceNeighborhood(iod0) {
+  def static sourceNeighborhood(iod0) {
     s0 = g.V().has('lbl', 'source').has('objectId', oid0).next();
     m0 = g.V(s0).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
     n = m0.size();
