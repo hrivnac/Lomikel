@@ -281,6 +281,30 @@ class LomikelServer {
     graph.tx().commit()
     return enhanced
     }
+    
+  def sourceNeighborhood(iod0) {
+    s0 = g.V().has('lbl', 'source').has('objectId', oid0).next();
+    m0 = g.V(s0).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
+    n = m0.size();
+    println(oid0 + ':\t' + m0);
+    distances = [:]
+    g.V().has('lbl', 'source').each{s -> 
+                                    oid = g.V(s).values('objectId').next();
+                                    m = g.V(s).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
+                                    dist = 0;
+                                    for (entry : m0.entrySet()) {
+                                      if (m[entry.getKey()] != null) {
+                                        dist += Math.pow(m[entry.getKey()] - entry.getValue(), 2);
+                                        }
+                                      }  
+                                    dist = Math.sqrt(dist) / n;
+                                    if (dist > 0) {
+                                      distances[oid] = dist;
+                                      //println(oid + ':\t' + dist  + '\t' + m);   
+                                      }                                
+                                    }   
+    return distances.sort{it.value};
+    }
    
   def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "134.158.74.54").set("storage.port", "2183").set("storage.hbase.table", "janusgraph").open()
   def static g = graph.traversal()
