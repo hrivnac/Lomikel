@@ -307,9 +307,9 @@ class Lomikel {
     def n = m0.size();
     def distances = [:]
     g.V().has('lbl', 'source').each{s -> 
-                                    oid = g.V(s).values('objectId').next();
-                                    m = g.V(s).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
-                                    dist = 0;
+                                    def oid = g.V(s).values('objectId').next();
+                                    def m = g.V(s).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
+                                    def dist = 0;
                                     for (entry : m0.entrySet()) {
                                       if (m[entry.getKey()] != null) {
                                         dist += Math.pow(m[entry.getKey()] - entry.getValue(), 2);
