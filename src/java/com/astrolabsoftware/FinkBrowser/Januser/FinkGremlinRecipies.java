@@ -622,7 +622,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         c12 = 0;
         // loop over all sources and add them into weights if contained in both SoI
         if (weights.containsKey(Pair.of(t1, t2))) {
-          c12 = weights.containsKey(Pair.of(t1, t2));
+          c12 = weights.get(Pair.of(t1, t2));
           }
         if (c12 > 0) {
           corr.put(Pair.of(t1, t2), c12);
@@ -641,6 +641,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       sizeInOut.put(t1, c12);
       }   
     // Creating overlaps
+    String hbaseUrl;
     Vertex aoi2;
     int n = 0;
     // loop over SoI and create AoI
