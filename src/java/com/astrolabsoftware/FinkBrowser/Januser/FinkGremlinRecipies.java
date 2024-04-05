@@ -414,6 +414,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.*/
   public void generateSourcesOfInterestCorrelations() {
     log.info("Generating correlations for Sources of Interest");
+    // Accumulating weights
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double>      weights   = new HashMap<>(); // cls, objectId -> weight
     Set<String>                            types     = new HashSet<>(); // [cls]
@@ -431,16 +432,19 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       cls = soi.property("cls").value().toString();
       types.add(cls);
       containsIt = soi.edges(Direction.OUT);
-      // loop over congtained sources
+      // loop over contained sources
       while (containsIt.hasNext()) {
         contains = containsIt.next();
-        weight = (Double)(contains.property("weight").value());
         source = contains.inVertex();
-        objectId = source.property("objectId").value().toString();
-        objectIds.add(objectId);
-        weights.put(Pair.of(cls, objectId), weight);
+        if (source.label().equals("source")) {
+          weight = (Double)(contains.property("weight").value());
+          objectId = source.property("objectId").value().toString();
+          objectIds.add(objectId);
+          weights.put(Pair.of(cls, objectId), weight);
+          }
         }
       }
+    // Calculation correlations and sizes
     Map<Pair<String, String>, Double> corr      = new HashMap<>(); // cls, cls -> correlation
     Map<String, Double>               sizeInOut = new HashMap<>(); // cls -> size
     double c12;
@@ -473,6 +477,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       sizeInOut.put(soi1, c12);
       }
+    // Creating overlaps
     int i1 = 0;
     int i2 = 0;
     int n = 0;
@@ -559,8 +564,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
   public void generateAlertsOfInterestCorrelationsNEW() {
     log.info("Generating correlations for Alerts of Interest");
+    // Accumulating weights
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
     Map<Pair<String, String>, Double> weights = new HashMap<>(); // cls2, cls1 -> weight
+    Set<String>                       types   = new HashSet<>(); // [cls]
     Vertex soi1;
     Vertex soi2;
     Vertex source;
@@ -574,16 +581,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String cls1;
     String cls2;
     Pair rel;
+    // loop over SoI
     while (soiT.hasNext()) {
       soi1 = soiT.next();
       cls1 = soi1.property("cls").value().toString();
+      types.add(cls1);
       deepcontains1It = soi1.edges(Direction.OUT);
+      // loop over contained sources
       while (deepcontains1It.hasNext()) { 
         deepcontains1 = deepcontains1It.next();
         source = deepcontains1.inVertex();
         if (source.label().equals("source")) {
           weight1 = (Double)(deepcontains1.property("weight").value());
           deepcontains2It = source.edges(Direction.IN);
+          // loop over congtaining SoI
           while (deepcontains2It.hasNext()) { 
             deepcontains2 = deepcontains2It.next();
             soi2 = deepcontains2.outVertex();
@@ -601,12 +612,79 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       }
-          
-    log.info(weights);    
-      
-    
-    
-    
+    // Calculation correlations and sizes
+    Map<Pair<String, String>, Double> corr      = new HashMap<>(); // cls, cls -> correlation
+    Map<String, Double>               sizeInOut = new HashMap<>(); // cls -> size
+    double c12;
+    // double-loop over SoI 
+    for (String soi1 : types) {
+      for (String soi2 : types) {
+        c12 = 0;
+        // loop over all sources and add them into weights if contained in both SoI
+          if (weights.containsKey(Pair.of(soi1, soi2)) {
+            c12 = weights.containsKey(Pair.of(soi1, soi2);
+            }
+          }
+        if (c12 > 0) {
+          corr.put(Pair.of(soi1, soi2), c12);
+          }
+        }
+      }
+    // loop over start SoI 
+    for (String soi1 : types) {
+      c12 = 0;
+      // loop over and sources and add them into size in SoI
+      for (String soi2 : types) {
+        if (weights.containsKey(Pair.of(soi1, soi2))) {
+          c12++;
+          }
+        }
+      sizeInOut.put(soi1, c12);
+      }   
+    // Creating overlaps
+    Vertex aoi2;
+    int n = 0;
+    // loop over SoI and create AoI
+    for (String soi : types) {
+      g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
+                            has("cls", soi).
+                            fold().
+                            coalesce(unfold(), 
+                                     addV("AlertsOfInterest").
+                                     property("lbl",        "AlertsOfInterest").
+                                     property("cls",        soi               ).
+                                     property("technology", "HBase"           ).
+                                     property("url",        hbaseUrl          )).
+                            iterate();      }
+    // double-loop over SoI and create overlaps Edge if non empty 
+    for (String cls1 : types) {
+      for (String cls2 : types) {
+        if (corr.containsKey(Pair.of(cls1, cls2))) {
+          n++;
+          soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
+          hbaseUrl = soi2.outVertex().property("url").value().toString();
+          aoi2 = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
+                         has("cls", cls2).
+                         fold().
+                         coalesce(unfold(), 
+                                  addV("AlertsOfInterest").
+                                  property("lbl",        "AlertsOfInterest").
+                                  property("cls",        cls2               ).
+                                  property("technology", "HBase"           ).
+                                  property("url",        hbaseUrl          )).
+                         next();
+          addEdge(g().V(soi1).next(),
+                  g().V(aoi2).next(),
+                  "overlaps",
+                  new String[]{"intersection",                
+                               "sizeIn",            
+                               "sizeOut"},
+                  new Double[]{corr.get(Pair.of(cls1, cls2)),
+                               sizeInOut.get(cls1),
+                               sizeInOut.get(cls2)});
+          }  
+        }
+      }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     //log.info("" + n + " correlations generated");
     }
