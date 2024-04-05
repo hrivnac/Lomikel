@@ -559,12 +559,48 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
   public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
-    List<Vertex> sois1 = g().V().has("lbl", "SourcesOfInterest").toList();
-    List<Vertex> sois2 = g().V().has("lbl", "SourcesOfInterest").toList();
-    for (Vertex soi1 : sois1) {
-      for (Vertex soi2 : sois2) {
+    GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
+    Map<Pair<String, String>, Integer> weights = new HashMap<>(); // cls2, cls1 -> weight
+    Vertex soi1;
+    Vertex soi2;
+    Iterator<Edge> deepcontains1It;
+    Iterator<Edge> deepcontains2It;
+    Edge deepcontains1;
+    Edge deepcontains2;
+    double weigh1t;
+    double weight2;
+    String cls1;
+    String cls2;
+    Pair rel;
+    while (soiT.hasNext()) {
+      soi1 = aoiT.next();
+      cls1 = soi.property("cls").value().toString();
+      deepcontains1It = soi.edges(Direction.OUT).has("lbl", "deepcontains");
+      while (deepcontains1It.hasNext()) { 
+        deepcontains1 = deepcontains1It.next();
+        weight1 = (Double)(deepcontains1.property("weight").value());
+        source = deepcontains1.inVertex();
+        deepcontains2It = source.edges(Direction.IN).has("lbl", "deepcontains");
+        while (deepcontains2It.hasNext()) { 
+          deepcontains2 = deepcontains2It.next();
+          weight2 = (Double)(deepcontains2.property("weight").value());
+          soi2 = deepcontains2.outVertex();
+          cls2 = soi2.property("cls").value().toString();
+          rel = Pair.of(cls1, cls2);
+          if (!weights.containsKey(rel)) {
+            weights.put(rel, 1);
+            }
+          weight = weights.get(rel);
+          weights.put(rel, weight + 1);
+          }
         }
       }
+          
+        
+      
+    
+    
+    
     g().getGraph().tx().commit(); // TBD: should use just commit()
     //log.info("" + n + " correlations generated");
     }
