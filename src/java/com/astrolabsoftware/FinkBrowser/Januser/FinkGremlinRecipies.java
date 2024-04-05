@@ -562,7 +562,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
-  public void generateAlertsOfInterestCorrelationsNEW() {
+  public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
     // Accumulating weights
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
@@ -691,7 +691,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
-  public void generateAlertsOfInterestCorrelations() {
+  public void generateAlertsOfInterestCorrelationsOld() {
     log.info("Generating correlations for Alerts of Interest");
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
     Map<Pair<String, String>, Integer> weights = new HashMap<>(); // cls, objectId -> weight
