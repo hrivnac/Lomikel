@@ -563,11 +563,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<Pair<String, String>, Integer> weights = new HashMap<>(); // cls2, cls1 -> weight
     Vertex soi1;
     Vertex soi2;
+    Vertex source;
     Iterator<Edge> deepcontains1It;
     Iterator<Edge> deepcontains2It;
     Edge deepcontains1;
     Edge deepcontains2;
-    double weigh1t;
+    double weight1;
     double weight2;
     String cls1;
     String cls2;
