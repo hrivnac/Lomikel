@@ -559,6 +559,19 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
   public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
+    List<Vertex> sois1 = g().V().has("lbl", "SourcesOfInterest").toList();
+    List<Vertex> sois2 = g().V().has("lbl", "SourcesOfInterest").toList();
+    for (Vertex soi1 : sois1) {
+      for (Vertex soi2 : sois2) {
+        }
+      }
+    g().getGraph().tx().commit(); // TBD: should use just commit()
+    //log.info("" + n + " correlations generated");
+    }
+    
+  /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
+  public void generateAlertsOfInterestCorrelationsOld() {
+    log.info("Generating correlations for Alerts of Interest");
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
     Map<Pair<String, String>, Integer> weights = new HashMap<>(); // cls, objectId -> weight
     Map<String, Integer>               sizesA  = new HashMap<>(); // cls -> size (of alerts)
