@@ -570,13 +570,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Edge deepcontains2;
     double weight1;
     double weight2;
+    double weight;
     String cls1;
     String cls2;
     Pair rel;
     while (soiT.hasNext()) {
       soi1 = soiT.next();
       cls1 = soi1.property("cls").value().toString();
-      deepcontains1It = soi.edges(Direction.OUT);
+      deepcontains1It = soi1.edges(Direction.OUT);
       while (deepcontains1It.hasNext()) { 
         deepcontains1 = deepcontains1It.next();
         source = deepcontains1.inVertex();
