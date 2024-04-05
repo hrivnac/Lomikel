@@ -95,14 +95,17 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param timeLimit  How far into the past the search should search (in minutes).
     * @param anomalies  Analyse <em>anomalies</em> taken from {@link FPC},
     *                   otherwise analyse <em>sources</em> from HBase database.
+    * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
+    *                   possibly filled with requested HBase columns.
     * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anhything fails. */
   public void processSourcesOfInterest(String  hbaseUrl,
                                        int     hbaseLimit,
                                        int     timeLimit,
                                        boolean anomalies,
+                                       boolean enhance,
                                        String  columns) throws LomikelException {
-    fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, false, columns);
+    fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, enhance, columns);
     g().E().has("lbl", "overlaps").drop().iterate();
     g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
@@ -116,12 +119,15 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param timeLimit  How far into the past the search should search (in minutes).
     * @param anomalies  Analyse <em>anomalies</em> taken from {@link FPC},
     *                   otherwise analyse <em>sources</em> from HBase database.
+    * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
+    *                   possibly filled with requested HBase columns.
     * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
   public void fillSourcesOfInterest(String  hbaseUrl,
                                     int     nLimit,
                                     int     timeLimit,
                                     boolean anomalies,
+                                    boolean enhance,
                                     String  columns) throws LomikelException {
     if (anomalies) {
       log.info("Filling SourcesOfInterest from " + hbaseUrl + ", nLimit = " + nLimit + ", timeLimit = " + timeLimit);
@@ -200,7 +206,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           val = cls.getValue();
           weight = val.size();
           log.info("\t" + key + " in " + weight + " alerts");
-          registerSourcesOfInterest(key, oid, weight, val, hbaseUrl, true, columns);
+          registerSourcesOfInterest(key, oid, weight, val, hbaseUrl, enhance, columns);
           }
         }
       catch (LomikelException e) {
@@ -221,7 +227,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
     *                   as <tt>ip:port:table:schema</tt>. 
     * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
-    *                   filled with requested HBase columns.
+    *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     *                   Ignored if enhancement not requested. */
   public void registerSourcesOfInterest(String      cls,
