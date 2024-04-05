@@ -595,7 +595,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                 weights.put(rel, 1);
                 }
               weight = weights.get(rel);
-              weights.put(rel, weight + 1);
+              weights.put(rel, weight + 1.0);
               }
             }
           }
