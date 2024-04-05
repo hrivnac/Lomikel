@@ -617,28 +617,28 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<String, Double>               sizeInOut = new HashMap<>(); // cls -> size
     double c12;
     // double-loop over SoI 
-    for (String soi1 : types) {
-      for (String soi2 : types) {
+    for (String cls1 : types) {
+      for (String cls2 : types) {
         c12 = 0;
         // loop over all sources and add them into weights if contained in both SoI
-        if (weights.containsKey(Pair.of(soi1, soi2))) {
-          c12 = weights.containsKey(Pair.of(soi1, soi2));
+        if (weights.containsKey(Pair.of(cls1, cls2))) {
+          c12 = weights.containsKey(Pair.of(cls1, cls2));
           }
         if (c12 > 0) {
-          corr.put(Pair.of(soi1, soi2), c12);
+          corr.put(Pair.of(cls1, cls2), c12);
           }
         }
       }
     // loop over start SoI 
-    for (String soi1 : types) {
+    for (String cls1 : types) {
       c12 = 0;
       // loop over and sources and add them into size in SoI
-      for (String soi2 : types) {
-        if (weights.containsKey(Pair.of(soi1, soi2))) {
+      for (String cls2 : types) {
+        if (weights.containsKey(Pair.of(cls1, cls2))) {
           c12++;
           }
         }
-      sizeInOut.put(soi1, c12);
+      sizeInOut.put(cls1, c12);
       }   
     // Creating overlaps
     Vertex aoi2;
