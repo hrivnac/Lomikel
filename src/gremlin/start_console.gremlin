@@ -343,7 +343,10 @@ class Lomikel {
                                     def dist = 0;
                                     for (entry : m0.entrySet()) {
                                       if (m[entry.getKey()] != null) {
-                                        dist += Math.pow(m[entry.getKey()] - entry.getValue(), 2);
+                                        dist += Math.pow(entry.getValue() - m[entry.getKey()], 2);
+                                        }
+                                      else {
+                                        dist += Math.pow(entry.getValue(),                     2);
                                         }
                                       }  
                                     dist = Math.sqrt(dist) / n;
