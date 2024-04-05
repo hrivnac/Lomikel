@@ -282,14 +282,45 @@ class LomikelServer {
     return enhanced
     }
     
-  def static sourceNeighborhood(oid0) {
+  def static sourceNeighborhood(oid0, classes0 = null) {
     def s0 = g.V().has('lbl', 'source').has('objectId', oid0).next();
-    def m0 = g.V(s0).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
+    def m0;
+    if (classes0 != null) {
+      m0 = g.V(s0).out().
+                   has('lbl', 'alert').
+                   in().
+                   has('lbl', 'AlertsOfInterest').
+                   has('cls', within(classes0)).
+                   groupCount().
+                   by('cls').
+                   toList()[0];
+      }
+    else {
+      m0 = g.V(s0).out().
+                   has('lbl', 'alert').
+                   in().
+                   has('lbl', 'AlertsOfInterest').
+                   groupCount().
+                   by('cls').
+                   toList()[0];
+      }
     def n = m0.size();
+    def classes = [];
+    for (entry : m0.entrySet()) {
+      classes += [entry.getKey()];
+      }
+    println('calculating sources distance wrt ' + classes);
     def distances = [:]
     g.V().has('lbl', 'source').each{s -> 
                                     def oid = g.V(s).values('objectId').next();
-                                    def m = g.V(s).out().has('lbl', 'alert').in().has('lbl', 'AlertsOfInterest').groupCount().by('cls').toList()[0];
+                                    def m = g.V(s).out().
+                                                   has('lbl', 'alert').
+                                                   in().
+                                                   has('lbl', 'AlertsOfInterest').
+                                                   has('cls', within(classes)).
+                                                   groupCount().
+                                                   by('cls').
+                                                   toList()[0];
                                     def dist = 0;
                                     for (entry : m0.entrySet()) {
                                       if (m[entry.getKey()] != null) {
