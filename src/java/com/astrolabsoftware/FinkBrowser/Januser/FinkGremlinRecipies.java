@@ -687,7 +687,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
-    //log.info("" + n + " correlations generated");
+    log.info("" + n + " correlations generated");
     }
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
