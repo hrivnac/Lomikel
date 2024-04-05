@@ -592,7 +592,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               cls2 = soi2.property("cls").value().toString();
               rel = Pair.of(cls1, cls2);
               if (!weights.containsKey(rel)) {
-                weights.put(rel, 1);
+                weights.put(rel, 1.0);
                 }
               weight = weights.get(rel);
               weights.put(rel, weight + 1.0);
