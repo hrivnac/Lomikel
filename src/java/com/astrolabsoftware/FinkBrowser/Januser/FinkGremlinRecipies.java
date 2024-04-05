@@ -574,25 +574,29 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String cls2;
     Pair rel;
     while (soiT.hasNext()) {
-      soi1 = aoiT.next();
-      cls1 = soi.property("cls").value().toString();
-      deepcontains1It = soi.edges(Direction.OUT).has("lbl", "deepcontains");
+      soi1 = soiT.next();
+      cls1 = soi1.property("cls").value().toString();
+      deepcontains1It = soi.edges(Direction.OUT)
       while (deepcontains1It.hasNext()) { 
         deepcontains1 = deepcontains1It.next();
-        weight1 = (Double)(deepcontains1.property("weight").value());
         source = deepcontains1.inVertex();
-        deepcontains2It = source.edges(Direction.IN).has("lbl", "deepcontains");
-        while (deepcontains2It.hasNext()) { 
-          deepcontains2 = deepcontains2It.next();
-          weight2 = (Double)(deepcontains2.property("weight").value());
-          soi2 = deepcontains2.outVertex();
-          cls2 = soi2.property("cls").value().toString();
-          rel = Pair.of(cls1, cls2);
-          if (!weights.containsKey(rel)) {
-            weights.put(rel, 1);
+        if (source.label().equals("source")) {
+          weight1 = (Double)(deepcontains1.property("weight").value());
+          deepcontains2It = source.edges(Direction.IN);
+          while (deepcontains2It.hasNext()) { 
+            deepcontains2 = deepcontains2It.next();
+            soi2 = deepcontains2.outVertex();
+            if (soi2.label().equals("SourcesOfInterest")) {
+              weight2 = (Double)(deepcontains2.property("weight").value());
+              cls2 = soi2.property("cls").value().toString();
+              rel = Pair.of(cls1, cls2);
+              if (!weights.containsKey(rel)) {
+                weights.put(rel, 1);
+                }
+              weight = weights.get(rel);
+              weights.put(rel, weight + 1);
+              }
             }
-          weight = weights.get(rel);
-          weights.put(rel, weight + 1);
           }
         }
       }
