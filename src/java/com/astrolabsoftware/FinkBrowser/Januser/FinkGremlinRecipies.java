@@ -105,7 +105,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                        boolean anomalies,
                                        boolean enhance,
                                        String  columns) throws LomikelException {
-    fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, enhance, columns);
+    fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, anomalies, enhance, columns);
     g().E().has("lbl", "overlaps").drop().iterate();
     g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
@@ -135,7 +135,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     else {
       log.info("Filling SourcesOfInterest from anomalies , nLimit = " + nLimit + ", timeLimit = " + timeLimit);
       }
-    log.info("\tenhancing with " + columns);
+    if (enhance) {
+      log.info("\tenhancing with " + columns);
+      }
     Set<String> oids;
     if (anomalies) {
       Calendar cal = Calendar.getInstance();
