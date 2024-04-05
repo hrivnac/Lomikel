@@ -662,7 +662,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         if (corr.containsKey(Pair.of(t1, t2))) {
           n++;
           soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", t2).next();
-          hbaseUrl = soi2.outVertex().property("url").value().toString();
+          hbaseUrl = soi2.property("url").value().toString();
           aoi2 = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
                          has("cls", t2).
                          fold().
