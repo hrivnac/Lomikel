@@ -303,26 +303,15 @@ class Lomikel {
     
   def static sourceNeighborhood(g, oid0, classes0 = null) {
     def s0 = g.V().has('lbl', 'source').has('objectId', oid0).next();
-    def m0;
-    if (classes0 != null) {
-      m0 = g.V(s0).out().
-                   has('lbl', 'alert').
-                   in().
-                   has('lbl', 'AlertsOfInterest').
-                   has('cls', within(classes0)).
-                   groupCount().
-                   by('cls').
-                   toList()[0];
-      }
-    else {
-      m0 = g.V(s0).out().
-                   has('lbl', 'alert').
-                   in().
-                   has('lbl', 'AlertsOfInterest').
-                   groupCount().
-                   by('cls').
-                   toList()[0];
-      }
+    def m0 = [:];
+    g.V(s0).inE().
+            project('cls', 'w').
+            by(outV().values('cls')).
+            by(values('weight')).each {it ->
+                                       if (classes0 == null || it['cls'] in classes0) {
+                                         m0[it['cls']] = it['w'];
+                                         }
+                                       }
     def n = m0.size();
     def classes = [];
     for (entry : m0.entrySet()) {
@@ -330,44 +319,45 @@ class Lomikel {
       }
     println('calculating sources distance wrt ' + classes);
     def distances = [:]
-    g.V().has('lbl', 'source').each{s -> 
-                                    def oid = g.V(s).values('objectId').next();
-                                    def m = g.V(s).out().
-                                                   has('lbl', 'alert').
-                                                   in().
-                                                   has('lbl', 'AlertsOfInterest').
-                                                   has('cls', within(classes)).
-                                                   groupCount().
-                                                   by('cls').
-                                                   toList()[0];
-                                    def dist = 0;
-                                    def n11;
-                                    def n12;
-                                    def n21;
-                                    def n22;
-                                    def n1;
-                                    def n2;
-                                    for (entry1 : m0.entrySet()) {
-                                      for (entry2 : m0.entrySet()) {
-                                        if (entry1.getKey() > entry2.getKey()) {
-                                          n11 = entry1.getValue();
-                                          n12 = entry2.getValue();
-                                          n21 = m[entry1.getKey()] == null ? 0 : m[entry1.getKey()];
-                                          n22 = m[entry2.getKey()] == null ? 0 : m[entry2.getKey()];
-                                          n1 = (n11 + n12) == 0 ? 0 : Math.abs(n11 - n12) / (n11 + n12);
-                                          n2 = (n21 + n22) == 0 ? 0 : Math.abs(n21 - n22) / (n21 + n22);
-                                          dist += Math.pow(n1 - n2, 2);
-                                          }
-                                        }
-                                      }
-                                    dist = Math.sqrt(dist) / n;
-                                    if (dist > 0) {
-                                      distances[oid] = dist;
-                                      }                                
-                                    }   
+    g.V().has('lbl', 'source').each {s -> 
+                                     def oid = g.V(s).values('objectId').next();
+                                     def m = [:];
+                                     g.V(s).inE().
+                                            project('cls', 'w').
+                                            by(outV().values('cls')).
+                                            by(values('weight')).each {it ->
+                                                                       if (it['cls'] in classes) {
+                                                                         m[it['cls']] = it['w'];
+                                                                         }
+                                                                       }
+                                     def dist = 0;
+                                     def n11;
+                                     def n12;
+                                     def n21;
+                                     def n22;
+                                     def n1;
+                                     def n2;
+                                     for (entry1 : m0.entrySet()) {
+                                       for (entry2 : m0.entrySet()) {
+                                         if (entry1.getKey() > entry2.getKey()) {
+                                           n11 = entry1.getValue();
+                                           n12 = entry2.getValue();
+                                           n21 = m[entry1.getKey()] == null ? 0 : m[entry1.getKey()];
+                                           n22 = m[entry2.getKey()] == null ? 0 : m[entry2.getKey()];
+                                           n1 = (n11 + n12) == 0 ? 0 : Math.abs(n11 - n12) / (n11 + n12);
+                                           n2 = (n21 + n22) == 0 ? 0 : Math.abs(n21 - n22) / (n21 + n22);
+                                           dist += Math.pow(n1 - n2, 2);
+                                           }
+                                         }
+                                       }
+                                     dist = Math.sqrt(dist) / n;
+                                     if (dist > 0) {
+                                       distances[oid] = dist;
+                                       }                                
+                                     }   
     return distances.sort{it.value};
     }
- 
+
   def static config    
        
   }
