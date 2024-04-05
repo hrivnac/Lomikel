@@ -641,7 +641,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       sizeInOut.put(t1, c12);
       }   
     // Creating overlaps
-    String hbaseUrl;
+    String hbaseUrl = "";
     Vertex aoi2;
     int n = 0;
     // loop over SoI and create AoI
@@ -658,6 +658,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                             iterate();      }
     // double-loop over SoI and create overlaps Edge if non empty 
     for (String t1 : types) {
+      soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", t1).next();
       for (String t2 : types) {
         if (corr.containsKey(Pair.of(t1, t2))) {
           n++;
