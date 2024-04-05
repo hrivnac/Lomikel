@@ -630,15 +630,15 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
     // loop over start SoI 
-    for (String cls1 : types) {
+    for (String t1 : types) {
       c12 = 0;
       // loop over and sources and add them into size in SoI
-      for (String cls2 : types) {
-        if (weights.containsKey(Pair.of(cls1, cls2))) {
+      for (String t2 : types) {
+        if (weights.containsKey(Pair.of(t1, t2))) {
           c12++;
           }
         }
-      sizeInOut.put(cls1, c12);
+      sizeInOut.put(t1, c12);
       }   
     // Creating overlaps
     Vertex aoi2;
@@ -656,19 +656,19 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                      property("url",        hbaseUrl          )).
                             iterate();      }
     // double-loop over SoI and create overlaps Edge if non empty 
-    for (String cls1 : types) {
-      for (String cls2 : types) {
-        if (corr.containsKey(Pair.of(cls1, cls2))) {
+    for (String t1 : types) {
+      for (String t2 : types) {
+        if (corr.containsKey(Pair.of(t1, t2))) {
           n++;
-          soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
+          soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", t2).next();
           hbaseUrl = soi2.outVertex().property("url").value().toString();
           aoi2 = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                         has("cls", cls2).
+                         has("cls", t2).
                          fold().
                          coalesce(unfold(), 
                                   addV("AlertsOfInterest").
                                   property("lbl",        "AlertsOfInterest").
-                                  property("cls",        cls2               ).
+                                  property("cls",        t2               ).
                                   property("technology", "HBase"           ).
                                   property("url",        hbaseUrl          )).
                          next();
@@ -678,9 +678,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                   new String[]{"intersection",                
                                "sizeIn",            
                                "sizeOut"},
-                  new Double[]{corr.get(Pair.of(cls1, cls2)),
-                               sizeInOut.get(cls1),
-                               sizeInOut.get(cls2)});
+                  new Double[]{corr.get(Pair.of(t1, t2)),
+                               sizeInOut.get(t1),
+                               sizeInOut.get(t2)});
           }  
         }
       }
