@@ -282,7 +282,8 @@ class LomikelServer {
     return enhanced
     }
     
-  def static sourceNeighborhood(oid0, classes0 = null) {
+    
+  def static sourceNeighborhood(g, oid0, classes0 = null) {
     def s0 = g.V().has('lbl', 'source').has('objectId', oid0).next();
     def m0;
     if (classes0 != null) {
@@ -322,11 +323,23 @@ class LomikelServer {
                                                    by('cls').
                                                    toList()[0];
                                     def dist = 0;
-                                    for (entry : m0.entrySet()) {
-                                      if (m[entry.getKey()] != null) {
-                                        dist += Math.pow(m[entry.getKey()] - entry.getValue(), 2);
+                                    def n11;
+                                    def n12;
+                                    def n21;
+                                    def n22;
+                                    def n1;
+                                    def n2;
+                                    for (entry1 : m0.entrySet()) {
+                                      for (entry2 : m0.entrySet()) {
+                                        n11 = entry1.getValue();
+                                        n12 = entry2.getValue();
+                                        n21 = m[entry1.getKey()] == null ? 0 : m[entry1.getKey()];
+                                        n22 = m[entry2.getKey()] == null ? 0 : m[entry2.getKey()];
+                                        n1 = (n11 + n12) == 0 ? 0 : Math.abs(n11 - n12) / (n11 + n12);
+                                        n2 = (n21 + n22) == 0 ? 0 : Math.abs(n21 - n22) / (n21 + n22);
+                                        dist += Math.pow(n1 - n2, 2);
                                         }
-                                      }  
+                                      }
                                     dist = Math.sqrt(dist) / n;
                                     if (dist > 0) {
                                       distances[oid] = dist;

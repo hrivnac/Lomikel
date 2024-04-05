@@ -330,7 +330,7 @@ class Lomikel {
       }
     println('calculating sources distance wrt ' + classes);
     def distances = [:]
-    g.V().has('lbl', 'source').each{s -> 
+    g.V().has('lbl', 'source').limit(100).each{s -> 
                                     def oid = g.V(s).values('objectId').next();
                                     def m = g.V(s).out().
                                                    has('lbl', 'alert').
@@ -341,14 +341,23 @@ class Lomikel {
                                                    by('cls').
                                                    toList()[0];
                                     def dist = 0;
-                                    for (entry : m0.entrySet()) {
-                                      if (m[entry.getKey()] != null) {
-                                        dist += Math.pow(entry.getValue() - m[entry.getKey()], 2);
+                                    def n11;
+                                    def n12;
+                                    def n21;
+                                    def n22;
+                                    def n1;
+                                    def n2;
+                                    for (entry1 : m0.entrySet()) {
+                                      for (entry2 : m0.entrySet()) {
+                                        n11 = entry1.getValue();
+                                        n12 = entry2.getValue();
+                                        n21 = m[entry1.getKey()] == null ? 0 : m[entry1.getKey()];
+                                        n22 = m[entry2.getKey()] == null ? 0 : m[entry2.getKey()];
+                                        n = (n11 + n12) == 0 ? 0 : Math.abs(n11 - n12) / (n11 + n12);
+                                        n = (n21 + n22) == 0 ? 0 : Math.abs(n21 - n22) / (n21 + n22);
+                                        dist += Math.pow(n1 - n2, 2);
                                         }
-                                      else {
-                                        dist += Math.pow(entry.getValue(),                     2);
-                                        }
-                                      }  
+                                      }
                                     dist = Math.sqrt(dist) / n;
                                     if (dist > 0) {
                                       distances[oid] = dist;
@@ -356,6 +365,7 @@ class Lomikel {
                                     }   
     return distances.sort{it.value};
     }
+sourceNeighborhood(g, 'ZTF18aaaabod');
  
   def static config    
        
