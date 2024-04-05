@@ -576,7 +576,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     while (soiT.hasNext()) {
       soi1 = soiT.next();
       cls1 = soi1.property("cls").value().toString();
-      deepcontains1It = soi.edges(Direction.OUT)
+      deepcontains1It = soi.edges(Direction.OUT);
       while (deepcontains1It.hasNext()) { 
         deepcontains1 = deepcontains1It.next();
         source = deepcontains1.inVertex();
