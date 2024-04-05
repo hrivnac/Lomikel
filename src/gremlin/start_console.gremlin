@@ -353,7 +353,6 @@ class Lomikel {
                                     }   
     return distances.sort{it.value};
     }
- sourceNeighborhood(g, 'ZTF18aaaabod');   
  
   def static config    
        
