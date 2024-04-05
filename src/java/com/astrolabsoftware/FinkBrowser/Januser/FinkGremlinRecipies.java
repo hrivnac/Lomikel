@@ -621,9 +621,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       for (String soi2 : types) {
         c12 = 0;
         // loop over all sources and add them into weights if contained in both SoI
-          if (weights.containsKey(Pair.of(soi1, soi2))) {
-            c12 = weights.containsKey(Pair.of(soi1, soi2));
-            }
+        if (weights.containsKey(Pair.of(soi1, soi2))) {
+          c12 = weights.containsKey(Pair.of(soi1, soi2));
           }
         if (c12 > 0) {
           corr.put(Pair.of(soi1, soi2), c12);
