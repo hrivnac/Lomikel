@@ -602,7 +602,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
           
-        
+    log.info(weights);    
       
     
     
