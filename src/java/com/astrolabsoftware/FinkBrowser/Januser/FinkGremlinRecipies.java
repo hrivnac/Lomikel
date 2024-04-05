@@ -560,7 +560,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
-    Map<Pair<String, String>, Integer> weights = new HashMap<>(); // cls2, cls1 -> weight
+    Map<Pair<String, String>, Double> weights = new HashMap<>(); // cls2, cls1 -> weight
     Vertex soi1;
     Vertex soi2;
     Vertex source;
