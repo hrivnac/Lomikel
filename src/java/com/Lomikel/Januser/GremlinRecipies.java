@@ -312,7 +312,7 @@ public class GremlinRecipies {
   public List<Edge> getEdge(Vertex v1,
                             Vertex v2,
                             String relation) {
-  return g().V(v2).outE(relation).filter(inV().is(v1)).toList().addAll(g().V(v2).outE(relation).filter(inV().is(v1)).toList());
+  return g().V(v2).outE(relation).filter(inVertex().is(v1)).toList().addAll(g().V(v2).outE(relation).filter(inVertex().is(v1)).toList());
   }
     
   /** Give {@link GraphTraversalSource}.
