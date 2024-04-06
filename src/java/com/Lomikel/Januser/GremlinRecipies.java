@@ -238,7 +238,7 @@ public class GremlinRecipies {
       }
     if (!create && reset) {
       List<Edge> edges = getEdge(v1, v2, relation);
-      if (edges.size() > 0) {
+      if (edges.size() != 1) {
         log.error("" + edges.size() + " edges exists, none modified");
         }
       else {
