@@ -10,7 +10,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inVertex;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.Property;
@@ -313,7 +313,7 @@ public class GremlinRecipies {
   public List<Edge> getEdge(Vertex v1,
                             Vertex v2,
                             String relation) {
-  return g().V(v2).outE(relation).filter(inVertex().is(v1)).toList().addAll(g().V(v2).outE(relation).filter(inVertex().is(v1)).toList());
+  return g().V(v2).outE(relation).filter(inV().is(v1)).toList().addAll(g().V(v2).outE(relation).filter(inV().is(v1)).toList());
   }
     
   /** Give {@link GraphTraversalSource}.
