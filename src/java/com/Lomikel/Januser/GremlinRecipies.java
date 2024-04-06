@@ -219,19 +219,32 @@ public class GremlinRecipies {
     * @param v2       The second {@link Vertex}.
     * @param relation The {@link Edge} name.
     * @param names    The names of the properties to be added.
-    * @param values   The values of the properties to be added. **/
-  // BUG: properties are not added to alfready existing Edge
-  // TBD: check names.length == values.length
-  public void addEdge(Vertex v1,
-                      Vertex v2,
-                      String relation,
+    * @param values   The values of the properties to be added. 
+    * @param reset    Whether reset properties of already existing {@link Edge}. */
+  public void addEdge(Vertex  v1,
+                      Vertex  v2,
+                      String  relation,
                       String[] names,
-                      Double[] values) {
-    if (!checkEdge(v1, v2, relation)) {
+                      Double[] values,
+                      boolean  reset) {
+    boolean create = !checkEdge(v1, v2, relation);
+    if (create) {
       Edge e = v1.addEdge(relation, v2);
       e.property("lbl", relation);
       for (int i = 0; i < names.length; i++) {
         e.property(names[i], values[i]);
+        }
+      }
+    if (!create && reset) {
+      List<Edge> edges = getEdge(v1, v2, relation);
+      if (edges.size() > 0) {
+        log.error("" + edge.size() + " edges exists, none modified");
+        }
+      else {
+        Edge e = edges.get(0);
+        for (int i = 0; i < names.length; i++) {
+          e.property(names[i], values[i]);
+          }
         }
       }
     }
@@ -242,19 +255,32 @@ public class GremlinRecipies {
     * @param v2       The second {@link Vertex}.
     * @param relation The {@link Edge} name.
     * @param names    The names of the properties to be added.
-    * @param values   The values of the properties to be added. **/
-  // BUG: properties are not added to alfready existing Edge
-  // TBD: check names.length == values.length
-  public void addEdge(Vertex v1,
-                      Vertex v2,
-                      String relation,
+    * @param values   The values of the properties to be added. 
+    * @param reset    Whether reset properties of already existing {@link Edge}. */
+  public void addEdge(Vertex   v1,
+                      Vertex   v2,
+                      String   relation,
                       String[] names,
-                      String[] values) {
-    if (!checkEdge(v1, v2, relation)) {
+                      String[] values,
+                      boolean  reset) {
+    boolean create = !checkEdge(v1, v2, relation);
+    if (create) {
       Edge e = v1.addEdge(relation, v2);
       e.property("lbl", relation);
       for (int i = 0; i < names.length; i++) {
         e.property(names[i], values[i]);
+        }
+      }
+    if (!create && reset) {
+      List<Edge> edges = getEdge(v1, v2, relation);
+      if (edges.size() > 0) {
+        log.error("" + edge.size() + " edges exists, none modified");
+        }
+      else {
+        Edge e = edges.get(0);
+        for (int i = 0; i < names.length; i++) {
+          e.property(names[i], values[i]);
+          }
         }
       }
     }
@@ -277,6 +303,17 @@ public class GremlinRecipies {
       }
     return _found;
     }
+    
+  /** Give all {@link Edge} between {@link Vertex}es..
+    * @param v1       The source {@link Vertex}.
+    * @param v2       The destination {@link Vertex}.
+    * @param relation The {@link Edge} name.
+    * @return         The {@link List} of found {@link Edge}es. */
+  public List<Edge> getEdge(Vertex v1,
+                            Vertex v2,
+                            String relation) {
+  return g.V(v2).outE(relation).filter(inV().is(v1)).toList().addAll(g.V(v2).outE(relation).filter(inV().is(v1)).toList());
+  }
     
   /** Give {@link GraphTraversalSource}.
     * @return {@link GraphTraversalSource}. */
