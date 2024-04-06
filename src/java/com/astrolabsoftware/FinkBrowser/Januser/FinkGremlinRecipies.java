@@ -290,7 +290,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             g().V(s).next(),
             "deepcontains",
             new String[]{"weight",    "instances"                                                     },
-            new String[]{"" + weight, instances.toString().replaceFirst("\\[", "").replaceAll("]", "")});
+            new String[]{"" + weight, instances.toString().replaceFirst("\\[", "").replaceAll("]", "")},
+            true);
     if (enhance) {
       try {
         fhclient(hbaseUrl);
@@ -498,7 +499,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                  "sizeOut"},
                     new Double[]{corr.get(Pair.of(soi1, soi2)),
                                  sizeInOut.get(soi1),
-                                 sizeInOut.get(soi2)});
+                                 sizeInOut.get(soi2)},
+                    true);
             }
           }
         }
@@ -555,7 +557,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                 g().V(alert).next(),
                 "contains",
                 new String[]{},
-                new String[]{});
+                new String[]{},
+                true);
         }
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
@@ -682,7 +685,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                "sizeOut"},
                   new Double[]{corr.get(Pair.of(t1, t2)),
                                sizeInOut.get(t1),
-                               sizeInOut.get(t2)});
+                               sizeInOut.get(t2)},
+                  true);
           }  
         }
       }
@@ -776,7 +780,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                "sizeOut"            },
                   new Double[]{(double)weights.get(Pair.of(a, s)),
                                (double)sizesA.get(a),
-                               (double)sizesS.get(s)});
+                               (double)sizesS.get(s)},
+                  true);
           }
         }
       }
