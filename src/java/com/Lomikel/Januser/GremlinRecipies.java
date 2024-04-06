@@ -238,7 +238,7 @@ public class GremlinRecipies {
     if (!create && reset) {
       List<Edge> edges = getEdge(v1, v2, relation);
       if (edges.size() > 0) {
-        log.error("" + edge.size() + " edges exists, none modified");
+        log.error("" + edges.size() + " edges exists, none modified");
         }
       else {
         Edge e = edges.get(0);
@@ -274,7 +274,7 @@ public class GremlinRecipies {
     if (!create && reset) {
       List<Edge> edges = getEdge(v1, v2, relation);
       if (edges.size() > 0) {
-        log.error("" + edge.size() + " edges exists, none modified");
+        log.error("" + edges.size() + " edges exists, none modified");
         }
       else {
         Edge e = edges.get(0);
@@ -312,7 +312,7 @@ public class GremlinRecipies {
   public List<Edge> getEdge(Vertex v1,
                             Vertex v2,
                             String relation) {
-  return g.V(v2).outE(relation).filter(inV().is(v1)).toList().addAll(g.V(v2).outE(relation).filter(inV().is(v1)).toList());
+  return g().V(v2).outE(relation).filter(inV().is(v1)).toList().addAll(g().V(v2).outE(relation).filter(inV().is(v1)).toList());
   }
     
   /** Give {@link GraphTraversalSource}.
