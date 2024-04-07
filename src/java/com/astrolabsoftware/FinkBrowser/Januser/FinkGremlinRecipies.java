@@ -91,7 +91,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Execute full chain of new sources correlations analyses.
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
-    * @param hbaseLimit The maximal number of alerts getting from HBase.
+    * @param nLimit The maximal number of alerts getting from HBase or Fink Portal.
     * @param timeLimit  How far into the past the search should search (in minutes).
     * @param anomalies  Analyse <em>anomalies</em> taken from {@link FPC},
     *                   otherwise analyse <em>sources</em> from HBase database.
@@ -100,12 +100,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anhything fails. */
   public void processSourcesOfInterest(String  hbaseUrl,
-                                       int     hbaseLimit,
+                                       int     nLimit,
                                        int     timeLimit,
                                        boolean anomalies,
                                        boolean enhance,
                                        String  columns) throws LomikelException {
-    fillSourcesOfInterest(hbaseUrl, hbaseLimit, timeLimit, anomalies, enhance, columns);
+    fillSourcesOfInterest(hbaseUrl, nLimit, timeLimit, anomalies, enhance, columns);
     g().E().has("lbl", "overlaps").drop().iterate();
     g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
