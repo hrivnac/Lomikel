@@ -580,7 +580,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     double weight1;
     double weight2;
     double cor;
-    Vertex soi;
+    Vertex soi1;
+    Vertex aoi2;
     String cls;
     Pair<String, String> rel;
     // loop over sources and accumulated weights to each source
@@ -593,8 +594,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       while (deepcontainsIt.hasNext()) {
         deepcontains = deepcontainsIt.next();
         weight = (Double)(deepcontains.property("weight").value());
-        soi = deepcontains.outVertex();
-        cls = soi.property("cls").value().toString();
+        soi1 = deepcontains.outVertex();
+        cls = soi1.property("cls").value().toString();
         types.add(cls);
         weights.put(cls, weight);
         }
@@ -602,15 +603,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       for (String cls1 : types) {
         weight1 = weights.get(cls1);
         for (String cls2 : types) {
-          if (types2 < types1) {
-            weight2 = weights.get(cls2);
-            rel = Pair.of(cls1, cls2);
-            if (!corr.containsKey(rel)) {
-              corr.put(rel, 1.0);
-              }
-            cor = weights.get(rel);
-            corr.put(rel, cor + 1.0);
+          weight2 = weights.get(cls2);
+          rel = Pair.of(cls1, cls2);
+          if (!corr.containsKey(rel)) {
+            corr.put(rel, 1.0);
             }
+          cor = weights.get(rel);
+          corr.put(rel, cor + 1.0);
           }
         }
       }
@@ -619,32 +618,32 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex aoi2;
     int n = 0;
     // loop over SoI and create AoI
-    for (String soi : types) {
+    for (String cls : types) {
       g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                            has("cls", soi).
+                            has("cls", cls).
                             fold().
                             coalesce(unfold(), 
                                      addV("AlertsOfInterest").
                                      property("lbl",        "AlertsOfInterest").
-                                     property("cls",        soi               ).
+                                     property("cls",        cls               ).
                                      property("technology", "HBase"           ).
                                      property("url",        hbaseUrl          )).
                             iterate();      }
     // double-loop over SoI and create overlaps Edge if non empty 
-    for (String t1 : types) {
-      soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", t1).next();
-      for (String t2 : types) {
+    for (String cls1 : types) {
+      soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls1).next();
+      for (String cls2 : types) {
         if (corr.containsKey(Pair.of(t1, t2))) {
           n++;
-          soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", t2).next();
+          soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
           hbaseUrl = soi2.property("url").value().toString();
           aoi2 = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                         has("cls", t2).
+                         has("cls", cls2).
                          fold().
                          coalesce(unfold(), 
                                   addV("AlertsOfInterest").
                                   property("lbl",        "AlertsOfInterest").
-                                  property("cls",        t2               ).
+                                  property("cls",        cls22               ).
                                   property("technology", "HBase"           ).
                                   property("url",        hbaseUrl          )).
                          next();
@@ -654,9 +653,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                   new String[]{"intersection",                
                                "sizeIn",            
                                "sizeOut"},
-                  new Double[]{corr.get(Pair.of(t1, t2)),
-                               corr.get(Pair.of(t1, t1)),
-                               corr.get(Pair.of(t2, t2))},
+                  new Double[]{corr.get(Pair.of(cls1, cls2)),
+                               corr.get(Pair.of(cls1, cls1)),
+                               corr.get(Pair.of(cls2, cls2))},
                   true);
           }  
         }
