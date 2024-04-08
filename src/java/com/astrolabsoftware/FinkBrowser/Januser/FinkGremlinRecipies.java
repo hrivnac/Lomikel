@@ -567,70 +567,52 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
   public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
-    // Accumulating weights
-    Map<String, Double>               weights0 = new HashMap<>(); // cls -> weight (for one source)
-    Map<Pair<String, String>, Double> weights  = new HashMap<>(); // [cls1, cls2] -> weight (for all sources)
+    // Accumulate correlations and sizes
+    Map<String, Double>               weights = new HashMap<>(); // cls -> weight (for one source)
+    Map<Pair<String, String>, Double> corr    = new HashMap<>(); // [cls1, cls2] -> weight (for all sources)
+    SortedSet<String>                 types   = new TreeSet<>(); // [cls]
     GraphTraversal<Vertex, Vertex> sourceT = g().V().has("lbl", "source");
     Vertex source;
     Iterator<Edge> deepcontainsIt;
     Edge deepcontains;
     double weight;
+    doublr weight1;
+    double weight2;
+    double cor;
     Vertex soi;
     String cls;
     Pair<String, String> rel;
-    // loop over sources
+    // loop over sources and accumulated weights to each source
     while (sourceT.hasNext()) {
       source = sourceT.next();
       deepcontainsIt = source.edges(Direction.IN);
-      weights0.clear(); 
+      types.clear();
+      weights.clear(); 
       // get all weights to this source
       while (deepcontainsIt.hasNext()) {
         deepcontains = deepcontainsIt.next();
         weight = (Double)(deepcontains.property("weight").value());
         soi = deepcontains.outVertex();
-        cls = soi.property("cls").value();
-        weights0.put(cls, weight);
+        cls = soi.property("cls").value().toString();
+        types.add(cls);
+        weights.put(cls, weight);
         }
       // double loop over accumulated weights and fill weights between SoIs
-      for (Map.Entry<String, Double> entry1 : weights0.entrySet()) {
-        for (Map.Entry<String, Double> entry2 : weights0.entrySet()) {
-          rel = Pair.of(entry1.getKey(), entry2.getKey());
-          if (!weights.containsKey(rel)) {
-            weights.put(rel, 1.0);
+      for (String cls1 : types) {
+        weight1 = entry1.getValue();
+        for (String cls2 : types) {
+          if (types2 < types1) {
+            weight2 = entry2.getValue();
+            rel = Pair.of(cls1, cls2);
+            if (!corr.containsKey(rel)) {
+              corr.put(rel, 1.0);
+              }
+            cor = weights.get(rel);
+            corr.put(rel, cor + 1.0);
             }
-          weight = weights.get(rel);
-          weights.put(rel, weight + 1.0);
           }
         }
       }
-    // Calculation correlations and sizes
-    Map<Pair<String, String>, Double> corr      = new HashMap<>(); // cls, cls -> correlation
-    Map<String, Double>               sizeInOut = new HashMap<>(); // cls -> size
-    double c12;
-    // double-loop over SoI 
-    for (String t1 : types) {
-      for (String t2 : types) {
-        c12 = 0;
-        // loop over all sources and add them into weights if contained in both SoI
-        if (weights.containsKey(Pair.of(t1, t2))) {
-          c12 = weights.get(Pair.of(t1, t2));
-          }
-        if (c12 > 0) {
-          corr.put(Pair.of(t1, t2), c12);
-          }
-        }
-      }
-    // loop over start SoI 
-    for (String t1 : types) {
-      c12 = 0;
-      // loop over and sources and add them into size in SoI
-      for (String t2 : types) {
-        if (weights.containsKey(Pair.of(t1, t2))) {
-          c12++;
-          }
-        }
-      sizeInOut.put(t1, c12);
-      }   
     // Creating overlaps
     String hbaseUrl = "";
     Vertex aoi2;
@@ -672,8 +654,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                "sizeIn",            
                                "sizeOut"},
                   new Double[]{corr.get(Pair.of(t1, t2)),
-                               sizeInOut.get(t1),
-                               sizeInOut.get(t2)},
+                               corr.get(Pair.of(t1, t1)),
+                               corr.get(Pair.of(t2, t2))},
                   true);
           }  
         }
