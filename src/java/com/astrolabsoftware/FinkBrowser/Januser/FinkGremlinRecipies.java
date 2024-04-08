@@ -570,7 +570,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     log.info("Generating correlations for Alerts of Interest");
     // Accumulate correlations and sizes
     Map<String, Double>               weights = new HashMap<>(); // cls -> weight (for one source)
-    Map<Pair<String, String>, Double> corr    = new HashMap<>(); // [cls1, cls2] -> weight (for all sources)
+    Map<Pair<String, String>, Double> corrSS  = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between SoI-SoI)
+    Map<Pair<String, String>, Double> corrSA  = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between SoI-AoI)
     SortedSet<String>                 types0  = new TreeSet<>(); // [cls] (for one source)
     SortedSet<String>                 types   = new TreeSet<>(); // [cls] (for all sources)
     GraphTraversal<Vertex, Vertex> sourceT = g().V().has("lbl", "source");
@@ -608,11 +609,18 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         for (String cls2 : types0) {
           weight2 = weights.get(cls2);
           rel = Pair.of(cls1, cls2);
-          if (!corr.containsKey(rel)) {
-            corr.put(rel, 1.0);
+          // SoI-SoI
+          if (!corrSS.containsKey(rel)) {
+            corrSS.put(rel, 1.0);
             }
-          cor = corr.get(rel);
-          corr.put(rel, cor + 1.0);
+          cor = corrSS.get(rel);
+          corrSS.put(rel, cor + 1.0);
+          // SoI-AoI
+          if (!corrSA.containsKey(rel)) {
+            corrSA.put(rel, weight2);
+            }
+          cor = corrSA.get(rel);
+          corr.put(rel, cor + weight2);
           }
         }
       }
@@ -630,12 +638,34 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                      property("cls",        cls1              ).
                                      property("technology", "HBase"           ).
                                      property("url",        hbaseUrl          )).
-                            iterate();      }
-    // double-loop over SoI and create overlaps Edge if non empty 
+                            iterate();
+      }
+    // double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
     for (String cls1 : types) {
       soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls1).next();
       for (String cls2 : types) {
-        if (corr.containsKey(Pair.of(cls1, cls2))) {
+        if (corrSS.containsKey(Pair.of(cls1, cls2))) {
+          n++;
+          soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
+          hbaseUrl = soi2.property("url").value().toString();
+          addEdge(g().V(soi1).next(),
+                  g().V(soi2).next(),
+                  "overlaps",
+                  new String[]{"intersection",                
+                               "sizeIn",            
+                               "sizeOut"},
+                  new Double[]{corrSS.get(Pair.of(cls1, cls2)),
+                               corrSS.get(Pair.of(cls1, cls1)),
+                               corrSS.get(Pair.of(cls2, cls2))},
+                  true);
+          }  
+        }
+      }
+    // double-loop over SoI and create overlaps Edge SoI-AoI if non empty 
+    for (String cls1 : types) {
+      soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls1).next();
+      for (String cls2 : types) {
+        if (corrSA.containsKey(Pair.of(cls1, cls2))) {
           n++;
           soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
           hbaseUrl = soi2.property("url").value().toString();
@@ -655,9 +685,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                   new String[]{"intersection",                
                                "sizeIn",            
                                "sizeOut"},
-                  new Double[]{corr.get(Pair.of(cls1, cls2)),
-                               corr.get(Pair.of(cls1, cls1)),
-                               corr.get(Pair.of(cls2, cls2))},
+                  new Double[]{corrSA.get(Pair.of(cls1, cls2)),
+                               corrSA.get(Pair.of(cls1, cls1)),
+                               corrSA.get(Pair.of(cls2, cls2))},
                   true);
           }  
         }
