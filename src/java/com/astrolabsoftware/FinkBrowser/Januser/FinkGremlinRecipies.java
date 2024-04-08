@@ -107,9 +107,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                        boolean enhance,
                                        String  columns) throws LomikelException {
     fillSourcesOfInterest(hbaseUrl, nLimit, timeLimit, anomalies, enhance, columns);
-    g().E().has("lbl", "overlaps").drop().iterate();
-    g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
-    g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
     generateCorrelations();
     }
         
@@ -697,7 +694,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
-    log.info("" + nss + ", " nsa + " source-source and source-alert correlations generated");
+    log.info("" + nss + ", " + nsa + " source-source and source-alert correlations generated");
     }
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
