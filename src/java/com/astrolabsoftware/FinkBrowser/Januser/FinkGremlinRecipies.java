@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Set;
 import java.util.HashSet;
@@ -576,7 +577,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Iterator<Edge> deepcontainsIt;
     Edge deepcontains;
     double weight;
-    doublr weight1;
+    double weight1;
     double weight2;
     double cor;
     Vertex soi;
@@ -599,10 +600,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       // double loop over accumulated weights and fill weights between SoIs
       for (String cls1 : types) {
-        weight1 = entry1.getValue();
+        weight1 = weights.get(cls1);
         for (String cls2 : types) {
           if (types2 < types1) {
-            weight2 = entry2.getValue();
+            weight2 = weights.get(cls2);
             rel = Pair.of(cls1, cls2);
             if (!corr.containsKey(rel)) {
               corr.put(rel, 1.0);
