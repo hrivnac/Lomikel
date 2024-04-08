@@ -609,7 +609,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           if (!corr.containsKey(rel)) {
             corr.put(rel, 1.0);
             }
-          cor = weights.get(rel);
+          cor = corr.get(rel);
           corr.put(rel, cor + 1.0);
           }
         }
