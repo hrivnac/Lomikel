@@ -568,50 +568,35 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
     // Accumulating weights
-    GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
-    Map<Pair<String, String>, Double> weights = new HashMap<>(); // cls2, cls1 -> weight
-    Set<String>                       types   = new HashSet<>(); // [cls]
-    Vertex soi1;
-    Vertex soi2;
+    Map<String, Double>               weights0 = new HasMap<>(); // cls -> weight (for one source)
+    Map<Pair<String, String>, Double> weights = new HashMap<>(); // [cls1, cls2] -> weight (for all sources)
+    GraphTraversal<Vertex, Vertex> sourceT = g().V().has("lbl", "source");
     Vertex source;
-    Iterator<Edge> deepcontains1It;
-    Iterator<Edge> deepcontains2It;
-    Edge deepcontains1;
-    Edge deepcontains2;
-    double weight1;
-    double weight2;
+    Iterator<Edge> deepcontainsIt;
     double weight;
-    String cls1;
-    String cls2;
-    Pair rel;
-    // loop over SoI
-    while (soiT.hasNext()) {
-      soi1 = soiT.next();
-      cls1 = soi1.property("cls").value().toString();
-      types.add(cls1);
-      deepcontains1It = soi1.edges(Direction.OUT);
-      // loop over contained sources
-      while (deepcontains1It.hasNext()) { 
-        deepcontains1 = deepcontains1It.next();
-        source = deepcontains1.inVertex();
-        if (source.label().equals("source")) {
-          weight1 = (Double)(deepcontains1.property("weight").value());
-          deepcontains2It = source.edges(Direction.IN);
-          // loop over congtaining SoI
-          while (deepcontains2It.hasNext()) { 
-            deepcontains2 = deepcontains2It.next();
-            soi2 = deepcontains2.outVertex();
-            if (soi2.label().equals("SourcesOfInterest")) {
-              weight2 = (Double)(deepcontains2.property("weight").value());
-              cls2 = soi2.property("cls").value().toString();
-              rel = Pair.of(cls1, cls2);
-              if (!weights.containsKey(rel)) {
-                weights.put(rel, 1.0);
-                }
-              weight = weights.get(rel);
-              weights.put(rel, weight + 1.0);
-              }
+    Vertex soi;
+    Pair<String, String> rel;
+    // loop over sources
+    while (sourceT.hasNext()) {
+      source = sourceT.next();
+      deepcontainsIt = s.edges(Direction.IN);
+      weights0.clear(); 
+      // get all weights to this source
+      while (deepcontainsIt.hasNext()) {
+        deepcontains = deepcontainsIt.next();
+        weight = (Double)(deepcontains.property("weight").value());
+        soi = deepcontains.outVertex();
+        weights0.put(soi, weight);
+        }
+      // double loop over accumulated weights and fill weights between SoIs
+      for (Map.Entry<String, Double> entry1 : weights0.entrySet()) {
+        for (Map.Entry<String, Double> entry2 : weights0.entrySet()) {
+          rel = Pair.of(entry1.getKey(), entry2.getKey());
+          if (!weights.containsKey(rel)) {
+            weights.put(rel, 1.0);
             }
+          weight = weights.get(rel);
+          weights.put(rel, weight + 1.0);
           }
         }
       }
