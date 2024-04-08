@@ -576,6 +576,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Edge deepcontains;
     double weight;
     Vertex soi;
+    String cls;
     Pair<String, String> rel;
     // loop over sources
     while (sourceT.hasNext()) {
@@ -587,7 +588,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         deepcontains = deepcontainsIt.next();
         weight = (Double)(deepcontains.property("weight").value());
         soi = deepcontains.outVertex();
-        weights0.put(soi, weight);
+        cls = soi.property("cls").value();
+        weights0.put(cls, weight);
         }
       // double loop over accumulated weights and fill weights between SoIs
       for (Map.Entry<String, Double> entry1 : weights0.entrySet()) {
