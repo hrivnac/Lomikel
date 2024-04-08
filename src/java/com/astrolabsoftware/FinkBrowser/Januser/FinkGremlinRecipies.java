@@ -581,6 +581,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     double weight2;
     double cor;
     Vertex soi1;
+    Vertex soi2;
     Vertex aoi2;
     String cls;
     Pair<String, String> rel;
@@ -617,14 +618,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String hbaseUrl = "";
     int n = 0;
     // loop over SoI and create AoI
-    for (String cls : types) {
+    for (String cls1 : types) {
       g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                            has("cls", cls).
+                            has("cls", cls1).
                             fold().
                             coalesce(unfold(), 
                                      addV("AlertsOfInterest").
                                      property("lbl",        "AlertsOfInterest").
-                                     property("cls",        cls               ).
+                                     property("cls",        cls1              ).
                                      property("technology", "HBase"           ).
                                      property("url",        hbaseUrl          )).
                             iterate();      }
