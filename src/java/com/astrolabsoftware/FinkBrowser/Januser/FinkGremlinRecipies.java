@@ -568,18 +568,19 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
     // Accumulating weights
-    Map<String, Double>               weights0 = new HasMap<>(); // cls -> weight (for one source)
-    Map<Pair<String, String>, Double> weights = new HashMap<>(); // [cls1, cls2] -> weight (for all sources)
+    Map<String, Double>               weights0 = new HashMap<>(); // cls -> weight (for one source)
+    Map<Pair<String, String>, Double> weights  = new HashMap<>(); // [cls1, cls2] -> weight (for all sources)
     GraphTraversal<Vertex, Vertex> sourceT = g().V().has("lbl", "source");
     Vertex source;
     Iterator<Edge> deepcontainsIt;
+    Edge deepcontains;
     double weight;
     Vertex soi;
     Pair<String, String> rel;
     // loop over sources
     while (sourceT.hasNext()) {
       source = sourceT.next();
-      deepcontainsIt = s.edges(Direction.IN);
+      deepcontainsIt = source.edges(Direction.IN);
       weights0.clear(); 
       // get all weights to this source
       while (deepcontainsIt.hasNext()) {
