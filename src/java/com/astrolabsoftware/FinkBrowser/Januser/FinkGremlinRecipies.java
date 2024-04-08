@@ -571,7 +571,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Accumulate correlations and sizes
     Map<String, Double>               weights = new HashMap<>(); // cls -> weight (for one source)
     Map<Pair<String, String>, Double> corr    = new HashMap<>(); // [cls1, cls2] -> weight (for all sources)
-    SortedSet<String>                 types   = new TreeSet<>(); // [cls]
+    SortedSet<String>                 types0  = new TreeSet<>(); // [cls] (for one source)
+    SortedSet<String>                 types   = new TreeSet<>(); // [cls] (for all sources)
     GraphTraversal<Vertex, Vertex> sourceT = g().V().has("lbl", "source");
     Vertex source;
     Iterator<Edge> deepcontainsIt;
@@ -589,7 +590,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     while (sourceT.hasNext()) {
       source = sourceT.next();
       deepcontainsIt = source.edges(Direction.IN);
-      types.clear();
+      types0.clear();
       weights.clear(); 
       // get all weights to this source
       while (deepcontainsIt.hasNext()) {
@@ -597,13 +598,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         weight = (Double)(deepcontains.property("weight").value());
         soi1 = deepcontains.outVertex();
         cls = soi1.property("cls").value().toString();
+        types0.add(cls);
         types.add(cls);
         weights.put(cls, weight);
         }
       // double loop over accumulated weights and fill weights between SoIs
-      for (String cls1 : types) {
+      for (String cls1 : types0) {
         weight1 = weights.get(cls1);
-        for (String cls2 : types) {
+        for (String cls2 : types0) {
           weight2 = weights.get(cls2);
           rel = Pair.of(cls1, cls2);
           if (!corr.containsKey(rel)) {
