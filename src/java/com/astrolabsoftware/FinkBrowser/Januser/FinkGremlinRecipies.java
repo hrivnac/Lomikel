@@ -615,7 +615,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     // Creating overlaps
     String hbaseUrl = "";
-    Vertex aoi2;
     int n = 0;
     // loop over SoI and create AoI
     for (String cls : types) {
@@ -633,7 +632,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     for (String cls1 : types) {
       soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls1).next();
       for (String cls2 : types) {
-        if (corr.containsKey(Pair.of(t1, t2))) {
+        if (corr.containsKey(Pair.of(cls1, cls2))) {
           n++;
           soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
           hbaseUrl = soi2.property("url").value().toString();
@@ -643,7 +642,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                          coalesce(unfold(), 
                                   addV("AlertsOfInterest").
                                   property("lbl",        "AlertsOfInterest").
-                                  property("cls",        cls22               ).
+                                  property("cls",        cls2              ).
                                   property("technology", "HBase"           ).
                                   property("url",        hbaseUrl          )).
                          next();
