@@ -110,8 +110,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().E().has("lbl", "overlaps").drop().iterate();
     g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
-    generateSourcesOfInterestCorrelations();
-    generateAlertsOfInterestCorrelations();
+    generateCorrelations();
     }
         
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts.
@@ -566,8 +565,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
-  public void generateAlertsOfInterestCorrelations() {
+  public void generateCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
+    // Clean all correlations
+    g().E().has("lbl", "overlaps").drop().iterate();
+    g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
+    g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
     // Accumulate correlations and sizes
     Map<String, Double>               weights = new HashMap<>(); // cls -> weight (for one source)
     Map<Pair<String, String>, Double> corrSS  = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between SoI-SoI)
@@ -626,7 +629,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     // Creating overlaps
     String hbaseUrl = "";
-    int n = 0;
+    int nss = 0;
+    int nsa = 0;
     // loop over SoI and create AoI
     for (String cls1 : types) {
       g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
@@ -645,7 +649,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls1).next();
       for (String cls2 : types) {
         if (corrSS.containsKey(Pair.of(cls1, cls2))) {
-          n++;
+          nss++;
           soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
           hbaseUrl = soi2.property("url").value().toString();
           addEdge(g().V(soi1).next(),
@@ -666,7 +670,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls1).next();
       for (String cls2 : types) {
         if (corrSA.containsKey(Pair.of(cls1, cls2))) {
-          n++;
+          nsa++;
           soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
           hbaseUrl = soi2.property("url").value().toString();
           aoi2 = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
@@ -693,11 +697,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
-    log.info("" + n + " correlations generated");
+    log.info("" + nss + ", " nsa + " source-source and source-alert correlations generated");
     }
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
-  public void generateAlertsOfInterestCorrelationsOld() {
+  public void generateAlertsOfInterestCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
     Map<Pair<String, String>, Integer> weights = new HashMap<>(); // cls, objectId -> weight
