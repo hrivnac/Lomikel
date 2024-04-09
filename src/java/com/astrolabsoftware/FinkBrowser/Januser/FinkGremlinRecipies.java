@@ -139,6 +139,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     Set<String> oids = new HashSet<>();;
     if (clss == null) {
+      log.info("*** " + hbaseUrl + ":");
       SmallHttpClient httpClient = new SmallHttpClient();
       fhclient(hbaseUrl);
       fhclient().setLimit(nLimit);
@@ -154,6 +155,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       JSONArray ja;
       JSONObject jo;
       for (String cls : clss) {
+        log.info("*** " + cls + ":");
         cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, -nLimit);
         d = cal.getTime();
