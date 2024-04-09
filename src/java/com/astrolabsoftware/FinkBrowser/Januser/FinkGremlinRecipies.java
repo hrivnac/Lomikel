@@ -94,19 +94,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param nLimit The maximal number of alerts getting from HBase or Fink Portal.
     * @param timeLimit  How far into the past the search should search (in minutes).
-    * @param anomalies  Analyse <em>anomalies</em> taken from {@link FPC},
-    *                   otherwise analyse <em>sources</em> from HBase database.
+    * @param clss       An array of <em>classes</em> taken from {@link FPC},
+    *                   if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
+    *                   if <tt>null</tt>, analyse <em>sources</em> from HBase database.
     * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
     *                   possibly filled with requested HBase columns.
     * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anhything fails. */
-  public void processSourcesOfInterest(String  hbaseUrl,
-                                       int     nLimit,
-                                       int     timeLimit,
-                                       boolean anomalies,
-                                       boolean enhance,
-                                       String  columns) throws LomikelException {
-    fillSourcesOfInterest(hbaseUrl, nLimit, timeLimit, anomalies, enhance, columns);
+  public void processSourcesOfInterest(String   hbaseUrl,
+                                       int      nLimit,
+                                       int      timeLimit,
+                                       String[] clss,
+                                       boolean  enhance,
+                                       String   columns) throws LomikelException {
+    fillSourcesOfInterest(hbaseUrl, nLimit, timeLimit, clss, enhance, columns);
     generateCorrelations();
     }
         
@@ -114,45 +115,30 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param nLimit     The maximal number of alerts getting from HBase or Fink Portal.
     * @param timeLimit  How far into the past the search should search (in minutes).
-    * @param anomalies  Analyse <em>anomalies</em> taken from {@link FPC},
-    *                   otherwise analyse <em>sources</em> from HBase database.
+    * @param clss       An array of <em>classes</em> taken from {@link FPC},
+    *                   if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
+    *                   if <tt>null</tt>, analyse <em>sources</em> from HBase database.
     * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
     *                   possibly filled with requested HBase columns.
     * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
-  public void fillSourcesOfInterest(String  hbaseUrl,
-                                    int     nLimit,
-                                    int     timeLimit,
-                                    boolean anomalies,
-                                    boolean enhance,
-                                    String  columns) throws LomikelException {
-    if (anomalies) {
+  public void fillSourcesOfInterest(String   hbaseUrl,
+                                    int      nLimit,
+                                    int      timeLimit,
+                                    String[] clss,
+                                    boolean  enhance,
+                                    String   columns) throws LomikelException {
+    if (clss == null) {
       log.info("Filling SourcesOfInterest from " + hbaseUrl + ", nLimit = " + nLimit + ", timeLimit = " + timeLimit);
       }
     else {
-      log.info("Filling SourcesOfInterest from anomalies , nLimit = " + nLimit + ", timeLimit = " + timeLimit);
+      log.info("Filling SourcesOfInterest of " + Arrays.toString(clss) + " from Fink Portal , nLimit = " + nLimit + ", timeLimit = " + timeLimit);
       }
     if (enhance) {
       log.info("\tenhancing with " + columns);
       }
-    Set<String> oids;
-    if (anomalies) {
-      Calendar cal = Calendar.getInstance();
-      cal.add(Calendar.MINUTE, -nLimit);
-      Date d = cal.getTime();
-      String sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
-      JSONArray ja = FPC.anomaly(new JSONObject().put("n",             nLimit).
-                                                  put("startdate",     sd).
-                                                  put("columns",       "i:objectId").
-                                                  put("output-format", "json"));
-      JSONObject jo;
-      oids = new HashSet<>();
-      for (int i = 0; i < ja.length(); i++) {
-        jo = ja.getJSONObject(i);
-        oids.add(jo.getString("i:objectId"));
-        }
-      }
-    else {
+    Set<String> oids = new HashSet<>();;
+    if (clss == null) {
       SmallHttpClient httpClient = new SmallHttpClient();
       fhclient(hbaseUrl);
       fhclient().setLimit(nLimit);
@@ -160,6 +146,36 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                 null,
                                 timeLimit,
                                 true);
+      }
+    else {
+      Calendar cal;
+      Date d;
+      String sd;
+      JSONArray ja;
+      JSONObject jo;
+      for (String cls : clss) {
+        cal = Calendar.getInstance();
+        cal.add(Calendar.MINUTE, -nLimit);
+        d = cal.getTime();
+        sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
+        if (cls.equals("*")) {
+          ja = FPC.anomaly(new JSONObject().put("n",             nLimit).
+                                            put("startdate",     sd).
+                                            put("columns",       "i:objectId").
+                                            put("output-format", "json"));
+          }
+        else {
+          ja = FPC.latests(new JSONObject().put("n",             nLimit).
+                                            put("class",         cls).
+                                            put("startdate",     sd).
+                                            put("columns",       "i:objectId").
+                                            put("output-format", "json"));
+          }
+        for (int i = 0; i < ja.length(); i++) {
+          jo = ja.getJSONObject(i);
+          oids.add(jo.getString("i:objectId"));
+          }
+        }
       }
     int size = oids.size();
     int n = 0;
