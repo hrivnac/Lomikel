@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 public class FPC {
     
   /** Call <em>Fink Science Portal <b>objects</b></em> Web Service.
-    * <a href="https://fink-portal.org/api/v1/objects">https://fink-portal.org/api/v1/objects</a>.
+    * <a href="https://fink-portal.org/api">https://fink-portal.org/api/v1</a>.
     * @param request  The requested formulated as {@link JSONObject}.
     * @param endpoint The service endpoint.
     * @return         The answer formulated as {@link JSONArray}.

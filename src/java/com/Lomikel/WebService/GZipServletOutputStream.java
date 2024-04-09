@@ -2,6 +2,7 @@ package com.Lomikel.WebService;
 
 // JSP
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 // Java
 import java.util.zip.GZIPOutputStream;
@@ -45,6 +46,15 @@ class GZipServletOutputStream extends ServletOutputStream {
   @Override
   public void write(int b) throws IOException {
     this.gzipOutputStream.write(b);
+    }
+    
+  @Override
+  public void setWriteListener(WriteListener writeListener)  {
+    }
+    
+  @Override
+  public boolean isReady()  {
+    return true;
     }
 
   private GZIPOutputStream gzipOutputStream = null;
