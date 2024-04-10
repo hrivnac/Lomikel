@@ -111,7 +111,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     generateCorrelations();
     }
         
-  /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts.
+  /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts (if requested).
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param nLimit     The maximal number of alerts getting from HBase or Fink Portal.
     * @param timeLimit  How far into the past the search should search (in minutes).
@@ -120,7 +120,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   if <tt>null</tt>, analyse <em>sources</em> from HBase database.
     * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
     *                   possibly filled with requested HBase columns.
-    * @param columns    HBase columns to be copied into graph alerts. May be <tt>null</tt>.
+    * @param columns    The HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
   public void fillSourcesOfInterest(String   hbaseUrl,
                                     int      nLimit,
@@ -184,6 +184,32 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     long dt;
     double freq;
     long startTime = System.currentTimeMillis();
+    // loop over all sources
+    for (String oid : oids) {
+      try {
+        fillSourcesOfInterest(oid, hbaseUrl, enhance, columns);
+        n++;
+        dt = (System.currentTimeMillis() - startTime) / 1000;
+        freq = (double)n / (double)dt;
+        log.info(oid + " (" + n + " of " + size + " with " + String.format("%.2f", freq) + " Hz):");
+        }
+      catch (LomikelException e) {
+        log.error("Cannot get classification for " + oid);
+        }
+      }
+    }
+    
+  /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts (if requested).
+    * @param oid        The <tt>objectId</tt> of source to be added.
+    * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
+    * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
+    *                   possibly filled with requested HBase columns.
+    * @param columns    The HBase columns to be copied into graph alerts. May be <tt>null</tt>. 
+    * @throws LomikelException If anything fails. */
+  public void fillSourcesOfInterest(String oid,
+                                    String   hbaseUrl,
+                                    boolean  enhance,
+                                    String   columns) throws LomikelException {
     JSONArray ja;
     JSONObject jo;
     Map<String, Set<Double>> classes; // cls -> [jd]
@@ -193,44 +219,32 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String key;
     Set<Double> val;
     int weight;
-    // loop over all sources
-    for (String oid : oids) {
-      try {
-        ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
-                                          put("output-format", "json"));
-        classes =  new TreeMap<>();
-        // get all alerts (jd) and their classes
-        for (int i = 0; i < ja.length(); i++) {
-          jo = ja.getJSONObject(i);
-          cl = jo.getString("v:classification");
-          jd = jo.getDouble("i:jd");
-          if (!cl.equals("Unknown")) {
-            if (classes.containsKey(cl)) {
-              jds = classes.get(cl);
-              jds.add(jd);
-              }
-            else {
-              jds = new TreeSet<Double>();
-              jds.add(jd);
-              classes.put(cl, jds);
-              }
-            }
+    ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
+                                      put("output-format", "json"));
+    classes =  new TreeMap<>();
+    // get all alerts (jd) and their classes
+    for (int i = 0; i < ja.length(); i++) {
+      jo = ja.getJSONObject(i);
+      cl = jo.getString("v:classification");
+      jd = jo.getDouble("i:jd");
+      if (!cl.equals("Unknown")) {
+        if (classes.containsKey(cl)) {
+          jds = classes.get(cl);
+          jds.add(jd);
           }
-        n++;
-        dt = (System.currentTimeMillis() - startTime) / 1000;
-        freq = (double)n / (double)dt;
-        log.info(oid + " (" + n + " of " + size + " with " + String.format("%.2f", freq) + " Hz):");
-        for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
-          key = cls.getKey();
-          val = cls.getValue();
-          weight = val.size();
-          log.info("\t" + key + " in " + weight + " alerts");
-          registerSourcesOfInterest(key, oid, weight, val, hbaseUrl, enhance, columns);
+        else {
+          jds = new TreeSet<Double>();
+          jds.add(jd);
+          classes.put(cl, jds);
           }
         }
-      catch (LomikelException e) {
-        log.error("Cannot get classification for " + oid);
-        }
+      }
+    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
+      key = cls.getKey();
+      val = cls.getValue();
+      weight = val.size();
+      log.info("\t" + key + " in " + weight + " alerts");
+      registerSourcesOfInterest(key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     }
     
