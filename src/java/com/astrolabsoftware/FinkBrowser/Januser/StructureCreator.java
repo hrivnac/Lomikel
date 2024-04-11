@@ -104,20 +104,24 @@ public class StructureCreator extends JanusClient {
        
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
+    * @param port     The HBase port.
     * @param table    The HBase table. */
   public StructureCreator(String hostname,
+                          int    port,
                           String table) {
-    super(hostname, table, false);
+    super(hostname, port, table, false);
     }
    
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
+    * @param port     The HBase port.
     * @param table    The HBase table.
     * @param batch    Whether open graph for batch loading. */
   public StructureCreator(String  hostname,
+                          int     port,
                           String  table,
                           boolean batch) {
-    super(hostname, table, batch);
+    super(hostname, port, table, batch);
     }
     
   /** Create with connection properties file.

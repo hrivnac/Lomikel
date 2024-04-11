@@ -29,13 +29,15 @@ public class JanusClient implements ModifyingGremlinClient {
   /** Extract implicite schema.
     * @param args[0] The operation: <tt>extract,populate</tt>.
     * @param args[1] The HBase hostname.
-    * @param args[2] The HBase table.
+    * @param args[2] The HBase port.
+    * @param args[3] The HBase table.
     * @throws Exception If fails. */ 
   public static void main(String[] args) throws Exception {
     Init.init();
     if (args[0].trim().equals("extract")) {
       JanusClient jc = new JanusClient(args[1],
-                                       args[2]);
+                                       Integer.valueOf(args[2]),
+                                       args[3]);
       GremlinRecipies gr = new GremlinRecipies(jc); 
       gr.createMetaSchema();
       }
@@ -50,8 +52,9 @@ public class JanusClient implements ModifyingGremlinClient {
     * @param hostname The HBase hostname.
     * @param table    The HBase table. */
   public JanusClient(String hostname,
+                     int    port,
                      String table) {
-    this(hostname, table, false);
+    this(hostname, port, table, false);
     }
    
   /** Create with connection parameters.
@@ -59,9 +62,11 @@ public class JanusClient implements ModifyingGremlinClient {
     * @param table    The HBase table.
     * @param batch    Whether open graph for batch loading. */
   public JanusClient(String  hostname,
+                     int     port,
                      String  table,
                      boolean batch) {
     _hostname = hostname;
+    _port     = port;
     _table    = table;
     _batch    = batch;
     Init.init();
@@ -84,6 +89,7 @@ public class JanusClient implements ModifyingGremlinClient {
     _graph = JanusGraphFactory.build()
                               .set("storage.backend",       "hbase")
                               .set("storage.hostname",      _hostname)
+                              .set("storage.port",          _port)
                               .set("storage.hbase.table",   _table)
                               .set("storage.batch-loading", _batch)
                               .open();
@@ -174,6 +180,8 @@ public class JanusClient implements ModifyingGremlinClient {
   private String _table;
   
   private String _hostname;
+  
+  private int _port;
   
   private boolean _batch;
     
