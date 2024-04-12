@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Configuration status="INFO"
+               name="interactive">
+  <Appenders>
+    <Console name="stdout"
+             target="SYSTEM_OUT">
+      <ThresholdFilter level="INFO" 
+                       onMatch="ACCEPT"
+                       onMismatch="DENY"/>
+      <PatternLayout pattern="%5r %-5p (%-30c{2}:%4L) : %m%n"/>
+      </Console>
+    <Console name="stderr"
+             target="SYSTEM_ERR">
+      <ThresholdFilter level="WARN"
+                       onMatch="ACCEPT"
+                       onMismatch="DENY"/>
+      <PatternLayout pattern="%5r %-5p (%-30c{2}:%4L) : %m%n"/>
+      </Console>
+    <RollingFile name="file"
+                 fileName="Lomikel.log"
+                 filePattern="Lomikel.log.%i">
+      <ThresholdFilter level="DEBUG"
+                       onMatch="ACCEPT"
+                       onMismatch="DENY"/>
+      <PatternLayout pattern="%5r %-5p %l : %m%n"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="10 MB"/>
+        </Policies>
+      <DefaultRolloverStrategy max="1"/>
+      </RollingFile>
+    </Appenders>
+  <Loggers>
+    <Root level="DEBUG">
+      <AppenderRef ref="stdout"/>
+      <AppenderRef ref="stderr"/>
+      <AppenderRef ref="file"/>
+     </Root>
+    <Logger name="org.apache.hadoop.util.NativeCodeLoader"                                  level="OFF"/>
+    <Logger name="org.apache.zookeeper.ZooKeeper"                                           level="WARN"/>
+    <Logger name="org.apache.zookeeper.ClientCnxn"                                          level="WARN"/>
+    <Logger name="org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient" level="WARN"/>
+    <Logger name="org.apache.hadoop.io.compress.CodecPool"                                  level="WARN"/>
+    </Loggers>
+  </Configuration>
