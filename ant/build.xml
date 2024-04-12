@@ -17,30 +17,13 @@
   <echo>Building for site ${target} on ${site}</echo>
 
   <path id="classpath.build">
-    <pathelement path="${log4j_jar}"/>
-    <pathelement path="${httpclient_jar}"/>
-    <pathelement path="${httpcore_jar}"/>
-    <pathelement path="${logging_jar}"/>
-    <pathelement path="${cli_jar}"/>
-    <pathelement path="${orgjson_jar}"/>
-    <pathelement path="${slf4j_jar}"/>
-    <pathelement path="${groovyconsole_jar}"/>
-    <pathelement path="${hbasecommon_jar}"/>
-    <pathelement path="${hbaseclient_jar}"/>
-    <pathelement path="${hadoopcommon_jar}"/>
-    <pathelement path="${javaxmail_jar}"/>
-    <pathelement path="${healpix_jar}"/>
-    <pathelement path="${bsh_jar}"/>
-    <pathelement path="${parquetavro_jar}"/>    
-    <pathelement path="${parquethadoop_jar}"/>    
-    <pathelement path="${jacksoncore_jar}"/>    
-    <pathelement path="${jacksonmapper_jar}"/>    
-    <pathelement path="${jython_jar}"/>    
-    <pathelement path="${cli_jar}"/>
     <fileset dir="${janusgraph_dir}/lib">
       <include name="*.jar"/>
       </fileset>
     <fileset dir="../extlib">
+      <include name="*.jar"/>
+      </fileset>
+    <fileset dir="../extlib/import">
       <include name="*.jar"/>
       </fileset>
     </path>
@@ -107,11 +90,7 @@
   <property name="classpath_phoenix.run.content" refid="classpath_phoenix.run"/>
 
   <taskdef name="groovy"
-           classname="org.codehaus.groovy.ant.Groovy">    <!--fileset dir="../lib">
-      <include name="*.jar"/>
-      <exclude name="*.exe.jar"/>
-      </fileset-->
-
+           classname="org.codehaus.groovy.ant.Groovy"> 
     <classpath>
       <fileset file="${groovy_jar}"/>
       <fileset file="${groovy_ant_jar}"/>
@@ -165,29 +144,21 @@
     <mkdir dir="../dist"/>
     <mkdir dir="../doc/JavaDoc"/>
     <copy todir="../extlib/import">
-			<fileset file="${log4j_jar}"/>
-			<fileset file="${slf4j_jar}"/>
 			<fileset file="${bsh_jar}"/>
-			<fileset file="${scala_jar}"/>
-			<fileset file="${httpclient_jar}"/>
-			<fileset file="${httpcore_jar}"/>
-			<fileset file="${logging_jar}"/>
 			<fileset file="${cli_jar}"/>
-			<fileset file="${orgjson_jar}"/>
 			<fileset file="${javaxmail_jar}"/>
-			<fileset file="${math3_jar}"/>
 			<fileset file="${healpix_jar}"/>
-			<fileset file="${groovy_jar}"/>
+			<fileset file="${orgjson_jar}"/>
 			<fileset file="${groovysh_jar}"/>
+			<fileset file="${parquethadoop_jar}"/>
+			<fileset file="${jython_jar}"/>
+			<fileset file="${scala_jar}"/>
+			<fileset file="${math3_jar}"/>
+			<fileset file="${groovy_jar}"/>
 			<fileset file="${groovyconsole_jar}"/>
 			<fileset file="${groovy_ant_jar}"/>
 			<fileset file="${groovy_sql_jar}"/>
-			<fileset file="${hbasecommon_jar}"/>
-			<fileset file="${hbaseclient_jar}"/>
-			<fileset file="${hadoopcommon_jar}"/>
 			<fileset file="${parquetavro_jar}"/>
-			<fileset file="${parquethadoop_jar}"/>
-			<fileset file="${jython_jar}"/>
 			<!--fileset file="${phoenix_jar}"/-->
       </copy>
     </target>
@@ -283,15 +254,6 @@
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.groovy"/>
       <fileset dir="../src/bsh"    includes="*.bsh"/>
       <fileset dir="../src/groovy" includes="*.groovy"/>
-      <zipfileset includes="**/*" src="${log4j_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${log4ja_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${log4jaa_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${slf4j_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${logging_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${javaxmail_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${healpix_jar}" excludes="META-INF/*"/>
       <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
         <provider classname="com.Lomikel.GremlinPlugin.LomikelConnector"/>
         </service>
@@ -306,13 +268,30 @@
       </jar>
     <jar jarfile="../lib/Lomikel-full-${version}.jar" index="yes">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${javaxmail_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${healpix_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${orgjson_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${hadoopcommon_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${hbasecommon_jar}" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${hbaseclient_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${groovysh_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${parquethadoop_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${jython_jar}" excludes="META-INF/*"/>
+			<zipfileset includes="**/*" src="${math3_jar}" excludes="META-INF/*"/>
+			<zipfileset includes="**/*" src="${groovy_jar}" excludes="META-INF/*"/>
+			<zipfileset includes="**/*" src="${groovyconsole_jar}" excludes="META-INF/*"/>
+			<zipfileset includes="**/*" src="${groovy_ant_jar}" excludes="META-INF/*"/>
+			<zipfileset includes="**/*" src="${groovy_sql_jar}" excludes="META-INF/*"/>
+			<zipfileset includes="**/*" src="${parquetavro_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/hbase-common-2.5.8-hadoop3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/hbase-client-2.5.8-hadoop3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-1.2-api-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-api-1.7.36.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-logging-1.2.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-common-3.3.5.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar" excludes="META-INF/*"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -324,7 +303,7 @@
   <target name="exe"
           depends="jar"
           description="Create exe JARs">
-    <!jar jarfile="../lib/Lomikel.exe.jar" index="yes">
+    <jar jarfile="../lib/Lomikel.exe.jar" index="yes">
       <zipfileset includes="**/*" src="../lib/Lomikel-full-${version}.jar" excludes="META-INF/*"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
@@ -334,8 +313,10 @@
         </manifest>
       </jar>    
     <!-- create from hbase classpath \-\-glob -->
-    <!jar jarfile="../lib/Lomikel-HBase.exe.jar" index="yes">
-      <zipfileset includes="**/*" src="../lib/Lomikel.exe.jar" excludes="META-INF/*"/>
+    <jar jarfile="../lib/Lomikel-HBase.exe.jar" index="yes">
+      <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/shaded-clients/hbase-shaded-client-2.5.8-hadoop3.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/audience-annotations-0.13.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/commons-logging-1.2.jar" excludes="META-INF/*"/>
@@ -346,362 +327,100 @@
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/opentelemetry-context-1.15.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/opentelemetry-semconv-1.15.0-alpha.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/slf4j-api-1.7.33.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-1.2-api-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-api-1.7.36.jar" excludes="META-INF/*"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="Lomikel"/>
+        <attribute name="AppName"    value="LomikelwHBase"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
-      </jar>    
+      </jar> 
+    <!-- empirically assembled minimum -->
     <jar jarfile="../lib/Lomikel-Janus.exe.jar" index="yes">
-      <zipfileset includes="**/*" src="../lib/Lomikel.exe.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hbase-shaded-client-2.5.3-hadoop3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/audience-annotations-0.13.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/htrace-core4-4.2.0-incubating.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jul-to-slf4j-1.7.32.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-api-1.15.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-context-1.15.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-semconv-1.15.0-alpha.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/slf4j-api-1.7.33.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${bsh_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${cli_jar}" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-1.2-api-2.20.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/slf4j-api-1.7.36.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-logging-1.2.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-common-3.3.5.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.9.3.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-beanutils-1.9.4.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-codec-1.15.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-collections-3.2.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-collections4-4.4.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-configuration-1.10.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-configuration2-2.9.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-io-2.11.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-lang-2.6.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-lang3-3.12.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-logging-1.2.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-text-1.10.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/elasticsearch-rest-client-8.10.4.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/exp4j-0.4.8.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/guava-32.1.3-jre.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-console-3.7.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-core-3.7.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-driver-3.7.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-groovy-3.7.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-language-3.7.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-server-3.7.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-shaded-3.7.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-util-3.7.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-4.0.9.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-4.0.9.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-console-4.0.9.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-groovysh-4.0.9.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-4.0.9.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-4.0.9.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-4.0.9.jar" excludes="META-INF/*"/>
+      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-4.0.9.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-templates-4.0.9.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-xml-4.0.9.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/guava-32.1.3-jre.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hbase-shaded-client-2.5.3-hadoop3.jar" excludes="META-INF/*"/>      
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hppc-0.9.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpasyncclient-4.1.5.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-nio-4.4.16.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/ivy-2.5.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-all-1.0.0.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-berkeleyje-1.0.0.jar" excludes="META-INF/*"/-->
-      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-bigtable-1.0.0.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-core-1.0.0.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-cql-1.0.0.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-driver-1.0.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-es-1.0.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-grpc-1.0.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-hadoop-1.0.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-hbase-1.0.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-inmemory-1.0.0.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-lucene-1.0.0.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-mixed-index-utils-1.0.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-server-1.0.0.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-solr-1.0.0.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javapoet-1.13.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javatuples-1.2.jar" excludes="META-INF/*"/>
+      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/javax.servlet-api-4.0.1.jar" excludes="META-INF/*"/-->
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jbcrypt-0.4.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-log-0.22.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-manifests-2.1.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcl-over-slf4j-1.7.36.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-2.14.6.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jctools-core-4.0.1.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-3.9.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jts-core-1.17.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-1.2-api-2.20.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-slf4j-impl-2.20.0.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-all-4.1.100.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-buffer-4.1.100.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-4.1.100.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-common-4.1.100.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-common-4.1.100.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-handler-4.1.100.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-4.1.100.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-http-4.1.100.Final.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-api-1.15.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-context-1.15.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-semconv-1.15.0-alpha.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/picocli-4.7.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/picocli-4.7.0.jar" excludes="META-INF/*"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/reflections8-0.11.7.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snakeyaml-2.2.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spatial4j-0.8.jar" excludes="META-INF/*"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.7.0.jar" excludes="META-INF/*"/>
-      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/accessors-smart-2.4.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/activation-1.1.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/amqp-client-5.19.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/animal-sniffer-annotations-1.23.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/annotations-4.1.1.4.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/antlr4-runtime-4.9.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/aopalliance-repackaged-2.6.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/asm-9.6.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/asm-analysis-9.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/asm-tree-9.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/asm-util-9.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/avro-1.11.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/avro-ipc-1.11.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/avro-mapred-1.11.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/bigtable-hbase-2.x-shaded-1.24.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/byte-buddy-1.12.19.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/byte-buddy-agent-1.12.19.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/cassandra-driver-core-3.11.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/cassandra-hadoop-util-1.0.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/checker-qual-3.39.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/chill_2.12-0.10.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/chill-java-0.10.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-beanutils-1.9.4.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-cli-1.5.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-compress-1.24.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-crypto-1.1.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-io-2.11.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-math3-3.6.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-net-3.9.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-text-1.10.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/compress-lzf-1.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/config-1.4.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/curator-client-4.2.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/curator-framework-4.2.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/curator-recipes-4.2.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/dnsjava-2.1.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/elasticsearch-rest-client-8.10.4.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/error_prone_annotations-2.23.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/failureaccess-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/grpc-api-1.59.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/grpc-context-1.59.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/grpc-core-1.59.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/grpc-netty-shaded-1.59.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/grpc-protobuf-1.59.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/grpc-protobuf-lite-1.59.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/grpc-stub-1.59.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/grpc-util-1.59.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gson-2.10.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-annotations-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-auth-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-client-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-client-api-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-client-runtime-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-common-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-distcp-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-gremlin-3.7.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-hdfs-client-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-mapreduce-client-common-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-mapreduce-client-core-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-mapreduce-client-jobclient-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-shaded-guava-1.1.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-shaded-protobuf_3_7-1.1.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-yarn-api-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-yarn-client-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-yarn-common-3.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hbase-shaded-mapreduce-2.5.3-hadoop3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/HdrHistogram-2.1.12.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hk2-api-2.6.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hk2-locator-2.6.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hk2-utils-2.6.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/http2-client-9.4.44.v20210927.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/http2-common-9.4.44.v20210927.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/http2-hpack-9.4.44.v20210927.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/http2-http-client-transport-9.4.44.v20210927.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpasyncclient-4.1.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpmime-4.5.13.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/j2objc-annotations-2.8.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-annotations-2.15.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-core-2.15.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-databind-2.15.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-datatype-json-org-2.15.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-jaxrs-base-2.12.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-jaxrs-json-provider-2.12.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-module-jaxb-annotations-2.12.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-module-scala_2.12-2.15.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jakarta.activation-api-1.2.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jakarta.annotation-api-1.3.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jakarta.inject-2.6.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jakarta.servlet-api-4.0.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jakarta.validation-api-2.0.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jakarta.ws.rs-api-2.1.6.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jakarta.xml.bind-api-2.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jamm-0.3.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jansi-1.17.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/java-driver-core-4.17.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/java-driver-query-builder-4.17.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/java-driver-shaded-guava-25.1-jre-graal-sub-1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javaparser-core-3.25.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javassist-3.29.2-GA.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javax.activation-api-1.2.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javax.servlet-api-4.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jaxb-api-2.3.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcip-annotations-1.0-1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jctools-core-4.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/je-18.3.12.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-client-1.19.4.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-client-2.36.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-common-2.36.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-container-servlet-2.36.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-container-servlet-core-2.36.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-core-1.19.4.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-hk2-2.36.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-server-2.36.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jersey-servlet-1.19.4.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-alpn-client-9.4.44.v20210927.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-alpn-java-client-9.4.44.v20210927.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-alpn-openjdk8-client-9.4.44.v20210927.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-client-9.4.53.v20231009.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-http-9.4.53.v20231009.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-io-9.4.53.v20231009.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-security-9.4.53.v20231009.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-servlet-9.4.53.v20231009.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-util-9.4.53.v20231009.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-util-ajax-9.4.53.v20231009.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-webapp-9.4.48.v20220622.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jetty-xml-9.4.48.v20220622.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jffi-1.3.9.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jffi-1.3.9-native.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jna-5.13.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jnr-a64asm-1.0.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jnr-constants-0.10.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jnr-ffi-2.2.11.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jnr-posix-3.1.15.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jnr-x86asm-1.0.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/json-20231013.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/json4s-ast_2.12-3.7.0-M11.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/json4s-core_2.12-3.7.0-M11.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/json4s-jackson_2.12-3.7.0-M11.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/json4s-scalap_2.12-3.7.0-M11.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/json-smart-2.4.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jsp-api-2.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jsr305-3.0.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jsr311-api-1.1.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-admin-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-client-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-common-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-core-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-crypto-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-identity-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-server-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-simplekdc-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerb-util-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerby-asn1-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerby-config-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerby-pkix-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerby-util-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kerby-xdr-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/kryo-shaded-4.0.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/leveldbjni-all-1.8.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/logback-classic-1.2.11.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/logback-core-1.2.11.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lucene-analyzers-common-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lucene-backward-codecs-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lucene-core-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lucene-queries-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lucene-queryparser-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lucene-sandbox-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lucene-spatial3d-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lucene-spatial-extras-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/lz4-java-1.8.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/metrics-core-4.2.21.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/metrics-graphite-4.2.21.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/metrics-jmx-4.2.21.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/metrics-json-4.2.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/metrics-jvm-4.2.21.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/minlog-1.3.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/mockito-core-4.11.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/native-protocol-1.5.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-buffer-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-dns-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-haproxy-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-http2-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-http-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-memcache-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-mqtt-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-redis-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-smtp-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-socks-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-stomp-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-xml-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-common-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-handler-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-handler-proxy-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-handler-ssl-ocsp-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-resolver-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-resolver-dns-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-resolver-dns-classes-macos-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-resolver-dns-native-macos-4.1.100.Final-osx-aarch_64.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-resolver-dns-native-macos-4.1.100.Final-osx-x86_64.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-classes-epoll-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-classes-kqueue-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-epoll-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-epoll-4.1.100.Final-linux-aarch_64.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-epoll-4.1.100.Final-linux-x86_64.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-kqueue-4.1.100.Final-osx-aarch_64.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-kqueue-4.1.100.Final-osx-x86_64.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-unix-common-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-rxtx-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-sctp-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-udt-4.1.100.Final.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/nimbus-jose-jwt-9.37.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/noggit-0.8.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/objenesis-3.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/org.abego.treelayout.core-1.0.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/oro-2.0.8.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/osgi-resource-locator-1.0.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/paranamer-2.8.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/perfmark-api-0.26.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/pickle-1.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/protobuf-java-3.24.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/protobuf-java-util-3.24.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/proto-google-common-protos-2.22.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/py4j-0.10.9.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/re2j-1.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/reactive-streams-1.0.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/reflections8-0.11.7.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/reload4j-1.2.19.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/RoaringBitmap-0.9.25.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/rocksdbjni-6.20.3.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/s2-geometry-library-java-1.0.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/scala-library-2.12.15.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/scala-reflect-2.12.15.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/scala-xml_2.12-1.2.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/servlet-api-2.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/shims-0.9.25.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snappy-java-1.1.10.5.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/solr-solrj-8.11.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spark-core_2.12-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spark-gremlin-3.7.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spark-kvstore_2.12-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spark-launcher_2.12-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spark-network-common_2.12-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spark-network-shuffle_2.12-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spark-tags_2.12-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spark-unsafe_2.12-3.3.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spotbugs-annotations-3.1.12.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/stax2-api-4.2.2.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/stream-2.9.8.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tink-1.6.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/token-provider-1.0.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/unused-1.0.0.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/vavr-0.10.4.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/vavr-match-0.10.4.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/websocket-api-9.4.48.v20220622.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/websocket-client-9.4.48.v20220622.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/websocket-common-9.4.48.v20220622.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/woodstox-core-6.5.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/xbean-asm9-shaded-4.20.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/xz-1.9.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/zookeeper-3.8.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/zookeeper-jute-3.8.1.jar" excludes="META-INF/*"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/zstd-jni-1.5.2-1.jar" excludes="META-INF/*"/-->
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="Lomikel"/>
+        <attribute name="AppName"    value="LomikelwHBase"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
-      </jar>   
+      </jar> 
     </target>
     
   <!-- WAR ==================================================================-->
@@ -749,14 +468,7 @@
       <classes dir="../src/ws">
         <include name="log4j.properties"/>
         </classes>
-      <lib file="../lib/Lomikel-${version}.jar"/>
-      <lib file="${orgjson_jar}"/>
-      <lib file="${javaxmail_jar}"/>
-      <lib file="${hbasecommon_jar}"/>
-      <lib file="${hbaseclient_ja}"/>
-      <lib file="${hadoopcommon_jar}"/>
-      <lib file="${groovysh_jar}"/>
-      <lib file="${healpix_jar}"/>
+      <lib file="../lib/Lomikel-full-${version}.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-codec-1.15.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-collections-3.2.2.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-configuration-1.10.jar"/>
