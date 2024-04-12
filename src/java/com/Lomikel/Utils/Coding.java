@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.lang.ClassNotFoundException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Coding</code> handles encoding and decoding of {@link String}s and {@link Object}.
   * @opt attributes
@@ -86,6 +87,6 @@ public class Coding {
     }
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(Coding.class);
+  private static Logger log = LogManager.getLogger(Coding.class);
     
   }

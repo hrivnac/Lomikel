@@ -12,7 +12,8 @@ import org.python.util.PythonInterpreter;
 import org.python.core.*; 
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Python Command Line.
   * @opt attributes
@@ -138,7 +139,7 @@ public class PYCLI extends CLI {
   protected static PythonInterpreter _interpreter;
  
   /** Logging . */
-  private static Logger log = Logger.getLogger(PYCLI.class);
+  private static Logger log = LogManager.getLogger(PYCLI.class);
    
  
   }

@@ -1,7 +1,8 @@
 package com.Lomikel.WebService;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>HBaseTableMemory</code> keeps connection properties between invocations.
   * @opt attributes
@@ -52,6 +53,6 @@ public class HBaseTableMemory {
   private String _group;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseTableMemory.class);
+  private static Logger log = LogManager.getLogger(HBaseTableMemory.class);
 
   }

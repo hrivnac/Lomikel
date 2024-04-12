@@ -16,7 +16,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Hertex</code> is a {@link Vertex} with additional properties
   * filled from HBase.
@@ -169,6 +170,6 @@ public class Hertex extends Wertex {
   private static HBaseClient _client;
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(Hertex.class);
+  private static Logger log = LogManager.getLogger(Hertex.class);
 
   }

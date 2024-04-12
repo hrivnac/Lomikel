@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Schema</code>handles database schema and types coding/decoding.
   * @opt attributes
@@ -172,6 +173,6 @@ public abstract class Schema<T> {
   private Map<String, String> _reMap;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(Schema.class);
+  private static Logger log = LogManager.getLogger(Schema.class);
 
   }

@@ -9,7 +9,8 @@ import org.apache.tinkerpop.gremlin.structure.Property;
 import java.util.Iterator;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>VertexField</code> is a {@link VertexProperty} with properties
   * filled from the aux database.
@@ -84,6 +85,6 @@ public class VertexField implements VertexProperty<String> {
   private Vertex _vertex;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(VertexField.class);
+  private static Logger log = LogManager.getLogger(VertexField.class);
 
   }

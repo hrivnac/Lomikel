@@ -10,7 +10,8 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>DateTimeManagement</code> manipulates date and time.
   * @opt attributes
@@ -158,6 +159,6 @@ public class DateTimeManagement {
   //private static String FORMAT = "yyyy MM dd HH:mm:ss";
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(DateTimeManagement.class);
+  private static Logger log = LogManager.getLogger(DateTimeManagement.class);
   
   }

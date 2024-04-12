@@ -8,7 +8,8 @@ import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
 import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>HBaseESClient</code> connects to HBase and updates {@link ESClient}. 
   * @opt attributes
@@ -53,6 +54,6 @@ public class HBaseESClient extends HBaseClient {
     }
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseESClient.class);
+  private static Logger log = LogManager.getLogger(HBaseESClient.class);
 
   }

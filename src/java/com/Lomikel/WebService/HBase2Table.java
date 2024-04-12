@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>HBase2Table</code> interprets <em>HBase</em> data
   * as a HTML table.
@@ -420,6 +421,6 @@ public class HBase2Table {
   private Map<String, Integer> _fLengths = new HashMap<>();
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBase2Table.class);
+  private static Logger log = LogManager.getLogger(HBase2Table.class);
 
   }

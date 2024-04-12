@@ -12,7 +12,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>DirectPhoenixClient</code> connects to Phoenix directly.
   * @opt attributes
@@ -95,6 +96,6 @@ public class DirectPhoenixClient extends PhoenixClient {
     } 
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(DirectPhoenixClient.class);
+  private static Logger log = LogManager.getLogger(DirectPhoenixClient.class);
     
   }

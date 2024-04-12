@@ -41,7 +41,8 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.ImageIcon;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** BeanShell Command Line.
   * with usual interval operations.
@@ -263,7 +264,7 @@ public class BSCLI extends CLI {
   private static BSConsole _console;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(BSCLI.class);
+  private static Logger log = LogManager.getLogger(BSCLI.class);
    
  
   }

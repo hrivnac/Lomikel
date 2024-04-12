@@ -16,7 +16,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>JanusClient</code> provides connection to Janus Graph.
   * @opt attributes
@@ -194,6 +195,6 @@ public class JanusClient implements ModifyingGremlinClient {
   long _t = 0;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(JanusClient.class);
+  private static Logger log = LogManager.getLogger(JanusClient.class);
 
   }

@@ -3,7 +3,8 @@ package com.Lomikel.Sockets;
 import com.Lomikel.Utils.LomikelException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>SocketTest</code> tests the communication
   * between {@link SocketClient} and {@link SocketServer}.
@@ -47,6 +48,6 @@ public class SocketTest {
 	private static int    _port = 5000;
 	  
   /** Logging . */
-  private static Logger log = Logger.getLogger(SocketTest.class);
+  private static Logger log = LogManager.getLogger(SocketTest.class);
 	  
   } 

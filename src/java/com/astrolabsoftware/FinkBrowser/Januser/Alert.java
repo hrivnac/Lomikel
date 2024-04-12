@@ -7,7 +7,8 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Alert</code> is a {@link Hertex} representing <em>alert</em>.
   * @opt attributes
@@ -68,6 +69,6 @@ public class Alert extends Hertex {
     }
         
   /** Logging . */
-  private static Logger log = Logger.getLogger(Alert.class);
+  private static Logger log = LogManager.getLogger(Alert.class);
 
   }

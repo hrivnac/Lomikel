@@ -4,7 +4,8 @@ package com.Lomikel.Graph;
 import org.json.JSONObject;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Edge</code> is {@link JSONObject} representation of
   * <a href="http://visjs.org">vis.js</a> <em>Edge</em>.
@@ -84,6 +85,6 @@ public class Edge extends JSONObject
     }
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(Edge.class);
+  private static Logger log = LogManager.getLogger(Edge.class);
    
   }

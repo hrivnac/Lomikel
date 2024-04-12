@@ -10,7 +10,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException; 
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>SocketClient</code> is a simple client for interprocess communication.
   * @opt attributes
@@ -91,6 +92,6 @@ public class SocketClient {
 	private int _port;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(SocketClient.class);
+  private static Logger log = LogManager.getLogger(SocketClient.class);
 
   } 

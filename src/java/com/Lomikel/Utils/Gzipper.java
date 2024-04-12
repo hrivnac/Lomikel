@@ -8,7 +8,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
  
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Gzipper</code> handles <em>gzip</em> compression and decompression.
   * @opt attributes
@@ -88,6 +89,6 @@ public class Gzipper {
     }
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(Gzipper.class);
+  private static Logger log = LogManager.getLogger(Gzipper.class);
     
   }

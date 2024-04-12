@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>DataRepository</code> communicates <tt>byte[]</tt> data between applets..
   * @opt attributes
@@ -47,6 +48,6 @@ public class DataRepository {
   private Map<String, byte[]> _data = new  HashMap<>();
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(DataRepository.class);
+  private static Logger log = LogManager.getLogger(DataRepository.class);
 
   }

@@ -9,7 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>AListener</code> implements {@link ActionListener}.
   * @opt attributes
@@ -31,6 +32,6 @@ public final class AListener implements ActionListener {
     }
  
   /** Logging . */
-  private static Logger log = Logger.getLogger(AListener.class);
+  private static Logger log = LogManager.getLogger(AListener.class);
 
   }

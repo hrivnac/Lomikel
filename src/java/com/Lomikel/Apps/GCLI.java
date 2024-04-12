@@ -12,7 +12,8 @@ import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Groovy Command Line.
   * @opt attributes
@@ -152,7 +153,7 @@ public class GCLI extends CLI {
   protected static GroovyShell _shell;
  
   /** Logging . */
-  private static Logger log = Logger.getLogger(GCLI.class);
+  private static Logger log = LogManager.getLogger(GCLI.class);
    
  
   }

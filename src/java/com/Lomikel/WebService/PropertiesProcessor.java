@@ -3,7 +3,8 @@ package com.Lomikel.WebService;
 import com.Lomikel.Utils.DateTimeManagement;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>PropertiesProcessor</code> extracts X-axes from rows for graphs.
   * @opt attributes
@@ -28,6 +29,6 @@ public class PropertiesProcessor {
     }
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(PropertiesProcessor.class);
+  private static Logger log = LogManager.getLogger(PropertiesProcessor.class);
 
   }

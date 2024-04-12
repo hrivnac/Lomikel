@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>DirectGremlinClient</code> provides direct connection to Gremlin Graph.
   * @opt attributes
@@ -132,6 +133,6 @@ public class DirectGremlinClient extends    GremlinClient
   private Client _client;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(DirectGremlinClient.class);
+  private static Logger log = LogManager.getLogger(DirectGremlinClient.class);
 
   }

@@ -1,7 +1,8 @@
 package com.Lomikel.Sockets;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>TestServable</code> is a simple testing {@link Servable} for interprocess communication.
   * @opt attributes
@@ -17,6 +18,6 @@ public class TestServable implements Servable {
     }
 
     /** Logging . */
-  private static Logger log = Logger.getLogger(TestServable.class);
+  private static Logger log = LogManager.getLogger(TestServable.class);
   
   } 

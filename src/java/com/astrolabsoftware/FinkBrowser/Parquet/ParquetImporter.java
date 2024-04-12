@@ -48,7 +48,8 @@ import java.time.LocalTime;
 import java.time.temporal.JulianFields;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>ParquetImporter</code> imports <em>Parquet</em> files into <em>JanusGraph</em>.
   * @opt attributes
@@ -437,6 +438,6 @@ public class ParquetImporter extends JanusClient {
     }
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(ParquetImporter.class);
+  private static Logger log = LogManager.getLogger(ParquetImporter.class);
                                                 
   }

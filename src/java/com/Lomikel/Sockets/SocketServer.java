@@ -12,7 +12,8 @@ import java.io.EOFException;
 import java.io.IOException; 
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>SocketServer</code> is a simple client for interprocess communication.
   * @opt attributes
@@ -83,6 +84,6 @@ public class SocketServer<S extends Servable> {
 	private S _servable;  
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(SocketServer.class);
+  private static Logger log = LogManager.getLogger(SocketServer.class);
 
   } 

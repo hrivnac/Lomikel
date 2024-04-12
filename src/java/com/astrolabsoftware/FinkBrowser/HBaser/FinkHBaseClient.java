@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkHBaseClient</code> handles connectionto HBase table
   * with specific Fink functionality. 
@@ -440,6 +441,6 @@ public class FinkHBaseClient extends HBaseSQLClient {
   private static HealpixNested _hn = Healpix.getNested(Healpix.depth(_NSIDE));  
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(FinkHBaseClient.class);
+  private static Logger log = LogManager.getLogger(FinkHBaseClient.class);
 
   }

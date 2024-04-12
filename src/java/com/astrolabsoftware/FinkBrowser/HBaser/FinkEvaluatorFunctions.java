@@ -1,7 +1,8 @@
 package com.astrolabsoftware.FinkBrowser.HBaser;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkEvaluatorFuctions</code> provide static functions available to
   * {@link Evaluator}.
@@ -13,6 +14,6 @@ import org.apache.log4j.Logger;
 public class FinkEvaluatorFunctions {
       
   /** Logging . */
-  private static Logger log = Logger.getLogger(FinkEvaluatorFunctions.class);
+  private static Logger log = LogManager.getLogger(FinkEvaluatorFunctions.class);
                                                 
   }

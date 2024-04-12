@@ -1,7 +1,8 @@
 package com.Lomikel.DB;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>CellContent</code> contains HBase Cell content.
   * @opt attributes
@@ -70,6 +71,6 @@ public class CellContent {
   public static enum Type {STRING, FITS};
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(CellContent.class);
+  private static Logger log = LogManager.getLogger(CellContent.class);
     
   }

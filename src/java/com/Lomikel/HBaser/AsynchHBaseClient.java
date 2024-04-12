@@ -18,7 +18,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>AsynchHBaseClient</code> provides {@link HBaseClient} scanning asynchronously.
   * Only some methods are available for asynchronous processing.
@@ -303,6 +304,6 @@ public class AsynchHBaseClient extends    HBaseClient
   private int     _loopWait = 1000; // 1s = 1000ms
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(AsynchHBaseClient.class);
+  private static Logger log = LogManager.getLogger(AsynchHBaseClient.class);
 
   }

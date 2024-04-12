@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>AsynchHBaseProcessor</code> implements {@link HBaseProcessor} for {@link AsynchHBaseClient}. 
   * @opt attributes
@@ -48,6 +49,6 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
   private ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(AsynchHBaseProcessor.class);
+  private static Logger log = LogManager.getLogger(AsynchHBaseProcessor.class);
 
   }

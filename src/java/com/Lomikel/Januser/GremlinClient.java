@@ -10,7 +10,8 @@ import org.apache.tinkerpop.gremlin.driver.Cluster;
 import org.apache.tinkerpop.gremlin.util.MessageSerializer;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>GremlinClient</code> provides connection to Gremlin Graph.
   * @opt attributes
@@ -68,6 +69,6 @@ public abstract class GremlinClient {
   private Cluster _cluster;  
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(GremlinClient.class);
+  private static Logger log = LogManager.getLogger(GremlinClient.class);
 
   }

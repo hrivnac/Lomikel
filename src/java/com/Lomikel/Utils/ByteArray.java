@@ -1,7 +1,8 @@
 package com.Lomikel.Utils;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>ByteArray</code> presents array of bytes as an Object.
   * @opt attributes
@@ -26,6 +27,6 @@ public class ByteArray {
   private byte[] _bytes;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(ByteArray.class);
+  private static Logger log = LogManager.getLogger(ByteArray.class);
 
   }

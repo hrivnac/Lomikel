@@ -12,7 +12,8 @@ import javax.mail.internet.InternetAddress;
 import java.util.Properties;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>NotifierMail</code> sends a notifying E-mail.
   * @opt attributes
@@ -163,6 +164,6 @@ public class NotifierMail {
   private static String _manager;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(NotifierMail.class);
+  private static Logger log = LogManager.getLogger(NotifierMail.class);
 
   }

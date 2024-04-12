@@ -16,7 +16,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Inspector</code> reads HDFS files.
   * @opt attributes
@@ -140,6 +141,6 @@ public class Inspector {
     }
                                        
   /** Logging . */
-  private static Logger log = Logger.getLogger(Inspector.class);
+  private static Logger log = LogManager.getLogger(Inspector.class);
 
   }

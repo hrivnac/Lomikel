@@ -17,7 +17,8 @@ import java.util.TreeMap;
 import java.util.Iterator;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Wertex</code> is a {@link Vertex} with additional properties
   * filled from the aux database.
@@ -290,6 +291,6 @@ public abstract class Wertex implements Vertex {
   private static Map<String, String> _representants = new TreeMap<>();
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(Wertex.class);
+  private static Logger log = LogManager.getLogger(Wertex.class);
 
   }

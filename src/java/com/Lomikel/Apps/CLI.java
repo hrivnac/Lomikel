@@ -14,7 +14,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Simple Command Line.
   * @opt attributes
@@ -217,7 +218,7 @@ public abstract class CLI {
   private static boolean _notebook   = false;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(CLI.class);
+  private static Logger log = LogManager.getLogger(CLI.class);
    
  
   }

@@ -18,7 +18,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Sertex</code> is a {@link Vertex} with additional properties
   * filled from Phoenix.
@@ -238,6 +239,6 @@ public class Sertex extends Wertex {
   private static Map<String, PhoenixSchema> _schemas = new TreeMap<>();
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(Sertex.class);
+  private static Logger log = LogManager.getLogger(Sertex.class);
 
   }

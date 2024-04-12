@@ -5,7 +5,8 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>NotifierURL</code> connects to Web page
   * to reqister call.
@@ -51,6 +52,6 @@ public class NotifierURL {
     }
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(NotifierURL.class);
+  private static Logger log = LogManager.getLogger(NotifierURL.class);
     
   }

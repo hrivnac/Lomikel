@@ -4,7 +4,8 @@ package com.Lomikel.Graph;
 import org.json.JSONObject;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Date</code> contains {@link Nodes} and {@link Edges}.
   * @opt attributes
@@ -33,6 +34,6 @@ public class Data {
   private JSONObject _data;
       
   /** Logging . */
-  private static Logger log = Logger.getLogger(Data.class);
+  private static Logger log = LogManager.getLogger(Data.class);
    
   }

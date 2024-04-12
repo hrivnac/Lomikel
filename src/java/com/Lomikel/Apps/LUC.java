@@ -8,7 +8,8 @@ import com.Lomikel.Apps.GCLI;
 import com.Lomikel.GUI.Icons;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Simple Command Line.
   * @opt attributes
@@ -70,7 +71,7 @@ public class LUC {
   private static CLI _cli;
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(LUC.class);
+  private static Logger log = LogManager.getLogger(LUC.class);
    
  
   }

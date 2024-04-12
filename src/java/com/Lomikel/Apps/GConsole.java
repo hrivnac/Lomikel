@@ -5,7 +5,8 @@ import groovy.lang.Binding;
 import groovy.console.ui.Console;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Groovy {@link Console} as {@linki Runnable}
   * @opt attributes
@@ -31,6 +32,6 @@ public final class GConsole extends Console implements Runnable {
     }
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(Console.class);
+  private static Logger log = LogManager.getLogger(Console.class);
 
   }

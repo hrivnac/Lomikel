@@ -19,7 +19,8 @@ import org.apache.tinkerpop.gremlin.util.ser.GraphSONMessageSerializerV3;
 import java.util.List;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>StringGremlinClient</code> provides connection to Gremlin Graph passing Gremlin commands as Strings.
   * @opt attributes
@@ -112,6 +113,6 @@ public class StringGremlinClient extends GremlinClient {
   private ObjectMapper _mapper;  
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(StringGremlinClient.class);
+  private static Logger log = LogManager.getLogger(StringGremlinClient.class);
 
   }

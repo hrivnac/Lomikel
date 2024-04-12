@@ -65,7 +65,8 @@ import java.util.Date;
 import java.util.Arrays;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>HBaseClient</code> connects to HBase. 
   * @opt attributes
@@ -922,6 +923,6 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   private String _formula;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseClient.class);
+  private static Logger log = LogManager.getLogger(HBaseClient.class);
 
   }

@@ -8,7 +8,8 @@ import java.lang.Math;
 import static java.lang.Math.PI;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>HBaseEvaluatorFuctions</code> provide static functions available to
   * {@link HBaseEvaluator}.
@@ -70,6 +71,6 @@ public class HBaseEvaluatorFunctions {
     }
       
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseEvaluatorFunctions.class);
+  private static Logger log = LogManager.getLogger(HBaseEvaluatorFunctions.class);
                                                 
   }

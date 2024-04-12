@@ -6,7 +6,8 @@ import org.apache.tinkerpop.gremlin.jsr223.console.GremlinShellEnvironment;
 import org.apache.tinkerpop.gremlin.jsr223.console.RemoteAcceptor;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Allows remote access to {@link LomikelConnector}.
   * @opt attributes
@@ -22,6 +23,6 @@ public class LomikelConsoleCustomizer implements ConsoleCustomizer {
     }
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(LomikelConsoleCustomizer.class);
+  private static Logger log = LogManager.getLogger(LomikelConsoleCustomizer.class);
 
   }

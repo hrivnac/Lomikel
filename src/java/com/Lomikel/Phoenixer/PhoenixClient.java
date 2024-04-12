@@ -20,7 +20,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>PhoenixClient</code> connects to Phoenix.
   * @opt attributes
@@ -345,6 +346,6 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
   static final String JDBC_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(PhoenixClient.class);
+  private static Logger log = LogManager.getLogger(PhoenixClient.class);
     
   }

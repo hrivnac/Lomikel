@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>PhoenixProxyClient</code> connects to PhoenixProxyServer over socket.
   * @opt attributes
@@ -67,6 +68,6 @@ public class PhoenixProxyClient extends PhoenixClient {
 	SocketClient _socketClient;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(PhoenixProxyClient.class);
+  private static Logger log = LogManager.getLogger(PhoenixProxyClient.class);
     
   }

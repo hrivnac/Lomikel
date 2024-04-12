@@ -49,7 +49,8 @@ import java.time.LocalTime;
 import java.time.temporal.JulianFields;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>ParquetReader</code> reads <em>Parquet</em> files.
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
@@ -249,6 +250,6 @@ public class ParquetReader {
   private static FileSystem _fs;
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(ParquetReader.class);
+  private static Logger log = LogManager.getLogger(ParquetReader.class);
                                                 
   }

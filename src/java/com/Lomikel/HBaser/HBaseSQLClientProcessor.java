@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.Map;  
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>HBaseSQLClientProcessor</code> implements {@link HBaseProcessor} for Phoenix SQL.
   * @opt attributes
@@ -137,6 +138,6 @@ public class HBaseSQLClientProcessor implements HBaseProcessor {
   private HBaseSQLClient _client;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseSQLClient.class);
+  private static Logger log = LogManager.getLogger(HBaseSQLClient.class);
 
   }

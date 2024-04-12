@@ -7,7 +7,8 @@ import org.apache.tinkerpop.gremlin.jsr223.console.RemoteAcceptor;
 import java.util.List;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Allows remote access to {@link LomikelConnector}.
   * @opt attributes
@@ -37,6 +38,6 @@ public class LomikelRemoteAcceptor implements RemoteAcceptor {
     }
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(LomikelRemoteAcceptor.class);
+  private static Logger log = LogManager.getLogger(LomikelRemoteAcceptor.class);
 
   }

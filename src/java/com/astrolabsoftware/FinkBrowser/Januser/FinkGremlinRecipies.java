@@ -66,7 +66,8 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkGremlinRecipies</code> provides various recipies to handle
   * and modify Gramlin Graphs fir Fink.
@@ -864,6 +865,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   private static String FINK_ANOMALY_WS = "https://fink-portal.org/api/v1/anomaly";
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(FinkGremlinRecipies.class);
+  private static Logger log = LogManager.getLogger(FinkGremlinRecipies.class);
 
   }

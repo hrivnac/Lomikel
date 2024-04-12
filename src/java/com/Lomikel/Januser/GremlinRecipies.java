@@ -40,7 +40,8 @@ import java.util.Iterator;
 import java.util.Optional;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>GremlinRecipies</code> provides various recipies to handle and modify Gramlin Graphs.
   * @opt attributes
@@ -634,6 +635,6 @@ public class GremlinRecipies {
   private boolean _found;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(GremlinRecipies.class);
+  private static Logger log = LogManager.getLogger(GremlinRecipies.class);
 
   }

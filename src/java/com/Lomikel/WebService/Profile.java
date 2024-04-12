@@ -1,7 +1,8 @@
 package com.Lomikel.WebService;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Profile</code> handles bootstrap profile.
   * @opt attributes
@@ -22,6 +23,6 @@ public class Profile {
   private String _profile;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(Profile.class);
+  private static Logger log = LogManager.getLogger(Profile.class);
 
   }

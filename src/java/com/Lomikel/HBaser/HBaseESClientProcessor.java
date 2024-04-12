@@ -11,7 +11,8 @@ import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 import java.util.Map;  
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>HBaseESProcessor</code> implements {@link HBaseProcessor} for {@link ESClient}. 
   * @opt attributes
@@ -61,6 +62,6 @@ public class HBaseESClientProcessor implements HBaseProcessor{
   private ESClient _esclient;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseESClientProcessor.class);
+  private static Logger log = LogManager.getLogger(HBaseESClientProcessor.class);
 
   }

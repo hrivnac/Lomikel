@@ -13,7 +13,8 @@ import org.apache.tinkerpop.gremlin.jsr223.DefaultImportCustomizer.Builder;
 import org.apache.tinkerpop.gremlin.jsr223.ImportCustomizer;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Add connection to aux databases into Gremlin.
   * @opt attributes
@@ -56,6 +57,6 @@ public class LomikelConnector extends AbstractGremlinPlugin {
     }
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(LomikelConnector.class);
+  private static Logger log = LogManager.getLogger(LomikelConnector.class);
 
   }

@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>ESClient</code> handles access to <em>ElasticSearch</em> database.
   * @opt attributes
@@ -170,6 +171,6 @@ public class ESClient {
   private String _url;
         
   /** Logging . */
-  private static Logger log = Logger.getLogger(ESClient.class);
+  private static Logger log = LogManager.getLogger(ESClient.class);
 
   }

@@ -4,7 +4,8 @@ import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Evaluator;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Evaluator</code> evaluates formulas for HBase.
   * @opt attributes
@@ -30,6 +31,6 @@ public class HBaseEvaluator extends Evaluator {
     }
                                          
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseEvaluator.class);
+  private static Logger log = LogManager.getLogger(HBaseEvaluator.class);
                                                 
   }

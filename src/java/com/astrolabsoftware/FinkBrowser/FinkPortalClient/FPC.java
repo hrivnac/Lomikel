@@ -11,7 +11,8 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>FPC</code> is a client for <a href="https://fink-portal.org/api">Fink Science Portal</a>.
   * @opt attributes
@@ -74,7 +75,7 @@ public class FPC {
   private static String ANOMALY_WS = "anomaly";
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(FPC.class);
+  private static Logger log = LogManager.getLogger(FPC.class);
                                                 
   }
 

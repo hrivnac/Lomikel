@@ -14,7 +14,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Schema</code>handles <em>HBase</em> types coding/decoding.
   * @opt attributes
@@ -235,6 +236,6 @@ public class HBaseSchema extends Schema<ByteArray> {
     }
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseSchema.class);
+  private static Logger log = LogManager.getLogger(HBaseSchema.class);
 
   }

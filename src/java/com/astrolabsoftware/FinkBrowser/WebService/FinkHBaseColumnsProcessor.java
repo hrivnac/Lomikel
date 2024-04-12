@@ -7,7 +7,8 @@ import com.Lomikel.WebService.HBaseColumnsProcessor;
 import java.util.Map;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkHBaseColumnsProcessor</code>  extracts X-axes from rows for graphs
   * @opt attributes
@@ -46,6 +47,6 @@ public class FinkHBaseColumnsProcessor extends HBaseColumnsProcessor {
     }
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(FinkHBaseColumnsProcessor.class);
+  private static Logger log = LogManager.getLogger(FinkHBaseColumnsProcessor.class);
 
   }

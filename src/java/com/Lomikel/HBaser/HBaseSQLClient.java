@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.TreeMap;  
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>HBaseSQLClient</code> adds SQL-search possibility and SQL Phoenix upsert
   * possibility to {@link HBaseClient}. 
@@ -248,6 +249,6 @@ public class HBaseSQLClient extends HBaseClient {
   private String _sqlTableName = null;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(HBaseSQLClient.class);
+  private static Logger log = LogManager.getLogger(HBaseSQLClient.class);
 
   }

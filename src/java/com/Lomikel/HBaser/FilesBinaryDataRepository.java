@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>FilesBinaryDataRepository</code> keeps temporary binary data in files.
   * @opt attributes
@@ -93,6 +94,6 @@ public class FilesBinaryDataRepository extends BinaryDataRepository {
 	private String _repdir = REPDIR;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(FilesBinaryDataRepository.class);
+  private static Logger log = LogManager.getLogger(FilesBinaryDataRepository.class);
     
   }

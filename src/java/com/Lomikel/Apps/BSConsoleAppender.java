@@ -1,9 +1,16 @@
 package com.Lomikel.Apps;
 
+// Java
+import java.io.Serializable;
+
 // Log4J
-import org.apache.log4j.Level;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
 
 /** <code>ConsoleAppender</code> appends Log4J messages
   * to the {@link Console}.
@@ -12,28 +19,32 @@ import org.apache.log4j.spi.LoggingEvent;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class BSConsoleAppender extends AppenderSkeleton {
+public class BSConsoleAppender extends AbstractAppender {
 
-  /** Append {@link LoggingEvent} to the {@link Console}.
-    * @param event The {@link LoggingEvent} to append. */
-	protected void append(LoggingEvent event) {
+  protected BSConsoleAppender(String                         name,
+                              Filter                         filter,
+                              Layout<? extends Serializable> layout,
+                              boolean                        ignoreExceptions) {
+        super(name, filter, layout, ignoreExceptions);
+    }
+    
+  @Override
+	public void append(LogEvent event) {
     String loggerName = event.getLoggerName();
     loggerName = loggerName.substring(loggerName.lastIndexOf(".") + 1, loggerName.length());
     if (event.getLevel().equals(Level.INFO)) {
       BSConsole.setText(loggerName + ": " + event.getMessage().toString());
       }
-    else if (event.getLevel().isGreaterOrEqual(Level.WARN)) {
+    else if (event.getLevel().isMoreSpecificThan(Level.WARN)) {
       BSConsole.setError(loggerName + ": " + event.getMessage().toString());
       }
     }
-
-  /** Close. */
-	public void close() {}
-
-	/** Doesn't require layout. */
-	public boolean requiresLayout() {
-    return false;
-    }
-
+    
+  public static BSConsoleAppender createAppender(String                         name, 
+                                                 Filter                         filter,
+                                                 Layout<? extends Serializable> layout,
+                                                 boolean                        ignoreExceptions) {
+        return new BSConsoleAppender(name, filter, layout, ignoreExceptions);
+    } 
   }
 

@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.Arrays;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>GremlinEvaluatorFuctions</code> provide static functions available to
   * {@link GremlinEvaluator}.
@@ -76,6 +77,6 @@ public class GremlinEvaluatorFunctions {
   private static double[] _weights;
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(GremlinEvaluatorFunctions.class);
+  private static Logger log = LogManager.getLogger(GremlinEvaluatorFunctions.class);
                                                 
   }

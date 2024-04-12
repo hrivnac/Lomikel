@@ -13,7 +13,8 @@ import javax.swing.BorderFactory;
 import bsh.util.JConsole;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** Bean Shell {@link JConsole}.
   * @opt attributes
@@ -62,6 +63,6 @@ public final class BSConsole extends JConsole {
   private static BSConsole _this;
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(BSConsole.class);
+  private static Logger log = LogManager.getLogger(BSConsole.class);
 
   }

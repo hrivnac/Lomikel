@@ -4,7 +4,8 @@ import com.Lomikel.Utils.DateTimeManagement;
 import com.Lomikel.WebService.PropertiesProcessor;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkPropertiesProcessor</code> extracts X-axes from rows for graphs.
   * @opt attributes
@@ -26,6 +27,6 @@ public class FinkPropertiesProcessor extends PropertiesProcessor {
     }
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(FinkPropertiesProcessor.class);
+  private static Logger log = LogManager.getLogger(FinkPropertiesProcessor.class);
 
   }

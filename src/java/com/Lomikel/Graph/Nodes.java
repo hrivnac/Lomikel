@@ -7,7 +7,8 @@ import org.json.JSONArray;
 import java.util.TreeSet;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Nodes</code> is {@link TreeSet} representation of
   * <a href="http://visjs.org">vis.js</a> <em>Node</em>.
@@ -34,6 +35,6 @@ public class Nodes extends TreeSet<Node> {
     }
       
   /** Logging . */
-  private static Logger log = Logger.getLogger(Nodes.class);
+  private static Logger log = LogManager.getLogger(Nodes.class);
    
   }

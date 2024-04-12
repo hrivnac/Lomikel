@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Evaluator</code> evaluates formulas.
   * @opt attributes
@@ -273,6 +274,6 @@ public class Evaluator {
   private Interpreter _interpreter;     
                                          
   /** Logging . */
-  private static Logger log = Logger.getLogger(Evaluator.class);
+  private static Logger log = LogManager.getLogger(Evaluator.class);
                                                 
   }

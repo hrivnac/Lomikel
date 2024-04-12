@@ -20,7 +20,8 @@ import java.io.StringReader;
 import java.io.IOException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>XSLTProcessor</code> converts XML fragments
   * using XSLT stylesheets.
@@ -130,6 +131,6 @@ public class XSLTProcessor {
   private Map<String, String> _parameters = new HashMap<>();
                                        
   /** Logging . */
-  private static Logger log = Logger.getLogger(XSLTProcessor.class);
+  private static Logger log = LogManager.getLogger(XSLTProcessor.class);
                                                 
   }

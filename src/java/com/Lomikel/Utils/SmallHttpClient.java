@@ -45,7 +45,8 @@ import javax.net.ssl.SSLContext;
 import org.apache.http.config.Registry;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>SmallHttpClient</code> sends http requests.
   * Supports Get/Post methods with/without GZIP compression.
@@ -632,6 +633,6 @@ public class SmallHttpClient {
     }
       
   /** Logging . */
-  private static Logger log = Logger.getLogger(SmallHttpClient.class);
+  private static Logger log = LogManager.getLogger(SmallHttpClient.class);
 
   }

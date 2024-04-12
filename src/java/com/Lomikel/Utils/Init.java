@@ -1,8 +1,11 @@
 package com.Lomikel.Utils;
 
 // Log4J
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.plugins.util.PluginManager;
 
 /** <code>Init</code> provides common initialisation.
   * @opt attributes
@@ -36,7 +39,6 @@ public class Init {
         NotifierURL.notify("", "LomikelWS", Info.release());
         }
       else {
-        PropertyConfigurator.configure(Init.class.getClassLoader().getResource("com/Lomikel/Utils/log4j.properties"));
         NotifierURL.notify("", "Lomikel", Info.release());
         }
       }
@@ -52,6 +54,6 @@ public class Init {
   public static boolean _initialised = false;  
     
   /** Logging . */
-  private static Logger log = Logger.getLogger(Init.class);
+  private static Logger log = LogManager.getLogger(Init.class);
 
   }

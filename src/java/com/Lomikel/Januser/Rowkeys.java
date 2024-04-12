@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Rowkeys</code> handles a list of row keys.
   * @opt attributes
@@ -78,6 +79,6 @@ public class Rowkeys {
   private Map<String, String> _rowkeys = new HashMap<>();
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(Rowkeys.class);
+  private static Logger log = LogManager.getLogger(Rowkeys.class);
   
   } 

@@ -6,7 +6,8 @@ import com.Lomikel.Sockets.Servable;
 import com.Lomikel.Utils.LomikelException;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** {@link PhoenixProxyServer} executes requests on the Phoenix Proxy via JDBC.
   * It listenes on the socket.
@@ -59,6 +60,6 @@ public class PhoenixProxyServer extends PhoenixClient
   private String _url; 
      
  /** Logging . */
- private static Logger log = Logger.getLogger(PhoenixProxyServer.class);
+ private static Logger log = LogManager.getLogger(PhoenixProxyServer.class);
    
  }

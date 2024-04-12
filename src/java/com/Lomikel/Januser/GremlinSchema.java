@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Schema</code>handles <em>Greamlin</em> types coding/decoding.
   * @opt attributes
@@ -61,6 +62,6 @@ public class GremlinSchema extends Schema<String> {
     }
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(GremlinSchema.class);
+  private static Logger log = LogManager.getLogger(GremlinSchema.class);
 
   }

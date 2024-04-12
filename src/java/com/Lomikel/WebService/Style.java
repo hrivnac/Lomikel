@@ -1,7 +1,8 @@
 package com.Lomikel.WebService;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Profile</code> handles web service style.
   * @opt attributes
@@ -22,6 +23,6 @@ public class Style {
   private String _style;
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(Style.class);
+  private static Logger log = LogManager.getLogger(Style.class);
 
   }

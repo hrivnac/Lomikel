@@ -10,7 +10,8 @@ import java.util.Set;
 import java.util.Arrays;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Schema</code>handles <em>Phoenix</em> schema and types coding/decoding.
   * @opt attributes
@@ -108,6 +109,6 @@ public class PhoenixSchema extends Schema<String> {
   private static Map<String, PhoenixSchema> _schemas = new HashMap<>();
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(PhoenixSchema.class);
+  private static Logger log = LogManager.getLogger(PhoenixSchema.class);
     
   }

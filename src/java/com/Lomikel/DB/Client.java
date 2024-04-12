@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Client</code> handles access to database.
   * @opt attributes
@@ -370,6 +371,6 @@ public abstract class Client<T, S extends Schema> {
 
   
   /** Logging . */
-  private static Logger log = Logger.getLogger(Client.class);
+  private static Logger log = LogManager.getLogger(Client.class);
 
   }

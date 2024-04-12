@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.Base64;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>BinaryDataRepository</code> keeps temporary binary data.
   * @opt attributes
@@ -63,6 +64,6 @@ public class BinaryDataRepository {
 	private static Map<String, byte[]> _data;
 
   /** Logging . */
-  private static Logger log = Logger.getLogger(BinaryDataRepository.class);
+  private static Logger log = LogManager.getLogger(BinaryDataRepository.class);
     
   }

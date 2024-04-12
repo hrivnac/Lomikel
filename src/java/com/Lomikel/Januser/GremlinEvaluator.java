@@ -4,7 +4,8 @@ import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.DB.Evaluator;
 
 // Log4J
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /** <code>Evaluator</code> evaluates formulas for Janusgraph.
   * @opt attributes
@@ -24,6 +25,6 @@ public class GremlinEvaluator extends Evaluator {
     }
                                           
   /** Logging . */
-  private static Logger log = Logger.getLogger(GremlinEvaluator.class);
+  private static Logger log = LogManager.getLogger(GremlinEvaluator.class);
                                                 
   }
