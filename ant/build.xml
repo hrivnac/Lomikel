@@ -236,9 +236,8 @@
       </path>
     <property name="classpath.libs" refid="libs"/>
     <jar jarfile="../lib/Lomikel-${version}.jar" index="yes">
-      <fileset dir="../build"      includes="**/*.class"/>
+      <fileset dir="../src/java"   includes="log4j2.xml"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.properties"/>
-      <fileset dir="../src/java"   includes="*.xml"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.xml"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.bsh"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.txt"/>
@@ -246,7 +245,6 @@
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.gif"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.css"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.groovy"/>
-      <fileset dir="../build"      includes="com/astrolabsoftware/FinkBrowser/**/*.class"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.properties"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.bsh"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.txt"/>
@@ -254,6 +252,7 @@
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.gif"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.css"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.groovy"/>
+      <fileset dir="../build"      includes="**/*.class"/>
       <fileset dir="../src/bsh"    includes="*.bsh"/>
       <fileset dir="../src/groovy" includes="*.groovy"/>
       <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
@@ -362,7 +361,6 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-4.0.9.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-4.0.9.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-4.0.9.jar"/>
-      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-4.0.9.jar"/-->
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-templates-4.0.9.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-xml-4.0.9.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hbase-shaded-client-2.5.3-hadoop3.jar"/>      
@@ -379,7 +377,6 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-mixed-index-utils-1.0.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javapoet-1.13.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javatuples-1.2.jar"/>
-      <!--zipfileset includes="**/*" src="${janusgraph_dir}/lib/javax.servlet-api-4.0.1.jar"/-->
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jbcrypt-0.4.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-log-0.22.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-manifests-2.1.0.jar"/>
