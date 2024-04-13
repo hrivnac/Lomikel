@@ -828,7 +828,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Create a new {@link FinkHBaseClient}. Singleton when url unchanged.
-    * @param hbaseUrl The HBase url as <tt>ip:port:table:schema</tt>.
+    * @param hbaseUrl The HBase url as <tt>ip:port:table[:schema]</tt>.
     * @return          The corresponding {@link FinkHBaseClient}, created and initialised if needed.
     * @throws LomikelException If cannot be created. */
   private FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
@@ -840,7 +840,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String ip     = url[0];
     String port   = url[1];
     String table  = url[2];
-    String schema = url[3];
     _fhclient = new FinkHBaseClient(ip, port);
     _fhclient.connect(table); // latest schema
     return _fhclient;
