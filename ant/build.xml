@@ -998,7 +998,7 @@
   <!-- Dist =================================================================-->
 
   <target name="dist"
-          depends="exe"
+          depends="exe,doc"
           description="Construct distribution">
     <mkdir dir="../dist"/>
     <copy todir="../dist">
