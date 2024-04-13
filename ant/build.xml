@@ -582,7 +582,7 @@
       <classes dir="../src/ws/FinkBrowser">
         <include name="log4j.xml"/>
         </classes>
-      <lib file="../lib/Lomikel-${version}.jar"/>
+      <lib file="../lib/Lomikel-Janus.exe.jar"/>
       <lib file="${orgjson_jar}"/>
       <lib file="${javaxmail_jar}"/>
       <lib file="${hbasecommon_jar}"/>
@@ -590,7 +590,7 @@
       <lib file="${hadoopcommon_jar}"/>
       <lib file="${groovysh_jar}"/>
       <lib file="${healpix_jar}"/>
-      <lib file="${janusgraph_dir}/lib/caffeine-2.9.3.jar"/>
+      <!--lib file="${janusgraph_dir}/lib/caffeine-2.9.3.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-codec-1.15.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-collections-3.2.2.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-configuration-1.10.jar"/>
@@ -598,13 +598,13 @@
       <lib file="${janusgraph_dir}/lib/commons-lang3-3.12.0.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-logging-1.2.jar"/>
       <lib file="${janusgraph_dir}/lib/exp4j-0.4.8.jar"/>
-      <lib file="${janusgraph_dir}/lib/guava-32.1.13-jre.jar"/><!-- !!!-->
+      <lib file="${janusgraph_dir}/lib/guava-32.1.13-jre.jar"/>
       <lib file="${janusgraph_dir}/lib/gremlin-console-3.7.0.jar"/>
       <lib file="${janusgraph_dir}/lib/gremlin-core-3.7.0.jar"/>
       <lib file="${janusgraph_dir}/lib/gremlin-driver-3.7.0.jar"/>
       <lib file="${janusgraph_dir}/lib/gremlin-groovy-3.7.0.jar"/>
       <lib file="${janusgraph_dir}/lib/gremlin-shaded-3.7.0.jar"/>
-      <lib file="${janusgraph_dir}/lib/groovy-4.0.9.jar"/><!-- !!!-->
+      <lib file="${janusgraph_dir}/lib/groovy-4.0.9.jar"/>
       <lib file="${janusgraph_dir}/lib/groovy-cli-picocli-4.0.9.jar"/>
       <lib file="${janusgraph_dir}/lib/groovy-console-4.0.9.jar"/>
       <lib file="${janusgraph_dir}/lib/groovy-json-4.0.9-indy.jar"/>
@@ -621,7 +621,7 @@
       <lib file="${janusgraph_dir}/lib/javatuples-1.2.jar"/>
       <lib file="${janusgraph_dir}/lib/javax.servlet-api-4.0.1.jar"/>
       <lib file="${janusgraph_dir}/lib/jbcrypt-0.4.jar"/>
-      <lib file="${janusgraph_dir}/lib/jcabi-log-0.22.0.jar"/><!-- !!!-->
+      <lib file="${janusgraph_dir}/lib/jcabi-log-0.22.0.jar"/>
       <lib file="${janusgraph_dir}/lib/jcabi-manifests-2.1.0.jar"/>
       <lib file="${janusgraph_dir}/lib/jcl-over-slf4j-1.7.36.jar"/>
       <lib file="${janusgraph_dir}/lib/jline-3.9.0.jar"/>
@@ -629,10 +629,9 @@
       <lib file="${janusgraph_dir}/lib/netty-all-4.1.100.Final.jar"/>
       <lib file="${janusgraph_dir}/lib/picocli-4.7.0.jar"/>
       <lib file="${janusgraph_dir}/lib/slf4j-api-1.7.36.jar"/>
-      <!--lib file="${janusgraph_dir}/lib/slf4j-log4j12-1.7.12.jar"/-->
       <lib file="${janusgraph_dir}/lib/snakeyaml-2.2.jar"/>
       <lib file="${janusgraph_dir}/lib/spatial4j-0.8.jar"/>
-      <lib file="${janusgraph_dir}/lib/tinkergraph-gremlin-3.7.0.jar"/>
+      <lib file="${janusgraph_dir}/lib/tinkergraph-gremlin-3.7.0.jar"/-->
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="FinkBrowser"/>
