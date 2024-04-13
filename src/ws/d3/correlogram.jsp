@@ -3,11 +3,12 @@
 <!-- Lomikel Correlogram -->
 <!-- @author Julius.Hrivnac@cern.ch -->
 
-<%@ page import="org.apache.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
 
 <%@ page errorPage="../ExceptionHandler.jsp" %>
 
-<%! static Logger log = Logger.getLogger(org.apache.jsp.d3.correlogram_jsp.class); %>
+<%! static Logger log = LoggerManager.getLogger(org.apache.jsp.d3.correlogram_jsp.class); %>
 
 <link href="correlogram.css" rel="stylesheet" type="text/css"/>
 <link href="venn.css" rel="stylesheet" type="text/css"/>

@@ -5,11 +5,12 @@
 
 <%@ page import="com.Lomikel.WebService.PropertiesProcessor" %>
 
-<%@ page import="org.apache.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
 
 <%@ page errorPage="../ExceptionHandler.jsp" %>
 
-<%! static Logger log = Logger.getLogger(org.apache.jsp.d3.scatterplot_jsp.class); %>
+<%! static Logger log = LogManager.getLogger(org.apache.jsp.d3.scatterplot_jsp.class); %>
 
 <jsp:useBean id="repository" class="com.Lomikel.WebService.StringRepository" scope="session"/>
    
