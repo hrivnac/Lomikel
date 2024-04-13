@@ -8,7 +8,7 @@
 
 <%@ page errorPage="../ExceptionHandler.jsp" %>
 
-<%! static Logger log = LoggerManager.getLogger(org.apache.jsp.d3.correlogram_jsp.class); %>
+<%! static Logger log = LogManager.getLogger(org.apache.jsp.d3.correlogram_jsp.class); %>
 
 <link href="correlogram.css" rel="stylesheet" type="text/css"/>
 <link href="venn.css" rel="stylesheet" type="text/css"/>
