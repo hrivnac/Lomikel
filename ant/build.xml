@@ -212,7 +212,7 @@
   <!-- Compile Native =======================================================-->
     
   <target name="compile-native"
-          depends="jar"
+          depends="exe"
           description="Compile into native application">
     <exec executable="${graalvm_dir}/bin/native-image">
       <arg value="--initialize-at-build-time=org.apache.log4j.Level,org.apache.log4j.Logger,org.apache.log4j.helpers.LogLog,org.apache.log4j.Priority,org.apache.log4j.LogManager,org.apache.log4j.helpers.Loader,org.apache.log4j.Category,org.apache.log4j.spi.RootLogger,org.apache.log4j.spi.LoggingEvent,org.slf4j.LoggerFactory,org.slf4j.impl.Log4jLoggerAdapter,org.slf4j.impl.Log4jLoggerFactory,org.slf4j.impl.StaticLoggerBinder"/>
@@ -433,7 +433,7 @@
   <!-- WAR ==================================================================-->
 
   <target name="war"
-          depends="jar"
+          depends="exe"
           description="Create WAR">
     <echo>Creating Lomikel.war</echo>
  		<copy file="../src/ws/index.jsp"             tofile="../build/index.jsp"   overwrite="true"/>
@@ -998,7 +998,7 @@
   <!-- Dist =================================================================-->
 
   <target name="dist"
-          depends="jar"
+          depends="exe"
           description="Construct distribution">
     <mkdir dir="../dist"/>
     <copy todir="../dist">
@@ -1238,7 +1238,7 @@
   <!-- Find Bugs ============================================================-->  
 
   <target name="findbugs"
-          depends="jar"
+          depends="exe"
           description="FindBugs Check">
     <property name="findbugs.home"
               value="${findbugs}"/>
@@ -1258,7 +1258,7 @@
     </target>
     
   <target name="spotbugs"
-          depends="jar"
+          depends="exe"
           description="SpotBugs Check">
     <spotbugs home="${spotbugs}"
               output="html"
