@@ -475,8 +475,8 @@
       <classes dir="../src/ws">
         <include name="log4j.xml"/>
         </classes>
-      <lib file="../lib/Lomikel-full-${version}.jar"/>
-      <lib file="${janusgraph_dir}/lib/commons-codec-1.15.jar"/>
+      <lib file="../lib/Lomikel-Janus.exe.jar"/>
+      <!--lib file="${janusgraph_dir}/lib/commons-codec-1.15.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-collections-3.2.2.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-configuration-1.10.jar"/>
       <lib file="${janusgraph_dir}/lib/commons-lang-2.6.jar"/>
@@ -514,10 +514,9 @@
       <lib file="${janusgraph_dir}/lib/netty-all-4.1.100.Final.jar"/>
       <lib file="${janusgraph_dir}/lib/picocli-4.7.0.jar"/>
       <lib file="${janusgraph_dir}/lib/slf4j-api-1.7.36.jar"/>
-      <!--lib file="${janusgraph_dir}/lib/slf4j-log4j12-1.7.12.jar"/-->
       <lib file="${janusgraph_dir}/lib/snakeyaml-2.2.jar"/>
       <lib file="${janusgraph_dir}/lib/spatial4j-0.8.jar"/>
-      <lib file="${janusgraph_dir}/lib/tinkergraph-gremlin-3.7.0.jar"/>
+      <lib file="${janusgraph_dir}/lib/tinkergraph-gremlin-3.7.0.jar"/-->
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
