@@ -4,9 +4,11 @@
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
 <%@ page import="com.Lomikel.Utils.SmallHttpClient" %>
-<%@ page import="org.apache.log4j.Logger" %>
 
-<%! static Logger log = Logger.getLogger(Proxy_jsp.class); %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
+
+<%! static Logger log = LogManager.getLogger(Proxy_jsp.class); %>
 
 <%
   String query = request.getQueryString();

@@ -20,13 +20,15 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 
-<%@ page import="org.apache.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
+
 
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
 <link href="HBaseTable.css" rel="stylesheet" type="text/css"/>
 
-<%! static Logger log = Logger.getLogger(HBaseTable_jsp.class); %>
+<%! static Logger log = LogManager.getLogger(HBaseTable_jsp.class); %>
 
 <jsp:useBean id="style"   class="com.Lomikel.WebService.Style"            scope="session"/>
 <jsp:useBean id="h2table" class="com.Lomikel.WebService.HBase2Table"      scope="session"/>

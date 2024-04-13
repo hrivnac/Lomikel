@@ -2,9 +2,11 @@
 
 <%@ page import="com.Lomikel.Januser.StringGremlinClient" %>
 <%@ page import="java.net.URLDecoder" %>
-<%@ page import="org.apache.log4j.Logger" %>
 
-<%! static Logger log = Logger.getLogger(GremlinClient_jsp.class); %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
+
+<%! static Logger log = LogManager.getLogger(GremlinClient_jsp.class); %>
 
 <%
   String host = request.getParameter("host");

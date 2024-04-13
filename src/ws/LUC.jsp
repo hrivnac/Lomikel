@@ -7,9 +7,11 @@
 <%@ page import="java.net.URLDecoder" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="org.apache.log4j.Logger" %>
 
-<%! static Logger log = Logger.getLogger(LUC_jsp.class); %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
+
+<%! static Logger log = LogManager.getLogger(LUC_jsp.class); %>
 
 <%
   String help = request.getParameter("help");

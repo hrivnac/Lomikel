@@ -13,9 +13,10 @@
 <%@ page import="com.Lomikel.Utils.Info" %>
 <%@ page import="com.Lomikel.Utils.LomikelException" %>
 
-<%@ page import="org.apache.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
 
-<%! static Logger log = Logger.getLogger(ExceptionHandler_jsp.class); %>
+<%! static Logger log = LogManager.getLogger(ExceptionHandler_jsp.class); %>
 
 <html>
   <head><title>Lomikel Exception Handler</title></head>

@@ -16,10 +16,12 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 
-<%@ page import="org.apache.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
 
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
-<%! static Logger log = Logger.getLogger(Venn_jsp.class); %>
+
+<%! static Logger log = LogManager.getLogger(Venn_jsp.class); %>
 
 <link href="d3/venn.css" rel="stylesheet" type="text/css"/>
 <script src="d3-v6.0.0/d3.js"       type="text/javascript"></script>

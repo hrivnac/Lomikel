@@ -13,9 +13,11 @@
 <%@ page import="java.io.DataInputStream"%>
 <%@ page import="java.util.Base64"%>
 <%@ page import="java.net.URLDecoder" %>
-<%@ page import="org.apache.log4j.Logger" %>
 
-<%! static Logger log = Logger.getLogger(FITSView_jsp.class); %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
+
+<%! static Logger log = LogManager.getLogger(FITSView_jsp.class); %>
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 

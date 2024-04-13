@@ -16,13 +16,14 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 
-<%@ page import="org.apache.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
 
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
 <link href="Nodes.css" rel="stylesheet" type="text/css"/>
 
-<%! static Logger log = Logger.getLogger(Edges_jsp.class); %>
+<%! static Logger log = LogManager.getLogger(Edges_jsp.class); %>
 
 <%@include file="Params.jsp" %>
 
