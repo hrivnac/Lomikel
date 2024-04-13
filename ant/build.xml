@@ -383,15 +383,36 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-manifests-2.1.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcl-over-slf4j-1.7.36.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jctools-core-4.0.1.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-3.9.0.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-3.9.0.jar"/>     
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-all-4.1.100.Final.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-buffer-4.1.100.Final.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-4.1.100.Final.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-common-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-dns-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-haproxy-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-http2-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-http-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-memcache-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-mqtt-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-redis-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-smtp-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-socks-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-stomp-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-xml-4.1.100.Final.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-common-4.1.100.Final.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-handler-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-handler-proxy-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-handler-ssl-ocsp-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-resolver-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-resolver-dns-4.1.100.Final.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-4.1.100.Final.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-codec-http-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-classes-epoll-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-classes-kqueue-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-epoll-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-epoll-4.1.100.Final-linux-x86_64.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-native-unix-common-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-rxtx-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-sctp-4.1.100.Final.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-transport-udt-4.1.100.Final.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-api-1.15.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-context-1.15.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/opentelemetry-semconv-1.15.0-alpha.jar"/>
