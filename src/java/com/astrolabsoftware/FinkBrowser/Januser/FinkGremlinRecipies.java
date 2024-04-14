@@ -884,6 +884,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             }
           }
         }
+      log.info(m);
       double dist = 0;
       double n11;
       double n12;
