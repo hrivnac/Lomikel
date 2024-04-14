@@ -884,7 +884,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             }
           }
         }
-      log.info(m);
       double dist = 0;
       double n11;
       double n12;
@@ -892,8 +891,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       double n22;
       double n1;
       double n2;
-      for (Map.Entry<String, Double> entry1 : m.entrySet()) {
-        for (Map.Entry<String, Double> entry2 : m.entrySet()) {
+      for (Map.Entry<String, Double> entry1 : m0.entrySet()) {
+        for (Map.Entry<String, Double> entry2 : m0.entrySet()) {
           if (entry1.getKey().compareTo(entry2.getKey()) > 0 ) {
             n11 = entry1.getValue();
             n12 = entry2.getValue();
