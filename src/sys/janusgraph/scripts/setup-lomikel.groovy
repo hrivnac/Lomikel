@@ -283,7 +283,7 @@ class LomikelServer {
     }
     
     
-  def static sourceNeighborhood(g, oid0, classes0 = null) {
+  def static sourceNeighborhood(oid0, classes0 = null) {
     def s0 = g.V().has('lbl', 'source').has('objectId', oid0).next();
     def m0;
     if (classes0 != null) {

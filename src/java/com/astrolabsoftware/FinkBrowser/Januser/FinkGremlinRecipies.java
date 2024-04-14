@@ -49,11 +49,13 @@ import javax.mail.MessagingException;
 
 // Java
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.TreeMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -825,6 +827,93 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     log.info("" + n + " correlations generated");
+    }
+    
+  /** Give {@link Map} of other <em>source</em>s ordered
+    * by distance to the specified <em>source</em> with respect
+    * to weights to all (or selected) <em>SourceOfInterest</em> classes.
+    * @param oid0      The <em>objectOd</em> of the <em>source</em>.
+    * @param classes0A An array of <em>SourceOfInterest</em> classes to be
+    *                  used in comparison.
+    *                  All <em>SourceOfInterest</em> classes of thr specified
+    *                  <em>source</em> will be used if <tt>null</tt>.
+    * @return          The distances to other sources, order by the distance. */
+  public Map<String, Double> sourceNeighborhood(String   oid0,
+                                                String[] classes0A) {
+    List<String> classes0 = ((classes0A == null) ? null : Arrays.asList(classes0A));
+    Vertex source0 = g().V().has("lbl", "source").has("objectId", oid0).next();
+    Map<String, Double> m0 = new HashMap<>();
+    Set<String> classes = new HashSet<>();
+    Edge deepcontains;
+    Vertex soi;
+    double weight;
+    String cls;
+    Iterator<Edge> deepcontainsIt = source0.edges(Direction.IN);
+    while (deepcontainsIt.hasNext()) { 
+      deepcontains = deepcontainsIt.next();
+      if (deepcontains.property("lbl").value().toString().equals("deepcontains")) {
+        weight = Double.valueOf(deepcontains.property("weight").value().toString()); // TBD: should be better way
+        soi = deepcontains.outVertex();
+        cls = soi.property("cls").value().toString();
+        if (classes0 == null || classes0.contains(cls)) {
+          m0.put(cls, weight);
+          classes.add(cls);
+          }
+        }
+      }
+    int n = m0.size();
+    log.info("calculating source distances from " + oid0 + " wrt " + classes + " ...");
+    Vertex source;
+    String oid;
+    Map<String, Double> m = new HashMap<>();
+    Map<String, Double> distances = new HashMap<>();
+    GraphTraversal<Vertex, Vertex> sourcesT = g().V().has("lbl", "source");    
+    while (sourcesT.hasNext()) {
+      m.clear();
+      source = sourcesT.next();
+      oid = source.property("objectId").value().toString();
+      deepcontainsIt = source.edges(Direction.IN);
+      while (deepcontainsIt.hasNext()) { 
+        deepcontains = deepcontainsIt.next();
+        if (deepcontains.property("lbl").value().toString().equals("deepcontains")) {
+          weight = Double.valueOf(deepcontains.property("weight").value().toString()); // TBD: should be better way
+          soi = deepcontains.outVertex();
+          cls = soi.property("cls").value().toString();
+          if (classes.contains(cls)) {
+            m.put(cls, weight);
+            }
+          }
+        }
+      double dist = 0;
+      double n11;
+      double n12;
+      double n21;
+      double n22;
+      double n1;
+      double n2;
+      for (Map.Entry<String, Double> entry1 : m.entrySet()) {
+        for (Map.Entry<String, Double> entry2 : m.entrySet()) {
+          if (entry1.getKey().compareTo(entry2.getKey()) > 0 ) {
+            n11 = entry1.getValue();
+            n12 = entry2.getValue();
+            n21 = m.get(entry1.getKey()) == null ? 0 : m.get(entry1.getKey());
+            n22 = m.get(entry2.getKey()) == null ? 0 : m.get(entry2.getKey());
+            n1 = (n11 + n12) == 0 ? 0 : Math.abs(n11 - n12) / (n11 + n12);
+            n2 = (n21 + n22) == 0 ? 0 : Math.abs(n21 - n22) / (n21 + n22);
+            dist += Math.pow(n1 - n2, 2);
+            }
+          }
+        }
+      dist = Math.sqrt(dist) / n;
+      if (dist > 0) {
+        distances.put(oid, dist);
+        }
+      }
+    Map<String, Double> distancesS = distances.entrySet().
+                                               stream().
+                                               sorted(Map.Entry.comparingByValue()).
+                                               collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+    return distancesS;
     }
     
   /** Create a new {@link FinkHBaseClient}. Singleton when url unchanged.
