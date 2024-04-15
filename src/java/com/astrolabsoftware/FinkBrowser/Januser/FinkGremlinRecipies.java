@@ -894,7 +894,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       // renormalize
       int n = m.size();
-      log.info(n0 + " " + n);
       for (Map.Entry<String, Double> entry : m.entrySet()) {
         m.replace(entry.getKey(), entry.getValue() / n);
         }
@@ -922,7 +921,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       // distance bewteen oid0 and oid
-      dist = Math.sqrt(dist) / n0 / n0;
+      dist = Math.sqrt(dist) / n / n;
       if (dist > 0) {
         distances.put(oid, dist);
         }
