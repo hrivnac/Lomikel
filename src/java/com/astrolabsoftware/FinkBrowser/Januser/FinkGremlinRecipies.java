@@ -906,7 +906,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             }
           }
         }
-      dist = Math.sqrt(dist) / n;
+      dist = Math.sqrt(dist) / n / n;
       if (dist > 0) {
         distances.put(oid, dist);
         }
