@@ -896,14 +896,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       for (Map.Entry<String, Double> entry1 : m0.entrySet()) {
         for (Map.Entry<String, Double> entry2 : m0.entrySet()) {
           if (entry1.getKey().compareTo(entry2.getKey()) > 0 ) {
-            //n11 = entry1.getValue();
-            //n12 = entry2.getValue();
-            //n21 = m.get(entry1.getKey()) == null ? 0 : m.get(entry1.getKey());
-            //n22 = m.get(entry2.getKey()) == null ? 0 : m.get(entry2.getKey());
-            //n1 = (n11 + n12) == 0 ? 0 : Math.abs(n11 - n12) / (n11 + n12);
-            //n2 = (n21 + n22) == 0 ? 0 : Math.abs(n21 - n22) / (n21 + n22);
-            //dist += Math.pow(n1 - n2, 2);
-            dist += 1.0;
+            n11 = entry1.getValue();
+            n12 = entry2.getValue();
+            n21 = m.get(entry1.getKey()) == null ? 0 : m.get(entry1.getKey());
+            n22 = m.get(entry2.getKey()) == null ? 0 : m.get(entry2.getKey());
+            n1 = (n11 + n12) == 0 ? 0 : Math.abs(n11 - n12) / (n11 + n12);
+            n2 = (n21 + n22) == 0 ? 0 : Math.abs(n21 - n22) / (n21 + n22);
+            dist += Math.pow(n1 - n2, 2);
             }
           }
         }
