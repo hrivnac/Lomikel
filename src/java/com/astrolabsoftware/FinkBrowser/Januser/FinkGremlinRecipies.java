@@ -834,6 +834,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * by distance to the specified <em>source</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
     * @param oid0      The <em>objectOd</em> of the <em>source</em>.
+    * @param oidS      An array of <em>source</em> objectIds to only avaluated.
+    *                  If null, all <em>source</em>s will be evaluated.
     * @param classes0A An array of <em>SourceOfInterest</em> classes to be
     *                  used in comparison.
     *                  All <em>SourceOfInterest</em> classes of thr specified
