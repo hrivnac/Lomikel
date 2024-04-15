@@ -24,6 +24,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.values;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.count;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.Property;
@@ -840,6 +841,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param nmax      The number of closest <em>source</em>s to give.
     * @return          The distances to other sources, order by the distance. */
   public Map<String, Double> sourceNeighborhood(String   oid0,
+                                                String[] oidS,
                                                 String[] classes0A,
                                                 int      nmax) {
     List<String> classes0 = ((classes0A == null) ? null : Arrays.asList(classes0A));
@@ -875,7 +877,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String oid;
     Map<String, Double> m = new HashMap<>();
     Map<String, Double> distances = new HashMap<>();
-    GraphTraversal<Vertex, Vertex> sourcesT = g().V().has("lbl", "source");    
+    GraphTraversal<Vertex, Vertex> sourcesT;
+    if (oidS == null) {
+      sourcesT = g().V().has("lbl", "source");   
+      }
+    else {
+      log.info("\tsearching only " + Arrays.asList(classes0A));
+      sourcesT = g().V().has("lbl", "source").has("objectId", within(oidS));
+      }
     while (sourcesT.hasNext()) {
       m.clear();
       source = sourcesT.next();
