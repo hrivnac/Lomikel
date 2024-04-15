@@ -1,4 +1,4 @@
-import com.astrolabsoftware.FinkBrowser.Utils.Info;
+import com.Lomikel.Utils.Info;
 import com.Lomikel.Januser.StringGremlinClient;
 import org.apache.tinkerpop.gremlin.driver.Result;
 

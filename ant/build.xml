@@ -104,7 +104,16 @@
       <fileset file="${groovy_ant_jar}"/>
       </classpath>
     </taskdef>
-
+    
+  <taskdef name="groovydoc"
+         classname= "org.codehaus.groovy.ant.Groovydoc">
+    <classpath>
+      <fileset file="${groovy_jar}"/>
+      <fileset file="${groovy_ant_jar}"/>
+      <fileset file="${groovy_groovydoc_jar}"/>
+      </classpath>
+    </taskdef>
+    
   <taskdef resource="edu/umd/cs/findbugs/anttask/tasks.properties"
            classpath="${spotbugs}/lib/spotbugs-ant.jar" />
 
@@ -208,6 +217,23 @@
         </classpath>
       </javac>
     </target>
+
+  <target name="compile-groovy"
+          depends="init"
+          description="Compile groovy sources">
+    <groovyc srcdir="../src/groovy"
+             destdir="../build"
+             classpathref="classpath.groovy"
+             fork="true"
+             includeantruntime="false"
+             configscript="../src/groovy/config.groovy"
+             targetBytecode="${env.java_version}"> 
+      <classpath>
+        <path refid="classpath.build"/>
+        <pathelement path="../build"/>
+        </classpath>
+      </groovyc>
+    </target>
         
   <!-- Compile Native =======================================================-->
     
@@ -226,7 +252,7 @@
   <!-- Create JAR ===========================================================-->
   
   <target name="jar"
-          depends="compile"
+          depends="compile,compile-groovy"
           description="Create JAR">
     <path id="libs">
       <fileset dir="../extlib">
@@ -998,7 +1024,7 @@
 
   <target name="doc"
           depends="jar,j2h,viz"
-          description="Construct documentation">
+          description="Construct Java documentation">
     <mkdir dir="../doc"/>
  		<copy todir="../doc">
 			<fileset dir="../src" includes="*.html"/>
@@ -1073,7 +1099,7 @@
       <group title="Fink Portal Client" packages="com.astrolabsoftware.FinkBrowser.FinkPOrtalClient*"/>
       <group title="Fink WebService"    packages="com.astrolabsoftware.FinkBrowser.WebService*"/>
       <group title="LehmanUtils"        packages="de.lehmannet.om.util*"/>
-      <link href="http://docs.oracle.com/javase/8/docs/api" packagelistLoc="${javadoc}" offline="true"/>
+      <link href="http://docs.oracle.com/javase/11/docs/api" packagelistLoc="${javadoc}" offline="true"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>
       <link href="https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs"/>
@@ -1093,6 +1119,26 @@
     <replace file="../doc/index.html" token="@VERSION@" value="${version}"/>
     <replace file="../doc/index.html" token="@BUILD@"   value="${TSTAMP} by ${user.name}"/>
   </target>
+    
+  <!-- GroovyDoc ============================================================-->
+
+  <target name="gdoc"
+          depends="doc"
+          description="Construct Groovy documentation">>
+    <groovydoc destdir="../doc/GroovyDoc"
+             sourcepath="../src/groovy"
+             packagenames="**.*"
+             use="true"
+             windowtitle="xxx"
+             doctitle="xxx"
+             header="xxx"
+             footer="xxx"
+             overview="../src/java/com/Lomikel/overview.html"
+             private="true">
+      <link packages="java.,org.xml.,javax.,org.xml." href="http://docs.oracle.com/javase/11/docs/api/"/>
+      <link packages="groovy.,org.codehaus.groovy."   href="http://docs.groovy-lang.org/latest/html/api/"/>
+      </groovydoc>
+    </target>
 
   <!-- Post =================================================================-->
 
