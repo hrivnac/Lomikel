@@ -837,9 +837,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                  used in comparison.
     *                  All <em>SourceOfInterest</em> classes of thr specified
     *                  <em>source</em> will be used if <tt>null</tt>.
+    * @param nmax      The number of closest <em>source</em>s to give.
     * @return          The distances to other sources, order by the distance. */
   public Map<String, Double> sourceNeighborhood(String   oid0,
-                                                String[] classes0A) {
+                                                String[] classes0A,
+                                                int      nmax) {
     List<String> classes0 = ((classes0A == null) ? null : Arrays.asList(classes0A));
     Vertex source0 = g().V().has("lbl", "source").has("objectId", oid0).next();
     Map<String, Double> m0 = new HashMap<>();
@@ -912,7 +914,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<String, Double> distancesS = distances.entrySet().
                                                stream().
                                                sorted(Map.Entry.comparingByValue()).
-                                               limit(10).
+                                               limit(nmax).
                                                collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     return distancesS;
     }
