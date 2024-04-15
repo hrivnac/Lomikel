@@ -882,7 +882,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       sourcesT = g().V().has("lbl", "source");   
       }
     else {
-      log.info("\tsearching only " + Arrays.asList(classes0A));
+      log.info("\tsearching only " + Arrays.asList(oidS));
       sourcesT = g().V().has("lbl", "source").has("objectId", within(oidS));
       }
     while (sourcesT.hasNext()) {
