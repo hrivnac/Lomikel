@@ -844,6 +844,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                                 int      nmax) {
     List<String> classes0 = ((classes0A == null) ? null : Arrays.asList(classes0A));
     Vertex source0 = g().V().has("lbl", "source").has("objectId", oid0).next();
+    // accumulate weights from oid0 to all classes
     Map<String, Double> m0 = new HashMap<>();
     Set<String> classes = new HashSet<>();
     Edge deepcontains;
@@ -863,7 +864,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       }
-    int n = m0.size();
+    int n0 = m0.size();
+    // accumulate weights from all other oids to all classes
     log.info("calculating source distances from " + oid0 + " wrt " + classes + " ...");
     Vertex source;
     String oid;
@@ -886,31 +888,41 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             }
           }
         }
+      // renormalize
+      int n = m.size();
+      for (Map.Entry<String, Double> entry : m.entrySet()) {
+        m.replace(entry.getKey(), entry.getValue() / n);
+        }
+      // calculate distance between oid0 and oid
       double dist = 0;
-      double n11;
-      double n12;
-      double n21;
-      double n22;
-      double n1;
-      double n2;
+      // cls = 1, 2
+      // oid = 0, x
+      double w01;
+      double w02;
+      double wx1;
+      double wx2;
+      double w0;
+      double wx;
       for (Map.Entry<String, Double> entry1 : m0.entrySet()) {
         for (Map.Entry<String, Double> entry2 : m0.entrySet()) {
           if (entry1.getKey().compareTo(entry2.getKey()) > 0 ) {
-            n11 = entry1.getValue();
-            n12 = entry2.getValue();
-            n21 = m.get(entry1.getKey()) == null ? 0 : m.get(entry1.getKey());
-            n22 = m.get(entry2.getKey()) == null ? 0 : m.get(entry2.getKey());
-            n1 = (n11 + n12) == 0 ? 0 : Math.abs(n11 - n12) / (n11 + n12);
-            n2 = (n21 + n22) == 0 ? 0 : Math.abs(n21 - n22) / (n21 + n22);
-            dist += Math.pow(n1 - n2, 2);
+            w01 = entry1.getValue();
+            w02 = entry2.getValue();
+            wx1 = m.get(entry1.getKey()) == null ? 0 : m.get(entry1.getKey());
+            wx2 = m.get(entry2.getKey()) == null ? 0 : m.get(entry2.getKey());
+            w0 = (w01 + w02) == 0 ? 0 : Math.abs(w01 - w02) / (w01 + w02);
+            wx = (wx1 + wx2) == 0 ? 0 : Math.abs(wx1 - wx2) / (wx1 + wx2);
+            dist += Math.pow(w0 - wx, 2);
             }
           }
         }
-      dist = Math.sqrt(dist) / n / n;
+      // distance bewteen oid0 and oid
+      dist = Math.sqrt(dist) / n0 / n0;
       if (dist > 0) {
         distances.put(oid, dist);
         }
       }
+    // rearrange distances
     Map<String, Double> distancesS = distances.entrySet().
                                                stream().
                                                sorted(Map.Entry.comparingByValue()).
