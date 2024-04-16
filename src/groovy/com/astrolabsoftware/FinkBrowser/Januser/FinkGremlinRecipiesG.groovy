@@ -83,7 +83,6 @@ class FinkGremlinRecipiesG extends FinkGremlinRecipies {
                                                 String[] classes0,
                                                 int      nmax) {
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
-    // accumulate weights from oid0 to all classes
     def m0 = [:];
     g().V(source0).inE().
                    project('cls', 'w').

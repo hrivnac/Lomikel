@@ -1023,7 +1023,7 @@
   <!-- JavaDoc ==============================================================-->
 
   <target name="doc"
-          depends="jar,j2h,viz"
+          depends="jar,j2h,viz,gdoc"
           description="Construct Java documentation">
     <mkdir dir="../doc"/>
  		<copy todir="../doc">
@@ -1123,17 +1123,17 @@
   <!-- GroovyDoc ============================================================-->
 
   <target name="gdoc"
-          depends="doc"
-          description="Construct Groovy documentation">>
+          depends="init"
+          description="Construct Groovy documentation">
     <groovydoc destdir="../doc/GroovyDoc"
              sourcepath="../src/groovy"
              packagenames="**.*"
              use="true"
-             windowtitle="xxx"
-             doctitle="xxx"
-             header="xxx"
-             footer="xxx"
-             overview="../src/java/com/Lomikel/overview.html"
+             windowtitle="Lomikel"
+             doctitle="&lt;u&gt;Lomikel&lt;/u&gt;"
+             header="&lt;center&gt;Lomikel version: ${version}&lt;/center&gt;"
+             footer="Written by: &lt;a href='http://cern.ch/hrivnac'&gt;J.Hrivnac&lt;/a&gt;&lt;br/&gt;&lt;a href='https://cern.ch/hrivnac/Activities/Packages/Lomikel'&gt;Documentation&lt;/a&gt; built ${TODAY} on ${os.name} by ${user.name}"
+             overview="../src/groovy/com/Lomikel/overview.html"
              private="true">
       <link packages="java.,org.xml.,javax.,org.xml." href="http://docs.oracle.com/javase/11/docs/api/"/>
       <link packages="groovy.,org.codehaus.groovy."   href="http://docs.groovy-lang.org/latest/html/api/"/>
