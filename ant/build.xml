@@ -42,7 +42,6 @@
      <fileset dir="${hbase_dir}">
       <include name="lib/*.jar"/>
       </fileset>
-    <pathelement path="${phoenix_jar}"/>
     <path refid="classpath.build"/>
     </path>
     
@@ -51,13 +50,11 @@
     <pathelement path="${groovy_sql_jar}"/>
     <pathelement path="${hadoop_phoenix_conf}"/>
     <pathelement path="${hbase_phoenix_conf}"/>
-    <pathelement path="${phoenix_jar}"/>
     <!--path refid="classpath.build"/-->
     </path>
 
   <path id="classpath.groovy">
     <fileset dir="${groovy_dir}/lib" includes="*.jar" excludes="groovy-ant-*.jar"/>
-    <fileset dir="${phoenix_dir}"    includes="${phoenix_jar_name}"/>
     </path>    
     
   <path id="classpath.janusgraph">
@@ -163,13 +160,7 @@
 			<fileset file="${jython_jar}"/>
 			<fileset file="${scala_jar}"/>
 			<fileset file="${math3_jar}"/>
-			<fileset file="${groovy_jar}"/>
-			<fileset file="${groovyconsole_jar}"/>
-			<fileset file="${groovy_ant_jar}"/>
-			<fileset file="${groovy_sql_jar}"/>
-			<fileset file="${groovy_groovydoc_jar}"/>
 			<fileset file="${parquetavro_jar}"/>
-			<!--fileset file="${phoenix_jar}"/-->
       </copy>
     </target>
     
@@ -955,7 +946,6 @@
     <copy todir="../dist">
 			<fileset dir="../lib" includes="*.jar"/>
 			<fileset dir="../extlib/import" includes="*.jar"/>
-			<file file="${phoenix_jar}"/>
       </copy>
     <exec executable="../src/sh/packExtJars.sh"/>
   </target>
