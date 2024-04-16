@@ -73,7 +73,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkGremlinRecipies</code> provides various recipies to handle
-  * and modify Gramlin Graphs fir Fink.
+  * and modify Gremlin Graphs for Fink.
   * @opt attributes
   * @opt operations
   * @opt types

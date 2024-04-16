@@ -167,6 +167,7 @@
 			<fileset file="${groovyconsole_jar}"/>
 			<fileset file="${groovy_ant_jar}"/>
 			<fileset file="${groovy_sql_jar}"/>
+			<fileset file="${groovy_groovydoc_jar}"/>
 			<fileset file="${parquetavro_jar}"/>
 			<!--fileset file="${phoenix_jar}"/-->
       </copy>
