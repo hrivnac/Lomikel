@@ -297,7 +297,6 @@
       <zipfileset includes="**/*" src="${javaxmail_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
-      <zipfileset includes="**/*" src="${groovysh_jar}"/>
       <zipfileset includes="**/*" src="${parquethadoop_jar}"/>
       <zipfileset includes="**/*" src="${jython_jar}"/>
 			<zipfileset includes="**/*" src="${math3_jar}"/>
@@ -305,6 +304,7 @@
 			<zipfileset includes="**/*" src="${groovyconsole_jar}"/>
 			<zipfileset includes="**/*" src="${groovy_ant_jar}"/>
 			<zipfileset includes="**/*" src="${groovy_sql_jar}"/>
+      <zipfileset includes="**/*" src="${groovysh_jar}"/>
 			<zipfileset includes="**/*" src="${parquetavro_jar}"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hbase-common-2.5.8-hadoop3.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hbase-client-2.5.8-hadoop3.jar"/>
@@ -329,6 +329,7 @@
       <zipfileset includes="**/*" src="${javaxmail_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
+      <zipfileset includes="**/*" src="${groovy_jar}"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/shaded-clients/hbase-shaded-client-2.5.8-hadoop3.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/audience-annotations-0.13.0.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/commons-logging-1.2.jar"/>
@@ -356,6 +357,7 @@
       <zipfileset includes="**/*" src="${javaxmail_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
+      <zipfileset includes="**/*" src="${groovy_jar}"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>

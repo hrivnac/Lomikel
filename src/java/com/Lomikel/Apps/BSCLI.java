@@ -129,7 +129,6 @@ public class BSCLI extends CLI {
     
   @Override
   public void close() {
-    // TBD
     }
 
   /** Load standard init files and setup standard environment. 
@@ -142,7 +141,7 @@ public class BSCLI extends CLI {
       log.info("cli set");
       }
     catch (EvalError e) {
-      log.error("Cannot set cli", e);
+      log.error("Cannot set cli: " + e.getMessage());
       log.debug("Cannot set cli", e);
       }
     StringFile     sf;
@@ -156,8 +155,8 @@ public class BSCLI extends CLI {
         }
       }
     catch (LomikelException e) {
-      log.warn("init.bsh file cannot be read.");
-      log.debug("init.bsh file cannot be read.", e);
+      log.warn("init.bsh file cannot be read or processed: " + e.getMessage());
+      log.debug("init.bsh file cannot be read or processed.", e);
       }
     catch (EvalError e) {
       log.error("Can't evaluate standard BeanShell expression", e);
@@ -172,8 +171,8 @@ public class BSCLI extends CLI {
           }
         }
       catch (LomikelException e) {
-        log.warn("Profile " + profile() + " cannot be loaded.");
-        log.debug("Profile " + profile() + " cannot be loaded.", e);
+        log.warn("Profile " + profile() + " cannot be loaded or processed: " + e.getMessage());
+        log.debug("Profile " + profile() + " cannot be loaded or processed.", e);
         }
       catch (EvalError e) {
         log.error("Can't evaluate standard BeanShell expression", e);
@@ -188,8 +187,8 @@ public class BSCLI extends CLI {
         }
       }
     catch (LomikelException e) {
-      log.warn(".state.bsh file cannot be read.");
-      log.debug(".state.bsh file cannot be read.", e);
+      log.warn(".state.bsh file cannot be read or processed: " + e.getMessage());
+      log.debug(".state.bsh file cannot be read or processed.", e);
       }
     catch (EvalError e) {
       log.error("Can't evaluate standard BeanShell expression", e);
@@ -204,8 +203,8 @@ public class BSCLI extends CLI {
           }
         }
       catch (LomikelException e) {
-        log.warn(source() + " file cannot be read.");
-        log.debug(source() + " file cannot be read.", e);
+        log.warn(source() + " file cannot be read or processed: " + e.getMessage());
+        log.debug(source() + " file cannot be read or processed.", e);
         }
       catch (EvalError e) {
         log.error("Can't evaluate standard BeanShell expression", e);
@@ -221,8 +220,8 @@ public class BSCLI extends CLI {
           }
         }
       catch (LomikelException e) {
-        log.error("Cannot read " + scriptSrc());
-        log.debug("Cannot read " + scriptSrc(), e);
+        log.error("Cannot read or process " + scriptSrc() + ": " + e.getMessage());
+        log.debug("Cannot read or proces " + scriptSrc(), e);
         }
       catch (EvalError e) {
         log.error("Cannot evaluate " + scriptArgs() + " " + scriptSrc());

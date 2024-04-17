@@ -40,6 +40,7 @@ public class HBaseESClientProcessor implements HBaseProcessor{
     
   /** Register results into {@link ESClient}.
     * @param results The {@link Map} of results. */
+  // TBD: make generic
   protected void results2ES(Map<String, Map<String, String>> results) {
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       try {

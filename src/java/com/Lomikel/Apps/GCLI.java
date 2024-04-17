@@ -50,7 +50,6 @@ public class GCLI extends CLI {
 
   @Override
   public void close() {
-    // TBD
     }
     
   /** Load standard init files and setup standard environment.
@@ -71,8 +70,8 @@ public class GCLI extends CLI {
         }
       }
     catch (LomikelException e) {
-      log.warn("init.groovy file cannot be read.");
-      log.debug("init.groovy file cannot be read.", e);
+      log.warn("init.groovy file cannot be read or processed: " + e.getMessage());
+      log.debug("init.groovy file cannot be read or processed.", e);
       }
     // Load site profile
     if (profile() != null) {
@@ -84,8 +83,8 @@ public class GCLI extends CLI {
           }
         }
       catch (LomikelException e) {
-        log.warn("Profile " + profile() + " cannot be loaded.");
-        log.debug("Profile " + profile() + " cannot be loaded.", e);
+        log.warn("Profile " + profile() + " cannot be loaded or processed: " + e.getMessage());
+        log.debug("Profile " + profile() + " cannot be loaded or processed.", e);
         }
       }
     // Loading state
@@ -97,8 +96,8 @@ public class GCLI extends CLI {
         }
       }
     catch (LomikelException e) {
-      log.warn(".state.groovy file cannot be read.");
-      log.debug(".state.groovy file cannot be read.", e);
+      log.warn(".state.groovy file cannot be read or processed: " + e.getMessage());
+      log.debug(".state.groovy file cannot be read or processed.", e);
       }
     // Source command line source
     if (source() != null) {
@@ -110,8 +109,8 @@ public class GCLI extends CLI {
           }
         }
       catch (LomikelException e) {
-        log.warn(source() + " file cannot be read.");
-        log.debug(source() + " file cannot be read.", e);
+        log.warn(source() + " file cannot be read or processed: " + e.getMessage());
+        log.debug(source() + " file cannot be read or processed", e);
         }
       }
     // Source embedded script
@@ -124,8 +123,8 @@ public class GCLI extends CLI {
           }
         }
       catch (LomikelException e) {
-        log.error("Cannot read " + scriptSrc());
-        log.debug("Cannot read " + scriptSrc(), e);
+        log.error("Cannot read or process " + scriptSrc() + ": " + e.getMessage());
+        log.debug("Cannot read or process" + scriptSrc(), e);
         }
       }
     return result;

@@ -74,7 +74,7 @@ public abstract class CLI {
                                    .withArgName("file")
                                    .create("s"));
     options.addOption(OptionBuilder.withLongOpt("api")
-                                   .withDescription("cli language: [bsh|groovy|python]")
+                                   .withDescription("cli language: [bsh|groovy|python] (othewise taken from source extension, defauld is bsh")
                                    .hasArg()
                                    .withArgName("language")
                                    .create("a"));
@@ -96,11 +96,29 @@ public abstract class CLI {
       if (cline.hasOption("notebook")) {
         _notebook = true;
         }
+      if (cline.hasOption("source")) {
+        _source = cline.getOptionValue("source");
+        }
       if (cline.hasOption("api")) {
         _api = cline.getOptionValue("api");
         }
-      if (cline.hasOption("source")) {
-        _source = cline.getOptionValue("source");
+      else if (_source != null) {
+        String[] parts = _source.split("\\.");
+        String ext = parts[parts.length - 1];
+        switch (ext) {
+          case "bsh":
+            _api = "bsh";
+            break;
+          case "groovy":
+            _api = "groovy";
+            break;
+          case "py":
+            _api = "python";
+            break;
+          default:
+            //_api = "bsh"; // the default
+            break;
+          }
         }
       if (cline.hasOption("help")) {
         StringWriter out    = new StringWriter();
