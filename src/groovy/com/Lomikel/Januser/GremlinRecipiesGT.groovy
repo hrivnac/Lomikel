@@ -24,6 +24,8 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 
+// JanusGraph
+import org.janusgraph.core.JanusGraphFactory;
 // Groovy
 import groovy.sql.Sql
 
@@ -164,7 +166,7 @@ trait GremlinRecipiesGT {
     * @param myName The name of the created {@link Graph}.
     *               If <tt>null</tt>, the graph will be only created in memory.
     * @return       The created {@link Graph}. */
-  def Graph myGraph(String myName) {
+  def Graph myGraph(String myName = null) {
     def graph0
     def g0
     if (myName == null) {
