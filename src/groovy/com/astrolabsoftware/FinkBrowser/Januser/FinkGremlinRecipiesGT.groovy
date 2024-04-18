@@ -38,6 +38,7 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.janusgraph.core.SchemaViolationException;
 import org.janusgraph.graphdb.vertices.StandardVertex;
 import org.janusgraph.graphdb.database.StandardJanusGraph;
+import static org.janusgraph.core.attribute.Geo.geoWithin;
 
 // Groovy SQL
 import groovy.sql.Sql;
@@ -54,6 +55,19 @@ import org.apache.logging.log4j.LogManager;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
+
+  /** TBD */
+  def static GraphTraversal geosearch(ra, dec, ang, jdmin, jdmax, limit) {
+    def lat = dec;
+    def lon = ra - 180;
+    def dist = ang * 6371.0087714 * Math.PI / 180;
+    def nDir = g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).count().next();
+    def nJD  = g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).count().next();
+    if (limit < nJD) {
+      nJD = limit;
+      }
+    return g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
+    }
       
   /** Give {@link Map} of other <em>source</em>s ordered
     * by distance to the specified <em>source</em> with respect
@@ -161,7 +175,44 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return distances.sort{it.value}.take(nmax);
     }
 
+  /** Drop all {@link Vertex} with specified <em>importDate</em>.
+    * @param importDate The <em>importDate</em> of {@link Vertex}es to drop.
+    *                   It's format should be like <tt>Mon Feb 14 05:51:20 UTC 2022</tt>.
+    * @param nCommit    The number of {Vertex}es to drop before each commit.
+    * @param tWait      The times (in <tt>s</tt>) to wait after each commit. */
+  def static drop_by_date(importDate, nCommit, tWait) {
+    def i = 0;
+    def tot = 0;
+    def nMax = g().V().has('importDate', importDate).count().next();
+    log.info('' + nMax + ' vertexes to drop');
+    def t0 = System.currentTimeMillis();
+    while(true) {
+      g().V().has('importDate', importDate).limit(nCommit).out().out().drop().iterate();
+      g().V().has('importDate', importDate).limit(nCommit).out().drop().iterate();
+      g().V().has('importDate', importDate).limit(nCommit).drop().iterate();
+      graph().traversal().tx().commit();
+      Thread.sleep(tWait)
+      tot = nCommit * ++i;
+      def dt = (System.currentTimeMillis() - t0) / 1000;
+      def per = 100 * tot / nMax;
+      def freq = tot / dt;
+      def rest = (nMax - tot) / freq / 60 /60;
+      log.info(tot + ' = ' + per + '% at ' + freq + 'Hz, ' + rest + 'h to go');
+      }
+    }
+    
+  /** Give status of importing from the <em>Import</em> {@link Vetex}es.
+    * @return The status of importing from the <em>Import</em> {@link Vetex}es. */
+  def static String importStatus() {
+    def txt = '';
+    txt += 'Imported:\n';
+    g().V().has('lbl', 'Import').has('nAlerts', neq(0)).order().by('importSource').valueMap('importSource', 'importDate', 'nAlerts').each{txt += '\t' + it + '\n'};
+    txt += 'Importing:\n';
+    g().V().has('lbl', 'Import').hasNot('complete').order().by('importSource').valueMap('importSource', 'importDate').each{txt += '\t' + it + '\n'};
+    return txt;
+    }
+
   /** Logging . */
-  private static Logger log = LogManager.getLogger(FinkGremlinRecipiesG.class);
+  private static Logger log = LogManager.getLogger(FinkGremlinRecipiesGT.class);
 
   }

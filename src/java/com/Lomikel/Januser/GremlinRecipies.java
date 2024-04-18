@@ -324,6 +324,13 @@ public class GremlinRecipies {
   public GraphTraversalSource g() {
     return _client == null ? _g : _client.g();
     }
+    
+  /** Give {@link Graph}.
+    * @return {@link Graph}. */
+  public Graph graph() {
+    return g().getGraph();
+    }
+  
   
   /** Commit. */
   public void commit() {
