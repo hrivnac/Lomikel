@@ -1,4 +1,4 @@
-import com.Lomikel.Januser.GremlinRecipies
+import com.Lomikel.Januser.GremlinRecipiesG
 import com.Lomikel.Phoenixer.PhoenixProxyClient
 import com.Lomikel.HBaser.HBaseClient
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient
@@ -8,19 +8,15 @@ import groovy.sql.Sql
 
 class Lomikel {
 
-  def static init(c) {
-    config = c
+  def static init(graph) {
+    g      = graph.traversal()
+    config = graph.configuration()
+    gr     = new GremlinRecipiesG(g)
     println "class Lomikel initialised"
     }
 
   def static hi() {
     return "Hello World from Lomikel console !"
-    }
-  
-  def static stat(g) {
-    def v = '\nV: ' + g.V().group().by(values('lbl')).by(count()).toSet()
-    def e = '\nE: ' + g.E().group().by(values('lbl')).by(count()).toSet()
-    return v + e
     }
     
   def static geosearch(g, ra, dec, ang, jdmin, jdmax, limit) {
@@ -214,6 +210,10 @@ class Lomikel {
     return graph0
     }
     
+  def static g  
+  
+  def static gr
+    
   def static config    
        
   }
@@ -224,7 +224,5 @@ prop = args[0]
 home = args[1]
 
 graph = JanusGraphFactory.open(prop)
-g = graph.traversal()
-c = graph.configuration()
 
-Lomikel.init(c)
+Lomikel.init(graph)

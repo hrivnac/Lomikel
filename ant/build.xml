@@ -233,11 +233,12 @@
           depends="exe"
           description="Compile into native application">
     <exec executable="${graalvm_dir}/bin/native-image">
-      <arg value="--initialize-at-build-time=org.apache.log4j.Level,org.apache.log4j.Logger,org.apache.log4j.helpers.LogLog,org.apache.log4j.Priority,org.apache.log4j.LogManager,org.apache.log4j.helpers.Loader,org.apache.log4j.Category,org.apache.log4j.spi.RootLogger,org.apache.log4j.spi.LoggingEvent,org.slf4j.LoggerFactory,org.slf4j.impl.Log4jLoggerAdapter,org.slf4j.impl.Log4jLoggerFactory,org.slf4j.impl.StaticLoggerBinder"/>
-      <arg value="-H:Name=Lomikel.exe"/>
+      <!--arg value="- -initialize-at-build-time=org.apache.log4j.Level,org.apache.log4j.Logger,org.apache.log4j.helpers.LogLog,org.apache.log4j.Priority,org.apache.log4j.LogManager,org.apache.log4j.helpers.Loader,org.apache.log4j.Category,org.apache.log4j.spi.RootLogger,org.apache.log4j.spi.LoggingEvent,org.slf4j.LoggerFactory,org.slf4j.impl.Log4jLoggerAdapter,org.slf4j.impl.Log4jLoggerFactory,org.slf4j.impl.StaticLoggerBinder"/-->
+      <arg value="--initialize-at-build-time=org.apache.log4j.Level,org.apache.log4j.Logger,org.apache.log4j.helpers.LogLog,org.apache.log4j.Priority,org.apache.log4j.LogManager,org.apache.log4j.helpers.Loader,org.apache.log4j.Category,org.apache.log4j.spi.RootLogger,org.apache.log4j.spi.LoggingEvent,org.slf4j.LoggerFactory,org.slf4j.impl.Log4jLoggerAdapter,org.slf4j.impl.Log4jLoggerFactory,org.slf4j.impl.StaticLoggerBinder,org.apache.hadoop.hbase.shaded.org.jcodings.spi.ISO_8859_16,org.apache.hadoop.hbase.shaded.org.jcodings.spi.Charsets"/>
+      <arg value="-H:Name=Lomikel-Janus.exe"/>
       <arg value="-H:Path=../bin"/>
       <arg value="-jar"/>
-      <arg value="../lib/Lomikel.exe.jar"/>
+      <arg value="../lib/Lomikel-Janus.exe.jar"/>
       </exec>
     </target>
     
