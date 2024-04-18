@@ -167,16 +167,16 @@ trait GremlinRecipiesGT {
     variableNames.split().
                   stream().
                   each {v ->
-                        .V().has('lbl', lbl).
-                             values(v).
-                             fold().
-                             as(v).
-                             mean(local).
-                             as('mean').
-                             select(v).
-                             unfold().
-                             math('(_-mean)^2').
-                             mean().
+                        g.V().has('lbl', lbl).
+                              values(v).
+                              fold().
+                              as(v).
+                              mean(local).
+                              as('mean').
+                              select(v).
+                              unfold().
+                              math('(_-mean)^2').
+                              mean().
                              math('sqrt(_)').map {sd -> sdMap += [(v):sd]};
                         }
     return sdMap;

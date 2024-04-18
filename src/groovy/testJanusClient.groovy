@@ -6,4 +6,6 @@ gr = new FinkGremlinRecipiesG(jc);
 print(jc.g().V().limit(1).valueMap().next());
 print(gr.sourceNeighborhood("ZTF17aaawgky", ["ZTF18abablgk", "ZTF18ablxmyz"], null, 10));
 print(gr.stat());
+print(gr.classification("ZTF17aaawgky"));
+print(gr.overlaps());
 
