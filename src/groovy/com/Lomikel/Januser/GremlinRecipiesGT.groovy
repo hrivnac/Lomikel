@@ -62,7 +62,9 @@ trait GremlinRecipiesGT {
     * @param name  The name of the {@link Vertex} property to check or set.
     * @param value The value of the {@link Vertex} property to check or set.
     * @return      The found or created {@link Vertex}. */
-  def GraphTraversal get_or_create(lbl, name, value) {
+  def GraphTraversal get_or_create(String lbl,
+                                   String name,
+                                   String value) {
     get_or_create(g(), lbl, name, value);
     }
           

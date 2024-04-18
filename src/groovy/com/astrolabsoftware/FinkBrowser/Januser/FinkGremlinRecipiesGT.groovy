@@ -57,7 +57,12 @@ import org.apache.logging.log4j.LogManager;
 public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
   /** TBD */
-  def static GraphTraversal geosearch(ra, dec, ang, jdmin, jdmax, limit) {
+  def static GraphTraversal geosearch(double ra,
+                                      double dec,
+                                      double ang,
+                                      double jdmin,
+                                      double jdmax,
+                                      int    limit) {
     def lat = dec;
     def lon = ra - 180;
     def dist = ang * 6371.0087714 * Math.PI / 180;
@@ -66,7 +71,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (limit < nJD) {
       nJD = limit;
       }
-    return g.V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
+    return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
     }
       
   /** Give {@link Map} of other <em>source</em>s ordered
@@ -103,7 +108,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<String, Double> sourceNeighborhood(String       oid0,
                                              List<String> oidS,
                                              List<String> classes0,
-                                                int          nmax) {
+                                             int          nmax) {
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
     g().V(source0).inE().
@@ -181,7 +186,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                   It's format should be like <tt>Mon Feb 14 05:51:20 UTC 2022</tt>.
     * @param nCommit    The number of {Vertex}es to drop before each commit.
     * @param tWait      The times (in <tt>s</tt>) to wait after each commit. */
-  def static drop_by_date(importDate, nCommit, tWait) {
+  def drop_by_date(String importDate,
+                   int    nCommit,
+                   int    tWait) {
     def i = 0;
     def tot = 0;
     def nMax = g().V().has('importDate', importDate).count().next();
@@ -204,7 +211,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     
   /** Give status of importing from the <em>Import</em> {@link Vetex}es.
     * @return The status of importing from the <em>Import</em> {@link Vetex}es. */
-  def static String importStatus() {
+  def String importStatus() {
     def txt = '';
     txt += 'Imported:\n';
     g().V().has('lbl', 'Import').
@@ -228,7 +235,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return    The recorded classification calculated
     *            by number of classified <em>alert</em>s. */
   // TBD: handle missing oids
-  def static List classification(oid) {
+  def List classification(String oid) {
     return g().V().has('lbl', 'source').
                    has('objectId', oid).
                    inE().
@@ -240,7 +247,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     
   /** Give all overlaps.
     * @return The overlaps. */
-  def static Map overlaps() {
+  def Map overlaps() {
     def overlaps = [:];
     g().E().has('lbl', 'overlaps').
             order().
