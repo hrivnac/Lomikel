@@ -4,7 +4,7 @@ import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 
 class Lomikel {
 
-  def static init(graph, g) {
+  def static init(graph, g, c, gr) {
     graph = graph;
     g     = g;
     c     = c;
