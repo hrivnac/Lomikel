@@ -113,8 +113,8 @@ trait GremlinRecipiesGT {
     * @param lbl           The label for {@link Vertex}es to evaluate.
     * @param variableNames The names of variables to analyse. 
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
-  def Map standardDeviation(String lbl,
-                            variableNames) {
+  def Map standardDeviation(String       lbl,
+                            List<String> variableNames) {
     def sdMap = [:]
     variableNames.split().
                   stream().
@@ -139,7 +139,7 @@ trait GremlinRecipiesGT {
     * @param myName The name of the created {@link Graph}.
     *               If <tt>null</tt>, the graph will be only created in memory.
     * @return       The created {@link Graph}. */
-  def Graph myGraph(myName) {
+  def Graph myGraph(String myName) {
     def graph0
     def g0
     if (myName == null) {
@@ -168,7 +168,8 @@ trait GremlinRecipiesGT {
     * @param v The <em>datalink</em> {@link Vertex}.
     * @param q The special (external) database query to be used in place of the standard one. Optiponal.
     * @return The <em>datalink</em> content. */
-    def String getDataLink(v, q = null) {
+    def String getDataLink(Vertex v,
+                           String q = null) {
     def url   = v.values('url'  ).next();
     def query;
     if (q != null) {
