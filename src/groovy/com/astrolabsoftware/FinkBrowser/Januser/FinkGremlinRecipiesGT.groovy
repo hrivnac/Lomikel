@@ -81,10 +81,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                  <em>source</em> will be used if <tt>null</tt>.
     * @param nmax      The number of closest <em>source</em>s to give.
     * @return          The distances to other sources, order by the distance. */
-  public Map<String, Double> sourceNeighborhood(String   oid0,
-                                                String[] oidS,
-                                                String[] classes0,
-                                                int      nmax) {
+  def static Map<String, Double> sourceNeighborhood(String   oid0,
+                                                    String[] oidS,
+                                                    String[] classes0,
+                                                    int      nmax) {
     return sourceNeighborhood(oid0, Arrays.asList(oidS), Arrays.asList(classes0), nmax);
     }
     
@@ -100,9 +100,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                  <em>source</em> will be used if <tt>null</tt>.
     * @param nmax      The number of closest <em>source</em>s to give.
     * @return          The distances to other sources, order by the distance. */
-  public Map<String, Double> sourceNeighborhood(String       oid0,
-                                                List<String> oidS,
-                                                List<String> classes0,
+  def Map<String, Double> sourceNeighborhood(String       oid0,
+                                             List<String> oidS,
+                                             List<String> classes0,
                                                 int          nmax) {
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
