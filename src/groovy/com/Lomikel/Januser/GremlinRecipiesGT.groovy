@@ -134,6 +134,30 @@ trait GremlinRecipiesGT {
     return sdMap;
     }
 
+  /** Calculate deviations of {@link Edge}s.
+    * @param lbl           The label for {@link Edge}s to evaluate.
+    * @param variableNames The names of variables to analyse. 
+    * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
+  def Map standardDeviationE(String       lbl,
+                             List<String> variableNames) {
+    def sdMap = [:]
+    variableNames.split().
+                  stream().
+                  each {v ->
+                        g().E().has('lbl', lbl).
+                                values(v).
+                                fold().
+                                as(v).
+                                mean(local).
+                                as('mean').
+                                select(v).
+                                unfold().
+                                math('(_-mean)^2').
+                                mean().
+                                math('sqrt(_)').map {sd -> sdMap += [(v):sd]};
+                        }
+    return sdMap;
+    }
    
   /** Create a new {@link Graph} (on the default storage).
     * @param myName The name of the created {@link Graph}.
