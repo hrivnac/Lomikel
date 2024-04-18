@@ -164,20 +164,21 @@ trait GremlinRecipiesGT {
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
   def static Map standardDeviation(g, lbl, variableNames) {
     def sdMap = [:]
-    variableNames.split().stream().each {v ->
-                                         g.V().has('lbl', lbl).
-                                               values(v).
-                                               fold().
-                                               as(v).
-                                               mean(local).
-                                               as('mean').
-                                               select(v).
-                                               unfold().
-                                               math('(_-mean)^2').
-                                               mean().
-                                               math('sqrt(_)').map{sd -> println  v + ': ' + sd;                                                                                                    
-                                          sdMap += [(v):sd]}.next();
-                                          }
+    variableNames.split().
+                  stream().
+                  each {v ->
+                        .V().has('lbl', lbl).
+                             values(v).
+                             fold().
+                             as(v).
+                             mean(local).
+                             as('mean').
+                             select(v).
+                             unfold().
+                             math('(_-mean)^2').
+                             mean().
+                             math('sqrt(_)').map {sd -> sdMap += [(v):sd]};
+                        }
     return sdMap;
     }
    

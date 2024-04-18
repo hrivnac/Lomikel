@@ -109,11 +109,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     g().V(source0).inE().
                    project('cls', 'w').
                    by(outV().values('cls')).
-                   by(values('weight')).each {it ->
-                                              if (classes0 == null || it['cls'] in classes0) {
-                                                m0[it['cls']] = it['w'];
-                                                }
-                                              }
+                   by(values('weight')).
+                   each {it ->
+                         if (classes0 == null || it['cls'] in classes0) {
+                           m0[it['cls']] = it['w'];
+                           }
+                         }
     def classes = [];
     for (entry : m0.entrySet()) {
       classes += [entry.getKey()];
@@ -206,12 +207,54 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def static String importStatus() {
     def txt = '';
     txt += 'Imported:\n';
-    g().V().has('lbl', 'Import').has('nAlerts', neq(0)).order().by('importSource').valueMap('importSource', 'importDate', 'nAlerts').each{txt += '\t' + it + '\n'};
+    g().V().has('lbl', 'Import').
+            has('nAlerts', neq(0)).
+            order().
+            by('importSource').
+            valueMap('importSource', 'importDate', 'nAlerts').
+            each {txt += '\t' + it + '\n'};
     txt += 'Importing:\n';
-    g().V().has('lbl', 'Import').hasNot('complete').order().by('importSource').valueMap('importSource', 'importDate').each{txt += '\t' + it + '\n'};
+    g().V().has('lbl', 'Import').
+            hasNot('complete').
+            order().
+            by('importSource').
+            valueMap('importSource', 'importDate').
+            each {txt += '\t' + it + '\n'};
     return txt;
     }
 
+  /** Give recorded classification.
+    * @param oid The <em>source objectId</em>.
+    * @return    The recorded classification calculated
+    *            by number of classified <em>alert</em>s. */
+  // TBD: handle missing oids
+  def static List classification(oid) {
+    return g().V().has('lbl', 'source').
+                   has('objectId', oid).
+                   inE().
+                   project('weight', 'class').
+                   by(values('weight')).
+                   by(outV().has('lbl', 'SourcesOfInterest').values('cls')).
+                   toList();
+    }
+    
+  /** Give all overlaps.
+    * @return The overlaps. */
+  def static Map overlaps() {
+    def overlaps = [:];
+    g().E().has('lbl', 'overlaps').
+            order().
+            by('intersection', asc).
+            project('xlbl', 'xcls', 'ylbl', 'ycls', 'intersection').
+            by(inV().values('lbl')).
+            by(inV().values('cls')).
+            by(outV().values('lbl')).
+            by(outV().values('cls')).
+            by(values('intersection')).
+            each {v -> overlaps[v['xlbl'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['ycls']] = v['intersection']};
+    return overlaps.sort{it.value};
+    }
+    
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkGremlinRecipiesGT.class);
 
