@@ -87,12 +87,13 @@ trait GremlinRecipiesGT {
     * @param n     The number of {@link Vertex}es to drop for each commit. */
   def dropV(String label,
             int    n) {
-    def m = g().V().has('lbl', label).count().next()
+    def m = g().V().has('lbl', label).count().next();
     while (m > 0) {
-      println('' + m + ' ' + label + 's to drop')
-      g().V().has('lbl', label).limit(n).drop().iterate()
-      graph().traversal().tx().commit()
-      m -= n
+      println('' + m + ' ' + label + 's to drop');
+      g().V().has('lbl', label).limit(n).drop().iterate();
+      graph().traversal().tx().commit();
+      m -= n;
+      }
     }
     
   /** Drop {@link Edge}s by groups.
@@ -100,21 +101,21 @@ trait GremlinRecipiesGT {
     * @param n     The number of {@link Edge}s to drop for each commit. */
   def dropE(String label,
             int    n) {
-    def m = g().E().has('lbl', label).count().next()
+    def m = g().E().has('lbl', label).count().next();
     while (m > 0) {
-      println('' + m + ' ' + label + 's to drop')
-      g().E().has('lbl', label).limit(n).drop().iterate()
-      graph().traversal().tx().commit()
-      m -= n
+      println('' + m + ' ' + label + 's to drop');
+      g().E().has('lbl', label).limit(n).drop().iterate();
+      graph().traversal().tx().commit();
+      m -= n;
       }
-     }
+    }
 
   /** Calculate deviations of {@link Vertex}es.
     * @param lbl           The label for {@link Vertex}es to evaluate.
     * @param variableNames The names of variables to analyse. 
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
-  def Map standardDeviation(String       lbl,
-                            List<String> variableNames) {
+  def Map standardDeviationV(String       lbl,
+                             List<String> variableNames) {
     def sdMap = [:]
     variableNames.split().
                   stream().
@@ -192,7 +193,7 @@ trait GremlinRecipiesGT {
     * @param v The <em>datalink</em> {@link Vertex}.
     * @param q The special (external) database query to be used in place of the standard one. Optiponal.
     * @return The <em>datalink</em> content. */
-    def String getDataLink(Vertex v,
+    def String getDataLink(v, // TBD: type ?
                            String q = null) {
     def url   = v.values('url'  ).next();
     def query;
