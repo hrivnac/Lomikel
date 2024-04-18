@@ -4,7 +4,7 @@ import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 
 class Lomikel {
 
-  def static init(graph) {
+  def static init(graph, g) {
     graph  = graph;
     g      = graph.traversal();
     config = graph.configuration();
@@ -19,7 +19,7 @@ class Lomikel {
   def static graph;  
   def static g  ;
   def static gr;
-  def static config  ;  
+  def static config;  
        
   }
   
@@ -29,5 +29,7 @@ prop = args[0];
 home = args[1];
 
 graph = JanusGraphFactory.open(prop);
+g = graph.traversal();
+c = graph.configuration();
 
-Lomikel.init(graph);
+Lomikel.init(graph, g);
