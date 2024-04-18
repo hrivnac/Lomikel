@@ -58,12 +58,12 @@ import org.apache.logging.log4j.LogManager;
 public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
   /** TBD */
-  def static GraphTraversal geosearch(double ra,
-                                      double dec,
-                                      double ang,
-                                      double jdmin,
-                                      double jdmax,
-                                      int    limit) {
+  def GraphTraversal geosearch(double ra,
+                               double dec,
+                               double ang,
+                               double jdmin,
+                               double jdmax,
+                               int    limit) {
     def lat = dec;
     def lon = ra - 180;
     def dist = ang * 6371.0087714 * Math.PI / 180;
@@ -87,10 +87,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                  <em>source</em> will be used if <tt>null</tt>.
     * @param nmax      The number of closest <em>source</em>s to give.
     * @return          The distances to other sources, order by the distance. */
-  def static Map<String, Double> sourceNeighborhood(String   oid0,
-                                                    String[] oidS,
-                                                    String[] classes0,
-                                                    int      nmax) {
+  def  Map<String, Double> sourceNeighborhood(String   oid0,
+                                              String[] oidS,
+                                              String[] classes0,
+                                              int      nmax) {
     return sourceNeighborhood(oid0, Arrays.asList(oidS), Arrays.asList(classes0), nmax);
     }
     

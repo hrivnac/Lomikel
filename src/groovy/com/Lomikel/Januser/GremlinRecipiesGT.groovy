@@ -44,16 +44,8 @@ trait GremlinRecipiesGT {
     * @return The full statistics of {@link Vertex}es and {@link Edge}es in
     *         the database. */
   def String stat() {
-    return stat(g());
-    }
-    
-  /** Give full statistics of {@link Vertex}es and {@link Edge}es in the database.
-    * @param g The {@link GraphTraversalSource} to analyse.
-    * @return  The full statistics of {@link Vertex}es and {@link Edge}es in
-    *          the database. */
-  def static String stat(g) {
-    def v = '\nV: ' + g.V().group().by(values('lbl')).by(count()).toSet().toString();
-    def e = '\nE: ' + g.E().group().by(values('lbl')).by(count()).toSet().toString();
+    def v = '\nV: ' + g().V().group().by(values('lbl')).by(count()).toSet().toString();
+    def e = '\nE: ' + g().E().group().by(values('lbl')).by(count()).toSet().toString();
     return v + e;
     }
     
@@ -65,130 +57,89 @@ trait GremlinRecipiesGT {
   def GraphTraversal get_or_create(String lbl,
                                    String name,
                                    String value) {
-    get_or_create(g(), lbl, name, value);
+    return g().V().has('lbl', lbl).
+                   has(name, value).
+                   fold().
+                   coalesce(unfold(), addV(lbl).
+                                      property('lbl', lbl).
+                                      property(name, value));
     }
           
-  /** Get (if exists) or create (if doesn't exist) {@link Vertex}.
-    * @param g     The {@link GraphTraversalSource} to use.
-    * @param lbl   The {@link Vertex} label.
-    * @param name  The name of the {@link Vertex} property to check or set.
-    * @param value The value of the {@link Vertex} property to check or set.
-    * @return      The found or created {@link Vertex}. */
-  def static GraphTraversal get_or_create(g, lbl, name, value) {
-    return g.V().has('lbl', lbl).
-                 has(name, value).
-                 fold().
-                 coalesce(unfold(), addV(lbl).
-                                    property('lbl', lbl).
-                                    property(name, value));
-    }
     
   /** Get (if exists) or create (if doesn't exist) {@link Edge}.
     * @param lbl   The {@link Edge} label.
     * @param name  The name of the {@link Edge} property to check or set.
     * @param value The value of the {@link Edge} property to check or set.
     * @return      The found or created {@link Edge}. */
-  def GraphTraversal get_or_create_edge(lbl, name, value) {
-    get_or_create_edge(g(), lbl, name, value);
+  def GraphTraversal get_or_create_edge(String lbl,
+                                        String name,
+                                        String value) {
+    return g().V().has('lbl', lbl1).
+                   has(name1, value1).
+                   as('v').
+               V().has('lbl', lbl2).
+                   has(name2, value2).
+               coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
     }
-              
-  /** Get (if exists) or create (if doesn't exist) {@link Edge}.
-    * @param g     The {@link GraphTraversalSource} to use.
-    * @param lbl   The {@link Edge} label.
-    * @param name  The name of the {@link Edge} property to check or set.
-    * @param value The value of the {@link Edge} property to check or set.
-    * @return      The found or created {@link Edge}. */
-  def static GraphTraversal get_or_create_edge(g, lbl1, name1, value1, lbl2, name2, value2, edge) {
-    return g.V().has('lbl', lbl1).
-                 has(name1, value1).
-                 as('v').
-             V().has('lbl', lbl2).
-                 has(name2, value2).
-             coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
-      }
-      
+                    
   /** Drop {@link Vertex}es by groups.
     * @param label The label of {@link Vertex}es to drop.
     * @param n     The number of {@link Vertex}es to drop for each commit. */
-  def dropV(label, n) {
-    dropV(graph(), label, n);
-    }
-      
-  /** Drop {@link Vertex}es by groups.
-    * @param graph The {@link Graph} to use.
-    * @param label The label of {@link Vertex}es to drop.
-    * @param n     The number of {@link Vertex}es to drop for each commit. */
-  def static dropV(graph, label, n) {
-    def g = graph.traversal()
-    def m = g.V().has('lbl', label).count().next()
+  def dropV(String label,
+            int    n) {
+    def m = g().V().has('lbl', label).count().next()
     while (m > 0) {
       println('' + m + ' ' + label + 's to drop')
-      g.V().has('lbl', label).limit(n).drop().iterate()
-      graph.traversal().tx().commit()
+      g().V().has('lbl', label).limit(n).drop().iterate()
+      graph().traversal().tx().commit()
       m -= n
-      }
     }
     
   /** Drop {@link Edge}s by groups.
     * @param label The label of {@link Edge}s to drop.
     * @param n     The number of {@link Edge}s to drop for each commit. */
-   def dropE(label, n) {
-     dropE(graph(), label, n);
+  def dropE(String label,
+            int    n) {
+    def m = g().E().has('lbl', label).count().next()
+    while (m > 0) {
+      println('' + m + ' ' + label + 's to drop')
+      g().E().has('lbl', label).limit(n).drop().iterate()
+      graph().traversal().tx().commit()
+      m -= n
+      }
      }
-    
-  /** Drop {@link Edge}s by groups.
-    * @param graph The {@link Graph} to use.
-    * @param label The label of {@link Edge}s to drop.
-    * @param n     The number of {@link Edge}s to drop for each commit. */
-   def static dropE(graph, label, n) {
-    def g = graph.traversal()
-    def m = g.E().has('lbl', label).count().next()
-    while (m > 0) {
-      println('' + m + ' ' + label + 's to drop')
-      g.E().has('lbl', label).limit(n).drop().iterate()
-      graph.traversal().tx().commit()
-      m -= n
-      }
-    }
 
   /** Calculate deviations of {@link Vertex}es.
     * @param lbl           The label for {@link Vertex}es to evaluate.
     * @param variableNames The names of variables to analyse. 
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
-  def static Map standardDeviation(lbl, variableNames) {
-    return standardDeviation(g(), lbl, variableName);
-    }
-
-  /** Calculate deviations of {@link Vertex}es.
-    * @param g     The {@link GraphTraversalSource} to use.
-    * @param lbl           The label for {@link Vertex}es to evaluate.
-    * @param variableNames The names of variables to analyse. 
-    * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
-  def static Map standardDeviation(g, lbl, variableNames) {
+  def Map standardDeviation(String lbl,
+                            variableNames) {
     def sdMap = [:]
     variableNames.split().
                   stream().
                   each {v ->
-                        g.V().has('lbl', lbl).
-                              values(v).
-                              fold().
-                              as(v).
-                              mean(local).
-                              as('mean').
-                              select(v).
-                              unfold().
-                              math('(_-mean)^2').
-                              mean().
-                             math('sqrt(_)').map {sd -> sdMap += [(v):sd]};
+                        g().V().has('lbl', lbl).
+                                values(v).
+                                fold().
+                                as(v).
+                                mean(local).
+                                as('mean').
+                                select(v).
+                                unfold().
+                                math('(_-mean)^2').
+                                mean().
+                                math('sqrt(_)').map {sd -> sdMap += [(v):sd]};
                         }
     return sdMap;
     }
+
    
   /** Create a new {@link Graph} (on the default storage).
     * @param myName The name of the created {@link Graph}.
     *               If <tt>null</tt>, the graph will be only created in memory.
     * @return       The created {@link Graph}. */
-  def static Graph myGraph(myName) {
+  def Graph myGraph(myName) {
     def graph0
     def g0
     if (myName == null) {
@@ -217,7 +168,7 @@ trait GremlinRecipiesGT {
     * @param v The <em>datalink</em> {@link Vertex}.
     * @param q The special (external) database query to be used in place of the standard one. Optiponal.
     * @return The <em>datalink</em> content. */
-    def static String getDataLink(v, q = null) {
+    def String getDataLink(v, q = null) {
     def url   = v.values('url'  ).next();
     def query;
     if (q != null) {
@@ -245,8 +196,7 @@ trait GremlinRecipiesGT {
                                         set('storage.port',        port    ).
                                         set('storage.hbase.table', table   ).
                                         open();
-          def g = graph.traversal();
-          return Eval.me('g', g, query);
+          return Eval.me('g', g(), query);
           break
         case 'Phoenix':
           return Sql.newInstance(url, 'org.apache.phoenix.jdbc.PhoenixDriver').
