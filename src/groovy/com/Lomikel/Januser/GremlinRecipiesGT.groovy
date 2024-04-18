@@ -8,11 +8,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import org.apache.tinkerpop.gremlin.structure.Graph;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.count;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.values;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.property;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;

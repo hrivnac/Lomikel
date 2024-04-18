@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 /** <code>LomikelException</code> provides the customised
   * {@link Exception} behaviour.

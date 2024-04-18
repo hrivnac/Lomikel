@@ -6,17 +6,17 @@ import com.Lomikel.Utils.LomikelException;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
 // Janus Graph
 import org.janusgraph.graphdb.vertices.StandardVertex;

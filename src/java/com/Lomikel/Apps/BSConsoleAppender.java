@@ -4,9 +4,7 @@ package com.Lomikel.Apps;
 import java.io.Serializable;
 
 // Log4J
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.Filter;

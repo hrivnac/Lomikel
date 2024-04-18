@@ -3,7 +3,7 @@ NOW=`date +"%Y%m%d%H%M%s"`
 LOG=/tmp/fillSOI-${NOW}.log
 LOCK=/tmp/fillSOI.lock 
 if [[ -e ${LOCK} ]]; then
-  echo "Already filling SOI with ${LOCK}"
+  echo "Already filling SoI with ${LOCK}"
   exit
   fi
 PID=$$
