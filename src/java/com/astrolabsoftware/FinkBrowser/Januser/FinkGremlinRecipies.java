@@ -303,7 +303,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         boolean     enhance,
                                         String      columns) {   
     log.info("\t\tregistering " + objectId + " as " + cls);
-    Vertex soi = g().V().has("SourcesOfInterest", "lbl", "SourcesOfInterest").
+    Vertex soi = g().V().has("lbl", "SourcesOfInterest").
                          has("cls", cls).
                          fold().
                          coalesce(unfold(), 
@@ -313,7 +313,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                   property("technology", "HBase"            ).
                                   property("url",        hbaseUrl           )).
                          next();
-    Vertex s = g().V().has("source", "lbl", "source").
+    Vertex s = g().V().has("lbl", "source").
                        has("objectId", objectId).
                        fold().
                        coalesce(unfold(), 
@@ -394,7 +394,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     for (String jd : jds) {
       n++;
       key = objectId + "_" + jd.trim();
-      alert = g().V().has("alert", "lbl", "alert").
+      alert = g().V().has("lbl", "alert").
                       has("objectId", objectId).
                       has("jd",       jd).
                       fold().
@@ -578,7 +578,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         cls      = contains.outVertex().property("cls").value().toString();
         hbaseUrl = contains.outVertex().property("url").value().toString();
         key = objectId + "_" + jd;
-        aoi = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
+        aoi = g().V().has("lbl", "AlertsOfInterest").
                       has("cls", cls).
                       fold().
                       coalesce(unfold(), 
@@ -656,7 +656,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           corrSS.put(rel, cor + 1.0);
           // SoI-AoI
           if (!corrSA.containsKey(rel)) {
-            corrSA.put(rel, 0);
+            corrSA.put(rel, 0.0);
             }
           cor = corrSA.get(rel);
           corrSA.put(rel, cor + weight2);
@@ -664,30 +664,29 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       }
     // Create overlaps
-    String hbaseUrl = "";
     int nss = 0;
     int nsa = 0;
-    // loop over SoI and create AoI
+    // Loop over SoI and create AoI
+    String hbaseUrl = g().V().has("lbl", "SourcesOfInterest").limit(1).values("url").value().toString();
     for (String cls1 : types) {
-      g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                            has("cls", cls1).
-                            fold().
-                            coalesce(unfold(), 
-                                     addV("AlertsOfInterest").
-                                     property("lbl",        "AlertsOfInterest").
-                                     property("cls",        cls1              ).
-                                     property("technology", "HBase"           ).
-                                     property("url",        hbaseUrl          )).
-                            iterate();
+      g().V().has("lbl", "AlertsOfInterest").
+              has("cls", cls1).
+              fold().
+              coalesce(unfold(), 
+                       addV("AlertsOfInterest").
+                       property("lbl",        "AlertsOfInterest").
+                       property("cls",        cls1              ).
+                       property("technology", "HBase"           ).
+                       property("url",        hbaseUrl          )).
+              iterate();
       }
-    // double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
+    // Double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
     for (String cls1 : types) {
       soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls1).next();
       for (String cls2 : types) {
         if (corrSS.containsKey(Pair.of(cls1, cls2))) {
           nss++;
           soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
-          hbaseUrl = soi2.property("url").value().toString();
           addEdge(g().V(soi1).next(),
                   g().V(soi2).next(),
                   "overlaps",
@@ -701,24 +700,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }  
         }
       }
-    // double-loop over SoI and create overlaps Edge SoI-AoI if non empty 
+    // Double-loop over SoI and create overlaps Edge SoI-AoI if non empty 
     for (String cls1 : types) {
       soi1 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls1).next();
       for (String cls2 : types) {
         if (corrSA.containsKey(Pair.of(cls1, cls2))) {
           nsa++;
-          soi2 = g().V().has("lbl", "SourcesOfInterest").has("cls", cls2).next();
-          hbaseUrl = soi2.property("url").value().toString();
-          aoi2 = g().V().has("AlertsOfInterest", "lbl", "AlertsOfInterest").
-                         has("cls", cls2).
-                         fold().
-                         coalesce(unfold(), 
-                                  addV("AlertsOfInterest").
-                                  property("lbl",        "AlertsOfInterest").
-                                  property("cls",        cls2              ).
-                                  property("technology", "HBase"           ).
-                                  property("url",        hbaseUrl          )).
-                         next();
+          aoi2 = g().V().has("lbl", "AlertsOfInterest").has("cls", cls2).next();
           addEdge(g().V(soi1).next(),
                   g().V(aoi2).next(),
                   "overlaps",
