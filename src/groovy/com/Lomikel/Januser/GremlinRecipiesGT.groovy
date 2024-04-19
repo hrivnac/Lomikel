@@ -149,7 +149,7 @@ trait GremlinRecipiesGT {
     def sdMap = [:];
     variableNames.stream().
                   each {v ->
-                        def x = g().E().has('lbl', lbl).limit(100).
+                        def x = g().E().has('lbl', lbl).
                                         values(v).
                                         fold().
                                         as(v).
