@@ -123,18 +123,18 @@ trait GremlinRecipiesGT {
     def sdMap = [:];
     variableNames.stream().
                   each {v ->
-                        x = g().V().has('lbl', lbl).
-                                    values(v).
-                                    fold().
-                                    as(v).
-                                    mean(local).
-                                    as('mean').
-                                    select(v).
-                                    unfold().
-                                    math('(_-mean)^2').
-                                    mean().
-                                    math('sqrt(_)').
-                                    next();
+                        def x = g().V().has('lbl', lbl).
+                                        values(v).
+                                        fold().
+                                        as(v).
+                                        mean(local).
+                                        as('mean').
+                                        select(v).
+                                        unfold().
+                                        math('(_-mean)^2').
+                                        mean().
+                                        math('sqrt(_)').
+                                        next();
                         sdMap[v] = x;
                         }
     return sdMap;
@@ -149,18 +149,18 @@ trait GremlinRecipiesGT {
     def sdMap = [:];
     variableNames.stream().
                   each {v ->
-                        x = g().E().has('lbl', lbl).
-                                    values(v).
-                                    fold().
-                                    as(v).
-                                    mean(local).
-                                    as('mean').
-                                    select(v).
-                                    unfold().
-                                    math('(_-mean)^2').
-                                    mean().
-                                    math('sqrt(_)').
-                                    next();
+                        def x = g().E().has('lbl', lbl).limit(100).
+                                        values(v).
+                                        fold().
+                                        as(v).
+                                        mean(local).
+                                        as('mean').
+                                        select(v).
+                                        unfold().
+                                        math('(_-mean)^2').
+                                        mean().
+                                        math('sqrt(_)').
+                                        next();
                         sdMap[v] = x;
                         }
     return sdMap;
