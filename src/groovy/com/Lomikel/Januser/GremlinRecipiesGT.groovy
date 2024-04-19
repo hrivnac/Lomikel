@@ -135,7 +135,7 @@ trait GremlinRecipiesGT {
                                     mean().
                                     math('sqrt(_)').
                                     next();
-                        sdMap[v] = x;}
+                        sdMap[v] = x;
                         }
     return sdMap;
     }
@@ -161,7 +161,7 @@ trait GremlinRecipiesGT {
                                     mean().
                                     math('sqrt(_)').
                                     next();
-                        sdmap[v] = x;}
+                        sdMap[v] = x;
                         }
     return sdMap;
     }
