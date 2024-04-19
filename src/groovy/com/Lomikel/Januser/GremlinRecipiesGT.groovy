@@ -120,7 +120,7 @@ trait GremlinRecipiesGT {
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
   def Map standardDeviationV(String       lbl,
                              List<String> variableNames) {
-    sdMap = [:];
+    def sdMap = [:];
     variableNames.stream().
                   each {v ->
                         x = g().V().has('lbl', lbl).
@@ -146,7 +146,7 @@ trait GremlinRecipiesGT {
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
   def Map standardDeviationE(String       lbl,
                              List<String> variableNames) {
-    sdMap = [:];
+    def sdMap = [:];
     variableNames.stream().
                   each {v ->
                         x = g().E().has('lbl', lbl).
