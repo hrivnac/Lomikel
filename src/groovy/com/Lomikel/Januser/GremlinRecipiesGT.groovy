@@ -119,8 +119,7 @@ trait GremlinRecipiesGT {
   def Map standardDeviationV(String       lbl,
                              List<String> variableNames) {
     def sdMap = [:]
-    variableNames.split().
-                  stream().
+    variableNames.stream().
                   each {v ->
                         g().V().has('lbl', lbl).
                                 values(v).
@@ -144,8 +143,7 @@ trait GremlinRecipiesGT {
   def Map standardDeviationE(String       lbl,
                              List<String> variableNames) {
     def sdMap = [:]
-    variableNames.split().
-                  stream().
+    variableNames.stream().
                   each {v ->
                         g().E().has('lbl', lbl).
                                 values(v).
