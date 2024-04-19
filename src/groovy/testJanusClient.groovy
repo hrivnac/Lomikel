@@ -8,4 +8,5 @@ print(gr.sourceNeighborhood("ZTF17aaawgky", ["ZTF18abablgk", "ZTF18ablxmyz"], nu
 print(gr.stat());
 print(gr.classification("ZTF17aaawgky"));
 print(gr.overlaps());
+print(gr.standardDeviationE('deepcontains', ['weight']));
 

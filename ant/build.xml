@@ -1093,7 +1093,8 @@
       <group title="Fink Portal Client" packages="com.astrolabsoftware.FinkBrowser.FinkPOrtalClient*"/>
       <group title="Fink WebService"    packages="com.astrolabsoftware.FinkBrowser.WebService*"/>
       <group title="LehmanUtils"        packages="de.lehmannet.om.util*"/>
-      <link href="http://docs.oracle.com/javase/11/docs/api" packagelistLoc="${javadoc}" offline="true"/>
+      <link href="http://docs.oracle.com/javase/11/docs/api"/>
+      <link href="http://docs.groovy-lang.org/latest/html/api"/>
       <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>
       <link href="https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs"/>
@@ -1121,7 +1122,7 @@
           description="Construct Groovy documentation">
     <groovydoc destdir="../doc/GroovyDoc"
              sourcepath="../src/groovy"
-             packagenames="**.*"
+             packagenames="com.Lomikel.Januser.*,com.astrolabsoftware.FinkBrowser.Januser.*"
              use="true"
              windowtitle="Lomikel"
              doctitle="&lt;u&gt;Lomikel&lt;/u&gt;"
@@ -1129,8 +1130,21 @@
              footer="Written by: &lt;a href='http://cern.ch/hrivnac'&gt;J.Hrivnac&lt;/a&gt;&lt;br/&gt;&lt;a href='https://cern.ch/hrivnac/Activities/Packages/Lomikel'&gt;Documentation&lt;/a&gt; built ${TODAY} on ${os.name} by ${user.name}"
              overview="../src/groovy/com/Lomikel/overview.html"
              private="true">
-      <link packages="java.,org.xml.,javax.,org.xml." href="http://docs.oracle.com/javase/11/docs/api/"/>
-      <link packages="groovy.,org.codehaus.groovy."   href="http://docs.groovy-lang.org/latest/html/api/"/>
+      <link href="http://docs.oracle.com/javase/11/docs/api"/>
+      <link href="http://docs.groovy-lang.org/latest/html/api"/>
+      <link href="http://www.beanshell.org/javadoc/"/>
+      <link packages="org.apache.logging.log4j." href="https://logging.apache.org/log4j/1.2/apidocs"/>
+      <link href="https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs"/>
+      <link href="http://stleary.github.io/JSON-java"/>
+      <link href="https://commons.apache.org/proper/commons-cli/apidocs"/>
+      <link href="https://javadoc.io/doc/org.janusgraph/janusgraph-core/latest"/>
+      <link href="https://tinkerpop.apache.org/javadocs/current/full"/>
+      <link href="http://www.beanshell.org/javadoc"/>
+      <link href="https://commons.apache.org/proper/commons-cli/apidocs"/>
+      <link href="https://cds-astro.github.io/cds-healpix-java/apidocs"/>
+      <link href="https://avro.apache.org/docs/1.8.2/api/java"/>
+      <link href="https://javadoc.io/doc/org.python/jython-standalone/latest"/>
+      <link packages="com.Lomikel.,com.astrolabsoftware." href="https://cern.ch/hrivnac/Activities/Packages/Lomikel/JavaDoc"/>
       </groovydoc>
     </target>
 
