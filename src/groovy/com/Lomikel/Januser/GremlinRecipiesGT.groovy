@@ -23,6 +23,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
+import static org.apache.tinkerpop.gremlin.process.traversal.Scope.local;
 
 // JanusGraph
 import org.janusgraph.core.JanusGraphFactory;
@@ -118,7 +119,7 @@ trait GremlinRecipiesGT {
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
   def Map standardDeviationV(String       lbl,
                              List<String> variableNames) {
-    def sdMap = [:]
+    def sdMap = [:];
     variableNames.stream().
                   each {v ->
                         g().V().has('lbl', lbl).
@@ -131,7 +132,8 @@ trait GremlinRecipiesGT {
                                 unfold().
                                 math('(_-mean)^2').
                                 mean().
-                                math('sqrt(_)').map {sd -> sdMap += [(v):sd]};
+                                math('sqrt(_)').
+                                map {sd -> sdMap += [(v):sd]};
                         }
     return sdMap;
     }
@@ -142,7 +144,7 @@ trait GremlinRecipiesGT {
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
   def Map standardDeviationE(String       lbl,
                              List<String> variableNames) {
-    def sdMap = [:]
+    def sdMap = [:];
     variableNames.stream().
                   each {v ->
                         g().E().has('lbl', lbl).
@@ -155,7 +157,8 @@ trait GremlinRecipiesGT {
                                 unfold().
                                 math('(_-mean)^2').
                                 mean().
-                                math('sqrt(_)').map {sd -> sdMap += [(v):sd]};
+                                math('sqrt(_)').
+                                map {sd -> sdMap += [(v):sd]};
                         }
     return sdMap;
     }
