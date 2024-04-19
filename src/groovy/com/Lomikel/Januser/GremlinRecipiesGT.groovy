@@ -27,6 +27,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.Scope.local;
 
 // JanusGraph
 import org.janusgraph.core.JanusGraphFactory;
+
 // Groovy
 import groovy.sql.Sql
 
@@ -119,21 +120,22 @@ trait GremlinRecipiesGT {
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
   def Map standardDeviationV(String       lbl,
                              List<String> variableNames) {
-    def sdMap = [:];
+    sdMap = [:];
     variableNames.stream().
                   each {v ->
-                        g().V().has('lbl', lbl).
-                                values(v).
-                                fold().
-                                as(v).
-                                mean(local).
-                                as('mean').
-                                select(v).
-                                unfold().
-                                math('(_-mean)^2').
-                                mean().
-                                math('sqrt(_)').
-                                map {sd -> sdMap += [(v):sd]};
+                        x = g().V().has('lbl', lbl).
+                                    values(v).
+                                    fold().
+                                    as(v).
+                                    mean(local).
+                                    as('mean').
+                                    select(v).
+                                    unfold().
+                                    math('(_-mean)^2').
+                                    mean().
+                                    math('sqrt(_)').
+                                    next();
+                        sdMap[v] = x;}
                         }
     return sdMap;
     }
@@ -144,21 +146,22 @@ trait GremlinRecipiesGT {
     * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
   def Map standardDeviationE(String       lbl,
                              List<String> variableNames) {
-    def sdMap = [:];
+    sdMap = [:];
     variableNames.stream().
                   each {v ->
-                        g().E().has('lbl', lbl).
-                                values(v).
-                                fold().
-                                as(v).
-                                mean(local).
-                                as('mean').
-                                select(v).
-                                unfold().
-                                math('(_-mean)^2').
-                                mean().
-                                math('sqrt(_)').
-                                map {sd -> sdMap += [(v):sd]};
+                        x = g().E().has('lbl', lbl).
+                                    values(v).
+                                    fold().
+                                    as(v).
+                                    mean(local).
+                                    as('mean').
+                                    select(v).
+                                    unfold().
+                                    math('(_-mean)^2').
+                                    mean().
+                                    math('sqrt(_)').
+                                    next();
+                        sdmap[v] = x;}
                         }
     return sdMap;
     }
