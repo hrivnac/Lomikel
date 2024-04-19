@@ -602,8 +602,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
   public void generateCorrelations() {
     log.info("Generating correlations for Alerts of Interest");
-    // Clean all correlations
+    // Clean all correlations 
     g().E().has("lbl", "overlaps").drop().iterate();
+    // Remove wrong SoI, AoI
     g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
     // Accumulate correlations and sizes
@@ -625,13 +626,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex aoi2;
     String cls;
     Pair<String, String> rel;
-    // loop over sources and accumulated weights to each source
+    // Loop over sources and accumulated weights to each source
     while (sourceT.hasNext()) {
-      source = sourceT.next();
-      deepcontainsIt = source.edges(Direction.IN);
       types0.clear();
       weights.clear(); 
-      // get all weights to this source
+      source = sourceT.next();
+      deepcontainsIt = source.edges(Direction.IN);
+      // Get all weights to this source
       while (deepcontainsIt.hasNext()) {
         deepcontains = deepcontainsIt.next();
         weight = (Double)(deepcontains.property("weight").value());
@@ -641,7 +642,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         types.add(cls);
         weights.put(cls, weight);
         }
-      // double loop over accumulated weights and fill weights between SoIs
+      // Double loop over accumulated weights and fill weights between SoIs
       for (String cls1 : types0) {
         weight1 = weights.get(cls1);
         for (String cls2 : types0) {
@@ -649,20 +650,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           rel = Pair.of(cls1, cls2);
           // SoI-SoI
           if (!corrSS.containsKey(rel)) {
-            corrSS.put(rel, 1.0);
+            corrSS.put(rel, 0.0);
             }
           cor = corrSS.get(rel);
           corrSS.put(rel, cor + 1.0);
           // SoI-AoI
           if (!corrSA.containsKey(rel)) {
-            corrSA.put(rel, weight2);
+            corrSA.put(rel, 0);
             }
           cor = corrSA.get(rel);
           corrSA.put(rel, cor + weight2);
           }
         }
       }
-    // Creating overlaps
+    // Create overlaps
     String hbaseUrl = "";
     int nss = 0;
     int nsa = 0;
