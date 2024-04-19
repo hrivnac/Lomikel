@@ -943,14 +943,12 @@
   <!-- Dist =================================================================-->
 
   <target name="dist"
-          depends="exe,doc"
+          depends="war,doc"
           description="Construct distribution">
     <mkdir dir="../dist"/>
     <copy todir="../dist">
 			<fileset dir="../lib" includes="*.jar"/>
-			<fileset dir="../extlib/import" includes="*.jar"/>
       </copy>
-    <exec executable="../src/sh/packExtJars.sh"/>
   </target>
 
   <!-- Run =================================================================-->
@@ -1017,7 +1015,7 @@
   <!-- JavaDoc ==============================================================-->
 
   <target name="doc"
-          depends="jar,j2h,viz,gdoc"
+          depends="exe,j2h,viz,gdoc"
           description="Construct Java documentation">
     <mkdir dir="../doc"/>
  		<copy todir="../doc">
@@ -1151,7 +1149,7 @@
   <!-- Post =================================================================-->
 
   <target name="post"
-          depends="jar,doc,war,dist"
+          depends="dist"
           description="Post documentation and distribution">
     <delete includeEmptyDirs="true">
       <fileset dir="${doc}" includes="**/*"/>
@@ -1211,6 +1209,9 @@
         </classpath>
       </taskdef>
     <vizant antfile="../ant/build.xml" outfile="../doc/build.dot"/>
+    <exec executable="${dot}">
+      <arg line="-T jpg ../doc/build.dot -O"/>
+      </exec>
     </target>
     
   <!-- Find Bugs ============================================================-->  
