@@ -674,10 +674,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       sizeS0 = 0.0;
       sizeA0 = 0.0;
       for (String cls2 : types) {
-        if (corrS.contains(Pair.of(cls1, cls2))) {
+        if (corrS.containsKey(Pair.of(cls1, cls2))) {
           sizeS0 += corrS.get(Pair.of(cls1, cls2));
           }
-        if (corrA.contains(Pair.of(cls1, cls2))) {
+        if (corrA.containsKey(Pair.of(cls1, cls2))) {
           sizeA0 += corrA.get(Pair.of(cls1, cls2));
           }
         }
