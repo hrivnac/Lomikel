@@ -493,7 +493,7 @@ function fillEdges() {
          callGremlinGraph(gr + ".V(" + selectedNodeI.id + ").outE().filter(inV().hasId(" + selectedNodeJ.id + "))");
         }
       if (document.getElementById('expandFrom').checked) {
-         callGremlinGraph(gr + ".V(" + selectedNodeI.id + ").inE().filter(inV().hasId(" + selectedNodeJ.id + "))");
+         callGremlinGraph(gr + ".V(" + selectedNodeI.id + ").inE().filter(outV().hasId(" + selectedNodeJ.id + "))");
         }
       }
     }
