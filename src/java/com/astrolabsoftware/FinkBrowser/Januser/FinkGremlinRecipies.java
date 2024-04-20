@@ -662,7 +662,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               corrA.put(rel, 0.0);
               }
             cor = corrA.get(rel);
-            corrA.put(rel, cor + weight2);
+            corrA.put(rel, cor + 1.0);
             }
           }
         }
