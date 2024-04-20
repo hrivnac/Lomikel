@@ -485,6 +485,22 @@ function clusterExpand() {
 // TBD: limit to visible nodes
 function fillEdges() {
   for (var i = 0; i < nodes.length; i++) {
+    for (var j = 0; j < nodes.length; j++) {
+      var selectedNodeI = nodes[i];
+      var selectedNodeJ = nodes[j];
+      document.getElementById("feedback").innerHTML += "Expanding " + selectedNodeI.label + "-" + selectedNodeJ + "<br/>";
+      if (document.getElementById('expandTo').checked) {
+         callGremlinGraph(gr + ".V(" + selectedNodeI.id + ").outE().filter(inV().hasId(" + selectedNodeJ.id + "))");
+        }
+      if (document.getElementById('expandFrom').checked) {
+         callGremlinGraph(gr + ".V(" + selectedNodeI.id + ").inE().filter(inV().hasId(" + selectedNodeJ.id + "))");
+        }
+      }
+    }
+  }
+  
+function fillAllEdges() {
+  for (var i = 0; i < nodes.length; i++) {
     var selectedNode = nodes[i];
     document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
     if (document.getElementById('expandTo').checked) {
@@ -492,7 +508,7 @@ function fillEdges() {
       }
     if (document.getElementById('expandFrom').checked) {
        callGremlinGraph(gr + ".V(" + selectedNode.id + ").inE()");
-      }  
+      }
     }
   }
   
