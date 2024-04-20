@@ -20,6 +20,10 @@
   long   n12 = Long.valueOf(request.getParameter("n12"));
   String m1  =              request.getParameter("m1");
   String m2  =              request.getParameter("m2");
+  if (m1.equals(m2)) {
+    m1 = m1 + "_1";
+    m2 = m2 + "_2";
+    }
   %>
   
 <table>
