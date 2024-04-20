@@ -17,8 +17,7 @@
      <input type="button" onclick="clusterByGroups()"  value="Cluster by group type" style="background-color:#bbffbb;">
      <input type="button" onclick="clusterByHubsize()" value="Cluster by group size" style="background-color:#bbffbb;">
      <input type="button" onclick="clusterExpand()"    value="Expand all clusters"   style="background-color:#bbffbb;">
-     <input type="button" onclick="fillEdges()"        value="Show internal edges"   style="background-color:#bbffbb;">
-     <input type="button" onclick="fillAllEdges()"     value="Show all edges"        style="background-color:#bbffbb;">
+     <input type="button" onclick="fillEdges()"        value="Show all edges"        style="background-color:#bbffbb;">
      <input type="checkbox" name="layout"     id="glayout"           onclick="switchLayout()"  value="false" title="hierarchical layout"                   >hierarchical</input>
     (<input type="checkbox" name="layout"     id="glayout_direction" onclick="switchLayout()"  value="false" title="up-down or left-right"                 >up/lr</input>
      <input type="checkbox" name="layout"     id="glayout_method"    onclick="switchLayout()"  value="false" title="ordered by size or hierarchy"          >size/hierarchy</input>)

@@ -498,20 +498,6 @@ function fillEdges() {
       }
     }
   }
-
-// Fill Edges, incl. those, going outside
-function fillAllEdges() {
-  for (var i = 0; i < nodes.length; i++) {
-    var selectedNode = nodes[i];
-    document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
-    if (document.getElementById('expandTo').checked) {
-       callGremlinGraph(gr + ".V(" + selectedNode.id + ").outE()");
-      }
-    if (document.getElementById('expandFrom').checked) {
-       callGremlinGraph(gr + ".V(" + selectedNode.id + ").inE()");
-      }
-    }
-  }
   
 // Cluster by Zoom
 function makeClusters(scale) {
