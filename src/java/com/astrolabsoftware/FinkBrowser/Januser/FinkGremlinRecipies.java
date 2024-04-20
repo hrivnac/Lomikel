@@ -608,13 +608,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     g().V().has("lbl", "AlertsOfInterest").not(has("cls")).drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
     // Accumulate correlations and sizes
-    Map<String, Double>               weights = new HashMap<>(); // cls -> weight (for one source)
-    Map<Pair<String, String>, Double> corrS   = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between SoI-SoI)
-    Map<Pair<String, String>, Double> corrA   = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between AoI-AoI)
-    Map<String, Double>               sizeS   = new HashMap<>(); // cls -> total (for all sources of SoI)
-    Map<String, Double>               sizeA   = new HashMap<>(); // cls -> total (for all sources of AoI)
-    SortedSet<String>                 types0  = new TreeSet<>(); // [cls] (for one source)
-    SortedSet<String>                 types   = new TreeSet<>(); // [cls] (for all sources)
+    Map<String, Double>               weights1 = new HashMap<>(); // cls -> weight (for one source)
+    Map<Pair<String, String>, Double> corrS    = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between SoI-SoI)
+    Map<Pair<String, String>, Double> corrA    = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between AoI-AoI)
+    Map<String, Double>               sizeS    = new HashMap<>(); // cls -> total (for all sources of SoI)
+    Map<String, Double>               sizeA    = new HashMap<>(); // cls -> total (for all sources of AoI)
+    SortedSet<String>                 types1   = new TreeSet<>(); // [cls] (for one source)
+    SortedSet<String>                 types    = new TreeSet<>(); // [cls] (for all sources)
     GraphTraversal<Vertex, Vertex> sourceT = g().V().has("lbl", "source");
     Vertex source;
     Iterator<Edge> deepcontainsIt;
@@ -631,39 +631,39 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Pair<String, String> rel;
     // Loop over sources and accumulated weights to each source
     while (sourceT.hasNext()) {
-      types0.clear();
-      weights.clear(); 
+      weights1.clear();
+      types1.clear();
       source = sourceT.next();
       deepcontainsIt = source.edges(Direction.IN);
       // Get all weights to this source
       while (deepcontainsIt.hasNext()) {
-        types0.clear();
+        types1.clear();
         deepcontains = deepcontainsIt.next();
         weight = (Double)(deepcontains.property("weight").value());
         soi1 = deepcontains.outVertex();
         cls = soi1.property("cls").value().toString();
-        types0.add(cls);
+        types1.add(cls);
         types.add(cls);
-        weights.put(cls, weight);
-        }
-      // Double loop over accumulated weights and fill weights between SoIs/AoIs
-      for (String cls1 : types0) {
-        weight1 = weights.get(cls1);
-        for (String cls2 : types0) {
-          weight2 = weights.get(cls2);
-          rel = Pair.of(cls1, cls2);
-          // SoI-SoI
-          if (!corrS.containsKey(rel)) {
-            corrS.put(rel, 0.0);
+        weights1.put(cls, weight);
+        // Double loop over accumulated weights and fill weights between SoIs/AoIs
+        for (String cls1 : types1) {
+          weight1 = weights1.get(cls1);
+          for (String cls2 : types1) {
+            weight2 = weights1.get(cls2);
+            rel = Pair.of(cls1, cls2);
+            // SoI-SoI
+            if (!corrS.containsKey(rel)) {
+              corrS.put(rel, 0.0);
+              }
+            cor = corrS.get(rel);
+            corrS.put(rel, cor + 1.0);
+            // AoI-AoI
+            if (!corrA.containsKey(rel)) {
+              corrA.put(rel, 0.0);
+              }
+            cor = corrA.get(rel);
+            corrA.put(rel, cor + weight2);
             }
-          cor = corrS.get(rel);
-          corrS.put(rel, cor + 1.0);
-          // AoI-AoI
-          if (!corrA.containsKey(rel)) {
-            corrA.put(rel, 0.0);
-            }
-          cor = corrA.get(rel);
-          corrA.put(rel, cor + weight2);
           }
         }
       }
