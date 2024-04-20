@@ -601,7 +601,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.*/
   public void generateCorrelations() {
-    log.info("Generating correlations for Alerts of Interest");
+    log.info("Generating correlations for Sources and Alerts of Interest");
     // Clean all correlations 
     g().E().has("lbl", "overlaps").drop().iterate();
     // Remove wrong SoI, AoI
@@ -673,9 +673,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     for (String cls1 : types) {
       sizeS0 = 0.0;
       sizeA0 = 0.0;
-      for (String cls2 : types) {           
-        sizeS0 += corrS.get(Pair.of(cls1, cls2));
-        sizeA0 += corrA.get(Pair.of(cls1, cls2));
+      for (String cls2 : types) {
+        if (corrS.contains(Pair.of(cls1, cls2))) {
+          sizeS0 += corrS.get(Pair.of(cls1, cls2));
+          }
+        if (corrA.contains(Pair.of(cls1, cls2))) {
+          sizeA0 += corrA.get(Pair.of(cls1, cls2));
+          }
         }
       sizeS.put(cls1, sizeS0);
       sizeA.put(cls1, sizeA0);
