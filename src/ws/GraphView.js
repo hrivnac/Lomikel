@@ -481,24 +481,26 @@ function clusterExpand() {
   network.cluster(clusterOptionsByData);
   }
 
-// Fill Edges, incl. those, going outside
+// Fill Edges
 function fillEdges() {
+  visibleIds = [];
   for (var i = 0; i < nodes.length; i++) {
-    for (var j = 0; j < nodes.length; j++) {
-      var selectedNodeI = nodes[i];
-      var selectedNodeJ = nodes[j];
-      document.getElementById("feedback").innerHTML += "Expanding " + selectedNodeI.label + "-" + selectedNodeJ + "<br/>";
+    visibleIds.push(nodes[i].id);
+    }
+  for (var i = 0; i < nodes.length; i++) {
+      var selectedNode = nodes[i];
+      document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
       if (document.getElementById('expandTo').checked) {
-         callGremlinGraph(gr + ".V(" + selectedNodeI.id + ").outE().filter(inV().hasId(" + selectedNodeJ.id + "))");
+         callGremlinGraph(gr + ".V(" + selectedNode.id + ").outE().filter(inV().hasId(within(" + visibleIds + ")))");
         }
       if (document.getElementById('expandFrom').checked) {
-         callGremlinGraph(gr + ".V(" + selectedNodeI.id + ").inE().filter(outV().hasId(" + selectedNodeJ.id + "))");
+         callGremlinGraph(gr + ".V(" + selectedNodeI.id + ").inE().filter(outV().hasId(within(" + visibleIds + ")))");
         }
       }
     }
   }
 
-// Fill Edges
+// Fill Edges, incl. those, going outside
 function fillAllEdges() {
   for (var i = 0; i < nodes.length; i++) {
     var selectedNode = nodes[i];
