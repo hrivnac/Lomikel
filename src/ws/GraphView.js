@@ -481,8 +481,7 @@ function clusterExpand() {
   network.cluster(clusterOptionsByData);
   }
 
-// Fill Edges
-// TBD: limit to visible nodes
+// Fill Edges, incl. those, going outside
 function fillEdges() {
   for (var i = 0; i < nodes.length; i++) {
     for (var j = 0; j < nodes.length; j++) {
@@ -498,7 +497,8 @@ function fillEdges() {
       }
     }
   }
-  
+
+// Fill Edges
 function fillAllEdges() {
   for (var i = 0; i < nodes.length; i++) {
     var selectedNode = nodes[i];
