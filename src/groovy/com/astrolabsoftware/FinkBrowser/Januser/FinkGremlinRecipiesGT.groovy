@@ -280,7 +280,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             cap('x').
             next().
             io(IoCore.graphml()).
-            writeGraph('/tmp/x.graphml');
+            writeGraph(fn);
     }
     
   /** Logging . */
