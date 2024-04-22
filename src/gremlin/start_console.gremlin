@@ -1,5 +1,3 @@
-import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
-  
 // -----------------------------------------------------------------------------
 
 class Lomikel {
@@ -31,6 +29,6 @@ home = args[1];
 graph = JanusGraphFactory.open(prop);
 g     = graph.traversal();
 c     = graph.configuration();
-gr    = new FinkGremlinRecipiesG(g);
+gr    = new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG(g);
 
 Lomikel.init(graph, g, c, gr);

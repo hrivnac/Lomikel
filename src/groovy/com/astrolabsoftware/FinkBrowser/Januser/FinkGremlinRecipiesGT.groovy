@@ -269,6 +269,20 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return overlaps.sort{it.value};
     }
     
+  /** Export all <em>AlertsOfInterest</em> and <em?SourcesOfInterest</em>
+    * {@link Vertex}es with connecting <em>overlaps</em> {@link Edge}s
+    * into <em>GraphML</em> file.
+    * @param fn The full filename of the output <em>GraphML</em> file. */
+  public void exportAoISoI(String fn) {  
+    g().V().has('lbl', within('AlertsOfInterest', 'SourcesOfInterest')).
+            outE().
+            subgraph('x').
+            cap('x').
+            next().
+            io(IoCore.graphml()).
+            writeGraph('/tmp/x.graphml');
+    }
+    
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkGremlinRecipiesGT.class);
 

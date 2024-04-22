@@ -136,23 +136,14 @@ public class GremlinRecipies {
                    Object  propertyValue,
                    boolean deep) {
     if (deep) {
-      //g().V().has("lbl", label)
-      //       .has(propertyName, propertyValue)
-      //       .union(fold().unfold(), repeat(out()).emit())
-      //       .drop();
-      //g().V().has("lbl", label)
-      //       .has(propertyName, propertyValue)
-      //       .store("s")
-      //       .repeat(out().store("s"))
-      //       .cap("s")
-      //       .unfold()
-      //       .drop();
-      List<Object> vv = g().V().has("lbl", label)
-                               .has(propertyName, propertyValue)
-                               .store("s")
-                               .repeat(out().store("s"))
-                               .cap("s")
-                               .unfold().toList();
+      List<Object> vv = g().V().has("lbl", label).
+                                has(propertyName, propertyValue).
+                                store("s").
+                                repeat(out().
+                                store("s")).
+                                cap("s").
+                                unfold().
+                                toList();
       StandardVertex v;
       for (Object o : vv) {
         v = (StandardVertex)o;
