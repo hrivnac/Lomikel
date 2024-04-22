@@ -274,7 +274,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * into <em>GraphML</em> file.
     * @param fn The full filename of the output <em>GraphML</em> file. */
   def exportAoISoI(String fn) {  
-    g.V().has('lbl', within('AlertsOfInterest', 'SourcesOfInterest')).
+    g().V().has('lbl', within('AlertsOfInterest', 'SourcesOfInterest')).
             outE().
             has('lbl', 'overlaps').
             subgraph('x').
