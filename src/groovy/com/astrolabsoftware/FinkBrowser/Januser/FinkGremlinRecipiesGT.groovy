@@ -274,14 +274,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * into <em>GraphML</em> file.
     * @param fn The full filename of the output <em>GraphML</em> file. */
   def exportAoISoI(String fn) {  
-    g().V().has('lbl', within('AlertsOfInterest', 'SourcesOfInterest')).
+    g.V().has('lbl', within('AlertsOfInterest', 'SourcesOfInterest')).
             outE().
+            has('lbl', 'overlaps').
             subgraph('x').
             cap('x').
             next().
             io(IoCore.graphml()).
             writeGraph(fn);
-    }
+    }  
     
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkGremlinRecipiesGT.class);
