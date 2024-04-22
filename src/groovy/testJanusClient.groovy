@@ -9,4 +9,4 @@ print(gr.stat());
 print(gr.classification("ZTF17aaawgky"));
 print(gr.overlaps());
 print(gr.standardDeviationE('deepcontains', ['weight']));
-
+print(gr.exportAoISoI('/tmp/Overlaps.graphml')); 

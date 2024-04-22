@@ -274,8 +274,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * {@link Vertex}es with connecting <em>overlaps</em> {@link Edge}s
     * into <em>GraphML</em> file.
     * @param fn The full filename of the output <em>GraphML</em> file. */
-  def exportAoISoI(String fn) {  
-    g().V().has('lbl', within('AlertsOfInterest', 'SourcesOfInterest')).
+  def exportAoISoI(String       fn,
+                   List<String> collections = null) {  
+    if (collections == null || collections.isEmpty()) {
+      collections = ['AlertsOfInterest', 'SourcesOfInterest'];
+      }
+    g().V().has('lbl', collections).
             outE().
             has('lbl', 'overlaps').
             subgraph('x').
