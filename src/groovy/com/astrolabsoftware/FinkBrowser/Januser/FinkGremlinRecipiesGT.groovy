@@ -267,7 +267,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     overlaps[v['xlbl'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['ycls']] = v['intersection'];
                     }
                   };
-    return overlaps.sort{it.value};
+    return overlaps.sort{-it.value};
     }
     
   /** Export all <em>AlertsOfInterest</em> and <em?SourcesOfInterest</em>

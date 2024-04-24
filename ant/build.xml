@@ -325,12 +325,12 @@
     <!-- create from hbase classpath \-\-glob -->
     <jar jarfile="../lib/Lomikel-HBase.exe.jar" index="yes">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
-      <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${cli_jar}"/>
-      <zipfileset includes="**/*" src="${javaxmail_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
       <zipfileset includes="**/*" src="${groovy_jar}"/>
+      <zipfileset includes="**/*" src="${jython_jar}"/>
+      <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/shaded-clients/hbase-shaded-client-2.5.8-hadoop3.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/audience-annotations-0.13.0.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/commons-logging-1.2.jar"/>
@@ -351,14 +351,14 @@
         </manifest>
       </jar> 
     <!-- empirically assembled minimum -->
-    <jar jarfile="../lib/Lomikel-Janus.exe.jar" index="yes">
+    <jar jarfile="../lib/Lomikel-Janus.exe.jar" index="yes" zip64Mode="always">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
-      <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${cli_jar}"/>
-      <zipfileset includes="**/*" src="${javaxmail_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
       <zipfileset includes="**/*" src="${groovy_jar}"/>
+      <zipfileset includes="**/*" src="${jython_jar}"/>
+      <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>
@@ -451,7 +451,7 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.7.0.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="LomikelwHBase"/>
+        <attribute name="AppName"    value="LomikelwJanus"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
@@ -1059,7 +1059,7 @@
              use="true"
              private="true"
              additionalparam=" -linksource -breakiterator -keywords -author -version"
-             source="1.8"
+             source="1.11"
              Overview="../src/java/com/Lomikel/overview.html"
              windowtitle="Lomikel">
       <doclet name="nl.talsmasoftware.umldoclet.UMLDoclet" pathref="umlDoclet.classpath">
