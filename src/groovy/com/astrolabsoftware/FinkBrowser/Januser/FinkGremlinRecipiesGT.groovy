@@ -91,7 +91,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def  Map<String, Double> sourceNeighborhood(String   oid0,
                                               String[] oidS,
                                               String[] classes0,
-                                              int      nmax) {
+                                              int      nmax = INTEGER.MAX_VALUES) {
     return sourceNeighborhood(oid0, Arrays.asList(oidS), Arrays.asList(classes0), nmax);
     }
     
@@ -110,7 +110,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<String, Double> sourceNeighborhood(String       oid0,
                                              List<String> oidS,
                                              List<String> classes0,
-                                             int          nmax) {
+                                             int          nmax = INTEGER.MAX_VALUES) {
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
     g().V(source0).inE().
