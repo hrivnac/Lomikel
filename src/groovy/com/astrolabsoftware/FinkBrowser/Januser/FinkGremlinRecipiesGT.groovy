@@ -87,6 +87,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                  All <em>SourceOfInterest</em> classes of thr specified
     *                  <em>source</em> will be used if <tt>null</tt>.
     * @param nmax      The number of closest <em>source</em>s to give.
+    *                  All are given, if missing.
     * @return          The distances to other sources, order by the distance. */
   def  Map<String, Double> sourceNeighborhood(String   oid0,
                                               String[] oidS,
@@ -106,6 +107,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                  All <em>SourceOfInterest</em> classes of thr specified
     *                  <em>source</em> will be used if <tt>null</tt>.
     * @param nmax      The number of closest <em>source</em>s to give.
+    *                  All are given, if missing.
     * @return          The distances to other sources, order by the distance. */
   def Map<String, Double> sourceNeighborhood(String       oid0,
                                              List<String> oidS,
