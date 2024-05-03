@@ -89,17 +89,23 @@
 
 <h4><a name="CLI">Command Line</a></h4>
 <pre style="color:blue; font-size:60%; background-color:#eeeeee">
-<a href="Lomikel.exe.jar">Lomikel.exe.jar</a>
-# you only need Phoenix, Hadoop and HBase if you use them
-$ alias lomikel='CLASSPATH=Lomikel.exe.jar:${PHOENIX_JAR}:`${HBASE_HOME}/bin/hbase classpath --glob`:`${HADOOP_HOME}/bin/hadoop classpath --glob` java com.Lomikel.Apps.LUC'
+# download <a href="Lomikel-Janus.exe.jar">Lomikel-Janus.exe.jar</a>
+# and
+# <a href="jython.jar">jython.jar</a> (if Python scripting is required)
+# if Python scripting is not required: 
+$ alias lomikel='java -jar Lomikel-Janus.exe.jar'
+# if Python scripting is required: 
+$ alias lomikel='java -cp Lomikel-Janus.exe.jar:jython.jar com.Lomikel.Apps.LUC'
 $ lomikel -h
-usage: java -jar Lomikel.exe.jar
- -a,--api             scripting language to use (default bsh, also available: python, groovy)
- -b,--batch           run in a batch
- -g,--gui             run in a graphical windowile
- -h,--help            show help
- -q,--quiet           minimal direct feedback
- -s,--source &lt;file&gt; source bsh file (init.bsh is also read)
+usage: java -jar Lomikel.exe.jar [-a <language>] [-b] [-g] [-h] [-n] [-q] [-s &lt;file&gt;] [-w]
+-a,--api &lt;language&gt; cli language: [bsh|groovy|python] (othewise taken from source extension, defauld is bsh
+-b,--batch          run in a batch
+-g,--gui            run in a graphical window
+-h,--help           show help
+-n,--notebook       run in an notebook
+-q,--quiet          minimal direct feedback
+-s,--source &lt;file&gt;  source script file (init.<language> is also sourced)
+-w,--web            run as a web service
 </pre>
 
 <h4><a name="Bugs-ToDos">Bugs, Inconsistencies and ToDos</a></h4>

@@ -105,9 +105,7 @@
   <taskdef name="groovydoc"
          classname= "org.codehaus.groovy.ant.Groovydoc">
     <classpath>
-      <fileset file="${groovy_jar}"/>
-      <fileset file="${groovy_ant_jar}"/>
-      <fileset file="${groovy_groovydoc_jar}"/>
+      <fileset dir="${groovy_dir}/lib" includes="*.jar"/>
       </classpath>
     </taskdef>
     
@@ -956,11 +954,12 @@
   <!-- Dist =================================================================-->
 
   <target name="dist"
-          depends="war,doc"
+          depends="exe"
           description="Construct distribution">
     <mkdir dir="../dist"/>
     <copy todir="../dist">
 			<fileset dir="../lib" includes="*.jar"/>
+			<file file="${jython_jar}"/>
       </copy>
   </target>
 
@@ -1072,7 +1071,7 @@
              use="true"
              private="true"
              additionalparam=" -linksource -breakiterator -keywords -author -version"
-             source="1.11"
+             source="11"
              Overview="../src/java/com/Lomikel/overview.html"
              windowtitle="Lomikel">
       <doclet name="nl.talsmasoftware.umldoclet.UMLDoclet" pathref="umlDoclet.classpath">
@@ -1169,7 +1168,7 @@
       </delete>
  		<copy todir="${doc}" force="true">
 			<fileset dir="../doc" includes="**/*"/>
-			<fileset dir="../lib" includes="Lomikel.exe.jar"/>
+			<fileset dir="../dist" includes="*.jar"/>
       </copy>
     </target>
 
