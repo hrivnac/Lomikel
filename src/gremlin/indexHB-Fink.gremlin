@@ -7,15 +7,16 @@ graph.tx().rollback()
 mgmt = graph.openManagement()
 
 // Properties
-jd  = mgmt.getPropertyKey('jd' )
-ra  = mgmt.getPropertyKey('ra' )
-dec = mgmt.getPropertyKey('dec')
-cls = mgmt.getPropertyKey('cls')
+jd         = mgmt.getPropertyKey('jd' )
+ra         = mgmt.getPropertyKey('ra' )
+dec        = mgmt.getPropertyKey('dec')
+classifier = mgmt.getPropertyKey('classifier')
+cls        = mgmt.getPropertyKey('cls')
 
 //  Indexes                                                            
-mgmt.buildIndex('byJd',    Vertex.class).addKey(jd)            .buildCompositeIndex()
-mgmt.buildIndex('byRaDec', Vertex.class).addKey(ra).addKey(dec).buildCompositeIndex()
-mgmt.buildIndex('byCls',   Vertex.class).addKey(cls)           .buildCompositeIndex()
+mgmt.buildIndex('byJd',    Vertex.class).addKey(jd)                    .buildCompositeIndex()
+mgmt.buildIndex('byRaDec', Vertex.class).addKey(ra).addKey(dec)        .buildCompositeIndex()
+mgmt.buildIndex('byCls',   Vertex.class).addKey(classifier).addKey(cls).buildCompositeIndex()
                                                                       
 mgmt.commit()
 
