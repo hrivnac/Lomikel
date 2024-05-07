@@ -633,7 +633,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
     * @param classifier The {@link Classifier} to be used. */
   public void generateCorrelations(Classifier classifier) {
-    log.info("Generating correlations for Sources and Alerts of Interest");
+    log.info("Generating correlations for Sources and Alerts of Interest for " + classifier.name());
     // Clean all correlations 
     g().E().has("lbl", "overlaps").drop().iterate();
     // Remove wrong SoI, AoI
