@@ -245,7 +245,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    inE().
                    project('weight', 'class').
                    by(values('weight')).
-                   by(outV().has('lbl', 'SourcesOfInterest').values('cls')).
+                   by(outV().has('lbl', 'SourcesOfInterest').values('classifier', 'cls')).
                    toList();
     }
     
@@ -258,15 +258,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     g().E().has('lbl', 'overlaps').
             order().
             by('intersection', asc).
-            project('xlbl', 'xcls', 'ylbl', 'ycls', 'intersection').
+            project('xlbl', 'xclassifier', 'xcls', 'ylbl', 'yclassifier', 'ycls', 'intersection').
             by(inV().values('lbl')).
+            by(inV().values('classifier')).
             by(inV().values('cls')).
             by(outV().values('lbl')).
+            by(outV().values('classifier')).
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
-                  if (v['xlbl'].equals(lbl) || v['ylbl'].equals(lbl)) {
-                    overlaps[v['xlbl'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['ycls']] = v['intersection'];
+                  if (lbl == null || v['xlbl'].equals(lbl) || v['ylbl'].equals(lbl)) {
+                    overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['ycls']] = v['intersection'];
                     }
                   };
     return overlaps.sort{-it.value};
