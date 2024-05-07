@@ -227,8 +227,8 @@ stylesheet.nodes.AlertsOfInterest = {
   properties:{},
   graphics: {
     label:"cls", 
-    title:"cls",        
-    subtitle:" ",     
+    title:"classifier",        
+    subtitle:"cls",     
     group:" ",        
     shape:"image",      
     image:"StarsAlerts.png",        
@@ -246,8 +246,8 @@ stylesheet.nodes.SourcesOfInterest = {
   properties:{},
   graphics: {
     label:"cls", 
-    title:"cls",        
-    subtitle:" ",     
+    title:"classifier",        
+    subtitle:"cls",     
     group:" ",        
     shape:"image",      
     image:"StarsSources.png",        
