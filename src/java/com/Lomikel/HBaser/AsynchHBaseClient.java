@@ -61,7 +61,7 @@ public class AsynchHBaseClient extends    HBaseClient
   public void run() {
     try {
       while (true) {
-       if (_doscan) {
+        if (_doscan) {
           log.info("Starting asynchronous scan");
           _scanning = true;
           setProcessor(new AsynchHBaseProcessor(_queue));
@@ -285,7 +285,25 @@ public class AsynchHBaseClient extends    HBaseClient
   public void setLoopWait(int t) {
     _loopWait = t;
     }
-        
+    
+  /** Stop the scanning and remove all remaining results. */
+  public void stop() {
+    stop(false);
+    }
+    
+  /** Stop the scanning.
+    * @param keep Whether to keep already accumulated results,
+    *             or to remove them. */
+  public void stop(boolean keep) {
+    log.info("Stopping scan");
+    _thread.stop();
+    _scanning = false;
+    if (!keep) {
+      log.info("\tand removing remaining results");
+      _queue.clear();
+      }
+    }
+    
   private ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
   
   private Thread _thread;

@@ -16,7 +16,7 @@ while (client.scanning() || client.size() > 0) {
     print(client.size() + ":\t" + client.poll());
     }
   }
-client.stop();
+//client.stop();
 
 client.setLimit(1000);
 client.setLoopWait(500);
