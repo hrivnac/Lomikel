@@ -382,7 +382,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     for (String jd : jds) {
       n++;
       key = objectId + "_" + jd.trim();
-      alert = g().V().has("lbl", "alert").
+      alert = g().V().has("lbl",      "alert").
                       has("objectId", objectId).
                       has("jd",       jd).
                       fold().
