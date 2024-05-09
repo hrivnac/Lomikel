@@ -60,10 +60,12 @@ mgmt.addProperties(AlertsCollection,
 mgmt.addProperties(alert,
                    lbl,
                    objectId,
-                   jd)
+                   jd,
+                   importDate)
 mgmt.addProperties(source,
                    lbl,
-                   objectId)
+                   objectId,
+                   importDate)
                                     
 // Edge properties
 mgmt.addProperties(overlaps,

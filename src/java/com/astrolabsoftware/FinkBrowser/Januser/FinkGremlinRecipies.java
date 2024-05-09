@@ -297,6 +297,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                 addV("source").
                                 property("lbl",      "source").
                                 property("objectId", objectId)).
+                       property("importDate", _now).
                        next();
     addEdge(g().V(soi).next(),
             g().V(s).next(),
@@ -375,7 +376,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                             String      columns) throws LomikelException {
     String objectId = source.property("objectId").value().toString();
     int n = 0;
-    String key;
+    String key;    
     Vertex alert;
     List<Map<String, String>> results;
     for (String jd : jds) {
@@ -390,6 +391,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                property("lbl",     "alert"  ).
                                property("objectId", objectId).
                                property("jd",       jd      )).
+                      property("importDate", _now).
                       next();
       if (columns != null) {
         results = fhclient().results2List(fhclient().scan(key,
@@ -886,7 +888,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   private FinkHBaseClient _fhclient;
   
   private String _fhclientUrl;
-  
+   
+  private String _now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()).toString();
+ 
   private static String FINK_OBJECTS_WS = "https://fink-portal.org/api/v1/objects";
   private static String FINK_LATESTS_WS = "https://fink-portal.org/api/v1/latests";
   private static String FINK_ANOMALY_WS = "https://fink-portal.org/api/v1/anomaly";
