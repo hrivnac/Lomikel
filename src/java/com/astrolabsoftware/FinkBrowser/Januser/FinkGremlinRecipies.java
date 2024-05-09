@@ -113,7 +113,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                        String[] clss,
                                        boolean  enhance,
                                        String   columns) throws LomikelException {
-    Classifier classifier = Classifier.valueOf(classifierName);
+    Classifiers classifier = Classifiers.valueOf(classifierName);
     fillSourcesOfInterest(classifier, hbaseUrl, nLimit, timeLimit, clss, enhance, columns);
     generateCorrelations(classifier);
     }
@@ -130,13 +130,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
-  public void fillSourcesOfInterest(Classifier classifier,
-                                    String     hbaseUrl,
-                                    int        nLimit,
-                                    int        timeLimit,
-                                    String[]   clss,
-                                    boolean    enhance,
-                                    String     columns) throws LomikelException {
+  public void fillSourcesOfInterest(Classifiers classifier,
+                                    String      hbaseUrl,
+                                    int         nLimit,
+                                    int         timeLimit,
+                                    String[]    clss,
+                                    boolean     enhance,
+                                    String      columns) throws LomikelException {
     String clssDesc = "";
     if (clss != null) {
       clssDesc = "of " + Arrays.toString(clss);
@@ -146,7 +146,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       log.info("\tenhancing with " + columns);
       }
     Set<String> oids = new HashSet<>();;
-    if (clss == null) {
+    if (clss == null) { 
       log.info("*** " + hbaseUrl + ":");
       SmallHttpClient httpClient = new SmallHttpClient();
       fhclient(hbaseUrl);
@@ -195,7 +195,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // loop over all sources
     for (String oid : oids) {
       try {
-        fillSourcesOfInterest(classifier, oid, hbaseUrl, enhance, columns);
+        classifySource(classifier, oid, hbaseUrl, enhance, columns);
         n++;
         dt = (System.currentTimeMillis() - startTime) / 1000;
         freq = (double)n / (double)dt;
@@ -207,7 +207,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     }
     
-  /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts (if requested).
+  /** Classify <em>source</em> and expand them to alerts (if requested).
     * @param classifier The {@link Classifier} to be used.
     * @param oid        The <tt>objectId</tt> of source to be added.
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
@@ -215,47 +215,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be copied into graph alerts. May be <tt>null</tt>. 
     * @throws LomikelException If anything fails. */
-  public void fillSourcesOfInterest(Classifier classifier,
-                                    String     oid,
-                                    String     hbaseUrl,
-                                    boolean    enhance,
-                                    String     columns) throws LomikelException {
-    JSONArray ja;
-    JSONObject jo;
-    Map<String, Set<Double>> classes; // cls -> [jd]
-    String cl;
-    double jd;
-    Set<Double> jds;
-    String key;
-    Set<Double> val;
-    int weight;
-    ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
-                                      put("output-format", "json"));
-    classes =  new TreeMap<>();
-    // get all alerts (jd) and their classes
-    for (int i = 0; i < ja.length(); i++) {
-      jo = ja.getJSONObject(i);
-      cl = jo.getString("v:classification");
-      jd = jo.getDouble("i:jd");
-      if (!cl.equals("Unknown")) {
-        if (classes.containsKey(cl)) {
-          jds = classes.get(cl);
-          jds.add(jd);
-          }
-        else {
-          jds = new TreeSet<Double>();
-          jds.add(jd);
-          classes.put(cl, jds);
-          }
-        }
-      }
-    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
-      key = cls.getKey();
-      val = cls.getValue();
-      weight = val.size();
-      log.info("\t" + key + " in " + weight + " alerts");
-      registerSourcesOfInterest(classifier, key, oid, weight, val, hbaseUrl, enhance, columns);
-      }
+  public void classifySource(Classifiers classifier,
+                             String      oid,
+                             String      hbaseUrl,
+                             boolean     enhance,
+                             String      columns) throws LomikelException {
+    classifier.instance().classify(this, oid, hbaseUrl, enhance, columns);
     }
     
   /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
@@ -274,14 +239,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     *                   Ignored if enhancement not requested. */
-  public void registerSourcesOfInterest(Classifier classifier,
-                                        String     cls,
-                                        String     objectId,
-                                        double     weight,
-                                        String     instancesS,
-                                        String     hbaseUrl,
-                                        boolean    enhance,
-                                        String     columns) {   
+  public void registerSourcesOfInterest(Classifiers classifier,
+                                        String      cls,
+                                        String      objectId,
+                                        double      weight,
+                                        String      instancesS,
+                                        String      hbaseUrl,
+                                        boolean     enhance,
+                                        String      columns) {   
     Set<Double> instances = new HashSet<>();
     for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
       instances.add(Double.parseDouble(instance));
@@ -304,7 +269,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   filled with requested HBase columns.
     * @param columns The HBase columns to be filled into alerts. May be <tt>null</tt>.
     *                   Ignored if enhancement not requested. */
-  public void registerSourcesOfInterest(Classifier  classifier,
+  public void registerSourcesOfInterest(Classifiers classifier,
                                         String      cls,
                                         String      objectId,
                                         double      weight,
@@ -356,8 +321,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param classifier The {@link Classifier} to be used.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
-  public void enhanceSourcesOfInterest(Classifier classifier,
-                                       String     columns) throws LomikelException {
+  public void enhanceSourcesOfInterest(Classifiers classifier,
+                                       String      columns) throws LomikelException {
     log.info("Expanding all SourcesOfInterest and enhancing them with " + columns);
     for (Object soi : g().V().has("lbl",        "SourcesOfInterest").
                               has("classifier", classifier.name()  ).
@@ -373,9 +338,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param cls        The type (class) of <em>SourcesOfInterest</em>.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
-  public void enhanceSourcesOfInterest(Classifier classifier,
-                                       String     cls,
-                                       String     columns) throws LomikelException {
+  public void enhanceSourcesOfInterest(Classifiers classifier,
+                                       String      cls,
+                                       String      columns) throws LomikelException {
     log.info("Expanding " + cls + " SourcesOfInterest and enhancing them with " + columns);
     Vertex soi = g().V().has("lbl",        "SourcesOfInterest").
                          has("classifier", classifier.name()  ).
@@ -404,10 +369,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param jds        The <em>jd</em> of related <em>Alerts</em>.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
-  public void enhanceSource(Classifier classifier,
-                            Vertex     source,
-                            String[]   jds,
-                            String     columns) throws LomikelException {
+  public void enhanceSource(Classifiers classifier,
+                            Vertex      source,
+                            String[]    jds,
+                            String      columns) throws LomikelException {
     String objectId = source.property("objectId").value().toString();
     int n = 0;
     String key;
@@ -459,8 +424,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param classifier The {@link Classifier} to be used.
     * @param cls        The type (class) of <em>SourcesOfInterest</em>.
     * @throws LomikelException If anything goes wrong. */
-  public void cleanSourcesOfInterest(Classifier classifier,
-                                     String     cls) throws LomikelException {
+  public void cleanSourcesOfInterest(Classifiers classifier,
+                                     String      cls) throws LomikelException {
     log.info("Cleaning " + cls + " SourcesOfInterest");
     g().V().has("lbl",        "SourcesOfInterest").
             has("classifier", classifier.name()  ).
@@ -474,7 +439,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.
     * @param classifier The {@link Classifier} to be used. */
-  public void generateSourcesOfInterestCorrelations(Classifier classifier) {
+  public void generateSourcesOfInterestCorrelations(Classifiers classifier) {
     log.info("Generating correlations for Sources of Interest for " + classifier.name());
     // Accumulating weights
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
@@ -572,7 +537,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Assemble AlertsOfInterest from all existing alerts. 
     * @param classifier The {@link Classifier} to be used. */ 
-  public void assembleAlertsOfInterest(Classifier classifier) {
+  public void assembleAlertsOfInterest(Classifiers classifier) {
     log.info("Assembling AlertsOfInterest");
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
     Vertex alert;
@@ -585,8 +550,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Assemble AlertsOfInterest from an alert.
     * @param classifier The {@link Classifier} to be used. 
     * @param alert      The existing alert. */
-  public void assembleAlertsOfInterest(Classifier classifier,
-                                       Vertex     alert) {
+  public void assembleAlertsOfInterest(Classifiers classifier,
+                                       Vertex      alert) {
     String jd = alert.property("jd").value().toString();
     Vertex source = alert.edges(Direction.IN).next().outVertex(); // BUG: should check lbl == source
     String objectId = source.property("objectId").value().toString();
@@ -632,7 +597,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
     * @param classifier The {@link Classifier} to be used. */
-  public void generateCorrelations(Classifier classifier) {
+  public void generateCorrelations(Classifiers classifier) {
     log.info("Generating correlations for Sources and Alerts of Interest for " + classifier.name());
     // Clean all correlations 
     g().E().has("lbl", "overlaps").drop().iterate();
@@ -792,7 +757,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
     * @param classifier The {@link Classifier} to be used. */
-  public void generateAlertsOfInterestCorrelations(Classifier classifier) {
+  public void generateAlertsOfInterestCorrelations(Classifiers classifier) {
     log.info("Generating correlations for Alerts of Interest for " + classifier.name());
     GraphTraversal<Vertex, Vertex> aoiT = g().V().has("lbl", "AlertsOfInterest");
     Map<Pair<String, String>, Integer> weights = new HashMap<>(); // cls, objectId -> weight
