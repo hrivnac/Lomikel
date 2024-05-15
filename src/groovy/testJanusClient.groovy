@@ -9,4 +9,8 @@ print(gr.stat());
 print(gr.classification("ZTF18actbfgh"));
 print(gr.overlaps());
 print(gr.standardDeviationE('deepcontains', ['weight']));
-print(gr.exportAoISoI('/tmp/Overlaps.graphml')); 
+print(gr.exportAoISoI('/tmp/Overlaps.graphml'));
+// sum of weights (= number od alerts) per source
+print(jc.g().V().has('lbl', 'source').order().by('objectId', asc).project('objectId', 'weight').by(values('objectId')).by(inE().values('weight').sum()));
+// numbers of source lastly updated per update (date)
+print(jc.g().V().has('lbl', 'source').values('importDate').groupCount());
