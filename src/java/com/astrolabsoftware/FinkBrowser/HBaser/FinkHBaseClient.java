@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 import java.io.IOException;
 
@@ -94,6 +95,28 @@ public class FinkHBaseClient extends HBaseSQLClient {
       }
     }
 
+  public Set<Pair<Double, Double>> search2(String objectId,
+                                           String column1,
+                                           String column2) {
+    Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", column1 + "," + column2, 0, 0);
+    Set<Pair<Double, Double>> scatter = new LinkedHashSet<>();
+    if (results != null && !results.isEmpty() && results.containsKey(objectId)) {
+      Map<String, Map<Long, String>> result = results.get(objectId);
+      Map<Long, String> var1 = result.get(column1);
+      Map<Long, String> var2 = result.get(column2);
+      for (var e : var1.entrySet()) {
+        if (var2.containsKey(e.getKey())) {
+          scatter.add(Pair.of(Double.valueOf(e.getValue()),
+                              Double.valueOf(var2.get(e.getKey()))));
+          }
+        }      
+      }
+    else {
+      log.warn("Nothing found");
+      }
+    return scatter;
+    }
+    
   /** Get alerts between two Julian dates (inclusive).
     * @param jdStart   The starting Julian date (including day franction).
     * @param jdStop    The stopping Julian date (including day franction).

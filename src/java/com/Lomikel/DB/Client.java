@@ -76,7 +76,7 @@ public abstract class Client<T, S extends Schema> {
     
   // Search --------------------------------------------------------------------
   
-  /** Get row(s).
+  /** Get row(s) with latest cell version.
     * @param key     The row key. Disables other search terms.
     *                It can be <tt>null</tt>.
     * @param search  The search terms as <tt>family:column:value,...</tt>.
@@ -116,8 +116,44 @@ public abstract class Client<T, S extends Schema> {
     long stop = now;
     return scan(key, search, filter, start, stop, ifkey, iftime);
     }
+  
+  /** Get row(s) with all cell versions.
+    * @param key     The row key. Disables other search terms.
+    *                It can be <tt>null</tt>.
+    * @param search  The search terms as <tt>family:column:value,...</tt>.
+    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                among <tt>exact,prefix,substring,regex</tt>.
+    *                The default for key is <tt>prefix</tt>,
+    *                the default for columns is <tt>substring</tt>.
+    *                The randomiser can be added with <tt>key:random:chance</tt>.
+    *                It can be <tt>null</tt>.
+    *                All searches are executed as prefix searches.    
+    * @param filter  The names of required values as <tt>family:column,...</tt>.
+    *                <tt>*</tt> = all.
+    * @param delay   The time period start, in minutes back since dow.
+    *                <tt>0</tt> means no time restriction.
+    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, Map<Long, String>>> scan3(String  key,
+                                                           String  search,
+                                                           String  filter,
+                                                           long    delay) {
+    String searchMsg = search;
+    if (searchMsg != null && searchMsg.length() > 80) {
+      searchMsg = searchMsg.substring(0, 80) + "...";
+      }
+    log.debug("Searching for key: " + key + 
+              ", search: " + searchMsg + 
+              ", filter: " + filter +
+              ", delay: "  + delay + " min");
+    long now = System.currentTimeMillis();
+    long start = (delay == 0L) ? 0L :  now - delay * 1000L * 60L;
+    long stop = now;
+    return scan3(key, search, filter, start, stop);
+    }
     
-  /** Get row(s).
+  /** Get row(s) with latest cell version.
     * @param key     The row key. Disables other search terms.
     *                It can be <tt>null</tt>.
     * @param search  The search terms as <tt>family:column:value,...</tt>.
@@ -178,7 +214,66 @@ public abstract class Client<T, S extends Schema> {
     return scan(key, searchM, filter, start, stop, ifkey, iftime);
     }
     
-  /** Get row(s).
+  /** Get row(s) with all cell versions.
+    * @param key     The row key. Disables other search terms.
+    *                It can be <tt>null</tt>.
+    * @param search  The search terms as <tt>family:column:value,...</tt>.
+    *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>
+    *                among <tt>exact,prefix,substring,regex</tt>.
+    *                The default for key is <tt>prefix</tt>,
+    *                the default for columns is <tt>substring</tt>.
+    *                The randomiser can be added with <tt>key:random:chance</tt>.
+    *                It can be <tt>null</tt>.
+    *                All searches are executed as prefix searches.    
+    * @param filter  The names of required values as <tt>family:column,...</tt>.
+    *                <tt>*</tt> = all.
+    * @param start   The time period start timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means since the beginning.
+    * @param stop    The time period stop timestamp in <tt>ms</tt>.
+    *                <tt>0</tt> means till now.
+    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
+    * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  // TBD: refactor scan3/scan
+  public Map<String, Map<String, Map<Long, String>>> scan3(String  key,
+                                                           String  search,
+                                                           String  filter,
+                                                           long    start,
+                                                           long    stop) {
+    String searchMsg = search;
+    if (search != null && search.length() > 80) {
+      searchMsg = search.substring(0, 80) + "...";
+      }
+    log.info("Searching for key: " + key + 
+             ", search: " + searchMsg + 
+             ", filter: " + filter +
+             ", interval: " + start + " ms - " + stop + " ms");
+    Map<String, String> searchM = new TreeMap<>();
+    if (search != null && !search.trim().equals("")) {
+      String[] ss;
+      String k;
+      String v;
+      for (String s : search.trim().split(",")) {
+        ss = s.trim().split(":");
+        if (ss.length == 4) {
+          k = ss[0] + ":" + ss[1] + ":" + ss[3];
+          }
+        else {
+          k = ss[0] + ":" + ss[1];
+          }
+        v = ss[2];
+        if (searchM.containsKey(k)) {
+          v = searchM.get(k) + "," + v;
+          }
+        searchM.put(k, v);
+        }
+      }
+    return scan3(key, searchM, filter, start, stop);
+    }
+    
+  /** Get row(s) with latest cell version.
     * @param key       The row key. Disables other search terms.
     *                  It can be <tt>null</tt>.
     * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
@@ -210,7 +305,35 @@ public abstract class Client<T, S extends Schema> {
     return scan(key, new SearchMap(searchMap), filter, start, stop, ifkey, iftime);
     }
     
-  /** Get row(s).
+  /** Get row(s) with all cell versions.
+    * @param key       The row key. Disables other search terms.
+    *                  It can be <tt>null</tt>.
+    * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
+    *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                  <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                  {@link Comparator} can be chosen as <tt>family:column:value:comparator-value</tt>
+    *                  among <tt>exact,prefix,substring,regex</tt>.
+    *                  The default for key is <tt>prefix</tt>,
+    *                  the default for columns is <tt>substring</tt>.
+    *                  The randomiser can be added with <tt>key:random:chance</tt>.
+    *                  It can be <tt>null</tt>.
+    *                  All searches are executed as prefix searches.    
+    * @param filter    The names of required values as <tt>family:column,...</tt>.
+    *                  <tt>*</tt> = all.
+    * @param start     The time period start timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means since the beginning.
+    * @param stop      The time period stop timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means till now.
+    * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public Map<String, Map<String, Map<Long, String>>> scan3(String              key,
+                                                           Map<String, String> searchMap,
+                                                           String              filter,
+                                                           long                start,
+                                                           long                stop) {
+    return scan3(key, new SearchMap(searchMap), filter, start, stop);
+    }
+    
+  /** Get row(s) with the latest cell version.
     * @param key       The row key. Disables other search terms.
     *                  It can be <tt>null</tt>.
     * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
@@ -239,6 +362,32 @@ public abstract class Client<T, S extends Schema> {
                                                         long      stop,
                                                         boolean   ifkey,
                                                         boolean   iftime);
+    
+  /** Get row(s) with all cell versions.
+    * @param key       The row key. Disables other search terms.
+    *                  It can be <tt>null</tt>.
+    * @param searchMap The {@link Map} of search terms as <tt>family:column-value,value,...</tt>.
+    *                  Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
+    *                  <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
+    *                  {@link Comparator} can be chosen as <tt>family:column:comparator-value</tt>
+    *                  among <tt>exact,prefix,substring,regex</tt>.
+    *                  The default for key is <tt>prefix</tt>,
+    *                  the default for columns is <tt>substring</tt>.
+    *                  The randomiser can be added with <tt>key:random:chance</tt>.
+    *                  It can be <tt>null</tt>.
+    *                  All searches are executed as prefix searches.    
+    * @param filter    The names of required values as <tt>family:column,...</tt>.
+    *                  <tt>*</tt> = all.
+    * @param start     The time period start timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means since the beginning.
+    * @param stop      The time period stop timestamp in <tt>ms</tt>.
+    *                  <tt>0</tt> means till now.
+    * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
+  public abstract Map<String, Map<String, Map<Long, String>>> scan3(String    key,
+                                                                    SearchMap searchMap,
+                                                                    String    filter,
+                                                                    long      start,
+                                                                    long      stop);
   
   // Aux -----------------------------------------------------------------------
     

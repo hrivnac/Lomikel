@@ -119,6 +119,17 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     String answer = query(sql);
     return interpretSqlAnswer(answer);
     }
+    
+  // BUG: call the other scan, filling just one version into map
+  @Override
+  public Map<String, Map<String, Map<Long, String>>> scan3(String    key,
+                                                           SearchMap searchMap,
+                                                           String    filter,
+                                                           long      start,
+                                                           long      stop) {
+    return null;
+    }
+ 
                    
   /** Formulate SQL request.
     * It has the same arguments as {@link #scan(String, SearchMap, String, long, long, boolean, boolean)}.

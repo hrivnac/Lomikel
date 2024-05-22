@@ -236,18 +236,25 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   /** Create new table.
     * @param tableName The name of new table.
     * @param families  The names of families.
-    *                  Can contains the max naumber of stored version after <tt>:</tt>
-    *                  (the default is <tt>1</tt> version).
+    *                  Can contains the max number of stored version after <tt>:</tt>
+    *                  (the default is <tt>1</tt> version, <tt>0</tt> gives <tt>Integer.MAX_VALUE</tt> versions).
     * @throws IOException If anything goes wrong. */
   public void create(String   tableName,
                      String[] families) throws IOException {
     setTableName(tableName);
     Admin admin = _connection.getAdmin();      
-    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName()));    
+    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName()));  
+    String familyName;
+    int    familyVersions;
     for (String family : families) {
       if (family.contains(":")) {
-        builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(family.split(":")[0]))
-                                                             .setMaxVersions(Integer.valueOf(family.split(":")[1]))
+        familyName     =                 family.split(":")[0];
+        familyVersions = Integer.valueOf(family.split(":")[1]);
+        if (familyVersions == 0) {
+          familyVersions = Integer.MAX_VALUE;
+          }
+        builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(familyName))
+                                                             .setMaxVersions(familyVersions)
                                                              .build());
         }
       else {
@@ -500,8 +507,9 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     log.debug(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
     return results;
     } 
-    
-  /** TBD */ 
+
+  @Override 
+  // TBD: refactor with scan
   public Map<String, Map<String, Map<Long, String>>> scan3(String    key,
                                                            SearchMap searchMap,
                                                            String    filter,
@@ -557,9 +565,8 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         try {
           r = table().get(get);
           log.debug("" + r.size() + " entries found");
-          addResult3(r, result, filter);
+          addResult(r, result, filter);
           results.put(k, result);
-          processResults3(results);
           }
         catch (IOException e) {
           log.error("Cannot search", e);
@@ -725,9 +732,8 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
             break;
             }
           result = new TreeMap<>();
-          if (addResult3(r, result, filter)) {
+          if (addResult(r, result, filter)) {
             results.put(Bytes.toString(r.getRow()), result);
-            processResults3(results);
             i++;
             }
           }
@@ -741,6 +747,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     }    
     
   /** Add {@link Result} into result {@link Map}.
+    * To be used with single-version results.
     * @param r       The {@link Result} to add.
     * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
     * @param filter  The comma-separated list of names of required values as <tt>family:column</tt>.
@@ -815,10 +822,17 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return true;
     }
 
-  /** TBD */
-  protected boolean addResult3(Result                         r,
-                               Map<String, Map<Long, String>> result,
-                               String                         filter) {
+  /** Add {@link Result} into result {@link Map}.
+    * To be used with multiversion results.
+    * @param r       The {@link Result} to add.
+    * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
+    * @param filter  The comma-separated list of names of required values as <tt>family:column</tt>.
+    *                It can be <tt>null</tt>.
+    * @return        Whether the result has been added. */
+  // TBD: refactor with the other addResult
+  protected boolean addResult(Result                         r,
+                              Map<String, Map<Long, String>> result,
+                              String                         filter) {
     if (r == null) {
       return false;
       }
@@ -883,13 +897,6 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   protected void processResults(Map<String, Map<String, String>> results) {
     if (_processor != null) {
       _processor.processResults(results);
-      }
-    }
-    
-  /** TBD */
-  protected void processResults3(Map<String, Map<String, Map<Long, String>>> results) {
-    if (_processor != null) {
-      //_processor.processResults(results);
       }
     }
    
