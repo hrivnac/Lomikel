@@ -143,8 +143,8 @@ public class ParquetReader {
     } 
     
   /** Process {@link Group}. Runs recursively.
-    * @param g     The {@link Group} to process. */
-  private void processGroup(Group                     g) {
+    * @param g The {@link Group} to process. */
+  private void processGroup(Group g) {
     SimpleGroup sg;
     GroupType type;
     String[] jt;

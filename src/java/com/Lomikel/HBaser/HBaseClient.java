@@ -11,11 +11,14 @@ import com.Lomikel.DB.SearchMap;
 
 // HBase
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.TableName ;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -232,21 +235,30 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                     
   /** Create new table.
     * @param tableName The name of new table.
-    * @param families  The name of families.
+    * @param families  The names of families.
+    *                  Can contains the max naumber of stored version after <tt>:</tt>
+    *                  (the default is <tt>1</tt> version).
     * @throws IOException If anything goes wrong. */
   public void create(String   tableName,
                      String[] families) throws IOException {
     setTableName(tableName);
-    Admin admin = _connection.getAdmin();
-    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName()));
+    Admin admin = _connection.getAdmin();      
+    TableDescriptorBuilder builder = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName()));    
     for (String family : families) {
-      builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(family)).build());
+      if (family.contains(":")) {
+        builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(family.split(":")[0]))
+                                                             .setMaxVersions(Integer.valueOf(family.split(":")[1]))
+                                                             .build());
+        }
+      else {
+        builder.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(family)).build());
+        }
       }
     admin.createTable(builder.build());
     admin.close();
     log.info("Created table " + tableName() + "(" + String.join(",", families) + ")");
     }
-                                                           
+                   
   @Override
   public Map<String, Map<String, String>> scan(String    key,
                                                SearchMap searchMap,
@@ -487,6 +499,245 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       }
     log.debug(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
     return results;
+    } 
+    
+  /** TBD */ 
+  public Map<String, Map<String, Map<Long, String>>> scan3(String    key,
+                                                           SearchMap searchMap,
+                                                           String    filter,
+                                                           long      start,
+                                                           long      stop) {
+    String searchMsg = "";
+    if (searchMap != null) {
+      searchMsg = searchMap.toString();
+      }
+    if (searchMsg.length() > 80) {
+      searchMsg = searchMsg.substring(0, 80) + "...}";
+      }
+    log.info("Searching for key: " + key + 
+             ", search: " + searchMsg + 
+             ", filter: " + filter +
+             ", interval: " + start + " ms - " + stop + " ms" +
+             ", searchLimit/resultLimit: " + searchLimit() + "/" + limit());
+    long time = System.currentTimeMillis();
+    if (stop == 0) {
+      stop = System.currentTimeMillis();
+      }
+    Map<String, Map<String, Map<Long, String>>> results = new TreeMap<>();
+    Map<String, Map<Long, String>> result;
+    String[] fc;
+    String family; 
+    String column;
+    String comparator;
+    String value;
+    String startKey = null;
+    String stopKey  = null;
+    if (key == null || !key.startsWith("schema")) {
+      if (_evaluator != null) {
+        filter = mergeColumns(filter, String.join(",", _evaluator.variables()));
+        }
+      filter = mergeColumns(filter, _alwaysColumns);
+      }
+    // Get
+    if (key != null && !key.trim().equals("")) {
+      Get get;
+      Result r;
+      for (String k : key.split(",")) {
+        get = new Get(Bytes.toBytes(k.trim())).readAllVersions();
+        // Filter
+        if (filter != null && !filter.trim().contains("*") && !filter.trim().equals("")) {
+          for (String f : filter.split(",")) {
+            fc = f.split(":");
+            family = fc[0];
+            column = fc[1];
+            get.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+            }
+          }
+        result = new TreeMap<>();
+        try {
+          r = table().get(get);
+          log.debug("" + r.size() + " entries found");
+          addResult3(r, result, filter);
+          results.put(k, result);
+          processResults3(results);
+          }
+        catch (IOException e) {
+          log.error("Cannot search", e);
+          }
+        }
+      }
+    // Scan
+    else {
+      Scan scan = new Scan().readAllVersions();
+      // Filter
+      if (filter != null && !filter.trim().contains("*") && !filter.trim().equals("")) {
+        for (String f : filter.split(",")) {
+          if (f.contains(":")) {
+            fc = f.split(":");
+            family = fc[0];
+            column = fc[1];
+            scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+            }
+          }
+        }
+      // Time range
+      try {
+        scan.setTimeRange(start, stop);
+        }
+      catch (IOException e) {
+        log.error("Cannot set time range " + start + " - " + stop);
+        }
+      // Search
+      if (searchMap == null) {
+        searchMap = new SearchMap();
+        }
+      // if (searchMap != null && !searchMap.isEmpty()) {
+      if (searchMap != null) {
+        List<Filter> filters = new ArrayList<>();
+        String firstKey = null;
+        String lastKey  = null;
+        boolean onlyKeys = !searchMap.isEmpty(); // if empty searchMap => no keys, so not onlyKeys
+        SortedSet<String> allKeys = new TreeSet<>();
+        for (Map.Entry<String, String> entry : MapUtil.sortByValue(searchMap.map()).entrySet()) {
+          fc = entry.getKey().split(":");
+          family = fc[0];
+          column = fc[1];
+          if (family != null && !family.equals("key")) {
+            scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column)); // adding search terms to columns
+            }
+          comparator = fc.length == 3 ? fc[2] : "default";
+          value  = entry.getValue();
+          if (family.equals("key") && column.equals("random")) {
+            onlyKeys = false;
+            filters.add(new RandomRowFilter(Float.parseFloat(value)));
+            }
+          else if (family.equals("key") && column.equals("startKey")) {
+            startKey = value;
+            }
+          else if (family.equals("key") && column.equals("stopKey")) {
+            stopKey = value;
+            }
+          else if (family.equals("key") && column.equals("key")) {
+            for (String v : value.split(",")) {
+              allKeys.add(v);
+              switch (comparator) {
+                case "exact":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new BinaryComparator(Bytes.toBytes(v))));
+                  break;
+                case "substring":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new SubstringComparator(v)));
+                  onlyKeys = false;
+                  break;
+                case "regex":
+                  filters.add(new RowFilter(CompareOp.EQUAL, new RegexStringComparator(v)));
+                  onlyKeys = false;
+                  break;
+                default: // prefix
+                  filters.add(new PrefixFilter(Bytes.toBytes(v)));
+                }
+              }
+            }
+          else {
+            onlyKeys = false;
+            for (String v : value.split(",")) {
+              switch (comparator) {
+                case "exact":
+                  filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, Bytes.toBytes(v)));
+                  break;
+                case "prefix":
+                  filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new BinaryPrefixComparator(Bytes.toBytes(v))));
+                  break;
+                case "regex":
+                  filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new RegexStringComparator(v)));
+                  break;
+                default: // substring
+                  filters.add(new SingleColumnValueFilter(Bytes.toBytes(family), Bytes.toBytes(column), CompareOp.EQUAL, new SubstringComparator(v)));
+                }
+              }
+            }
+          }
+        if (startKey != null || stopKey != null) {
+          if (isReversed()) {
+            if (stopKey != null) {
+              scan.withStartRow(                              Bytes.toBytes(stopKey ) , true);
+              }
+            if (startKey != null) {
+              scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(startKey)), true);
+              }
+            }
+          else {
+            if (startKey != null) {
+              scan.withStartRow(                              Bytes.toBytes(startKey) , true);
+              }
+            if (stopKey != null) {
+              scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(stopKey )), true);
+              }
+            }
+          }
+        else if (onlyKeys) {
+          if (isReversed()) {
+            scan.withStartRow(                              Bytes.toBytes(allKeys.last()),   true);
+            scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.first())), true);
+            }
+          else {
+            scan.withStartRow(                              Bytes.toBytes(allKeys.first()), true);
+            scan.withStopRow(Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.last())), true);
+            }
+          }
+        if (_isRange && !onlyKeys) {
+          log.warn("Range scan is ignored because incompatible with other arguments");
+          _isRange = false;
+          }
+        FilterList filterList;
+        if (_isRange) {
+          log.info("Performing range scan");
+          RowRange rr = new RowRange(                               Bytes.toBytes(allKeys.first()), true,
+                                     Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.last())), true);
+          List<RowRange> lrr = new ArrayList<>();
+          lrr.add(rr);
+          filterList = new FilterList(_operator, new MultiRowRangeFilter(lrr));
+          }
+        else  {
+          filterList = new FilterList(_operator, filters);  
+          }
+        scan.setFilter(filterList);
+        }
+      // Limit
+      int limit0 = _limit0;
+      if (_evaluator == null && (limit() < _limit0 || _limit0 == 0)) {
+        limit0 = limit();
+        }
+      if (limit0 > 0) {
+        scan.setLimit(limit0);
+        if (schema() != null) {
+          scan.setMaxResultSize(limit0 * schema().size());
+          }
+        }
+      // Reversed
+      scan.setReversed(isReversed());
+      log.info("scan = " + scan);
+      // Results
+      try {
+        _rs = table().getScanner(scan);
+        int i = 0;
+        for (Result r : _rs) {
+          if (i >= limit()) {
+            break;
+            }
+          result = new TreeMap<>();
+          if (addResult3(r, result, filter)) {
+            results.put(Bytes.toString(r.getRow()), result);
+            processResults3(results);
+            i++;
+            }
+          }
+        }
+      catch (IOException e) {
+        log.error("Cannot search", e);
+        }
+      }
+    log.debug(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
+    return results;
     }    
     
   /** Add {@link Result} into result {@link Map}.
@@ -563,6 +814,68 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       }
     return true;
     }
+
+  /** TBD */
+  protected boolean addResult3(Result                         r,
+                               Map<String, Map<Long, String>> result,
+                               String                         filter) {
+    if (r == null) {
+      return false;
+      }
+    String key = Bytes.toString(r.getRow());
+    // when schema is already loaded => ignore schema rows
+    if (key.startsWith("schema") && schema() != null) {
+      return false;
+      }
+    // evaluate non-schema rows
+    if (!key.startsWith("schema") &&_evaluator != null && !evaluateResult(r)) {
+      return false;
+      }
+    String[] ff;
+    String ref;
+    Map<Long, String> t;
+    if (r.getRow() != null) {
+      String family;
+      String column;
+      NavigableMap<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>>	resultMap = r.getMap();
+      for (Map.Entry<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> entry : resultMap.entrySet()) {
+        family = Bytes.toString(entry.getKey());
+        for (Map.Entry<byte[], NavigableMap<Long, byte[]>> e : entry.getValue().entrySet()) {
+          column = family + ":" + Bytes.toString(e.getKey());
+          if (filter == null || filter.contains("*") || filter.contains(column)) {
+            // searching for schema
+            if (key.startsWith("schema")) {
+              log.error("3D cell cannot be used for schema");
+              }
+            // known schema
+            else if (schema() != null && schema().type(column) != null) {
+              // binary
+              if (family.equals("b")) {
+                log.error("3D cell cannot be used for binary data");
+                }
+              // not binary
+              else {
+                t = new TreeMap<>();
+                for (Map.Entry<Long, byte[]> ee : e.getValue().entrySet()) {
+                  t.put(ee.getKey(), schema().decode(column, ee.getValue()));
+                  }
+                result.put(column, t);
+                }
+              }
+            // no schema
+            else {
+              t = new TreeMap<>();
+              for (Map.Entry<Long, byte[]> ee : e.getValue().entrySet()) {
+                t.put(ee.getKey(), Bytes.toString(ee.getValue()));
+                }
+              result.put(column, t);
+              }
+            }
+          }
+        }
+      }
+    return true;
+    }
     
   /** Process results after each insertion of new result.
     * May be imlemented in subclasses or setup via {@link #setProcessor}.
@@ -573,6 +886,13 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       }
     }
     
+  /** TBD */
+  protected void processResults3(Map<String, Map<String, Map<Long, String>>> results) {
+    if (_processor != null) {
+      //_processor.processResults(results);
+      }
+    }
+   
   /** Set {@link HBaseProcessor}.
     * @param resultsProcessor The {@link HBaseProcessor} to set. */
   public void setProcessor(HBaseProcessor processor) {
