@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 import java.io.IOException;
@@ -84,7 +86,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     setFinkEvaluatorFunctions();
     }
     
-  /** TBD */
+  /** Setup the default sets of evaluation functions. */
   private void setFinkEvaluatorFunctions() {
     try {
       evaluator().setEvaluatorFunctions("com.astrolabsoftware.FinkBrowser.HBaser.FinkEvaluatorFunctions", "com/astrolabsoftware/FinkBrowser/HBaser/FinkEvaluatorFunctions.bsh");
@@ -95,26 +97,93 @@ public class FinkHBaseClient extends HBaseSQLClient {
       }
     }
 
-  public Set<Pair<Double, Double>> search2(String objectId,
-                                           String column1,
-                                           String column2) {
-    Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", column1 + "," + column2, 0, 0);
-    Set<Pair<Double, Double>> scatter = new LinkedHashSet<>();
+  /** Give n-dim scatter plot from multi-versioned columns,
+    * associated by their timestamps.
+    * @param objectId The objectId to get the scatter for.
+    * @param xColumn  The column to get as x-axis.
+    * @param yColumns The columns to get as y-axis.
+    *                 Missing values will be set as <tt>NaN</tt>.
+    *                 Values without correspondence in <tt>xColumn</tt> will be ignored.
+    * @return         The resulting x -&gt; [y] mappings. */
+  public Map<String, List<Double>> search2(String objectId,
+                                           String xColumn,
+                                           String yColumns) {
+    Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", xColumn + "," + yColumns, 0, 0);
+    Map<String, List<Double>> map = new TreeMap<>();
+    map.put(xColumn, new ArrayList<Double>());
+    for (String yColumn : yColumns.split(",")) {
+      map.put(yColumn, new ArrayList<Double>());
+      }
     if (results != null && !results.isEmpty() && results.containsKey(objectId)) {
       Map<String, Map<Long, String>> result = results.get(objectId);
-      Map<Long, String> var1 = result.get(column1);
-      Map<Long, String> var2 = result.get(column2);
-      for (var e : var1.entrySet()) {
-        if (var2.containsKey(e.getKey())) {
-          scatter.add(Pair.of(Double.valueOf(e.getValue()),
-                              Double.valueOf(var2.get(e.getKey()))));
+      Map<Long, String> xs = result.get(xColumn);
+      Map<Long, String> ys;
+      for (Map.Entry<Long, String> x : xs.entrySet()) {
+        map.get(xColumn).add(Double.valueOf(x.getValue()));
+        for (String yColumn : yColumns.split(",")) {
+          ys = result.get(yColumn);
+          if (ys.containsKey(x.getKey())) {
+            map.get(yColumn).add(Double.valueOf(ys.get(x.getKey())));
+            }
+          else {
+            map.get(yColumn).add(Double.NaN);
+            }
           }
         }      
       }
     else {
       log.warn("Nothing found");
       }
-    return scatter;
+    return map;
+    }
+    
+  /** Assemble curves of variable columns from anogther table
+    * as multi-versioned columns of the current table.
+    * @param sourceClient The {@link HBaseClient} of the source table.
+    *                     It should be already opened and connected with appropriate schema.
+    * @param objectIds    The comma-separated list of <em>objectIds</em> to extract.
+    * @param columns      The comma-separated list of columns (incl families) to extract.
+    * @param schemaName   The name of the schema to be created in the new table.
+    *                     The columns in the new table will belong to the <em>c</em> family
+    *                     and will have the type of <em>double</em>. */
+  public void assembleCurves(HBaseClient sourceClient,
+                             String      objectIds,
+                             String      columns,
+                             String      schemaName) {
+    String[] schema = columns.split(",");
+    for (int i = 0; i < schema.length; i++) {
+      schema[i] = "c:" + schema[i].split(":")[1] + ":double";
+      }
+    try {
+      put(schemaName, schema);
+      }
+    catch (IOException e) {
+      log.error("Cannot create schema " + schemaName + " = " + schema, e);
+      }
+    try {
+      connect(tableName(), schemaName);
+      }
+    catch (LomikelException e) {
+      log.error("Cannot reconnect to " + tableName() + " with new schema", e);
+      }
+    Map<String, Map<String, String>> results;
+    Set<String> curves = new TreeSet<>();
+    for (String objectId : objectIds.split(",")) {
+      log.info(objectId);
+      results = sourceClient.scan(null, "key:key:" + objectId + ":prefix", columns, 0, false, false);
+      for (Map.Entry<String, Map<String, String>> row : results.entrySet()) {
+        curves.clear();
+        for (Map.Entry<String, String> e : row.getValue().entrySet()) {
+          curves.add("c:" + e.getKey().split(":")[1] + ":" + e.getValue());
+          }
+        try {
+          put(objectId, curves.toArray(new String[0]));
+          }
+        catch (IOException e) {
+          log.error("Cannot insert " + objectId + " = " + curves, e);
+         }
+        }
+      }
     }
     
   /** Get alerts between two Julian dates (inclusive).
