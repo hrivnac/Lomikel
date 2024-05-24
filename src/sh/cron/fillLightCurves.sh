@@ -10,5 +10,5 @@ PID=$$
 echo ${PID} > ${LOCK}
 cd ~/Lomikel/ant
 source ./setup.sh
-java -jar ~/Lomikel/lib/Lomikel-HBase.exe.jar -b -s ~/Lomikel/work/fillLightCurves.groovy | tee -a ${LOG} 2>&1
+java -jar ~/Lomikel/lib/Lomikel-HBase.exe.jar -b -s ~/Lomikel/src/work/fillLightCurves.groovy | tee -a ${LOG} 2>&1
 /bin/rm -f ${LOCK} 
