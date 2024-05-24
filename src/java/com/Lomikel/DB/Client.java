@@ -76,10 +76,14 @@ public abstract class Client<T, S extends Schema> {
     
   // Search --------------------------------------------------------------------
   
+  /** Delete row(s) with all cell versions.
+    * @param key     The row key. */
+  public abstract void delete(String key);
+   
   /** Get row(s) with latest cell version.
     * @param key     The row key. Disables other search terms.
     *                It can be <tt>null</tt>.
-    * @param search  The search terms as <tt>family:column:value,...</tt>.
+   * @param search  The search terms as <tt>family:column:value,...</tt>.
     *                Key can be searched with <tt>family:column = key:key<tt> "pseudo-name".
     *                <tt>key:startKey</tt> and <tt>key:stopKey</tt> van restrict search to a key interval.
     *                {@link Comparator} can be chosen as <tt>family:column:value:comparator</tt>

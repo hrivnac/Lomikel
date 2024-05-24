@@ -1,4 +1,5 @@
 import com.Lomikel.HBaser.HBaseClient;
+import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 
 // Open HBase database (ip, port)
 client = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
@@ -83,6 +84,7 @@ client.close();
 // -----------------------------------------------------------------------------
 
 // Get all schemas
+
 client1 = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
 client1.connect("ztf", null);
 results = client1.scan(null,
@@ -119,3 +121,19 @@ results = client2.scan("row_a_1",
 print(client2.results2String(results)); 
 
 client2.close()
+
+// -----------------------------------------------------------------------------
+
+source = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+source.connect("ztf");
+
+
+client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client.create("CurveTest1", new String[]{"c:100"});
+client.connect("CurveTest1", null);
+client.assembleCurves(source,
+                    "ZTF19aaaiwak,ZTF19aaaiwam,ZTF19aaaiwef,ZTF19aaaiwfu",
+                    "i:jd,i:ra,i:dec",
+                    "schema_0_0_1");
+                    
+// -----------------------------------------------------------------------------

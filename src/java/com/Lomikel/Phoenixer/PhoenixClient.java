@@ -102,6 +102,11 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     
   // Search --------------------------------------------------------------------
            
+  @Override
+  // BUG: TBD
+  public void delete(String key) {
+    }
+  
   /** 
     * {@inheritDoc}
     *

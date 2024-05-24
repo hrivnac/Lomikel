@@ -24,7 +24,7 @@ export GROOVY_CLASSPATH=""
 for JAR in ${janusgraph_dir}/lib/*.jar; do
   JANUSGRAPH_CLASSPATH=${JANUSGRAPH_CLASSPATH}:${JAR} 
   done
-export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${JANUSGRAPH_CLASSPATH}"
+export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${jython_jar}:${JANUSGRAPH_CLASSPATH}"
 export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}"
     
 export janusgraph_dir
