@@ -58,7 +58,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
   public FinkHBaseClient(String zookeepers,
                          String clientPort) throws LomikelException {
     super(zookeepers, clientPort);
-    setFinkEvaluatorFunctions();
+    //setFinkEvaluatorFunctions();
     }
        
   /** Create.
@@ -68,7 +68,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
   public FinkHBaseClient(String zookeepers,
                          int    clientPort) throws LomikelException {
     super(zookeepers, clientPort);
-    setFinkEvaluatorFunctions();
+    //setFinkEvaluatorFunctions();
     }
    
   /** Create.
@@ -76,7 +76,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     * @throws LomikelException If anything goes wrong. */
   public FinkHBaseClient(String url) throws LomikelException {
     super(url);
-    setFinkEvaluatorFunctions();
+    //setFinkEvaluatorFunctions();
     }
    
   /** Create on <em>localhost</em>.
@@ -232,9 +232,10 @@ public class FinkHBaseClient extends HBaseSQLClient {
         for (Map.Entry<String, String> e : row.getValue().entrySet()) {
           if (e.getValue().contains("]")) {            
             for (String value : e.getValue().replaceAll("\\[", "").replaceAll("]", "").split(",")) {
-              if (!value.trim().equals("NaN")) {
-                curves.add(subcolumns[i++] + ":" + value.trim());
+              if (!value.trim().equals("NaN") && !value.trim().equals("null")) {
+                curves.add(subcolumns[i] + ":" + value.trim());
                 }
+              i++;
               }
             }
           else {
@@ -242,7 +243,9 @@ public class FinkHBaseClient extends HBaseSQLClient {
             }
           }
         try {
-          put(objectId, curves.toArray(new String[0]));
+          if (!curves.isEmpty()) {
+            put(objectId, curves.toArray(new String[0]));
+            }
           }
         catch (IOException e) {
           log.error("Cannot insert " + objectId + " = " + curves, e);
