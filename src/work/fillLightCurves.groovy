@@ -8,7 +8,7 @@ oids = source.latests("i:objectId",
                       1000,
                       true);
 oids = oids.toArray().join(",");
-source.setLimit(0);
+source.setLimit(Integer.MAX_VALUE);
 client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
 client.connect("LightCurves", null);
 client.assembleLightCurves(source, oids);

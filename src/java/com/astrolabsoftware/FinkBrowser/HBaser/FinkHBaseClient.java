@@ -58,6 +58,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
   public FinkHBaseClient(String zookeepers,
                          String clientPort) throws LomikelException {
     super(zookeepers, clientPort);
+    setFinkEvaluatorFunctions();
     }
        
   /** Create.
@@ -67,7 +68,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
   public FinkHBaseClient(String zookeepers,
                          int    clientPort) throws LomikelException {
     super(zookeepers, clientPort);
-    //setFinkEvaluatorFunctions();
+    setFinkEvaluatorFunctions();
     }
    
   /** Create.
