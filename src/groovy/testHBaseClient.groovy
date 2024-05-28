@@ -124,10 +124,9 @@ client2.close()
 
 // -----------------------------------------------------------------------------
 
+// create jd-ra-dec curves
 source = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
 source.connect("ztf");
-
-
 client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
 client.create("CurveTest1", new String[]{"c:100"});
 client.connect("CurveTest1", null);
@@ -135,5 +134,17 @@ client.assembleCurves(source,
                     "ZTF19aaaiwak,ZTF19aaaiwam,ZTF19aaaiwef,ZTF19aaaiwfu",
                     "i:jd,i:ra,i:dec",
                     "schema_0_0_1");
+                    
+// add one source to LightCurves
+source = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+source.connect("ztf");
+client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client.connect("LightCurves", null);
+client.assembleLightCurves(source, "ZTF18ablmixw");
+                    
+// get LightCurves for one source
+client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client.connect("LightCurves");
+client.search2("ZTF18ablmixw", "c:jd", null);
                     
 // -----------------------------------------------------------------------------

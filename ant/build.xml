@@ -306,11 +306,11 @@
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
       <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${cli_jar}"/>
+      <zipfileset includes="**/*" src="${joinery_jar}"/>
       <zipfileset includes="**/*" src="${javaxmail_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
       <zipfileset includes="**/*" src="${parquethadoop_jar}"/>
-      <zipfileset includes="**/*" src="${jython_jar}"/>
 			<zipfileset includes="**/*" src="${math3_jar}"/>
 			<zipfileset includes="**/*" src="${groovy_jar}"/>
 			<zipfileset includes="**/*" src="${groovyconsole_jar}"/>
@@ -337,10 +337,10 @@
     <jar jarfile="../lib/Lomikel-HBase.exe.jar" index="yes">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
       <zipfileset includes="**/*" src="${cli_jar}"/>
+      <zipfileset includes="**/*" src="${joinery_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
       <zipfileset includes="**/*" src="${groovy_jar}"/>
-      <zipfileset includes="**/*" src="${jython_jar}"/>
       <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/shaded-clients/hbase-shaded-client-2.5.8-hadoop3.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/audience-annotations-0.13.0.jar"/>
@@ -365,10 +365,10 @@
     <jar jarfile="../lib/Lomikel-Janus.exe.jar" index="yes" zip64Mode="always">
       <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
       <zipfileset includes="**/*" src="${cli_jar}"/>
+      <zipfileset includes="**/*" src="${joinery_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
       <zipfileset includes="**/*" src="${groovy_jar}"/>
-      <zipfileset includes="**/*" src="${jython_jar}"/>
       <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>

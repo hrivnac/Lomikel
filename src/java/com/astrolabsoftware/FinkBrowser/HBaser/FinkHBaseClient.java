@@ -18,6 +18,9 @@ import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 // HBase
 import org.apache.hadoop.hbase.TableExistsException;
 
+// Joinery
+import joinery.DataFrame;
+
 // Java
 import java.lang.Math;
 import static java.lang.Math.PI;
@@ -103,39 +106,54 @@ public class FinkHBaseClient extends HBaseSQLClient {
     * @param objectId The objectId to get the scatter for.
     * @param xColumn  The column to get as x-axis.
     * @param yColumns The columns to get as y-axis.
+    *                 If <tt>null</tt>, all available columns will be delivered.
     *                 Missing values will be set as <tt>NaN</tt>.
     *                 Values without correspondence in <tt>xColumn</tt> will be ignored.
-    * @return         The resulting x -&gt; [y] mappings. */
-  public Map<String, List<Double>> search2(String objectId,
-                                           String xColumn,
-                                           String yColumns) {
-    Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", xColumn + "," + yColumns, 0, 0);
-    Map<String, List<Double>> map = new TreeMap<>();
-    map.put(xColumn, new ArrayList<Double>());
-    for (String yColumn : yColumns.split(",")) {
-      map.put(yColumn, new ArrayList<Double>());
+    * @return         The resulting x -&gt; [y] {@link DataFrame}. */
+  public DataFrame<Double> search2(String objectId,
+                                   String xColumn,
+                                   String yColumns) {
+    if (yColumns == null) {
+      yColumns = "";
+      boolean first = true;
+      for (String y : LIGHTCURVE_SCHEMA) {
+        if (first) {
+          first = false;
+          }
+        else {
+          yColumns += ",";
+          }
+        yColumns += "c:lc_g_" + y;
+        }
+      for (String y : LIGHTCURVE_SCHEMA) {
+        yColumns += ",c:lc_r_" + y;
+        }
       }
+    Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", xColumn + "," + yColumns, 0, 0);
+    List<Double> list = new ArrayList<>();
+    DataFrame<Double> df = new DataFrame<>(yColumns.split(","));
     if (results != null && !results.isEmpty() && results.containsKey(objectId)) {
       Map<String, Map<Long, String>> result = results.get(objectId);
       Map<Long, String> xs = result.get(xColumn);
       Map<Long, String> ys;
       for (Map.Entry<Long, String> x : xs.entrySet()) {
-        map.get(xColumn).add(Double.valueOf(x.getValue()));
+        list.clear();
         for (String yColumn : yColumns.split(",")) {
           ys = result.get(yColumn);
-          if (ys.containsKey(x.getKey())) {
-            map.get(yColumn).add(Double.valueOf(ys.get(x.getKey())));
+          if (ys != null && ys.containsKey(x.getKey())) {
+            list.add(Double.valueOf(ys.get(x.getKey())));
             }
           else {
-            map.get(yColumn).add(Double.NaN);
+            list.add(Double.NaN);
             }
           }
-        }      
+        df.append(Double.valueOf(x.getValue()), list);
+        }
       }
     else {
       log.warn("Nothing found");
       }
-    return map;
+    return df;
     }
     
   /** Assemble curves of variable columns from another table
