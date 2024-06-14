@@ -74,7 +74,7 @@ public abstract class CLI {
                                    .withArgName("file")
                                    .create("s"));
     options.addOption(OptionBuilder.withLongOpt("api")
-                                   .withDescription("cli language: [bsh|groovy|python] (othewise taken from source extension, defauld is bsh")
+                                   .withDescription("cli language: [bsh|groovy|python] (othewise taken from source extension, defauld is groovy")
                                    .hasArg()
                                    .withArgName("language")
                                    .create("a"));
@@ -116,7 +116,7 @@ public abstract class CLI {
             _api = "python";
             break;
           default:
-            //_api = "bsh"; // the default
+            _api = "groovy"; // the default
             break;
           }
         }

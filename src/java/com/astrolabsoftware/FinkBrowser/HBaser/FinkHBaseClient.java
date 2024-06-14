@@ -109,10 +109,12 @@ public class FinkHBaseClient extends HBaseSQLClient {
     *                 If <tt>null</tt>, all available columns will be delivered.
     *                 Missing values will be set as <tt>NaN</tt>.
     *                 Values without correspondence in <tt>xColumn</tt> will be ignored.
+    * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
     * @return         The resulting x -&gt; [y] {@link DataFrame}. */
-  public DataFrame<Double> search2(String objectId,
-                                   String xColumn,
-                                   String yColumns) {
+  public DataFrame<Double> search2(String  objectId,
+                                   String  xColumn,
+                                   String  yColumns,
+                                   boolean skipAllNull) {
     if (yColumns == null) {
       yColumns = "";
       boolean first = true;
@@ -132,26 +134,38 @@ public class FinkHBaseClient extends HBaseSQLClient {
     Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", xColumn + "," + yColumns, 0, 0);
     List<Double> list = new ArrayList<>();
     DataFrame<Double> df = new DataFrame<>(yColumns.split(","));
+    boolean hasVal;
     if (results != null && !results.isEmpty() && results.containsKey(objectId)) {
       Map<String, Map<Long, String>> result = results.get(objectId);
       Map<Long, String> xs = result.get(xColumn);
       Map<Long, String> ys;
       for (Map.Entry<Long, String> x : xs.entrySet()) {
         list.clear();
+        hasVal = false;
         for (String yColumn : yColumns.split(",")) {
           ys = result.get(yColumn);
           if (ys != null && ys.containsKey(x.getKey())) {
             list.add(Double.valueOf(ys.get(x.getKey())));
+            hasVal = true;
             }
           else {
-            list.add(Double.NaN);
+            list.add(null);
             }
           }
-        df.append(Double.valueOf(x.getValue()), list);
+        if (!skipAllNull || hasVal) {
+          df.append(Double.valueOf(x.getValue()), list);
+          }
         }
       }
     else {
       log.warn("Nothing found");
+      }
+    if (skipAllNull) {
+      for (String yColumn : yColumns.split(",")) {
+        if (df.col(yColumn).stream().allMatch(e -> e == null)) {
+          df = df.drop(yColumn);
+          }
+        }
       }
     return df;
     }
@@ -162,7 +176,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     * @param sourceClient The {@link HBaseClient} of the source table.
     *                     It should be already opened and connected with appropriate schema.
     * @param objectIds    The comma-separated list of <em>objectIds</em> to extract.
-    * @param columns      The comma-separated list of columns (incl families) to extract.
+    * @param columns      The comma-separated list of columns (incl. families) to extract.
     * @param schemaName   The name of the schema to be created in the new table.
     *                     The columns in the new table will belong to the <em>c</em> family
     *                     and will have the type of <em>double</em>. */
@@ -188,16 +202,23 @@ public class FinkHBaseClient extends HBaseSQLClient {
       }
     Map<String, Map<String, String>> results;
     Set<String> curves = new TreeSet<>();
+    String value;
     for (String objectId : objectIds.split(",")) {
       delete(objectId);
       results = sourceClient.scan(null, "key:key:" + objectId + ":prefix", columns, 0, false, false);
+      log.info("Adding " + objectId + "[" + results.size() + "]");
       for (Map.Entry<String, Map<String, String>> row : results.entrySet()) {
         curves.clear();
         for (Map.Entry<String, String> e : row.getValue().entrySet()) {
-          curves.add("c:" + e.getKey().split(":")[1] + ":" + e.getValue());
+          value = e.getValue();
+          if (!value.trim().equals("NaN") && !value.trim().equals("null")) {
+            curves.add("c:" + e.getKey().split(":")[1] + ":" + value.trim());
+            }
           }
         try {
-          put(objectId, curves.toArray(new String[0]));
+          if (!curves.isEmpty()) {
+            put(objectId, curves.toArray(new String[0]));
+            }
           }
         catch (IOException e) {
           log.error("Cannot insert " + objectId + " = " + curves, e);
@@ -244,6 +265,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     for (String objectId : objectIds.split(",")) {
       delete(objectId);
       results = sourceClient.scan(null, "key:key:" + objectId + ":prefix", columns, 0, false, false);
+      log.info("Adding " + objectId + "[" + results.size() + "]");
       for (Map.Entry<String, Map<String, String>> row : results.entrySet()) {
         curves.clear();
         i = 0;
@@ -267,7 +289,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
           }
         catch (IOException e) {
           log.error("Cannot insert " + objectId + " = " + curves, e);
-         }
+          }
         }
       }
     }

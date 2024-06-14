@@ -1057,8 +1057,9 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                   String[] values) throws IOException {
     Put put = new Put(Bytes.toBytes(key));
     String value;
+    String[] w;
     for (String v : values) {
-      String[] w = v.split(":");
+      w = v.split(":");
       value = w[2];
       if (schema() != null) {
         put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), schema().encode(w[0] +  ":" +  w[1], value).bytes());
@@ -1068,6 +1069,34 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         }
       }
     table().put(put);
+    }
+    
+  /** Add rows into table in a batch.
+    * @param rows   The {@link Map} rowkey -&gt; (family:column -&gt; value).
+    *               Use schema if defined.
+    * @throws IOException If anything goes wrong. */
+  public void put(Map<String, Map<String, String>> rows) throws IOException {
+    List<Put> puts = new ArrayList<Put>();
+    String key;
+    Put put;
+    String[] w;
+    String value;
+    for (Map.Entry<String, Map<String, String>> row : rows.entrySet()) {
+      key = row.getKey();
+      put = new Put(Bytes.toBytes(key));
+      for (Map.Entry<String, String> cell : row.getValue().entrySet()) {
+        w = cell.getKey().split(":");
+        value  = cell.getValue();
+        if (schema() != null) {
+          put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), schema().encode(w[0] +  ":" +  w[1], value).bytes());
+          }
+        else {
+          put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), Bytes.toBytes(value));
+          }
+        }
+      puts.add(put);  
+      }
+    table().put(puts);
     }
   
   // Aux -----------------------------------------------------------------------
