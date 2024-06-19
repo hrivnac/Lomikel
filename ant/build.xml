@@ -951,7 +951,7 @@
       </delete>
    </target>
    
-  <!-- Dist =================================================================-->
+  <!-- Dist ==========================WWW=======================================-->
 
   <target name="dist"
           depends="exe"
@@ -1161,7 +1161,7 @@
   <!-- Post =================================================================-->
 
   <target name="post"
-          depends="dist"
+          depends="init"
           description="Post documentation and distribution">
     <delete includeEmptyDirs="true">
       <fileset dir="${doc}" includes="**/*"/>
@@ -1170,6 +1170,14 @@
 			<fileset dir="../doc" includes="**/*"/>
 			<fileset dir="../dist" includes="*.jar"/>
       </copy>
+    <copy file="../ant/pom.xml"
+          tofile="pom.xml"/>
+    <replace file="pom.xml" token="@version@" value="${version}"/>
+    <exec executable="/usr/bin/mvn">
+      <arg value="install:install-file"/>
+      <arg value="-Dfile=../lib/Lomikel-${version}.jar"/>
+      <arg value="-DpomFile=pom.xml"/>
+      </exec>
     </target>
 
   <!-- JDepend ==============================================================-->

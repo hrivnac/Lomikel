@@ -168,7 +168,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
         }
       }
     return df;
-    }
+   }
     
   /** Assemble curves of variable columns from another table
     * as multi-versioned columns of the current table.

@@ -221,7 +221,7 @@ public abstract class CLI {
                          
   private static String  _source     = null;
                          
-  private static String  _api        = "bsh";
+  private static String  _api        = "groovy";
                                     
   private static String  _help       = "";
                                     
