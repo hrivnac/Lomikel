@@ -104,6 +104,78 @@ public class FinkHBaseClient extends HBaseSQLClient {
   /** Give n-dim scatter plot from multi-versioned columns,
     * associated by their timestamps.
     * @param objectId The objectId to get the scatter for.
+    * @param columns  The column to get.
+    *                 If <tt>null</tt> or <tt>*</tt>, all available columns will be delivered.
+    *                 Missing values will be set as <tt>NaN</tt>.
+    * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
+    * @return         The resulting x -&gt; [y] {@link DataFrame}. */
+  public DataFrame<Double> search2(String  objectId,
+                                   String  columns,
+                                   boolean skipAllNull) {
+    if (columns == null || columns.equals("*")) {
+      columns = "";
+      boolean first = true;
+      for (String column : schema().columnNames()) {
+        if (schema().isNumber(column)) {
+          if (first) {
+            first = false;
+            }
+          else {
+            columns += ",";
+            }
+          columns += column;
+          }
+        }
+      }
+    Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", columns, 0, 0);
+    List<Double> list = new ArrayList<>();
+    DataFrame<Double> df = new DataFrame<>(columns.split(","));
+    boolean hasVal = false;
+    if (results != null && !results.isEmpty() && results.containsKey(objectId)) {
+      Map<String, Map<Long, String>> result = results.get(objectId);
+      Set<Long> timestamps = new TreeSet<>();
+      for (Map.Entry<String, Map<Long, String>> item : result.entrySet()) {
+        for (Map.Entry<Long, String> value : item.getValue().entrySet()) {
+          timestamps.add(value.getKey());
+          }
+        }
+      Map<Long, String> columnsVal;
+      for (Long timestamp : timestamps) {
+        list.clear();
+        hasVal = false;
+        for (String column : columns.split(",")) {
+          if (result.containsKey(column)) {
+            columnsVal = result.get(column);
+            if (columnsVal.containsKey(timestamp)) {
+              list.add(Double.valueOf(columnsVal.get(timestamp)));
+              hasVal = true;
+              }
+            else {
+              list.add(null);
+              }
+            }
+          }
+        if (!skipAllNull || hasVal) {
+          df.append(list);
+          }      
+        }
+      }
+    else {
+      log.warn("Nothing found");
+      }
+    if (skipAllNull) {
+      for (String column : columns.split(",")) {
+        if (df.col(column).stream().allMatch(e -> e == null || e == 0)) {
+          df = df.drop(column);
+          }
+        }
+      }
+    return df;
+    }
+  
+  /** Give n-dim scatter plot from multi-versioned columns,
+    * associated by their timestamps.
+    * @param objectId The objectId to get the scatter for.
     * @param xColumn  The column to get as x-axis.
     * @param yColumns The columns to get as y-axis.
     *                 If <tt>null</tt>, all available columns will be delivered.
@@ -169,7 +241,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
       }
     return df;
    }
-    
+  
   /** Assemble curves of variable columns from another table
     * as multi-versioned columns of the current table.
     * All previous lightcurves for selected <em>objectId</em>s are deleted.
