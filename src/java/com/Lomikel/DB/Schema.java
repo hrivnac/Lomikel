@@ -154,6 +154,34 @@ public abstract class Schema<T> {
       } 
    }
    
+  /** Give column value cassed to its proper type.
+    * @param columnName  The name of the column.
+    * @param columnValue The value of the column.
+    * @return            The column value casted to its proper type. */
+  public Object castColumn(String columnName,
+                           String columnValue) {
+    switch (type(columnName)) {
+      case "float":
+        return Float.valueOf(columnValue);
+      case "double":
+        return Double.valueOf(columnValue);
+      case "integer":
+        return Integer.valueOf(columnValue);
+      case "long":
+        return Long.valueOf(columnValue);
+      case "short":
+        return Short.valueOf(columnValue);
+      case "fits":
+        return null;
+      case "fits/image":
+        return null;
+      case "binary":
+        return null;
+      default: // includes "string"
+        return columnValue;
+      }
+    }
+   
   /** Whether schema contains a column.
     * @param name The name of the column.
     * @return Whether schema contains a column. */

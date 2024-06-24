@@ -104,11 +104,11 @@ public class FinkHBaseClient extends HBaseSQLClient {
   /** Give n-dim scatter plot from multi-versioned columns,
     * associated by their timestamps.
     * @param objectId The objectId to get the scatter for.
-    * @param columns  The column to get.
+    * @param columns  The columns to get.
     *                 If <tt>null</tt> or <tt>*</tt>, all available columns will be delivered.
-    *                 Missing values will be set as <tt>NaN</tt>.
     * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
-    * @return         The resulting x -&gt; [y] {@link DataFrame}. */
+    * @return         The resulting {@link DataFrame}. */
+  // TBD: refactor
   public DataFrame<Double> search2(String  objectId,
                                    String  columns,
                                    boolean skipAllNull) {
@@ -116,20 +116,18 @@ public class FinkHBaseClient extends HBaseSQLClient {
       columns = "";
       boolean first = true;
       for (String column : schema().columnNames()) {
-        if (schema().isNumber(column)) {
-          if (first) {
-            first = false;
-            }
-          else {
-            columns += ",";
-            }
-          columns += column;
+        if (first) {
+          first = false;
           }
+        else {
+          columns += ",";
+          }
+        columns += column;
         }
       }
     Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", columns, 0, 0);
-    List<Double> list = new ArrayList<>();
-    DataFrame<Double> df = new DataFrame<>(columns.split(","));
+    List<Object> list = new ArrayList<>();
+    DataFrame df = new DataFrame(columns.split(","));
     boolean hasVal = false;
     if (results != null && !results.isEmpty() && results.containsKey(objectId)) {
       Map<String, Map<Long, String>> result = results.get(objectId);
@@ -147,7 +145,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
           if (result.containsKey(column)) {
             columnsVal = result.get(column);
             if (columnsVal.containsKey(timestamp)) {
-              list.add(Double.valueOf(columnsVal.get(timestamp)));
+              list.add(schema().castColumn(column, columnsVal.get(timestamp)));
               hasVal = true;
               }
             else {
@@ -165,7 +163,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
       }
     if (skipAllNull) {
       for (String column : columns.split(",")) {
-        if (df.col(column).stream().allMatch(e -> e == null || e == 0)) {
+        if (df.col(column).stream().allMatch(e -> e == null)) {
           df = df.drop(column);
           }
         }
@@ -178,34 +176,31 @@ public class FinkHBaseClient extends HBaseSQLClient {
     * @param objectId The objectId to get the scatter for.
     * @param xColumn  The column to get as x-axis.
     * @param yColumns The columns to get as y-axis.
-    *                 If <tt>null</tt>, all available columns will be delivered.
-    *                 Missing values will be set as <tt>NaN</tt>.
+    *                 If <tt>null</tt> or <tt>*</tt>, all available columns will be delivered.
     *                 Values without correspondence in <tt>xColumn</tt> will be ignored.
     * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
     * @return         The resulting x -&gt; [y] {@link DataFrame}. */
+  // TBD: refactor
   public DataFrame<Double> search2(String  objectId,
                                    String  xColumn,
-                                   String  yColumns,
+                                   String  columns,
                                    boolean skipAllNull) {
-    if (yColumns == null) {
-      yColumns = "";
+    if (columns == null || columns.equals("*")) {
+      columns = "";
       boolean first = true;
-      for (String y : LIGHTCURVE_SCHEMA) {
+      for (String column : schema().columnNames()) {
         if (first) {
           first = false;
           }
         else {
-          yColumns += ",";
+          columns += ",";
           }
-        yColumns += "c:lc_g_" + y;
-        }
-      for (String y : LIGHTCURVE_SCHEMA) {
-        yColumns += ",c:lc_r_" + y;
+        columns += column;
         }
       }
-    Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", xColumn + "," + yColumns, 0, 0);
-    List<Double> list = new ArrayList<>();
-    DataFrame<Double> df = new DataFrame<>(yColumns.split(","));
+    Map<String, Map<String, Map<Long, String>>> results = scan3(objectId, "", xColumn + "," + columns, 0, 0);
+    List<Object> list = new ArrayList<>();
+    DataFrame df = new DataFrame(columns.split(","));
     boolean hasVal;
     if (results != null && !results.isEmpty() && results.containsKey(objectId)) {
       Map<String, Map<Long, String>> result = results.get(objectId);
@@ -214,10 +209,10 @@ public class FinkHBaseClient extends HBaseSQLClient {
       for (Map.Entry<Long, String> x : xs.entrySet()) {
         list.clear();
         hasVal = false;
-        for (String yColumn : yColumns.split(",")) {
-          ys = result.get(yColumn);
+        for (String column : columns.split(",")) {
+          ys = result.get(column);
           if (ys != null && ys.containsKey(x.getKey())) {
-            list.add(Double.valueOf(ys.get(x.getKey())));
+            list.add(schema().castColumn(column, ys.get(x.getKey())));           
             hasVal = true;
             }
           else {
@@ -225,7 +220,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
             }
           }
         if (!skipAllNull || hasVal) {
-          df.append(Double.valueOf(x.getValue()), list);
+          df.append(schema().castColumn(xColumn, x.getValue()), list);
           }
         }
       }
@@ -233,15 +228,15 @@ public class FinkHBaseClient extends HBaseSQLClient {
       log.warn("Nothing found");
       }
     if (skipAllNull) {
-      for (String yColumn : yColumns.split(",")) {
-        if (df.col(yColumn).stream().allMatch(e -> e == null)) {
-          df = df.drop(yColumn);
+      for (String column : columns.split(",")) {
+        if (df.col(column).stream().allMatch(e -> e == null)) {
+          df = df.drop(column);
           }
         }
       }
     return df;
    }
-  
+   
   /** Assemble curves of variable columns from another table
     * as multi-versioned columns of the current table.
     * All previous lightcurves for selected <em>objectId</em>s are deleted.
