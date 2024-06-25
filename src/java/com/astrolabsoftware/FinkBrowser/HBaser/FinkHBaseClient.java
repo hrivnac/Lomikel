@@ -128,6 +128,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
                                    String  xColumn,
                                    String  columns,
                                    boolean skipAllNull) {
+    log.info("Searching curves " + xColumn + " * " + columns + " for " + objectId);
     if (columns == null || columns.equals("*")) {
       columns = "";
       boolean first = true;
@@ -151,6 +152,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     boolean hasVal;
     if (results != null && !results.isEmpty() && results.containsKey(objectId)) {
       Map<String, Map<Long, String>> result = results.get(objectId);
+      // xColumn as index
       if (xColumn == null) {
         Set<Long> timestamps = new TreeSet<>();
         for (Map.Entry<String, Map<Long, String>> item : result.entrySet()) {
@@ -179,6 +181,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
             }                    
           }
         }
+      // automatic index
       else {
         Map<Long, String> xs = result.get(xColumn);
         Map<Long, String> ys;

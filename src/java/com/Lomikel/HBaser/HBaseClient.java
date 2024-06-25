@@ -538,7 +538,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     if (searchMsg.length() > 80) {
       searchMsg = searchMsg.substring(0, 80) + "...}";
       }
-    log.info("Searching for key: " + key + 
+    log.info("Searching multiversion for key: " + key + 
              ", search: " + searchMsg + 
              ", filter: " + filter +
              ", interval: " + start + " ms - " + stop + " ms" +
