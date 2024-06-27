@@ -67,7 +67,7 @@ public class FinkPortal10Classifier implements Classifier {
       val = cls.getValue();
       weight = (int) (val.size() * ((Math.random() * (1.1 - 0.9)) + 0.9));
       log.info("\t" + key + " in " + weight + " alerts");
-      recipies.registerSourcesOfInterest(Classifiers.FINK_PORTAL, key, oid, weight, val, hbaseUrl, enhance, columns);
+      recipies.registerSourcesOfInterest(Classifiers.FINK_PORTAL_10, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     }
 
