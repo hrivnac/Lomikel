@@ -139,10 +139,10 @@ public abstract class Client<T, S extends Schema> {
     * @param delay   The time period start, in minutes back since dow.
     *                <tt>0</tt> means no time restriction.
     * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
-  public Map<String, Map<String, Map<Long, String>>> scan3(String  key,
-                                                           String  search,
-                                                           String  filter,
-                                                           long    delay) {
+  public Map<String, Map<String, Map<Long, String>>> scan3D(String  key,
+                                                            String  search,
+                                                            String  filter,
+                                                            long    delay) {
     String searchMsg = search;
     if (searchMsg != null && searchMsg.length() > 80) {
       searchMsg = searchMsg.substring(0, 80) + "...";
@@ -154,7 +154,7 @@ public abstract class Client<T, S extends Schema> {
     long now = System.currentTimeMillis();
     long start = (delay == 0L) ? 0L :  now - delay * 1000L * 60L;
     long stop = now;
-    return scan3(key, search, filter, start, stop);
+    return scan3D(key, search, filter, start, stop);
     }
     
   /** Get row(s) with latest cell version.
@@ -241,11 +241,11 @@ public abstract class Client<T, S extends Schema> {
     * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
     * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   // TBD: refactor scan3/scan
-  public Map<String, Map<String, Map<Long, String>>> scan3(String  key,
-                                                           String  search,
-                                                           String  filter,
-                                                           long    start,
-                                                           long    stop) {
+  public Map<String, Map<String, Map<Long, String>>> scan3D(String  key,
+                                                            String  search,
+                                                            String  filter,
+                                                            long    start,
+                                                            long    stop) {
     String searchMsg = search;
     if (search != null && search.length() > 80) {
       searchMsg = search.substring(0, 80) + "...";
@@ -274,7 +274,7 @@ public abstract class Client<T, S extends Schema> {
         searchM.put(k, v);
         }
       }
-    return scan3(key, searchM, filter, start, stop);
+    return scan3D(key, searchM, filter, start, stop);
     }
     
   /** Get row(s) with latest cell version.
@@ -329,12 +329,12 @@ public abstract class Client<T, S extends Schema> {
     * @param stop      The time period stop timestamp in <tt>ms</tt>.
     *                  <tt>0</tt> means till now.
     * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
-  public Map<String, Map<String, Map<Long, String>>> scan3(String              key,
-                                                           Map<String, String> searchMap,
-                                                           String              filter,
-                                                           long                start,
-                                                           long                stop) {
-    return scan3(key, new SearchMap(searchMap), filter, start, stop);
+  public Map<String, Map<String, Map<Long, String>>> scan3D(String              key,
+                                                            Map<String, String> searchMap,
+                                                            String              filter,
+                                                            long                start,
+                                                            long                stop) {
+    return scan3D(key, new SearchMap(searchMap), filter, start, stop);
     }
     
   /** Get row(s) with the latest cell version.
@@ -387,11 +387,11 @@ public abstract class Client<T, S extends Schema> {
     * @param stop      The time period stop timestamp in <tt>ms</tt>.
     *                  <tt>0</tt> means till now.
     * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
-  public abstract Map<String, Map<String, Map<Long, String>>> scan3(String    key,
-                                                                    SearchMap searchMap,
-                                                                    String    filter,
-                                                                    long      start,
-                                                                    long      stop);
+  public abstract Map<String, Map<String, Map<Long, String>>> scan3D(String    key,
+                                                                     SearchMap searchMap,
+                                                                     String    filter,
+                                                                     long      start,
+                                                                     long      stop);
   
   // Aux -----------------------------------------------------------------------
     

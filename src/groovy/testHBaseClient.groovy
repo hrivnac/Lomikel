@@ -46,7 +46,7 @@ results = client.scan(null,
                       true);
 print(client.results2String(results)); 
 
-// Get timeline dependece of i:dec
+// Get timeline dependece of i:dec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
 results = client.timeline("i:dec", null);
 print(results); 
 
@@ -124,10 +124,9 @@ client2.close()
 
 // -----------------------------------------------------------------------------
 
-
 client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
 client.connect("ztf_cube", "string");
-client.search2("ZTF17aaaehuf", "i:jd", "i:ra,i:dec", true);
-client.search2("ZTF17aaaehuf", "i:ra,i:dec", true);
+client.search3D("ZTF17aaaehuf", "i:jd", "i:ra,i:dec", true);
+client.search3D("ZTF17aaaehuf", "i:ra,i:dec", true);
 
 // -----------------------------------------------------------------------------

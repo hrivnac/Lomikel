@@ -127,11 +127,11 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     
   // BUG: call the other scan, filling just one version into map
   @Override
-  public Map<String, Map<String, Map<Long, String>>> scan3(String    key,
-                                                           SearchMap searchMap,
-                                                           String    filter,
-                                                           long      start,
-                                                           long      stop) {
+  public Map<String, Map<String, Map<Long, String>>> scan3D(String    key,
+                                                            SearchMap searchMap,
+                                                            String    filter,
+                                                            long      start,
+                                                            long      stop) {
     return null;
     }
  

@@ -529,11 +529,11 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
 
   @Override 
   // TBD: refactor with scan
-  public Map<String, Map<String, Map<Long, String>>> scan3(String    key,
-                                                           SearchMap searchMap,
-                                                           String    filter,
-                                                           long      start,
-                                                           long      stop) {
+  public Map<String, Map<String, Map<Long, String>>> scan3D(String    key,
+                                                            SearchMap searchMap,
+                                                            String    filter,
+                                                            long      start,
+                                                            long      stop) {
     String searchMsg = "";
     if (searchMap != null) {
       searchMsg = searchMap.toString();
@@ -957,10 +957,10 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     *                 If <tt>null</tt> or <tt>*</tt>, all available columns will be delivered.
     * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
     * @return         The resulting {@link DataFrame}. */
-  public DataFrame<Object> search2(String  rowkey,
-                                   String  columns,
-                                   boolean skipAllNull) {
-    return search2(rowkey, null, columns, skipAllNull);
+  public DataFrame<Object> search3D(String  rowkey,
+                                    String  columns,
+                                    boolean skipAllNull) {
+    return search3D(rowkey, null, columns, skipAllNull);
     }
   
   /** Give n-dim scatter plot from multi-versioned columns,
@@ -973,10 +973,10 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     *                 Values without correspondence in <tt>xColumn</tt> will be ignored.
     * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
     * @return         The resulting x -&gt; [y] {@link DataFrame}. */
-  public DataFrame<Object> search2(String  rowkey,
-                                   String  xColumn,
-                                   String  columns,
-                                   boolean skipAllNull) {
+  public DataFrame<Object> search3D(String  rowkey,
+                                    String  xColumn,
+                                    String  columns,
+                                    boolean skipAllNull) {
     log.info("Searching curves " + xColumn + " * " + columns + " for " + rowkey);
     if (columns == null || columns.equals("*")) {
       columns = "";
@@ -991,11 +991,11 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         columns += column;
         }
       }
-    Map<String, Map<String, Map<Long, String>>> results = scan3(rowkey,
-                                                                "",
-                                                                ((xColumn != null) ? (xColumn + ",") : "") + columns,
-                                                                0,
-                                                                0);
+    Map<String, Map<String, Map<Long, String>>> results = scan3D(rowkey,
+                                                                 "",
+                                                                 ((xColumn != null) ? (xColumn + ",") : "") + columns,
+                                                                 0,
+                                                                 0);
     List<Object> list = new ArrayList<>();
     DataFrame df = new DataFrame(columns.split(","));
     boolean hasVal;
