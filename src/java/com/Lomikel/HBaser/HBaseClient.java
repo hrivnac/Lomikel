@@ -54,6 +54,9 @@ import org.apache.hadoop.conf.Configuration;
 import static cds.healpix.VerticesAndPathComputer.LON_INDEX;
 import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 
+// Joinery
+import joinery.DataFrame;
+
 // Java
 import java.util.List;  
 import java.util.ArrayList;  
@@ -947,6 +950,122 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       }
     }
     
+  /** Give n-dim scatter plot from multi-versioned columns,
+    * associated by their timestamps.
+    * @param rowkey   The rowkey to get the scatter for.
+    * @param columns  The columns to get.
+    *                 If <tt>null</tt> or <tt>*</tt>, all available columns will be delivered.
+    * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
+    * @return         The resulting {@link DataFrame}. */
+  public DataFrame<Object> search2(String  rowkey,
+                                   String  columns,
+                                   boolean skipAllNull) {
+    return search2(rowkey, null, columns, skipAllNull);
+    }
+  
+  /** Give n-dim scatter plot from multi-versioned columns,
+    * associated by their timestamps.
+    * @param rowkey   The rowkey to get the scatter for.
+    * @param xColumn  The column to get as x-axis (index).
+    *                 if <tt>null</tt>, the automatic index will be created.
+    * @param yColumns The columns to get as y-axis.
+    *                 If <tt>null</tt> or <tt>*</tt>, all available columns will be delivered.
+    *                 Values without correspondence in <tt>xColumn</tt> will be ignored.
+    * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
+    * @return         The resulting x -&gt; [y] {@link DataFrame}. */
+  public DataFrame<Object> search2(String  rowkey,
+                                   String  xColumn,
+                                   String  columns,
+                                   boolean skipAllNull) {
+    log.info("Searching curves " + xColumn + " * " + columns + " for " + rowkey);
+    if (columns == null || columns.equals("*")) {
+      columns = "";
+      boolean first = true;
+      for (String column : schema().columnNames()) {
+        if (first) {
+          first = false;
+          }
+        else {
+          columns += ",";
+          }
+        columns += column;
+        }
+      }
+    Map<String, Map<String, Map<Long, String>>> results = scan3(rowkey,
+                                                                "",
+                                                                ((xColumn != null) ? (xColumn + ",") : "") + columns,
+                                                                0,
+                                                                0);
+    List<Object> list = new ArrayList<>();
+    DataFrame df = new DataFrame(columns.split(","));
+    boolean hasVal;
+    if (results != null && !results.isEmpty() && results.containsKey(rowkey)) {
+      Map<String, Map<Long, String>> result = results.get(rowkey);
+      // xColumn as index
+      if (xColumn == null) {
+        Set<Long> timestamps = new TreeSet<>();
+        for (Map.Entry<String, Map<Long, String>> item : result.entrySet()) {
+          for (Map.Entry<Long, String> value : item.getValue().entrySet()) {
+            timestamps.add(value.getKey());
+            }
+          }
+        Map<Long, String> columnsVal;
+        for (Long timestamp : timestamps) {
+          list.clear();
+          hasVal = false;
+          for (String column : columns.split(",")) {
+            if (result.containsKey(column)) {
+              columnsVal = result.get(column);
+              if (columnsVal.containsKey(timestamp)) {
+                list.add(schema().castColumn(column, columnsVal.get(timestamp)));
+                hasVal = true;
+                }
+              else {
+                list.add(null);
+                }
+              }
+            }
+          if (!skipAllNull || hasVal) {
+            df.append(list);
+            }                    
+          }
+        }
+      // automatic index
+      else {
+        Map<Long, String> xs = result.get(xColumn);
+        Map<Long, String> ys;
+        for (Map.Entry<Long, String> x : xs.entrySet()) {
+          list.clear();
+          hasVal = false;
+          for (String column : columns.split(",")) {
+            ys = result.get(column);
+            if (ys != null && ys.containsKey(x.getKey())) {
+              list.add(schema().castColumn(column, ys.get(x.getKey())));           
+              hasVal = true;
+              }
+            else {
+              list.add(null);
+              }
+            }
+          if (!skipAllNull || hasVal) {
+            df.append(schema().castColumn(xColumn, x.getValue()), list);
+            }
+          }
+        }
+      }
+    else {
+      log.warn("Nothing found");
+      }
+    if (skipAllNull) {
+      for (String column : columns.split(",")) {
+        if (df.col(column).stream().allMatch(e -> e == null)) {
+          df = df.drop(column);
+          }
+        }
+      }
+    return df;
+   }
+   
   /** Give the timeline for the column.
     * @param columnName The name of the column.
     * @param search   The search terms as <tt>family:column:value,...</tt>.

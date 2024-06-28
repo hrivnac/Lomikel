@@ -398,7 +398,7 @@ public abstract class Client<T, S extends Schema> {
   /** Results presented as a readable {@link String}.
     * @param results The {@link Map} of results.
     * @return        The result in a readable {@link String}. */
-  public static String results2String(Map<String, Map<String, String>> results) {
+  public String results2String(Map<String, Map<String, String>> results) {
     StringBuffer reportB = new StringBuffer();
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       reportB.append(entry.getKey())
@@ -409,10 +409,39 @@ public abstract class Client<T, S extends Schema> {
     return reportB.toString();
     }
     
+  /** Results presented as an CVS {@link String}.
+    * @param results The {@link Map} of results.
+    * @return        The result in a CVS {@link String}. */
+  public String results2CVS(Map<String, Map<String, String>> results) {
+    Set<String> columnNames = schema().columnNames();
+    StringBuffer reportB = new StringBuffer();
+    reportB.append(String.join(",", columnNames))
+           .append("\n");
+    Map<String, String> value;
+    boolean first;
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      reportB.append(entry.getKey())
+             .append("\n");
+      value = entry.getValue();
+      first = true;
+      for (String clm : columnNames) {
+        if (first) {
+          first = false;
+          }
+        else {
+          reportB.append(",");
+          }
+        reportB.append(value.get(clm));
+        }
+      reportB.append("\n");
+      }
+    return reportB.toString();
+    }
+    
   /** Results presented as a {@link List}.
     * @param results The {@link Map} of results.
     * @return        The result as a {@link List}. */
-  public static List<Map<String, String>> results2List(Map<String, Map<String, String>> results) {
+  public List<Map<String, String>> results2List(Map<String, Map<String, String>> results) {
     List<Map<String, String>> report = new ArrayList<>();
     Map<String, String> row;
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
