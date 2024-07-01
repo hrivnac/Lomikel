@@ -131,7 +131,9 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
                                                             SearchMap searchMap,
                                                             String    filter,
                                                             long      start,
-                                                            long      stop) {
+                                                            long      stop,
+                                                            boolean   ifkey,
+                                                            boolean   iftime) {
     return null;
     }
  
