@@ -138,23 +138,28 @@ public abstract class Client<T, S extends Schema> {
     *                <tt>*</tt> = all.
     * @param delay   The time period start, in minutes back since dow.
     *                <tt>0</tt> means no time restriction.
+    * @param ifkey   Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether give also entries timestamps (as <tt>key:time</tt>).
     * @return        The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, Map<Long, String>>> scan3D(String  key,
                                                             String  search,
                                                             String  filter,
-                                                            long    delay) {
+                                                            long    delay,
+                                                            boolean ifkey,
+                                                            boolean iftime) {
     String searchMsg = search;
     if (searchMsg != null && searchMsg.length() > 80) {
       searchMsg = searchMsg.substring(0, 80) + "...";
       }
     log.debug("Searching for key: " + key + 
-              ", search: " + searchMsg + 
-              ", filter: " + filter +
-              ", delay: "  + delay + " min");
+              ", search: "  + searchMsg + 
+              ", filter: "  + filter +
+              ", delay: "   + delay + " min" +
+              ", id/time: " + ifkey + "/" + iftime);
     long now = System.currentTimeMillis();
     long start = (delay == 0L) ? 0L :  now - delay * 1000L * 60L;
     long stop = now;
-    return scan3D(key, search, filter, start, stop);
+    return scan3D(key, search, filter, start, stop, ifkey, iftime);
     }
     
   /** Get row(s) with latest cell version.
@@ -245,15 +250,18 @@ public abstract class Client<T, S extends Schema> {
                                                             String  search,
                                                             String  filter,
                                                             long    start,
-                                                            long    stop) {
+                                                            long    stop,
+                                                            boolean ifkey,
+                                                            boolean iftime) {
     String searchMsg = search;
     if (search != null && search.length() > 80) {
       searchMsg = search.substring(0, 80) + "...";
       }
     log.info("Searching for key: " + key + 
-             ", search: " + searchMsg + 
-             ", filter: " + filter +
-             ", interval: " + start + " ms - " + stop + " ms");
+             ", search: "   + searchMsg + 
+             ", filter: "   + filter +
+             ", interval: " + start + " ms - " + stop + " ms" +
+             ", id/time: "  + ifkey + "/" + iftime);
     Map<String, String> searchM = new TreeMap<>();
     if (search != null && !search.trim().equals("")) {
       String[] ss;
@@ -274,7 +282,7 @@ public abstract class Client<T, S extends Schema> {
         searchM.put(k, v);
         }
       }
-    return scan3D(key, searchM, filter, start, stop);
+    return scan3D(key, searchM, filter, start, stop, ifkey, iftime);
     }
     
   /** Get row(s) with latest cell version.
@@ -328,13 +336,17 @@ public abstract class Client<T, S extends Schema> {
     *                  <tt>0</tt> means since the beginning.
     * @param stop      The time period stop timestamp in <tt>ms</tt>.
     *                  <tt>0</tt> means till now.
+    * @param ifkey     Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime    Whether give also entries timestamps (as <tt>key:time</tt>).
     * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public Map<String, Map<String, Map<Long, String>>> scan3D(String              key,
                                                             Map<String, String> searchMap,
                                                             String              filter,
                                                             long                start,
-                                                            long                stop) {
-    return scan3D(key, new SearchMap(searchMap), filter, start, stop);
+                                                            long                stop,
+                                                            boolean             ifkey,
+                                                            boolean             iftime) {
+    return scan3D(key, new SearchMap(searchMap), filter, start, stop, ifkey, iftime);
     }
     
   /** Get row(s) with the latest cell version.
@@ -386,12 +398,16 @@ public abstract class Client<T, S extends Schema> {
     *                  <tt>0</tt> means since the beginning.
     * @param stop      The time period stop timestamp in <tt>ms</tt>.
     *                  <tt>0</tt> means till now.
+    * @param ifkey     Whether give also entries keys (as <tt>key:key</tt>).
+    * @param iftime    Whether give also entries timestamps (as <tt>key:time</tt>).
     * @return          The {@link Map} of {@link Map}s of results as <tt>key-&t;{family:column-&gt;value}</tt>. */
   public abstract Map<String, Map<String, Map<Long, String>>> scan3D(String    key,
                                                                      SearchMap searchMap,
                                                                      String    filter,
                                                                      long      start,
-                                                                     long      stop);
+                                                                     long      stop,
+                                                                     boolean   ifkey,
+                                                                     boolean   iftime);
   
   // Aux -----------------------------------------------------------------------
     

@@ -533,7 +533,9 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                                                             SearchMap searchMap,
                                                             String    filter,
                                                             long      start,
-                                                            long      stop) {
+                                                            long      stop,
+                                                            boolean   ifkey,
+                                                            boolean   iftime) {
     String searchMsg = "";
     if (searchMap != null) {
       searchMsg = searchMap.toString();
@@ -545,6 +547,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
              ", search: " + searchMsg + 
              ", filter: " + filter +
              ", interval: " + start + " ms - " + stop + " ms" +
+             ", id/time: " + ifkey + "/" + iftime +
              ", searchLimit/resultLimit: " + searchLimit() + "/" + limit());
     long time = System.currentTimeMillis();
     if (stop == 0) {
@@ -584,7 +587,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         try {
           r = table().get(get);
           log.debug("" + r.size() + " entries found");
-          addResult(r, result, filter);
+          addResult3D(r, result, filter, ifkey, iftime);
           results.put(k, result);
           }
         catch (IOException e) {
@@ -751,7 +754,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
             break;
             }
           result = new TreeMap<>();
-          if (addResult(r, result, filter)) {
+          if (addResult3D(r, result, filter, ifkey, iftime)) {
             results.put(Bytes.toString(r.getRow()), result);
             i++;
             }
@@ -847,11 +850,15 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * @param result  The {@link Map} of results <tt>familty:column-&gt;value</tt>.
     * @param filter  The comma-separated list of names of required values as <tt>family:column</tt>.
     *                It can be <tt>null</tt>.
+    * @param ifkey   Whether add also entries keys (as <tt>key:key</tt>).
+    * @param iftime  Whether add also entries timestamps (as <tt>key:time</tt>).
     * @return        Whether the result has been added. */
   // TBD: refactor with the other addResult
-  protected boolean addResult(Result                         r,
-                              Map<String, Map<Long, String>> result,
-                              String                         filter) {
+  protected boolean addResult3D(Result                         r,
+                                Map<String, Map<Long, String>> result,
+                                String                         filter,
+                                boolean                        ifkey,
+                                boolean                        iftime) {
     if (r == null) {
       return false;
       }
@@ -867,6 +874,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     String[] ff;
     String ref;
     Map<Long, String> t;
+    Set<Long> allTS = new TreeSet<>();
     if (r.getRow() != null) {
       String family;
       String column;
@@ -891,6 +899,9 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                 t = new TreeMap<>();
                 for (Map.Entry<Long, byte[]> ee : e.getValue().entrySet()) {
                   t.put(ee.getKey(), schema().decode(column, ee.getValue()));
+                  if (ifkey || iftime) {
+                    allTS.add(ee.getKey());
+                    }
                   }
                 result.put(column, t);
                 }
@@ -900,11 +911,33 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
               t = new TreeMap<>();
               for (Map.Entry<Long, byte[]> ee : e.getValue().entrySet()) {
                 t.put(ee.getKey(), Bytes.toString(ee.getValue()));
+                if (ifkey || iftime) {
+                  allTS.add(ee.getKey());
+                  }
                 }
               result.put(column, t);
               }
             }
           }
+        }
+      if (ifkey) {
+        t = new TreeMap<>();
+        for (Long ts : allTS) {
+          t.put(ts, key);
+          }
+        result.put("key:key", t);
+        }
+      if (iftime) {
+        t = new TreeMap<>();
+        for (Long ts : allTS) {
+          if (dateFormat() == null) {
+            t.put(ts, String.valueOf(ts));
+            }
+          else {
+            t.put(ts, DateTimeManagement.time2String(ts));
+            }
+          }
+        result.put("key:time", t);   
         }
       }
     return true;
@@ -955,12 +988,16 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * @param rowkey   The rowkey to get the scatter for.
     * @param columns  The columns to get.
     *                 If <tt>null</tt> or <tt>*</tt>, all available columns will be delivered.
+    * @param ifkey    Whether add also entries keys (as <tt>key:key</tt>).
+    * @param iftime   Whether add also entries timestamps (as <tt>key:time</tt>).
     * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
     * @return         The resulting {@link DataFrame}. */
   public DataFrame<Object> search3D(String  rowkey,
                                     String  columns,
+                                    boolean ifkey,
+                                    boolean iftime,
                                     boolean skipAllNull) {
-    return search3D(rowkey, null, columns, skipAllNull);
+    return search3D(rowkey, null, columns, ifkey, iftime, skipAllNull);
     }
   
   /** Give n-dim scatter plot from multi-versioned columns,
@@ -968,14 +1005,18 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * @param rowkey   The rowkey to get the scatter for.
     * @param xColumn  The column to get as x-axis (index).
     *                 if <tt>null</tt>, the automatic index will be created.
-    * @param yColumns The columns to get as y-axis.
+    * @param columns  The columns to get as y-axis.
     *                 If <tt>null</tt> or <tt>*</tt>, all available columns will be delivered.
     *                 Values without correspondence in <tt>xColumn</tt> will be ignored.
+    * @param ifkey    Whether add also entries keys (as <tt>key:key</tt>).
+    * @param iftime   Whether add also entries timestamps (as <tt>key:time</tt>).
     * @param skipNull Whether remove rows and columns all all <tt>null</tt> entries.
     * @return         The resulting x -&gt; [y] {@link DataFrame}. */
   public DataFrame<Object> search3D(String  rowkey,
                                     String  xColumn,
                                     String  columns,
+                                    boolean ifkey,
+                                    boolean iftime,
                                     boolean skipAllNull) {
     log.info("Searching curves " + xColumn + " * " + columns + " for " + rowkey);
     if (columns == null || columns.equals("*")) {
@@ -995,9 +1036,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                                                                  "",
                                                                  ((xColumn != null) ? (xColumn + ",") : "") + columns,
                                                                  0,
-                                                                 0);
+                                                                 0,
+                                                                 ifkey,
+                                                                 iftime);
     List<Object> list = new ArrayList<>();
-    DataFrame df = new DataFrame(columns.split(","));
+    String columnsAll = columns + (ifkey ? ",key:key" : "") + (iftime ? ",key:time" : "");
+    DataFrame df = new DataFrame(columnsAll.split(","));
     boolean hasVal;
     if (results != null && !results.isEmpty() && results.containsKey(rowkey)) {
       Map<String, Map<Long, String>> result = results.get(rowkey);
@@ -1025,6 +1069,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                 }
               }
             }
+          if (ifkey) {
+            list.add(result.get("key:key").get(timestamp));
+            }
+          if (iftime) {
+            list.add(result.get("key:time").get(timestamp));
+            }
           if (!skipAllNull || hasVal) {
             df.append(list);
             }                    
@@ -1046,6 +1096,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
             else {
               list.add(null);
               }
+            }
+          if (ifkey) {
+            list.add(result.get("key:key").get(x.getKey()));
+            }
+          if (iftime) {
+            list.add(result.get("key:time").get(x.getKey()));
             }
           if (!skipAllNull || hasVal) {
             df.append(schema().castColumn(xColumn, x.getValue()), list);
