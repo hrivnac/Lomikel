@@ -463,13 +463,22 @@ public abstract class Client<T, S extends Schema> {
   public DataFrame<Object> results2DF(Map<String, Map<String, String>> results) {
     Set<String> columnNames = schema().columnNames();
     DataFrame df = new DataFrame(columnNames);
+    df.add("key:key");
+    df.add("key:time");
     List<Object> list = new ArrayList<>();
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       list.clear();
       for (String column : columnNames) {
         list.add(entry.getValue().get(column));
         }
+      list.add(entry.getValue().get("key:key"));
+      list.add(entry.getValue().get("key:time"));
       df.append(entry.getKey(), list);
+      }
+    for (String column : columnNames) {
+      if (df.col(column).stream().allMatch(e -> e == null)) {
+        df = df.drop(column);
+        }
       }
     return df;
     }
