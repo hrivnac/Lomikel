@@ -2,6 +2,9 @@ package com.Lomikel.DB;
 
 import com.Lomikel.Utils.LomikelException;
 
+// Joinery
+import joinery.DataFrame;
+
 // Java
 import java.util.Map;
 import java.util.TreeMap;
@@ -452,6 +455,23 @@ public abstract class Client<T, S extends Schema> {
       reportB.append("\n");
       }
     return reportB.toString();
+    }
+    
+  /** Results presented as an CVS {@link String}.
+    * @param results The {@link Map} of results.
+    * @return        The result in a {@link DataFrame}. */
+  public DataFrame<Object> results2DF(Map<String, Map<String, String>> results) {
+    Set<String> columnNames = schema().columnNames();
+    DataFrame df = new DataFrame(columnNames);
+    List<Object> list = new ArrayList<>();
+    for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
+      list.clear();
+      for (String column : columnNames) {
+        list.add(entry.getValue().get(column));
+        }
+      df.append(entry.getKey(), list);
+      }
+    return df;
     }
     
   /** Results presented as a {@link List}.
