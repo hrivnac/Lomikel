@@ -265,7 +265,7 @@
         </fileset>
       </path>
     <property name="classpath.libs" refid="libs"/>
-    <jar jarfile="../lib/Lomikel-${version}.jar" index="yes">
+    <jar jarfile="../lib/Lomikel-${version}.jar" index="no">
       <fileset dir="../src/java"   includes="log4j2.xml"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.properties"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.xml"/>
@@ -302,8 +302,7 @@
   <target name="exe"
           depends="jar"
           description="Create exe JARs">
-    <jar jarfile="../lib/Lomikel.exe.jar" index="yes">
-      <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
+    <jar jarfile="../lib/Lomikel-ext.jar" index="no">
       <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${cli_jar}"/>
       <zipfileset includes="**/*" src="${joinery_jar}"/>
@@ -312,20 +311,15 @@
       <zipfileset includes="**/*" src="${orgjson_jar}"/>
       <zipfileset includes="**/*" src="${parquethadoop_jar}"/>
 			<zipfileset includes="**/*" src="${math3_jar}"/>
+			<zipfileset includes="**/*" src="${jython_jar}"/>
 			<zipfileset includes="**/*" src="${groovy_jar}"/>
 			<zipfileset includes="**/*" src="${groovyconsole_jar}"/>
 			<zipfileset includes="**/*" src="${groovy_ant_jar}"/>
 			<zipfileset includes="**/*" src="${groovy_sql_jar}"/>
       <zipfileset includes="**/*" src="${groovysh_jar}"/>
 			<zipfileset includes="**/*" src="${parquetavro_jar}"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/hbase-common-2.5.8-hadoop3.jar"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/hbase-client-2.5.8-hadoop3.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-logging-1.2.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-common-3.3.5.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -333,15 +327,26 @@
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
       </jar>    
+    <jar jarfile="../lib/Lomikel.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="Lomikel"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext.jar"/>
+        </manifest>
+      </jar>    
+    <jar jarfile="../lib/Lomikel-HBase.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelwHBase"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext.jar HBase-all.jar"/>
+        </manifest>
+      </jar> 
     <!-- create from hbase classpath \-\-glob -->
-    <jar jarfile="../lib/Lomikel-HBase.exe.jar" index="yes">
-      <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
-      <zipfileset includes="**/*" src="${cli_jar}"/>
-      <zipfileset includes="**/*" src="${joinery_jar}"/>
-      <zipfileset includes="**/*" src="${healpix_jar}"/>
-      <zipfileset includes="**/*" src="${orgjson_jar}"/>
-      <zipfileset includes="**/*" src="${groovy_jar}"/>
-      <zipfileset includes="**/*" src="${bsh_jar}"/>
+    <jar jarfile="../lib/HBase-all.jar" index="no">
       <zipfileset includes="**/*" src="${hbase_dir}/lib/shaded-clients/hbase-shaded-client-2.5.8-hadoop3.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/audience-annotations-0.13.0.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/commons-logging-1.2.jar"/>
@@ -352,24 +357,27 @@
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/opentelemetry-context-1.15.0.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/opentelemetry-semconv-1.15.0-alpha.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/slf4j-api-1.7.33.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar"/>
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="HBase4Lomikel"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        </manifest>
+      </jar>
+    <jar jarfile="../lib/Lomikel-Janus.exe.jar" index="no">
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="LomikelwHBase"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext.jar Janus-all.jar"/>
         </manifest>
       </jar> 
     <!-- empirically assembled minimum -->
-    <jar jarfile="../lib/Lomikel-Janus.exe.jar" index="yes" zip64Mode="always">
-      <zipfileset includes="**/*" src="../lib/Lomikel-${version}.jar"/>
-      <zipfileset includes="**/*" src="${cli_jar}"/>
-      <zipfileset includes="**/*" src="${joinery_jar}"/>
-      <zipfileset includes="**/*" src="${healpix_jar}"/>
-      <zipfileset includes="**/*" src="${orgjson_jar}"/>
-      <zipfileset includes="**/*" src="${groovy_jar}"/>
-      <zipfileset includes="**/*" src="${bsh_jar}"/>
+    <jar jarfile="../lib/Janus-all.jar" index="no" zip64Mode="always">
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-logging-1.2.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-common-3.3.5.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>
@@ -415,6 +423,7 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-hbase-1.0.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-mixed-index-utils-1.0.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javapoet-1.13.0.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javassist-3.29.2-GA.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/javatuples-1.2.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jbcrypt-0.4.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-log-0.22.0.jar"/>

@@ -90,13 +90,20 @@
 
 <h4><a name="CLI">Command Line</a></h4>
 <pre style="color:blue; font-size:60%; background-color:#eeeeee">
+# download <a href="Lomikel-@VERSION@.jar">Lomikel-@VERSION@.jar</a>
+# download <a href="Lomikel-ext.jar">Lomikel-ext.jar</a>
+# then
+# download <a href="Lomikel.exe.jar">Lomikel.exe.jar</a>
+# for pure Lomikel
+# download <a href="Lomikel-HBase.exe.jar">Lomikel-HBase.exe.jar</a>
+# for Lomikel with HBase support
 # download <a href="Lomikel-Janus.exe.jar">Lomikel-Janus.exe.jar</a>
-# and
-# <a href="jython.jar">jython.jar</a> (if Python scripting is required)
-# if Python scripting is not required: 
-$ alias lomikel='java -jar Lomikel-Janus.exe.jar'
-# if Python scripting is required: 
-$ alias lomikel='java -cp Lomikel-Janus.exe.jar:jython.jar com.Lomikel.Apps.LUC'
+# for Lomikel with Janus and HBase support
+# 
+# then set an alias to appripriate exe.jar file
+$ alias lomikel='java -jar Lomikel*.exe.jar'
+#
+# then call
 $ lomikel -h
 usage: java -jar Lomikel.exe.jar [-a <language>] [-b] [-g] [-h] [-n] [-q] [-s &lt;file&gt;] [-w]
 -a,--api &lt;language&gt; cli language: [bsh|groovy|python] (othewise taken from source extension, defauld is bsh
