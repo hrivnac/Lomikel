@@ -87,7 +87,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<String, Double> sourceNeighborhood(String       oid0,
                                              String       classifier,
                                              int          nmax = Integer.MAX_VALUE) {
-    return sourceNeighborhood(oid0, classifier, nmax);
+    return sourceNeighborhood(oid0, null, null, classifier, nmax);
     }
         
   /** Give {@link Map} of other <em>source</em>s ordered
