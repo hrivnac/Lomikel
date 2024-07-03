@@ -75,43 +75,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
     }
-    
-  /** Give {@link Map} of other <em>source</em>s ordered
-    * by distance to the specified <em>source</em> with respect
-    * to weights to all (or selected) <em>SourceOfInterest</em> classes.
-    * @param oid0       The <em>objectOd</em> of the <em>source</em>.
-    * @param classifier The classifier name to be used.
-    * @param nmax       The number of closest <em>source</em>s to give.
-    *                   All are given, if missing.
-    * @return           The distances to other sources, order by the distance. */
-  def  Map<String, Double> sourceNeighborhood(String   oid0,
-                                              String   classifier,
-                                              int      nmax = Integer.MAX_VALUE) {
-    return sourceNeighborhood(oid0, null, null, nmax);
-    }
-      
-  /** Give {@link Map} of other <em>source</em>s ordered
-    * by distance to the specified <em>source</em> with respect
-    * to weights to all (or selected) <em>SourceOfInterest</em> classes.
-    * @param oid0       The <em>objectOd</em> of the <em>source</em>.
-    * @param oidS       An array of <em>source</em> objectIds to only avaluated.
-    *                   If null, all <em>source</em>s will be evaluated.
-    * @param classes0A  An array of <em>SourceOfInterest</em> classes to be
-    *                   used in comparison.
-    *                   All <em>SourceOfInterest</em> classes of thr specified
-    *                   <em>source</em> will be used if <tt>null</tt>.
-    * @param classifier The classifier name to be used.
-    * @param nmax       The number of closest <em>source</em>s to give.
-    *                   All are given, if missing.
-    * @return           The distances to other sources, order by the distance. */
-  def  Map<String, Double> sourceNeighborhood(String   oid0,
-                                              String[] oidS,
-                                              String[] classes0,
-                                              String   classifier,
-                                              int      nmax = Integer.MAX_VALUE) {
-    return sourceNeighborhood(oid0, Arrays.asList(oidS), Arrays.asList(classes0), nmax);
-    }
-    
+        
   /** Give {@link Map} of other <em>source</em>s ordered
     * by distance to the specified <em>source</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
