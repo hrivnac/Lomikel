@@ -109,15 +109,22 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                              List<String> classes0,
                                              String       classifier,
                                              int          nmax = Integer.MAX_VALUE) {
+    if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
+      log.info(oid0 + " has no registered neighborhood");
+      return [:];
+      }
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
     g().V(source0).inE().
-                   project('cls', 'w').
+                   project('classifier', 'cls', 'w').
+                   by(outV().values('classifier')).
                    by(outV().values('cls')).
                    by(values('weight')).
                    each {it ->
-                         if (classes0 == null || it['cls'] in classes0) {
-                           m0[it['cls']] = it['w'];
+                         if (it['classifier'] = classifier) {
+                           if (classes0 == null || it['cls'] in classes0) {
+                             m0[it['cls']] = it['w'];
+                             }
                            }
                          }
     def classes = [];
@@ -133,10 +140,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def sources;
     if (oidS) {
       log.info("\tsearching only " + oidS);
-      sources = g().V().has('lbl', 'source').has('objectId', within(oidS));
+      sources = g().V().has('lbl', 'source').
+                        has('objectId', within(oidS));
       }
     else {
-      sources = g().V().has('lbl', 'source');   
+      //sources = g().V().has('lbl', 'SourcesOfInterest').
+      //                  has('classifier', classifier).
+      //                  has('cls', within(classes)).
+      //                  out().
+      //                  has('lbl', 'source').
+      //                  dedup();            
+      sources = g().V().has('lbl', 'source');
       }
     sources.each {s -> 
                   def oid = g().V(s).values('objectId').next();
@@ -156,21 +170,29 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     m[entry.getKey()] = entry.getValue() / n;
                     }
                   def dist = 0;
+                  def key1;
+                  def key2;
                   def w01;
                   def w02;
+                  def w012;
+                  def wx12;
                   def wx1;
                   def wx2;
                   def w0;
                   def wx;
                   for (entry1 : m0.entrySet()) {
                     for (entry2 : m0.entrySet()) {
-                      if (entry1.getKey() > entry2.getKey()) {
+                      key1 = entry1.getKey();
+                      key2 = entry2.getKey();
+                      if (key1 > key2) {
                         w01 = entry1.getValue();
                         w02 = entry2.getValue();
-                        wx1 = m[entry1.getKey()] == null ? 0 : m[entry1.getKey()];
-                        wx2 = m[entry2.getKey()] == null ? 0 : m[entry2.getKey()];
-                        w0 = (w01 + w02) == 0 ? 0 : Math.abs(w01 - w02) / (w01 + w02);
-                        wx = (wx1 + wx2) == 0 ? 0 : Math.abs(wx1 - wx2) / (wx1 + wx2);
+                        wx1 = m[key1] == null ? 0 : m[key1];
+                        wx2 = m[key2] == null ? 0 : m[key2];
+                        w012 = w01 + w02;
+                        wx12 = wx1 + wx2;
+                        w0 = w012 == 0 ? 0 : Math.abs(w01 - w02) / w012;
+                        wx = wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12;
                         dist += Math.pow(w0 - wx, 2);
                         }
                       }

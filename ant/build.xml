@@ -469,11 +469,11 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snakeyaml-2.2.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spatial4j-0.8.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.7.0.jar"/>
+      <!--zipgroupfileset dir="${janusgraph_dir}/lib" includes="**/*.jar"/-->
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="LomikelwJanus"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
-        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
       </jar> 
     </target>
