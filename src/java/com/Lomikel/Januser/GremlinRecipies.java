@@ -341,6 +341,13 @@ public class GremlinRecipies {
       }
     }
     
+  /** Give the porting {@link ModifyingGremlinClient}.
+    * @return The porting {@link ModifyingGremlinClient}.
+    *         <tt>null</tt> if directkly connected to graph. */
+  public ModifyingGremlinClient client() {
+    return _client;
+    }
+    
   /** Check multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
