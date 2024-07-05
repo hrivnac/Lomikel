@@ -131,11 +131,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     for (entry : m0.entrySet()) {
       classes += [entry.getKey()];
       }
-    def n0 = m0.size();
-    for (entry : m0.entrySet()) {
-      m0[entry.getKey()] = entry.getValue() / n0;
-      }
-    log.info('calculating source distance from ' + oid0 + ' wrt ' + classes + " ...");
+    log.info('calculating source distances from ' + oid0 + m0 + " ...");
+    m0 = normalizeMap(m0);
     def distances = [:]
     def sources;
     if (oidS) {
@@ -164,52 +161,70 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            project('cls', 'classifier', 'w').
                            by(outV().values('cls')).
                            by(outV().values('classifier')).
-                           by(values('weight')).each {it ->
-                                                      if (it['classifier'].equals(classifier) &&
-                                                          it['cls'] in classes) {
-                                                        m[it['cls']] = it['w'];
-                                                        }
-                                                      }
-                  def n = m.size();
-                  for (entry : m.entrySet()) {
-                    m[entry.getKey()] = entry.getValue() / n;
-                    }
-                  def dist = 0;
-                  def key1;
-                  def key2;
-                  def w01;
-                  def w02;
-                  def w012;
-                  def wx12;
-                  def wx1;
-                  def wx2;
-                  def w0;
-                  def wx;
-                  for (entry1 : m0.entrySet()) {
-                    for (entry2 : m0.entrySet()) {
-                      key1 = entry1.getKey();
-                      key2 = entry2.getKey();
-                      if (key1 > key2) {
-                        w01 = entry1.getValue();
-                        w02 = entry2.getValue();
-                        wx1 = m[key1] == null ? 0 : m[key1];
-                        wx2 = m[key2] == null ? 0 : m[key2];
-                        w012 = w01 + w02;
-                        wx12 = wx1 + wx2;
-                        w0 = w012 == 0 ? 0 : Math.abs(w01 - w02) / w012;
-                        wx = wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12;
-                        dist += Math.pow(w0 - wx, 2);
-                        }
-                      }
-                    }
-                  dist = Math.sqrt(dist) / n / n;
+                           by(values('weight')).
+                           each {it ->
+                                 if (it['classifier'].equals(classifier) &&
+                                     it['cls'] in classes) {
+                                   m[it['cls']] = it['w'];
+                                   }
+                                 }
+                  m = normalizeMap(m);
+                  def dist = sourceDistance(m0, m);
                   if (dist > 0) {
                     distances[oid] = dist;
-                    }                                
-                  }   
+                    }     
+                  }
     return distances.sort{it.value}.take(nmax);
     }
-
+    
+  /** Give distance (metric) between two classifier {@link Map}s.
+    * @param m0 The first classifier {@link Map}.
+    * @param m  The second classifier {@link Map}.
+    *           Entries, not present also in m0, will be ignored.
+    * @return   The distance  between two {@link Map}s. */
+  def double sourceDistance(Map<String, Double> m0,
+                            Map<String, Double> m) {
+    def dist = 0;
+    def key1;
+    def key2;
+    def w01;
+    def w02;
+    def w012;
+    def wx12;
+    def wx1;
+    def wx2;
+    def w0;
+    def wx;
+    for (entry1 : m0.entrySet()) {
+      for (entry2 : m0.entrySet()) {
+        key1 = entry1.getKey();
+        key2 = entry2.getKey();
+        if (key1 > key2) {
+          w01 = entry1.getValue();
+          w02 = entry2.getValue();
+          wx1 = m[key1] == null ? 0 : m[key1];
+          wx2 = m[key2] == null ? 0 : m[key2];
+          w012 = w01 + w02;
+          wx12 = wx1 + wx2;
+          w0 = w012 == 0 ? 0 : Math.abs(w01 - w02) / w012;
+          wx = wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12;
+          dist += Math.pow(w0 - wx, 2);
+          }
+        }
+      }
+    return dist;
+    }
+    
+  /** Normalize {@link Map}.
+    * @param inputMap The {@link Map} to be normalized.
+    * @return         The normalized {@link Map}. */
+  def normalizeMap(Map<String, Double> inputMap) {
+    def sum = inputMap.values().sum();
+    def normalizedMap = inputMap.collectEntries {key, value -> [(key): value / sum]}
+    return normalizedMap;
+    }
+  
+    
   /** Drop all {@link Vertex} with specified <em>importDate</em>.
     * @param importDate The <em>importDate</em> of {@link Vertex}es to drop.
     *                   It's format should be like <tt>Mon Feb 14 05:51:20 UTC 2022</tt>.
