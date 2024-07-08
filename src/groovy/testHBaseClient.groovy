@@ -132,3 +132,29 @@ client.search3D("ZTF17aaaehuf", "i:jd", "i:ra,i:dec", true, true, true);
 client.search3D("ZTF17aaaehuf",         "i:ra,i:dec", true, true, true);
 
 // -----------------------------------------------------------------------------
+
+// Curves
+source = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+source.connect("ztf");
+client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+//client.create("Curves", new String[]{"c:0"});
+client.connect("Curves", null);
+client.assembleCurves(source,
+                      "ZTF19aaaiwak,ZTF19aaaiwam,ZTF19aaaiwef,ZTF19aaaiwfu,ZTF18acetjlq,ZTF18abrymkr",
+                      "i:jd,i:ra,i:dec",
+                      "schema_0_0_1");
+print(client.search3D("ZTF18acetjlq", "c:jd", "c:ra,c:dec", true, true, true));
+f = {row -> return (row[0] - row[1])};
+client.search3D("ZTF18abrymkr", "c:jd", "c:ra,c:dec", true, true, true).add("f", f).retain("f").plot();
+
+                   
+// LightCurves
+source = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+source.connect("ztf");
+client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+//client.create("LightCurves", new String[]{"c:0"});
+client.connect("LightCurves", null);
+client.assembleLightCurves(source, "ZTF18acetjlq");
+client.search3D("ZTF18acetjlq", "c:jd", "*", true, true, true).show();
+                    
+// -----------------------------------------------------------------------------
