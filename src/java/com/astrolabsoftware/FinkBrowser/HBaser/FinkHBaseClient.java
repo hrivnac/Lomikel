@@ -439,6 +439,129 @@ public class FinkHBaseClient extends HBaseSQLClient {
     log.info("" + n + " rows written");
     jdClient.close();
     }    
+  /** Assemble curves of variable columns from another table
+    * as multi-versioned columns of the current table.
+    * All previous lightcurves for selected <em>objectId</em>s are deleted.
+    * @param sourceClient The {@link HBaseClient} of the source table.
+    *                     It should be already opened and connected with appropriate schema.
+    * @param objectIds    The comma-separated list of <em>objectIds</em> to extract.
+    * @param columns      The comma-separated list of columns (incl. families) to extract.
+    * @param schemaName   The name of the schema to be created in the new table.
+    *                     The columns in the new table will belong to the <em>c</em> family
+    *                     and will have the type of <em>double</em>. */
+  public void assembleCurves(HBaseClient sourceClient,
+                             String      objectIds,
+                             String      columns,
+                             String      schemaName) {
+    String[] schema = columns.split(",");
+    for (int i = 0; i < schema.length; i++) {
+      schema[i] = "c:" + schema[i].split(":")[1] + ":double";
+      }
+    try {
+      put(schemaName, schema);
+      }
+    catch (IOException e) {
+      log.error("Cannot create schema " + schemaName + " = " + schema, e);
+      }
+    try {
+      connect(tableName(), schemaName);
+      }
+    catch (LomikelException e) {
+      log.error("Cannot reconnect to " + tableName() + " with new schema", e);
+      }
+    Map<String, Map<String, String>> results;
+    Set<String> curves = new TreeSet<>();
+    String value;
+    for (String objectId : objectIds.split(",")) {
+      delete(objectId);
+      results = sourceClient.scan(null, "key:key:" + objectId + ":prefix", columns, 0, false, false);
+      log.info("Adding " + objectId + "[" + results.size() + "]");
+      for (Map.Entry<String, Map<String, String>> row : results.entrySet()) {
+        curves.clear();
+        for (Map.Entry<String, String> e : row.getValue().entrySet()) {
+          value = e.getValue();
+          if (!value.trim().equals("NaN") && !value.trim().equals("null")) {
+            curves.add("c:" + e.getKey().split(":")[1] + ":" + value.trim());
+            }
+          }
+        try {
+          if (!curves.isEmpty()) {
+            put(objectId, curves.toArray(new String[0]));
+            }
+          }
+        catch (IOException e) {
+          log.error("Cannot insert " + objectId + " = " + curves, e);
+         }
+        }
+      }
+    }
+    
+  /** Assemble lightcurves from another table
+    * as multi-versioned columns of the current table.
+    * All previous lightcurves for selected <em>objectId</em>s are deleted.
+    * The colums schema is embedded in this class sourcecode.
+    * @param sourceClient The {@link HBaseClient} of the source table.
+    *                     It should be already opened and connected with appropriate schema.
+    * @param objectIds    The comma-separated list of <em>objectId</em>s to extract. */
+   public void assembleLightCurves(HBaseClient sourceClient,
+                                   String      objectIds) {
+    String columns = "i:jd,d:lc_features_g,d:lc_features_r";
+    String schemaName = "schema_lc_0_0_0";
+    int slength = LIGHTCURVE_SCHEMA.length;
+    String[] schema     = new String[2 * slength];
+    String[] subcolumns = new String[2 * slength];
+    for (int i = 0; i < slength; i++) {
+      schema[    i          ] = "c:lc_g_" + LIGHTCURVE_SCHEMA[i] + ":double";
+      schema[    i + slength] = "c:lc_r_" + LIGHTCURVE_SCHEMA[i] + ":double";
+      subcolumns[i          ] = "c:lc_g_" + LIGHTCURVE_SCHEMA[i];
+      subcolumns[i + slength] = "c:lc_r_" + LIGHTCURVE_SCHEMA[i];
+      }
+    try {
+      put(schemaName, schema);
+      }
+    catch (IOException e) {
+      log.error("Cannot create schema " + schemaName + " = " + schema, e);
+      }
+    try {
+      connect(tableName(), schemaName);
+      }
+    catch (LomikelException e) {
+      log.error("Cannot reconnect to " + tableName() + " with new schema", e);
+      }
+    Map<String, Map<String, String>> results;
+    Set<String> curves = new TreeSet<>();
+    int i;
+    for (String objectId : objectIds.split(",")) {
+      delete(objectId);
+      results = sourceClient.scan(null, "key:key:" + objectId + ":prefix", columns, 0, false, false);
+      log.info("Adding " + objectId + "[" + results.size() + "]");
+      for (Map.Entry<String, Map<String, String>> row : results.entrySet()) {
+        curves.clear();
+        i = 0;
+        for (Map.Entry<String, String> e : row.getValue().entrySet()) {
+          if (e.getValue().contains("]")) {            
+            for (String value : e.getValue().replaceAll("\\[", "").replaceAll("]", "").split(",")) {
+              if (!value.trim().equals("NaN") && !value.trim().equals("null")) {
+                curves.add(subcolumns[i] + ":" + value.trim());
+                }
+              i++;
+              }
+            }
+          else {
+            curves.add("c:jd:" + e.getValue());
+            }
+          }
+        try {
+          if (!curves.isEmpty()) {
+            put(objectId, curves.toArray(new String[0]));
+            }
+          }
+        catch (IOException e) {
+          log.error("Cannot insert " + objectId + " = " + curves, e);
+          }
+        }
+      }
+    }
     
   private static String[] LIGHTCURVE_SCHEMA = new String[]{"lc00",
                                                            "lc01",

@@ -14,3 +14,23 @@ gr.exportAoISoI('/tmp/Overlaps.graphml');
 jc.g().V().has('lbl', 'source').order().by('objectId', asc).project('objectId', 'weight').by(values('objectId')).by(inE().values('weight').sum());
 // numbers of source lastly updated per update (date)
 jc.g().V().has('lbl', 'source').values('importDate').groupCount();
+
+// comparison of JanusClient, DirectGremlinClient, StringGremlinClient
+
+import com.Lomikel.Januser.JanusClient;
+import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
+jc = new JanusClient('/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties');
+gr = new FinkGremlinRecipiesG(jc);
+gr.sourceNeighborhood('ZTF18actbfgh', 'FINK_PORTAL', 10);
+
+import com.Lomikel.Januser.StringGremlinClient;
+client = new StringGremlinClient('134.158.74.85', 24444);
+print(client.interpret("gr=new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG(g);gr.sourceNeighborhood('ZTF18actbfgh', 'FINK_PORTAL', 10)"));
+
+import com.Lomikel.Januser.DirectGremlinClient;
+import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
+client = new DirectGremlinClient('134.158.74.85', 24444);
+g = client.g();
+gr = new FinkGremlinRecipiesG(g);
+gr.sourceNeighborhood('ZTF18abctqum', 'FINK_PORTAL', 10);
+

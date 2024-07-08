@@ -124,6 +124,8 @@ client2.close()
 
 // -----------------------------------------------------------------------------
 
+// 3D searching
+
 client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
 client.connect("ztf_cube", "string");
 client.search3D("ZTF17aaaehuf", "i:jd", "i:ra,i:dec", true, true, true);
