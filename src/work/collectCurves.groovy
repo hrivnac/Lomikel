@@ -1,19 +1,42 @@
-# collect light curves for machine learning
+// collect light curves for machine learning
 
+// Lomikel
 import com.Lomikel.HBaser.HBaseClient;
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
+
+// org.json
 import org.json.JSONObject;
+
+// Log
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
+// Java
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-nLimit = 10000;
-tLimit = 10000;
+// -----------------------------------------------------------------------------
+
+log = LoggerFactory.getLogger(this.class);
+
+nLimit = 20000;
+tLimit = 2000000;
 fullSize = 100;
 threshold = 0.75;
-numClasses = 6;
-selection = ["EB*":0, "RRLyr":0, "Mira":0, "LPV*":0, "V*":0, "Star":0];
+numClasses = 1;
+//selection = ["EB*":0];
+//selection = ["RRLyr":0];
+//selection = ["Mira":0];
+//selection = ["LPV*":0];
+//selection = ["V*":0];
+//selection = ["Star":0];
+//selection = ["Kilonova candidate":0];
+//selection = ["SN candidate":0];
+selection = ["Microlensing candidate":0];
+
+// Init files
 
 files = [:]
 indexes = [:]
@@ -26,6 +49,8 @@ for (sel : selection) {
   indexes[sel.getKey()] = index;
   }
 
+// Get oids  
+  
 cal = Calendar.getInstance();
 cal.add(Calendar.MINUTE, - tLimit);
 d = cal.getTime();
@@ -41,14 +66,17 @@ for (sel : selection) {
                                    .put("startdate",     sd)
                                    .put("columns",       "i:objectId")
                                    .put("output-format", "json"));
-  println(sel.getKey() + ": " + ja.length());
+  log.info(sel.getKey() + ": " + ja.length());
   for (int i = 0; i < ja.length(); i++) {
     jo = ja.getJSONObject(i);
     oids.add(jo.getString("i:objectId"));
     } 
   }                     
                       
-println("all: " + oids.size());
+log.info("all: " + oids.size());
+
+// Extract curves to files
+
 r   = {row -> return (row[2] == 1.0) ? row[1] : null};
 g   = {row -> return (row[2] == 2.0) ? row[1] : null};
 mjd = {row -> return row[0] - 2400000.5};
@@ -127,7 +155,7 @@ for (oid : oids) {
                              full = false;
                              }
                            }
-      println(oid + ": " + selection);
+      log.info(oid + ": " + selection);
       if (full) {
         break;
         }
@@ -135,3 +163,4 @@ for (oid : oids) {
     }
   }
   
+// -----------------------------------------------------------------------------
