@@ -19,7 +19,7 @@ public class BinaryDataRepository {
 
   /** Create. */
 	public BinaryDataRepository() {
-	  log.info("Storing binary data in static memory");
+	  log.debug("Storing binary data in static memory");
 	  _data = new HashMap<>();
 	  }
 	  

@@ -93,7 +93,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                      String clientPort) throws LomikelException {
     Init.init();
     setup(zookeepers, clientPort);
-    log.info("Opening " + zookeepers + " on port " + clientPort);
+    log.debug("Opening " + zookeepers + " on port " + clientPort);
     _conf = HBaseConfiguration.create();
     if (zookeepers != null) {
       _conf.set("hbase.zookeeper.quorum", zookeepers);
@@ -151,10 +151,10 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                        int    timeout,
                        int    retries) throws LomikelException {
     // Table setup
-    log.info("Connecting to " + tableName);
+    log.debug("Connecting to " + tableName);
     setTableName(tableName);
     if (timeout > 0) {
-      log.info("\tglobal timeout = " + timeout);
+      log.debug("\tglobal timeout = " + timeout);
       _conf.setInt("hbase.rpc.timeout",                   timeout);
       _conf.setInt("hbase.client.scanner.timeout.period", timeout);
       _conf.setInt("hbase.client.operation.timeout",      timeout); 
@@ -162,7 +162,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       _conf.setInt("hbase.client.pause",                  timeout); 
       }
     if (retries > 0) {
-      log.info("\tglobal retries = " + retries);
+      log.debug("\tglobal retries = " + retries);
       _conf.setInt("zookeeper.recovery.retry",            retries);
       _conf.setInt("hbase.client.retries.number",         retries);
       }
@@ -176,13 +176,13 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     setSearchLimit(Integer.MAX_VALUE);
     // Schema search
     if (schemaName == null) {
-      log.info("Not using schema");
+      log.debug("Not using schema");
       }
     else {
       Map<String, Map<String, String>> schemas = null;
       try {
         if (schemaName.equals("")) {
-          log.info("Using the most recent schema");
+          log.debug("Using the most recent schema");
           schemas = scan(null,
                          "key:key:schema:prefix",
                          "*",
@@ -191,7 +191,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                          false);
           }
         else {
-          log.info("Searching for schema " + schemaName);
+          log.debug("Searching for schema " + schemaName);
           schemas = scan(schemaName,
                          null,
                          "*",
@@ -207,7 +207,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         log.error("No schema found");
         }
       else if (schemas.size() > 1) {
-        log.info("" + schemas.size() + " schemas found, choosing the most recent one");
+        log.debug("" + schemas.size() + " schemas found, choosing the most recent one");
         Set<Map.Entry<String, Map<String, String>>> schemasSet = schemas.entrySet();
         List<Map.Entry<String, Map<String, String>>> schemasList = new ArrayList<>(schemasSet);
         Map.Entry<String, Map<String, String>> schemaEntry = schemasList.get(schemasList.size() - 1);
@@ -272,7 +272,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
               
   @Override
   public void delete(String key) {
-    log.info("Deleting for key: " + key);
+    log.debug("Deleting for key: " + key);
     Delete delete;
     for (String k : key.split(",")) {
       delete = new Delete(Bytes.toBytes(k.trim()));
@@ -300,12 +300,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     if (searchMsg.length() > 80) {
       searchMsg = searchMsg.substring(0, 80) + "...}";
       }
-    log.info("Searching for key: " + key + 
-             ", search: " + searchMsg + 
-             ", filter: " + filter +
-             ", interval: " + start + " ms - " + stop + " ms" +
-             ", id/time: " + ifkey + "/" + iftime +
-             ", searchLimit/resultLimit: " + searchLimit() + "/" + limit());
+    log.debug("Searching for key: " + key + 
+              ", search: " + searchMsg + 
+              ", filter: " + filter +
+              ", interval: " + start + " ms - " + stop + " ms" +
+              ", id/time: " + ifkey + "/" + iftime +
+              ", searchLimit/resultLimit: " + searchLimit() + "/" + limit());
     long time = System.currentTimeMillis();
     if (stop == 0) {
       stop = System.currentTimeMillis();
@@ -477,7 +477,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           }
         FilterList filterList;
         if (_isRange) {
-          log.info("Performing range scan");
+          log.debug("Performing range scan");
           RowRange rr = new RowRange(                               Bytes.toBytes(allKeys.first()), true,
                                      Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.last())), true);
           List<RowRange> lrr = new ArrayList<>();
@@ -502,7 +502,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         }
       // Reversed
       scan.setReversed(isReversed());
-      log.info("scan = " + scan);
+      log.debug("scan = " + scan);
       // Results
       try {
         _rs = table().getScanner(scan);
@@ -543,12 +543,12 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     if (searchMsg.length() > 80) {
       searchMsg = searchMsg.substring(0, 80) + "...}";
       }
-    log.info("Searching multiversion for key: " + key + 
-             ", search: " + searchMsg + 
-             ", filter: " + filter +
-             ", interval: " + start + " ms - " + stop + " ms" +
-             ", id/time: " + ifkey + "/" + iftime +
-             ", searchLimit/resultLimit: " + searchLimit() + "/" + limit());
+    log.debug("Searching multiversion for key: " + key + 
+              ", search: " + searchMsg + 
+              ", filter: " + filter +
+              ", interval: " + start + " ms - " + stop + " ms" +
+              ", id/time: " + ifkey + "/" + iftime +
+              ", searchLimit/resultLimit: " + searchLimit() + "/" + limit());
     long time = System.currentTimeMillis();
     if (stop == 0) {
       stop = System.currentTimeMillis();
@@ -719,7 +719,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
           }
         FilterList filterList;
         if (_isRange) {
-          log.info("Performing range scan");
+          log.debug("Performing range scan");
           RowRange rr = new RowRange(                               Bytes.toBytes(allKeys.first()), true,
                                      Bytes.unsignedCopyAndIncrement(Bytes.toBytes(allKeys.last())), true);
           List<RowRange> lrr = new ArrayList<>();
@@ -744,7 +744,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         }
       // Reversed
       scan.setReversed(isReversed());
-      log.info("scan = " + scan);
+      log.debug("scan = " + scan);
       // Results
       try {
         _rs = table().getScanner(scan);
@@ -1018,7 +1018,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                                     boolean ifkey,
                                     boolean iftime,
                                     boolean skipAllNull) {
-    log.info("Searching curves " + xColumn + " * " + columns + " for " + rowkey);
+    log.debug("Searching curves " + xColumn + " * " + columns + " for " + rowkey);
     if (columns == null || columns.equals("*")) {
       columns = "";
       boolean first = true;
@@ -1135,7 +1135,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * @return         The {@link Set} of {@link Pair}s of timestamp-value. */
   public Set<Pair<String, String>> timeline(String columnName,
                                             String search) {
-    log.info("Getting timeline of " + columnName + " with " + search);
+    log.debug("Getting timeline of " + columnName + " with " + search);
     Set<Pair<String, String>> tl = new TreeSet<>();
     Map<String, Map<String, String>> results = scan(null, search, columnName, 0, false, true);
     Pair<String, String> p;
@@ -1161,7 +1161,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                              String  prefixValue,
                              long    minutes,
                              boolean getValues) {
-    log.info("Getting " + columnName + " of rows prefixed by " + prefixValue + " from last " + minutes + " minutes");
+    log.debug("Getting " + columnName + " of rows prefixed by " + prefixValue + " from last " + minutes + " minutes");
     Set<String> l = new TreeSet<>();
     String search = "";
     if (prefixValue != null) {
@@ -1205,10 +1205,10 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     if (formula == null || formula.trim().equals("")) {
       _formula   = null;
       _evaluator = null;
-      log.info("Unsetting evaluation formula");
+      log.debug("Unsetting evaluation formula");
       return;
       }
-    log.info("Setting evaluation formula '" + formula + "'");
+    log.debug("Setting evaluation formula '" + formula + "'");
     if (schema() == null) {
       log.error("Evaluation can be set only for known Schema");
       return;
@@ -1279,7 +1279,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   /** Set the limit for the number of searched results (before eventual evaluation).
     * @param limit The limit for the number of searched esults. */
   public void setSearchLimit(int limit) {
-    log.info("Setting search limit " + limit);
+    log.debug("Setting search limit " + limit);
     _limit0 = limit;
     }
     
@@ -1292,7 +1292,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   /** Set the AND/OR operator for prefix column search.
     * @param operator OR when contains OR, AND otherwise. */
   public void setSearchOperator(String operator) {
-    log.info("Setting search operator to " + operator);
+    log.debug("Setting search operator to " + operator);
     if (operator.contains("OR")) {
        _operator = FilterList.Operator.MUST_PASS_ONE;
        }
@@ -1305,7 +1305,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * @param dateFormat The result timestamp format.
     *                  The default is the native HBase format (ms). */
   public void setDateFormat(String dateFormat) {
-    log.info("Setting Date format " + dateFormat);
+    log.debug("Setting Date format " + dateFormat);
     _dateFormat = dateFormat;
     }
     
@@ -1386,14 +1386,14 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     */
   public void setAlwaysColumns(String columns) {
     _alwaysColumns = columns;
-    log.info("Setting always columns " + columns );
+    log.debug("Setting always columns " + columns );
     }
   
   /** Add columns to show in any case, regardless further filters.
     * @param columns The comma-separated list of columns to show in any case, regardless further filters. */
   public void addAlwaysColumns(String columns) {
     _alwaysColumns = mergeColumns(_alwaysColumns, columns);
-    log.info("Adding always columns " + columns + " => " + _alwaysColumns);
+    log.debug("Adding always columns " + columns + " => " + _alwaysColumns);
     }
   
   /** Merge two comma-separated list of columns.
@@ -1410,7 +1410,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
               + "," +
               ((columns2 == null) ? "" : columns2);
     columns = columns.replaceAll(",,", ",").replaceAll("^,", "").replaceAll(",$", "");
-    log.info("Merging " + columns1 + " + " + columns2 + " => " + columns);
+    log.debug("Merging " + columns1 + " + " + columns2 + " => " + columns);
     return columns;
     }
     

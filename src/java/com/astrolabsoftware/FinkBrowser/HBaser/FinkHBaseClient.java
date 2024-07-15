@@ -114,7 +114,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
                                                  String  filter,
                                                  boolean ifkey,
                                                  boolean iftime)  {
-    log.info("Searching for alerts in jd interval: " + jdStart + " - " + jdStop);
+    log.debug("Searching for alerts in jd interval: " + jdStart + " - " + jdStop);
     Map<String, String> searchMap = jd2keys(jdStart, jdStop, reversed);
     if (searchMap.isEmpty()) {
       return new TreeMap<String, Map<String, String>>();
@@ -151,7 +151,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
                                                  String  filter,
                                                  boolean ifkey,
                                                  boolean iftime)  {
-    log.info("Searching for alerts within " + delta + " deg of (ra, dec) = (" + ra + ", " + dec + ")");
+    log.debug("Searching for alerts within " + delta + " deg of (ra, dec) = (" + ra + ", " + dec + ")");
     Map<String, String> searchMap = radec2keys(ra, dec, delta);
     if (searchMap.isEmpty()) {
       return new TreeMap<String, Map<String, String>>();
@@ -263,7 +263,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     HealpixNestedFixedRadiusConeComputer cc = _hn.newConeComputerApprox(coneRadiusDel); // robust code
     HealpixNestedBMOC bmoc = cc.overlappingCenters(coneCenterLon, coneCenterLat);
     String pixs = "" + _hn.toRing(_hn.hash(coneCenterLon, coneCenterLat));
-    log.info("Central pixel: " + pixs);
+    log.debug("Central pixel: " + pixs);
     int n = 0;
     FlatHashIterator hIt = bmoc.flatHashIterator();
     //while (hIt.hasNext()) {
@@ -275,7 +275,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
       pixs += "," + _hn.toRing(cell.getHash());
       n++;
       } 
-    log.info("" + n + " cells found (using nside = " + _NSIDE + ", depth = " + Healpix.depth(_NSIDE) + ")");
+    log.debug("" + n + " cells found (using nside = " + _NSIDE + ", depth = " + Healpix.depth(_NSIDE) + ")");
     Map<String, String> pixMap = new TreeMap<>();
     pixMap.put("key:key:prefix", pixs);
     Map<String, String> searchMap = new TreeMap<>();
@@ -291,7 +291,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
                                                              0,
                                                              false,
                                                              false);
-      log.info(results);
+      //log.info(results);
       String keys = results.values().stream().map(m -> m.get("i:objectId")).collect(Collectors.joining(","));
       if (keys != null && !keys.trim().equals("")) { 
         searchMap.put("key:key:prefix", keys);
@@ -319,7 +319,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
   @Override
   public Set<Pair<String, String>> timeline(String columnName,
                                             String search) {
-    log.info("Getting alerts timeline of " + columnName + " with " + search);
+    log.debug("Getting alerts timeline of " + columnName + " with " + search);
     Set<Pair<String, String>> tl = new TreeSet<>();
     Map<String, Map<String, String>> results = scan(null, search, columnName + ",i:jd", 0, false, false);
     Pair<String, String> p;
@@ -346,7 +346,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
                              String  prefixValue,
                              long    minutes,
                              boolean getValues) {
-    log.info("Getting " + columnName + " of alerts prefixed by " + prefixValue + " from last " + minutes + " minutes");
+    log.debug("Getting " + columnName + " of alerts prefixed by " + prefixValue + " from last " + minutes + " minutes");
     Set<String> l = new TreeSet<>();
     double nowJD = DateTimeManagement.julianDate();
     double minJD = nowJD - minutes / 60.0 / 24.0;
@@ -382,7 +382,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     String ra;
     String dec;
     String key;
-    log.info("Writing " + pixelTableName + "...");
+    log.debug("Writing " + pixelTableName + "...");
     int n = 0;
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       objectId = entry.getValue().get("i:objectId");
@@ -399,7 +399,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
         }
       }
     System.out.println();
-    log.info("" + n + " rows written");
+    log.debug("" + n + " rows written");
     pixelClient.close();
     }
   
@@ -422,7 +422,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     String objectId;
     String jd;
     String key;
-    log.info("Writing " + jdTableName + "...");
+    log.debug("Writing " + jdTableName + "...");
     int n = 0;
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       objectId = entry.getValue().get("i:objectId");
@@ -436,7 +436,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
         }
       }
     System.out.println();
-    log.info("" + n + " rows written");
+    log.debug("" + n + " rows written");
     jdClient.close();
     }    
   /** Assemble curves of variable columns from another table
@@ -475,7 +475,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     for (String objectId : objectIds.split(",")) {
       delete(objectId);
       results = sourceClient.scan(null, "key:key:" + objectId + ":prefix", columns, 0, false, false);
-      log.info("Adding " + objectId + "[" + results.size() + "]");
+      log.debug("Adding " + objectId + "[" + results.size() + "]");
       for (Map.Entry<String, Map<String, String>> row : results.entrySet()) {
         curves.clear();
         for (Map.Entry<String, String> e : row.getValue().entrySet()) {
@@ -534,7 +534,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     for (String objectId : objectIds.split(",")) {
       delete(objectId);
       results = sourceClient.scan(null, "key:key:" + objectId + ":prefix", columns, 0, false, false);
-      log.info("Adding " + objectId + "[" + results.size() + "]");
+      log.debug("Adding " + objectId + "[" + results.size() + "]");
       for (Map.Entry<String, Map<String, String>> row : results.entrySet()) {
         curves.clear();
         i = 0;

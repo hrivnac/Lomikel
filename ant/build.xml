@@ -473,6 +473,16 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar> 
+    <copy file="${dl4j_jar}" tofile="../lib/dl4j-all.jar"/>
+    <jar jarfile="../lib/Lomikel-dl4j.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelwDL4J"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext.jar dl4j-all.jar"/>
+        </manifest>
+      </jar> 
     </target>
     
   <!-- WAR ==================================================================-->

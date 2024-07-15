@@ -198,11 +198,11 @@ public abstract class Client<T, S extends Schema> {
     if (search != null && search.length() > 80) {
       searchMsg = search.substring(0, 80) + "...";
       }
-    log.info("Searching for key: " + key + 
-             ", search: " + searchMsg + 
-             ", filter: " + filter +
-             ", interval: " + start + " ms - " + stop + " ms" +
-             ", id/time: " + ifkey + "/" + iftime);
+    log.debug("Searching for key: " + key + 
+              ", search: " + searchMsg + 
+              ", filter: " + filter +
+              ", interval: " + start + " ms - " + stop + " ms" +
+              ", id/time: " + ifkey + "/" + iftime);
     Map<String, String> searchM = new TreeMap<>();
     if (search != null && !search.trim().equals("")) {
       String[] ss;
@@ -260,11 +260,11 @@ public abstract class Client<T, S extends Schema> {
     if (search != null && search.length() > 80) {
       searchMsg = search.substring(0, 80) + "...";
       }
-    log.info("Searching for key: " + key + 
-             ", search: "   + searchMsg + 
-             ", filter: "   + filter +
-             ", interval: " + start + " ms - " + stop + " ms" +
-             ", id/time: "  + ifkey + "/" + iftime);
+    log.debug("Searching for key: " + key + 
+              ", search: "   + searchMsg + 
+              ", filter: "   + filter +
+              ", interval: " + start + " ms - " + stop + " ms" +
+              ", id/time: "  + ifkey + "/" + iftime);
     Map<String, String> searchM = new TreeMap<>();
     if (search != null && !search.trim().equals("")) {
       String[] ss;
@@ -527,7 +527,7 @@ public abstract class Client<T, S extends Schema> {
   /** Set the limit for the number of results.
     * @param limit The limit for the number of results. */
   public void setLimit(int limit) {
-    log.info("Setting limit " + limit);
+    log.debug("Setting limit " + limit);
     _limit = limit;
     }
     
@@ -540,7 +540,7 @@ public abstract class Client<T, S extends Schema> {
   /** Set whether the results should be in the reversed order.
     * @param reversed Whether the results should be in the reversed order. */
   public void setReversed(boolean reversed) {
-    log.info("Setting reversed " + reversed);
+    log.debug("Setting reversed " + reversed);
     _reversed = reversed;
     }
     
