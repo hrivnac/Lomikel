@@ -2,7 +2,6 @@
 # register them in graph of 'AlertsOfInterest'
 # enhance them with columns from HBase
 # export resulting graph into graphml file
-# lomikel -api p -b -s parquet2graphml.py
 
 from com.Lomikel.Parquet import ParquetReader
 from com.Lomikel.Januser import StringGremlinClient

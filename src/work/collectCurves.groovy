@@ -1,3 +1,5 @@
+# collect light curves for machine learning
+
 import com.Lomikel.HBaser.HBaseClient;
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
