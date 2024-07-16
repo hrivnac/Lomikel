@@ -8,9 +8,9 @@ import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 // org.json
 import org.json.JSONObject;
 
-// Log
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// Log4J
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 // Java
 import java.util.Calendar;
@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 
 // -----------------------------------------------------------------------------
 
-log = LoggerFactory.getLogger(this.class);
+log = LogManager.getLogger(this.class);
 
 nLimit = 20000;
 tLimit = 2000000;

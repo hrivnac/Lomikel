@@ -47,7 +47,7 @@ import java.util.Random;
 
 // -----------------------------------------------------------------------------
 
-log = LoggerFactory.getLogger(this.class);
+log = LogManager.getLogger(this.class);
 
 // Get data
 
