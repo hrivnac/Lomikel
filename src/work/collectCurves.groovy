@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 log = LogManager.getLogger(this.class);
 
 nLimit = 2000;
-tLimit = 200000;
+tLimit = 2000000;
 fullSize = 100;
 threshold = 0.75;
 numClasses = 1;
@@ -33,7 +33,7 @@ selection = ["EB*":0];
 //selection = ["V*":0];
 //selection = ["Star":0];
 //selection = ["Kilonova candidate":0];
-//selection = ["SN candidate":0];
+selection = ["SN candidate":0];
 //selection = ["Microlensing candidate":0];
 
 // Init files
@@ -88,19 +88,23 @@ for (oid : oids) {
                         oid,
                         "i:jd,i:fid,i:magpsf",
                         "schema_0_0_1");
-  lc = client.search3D(oid,
-                       "c:jd",
-                       "c:jd,c:magpsf,c:fid",
-                       true,
-                       true,
-                       true)
-             .add("r", r)
-             .add("g", g)
-             .add("mjd", mjd)
-             .retain("mjd", "g")
-             .reindex("mjd")
-             .dropna();
-  if (lc.length() >= 60) {
+  lc = null;
+  try {
+    lc = client.search3D(oid,
+                         "c:jd",
+                         "c:jd,c:magpsf,c:fid",
+                         true,
+                         true,
+                         true)
+               .add("r", r)
+               .add("g", g)
+               .add("mjd", mjd)
+               .retain("mjd", "g")
+               .reindex("mjd")
+               .dropna();
+    }
+  catch (Exception e) {}
+  if (lc != null && lc.length() >= 60) {
     lc = lc.slice(0, 60)
            .transpose()
            .toArray();

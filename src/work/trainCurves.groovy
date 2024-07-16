@@ -29,8 +29,8 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.nd4j.common.primitives.Pair;
 
 // Log
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 // Apache
 import org.apache.commons.io.FileUtils;
