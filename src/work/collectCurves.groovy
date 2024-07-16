@@ -34,7 +34,7 @@ numClasses = 1;
 //selection = ["Star":0];
 //selection = ["Kilonova candidate":0];
 //selection = ["SN candidate":0];
-selection = ["Microlensing candidate":0];
+//selection = ["Microlensing candidate":0];
 
 // Init files
 
