@@ -859,7 +859,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                                 String                         filter,
                                 boolean                        ifkey,
                                 boolean                        iftime) {
-    if (r == null) {
+    if (r == null || r.getRow() == null) {
       return false;
       }
     String key = Bytes.toString(r.getRow());

@@ -21,12 +21,12 @@ import java.text.SimpleDateFormat;
 
 log = LogManager.getLogger(this.class);
 
-nLimit = 20000;
-tLimit = 2000000;
+nLimit = 2000;
+tLimit = 200000;
 fullSize = 100;
 threshold = 0.75;
 numClasses = 1;
-//selection = ["EB*":0];
+selection = ["EB*":0];
 //selection = ["RRLyr":0];
 //selection = ["Mira":0];
 //selection = ["LPV*":0];
@@ -97,7 +97,7 @@ for (oid : oids) {
              .add("r", r)
              .add("g", g)
              .add("mjd", mjd)
-             .retain("mjd", "r")
+             .retain("mjd", "g")
              .reindex("mjd")
              .dropna();
   if (lc.length() >= 60) {
