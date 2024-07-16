@@ -106,7 +106,7 @@ for (oid : oids) {
            .toArray();
 
     ja = FPC.objects(new JSONObject().put("objectId", oid)
-                                   .put("output-format", "json"));
+                                     .put("output-format", "json"));
     classes = [:];
     for (int i = 0; i < ja.length(); i++) {
       jo = ja.getJSONObject(i);

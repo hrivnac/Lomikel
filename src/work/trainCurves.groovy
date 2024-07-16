@@ -2,7 +2,7 @@
 // and train them using UCISequenceClassification
 
 // Krakev
-import com.Krakev.deeplearning4j.UCISequenceClassification.UCISequenceClassification;
+import com.Krakev.deeplearning4j.Utils.DataOrganizer;
 
 // Deeplearning4j
 import org.datavec.api.records.reader.SequenceRecordReader;
@@ -49,23 +49,25 @@ import java.util.Random;
 
 log = LoggerFactory.getLogger(this.class);
 
-c = new UCISequenceClassification();
-
 // Get data
 
-c.setUpStorage("../data/lc/");
-data = new File("all.lst").text;
-c.prepareData(data);
+c = new DataOrganizer("../data/lc/");
+data = new File("../data/x.lst").text;
+c.prepareData(data, 100, 450);
 
 // Initialise data
 
-trainFeatures = new CSVSequenceRecordReader();
-trainFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTrain.getAbsolutePath() + "/%d.csv", 0, 449));
-trainLabels = new CSVSequenceRecordReader();
-trainLabels.initialize(new NumberedFileInputSplit(c.labelsDirTrain.getAbsolutePath() + "/%d.csv", 0, 449));
-
 miniBatchSize = 10;
 numLabelClasses = 6;
+trainSize = 450;
+testSize = 150;
+nEpochs = 40;
+
+trainFeatures = new CSVSequenceRecordReader();
+trainFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTrain.getAbsolutePath() + "/%d.csv", 0, trainSize - 1));
+trainLabels = new CSVSequenceRecordReader();
+trainLabels.initialize(new NumberedFileInputSplit(c.labelsDirTrain.getAbsolutePath() + "/%d.csv", 0, trainSize - 1));
+
 trainData = new SequenceRecordReaderDataSetIterator(trainFeatures,
                                                     trainLabels,
                                                     miniBatchSize,
@@ -79,9 +81,9 @@ trainData.reset();
 trainData.setPreProcessor(normalizer);
 
 testFeatures = new CSVSequenceRecordReader();
-testFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTest.getAbsolutePath() + "/%d.csv", 0, 149));
+testFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTest.getAbsolutePath() + "/%d.csv", 0, testSize - 1));
 testLabels = new CSVSequenceRecordReader();
-testLabels.initialize(new NumberedFileInputSplit(c.labelsDirTest.getAbsolutePath() + "/%d.csv", 0, 149));
+testLabels.initialize(new NumberedFileInputSplit(c.labelsDirTest.getAbsolutePath() + "/%d.csv", 0, testSize - 1));
 
 testData = new SequenceRecordReaderDataSetIterator(testFeatures,
                                                    testLabels,
@@ -120,7 +122,6 @@ net.init();
 
 log.info("Starting training...");
 net.setListeners(new ScoreIterationListener(20), new EvaluativeListener(testData, 1, InvocationType.EPOCH_END));
-nEpochs = 40;
 net.fit(trainData, nEpochs);
 
 // Test
