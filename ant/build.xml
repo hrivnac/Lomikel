@@ -320,6 +320,11 @@
 			<zipfileset includes="**/*" src="${parquetavro_jar}"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpasyncclient-4.1.5.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-nio-4.4.16.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -404,11 +409,6 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-common-3.3.5.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hbase-shaded-client-2.5.3-hadoop3.jar"/>      
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hppc-0.9.1.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpasyncclient-4.1.5.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-4.4.16.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpcore-nio-4.4.16.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/ivy-2.5.1.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-all-1.0.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-core-1.0.0.jar"/>
@@ -473,6 +473,11 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar> 
+    </target>
+    
+  <target name="exe-dl4j"
+          depends="jar"
+          description="Create exe JARs for dl4j">
     <copy file="${dl4j_jar}" tofile="../lib/dl4j-all.jar"/>
     <jar jarfile="../lib/Lomikel-dl4j.exe.jar" index="no">
       <manifest>
