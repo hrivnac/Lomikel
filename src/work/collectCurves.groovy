@@ -9,8 +9,8 @@ import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 import org.json.JSONObject;
 
 // Log
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // Java
 import java.util.Calendar;
