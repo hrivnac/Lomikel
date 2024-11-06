@@ -1,5 +1,5 @@
 import com.Lomikel.Livyser.Server;
-import com.Lomikel.Livyser.Language;
+import com.Lomikel.Livyser.Language.PYTHON;
 import org.json.JSONObject;
 
 serverName     = "LAL";
