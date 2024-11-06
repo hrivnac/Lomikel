@@ -28,7 +28,7 @@ sleep          = 1
 
 server = new Server(serverName, urlLivy, urlSpark, urlHBase);
 
-action = new Action("Pokus", "1+1", Language.PYTHIN);
+action = new Action("Pokus", "1+1", Language.PYTHON);
 
 result = server.executeAction(action);
 
