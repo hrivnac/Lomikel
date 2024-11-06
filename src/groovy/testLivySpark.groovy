@@ -1,5 +1,6 @@
 import com.Lomikel.Livyser.Server;
-import com.Lomikel.Livyser.Language.PYTHON;
+import com.Lomikel.Livyser.Action;
+import com.Lomikel.Livyser.Language;
 import org.json.JSONObject;
 
 serverName     = "LAL";
@@ -27,7 +28,9 @@ sleep          = 1
 
 server = new Server(serverName, urlLivy, urlSpark, urlHBase);
 
-result = server.executeAction("1+1", Language.PYTHON);
+action = new Action("Pokus", "1+1", Language.PYTHIN);
+
+result = server.executeAction(action);
 
 print(result);
 
