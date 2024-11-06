@@ -43,7 +43,8 @@ id = server.livy().sendJob(fileName,
                            proxyUser,
                            Integer.MAX_VALUE,
                            1);
-                           
+   
+print(id);
 while (true) {
   resultString = server.livy().checkBatchProgress(id, 10, 1);
   if (resultString != null) {
