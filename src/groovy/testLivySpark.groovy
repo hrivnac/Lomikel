@@ -25,7 +25,13 @@ tries          = 10;
 sleep          = 1
 
 server = new Server(serverName, urlLivy, urlSpark, urlHBase);
-id = server.livy().sendJob(fileName,
+
+result = server.executeAction("1+1", Language.PYTHON);
+
+print(result);
+
+/*
+id = server.livy().sendJob(fileName,sendJ
                            className,
                            args,
                            driverMemory,
@@ -72,3 +78,4 @@ for (Object logEntry : logArray) {
 resultString = server.livy().getBatchLog(id, 10, 1);
 result = new JSONObject(resultString);
 logArray = result.getJSONArray("log");
+*/
