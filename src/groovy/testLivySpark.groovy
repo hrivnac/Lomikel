@@ -2,8 +2,8 @@ import com.Lomikel.Livyser.Server;
 import org.json.JSONObject;
 
 serverName     = "LAL";
-urlLivy        = "http://vm-75222.lal.in2p3.fr:21111";
-urlSpark       = "http://vm-75222.lal.in2p3.fr:20001";
+urlLivy        = "http://vm-75222.lal.in2p3.fr:8020";
+urlSpark       = "http://vm-75222.lal.in2p3.fr:21111";
 urlHBase       = "http://hbase-1.lal.in2p3.fr:2183";
 fileName       = "test.py";
 className      = null;
