@@ -44,4 +44,4 @@ alias lomikel_hbase='java -jar ../lib/Lomikel-HBase.exe.jar'
 alias lomikel_janus='java -jar ../lib/Lomikel-Janus.exe.jar'
 alias lomikel_dl4j='java --enable-preview -jar ../lib/Lomikel-dl4j.exe.jar'
 
-echo "commands: gremlin_console_Local, gremlin_console_IJCLab, gremlin_Local, gremlin_IJCLab, lomikel, lomikel_pure, lomikel_hbase, lomikel_janus"
+echo "commands: gremlin_console_Local, gremlin_console_IJCLab, gremlin_Local, gremlin_IJCLab, lomikel, lomikel_pure, lomikel_hbase, lomikel_janus, lomikel_dl4j"

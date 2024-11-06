@@ -49,19 +49,20 @@ import java.util.Random;
 
 log = LogManager.getLogger(this.class);
 
+miniBatchSize = 10;
+numLabelClasses = 3;
+blockSize = 100;
+trainSize = (int)(numLabelClasses * blockSize * 0.75);
+testSize =  (int)(numLabelClasses * blockSize - trainSize);
+nEpochs = 40;
+
 // Get data
 
 c = new DataOrganizer("../data/lc/");
-data = new File("../data/x.lst").text;
-c.prepareData(data, 100, 450);
+data = new File("../data/gr.lst").text;
+c.prepareData(data, blockSize, trainSize);
 
 // Initialise data
-
-miniBatchSize = 10;
-numLabelClasses = 6;
-trainSize = 450;
-testSize = 150;
-nEpochs = 40;
 
 trainFeatures = new CSVSequenceRecordReader();
 trainFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTrain.getAbsolutePath() + "/%d.csv", 0, trainSize - 1));

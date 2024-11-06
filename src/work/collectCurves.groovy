@@ -33,7 +33,7 @@ selection = ["EB*":0];
 //selection = ["V*":0];
 //selection = ["Star":0];
 //selection = ["Kilonova candidate":0];
-selection = ["SN candidate":0];
+//selection = ["SN candidate":0];
 //selection = ["Microlensing candidate":0];
 
 // Init files
@@ -77,8 +77,8 @@ log.info("all: " + oids.size());
 
 // Extract curves to files
 
-r   = {row -> return (row[2] == 1.0) ? row[1] : null};
-g   = {row -> return (row[2] == 2.0) ? row[1] : null};
+r   = {row -> return (row[2] == 1.0) ? row[1] : 0};
+g   = {row -> return (row[2] == 2.0) ? row[1] : 0};
 mjd = {row -> return row[0] - 2400000.5};
 
 for (oid : oids) {
@@ -99,7 +99,7 @@ for (oid : oids) {
                .add("r", r)
                .add("g", g)
                .add("mjd", mjd)
-               .retain("mjd", "g")
+               .retain("mjd", "r", "g")
                .reindex("mjd")
                .dropna();
     }
@@ -130,7 +130,7 @@ for (oid : oids) {
       }
     classification = [:];
     sum = 0;
-    classes.each{cl -> sum +=cl.getValue().size();
+    classes.each{cl -> sum += cl.getValue().size();
                        classification[cl.getKey()] = cl.getValue().size();
                        };
     classes.each{cl -> classification[cl.getKey()] /= sum};

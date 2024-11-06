@@ -1109,6 +1109,7 @@
       <group title="Januser"            packages="com.Lomikel.Januser*"/>
       <group title="ElasticSearcher"    packages="com.Lomikel.ElasticSearcher*"/>
       <group title="Phoenixer"          packages="com.Lomikel.Phoenixer*"/>
+      <group title="Livyser"            packages="com.Lomikel.Livyser*"/>
       <group title="Graph"              packages="com.Lomikel.Graph*"/>
       <group title="Utils"              packages="com.Lomikel.Utils*"/>
       <group title="Sockets"            packages="com.Lomikel.Sockets*"/>

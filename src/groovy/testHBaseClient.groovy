@@ -11,6 +11,7 @@ client.setLimit(5);
 // Get the loaded schema as family:column=type,...
 result = client.schema();
 print(result);
+
 // Get two columns for two known alerts (specified by their keys) 
 // Result: Map<String, Map<String, String>>
 results = client.scan("ZTF17aaaaaal_2458860.665162,ZTF17aaaaaal_2458899.6333102",
