@@ -8,7 +8,7 @@ urlLivy        = "http://134.158.75.222:21111";
 urlSpark       = "http://134.158.75.222:8020";
 //urlHBase       = "http://hbase-1.lal.in2p3.fr:2183";
 urlHBase       = null;
-fileName       = "test.py";
+fileName       = "/user/hrivnac/test.py";
 className      = null;
 args           = "";
 driverMemory   = null;
@@ -29,13 +29,10 @@ sleep          = 1
 
 server = new Server(serverName, urlLivy, urlSpark, urlHBase);
 
-action = new Action("Pokus", "1+1", Language.PYTHON, conf);
+//action = new Action("Pokus", "1+1", Language.PYTHON, conf);
+//result = server.livy().executeAction(action);
+//print(result);
 
-result = server.livy().executeAction(action);
-
-print(result);
-
-/*
 id = server.livy().sendJob(fileName,sendJ
                            className,
                            args,
@@ -83,4 +80,4 @@ for (Object logEntry : logArray) {
 resultString = server.livy().getBatchLog(id, 10, 1);
 result = new JSONObject(resultString);
 logArray = result.getJSONArray("log");
-*/
+
