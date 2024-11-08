@@ -53,6 +53,7 @@ id = server.livy().sendJob(fileName,
                            1);
    
 print(id);
+statex0 = null;
 while (true) {
   resultString = server.livy().checkBatchProgress(id, 10, 1);
   if (resultString != null) {
