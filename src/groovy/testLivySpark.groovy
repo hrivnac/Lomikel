@@ -52,7 +52,7 @@ id = server.livy().sendJob(fileName,
                            Integer.MAX_VALUE,
                            1);
    
-print(id);
+println(id);
 statex0 = null;
 while (true) {
   resultString = server.livy().checkBatchProgress(id, 10, 1);
@@ -61,10 +61,10 @@ while (true) {
     statex = result.getString("state");
     if (statex0 == null) {
       statex0 = statex;
-      print("State: " + statex + "<br/>");
+      println("State: " + statex);
       }
     if (!statex.equals(statex0)) {
-      print("State: " + statex + "<br/>");
+      println("State: " + statex);
       statex0 = statex;
       }
     if (statex.equals("success") || statex.equals("dead")) {
@@ -80,5 +80,5 @@ for (Object logEntry : logArray) {
   }
 resultString = server.livy().getBatchLog(id, 10, 1);
 result = new JSONObject(resultString);
-logArray = result.getJSONArray("log");
-
+println(resultString);
+println(fullLog);
