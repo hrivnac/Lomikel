@@ -33,7 +33,7 @@ server = new Server(serverName, urlLivy, urlSpark, urlHBase);
 //result = server.livy().executeAction(action);
 //print(result);
 
-id = server.livy().sendJob(fileName,sendJ
+id = server.livy().sendJob(fileName,
                            className,
                            args,
                            driverMemory,
