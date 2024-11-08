@@ -39,12 +39,14 @@ public class LivyRESTClient {
     * <pre>
     * POST /sessions {"kind":*language*}
     * </pre>
-    * @param language The {@link Language} of the {@link Session}.
+    * @param language  The {@link Language} of the {@link Session}.
+    * @param conf      The Sparc configuration (as JSON String).
     * @param tries     How many times to try.
     * @param sleep     How many <tt>s</tt> wait between tries.
     * @return The new session number. */
   // TBD: allow closing session
   public int initSession(Language language,
+                         String   conf,
                          int      tries,
                          int      sleep) {
     log.info("Creating Session in " + language);
@@ -54,7 +56,7 @@ public class LivyRESTClient {
     while (!success && i++ <= tries) {
       try {
         Thread.sleep(1000 * sleep);
-        result = SmallHttpClient.postJSON(_url + "/sessions", "{\"kind\":\"" + language.asSpark() + "\"}", null, null);
+        result = SmallHttpClient.postJSON(_url + "/sessions", "{\"kind\":\"" + language.asSpark() + ",\"conf\":\"" + conf + "\"}", null, null);
         success = true;
         }
       catch (LomikelException e) {
@@ -543,12 +545,14 @@ public class LivyRESTClient {
   /** Execute action, try until succeeds, wait for result.
     * @param cmd      The command to send.
     * @param language The command {@link Language}.
+    * @param conf     The Sparc configuration (as JSON String).
     * @return         The result as <em>Json</em> string. */
   public String executeAction(String   cmd,
-                              Language language) {
+                              Language language,
+                              String   conf) {
     log.info("Executing command '" + cmd + "' in " + language + " and waiting for result");
-    int sessionId   = initSession(language,       Integer.MAX_VALUE, 1);
-    int statementId = sendCommand(sessionId, cmd, Integer.MAX_VALUE, 1);
+    int sessionId   = initSession(language,  conf, Integer.MAX_VALUE, 1);
+    int statementId = sendCommand(sessionId, cmd,  Integer.MAX_VALUE, 1);
     return waitForActionResult(sessionId, statementId,  Integer.MAX_VALUE, 1);
     }
     

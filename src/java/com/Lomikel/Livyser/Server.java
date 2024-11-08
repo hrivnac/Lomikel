@@ -19,7 +19,7 @@ public class Server extends Element {
     * @param name     The Server name.
     * @param urlLivy  The url of the Spark Server Livy interface.
     * @param urlSpark The url of the Spark Server.
-    * @param urlHBase The url of the HBase Server. */
+    * @param urlHBase The url of the HBase Server. Can be <tt>null</tt>.*/
   public Server(String name,
                 String urlLivy,
                 String urlSpark,
@@ -27,7 +27,9 @@ public class Server extends Element {
     super(name);
     setLivy(urlLivy);
     setSpark(urlSpark);
-    setHBase(urlHBase);
+    if (urlHBase != null) {
+      setHBase(urlHBase);
+      }
     }
         
   /** Create new Spark and Livy Server.
