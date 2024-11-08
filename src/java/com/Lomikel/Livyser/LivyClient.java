@@ -22,7 +22,9 @@ public class LivyClient extends LivyRESTClient {
     * @param Action The {@link Action} to be executed.
     * @return       The result as <em>Json</em> string. */
   public String executeAction(Action action) {
-    return executeAction(action.cmd(), action.language());
+    return executeAction(action.cmd(),
+                         action.language(),
+                         action.conf());
     }
     
   /** Send job, try until succeeds, wait for result.

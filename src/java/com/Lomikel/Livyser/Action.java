@@ -15,13 +15,16 @@ public class Action extends Element {
   /** Create new Action.
     * @param name     The Action name.
     * @param cmd      The command.
-    * @param language The {@link Language} od the command. */
+    * @param language The {@link Language} od the command.
+    * @param conf     The Sparc configuration (as JSON String). */
   public Action(String        name,
                 String        cmd,
-                Language      language) {
+                Language      language,
+                String        conf) {
     super(name);
     _cmd      = cmd;
     _language = language;
+    _conf     = conf;
     }
 
   /** Give the associated command text.
@@ -34,6 +37,12 @@ public class Action extends Element {
     * @return The Action {@link Language}. */
   public Language language() {
     return _language;
+    }
+    
+  /** Give the Spark configuration.
+    * @return The Spark configuration. */
+  public String conf() {
+    return _conf;
     }
     
   /** Set as a new Action, so it will be stored on Exit. */
@@ -55,6 +64,8 @@ public class Action extends Element {
   private String _cmd;
   
   private Language _language;
+  
+  private String _conf;
   
   private boolean _new = false;
   
