@@ -158,7 +158,7 @@ public class ESClient {
     * @param  value     The field value.
     * @return           The rowkey values.
     * @throws LomikelException If anything goes wrong. */
-  public List<String> searchRange(String idxName,
+  public List<String> searchValue(String idxName,
                                   String fieldName,
                                   long   value) throws LomikelException {
     return search(idxName, new JSONObject().put("query",
@@ -169,15 +169,19 @@ public class ESClient {
   /** Search value.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
-    * @param  value     The field value.
+    * @param  minValue  The minimal value.
+    * @param  maxValue  The maximal value.
     * @return           The rowkey values.
     * @throws LomikelException If anything goes wrong. */
   public List<String> searchRange(String idxName,
                                   String fieldName,
-                                  String value) throws LomikelException {
+                                  String minValue,
+                                  String maxValue) throws LomikelException {
     return search(idxName, new JSONObject().put("query",
-                                                new JSONObject().put("match",
-                                                                     new JSONObject().put(fieldName, value))).toString());
+                                                new JSONObject().put("range",
+                                                                     new JSONObject().put(fieldName,
+                                                                                          new JSONObject().put("gte", minValue)
+                                                                                                          .put("lte", maxValue)))).toString());
     }
     
   /** Search value in range.

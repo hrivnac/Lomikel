@@ -1,4 +1,4 @@
-mport com.Lomikel.HBaser.HBaseESClient;
+import com.Lomikel.HBaser.HBaseESClient;
 import com.Lomikel.ElasticSearcher.ESClient;
 
 esclient = new ESClient("http://134.158.74.85:20200");
