@@ -74,16 +74,16 @@ public class ESClient {
                                                       .put("lon", lon)).toString());
     }
     
-  /** Insert new value entry into index.
+  /** Insert new double value entry into index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  rowkey    The rowkey value.
     * @param  value     The double value.
     * @throws LomikelException If anything goes wrong. */
-  public void putValue(String idxName, 
-                      String fieldName,
-                      String rowkey,
-                      String value) throws LomikelException { 
+  public void putDouble(String idxName, 
+                        String fieldName,
+                        String rowkey,
+                        double value) throws LomikelException { 
     put(idxName, new JSONObject().put("text",    rowkey)
                                  .put(fieldName, value).toString());
     }
