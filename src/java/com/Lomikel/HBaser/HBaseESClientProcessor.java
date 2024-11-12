@@ -55,7 +55,7 @@ public class HBaseESClientProcessor implements HBaseProcessor{
         _esclient.putValue("jd",
                            "date",
                            entry.getKey(),
-                           entry.getValue().get("i:jd"));
+                           Double.valueOf(entry.getValue().get("i:jd")));
         }
       catch (LomikelException e) {
         log.error("Cannot insert result " + entry, e);

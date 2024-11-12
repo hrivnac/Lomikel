@@ -80,10 +80,38 @@ public class ESClient {
     * @param  rowkey    The rowkey value.
     * @param  value     The double value.
     * @throws LomikelException If anything goes wrong. */
-  public void putDouble(String idxName, 
-                        String fieldName,
-                        String rowkey,
-                        double value) throws LomikelException { 
+  public void putValue(String idxName, 
+                       String fieldName,
+                       String rowkey,
+                       double value) throws LomikelException { 
+    put(idxName, new JSONObject().put("text",    rowkey)
+                                 .put(fieldName, value).toString());
+    }
+    
+  /** Insert new String value entry into index.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  rowkey    The rowkey value.
+    * @param  value     The double value.
+    * @throws LomikelException If anything goes wrong. */
+  public void putValue(String idxName, 
+                       String fieldName,
+                       String rowkey,
+                       String value) throws LomikelException { 
+    put(idxName, new JSONObject().put("text",    rowkey)
+                                 .put(fieldName, value).toString());
+    }
+    
+  /** Insert new int value entry into index.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  rowkey    The rowkey value.
+    * @param  value     The double value.
+    * @throws LomikelException If anything goes wrong. */
+  public void putValue(String idxName, 
+                       String fieldName,
+                       String rowkey,
+                       int    value) throws LomikelException { 
     put(idxName, new JSONObject().put("text",    rowkey)
                                  .put(fieldName, value).toString());
     }

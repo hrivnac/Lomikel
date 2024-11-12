@@ -8,7 +8,7 @@ esclient.putGeoPoint("radec", "location", "point 1", 45.12, -79.34);
 esclient.searchGeoPoint("radec", "location", 71.8747439, 47.9747439, 0.1);
 
 esclient.createIndex("jd", "date", "double");
-esclient.putDouble("jd", "date", "date 1", 12.3456789);
+esclient.putValue("jd", "date", "date 1", 12.3456789);
 esclient.searchDouble("jd", "date", 12.0, 13.0);
 
 client = new HBaseESClient("hbase-1.lal.in2p3.fr", 2183);
