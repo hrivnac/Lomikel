@@ -12,38 +12,51 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Timer {
 
+  /** Create.
+    * @param msg           The message to use for logging.
+    * @param modulus       The <em>mod</em> to specify report frequency.
+    * @param modulusCommit The <em>mod</em> to specify commit frequency.
+  public Timer(String msg,
+               int    modulus,
+               int    modulusCommit) {
+    _msg           = msg;
+    _modulus       = modulus;
+    _modulusCommit = modulusCommit;
+    }
+  
   /** Start timer. */
   public void start() {
     _t = System.currentTimeMillis();
     _i = 0;
     }
 
-  /** Timer snapshot. Report.
-    * @param msg           The message to use for logging.
-    * @param modulus       The <em>mod</em> to specify report frequency.
-    * @param modulusCommit The <em>mod</em> to specify commit frequency.
-    * @return              If commit should be executed. */
-  public boolean report(String msg,
-                        int    modulus,
-                        int    modulusCommit) {
+  /** Report snapshot.
+    * @return If commit should be executed. */
+  public boolean report() {
     _i++;
-    if (modulus > -1 && _i % modulus != 0) {
+    if (_modulus > -1 && _i % _modulus != 0) {
       return false;
       }
     long dt = (System.currentTimeMillis() - _t) / 1000;
     if (dt == 0) {
       dt = 1;
       }
-    log.info("" + _i + " " + msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz");
-    if (modulusCommit > -1 && _i % modulusCommit == 0) {
+    log.info("" + _i + " " + _msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz");
+    if (_modulusCommit > -1 && _i % _modulusCommit == 0) {
 	    return true;
       }
     return false;
     }    
 
-  long _t = 0;
+  private long _t = 0;
   
-  int _i;
+  private int _i;
+  
+  private String  _msg;
+  
+  private int _modulus;
+  
+  private int _modulusCommit;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(Timer.class);

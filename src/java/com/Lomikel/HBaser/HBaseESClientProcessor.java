@@ -27,7 +27,7 @@ public class HBaseESClientProcessor implements HBaseProcessor{
     * @param esclient The {@link ESClient} to be attached. */
   public HBaseESClientProcessor(ESClient esclient) {
     _esclient = esclient;
-    _timer = new Timer();
+    _timer = new Timer("entries added", 10, 20);
     _timer.start();
     }
        
@@ -60,15 +60,13 @@ public class HBaseESClientProcessor implements HBaseProcessor{
       catch (LomikelException e) {
         log.error("Cannot insert result " + entry, e);
         }
-      _timer.report("entries added", 5, 10, ++_i);
+      _timer.report();
       }
     }
     
   private ESClient _esclient;
   
   private Timer _timer;
-  
-  private int _i = 0;
   
   /** Logging . */
   private static Logger log = LogManager.getLogger(HBaseESClientProcessor.class);
