@@ -33,6 +33,7 @@ public class ESClient {
     }
     
   // Create index ==============================================================  
+  
     
   /** Create new <em>ElasticSearch</em> simple index.
     * @param  idxName   The index name.
@@ -49,24 +50,6 @@ public class ESClient {
     log.info("Creating index " + jsonCmd);
     String answer = _httpClient.putJSON(_url + "/" + idxName, jsonCmd, null, null);
     log.info(answer);
-    }
-
-  /** Create new <em>ElasticSearch</em> <em>GeoPoint</em> index.
-    * @param  idxName   The index name.
-    * @param  fieldName The indexed field name.
-    * @throws LomikelException If anything goes wrong. */
-  public void createGeoPointIndex(String idxName,
-                                  String fieldName) throws LomikelException {
-    createIndex(idxName, fieldName, "geo_point");
-    }
-  
-  /** Create new <em>ElasticSearch</em> double index.
-    * @param  idxName   The index name.
-    * @param  fieldName The indexed field name.
-    * @throws LomikelException If anything goes wrong. */
-  public void createDoubleIndex(String idxName,
-                                String fieldName) throws LomikelException {
-    createIndex(idxName, fieldName, "double");
     }
   
   // Put value =================================================================  
@@ -85,30 +68,32 @@ public class ESClient {
                           double dec) throws LomikelException { 
     double lat = dec;
     double lon = ra - 180;
-    putFinish(idxName, new JSONObject().put("text", rowkey)
-                                       .put(fieldName,
-                                            new JSONObject().put("lat", lat)
-                                                            .put("lon", lon)).toString());
+    put(idxName, new JSONObject().put("text", rowkey)
+                                 .put(fieldName,
+                                      new JSONObject().put("lat", lat)
+                                                      .put("lon", lon)).toString());
     }
     
-  /** Insert new double value entry into index.
+  /** Insert new value entry into index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  rowkey    The rowkey value.
     * @param  value     The double value.
     * @throws LomikelException If anything goes wrong. */
-  public void putDouble(String idxName, 
-                        String fieldName,
-                        String rowkey,
-                        double value) throws LomikelException { 
-    putFinish(idxName, new JSONObject().put("text",    rowkey)
-                                       .put(fieldName, value).toString());
+  public void putValue(String idxName, 
+                      String fieldName,
+                      String rowkey,
+                      String value) throws LomikelException { 
+    put(idxName, new JSONObject().put("text",    rowkey)
+                                 .put(fieldName, value).toString());
     }
     
-  /** Finish inserting new value into index.
+  /** Insert new value into index.
+    * @param  idxName The index name.
+    * @param  jsonCmd The json command to execute.
     * @throws LomikelException If anything goes wrong. */
-  private void putFinish(String idxName,
-                         String jsonCmd) throws LomikelException {
+  private void put(String idxName,
+                   String jsonCmd) throws LomikelException {
     log.debug("Inserting " + jsonCmd);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     }
@@ -121,7 +106,7 @@ public class ESClient {
     * @param  ra        The <tt>ra</tt> value.                                                                                                                                                                                                                    
     * @param  dec       The <tt>dec</tt> value.                                                                                                                                                                                                                   
     * @param  ang       The cone ang value.                                                                                                                                                                                                                       
-    * @return           The rowkey value.                                                                                                                                                                                                                         
+    * @return           The rowkey values.                                                                                                                                                                                                                         
     * @throws LomikelException If anything goes wrong. */
   public List<String> searchGeoPoint(String idxName,
                                      String fieldName,
@@ -131,13 +116,12 @@ public class ESClient {
     double lat = dec;
     double lon = ra - 180;
     double dist = ang * Math.PI * 6371008.7714 / 180.0; //org.elasticsearch.common.geo.GeoUtils.EARTH_MEAN_RADIUS                                                                                                                                               
-    String jsonCmd = new JSONObject().put("query",
-                                          new JSONObject().put("geo_distance",
-                                                               new JSONObject().put(fieldName,
-                                                                                    new JSONObject().put("lat", lat)
-                                                                                                    .put("lon", lon))
-                                                                               .put("distance", dist))).toString();
-    return searchFinish(idxName, jsonCmd);
+    return search(idxName, new JSONObject().put("query",
+                           new JSONObject().put("geo_distance",
+                                                new JSONObject().put(fieldName,
+                                                                     new JSONObject().put("lat", lat)
+                                                                                     .put("lon", lon))
+                                                                .put("distance", dist))).toString());
     }
     
   /** Search double value from index.
@@ -145,22 +129,26 @@ public class ESClient {
     * @param  fieldName The indexed field name.
     * @param  minValue  The minimal double value.
     * @param  maxValue  The maximal double value.
-    * @return           The rowkey value.
+    * @return           The rowkey values.
     * @throws LomikelException If anything goes wrong. */
   public List<String> searchDouble(String idxName,
                                    String fieldName,
                                    double minValue,
                                    double maxValue) throws LomikelException {
-    String jsonCmd = new JSONObject().put("query",
-                                          new JSONObject().put("range",
-                                                               new JSONObject().put(fieldName,
-                                                                                    new JSONObject().put("gte", minValue)
-                                                                                                    .put("lte", maxValue)))).toString();
-    return searchFinish(idxName, jsonCmd);
+    return search(idxName, new JSONObject().put("query",
+                                                new JSONObject().put("range",
+                                                                     new JSONObject().put(fieldName,
+                                                                                          new JSONObject().put("gte", minValue)
+                                                                                                          .put("lte", maxValue)))).toString());
     }
 
-  private List<String> searchFinish(String idxName,
-                                    String jsonCmd) throws LomikelException {
+  /** Search value from index.
+    * @param  idxName The index name.
+    * @param  jsonCmd The json command to execute.
+    * @return         The rowkey values.
+    * @throws LomikelException If anything goes wrong. */
+  private List<String> search(String idxName,
+                              String jsonCmd) throws LomikelException {
     String answer = "no answer";
     List<String> results = new ArrayList<>();
     log.info("Searching " + jsonCmd);
