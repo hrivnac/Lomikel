@@ -27,7 +27,7 @@ public class Timer {
                         int    modulus,
                         int    modulusCommit) {
     _i++;
-    if (modulus > -1 && i%modulus != 0) {
+    if (modulus > -1 && _i % modulus != 0) {
       return false;
       }
     long dt = (System.currentTimeMillis() - _t) / 1000;
@@ -35,7 +35,7 @@ public class Timer {
       dt = 1;
       }
     log.info("" + _i + " " + msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz");
-    if (modulusCommit > -1 && _i%modulusCommit == 0) {
+    if (modulusCommit > -1 && _i % modulusCommit == 0) {
 	    return true;
       }
     return false;
