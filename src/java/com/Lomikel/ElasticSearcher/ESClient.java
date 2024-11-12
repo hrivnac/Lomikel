@@ -35,7 +35,7 @@ public class ESClient {
   /** Create new <em>ElasticSearch</em> simple index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
-    * @param  fieldType The indexed field type ()<tt>geo_point, double).
+    * @param  fieldType The indexed field type <tt>geo_point, double)</tt>.
     * @throws LomikelException If anything goes wrong. */
   public void createIndex(String idxName,
                           String fieldName,
@@ -50,6 +50,24 @@ public class ESClient {
     log.info(answer);
     }
 
+  /** Create new <em>ElasticSearch</em> <em>GeoPoint</em> index.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @throws LomikelException If anything goes wrong. */
+  public void createGeoPointIndex(String idxName,
+                                  String fieldName) throws LomikelException {
+    createIndex(idxName, fieldName, "geo_point");
+    }
+  
+  /** Create new <em>ElasticSearch</em> double index.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @throws LomikelException If anything goes wrong. */
+  public void createDoubleIndex(String idxName,
+                                String fieldName) throws LomikelException {
+    createIndex(idxName, fieldName, "double");
+    }
+  
   /** Insert new <em>ra,dec</em> <em>GeoPoint</em> entry into index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
