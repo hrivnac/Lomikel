@@ -4,7 +4,7 @@ package com.Lomikel.Livyser;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>Search</code> represents a search running or finished on <em>HBase</em>.
+/** Search represents an job running on a HBase Server.
   * @opt attributes
   * @opt operations
   * @opt types

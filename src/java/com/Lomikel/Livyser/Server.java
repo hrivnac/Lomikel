@@ -7,7 +7,8 @@ import com.Lomikel.Utils.LomikelException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>Server</code> represents <em>Spark</em> server behind <em>Livy</em> proxy.
+/** Server represents a Spark Server behind Livy Server.
+  * You can create a new Session on it.
   * @opt attributes
   * @opt operations
   * @opt types

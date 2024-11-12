@@ -4,7 +4,7 @@ package com.Lomikel.Livyser;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>Task</code> represents a task running or finished on <em>Spark</em>.
+/** Task represents an task running on a Spark Server behind Livy Server.
   * @opt attributes
   * @opt operations
   * @opt types

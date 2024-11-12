@@ -8,7 +8,10 @@ import java.io.IOException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>Job</code> represents an action to be executed on <em>Spark</em>.
+/** Job represents a program to be send to a Spark Server,
+  * formulated as a JAR or PY file.
+  * It can be written in Python or Scala.
+  * You can send it to a Batch opened on a Spark Server.
   * @opt attributes
   * @opt operations
   * @opt types

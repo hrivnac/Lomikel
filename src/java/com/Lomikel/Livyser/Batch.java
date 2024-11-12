@@ -4,7 +4,7 @@ package com.Lomikel.Livyser;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>Batch</code> represents <em>Spark</em> batch.
+/** Batch represents a job on a Spark Server behind Livy Server.
   * @opt attributes
   * @opt operations
   * @opt types

@@ -10,7 +10,8 @@ import java.util.TreeSet;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>Sender</code> represents <em>Spark</em> sender.
+/** Sennder represents a connection on a Spark Server behind Livy Server.
+  * You can send an Job to it.
   * Because Senders are not known to <em>Livy</em>,
   * they are registered here, together with related {@link Batch}s.
   * @opt attributes

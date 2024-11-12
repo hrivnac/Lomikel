@@ -4,7 +4,10 @@ package com.Lomikel.Livyser;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>Action</code> represents an action to be executed on <em>Spark</em>.
+/** <code>Action</code> represents an action to be executed on Spark
+  * Server, formulated as a simple text.
+  * It can be written in Python, Scala, SQL or R.
+  * You can send it to a Session opened on a Spark Server.
   * @opt attributes
   * @opt operations
   * @opt types

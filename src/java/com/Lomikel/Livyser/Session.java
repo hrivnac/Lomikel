@@ -4,7 +4,8 @@ package com.Lomikel.Livyser;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>Session</code> represents <em>Spark</em> session.
+/** Session represents a session on a Spark Server behind Livy Server.
+  * You can send an Action to it.
   * @opt attributes
   * @opt operations
   * @opt types
