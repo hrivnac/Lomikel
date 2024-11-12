@@ -60,8 +60,8 @@ public class HBaseESClientProcessor implements HBaseProcessor{
       catch (LomikelException e) {
         log.error("Cannot insert result " + entry, e);
         }
+      _timer.report("entries added", 5, 10, ++_i);
       }
-    _timer.report("entries added", 5, 10, ++_i);
     }
     
   private ESClient _esclient;
