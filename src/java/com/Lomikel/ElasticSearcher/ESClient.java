@@ -38,7 +38,7 @@ public class ESClient {
   /** Create new <em>ElasticSearch</em> simple index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
-    * @param  fieldType The indexed field type <tt>geo_point, double, long, text, date, date_nanos, boolean</tt>.
+    * @param  fieldType The indexed field type <tt>geo_point, double, long, date_nanos</tt>.
     * @throws LomikelException If anything goes wrong. */
   public void createIndex(String idxName,
                           String fieldName,
@@ -74,25 +74,11 @@ public class ESClient {
                                                       .put("lon", lon)).toString());
     }
     
-  /** Insert new double value entry into index.
-    * @param  idxName   The index name.
-    * @param  fieldName The indexed field name.
-    * @param  rowkey    The rowkey value.
-    * @param  value     The double value.
-    * @throws LomikelException If anything goes wrong. */
-  public void putValue(String idxName, 
-                       String fieldName,
-                       String rowkey,
-                       double value) throws LomikelException { 
-    put(idxName, new JSONObject().put("text",    rowkey)
-                                 .put(fieldName, value).toString());
-    }
-    
   /** Insert new String value entry into index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  rowkey    The rowkey value.
-    * @param  value     The double value.
+    * @param  value     The field value.
     * @throws LomikelException If anything goes wrong. */
   public void putValue(String idxName, 
                        String fieldName,
@@ -102,16 +88,30 @@ public class ESClient {
                                  .put(fieldName, value).toString());
     }
     
-  /** Insert new int value entry into index.
+  /** Insert new long value entry into index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  rowkey    The rowkey value.
-    * @param  value     The double value.
+    * @param  value     The field value.
     * @throws LomikelException If anything goes wrong. */
   public void putValue(String idxName, 
                        String fieldName,
                        String rowkey,
-                       int    value) throws LomikelException { 
+                       long   value) throws LomikelException { 
+    put(idxName, new JSONObject().put("text",    rowkey)
+                                 .put(fieldName, value).toString());
+    }
+    
+  /** Insert new double value entry into index.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  rowkey    The rowkey value.
+    * @param  value     The field value.
+    * @throws LomikelException If anything goes wrong. */
+  public void putValue(String idxName, 
+                       String fieldName,
+                       String rowkey,
+                       double value) throws LomikelException { 
     put(idxName, new JSONObject().put("text",    rowkey)
                                  .put(fieldName, value).toString());
     }
@@ -128,7 +128,7 @@ public class ESClient {
 
   // Search ====================================================================  
     
-  /** Search <em>ra,dec</em> <em>GeoPoint</em>s from index.                                                                                                                                                                                                     
+  /** Search <em>ra,dec</em> <em>GeoPoint</em>s in distance.                                                                                                                                                                                                     
     * @param  idxName   The index name.                                                                                                                                                                                                                           
     * @param  fieldName The indexed field name.
     * @param  ra        The <tt>ra</tt> value.                                                                                                                                                                                                                    
@@ -152,17 +152,63 @@ public class ESClient {
                                                                 .put("distance", dist))).toString());
     }
     
-  /** Search double value from index.
+  /** Search value.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
-    * @param  minValue  The minimal double value.
-    * @param  maxValue  The maximal double value.
+    * @param  value     The field value.
     * @return           The rowkey values.
     * @throws LomikelException If anything goes wrong. */
-  public List<String> searchDouble(String idxName,
-                                   String fieldName,
-                                   double minValue,
-                                   double maxValue) throws LomikelException {
+  public List<String> searchRange(String idxName,
+                                  String fieldName,
+                                  long   value) throws LomikelException {
+    return search(idxName, new JSONObject().put("query",
+                                                new JSONObject().put("match",
+                                                                     new JSONObject().put(fieldName, value))).toString());
+    }
+    
+  /** Search value.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  value     The field value.
+    * @return           The rowkey values.
+    * @throws LomikelException If anything goes wrong. */
+  public List<String> searchRange(String idxName,
+                                  String fieldName,
+                                  String value) throws LomikelException {
+    return search(idxName, new JSONObject().put("query",
+                                                new JSONObject().put("match",
+                                                                     new JSONObject().put(fieldName, value))).toString());
+    }
+    
+  /** Search value in range.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  minValue  The minimal value.
+    * @param  maxValue  The maximal value.
+    * @return           The rowkey values.
+    * @throws LomikelException If anything goes wrong. */
+  public List<String> searchRange(String idxName,
+                                  String fieldName,
+                                  long   minValue,
+                                  long   maxValue) throws LomikelException {
+    return search(idxName, new JSONObject().put("query",
+                                                new JSONObject().put("range",
+                                                                     new JSONObject().put(fieldName,
+                                                                                          new JSONObject().put("gte", minValue)
+                                                                                                          .put("lte", maxValue)))).toString());
+    }
+    
+  /** Search value in range.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  minValue  The minimal value.
+    * @param  maxValue  The maximal value.
+    * @return           The rowkey values.
+    * @throws LomikelException If anything goes wrong. */
+  public List<String> searchRange(String idxName,
+                                  String fieldName,
+                                  double minValue,
+                                  double maxValue) throws LomikelException {
     return search(idxName, new JSONObject().put("query",
                                                 new JSONObject().put("range",
                                                                      new JSONObject().put(fieldName,
