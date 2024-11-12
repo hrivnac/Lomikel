@@ -35,7 +35,7 @@ public class ESClient {
   /** Create new <em>ElasticSearch</em> simple index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
-    * @param  fieldType The indexed field type <tt>geo_point, double)</tt>.
+    * @param  fieldType The indexed field type <tt>geo_point, double, long, text, date, date_nanos, boolean</tt>.
     * @throws LomikelException If anything goes wrong. */
   public void createIndex(String idxName,
                           String fieldName,
@@ -45,8 +45,7 @@ public class ESClient {
                                                                new JSONObject().put(fieldName,
                                                                                     new JSONObject().put("type", fieldType)))).toString();
     log.info("Creating index " + jsonCmd);
-    SmallHttpClient httpClient = new SmallHttpClient();
-    String answer = httpClient.putJSON(_url + "/" + idxName, jsonCmd, null, null);
+    String answer = _httpClient.putJSON(_url + "/" + idxName, jsonCmd, null, null);
     log.info(answer);
     }
 
@@ -82,13 +81,10 @@ public class ESClient {
                           double dec) throws LomikelException { 
     double lat = dec;
     double lon = ra - 180;
-    String jsonCmd = new JSONObject().put("text", rowkey)
-                                     .put(fieldName,
-                                          new JSONObject().put("lat", lat)
-                                                          .put("lon", lon)).toString();
-    log.info("Inserting " + jsonCmd);
-    SmallHttpClient httpClient = new SmallHttpClient();
-    String answer = httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
+    putFinish(idxName, new JSONObject().put("text", rowkey)
+                                       .put(fieldName,
+                                            new JSONObject().put("lat", lat)
+                                                            .put("lon", lon)).toString());
     }
     
   /** Insert new double value entry into index.
@@ -101,11 +97,15 @@ public class ESClient {
                         String fieldName,
                         String rowkey,
                         double value) throws LomikelException { 
-    String jsonCmd = new JSONObject().put("text",    rowkey)
-                                     .put(fieldName, value).toString();
-    log.info("Inserting " + jsonCmd);
-    SmallHttpClient httpClient = new SmallHttpClient();
-    String answer = httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
+    putFinish(idxName, new JSONObject().put("text",    rowkey)
+                                       .put(fieldName, value).toString());
+    }
+    
+  /** TBD */
+  private void putFinish(String idxName,
+                         String jsonCmd) throws LomikelException {
+    log.debug("Inserting " + jsonCmd);
+    String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     }
 
   /** Search <em>ra,dec</em> <em>GeoPoint</em>s from index.                                                                                                                                                                                                     
@@ -134,8 +134,7 @@ public class ESClient {
                                                                                                       .put("lon", lon))
                                                                                  .put("distance", dist))).toString();
       log.info("Searching " + jsonCmd);
-      SmallHttpClient httpClient = new SmallHttpClient();
-      answer = httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, null, null);
+      answer = _httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, null, null);
       JSONObject answerJ = new JSONObject(answer);
       JSONArray hitsJ = answerJ.getJSONObject("hits").getJSONArray("hits");
       for (Object o : hitsJ) {
@@ -170,8 +169,7 @@ public class ESClient {
                                                                                       new JSONObject().put("gte", minValue)
                                                                                                       .put("lte", maxValue)))).toString();
       log.info("Searching " + jsonCmd);
-      SmallHttpClient httpClient = new SmallHttpClient();
-      answer = httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, null, null);
+      answer = _httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, null, null);
       JSONObject answerJ = new JSONObject(answer);
       JSONArray hitsJ = answerJ.getJSONObject("hits").getJSONArray("hits");
       for (Object o : hitsJ) {
@@ -187,6 +185,8 @@ public class ESClient {
     }
  
   private String _url;
+  
+  private SmallHttpClient _httpClient = new SmallHttpClient();
         
   /** Logging . */
   private static Logger log = LogManager.getLogger(ESClient.class);
