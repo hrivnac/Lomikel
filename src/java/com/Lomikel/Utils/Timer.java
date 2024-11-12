@@ -15,21 +15,18 @@ public class Timer {
   /** Start timer. */
   public void start() {
     _t = System.currentTimeMillis();
+    _i = 0;
     }
 
   /** Timer snapshot. Report.
-    * @param msg           The message to use for loggiong.
-    * @param i             The call number.
+    * @param msg           The message to use for logging.
     * @param modulus       The <em>mod</em> to specify report frequency.
     * @param modulusCommit The <em>mod</em> to specify commit frequency.
     * @return              If commit should be executed. */
   public boolean report(String msg,
-                        int    i,
                         int    modulus,
                         int    modulusCommit) {
-    if (i == 0) {
-      return false;
-      }
+    _i++;
     if (modulus > -1 && i%modulus != 0) {
       return false;
       }
@@ -37,14 +34,16 @@ public class Timer {
     if (dt == 0) {
       dt = 1;
       }
-    log.info("" + i + " " + msg + " in " + dt + "s, freq = " + (i / dt) + "Hz");
-    if (modulusCommit > -1 && i%modulusCommit == 0) {
+    log.info("" + _i + " " + msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz");
+    if (modulusCommit > -1 && _i%modulusCommit == 0) {
 	    return true;
       }
     return false;
     }    
 
   long _t = 0;
+  
+  int _i;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(Timer.class);
