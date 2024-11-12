@@ -15,7 +15,7 @@ public class Timer {
   /** Create.
     * @param msg           The message to use for logging.
     * @param modulus       The <em>mod</em> to specify report frequency.
-    * @param modulusCommit The <em>mod</em> to specify commit frequency.
+    * @param modulusCommit The <em>mod</em> to specify commit frequency. */
   public Timer(String msg,
                int    modulus,
                int    modulusCommit) {
