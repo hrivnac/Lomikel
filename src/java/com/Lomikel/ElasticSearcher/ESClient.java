@@ -32,6 +32,8 @@ public class ESClient {
     _url = url;
     }
     
+  // Create index ==============================================================  
+    
   /** Create new <em>ElasticSearch</em> simple index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
@@ -67,6 +69,8 @@ public class ESClient {
     createIndex(idxName, fieldName, "double");
     }
   
+  // Put value =================================================================  
+    
   /** Insert new <em>ra,dec</em> <em>GeoPoint</em> entry into index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
@@ -101,13 +105,16 @@ public class ESClient {
                                        .put(fieldName, value).toString());
     }
     
-  /** TBD */
+  /** Finish inserting new value into index.
+    * @throws LomikelException If anything goes wrong. */
   private void putFinish(String idxName,
                          String jsonCmd) throws LomikelException {
     log.debug("Inserting " + jsonCmd);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     }
 
+  // Search ====================================================================  
+    
   /** Search <em>ra,dec</em> <em>GeoPoint</em>s from index.                                                                                                                                                                                                     
     * @param  idxName   The index name.                                                                                                                                                                                                                           
     * @param  fieldName The indexed field name.
@@ -124,16 +131,40 @@ public class ESClient {
     double lat = dec;
     double lon = ra - 180;
     double dist = ang * Math.PI * 6371008.7714 / 180.0; //org.elasticsearch.common.geo.GeoUtils.EARTH_MEAN_RADIUS                                                                                                                                               
+    String jsonCmd = new JSONObject().put("query",
+                                          new JSONObject().put("geo_distance",
+                                                               new JSONObject().put(fieldName,
+                                                                                    new JSONObject().put("lat", lat)
+                                                                                                    .put("lon", lon))
+                                                                               .put("distance", dist))).toString();
+    return searchFinish(idxName, jsonCmd);
+    }
+    
+  /** Search double value from index.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  minValue  The minimal double value.
+    * @param  maxValue  The maximal double value.
+    * @return           The rowkey value.
+    * @throws LomikelException If anything goes wrong. */
+  public List<String> searchDouble(String idxName,
+                                   String fieldName,
+                                   double minValue,
+                                   double maxValue) throws LomikelException {
+    String jsonCmd = new JSONObject().put("query",
+                                          new JSONObject().put("range",
+                                                               new JSONObject().put(fieldName,
+                                                                                    new JSONObject().put("gte", minValue)
+                                                                                                    .put("lte", maxValue)))).toString();
+    return searchFinish(idxName, jsonCmd);
+    }
+
+  private List<String> searchFinish(String idxName,
+                                    String jsonCmd) throws LomikelException {
     String answer = "no answer";
     List<String> results = new ArrayList<>();
+    log.info("Searching " + jsonCmd);
     try {
-      String jsonCmd = new JSONObject().put("query",
-                                            new JSONObject().put("geo_distance",
-                                                                 new JSONObject().put(fieldName,
-                                                                                      new JSONObject().put("lat", lat)
-                                                                                                      .put("lon", lon))
-                                                                                 .put("distance", dist))).toString();
-      log.info("Searching " + jsonCmd);
       answer = _httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, null, null);
       JSONObject answerJ = new JSONObject(answer);
       JSONArray hitsJ = answerJ.getJSONObject("hits").getJSONArray("hits");
@@ -149,40 +180,7 @@ public class ESClient {
     return results;
     }
     
-  /** Search double value from index.
-    * @param  idxName   The index name.
-    * @param  fieldName The indexed field name.
-    * @param  minValue  The minimal double value.
-    * @param  maxValue  The maximal double value.
-    * @return           The rowkey value.
-    * @throws LomikelException If anything goes wrong. */
-  public List<String> searchDouble(String idxName,
-                                   String fieldName,
-                                   double minValue,
-                                   double maxValue) throws LomikelException {
-    String answer = "no answer";
-    List<String> results = new ArrayList<>();
-    try {
-      String jsonCmd = new JSONObject().put("query",
-                                            new JSONObject().put("range",
-                                                                 new JSONObject().put(fieldName,
-                                                                                      new JSONObject().put("gte", minValue)
-                                                                                                      .put("lte", maxValue)))).toString();
-      log.info("Searching " + jsonCmd);
-      answer = _httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, null, null);
-      JSONObject answerJ = new JSONObject(answer);
-      JSONArray hitsJ = answerJ.getJSONObject("hits").getJSONArray("hits");
-      for (Object o : hitsJ) {
-        results.add(((JSONObject)o).getJSONObject("_source").getString("text"));
-        }
-      }
-    catch (Exception e) {
-      log.error("No results found", e);
-      log.info("Elastic search answer:\t" + answer);
-      }
-    log.info("" + results.size() + " results found");
-    return results;
-    }
+  // ===========================================================================
  
   private String _url;
   
