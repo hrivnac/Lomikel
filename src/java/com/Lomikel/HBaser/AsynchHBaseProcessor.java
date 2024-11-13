@@ -37,9 +37,13 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
         break;
         }
       _queue.add(entry.getValue());
-      while (_queue.size() > 1000) {
-        log.info("XXXXXX " + _queue.size());
-        java.util.concurrent.TimeUnit.SECONDS.sleep(5);
+      try {
+        while (_queue.size() > 1000) {
+          log.info("XXXXXX " + _queue.size());
+          java.util.concurrent.TimeUnit.SECONDS.sleep(5);
+          }
+        }
+      catch (InterruptedException e) {
         }
       }
     if (isSchema) {
