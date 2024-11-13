@@ -7,6 +7,7 @@ import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 // Java
 import java.util.Map;  
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -38,12 +39,13 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
         }
       _queue.add(entry.getValue());
       try {
-        while (_queue.size() > 1000) {
-          log.info("XXXXXX " + _queue.size());
-          java.util.concurrent.TimeUnit.SECONDS.sleep(5);
+        while (_queue.size() > _maxsize) {
+          log.info("queue size = " + _queue.size() + " > " _maxsize);
+          TimeUnit.SECONDS.sleep(_waitSeconds);
           }
         }
       catch (InterruptedException e) {
+        log.warn("Processing pause interruped");
         }
       }
     if (isSchema) {
@@ -53,8 +55,19 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
       results.clear();
       }
     }
+    
+  /** Set maximum size of the queue.
+    * Queue accumlation will stop till its size goes bellow this limit.
+    * @param maxsize The maximum size of the queue. DEfault is <tt>1000</tt>. */
+  public void setMaxQueueSize(int maxsize) {
+    _maxsize = maxsize;
+    }
 
   private ConcurrentLinkedQueue<Map<String, String>> _queue;
+  
+  private int _maxsize = 1000;
+  
+  private int _waitSeconds = 5;
   
   /** Logging . */
   private static Logger log = LogManager.getLogger(AsynchHBaseProcessor.class);
