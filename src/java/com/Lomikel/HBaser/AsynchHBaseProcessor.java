@@ -67,7 +67,7 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
   
   private int _maxsize = 1000;
   
-  private int _waitSeconds = 1;
+  private int _waitSeconds = 5;
   
   /** Logging . */
   private static Logger log = LogManager.getLogger(AsynchHBaseProcessor.class);
