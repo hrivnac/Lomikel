@@ -8,7 +8,6 @@ esclient = new ESClient("http://134.158.74.85:20200");
 
 client = new AsynchHBaseClient("hbase-1.lal.in2p3.fr", 2183);
 client.connect("ztf", "schema_3.1_5.6.2");
-//client.setLimit(10000);
 client.startScan(null,
                  null,
                  "i:ra,i:dec,i:jd",
