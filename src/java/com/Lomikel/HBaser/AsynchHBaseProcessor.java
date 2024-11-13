@@ -30,6 +30,7 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
     * and clean the {@link Map}. */  
   @Override
   public void processResults(Map<String, Map<String, String>> results) {
+    log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
     boolean isSchema = false; // BUG: in other subclasses of HBaseClient ?
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (entry.getKey().startsWith("schema")) {
