@@ -160,7 +160,35 @@ public class ESClient {
     * @throws LomikelException If anything goes wrong. */
   public List<String> searchValue(String idxName,
                                   String fieldName,
+                                  String value) throws LomikelException {
+    return search(idxName, new JSONObject().put("query",
+                                                new JSONObject().put("match",
+                                                                     new JSONObject().put(fieldName, value))).toString());
+    }
+    
+  /** Search value.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  value     The field value.
+    * @return           The rowkey values.
+    * @throws LomikelException If anything goes wrong. */
+  public List<String> searchValue(String idxName,
+                                  String fieldName,
                                   long   value) throws LomikelException {
+    return search(idxName, new JSONObject().put("query",
+                                                new JSONObject().put("match",
+                                                                     new JSONObject().put(fieldName, value))).toString());
+    }
+    
+  /** Search value.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  value     The field value.
+    * @return           The rowkey values.
+    * @throws LomikelException If anything goes wrong. */
+  public List<String> searchValue(String idxName,
+                                  String fieldName,
+                                  double value) throws LomikelException {
     return search(idxName, new JSONObject().put("query",
                                                 new JSONObject().put("match",
                                                                      new JSONObject().put(fieldName, value))).toString());

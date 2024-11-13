@@ -1,6 +1,5 @@
 package com.Lomikel.HBaser;
 
-import com.Lomikel.Utils.Timer;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.ElasticSearcher.ESClient;
 
@@ -27,8 +26,6 @@ public class HBaseESClientProcessor implements HBaseProcessor{
     * @param esclient The {@link ESClient} to be attached. */
   public HBaseESClientProcessor(ESClient esclient) {
     _esclient = esclient;
-    _timer = new Timer("entries added", 10, 20);
-    _timer.start();
     }
        
   /** Depending on <tt>_esclient</tt>, upsert results into <em>ElasticSearch</em>
@@ -63,18 +60,15 @@ public class HBaseESClientProcessor implements HBaseProcessor{
         _esclient.putValue("jd_nano",
                            "jd_nano",
                            entry.getKey(),
-                           (long)(1000000000 * Double.valueOf(entry.getValue().get("i:jd"))));
-       }
+                           (int)(1000000000 * Double.valueOf(entry.getValue().get("i:jd"))));
+        }
       catch (LomikelException e) {
         log.error("Cannot insert result " + entry, e);
         }
-      _timer.report();
       }
     }
     
   private ESClient _esclient;
-  
-  private Timer _timer;
   
   /** Logging . */
   private static Logger log = LogManager.getLogger(HBaseESClientProcessor.class);

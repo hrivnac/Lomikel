@@ -304,22 +304,22 @@ public class AsynchHBaseClient extends    HBaseClient
       }
     }
     
-  private ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
+  protected ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
   
   private Thread _thread;
   
-  private String  _scanKey;
-  private String  _scanSearch;
-  private String  _scanFilter;
-  private long    _scanStart;
-  private long    _scanStop;
-  private boolean _scanIfkey; 
-  private boolean _scanIftime;
+  protected String  _scanKey;
+  protected String  _scanSearch;
+  protected String  _scanFilter;
+  protected long    _scanStart;
+  protected long    _scanStop;
+  protected boolean _scanIfkey; 
+  protected boolean _scanIftime;
     
-  private boolean _doscan   = false;  
-  private boolean _scanning = false;
+  protected boolean _doscan   = false;  
+  protected boolean _scanning = false;
   
-  private int     _loopWait = 1000; // 1s = 1000ms
+  protected int     _loopWait = 1000; // 1s = 1000ms
   
   /** Logging . */
   private static Logger log = LogManager.getLogger(AsynchHBaseClient.class);
