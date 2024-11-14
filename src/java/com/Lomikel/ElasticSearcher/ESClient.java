@@ -49,7 +49,8 @@ public class ESClient {
     String jsonCmd = new JSONObject().put("mappings",
                                           new JSONObject().put("properties",
                                                                new JSONObject().put(fieldName,
-                                                                                    new JSONObject().put("type", fieldType)))).toString();
+                                                                                    new JSONObject().put("type", fieldType))))
+                                     .toString();
     log.info("Creating index " + jsonCmd);
     String answer = _httpClient.putJSON(_url + "/" + idxName, jsonCmd, null, null);
     log.info(answer);
@@ -146,9 +147,9 @@ public class ESClient {
     String jsonCmd = _commands.get(idxName).stream()
                                            .map(Object::toString)
                                            .collect(Collectors.joining("\n"));
-    //log.info("Inserting " + idxName + " ->\n" + jsonCmd);
+    log.info("Inserting " + idxName + " ->\n" + jsonCmd);
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
-    String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd, null, null);
+    //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd, null, null);
     //log.info(answer);
     }
     
