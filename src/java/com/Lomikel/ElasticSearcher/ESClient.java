@@ -321,7 +321,7 @@ public class ESClient {
       JSONObject answerJ = new JSONObject(answer);
       JSONArray hitsJ = answerJ.getJSONObject("hits").getJSONArray("hits");
       for (Object o : hitsJ) {
-        results.add(((JSONObject)o).getJSONObject("_id"));
+        results.add(((JSONObject)o).getString("_id"));
         }
       }
     catch (Exception e) {
