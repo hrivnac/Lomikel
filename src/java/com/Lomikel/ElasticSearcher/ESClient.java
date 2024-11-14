@@ -135,6 +135,7 @@ public class ESClient {
      cmdList.add(cmd);
      _commands.put(idxName, cmdList);
      }
+   log.info(_commands);
    }
     
   /** Insert new value into index.
