@@ -124,16 +124,16 @@ public class ESClient {
     * @throws LomikelException If anything goes wrong. */
   private void put(String     idxName,
                    JSONObject cmd) throws LomikelException {
+   List<JSONObject> cmdList;
    if (!_commands.containsKey(idxName)) {
-     _commands.put(idxName, cmd);
+     cmdList = new ArrayList<>();
+     cmdList.add(cmd);
+     _commands.put(idxName, cmdList);
      }
    else {
-     JSONObject newCmd = _commands.get(idxName);
-     log.info(newCmd);
-     for(String key : JSONObject.getNames(cmd)) {
-       newCmd.put(key, cmd.get(key));
-       }
-     _commands.put(idxName, newCmd);
+     cmdList = _commands.get(idxName);
+     cmdList.add(cmd);
+     _commands.put(idxName, cmdList);
      }
    }
     
@@ -144,7 +144,8 @@ public class ESClient {
   public void commit(String idxName) throws LomikelException {
     String jsonCmd = _commands.get(idxName).toString();
     log.debug("Inserting " + idxName + " -> " + jsonCmd);
-    String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
+    //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
+    String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd, null, null);
     }
     
   public void commit() {
@@ -157,7 +158,7 @@ public class ESClient {
         }});
     }
    
-  private Map<String, JSONObject> _commands = new HashMap<>();
+  private Map<String, List<JSONObject>> _commands = new HashMap<>();
 
   // Search ====================================================================  
     
