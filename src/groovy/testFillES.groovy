@@ -30,14 +30,14 @@ while (client.scanning() || client.size() > 0) {
                                                   "jd_double",
                                                   k,
                                                   Double.valueOf(v.get("i:jd")));
-                                esclient.putValue("jd_string",
-                                                  "jd_string",
+                                esclient.putValue("jd_text",
+                                                  "jd_text",
                                                   k,
                                                   v.get("i:jd"));
-                                esclient.putValue("jd_nano",
-                                                  "jd_nano",
+                                esclient.putValue("jd_long",
+                                                  "jd_long",
                                                   k,
-                                                  (int)(1000000000 * Double.valueOf(v.get("i:jd"))));
+                                                  (long)(1000000000 * Double.valueOf(v.get("i:jd"))));
                          }
     }
   }

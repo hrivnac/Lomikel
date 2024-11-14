@@ -149,7 +149,8 @@ public class ESClient {
                                                 new JSONObject().put(fieldName,
                                                                      new JSONObject().put("lat", lat)
                                                                                      .put("lon", lon))
-                                                                .put("distance", dist))).toString());
+                                                                .put("distance", dist)))
+                                           .toString());
     }
     
   /** Search value.
@@ -163,7 +164,8 @@ public class ESClient {
                                   String value) throws LomikelException {
     return search(idxName, new JSONObject().put("query",
                                                 new JSONObject().put("match",
-                                                                     new JSONObject().put(fieldName, value))).toString());
+                                                                     new JSONObject().put(fieldName, value)))
+                                           .toString());
     }
     
   /** Search value.
@@ -177,7 +179,8 @@ public class ESClient {
                                   long   value) throws LomikelException {
     return search(idxName, new JSONObject().put("query",
                                                 new JSONObject().put("match",
-                                                                     new JSONObject().put(fieldName, value))).toString());
+                                                                     new JSONObject().put(fieldName, value)))
+                                           .toString());
     }
     
   /** Search value.
@@ -191,7 +194,8 @@ public class ESClient {
                                   double value) throws LomikelException {
     return search(idxName, new JSONObject().put("query",
                                                 new JSONObject().put("match",
-                                                                     new JSONObject().put(fieldName, value))).toString());
+                                                                     new JSONObject().put(fieldName, value)))
+                                           .toString());
     }
     
   /** Search value.
@@ -209,7 +213,8 @@ public class ESClient {
                                                 new JSONObject().put("range",
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
-                                                                                                          .put("lte", maxValue)))).toString());
+                                                                                                          .put("lte", maxValue))))
+                                           .toString());
     }
     
   /** Search value in range.
@@ -227,7 +232,9 @@ public class ESClient {
                                                 new JSONObject().put("range",
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
-                                                                                                          .put("lte", maxValue)))).toString());
+                                                                                                          .put("lte", maxValue))))
+                                           .put("size", _size)
+                                           .toString());
     }
     
   /** Search value in range.
@@ -245,7 +252,9 @@ public class ESClient {
                                                 new JSONObject().put("range",
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
-                                                                                                          .put("lte", maxValue)))).toString());
+                                                                                                          .put("lte", maxValue))))
+                                           .put("size", size)
+                                           .toString());
     }
 
   /** Search value from index.
@@ -275,10 +284,16 @@ public class ESClient {
     }
     
   // ===========================================================================
+  
+  public void setSize(int size) {
+    _size = size;
+    }
  
   private String _url;
   
   private SmallHttpClient _httpClient = new SmallHttpClient();
+  
+  private int _size = 10;
         
   /** Logging . */
   private static Logger log = LogManager.getLogger(ESClient.class);
