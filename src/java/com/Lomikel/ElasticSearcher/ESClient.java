@@ -10,6 +10,8 @@ import org.json.JSONArray;
 // Java
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -71,7 +73,7 @@ public class ESClient {
     put(idxName, new JSONObject().put("text", rowkey)
                                  .put(fieldName,
                                       new JSONObject().put("lat", lat)
-                                                      .put("lon", lon)).toString());
+                                                      .put("lon", lon)));
     }
     
   /** Insert new String value entry into index.
@@ -85,7 +87,7 @@ public class ESClient {
                        String rowkey,
                        String value) throws LomikelException { 
     put(idxName, new JSONObject().put("text",    rowkey)
-                                 .put(fieldName, value).toString());
+                                 .put(fieldName, value));
     }
     
   /** Insert new long value entry into index.
@@ -99,7 +101,7 @@ public class ESClient {
                        String rowkey,
                        long   value) throws LomikelException { 
     put(idxName, new JSONObject().put("text",    rowkey)
-                                 .put(fieldName, value).toString());
+                                 .put(fieldName, value));
     }
     
   /** Insert new double value entry into index.
@@ -113,18 +115,44 @@ public class ESClient {
                        String rowkey,
                        double value) throws LomikelException { 
     put(idxName, new JSONObject().put("text",    rowkey)
-                                 .put(fieldName, value).toString());
+                                 .put(fieldName, value));
     }
     
   /** Insert new value into index.
     * @param  idxName The index name.
     * @param  jsonCmd The json command to execute.
     * @throws LomikelException If anything goes wrong. */
-  private void put(String idxName,
-                   String jsonCmd) throws LomikelException {
-    log.debug("Inserting " + jsonCmd);
+  private void put(String     idxName,
+                   JSONObject cmd) throws LomikelException {
+   if (!_commands.containsKey(idxName)) {
+     _commands.put(idxName, cmd);
+     }
+   else {
+     JSONObject newCmd = _commands.get(idxName).put(idxName, cmd);
+     _commands.put(idxName, newCmd);
+     }
+   }
+    
+  /** Insert new value into index.
+    * @param  idxName The index name.
+    * @param  jsonCmd The json command to execute.
+    * @throws LomikelException If anything goes wrong. */
+  public void commit(String idxName) throws LomikelException {
+    String jsonCmd = _commands.get(idxName).toString();
+    log.debug("Inserting " + idxName + " -> " + jsonCmd);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     }
+    
+  public void commit() {
+    _commands.forEach((k, v) -> {
+      try {
+        commit(k);
+        }
+      catch (LomikelException e) {
+        }});
+    }
+   
+  private Map<String, JSONObject> _commands = new HashMap<>();
 
   // Search ====================================================================  
     
@@ -233,7 +261,7 @@ public class ESClient {
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
                                                                                                           .put("lte", maxValue))))
-                                           .put("size", _size)
+                                           .put("size", _sizeSearch)
                                            .toString());
     }
     
@@ -253,7 +281,7 @@ public class ESClient {
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
                                                                                                           .put("lte", maxValue))))
-                                           .put("size", _size)
+                                           .put("size", _sizeSearch)
                                            .toString());
     }
 
@@ -285,15 +313,25 @@ public class ESClient {
     
   // ===========================================================================
   
-  public void setSize(int size) {
-    _size = size;
+  /** Set the limit on number of results to show.
+    * @param size The limit on number of results to show. The defauld is <tt>10</tt>. */
+  public void setSizeSearch(int size) {
+    _sizeSearch = size;
+    }
+    
+  /** Set the limit on number of entries to insert in one call (per index).
+    * @param size The limit on number of entries to in sert in one call. The defauld is <tt>1</tt>.*/
+  public void setSizePut(int size) {
+    _sizeSearch = size;
     }
  
   private String _url;
   
   private SmallHttpClient _httpClient = new SmallHttpClient();
   
-  private int _size = 10;
+  private int _sizeSearch = 10;
+  
+  private int _sizePut = 1;
         
   /** Logging . */
   private static Logger log = LogManager.getLogger(ESClient.class);
