@@ -72,11 +72,12 @@ public class ESClient {
                           double dec) throws LomikelException { 
     double lat = dec;
     double lon = ra - 180;
-    put(idxName, new JSONObject().put("index",
-                                      new JSONObject().put("_id", rowkey)),
-                                 new JSONObject().put(fieldName,
-                                      new JSONObject().put("lat", lat)
-                                                      .put("lon", lon)));
+    put(idxName,
+        new JSONObject().put("index",
+                             new JSONObject().put("_id", rowkey)),
+        new JSONObject().put(fieldName,
+                             new JSONObject().put("lat", lat)
+                                             .put("lon", lon)));
     }
     
   /** Insert new String value entry into index.
@@ -89,9 +90,10 @@ public class ESClient {
                        String fieldName,
                        String rowkey,
                        String value) throws LomikelException { 
-    put(idxName, new JSONObject().put("index",
-                                      new JSONObject().put("_id", rowkey)),
-                                 new JSONObject().put(fieldName, value));
+    put(idxName,
+        new JSONObject().put("index",
+                             new JSONObject().put("_id", rowkey)),
+        new JSONObject().put(fieldName, value));
     }
     
   /** Insert new long value entry into index.
@@ -104,9 +106,10 @@ public class ESClient {
                        String fieldName,
                        String rowkey,
                        long   value) throws LomikelException { 
-    put(idxName, new JSONObject().put("index",
-                                      new JSONObject().put("_id", rowkey)),
-                                 new JSONObject().put(fieldName, value));
+    put(idxName,
+        new JSONObject().put("index",
+                             new JSONObject().put("_id", rowkey)),
+        new JSONObject().put(fieldName, value));
     }
     
   /** Insert new double value entry into index.
@@ -119,14 +122,16 @@ public class ESClient {
                        String fieldName,
                        String rowkey,
                        double value) throws LomikelException { 
-    put(idxName, new JSONObject().put("index",
-                                      new JSONObject().put("_id", rowkey)),
-                                 new JSONObject().put(fieldName, value));
+    put(idxName,
+        new JSONObject().put("index",
+                             new JSONObject().put("_id", rowkey)),
+        new JSONObject().put(fieldName, value));
     }
     
   /** Insert new value into index.
     * @param  idxName The index name.
-    * @param  jsonCmd The json command to execute.
+    * @param  idx The index json entry.
+    * @param  cmd The cpommand json entry.
     * @throws LomikelException If anything goes wrong. */
   private void put(String     idxName,
                    JSONObject idx,
@@ -143,20 +148,20 @@ public class ESClient {
    _commands.put(idxName, cmdList);
    }
     
-  /** Insert new value into index.
+  /** Commit new values into index.
     * @param  idxName The index name.
-    * @param  jsonCmd The json command to execute.
     * @throws LomikelException If anything goes wrong. */
   public void commit(String idxName) throws LomikelException {
     String jsonCmd = _commands.get(idxName).stream()
                                            .map(Object::toString)
                                            .collect(Collectors.joining("\n"));
-    log.info("Inserting " + idxName + " ->\n" + jsonCmd);
+    log.info("Inserting " + idxName);
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", null, null);
-    log.info(answer);
     }
     
+  /** Commit all new values into index.
+    * @throws LomikelException If anything goes wrong. */
   public void commit() {
     log.info(_commands);
     _commands.forEach((k, v) -> {
@@ -316,7 +321,8 @@ public class ESClient {
       JSONObject answerJ = new JSONObject(answer);
       JSONArray hitsJ = answerJ.getJSONObject("hits").getJSONArray("hits");
       for (Object o : hitsJ) {
-        results.add(((JSONObject)o).getJSONObject("_source").getString("text"));
+        log.info(o);
+        //results.add(((JSONObject)o).getJSONObject("_source").getString("text"));
         }
       }
     catch (Exception e) {
