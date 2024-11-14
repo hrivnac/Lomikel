@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -142,7 +143,9 @@ public class ESClient {
     * @param  jsonCmd The json command to execute.
     * @throws LomikelException If anything goes wrong. */
   public void commit(String idxName) throws LomikelException {
-    String jsonCmd = _commands.get(idxName).toString();
+    String jsonCmd = _commands.get(idxName).stream()
+                                           .map(Object::toString)
+                                           .collect(Collectors.joining("\n"));
     //log.info("Inserting " + idxName + " ->\n" + jsonCmd);
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd, null, null);
