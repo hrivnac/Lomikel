@@ -143,10 +143,10 @@ public class ESClient {
     * @throws LomikelException If anything goes wrong. */
   public void commit(String idxName) throws LomikelException {
     String jsonCmd = _commands.get(idxName).toString();
-    log.info("Inserting " + idxName + " ->\n" + jsonCmd);
+    //log.info("Inserting " + idxName + " ->\n" + jsonCmd);
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd, null, null);
-    log.info(answer);
+    //log.info(answer);
     }
     
   public void commit() {
@@ -156,6 +156,7 @@ public class ESClient {
         commit(k);
         }
       catch (LomikelException e) {
+        log.error("Cannot commit " + k, e);
         }});
     }
    
