@@ -153,8 +153,8 @@ public class ESClient {
                                            .collect(Collectors.joining("\n"));
     log.info("Inserting " + idxName + " ->\n" + jsonCmd);
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
-    //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd, null, null);
-    //log.info(answer);
+    String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd, null, null);
+    log.info(answer);
     }
     
   public void commit() {
