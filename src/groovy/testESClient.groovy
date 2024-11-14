@@ -4,7 +4,7 @@ import com.Lomikel.ElasticSearcher.ESClient;
 esclient = new ESClient("http://134.158.74.85:20200");
 esclient.createIndex("radec", "location", "geo_point");
 esclient.putGeoPoint("radec", "location", "point 1", 45.12, -79.34);
-esclient.searchGeoPoint("radec "location", 71.8747439, 47.9747439, 0.1);
+esclient.searchGeoPoint("radec", "location", 71.8747439, 47.9747439, 0.1);
 sclient.createIndex("jd_double", "jd_double", "double");
 esclient.createIndex("jd_text", "jd_text", "string");
 esclient.createIndex("jd_long", "jd_long", "long");
