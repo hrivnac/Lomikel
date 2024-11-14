@@ -72,7 +72,8 @@ public class ESClient {
                           double dec) throws LomikelException { 
     double lat = dec;
     double lon = ra - 180;
-    put(idxName, new JSONObject().put("text", rowkey)
+    put(idxName, new JSONObject().put("index",
+                                      new JSONObject("_id", rowkey))
                                  .put(fieldName,
                                       new JSONObject().put("lat", lat)
                                                       .put("lon", lon)));
@@ -88,7 +89,8 @@ public class ESClient {
                        String fieldName,
                        String rowkey,
                        String value) throws LomikelException { 
-    put(idxName, new JSONObject().put("text",    rowkey)
+    put(idxName, new JSONObject().put("index",
+                                      new JSONObject("_id", rowkey))
                                  .put(fieldName, value));
     }
     
@@ -102,7 +104,8 @@ public class ESClient {
                        String fieldName,
                        String rowkey,
                        long   value) throws LomikelException { 
-    put(idxName, new JSONObject().put("text",    rowkey)
+    put(idxName, new JSONObject().put("index",
+                                      new JSONObject("_id", rowkey))
                                  .put(fieldName, value));
     }
     
@@ -116,7 +119,8 @@ public class ESClient {
                        String fieldName,
                        String rowkey,
                        double value) throws LomikelException { 
-    put(idxName, new JSONObject().put("text",    rowkey)
+    put(idxName, new JSONObject().put("index",
+                                      new JSONObject("_id", rowkey))
                                  .put(fieldName, value));
     }
     
