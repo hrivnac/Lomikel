@@ -133,12 +133,12 @@ public class ESClient {
    List<String> cmdList;
    if (!_commands.containsKey(idxName)) {
      cmdList = new ArrayList<>();
-     cmdList.add(cmd);
+     cmdList.add(cmd.toString());
      _commands.put(idxName, cmdList);
      }
    else {
      cmdList = _commands.get(idxName);
-     cmdList.add(cmd.toList());
+     cmdList.add(cmd.toString());
      _commands.put(idxName, cmdList);
      }
    }
