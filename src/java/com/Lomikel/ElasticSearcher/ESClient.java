@@ -144,6 +144,7 @@ public class ESClient {
     }
     
   public void commit() {
+    log.info(_commands);
     _commands.forEach((k, v) -> {
       try {
         commit(k);
