@@ -128,7 +128,10 @@ public class ESClient {
      _commands.put(idxName, cmd);
      }
    else {
-     JSONObject newCmd = _commands.get(idxName).put(idxName, cmd);
+     JSONObject newCmd = _commands.get(idxName);
+     for(String key : JSONObject.getNames(cmd)) {
+       newCmd.put(key, cmd.get(key));
+       }
      _commands.put(idxName, newCmd);
      }
    }
