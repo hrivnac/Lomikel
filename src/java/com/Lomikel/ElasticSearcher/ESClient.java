@@ -253,7 +253,7 @@ public class ESClient {
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
                                                                                                           .put("lte", maxValue))))
-                                           .put("size", size)
+                                           .put("size", _size)
                                            .toString());
     }
 
