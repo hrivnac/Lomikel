@@ -135,7 +135,6 @@ public class ESClient {
      cmdList.add(cmd);
      _commands.put(idxName, cmdList);
      }
-   log.info(_commands);
    }
     
   /** Insert new value into index.
@@ -150,7 +149,7 @@ public class ESClient {
     }
     
   public void commit() {
-    //log.info(_commands);
+    log.info(_commands);
     _commands.forEach((k, v) -> {
       try {
         commit(k);
