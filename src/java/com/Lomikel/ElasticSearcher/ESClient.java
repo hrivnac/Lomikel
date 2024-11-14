@@ -73,8 +73,8 @@ public class ESClient {
     double lat = dec;
     double lon = ra - 180;
     put(idxName, new JSONObject().put("index",
-                                      new JSONObject().put("_id", rowkey))
-                                 .put(fieldName,
+                                      new JSONObject().put("_id", rowkey)),
+                                 new JSONObject().put(fieldName,
                                       new JSONObject().put("lat", lat)
                                                       .put("lon", lon)));
     }
@@ -90,8 +90,8 @@ public class ESClient {
                        String rowkey,
                        String value) throws LomikelException { 
     put(idxName, new JSONObject().put("index",
-                                      new JSONObject().put("_id", rowkey))
-                                 .put(fieldName, value));
+                                      new JSONObject().put("_id", rowkey)),
+                                 new JSONObject().put(fieldName, value));
     }
     
   /** Insert new long value entry into index.
@@ -105,8 +105,8 @@ public class ESClient {
                        String rowkey,
                        long   value) throws LomikelException { 
     put(idxName, new JSONObject().put("index",
-                                      new JSONObject().put("_id", rowkey))
-                                 .put(fieldName, value));
+                                      new JSONObject().put("_id", rowkey)),
+                                 new JSONObject().put(fieldName, value));
     }
     
   /** Insert new double value entry into index.
@@ -120,8 +120,8 @@ public class ESClient {
                        String rowkey,
                        double value) throws LomikelException { 
     put(idxName, new JSONObject().put("index",
-                                      new JSONObject().put("_id", rowkey))
-                                 .put(fieldName, value));
+                                      new JSONObject().put("_id", rowkey)),
+                                 new JSONObject().put(fieldName, value));
     }
     
   /** Insert new value into index.
@@ -129,11 +129,12 @@ public class ESClient {
     * @param  jsonCmd The json command to execute.
     * @throws LomikelException If anything goes wrong. */
   private void put(String     idxName,
+                   JSONObject idx,
                    JSONObject cmd) throws LomikelException {
    List<String> cmdList;
    if (!_commands.containsKey(idxName)) {
      cmdList = new ArrayList<>();
-     log.info(cmd.toString());
+     log.info(idx.toString() + " " + cmd.toString());
      cmdList.add(cmd.toString());
      _commands.put(idxName, cmdList);
      }
