@@ -129,6 +129,7 @@ public class ESClient {
      }
    else {
      JSONObject newCmd = _commands.get(idxName);
+     log.info(newCmd);
      for(String key : JSONObject.getNames(cmd)) {
        newCmd.put(key, cmd.get(key));
        }
@@ -147,7 +148,7 @@ public class ESClient {
     }
     
   public void commit() {
-    log.info(_commands);
+    //log.info(_commands);
     _commands.forEach((k, v) -> {
       try {
         commit(k);
