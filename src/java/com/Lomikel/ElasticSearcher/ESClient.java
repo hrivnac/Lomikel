@@ -130,7 +130,7 @@ public class ESClient {
     * @throws LomikelException If anything goes wrong. */
   private void put(String     idxName,
                    JSONObject cmd) throws LomikelException {
-   List<JSONObject> cmdList;
+   List<String> cmdList;
    if (!_commands.containsKey(idxName)) {
      cmdList = new ArrayList<>();
      cmdList.add(cmd);
@@ -138,7 +138,7 @@ public class ESClient {
      }
    else {
      cmdList = _commands.get(idxName);
-     cmdList.add(cmd);
+     cmdList.add(cmd.toList());
      _commands.put(idxName, cmdList);
      }
    }
@@ -168,7 +168,7 @@ public class ESClient {
         }});
     }
    
-  private Map<String, List<JSONObject>> _commands = new HashMap<>();
+  private Map<String, List<String>> _commands = new HashMap<>();
 
   // Search ====================================================================  
     
