@@ -163,7 +163,6 @@ public class ESClient {
   /** Commit all new values into index.
     * @throws LomikelException If anything goes wrong. */
   public void commit() {
-    log.info(_commands);
     _commands.forEach((k, v) -> {
       try {
         commit(k);
