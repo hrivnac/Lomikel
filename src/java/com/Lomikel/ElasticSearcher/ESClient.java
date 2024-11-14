@@ -134,15 +134,13 @@ public class ESClient {
    List<String> cmdList;
    if (!_commands.containsKey(idxName)) {
      cmdList = new ArrayList<>();
-     log.info(idx.toString() + " " + cmd.toString());
-     cmdList.add(cmd.toString());
-     _commands.put(idxName, cmdList);
      }
    else {
      cmdList = _commands.get(idxName);
-     cmdList.add(cmd.toString());
-     _commands.put(idxName, cmdList);
      }
+   cmdList.add(idx.toString());
+   cmdList.add(cmd.toString());
+   _commands.put(idxName, cmdList);
    }
     
   /** Insert new value into index.
