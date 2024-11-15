@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ConcurrentMap;
+import java.util.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 // Log4J
@@ -352,7 +354,7 @@ public class ESClient {
   
   private int _sizePut = 1;
    
-  private Map<String, List<String>> _commands = new HashMap<>();
+  private ConcurrentMap<String, List<String>> _commands = new ConcurrentHashMap<>();
         
   /** Logging . */
   private static Logger log = LogManager.getLogger(ESClient.class);
