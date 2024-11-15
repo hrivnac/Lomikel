@@ -22,6 +22,7 @@ public class Timer {
     _msg     = msg;
     _modulus = modulus;
     _commitF = commitF;
+    log.info("Status will be reported every " + modulus + " calls, commit will be sugested every " + commitF + " reports.");
     }
   
   /** Start timer. */

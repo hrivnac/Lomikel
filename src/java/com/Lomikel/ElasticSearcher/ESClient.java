@@ -200,6 +200,7 @@ public class ESClient {
                                                                      new JSONObject().put("lat", lat)
                                                                                      .put("lon", lon))
                                                                 .put("distance", dist)))
+                                           .put("size", _size)
                                            .toString());
     }
     
@@ -215,6 +216,7 @@ public class ESClient {
     return search(idxName, new JSONObject().put("query",
                                                 new JSONObject().put("match",
                                                                      new JSONObject().put(fieldName, value)))
+                                           .put("size", _size)
                                            .toString());
     }
     
@@ -230,6 +232,7 @@ public class ESClient {
     return search(idxName, new JSONObject().put("query",
                                                 new JSONObject().put("match",
                                                                      new JSONObject().put(fieldName, value)))
+                                           .put("size", _size)
                                            .toString());
     }
     
@@ -245,6 +248,7 @@ public class ESClient {
     return search(idxName, new JSONObject().put("query",
                                                 new JSONObject().put("match",
                                                                      new JSONObject().put(fieldName, value)))
+                                           .put("size", _size)
                                            .toString());
     }
     
@@ -283,7 +287,7 @@ public class ESClient {
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
                                                                                                           .put("lte", maxValue))))
-                                           .put("size", _sizeSearch)
+                                           .put("size", _size)
                                            .toString());
     }
     
@@ -303,7 +307,7 @@ public class ESClient {
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
                                                                                                           .put("lte", maxValue))))
-                                           .put("size", _sizeSearch)
+                                           .put("size", _size)
                                            .toString());
     }
 
@@ -338,22 +342,14 @@ public class ESClient {
   /** Set the limit on number of results to show.
     * @param size The limit on number of results to show. The defauld is <tt>10</tt>. */
   public void setSizeSearch(int size) {
-    _sizeSearch = size;
-    }
-    
-  /** Set the limit on number of entries to insert in one call (per index).
-    * @param size The limit on number of entries to in sert in one call. The defauld is <tt>1</tt>.*/
-  public void setSizePut(int size) {
-    _sizeSearch = size;
+    _size = size;
     }
  
   private String _url;
   
   private SmallHttpClient _httpClient = new SmallHttpClient();
   
-  private int _sizeSearch = 10;
-  
-  private int _sizePut = 1;
+  private int _size= 10;
    
   private ConcurrentMap<String, List<String>> _commands = new ConcurrentHashMap<>();
         
