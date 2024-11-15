@@ -158,6 +158,7 @@ public class ESClient {
     log.info("Inserting " + idxName);
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", null, null);
+    _commands.remove(idxName);
     }
     
   /** Commit all new values into index.
@@ -171,8 +172,6 @@ public class ESClient {
         log.error("Cannot commit " + k, e);
         }});
     }
-   
-  private Map<String, List<String>> _commands = new HashMap<>();
 
   // Search ====================================================================  
     
@@ -352,6 +351,8 @@ public class ESClient {
   private int _sizeSearch = 10;
   
   private int _sizePut = 1;
+   
+  private Map<String, List<String>> _commands = new HashMap<>();
         
   /** Logging . */
   private static Logger log = LogManager.getLogger(ESClient.class);
