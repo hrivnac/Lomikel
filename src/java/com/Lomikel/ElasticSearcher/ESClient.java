@@ -154,10 +154,11 @@ public class ESClient {
     * @param  idxName The index name.
     * @throws LomikelException If anything goes wrong. */
   public void commit(String idxName) throws LomikelException {
-    String jsonCmd = _commands.get(idxName).stream()
-                                           .map(Object::toString)
-                                           .collect(Collectors.joining("\n"));
-    log.info("Inserting " + idxName);
+    List<String> command = _commands.get(idxName);
+    String jsonCmd = command.stream()
+                            .map(Object::toString)
+                            .collect(Collectors.joining("\n"));
+    log.info("Inserting " + idxName + "[" + command.size() + "]");
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", null, null);
     _commands.remove(idxName);
