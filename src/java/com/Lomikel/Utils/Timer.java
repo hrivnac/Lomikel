@@ -15,19 +15,20 @@ public class Timer {
   /** Create.
     * @param msg           The message to use for logging.
     * @param modulus       The <em>mod</em> to specify report frequency.
-    * @param modulusCommit The <em>mod</em> to specify commit frequency. */
+    * @param modulusCommit The commit frequency (how many reports). */
   public Timer(String msg,
                int    modulus,
-               int    modulusCommit) {
-    _msg           = msg;
-    _modulus       = modulus;
-    _modulusCommit = modulusCommit;
+               int    commitF) {
+    _msg     = msg;
+    _modulus = modulus;
+    _commitF = commitF;
     }
   
   /** Start timer. */
   public void start() {
     _t = System.currentTimeMillis();
     _i = 0;
+    _j = 0;
     }
 
   /** Report snapshot.
@@ -37,12 +38,13 @@ public class Timer {
     if (_modulus > -1 && _i % _modulus != 0) {
       return false;
       }
+    _j++;
     long dt = (System.currentTimeMillis() - _t) / 1000;
     if (dt == 0) {
       dt = 1;
       }
     log.info("" + _i + " " + _msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz");
-    if (_modulusCommit > -1 && _i % _modulusCommit == 0) {
+    if (_commitF > -1 && _j % _commitF == 0) {
 	    return true;
       }
     return false;
@@ -52,11 +54,13 @@ public class Timer {
   
   private int _i;
   
+  private int _j;
+  
   private String  _msg;
   
   private int _modulus;
   
-  private int _modulusCommit;
+  private int _commitF;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(Timer.class);
