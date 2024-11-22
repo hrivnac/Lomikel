@@ -300,7 +300,7 @@ public class LivyRESTClient {
       request += ", \"name\":\"" + name + "\"";
       }
     if (conf != null) {
-      request += ", \"conf\":\"" + conf + "\"";
+      request += ", \"conf\":" + conf + "";
       }   
     if (proxyUser != null) {
       request += ", \"proxyUser\":\"" + proxyUser + "\"";
