@@ -305,7 +305,7 @@ public class LivyRESTClient {
     if (proxyUser != null) {
       request += ", \"proxyUser\":\"" + proxyUser + "\"";
       }
-    request += "\"}";
+    request += "}";
     String result = "";
     boolean success = false;
     int i = 0;
