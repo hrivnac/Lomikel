@@ -312,25 +312,19 @@ public class LivyRESTClient {
     while (!success && i++ <= tries) {
       try {
         Thread.sleep(1000 * sleep);
-        log.info("Sending[" + tries + "]: " + request);
+        log.info("Sending[" + i + "]: " + request);
         result = SmallHttpClient.postJSON(_url + "/batches", request, null, null);
-        //if (className == null) {
-        //  result = SmallHttpClient.postJSON(_url + "/batches", "{\"file\":\"" + file + "\"}", null, null);
-        //  }
-        //else {
-        //  result = SmallHttpClient.postJSON(_url + "/batches", "{\"file\":\"" + file + "\", \"className\":\"" + className + "\"}", null, null);
-        //  }
         success = true;
         }
       catch (LomikelException e) {
-        log.debug("Request has failed\n\t" + result, e);
+        log.debug("Request has failed", e);
         }
       catch (InterruptedException e) {
         break;
         }
       }
+    log.debug("Result:\n" + result.trim());
     if (success) {
-      log.debug("Result:\n" + result.trim());
       return new JSONObject(result).getInt("id");
       }
     else {
