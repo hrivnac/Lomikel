@@ -312,7 +312,7 @@ public class LivyRESTClient {
     while (!success && i++ <= tries) {
       try {
         Thread.sleep(1000 * sleep);
-        log.info("Sending: " + request);
+        log.info("Sending[" + tries + "]: " + request);
         result = SmallHttpClient.postJSON(_url + "/batches", request, null, null);
         //if (className == null) {
         //  result = SmallHttpClient.postJSON(_url + "/batches", "{\"file\":\"" + file + "\"}", null, null);
@@ -323,7 +323,7 @@ public class LivyRESTClient {
         success = true;
         }
       catch (LomikelException e) {
-        log.debug("Request has failed", e);
+        log.debug("Request has failed\n\t" + result, e);
         }
       catch (InterruptedException e) {
         break;
