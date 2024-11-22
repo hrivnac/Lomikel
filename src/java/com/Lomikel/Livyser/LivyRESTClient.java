@@ -19,22 +19,21 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 /** <code>LivyRESTCLient</code> is the bridge to the <em>Livy</em> REST service:
-  * <a href="https://livy.incubator.apache.org/docs/latest/rest-api.html">API</a>.
+  * <a href="https://livy.apache.org/docs/latest/rest-api.html">API</a>.
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // TBD: handle full answer, check for errors
-public class LivyRESTClient {
+public class LivyRESTClient extends LivyClient {
   
   /** Connect to the server.
     * @param url The url of the server. */
   public LivyRESTClient(String url) {
-    log.info("Connecting to Livy Server " + url);
-    _url = url;
+    super(url);
     }
-  
+    
   /** Initiate session on the server.
     * <pre>
     * POST /sessions {"kind":*language*}
@@ -56,7 +55,7 @@ public class LivyRESTClient {
     while (!success && i++ <= tries) {
       try {
         Thread.sleep(1000 * sleep);
-        result = SmallHttpClient.postJSON(_url + "/sessions", "{\"kind\":\"" + language.asSpark() + ",\"conf\":\"" + conf + "\"}", null, null);
+        result = SmallHttpClient.postJSON(url() + "/sessions", "{\"kind\":\"" + language.asSpark() + ",\"conf\":\"" + conf + "\"}", null, null);
         success = true;
         }
       catch (LomikelException e) {
@@ -84,7 +83,7 @@ public class LivyRESTClient {
     List<Map.Entry<Integer, Language>> ss = new ArrayList<>();
     String result = "";
     try {
-      result = SmallHttpClient.get(_url + "/sessions", null);
+      result = SmallHttpClient.get(url() + "/sessions", null);
       }
     catch (LomikelException e) {
       LomikelException.reportException("Request has failed", e, log);
@@ -114,7 +113,7 @@ public class LivyRESTClient {
     List<Integer> ss = new ArrayList<>();
     String result = "";
     try {
-      result = SmallHttpClient.get(_url + "/batches", null);
+      result = SmallHttpClient.get(url() + "/batches", null);
       }
     catch (LomikelException e) {
       LomikelException.reportException("Request has failed", e, log);
@@ -143,7 +142,7 @@ public class LivyRESTClient {
     List<Integer> ss = new ArrayList<>();
     String result = "";
     try {
-      result = SmallHttpClient.get(_url + "/sessions/" + idSession + "/statements", null);
+      result = SmallHttpClient.get(url() + "/sessions/" + idSession + "/statements", null);
       }
     catch (LomikelException e) {
       LomikelException.reportException("Request has failed", e, log);
@@ -162,7 +161,7 @@ public class LivyRESTClient {
     * @param  idSession The existing session number. */
   public void deleteSession(int idSession) {
     try {
-      SmallHttpClient.delete(_url + "/sessions/" + idSession, null);
+      SmallHttpClient.delete(url() + "/sessions/" + idSession, null);
       }
     catch (LomikelException e) {
       LomikelException.reportException("Request has failed", e, log);
@@ -192,7 +191,7 @@ public class LivyRESTClient {
     while (!success && i++ <= tries) {
       try {
         Thread.sleep(1000 * sleep);
-        result = SmallHttpClient.postJSON(_url + "/sessions/" + idSession + "/statements", "{\"code\":\"" + code + "\"}", null, null);
+        result = SmallHttpClient.postJSON(url() + "/sessions/" + idSession + "/statements", "{\"code\":\"" + code + "\"}", null, null);
         success = true;
         }
       catch (LomikelException e) {
@@ -313,7 +312,7 @@ public class LivyRESTClient {
       try {
         Thread.sleep(1000 * sleep);
         log.info("Sending[" + i + "]: " + request);
-        result = SmallHttpClient.postJSON(_url + "/batches", request, null, null);
+        result = SmallHttpClient.postJSON(url() + "/batches", request, null, null);
         success = true;
         }
       catch (LomikelException e) {
@@ -351,7 +350,7 @@ public class LivyRESTClient {
     while (!success && i++ <= tries) {
       try {
         Thread.sleep(1000 * sleep);
-        result = SmallHttpClient.get(_url + "/sessions/" + idSession + "/statements/" + idStatement, null);
+        result = SmallHttpClient.get(url() + "/sessions/" + idSession + "/statements/" + idStatement, null);
         success = true;
         }
       catch (LomikelException e) {
@@ -388,7 +387,7 @@ public class LivyRESTClient {
     while (!success && i++ <= tries) {
       try {
         Thread.sleep(1000 * sleep);
-        resultString = SmallHttpClient.get(_url + "/batches/" + idBatch, null);
+        resultString = SmallHttpClient.get(url() + "/batches/" + idBatch, null);
         result = new JSONObject(resultString);
         success = true;
         }
@@ -426,7 +425,7 @@ public class LivyRESTClient {
     while (!success && i++ <= tries) {
       try {
         Thread.sleep(1000 * sleep);
-        resultString = SmallHttpClient.get(_url + "/batches/" + idBatch + "/log", null);
+        resultString = SmallHttpClient.get(url() + "/batches/" + idBatch + "/log", null);
         result = new JSONObject(resultString);
         success = true;
         }
@@ -453,7 +452,7 @@ public class LivyRESTClient {
     * @param  idBatch The existing batch session number. */
   public void deleteBatch(int idBatch) {
     try {
-      SmallHttpClient.delete(_url + "/batches/" + idBatch, null);
+      SmallHttpClient.delete(url() + "/batches/" + idBatch, null);
         }
     catch (LomikelException e) {
       log.debug("Request has failed", e);
@@ -538,11 +537,7 @@ public class LivyRESTClient {
       }
     }
   
-  /** Execute action, try until succeeds, wait for result.
-    * @param cmd      The command to send.
-    * @param language The command {@link Language}.
-    * @param conf     The Sparc configuration (as JSON String).
-    * @return         The result as <em>Json</em> string. */
+  @Override
   public String executeAction(String   cmd,
                               Language language,
                               String   conf) {
@@ -552,24 +547,7 @@ public class LivyRESTClient {
     return waitForActionResult(sessionId, statementId,  Integer.MAX_VALUE, 1);
     }
     
-  /** Send job, try until succeeds, wait for result.
-    * @param file           The jar filename.
-    * @param className      The <em>main</em> className.
-    * @param args           The Job args, if any. 
-    * @param driverMemory   The Job driver memory or <tt>null</tt>. 
-    * @param driverCores    The Job driver cores or <tt>0</tt>.  
-    * @param executorMemory The Job executor memory or <tt>null</tt>. 
-    * @param executorCores  The Job executor cores or <tt>0</tt>. 
-    * @param numExecutors   The Job executots or <tt>0</tt>.
-    * @param jars           The Job jars or <tt>null</tt>. 
-    * @param pyFiles        The Job pyFiles or <tt>null</tt>. 
-    * @param files          The Job files or <tt>null</tt>. 
-    * @param archives       The Job archives or <tt>null</tt>. 
-    * @param queue          The Job queue or <tt>null</tt>.
-    * @param name           The Job name or <tt>null</tt>.
-    * @param conf           The Job conf or <tt>null</tt>. 
-    * @param proxyUser      The Job proxyUser or <tt>null</tt>. 
-    * @return               The result as <em>Json</em> string. */
+  @Override
   public String sendJob(String file,
                         String className,
                         String args,
@@ -609,15 +587,9 @@ public class LivyRESTClient {
            getBatchLog(     batchId, Integer.MAX_VALUE, 1);
     }
     
-  /** Give Livy server url.
-    * @return The Livy server url. */
-  public String url() {
-    return _url;
-    }
-    
   @Override
   public String toString() {
-    return "LivyRESTClient(" + _url + ")";
+    return "LivyRESTClient(" + url() + ")";
     }
     
   private String _url;
