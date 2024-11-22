@@ -300,7 +300,7 @@ public class LivyRESTClient {
       request += ", \"name\":\"" + name + "\"";
       }
     if (conf != null) {
-      request += ", \"conf\":" + conf + "";
+      request += ", \"conf\":\"" + conf + "\"";
       }   
     if (proxyUser != null) {
       request += ", \"proxyUser\":\"" + proxyUser + "\"";
@@ -309,7 +309,7 @@ public class LivyRESTClient {
     String result = "";
     boolean success = false;
     int i = 0;
-    while (!success && i++ <= tries) {
+    while (!success && i++ < tries) {
       try {
         Thread.sleep(1000 * sleep);
         log.info("Sending[" + i + "]: " + request);
