@@ -43,7 +43,7 @@ public class Server extends Element {
     * @param urlLivy  The url of the Spark Server Livy interface. */
   public void setLivy(String url) {
     _urlLivy = url;
-    _livy = new LivyClient(url);
+    _livy = new LivyRESTClient(url);
     }
 
   /** Set Spark Server.
@@ -154,7 +154,7 @@ public class Server extends Element {
   
   private String _urlGanglia;
   
-  private LivyClient _livy;
+  private LivyRESTClient _livy;
   
   private HBaseClient _hbase;
   
