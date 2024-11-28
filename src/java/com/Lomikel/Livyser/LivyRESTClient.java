@@ -263,7 +263,7 @@ public class LivyRESTClient extends LivyClient {
       request += ", \"className\":\"" + className + "\"";
       }
     if (args != null) {
-      request += ", \"args\":\"" + args + "\"";
+      request += ", \"args\":" + args;
       }
     if (driverMemory != null) {
       request += ", \"driverMemory\":\"" + driverMemory + "\"";
@@ -281,16 +281,16 @@ public class LivyRESTClient extends LivyClient {
       request += ", \"numExecutors\":\"" + numExecutors + "\"";
       }
     if (jars != null) {
-      request += ", \"jars\":\"" + jars + "\"";
+      request += ", \"jars\":" + jars;
       }
     if (pyFiles != null) {
-      request += ", \"pyFiles\":" + pyFiles + "";
+      request += ", \"pyFiles\":" + pyFiles;
       }
     if (files != null) {
-      request += ", \"files\":\"" + files + "\"";
+      request += ", \"files\":" + files;
       }
     if (archives != null) {
-      request += ", \"archives\":\"" + archives + "\"";
+      request += ", \"archives\":" + archives;
       }
     if (queue != null) {
       request += ", \"queue\":\"" + queue + "\"";
@@ -299,7 +299,7 @@ public class LivyRESTClient extends LivyClient {
       request += ", \"name\":\"" + name + "\"";
       }
     if (conf != null) {
-      request += ", \"conf\":" + conf + "";
+      request += ", \"conf\":" + conf;
       }   
     if (proxyUser != null) {
       request += ", \"proxyUser\":\"" + proxyUser + "\"";
