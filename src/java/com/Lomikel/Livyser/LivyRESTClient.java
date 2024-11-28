@@ -284,7 +284,7 @@ public class LivyRESTClient extends LivyClient {
       request += ", \"jars\":\"" + jars + "\"";
       }
     if (pyFiles != null) {
-      request += ", \"pyFiles\":\"" + pyFiles + "\"";
+      request += ", \"pyFiles\":" + pyFiles + "";
       }
     if (files != null) {
       request += ", \"files\":\"" + files + "\"";
