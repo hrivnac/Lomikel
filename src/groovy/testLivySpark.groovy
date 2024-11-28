@@ -3,14 +3,14 @@ import com.Lomikel.Livyser.Action;
 import com.Lomikel.Livyser.Language;
 import org.json.JSONObject;
 
-serverName     = "LAL";
-urlLivy        = "http://134.158.75.222:21111";
-urlSpark       = "http://134.158.75.222:8020";
-//urlHBase       = "http://hbase-1.lal.in2p3.fr:2183";
+serverName     = 'LAL';
+urlLivy        = 'http://134.158.75.222:21111';
+urlSpark       = 'http://134.158.75.222:8020';
+//urlHBase       = 'http://hbase-1.lal.in2p3.fr:2183';
 urlHBase       = null;
-fileName       = "/user/julius.hrivnac/test.py";
+fileName       = '/user/julius.hrivnac/test.py';
 className      = null;
-args           = "";
+args           = null;
 driverMemory   = null;
 driverCores    = 0;
 executorMemory = null;
@@ -22,8 +22,9 @@ files          = null;
 archives       = null;
 queue          = null;
 jobName        = null;
-conf           = "{'spark.mesos.principal': 'lsst', 'spark.mesos.secret': 'secret', 'spark.mesos.role': 'lsst', 'spark.cores.max': '8', 'spark.executor.cores': '2', 'name': 'livy-batch', 'spark.jars.packages': 'org.apache.spark:spark-streaming-kafka-0-10-assembly_2.12:3.4.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1,org.apache.spark:spark-avro_2.12:3.4.1', 'spark.executor.memory': '4g'}";
-proxyUser      = null;
+conf           = '{"spark.mesos.principal": "lsst", "spark.mesos.secret": "secret", "spark.mesos.role": "lsst", "spark.cores.max": "8", "spark.executor.cores": "2", "name": "livy-batch", "spark.jars.packages": "org.apache.spark:spark-streaming-kafka-0-10-\
+assembly_2.12:3.4.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1,org.apache.spark:spark-avro_2.12:3.4.1", "spark.executor.memory": "4g"}';
+proxyUser      = 'livy';
 tries          = 10;
 sleep          = 1
 
@@ -49,29 +50,31 @@ id = server.livy().sendJob(fileName,
                            jobName,
                            conf,
                            proxyUser,
-                           Integer.MAX_VALUE,
-                           1);
+                           tries,
+                           sleep);
    
 println("id = " + id);
+if (id >= 0) {
 statex0 = null;
-while (true) {
-  resultString = server.livy().checkBatchProgress(id, 10, 1);
-  if (resultString != null) {
-    result = new JSONObject(resultString);
-    statex = result.getString("state");
-    if (statex0 == null) {
-      statex0 = statex;
-      println("State: " + statex);
+  while (true) {
+    resultString = server.livy().checkBatchProgress(id, 10, 1);
+    if (resultString != null) {
+      result = new JSONObject(resultString);
+      statex = result.getString("state");
+      if (statex0 == null) {
+        statex0 = statex;
+        println("State: " + statex);
+        }
+      if (!statex.equals(statex0)) {
+        println("State: " + statex);
+        statex0 = statex;
+        }
+      if (statex.equals("success") || statex.equals("dead")) {
+        break;
+        }
       }
-    if (!statex.equals(statex0)) {
-      println("State: " + statex);
-      statex0 = statex;
-      }
-    if (statex.equals("success") || statex.equals("dead")) {
-      break;
-      }
+    Thread.sleep(1000);
     }
-  Thread.sleep(1000);
   }
 //logArray = result.getJSONArray("log");    
 //String fullLog = "";
