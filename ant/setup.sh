@@ -24,7 +24,7 @@ export GROOVY_CLASSPATH=""
 for JAR in ${janusgraph_dir}/lib/*.jar; do
   JANUSGRAPH_CLASSPATH=${JANUSGRAPH_CLASSPATH}:${JAR} 
   done
-export LOMIKEL_CLASSPATH="../lib/Lomikel.exe.jar:${jython_jar}:${JANUSGRAPH_CLASSPATH}"
+export LOMIKEL_CLASSPATH="../lib/Lomikel-${version}.exe.jar:${jython_jar}:${JANUSGRAPH_CLASSPATH}"
 export GREMLIN_CLASSPATH="${groovy_sql_jar}":"${bsh_jar}"
     
 export janusgraph_dir
@@ -39,9 +39,9 @@ alias gremlin_console_IJCLab='CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}
 alias gremlin_Local='CLASSPATH=""  ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
 alias gremlin_IJCLab='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
 alias lomikel='CLASSPATH="${LOMIKEL_CLASSPATH}" java com.Lomikel.Apps.LUC'
-alias lomikel_pure='java -jar ../lib/Lomikel.exe.jar'
-alias lomikel_hbase='java -jar ../lib/Lomikel-HBase.exe.jar'
-alias lomikel_janus='java -jar ../lib/Lomikel-Janus.exe.jar'
-alias lomikel_dl4j='java --enable-preview -jar ../lib/Lomikel-dl4j.exe.jar'
+alias lomikel_pure='java -jar ../lib/Lomikel-${version}.exe.jar'
+alias lomikel_hbase='java -jar ../lib/Lomikel-${version}-HBase.exe.jar'
+alias lomikel_janus='java -jar ../lib/Lomikel-${version}-Janus.exe.jar'
+alias lomikel_dl4j='java --enable-preview -jar ../lib/Lomikel-${version}-dl4j.exe.jar'
 
 echo "commands: gremlin_console_Local, gremlin_console_IJCLab, gremlin_Local, gremlin_IJCLab, lomikel, lomikel_pure, lomikel_hbase, lomikel_janus, lomikel_dl4j"

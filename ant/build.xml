@@ -302,7 +302,7 @@
   <target name="exe"
           depends="jar"
           description="Create exe JARs">
-    <jar jarfile="../lib/Lomikel-ext.jar" index="no">
+    <jar jarfile="../lib/Lomikel-${version}-ext.jar" index="no">
       <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${cli_jar}"/>
       <zipfileset includes="**/*" src="${joinery_jar}"/>
@@ -332,7 +332,7 @@
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
       </jar>    
-    <jar jarfile="../lib/Lomikel.exe.jar" index="no">
+    <jar jarfile="../lib/Lomikel-${version}.exe.jar" index="no">
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -341,17 +341,17 @@
         <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext.jar"/>
         </manifest>
       </jar>    
-    <jar jarfile="../lib/Lomikel-HBase.exe.jar" index="no">
+    <jar jarfile="../lib/Lomikel-${version}-HBase.exe.jar" index="no">
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="LomikelwHBase"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext.jar HBase-all.jar"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar Lomikel-${version}-HBase.jar"/>
         </manifest>
       </jar> 
     <!-- create from hbase classpath \-\-glob -->
-    <jar jarfile="../lib/HBase-all.jar" index="no">
+    <jar jarfile="../lib/Lomikel-${version}-HBase.jar" index="no">
       <zipfileset includes="**/*" src="${hbase_dir}/lib/shaded-clients/hbase-shaded-client-2.5.8-hadoop3.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/audience-annotations-0.13.0.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/commons-logging-1.2.jar"/>
@@ -368,17 +368,17 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar>
-    <jar jarfile="../lib/Lomikel-Janus.exe.jar" index="no">
+    <jar jarfile="../lib/Lomikel-${version}-Janus.exe.jar" index="no">
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="LomikelwHBase"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext.jar Janus-all.jar"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar Lomikel-${version}-Janus.jar"/>
         </manifest>
       </jar> 
     <!-- empirically assembled minimum -->
-    <jar jarfile="../lib/Janus-all.jar" index="no" zip64Mode="always">
+    <jar jarfile="../lib/Lomikel-${version}-Janus.jar" index="no" zip64Mode="always">
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.9.3.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-beanutils-1.9.4.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/commons-codec-1.15.jar"/>
@@ -477,13 +477,13 @@
           depends="jar"
           description="Create exe JARs for dl4j">
     <copy file="${dl4j_jar}" tofile="../lib/dl4j-all.jar"/>
-    <jar jarfile="../lib/Lomikel-dl4j.exe.jar" index="no">
+    <jar jarfile="../lib/Lomikel-${version}-dl4j.exe.jar" index="no">
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="LomikelwDL4J"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext.jar dl4j-all.jar"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar dl4j-all.jar"/>
         </manifest>
       </jar> 
     </target>
@@ -533,7 +533,7 @@
       <classes dir="../src/ws">
         <include name="log4j.xml"/>
         </classes>
-      <lib file="../lib/Lomikel-Janus.exe.jar"/>
+      <lib file="../lib/Lomikel-${version}-Janus.exe.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -599,7 +599,7 @@
       <classes dir="../src/ws/FinkBrowser">
         <include name="log4j.xml"/>
         </classes>
-      <lib file="../lib/Lomikel-Janus.exe.jar"/>
+      <lib file="../lib/Lomikel-${version}-Janus.exe.jar"/>
       <lib file="${orgjson_jar}"/>
       <lib file="${javaxmail_jar}"/>
       <lib file="${hbasecommon_jar}"/>
@@ -1018,6 +1018,19 @@
       <arg value="../lib/FinkBrowser.war"/>
       </java>
     </target>
+    
+  <!-- Start Py4J Gateway Server ============================================-->
+
+  <target name="start-py4j"
+          description="Start Py4J Gateway Server">
+    <echo>Starting Py4J Gateway Server</echo>
+    <java classname="com.Lomikel.Py4J.LomikelGatewayServer"
+          fork="true">
+      <classpath>
+        <path refid="classpath.janusgraph"/>
+        </classpath>
+      </java>
+    </target>
 
   <!-- Check ================================================================-->
     
@@ -1113,6 +1126,7 @@
       <group title="Graph"              packages="com.Lomikel.Graph*"/>
       <group title="Utils"              packages="com.Lomikel.Utils*"/>
       <group title="Sockets"            packages="com.Lomikel.Sockets*"/>
+      <group title="Py4J"               packages="com.Lomikel.Py4J*"/>
       <group title="GremlinPlugin"      packages="com.Lomikel.GremlinPlugin*"/>
       <group title="GUI"                packages="com.Lomikel.GUI*"/>
       <group title="TinkerPopPatch"     packages="com.Lomikel.TinerPopPatch*"/>
@@ -1138,6 +1152,7 @@
       <link href="https://cds-astro.github.io/cds-healpix-java/apidocs"/>
       <link href="https://avro.apache.org/docs/1.8.2/api/java"/>
       <link href="https://javadoc.io/doc/org.python/jython-standalone/latest"/>
+      <link href="https://www.py4j.org/_static/javadoc"/>
       <classpath>
         <path refid="classpath.run"/>
         </classpath>
