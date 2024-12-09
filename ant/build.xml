@@ -318,6 +318,7 @@
 			<zipfileset includes="**/*" src="${groovy_sql_jar}"/>
       <zipfileset includes="**/*" src="${groovysh_jar}"/>
 			<zipfileset includes="**/*" src="${parquetavro_jar}"/>
+			<zipfileset includes="**/*" src="${py4j_jar}"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpasyncclient-4.1.5.jar"/>
