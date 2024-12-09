@@ -21,7 +21,7 @@ numExecutors   = 0;
 //jars           = '["hdfs:///user/julius.hrivnac/hbase-spark-hbase2.3.0_spark3.4.1_scala2.12.0_hadoop3.3.6.jar","hdfs:///user/hrivnac/hbase-spark-protocol-shaded-hbase2.3.0_spark3.4.1_scala2.12.0_hadoop3.3.6.jar"]';
 jars           = null;
 pyFiles        = null;
-files          = null;
+files          = null
 archives       = null;
 queue          = null;
 jobName        = null;
@@ -62,7 +62,7 @@ id = server.livy().sendJob(fileName,
                            proxyUser,
                            tries,
                            1);
-
+   
 println("id = " + id);
 statex0 = null;
 if (id >= 0) {
@@ -86,7 +86,7 @@ if (id >= 0) {
     Thread.sleep(1000);
     }
   }
-//logArray = result.getJSONArray("log");
+//logArray = result.getJSONArray("log");    
 //String fullLog = "";
 //for (Object logEntry : logArray) {
 //  fullLog += logEntry.toString() + "\n";
@@ -94,4 +94,3 @@ if (id >= 0) {
 resultString = server.livy().getBatchLog(id, 10, 1);
 //result = new JSONObject(resultString);
 println(resultString);
-
