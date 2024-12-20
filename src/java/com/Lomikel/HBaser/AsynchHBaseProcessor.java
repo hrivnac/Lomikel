@@ -58,7 +58,7 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
     
   /** Set maximum size of the queue.
     * Queue accumlation will stop till its size goes bellow this limit.
-    * @param maxsize The maximum size of the queue. DEfault is <tt>1000</tt>. */
+    * @param maxsize The maximum size of the queue. Default is <tt>1000</tt>. */
   public void setMaxQueueSize(int maxsize) {
     _maxsize = maxsize;
     }

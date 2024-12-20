@@ -64,7 +64,7 @@ public class AsynchHBaseClient extends    HBaseClient
         if (_doscan) {
           log.info("Starting asynchronous scan");
           _scanning = true;
-          setProcessor(new AsynchHBaseProcessor(_queue));
+          setProcessor(_processor);
           scan(_scanKey,
                _scanSearch,
                _scanFilter,
@@ -279,9 +279,16 @@ public class AsynchHBaseClient extends    HBaseClient
     return _scanning;
     }
     
+  /** Set maximum size of the queue.
+    * Queue accumlation will stop till its size goes bellow this limit.
+    * @param maxsize The maximum size of the queue. Default is <tt>1000</tt>. */
+  public void setMaxQueueSize(int maxsize) {
+    _processor.setMaxQueueSize(maxsize);
+    }
+    
   /** Set the time parallel thread waits between actions.
-    * @param t The time parallel thread waits between actions.
-    *          The default is <tt>1s</tt>. */
+    * @param t The time parallel thread waits between actions (in <tt>ms</tt>).
+    *          The default is <tt>1000ms</tt>. */
   public void setLoopWait(int t) {
     _loopWait = t;
     }
@@ -305,6 +312,8 @@ public class AsynchHBaseClient extends    HBaseClient
     }
     
   protected ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
+  
+  protected AsynchHBaseProcessor _processor = new AsynchHBaseProcessor(_queue);
   
   private Thread _thread;
   
