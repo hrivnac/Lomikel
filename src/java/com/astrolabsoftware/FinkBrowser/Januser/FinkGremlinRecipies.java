@@ -709,21 +709,26 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                      next();
       for (String cls2 : types) {
         if (corrS.containsKey(Pair.of(cls1, cls2))) {
-          ns++;
-          soi2 = g().V().has("lbl",        "SourcesOfInterest").
-                         has("classifier", classifier.name()  ).
-                         has("cls",        cls2               ).
-                         next();
-          addEdge(g().V(soi1).next(),
-                  g().V(soi2).next(),
-                  "overlaps",
-                  new String[]{"intersection",                
-                               "sizeIn",            
-                               "sizeOut"},
-                  new Double[]{corrS.get(Pair.of(cls1, cls2)),
-                               sizeS.get(cls1),
-                               sizeS.get(cls2)},
-                  true);
+          try {
+            soi2 = g().V().has("lbl",        "SourcesOfInterest").
+                           has("classifier", classifier.name()  ).
+                           has("cls",        cls2               ).
+                           next();
+            addEdge(g().V(soi1).next(),
+                    g().V(soi2).next(),
+                    "overlaps",
+                    new String[]{"intersection",                
+                                 "sizeIn",            
+                                 "sizeOut"},
+                    new Double[]{corrS.get(Pair.of(cls1, cls2)),
+                                 sizeS.get(cls1),
+                                 sizeS.get(cls2)},
+                    true);
+            ns++;
+            }
+          catch (NoSuchElementException e) {
+            log.error("SoI " + classifier.name() + " for " + cls2 + " doesn;t exist");
+            }          
           }  
         }
       }
@@ -735,21 +740,26 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                      next();
       for (String cls2 : types) {
         if (corrA.containsKey(Pair.of(cls1, cls2))) {
-          na++;
-          aoi2 = g().V().has("lbl",        "AlertsOfInterest").
-                         has("classifier", classifier.name() ).
-                         has("cls",        cls2              ).
-                         next();
-          addEdge(g().V(aoi1).next(),
-                  g().V(aoi2).next(),
-                  "overlaps",
-                  new String[]{"intersection",                
-                               "sizeIn",            
-                               "sizeOut"},
-                  new Double[]{corrA.get(Pair.of(cls1, cls2)),
-                               sizeA.get(cls1),
-                               sizeA.get(cls2)},
-                  true);
+          try {
+            aoi2 = g().V().has("lbl",        "AlertsOfInterest").
+                           has("classifier", classifier.name() ).
+                           has("cls",        cls2              ).
+                           next();
+            addEdge(g().V(aoi1).next(),
+                    g().V(aoi2).next(),
+                    "overlaps",
+                    new String[]{"intersection",                
+                                 "sizeIn",            
+                                 "sizeOut"},
+                    new Double[]{corrA.get(Pair.of(cls1, cls2)),
+                                 sizeA.get(cls1),
+                                 sizeA.get(cls2)},
+                    true);
+            na++;
+            }
+          catch (NoSuchElementException e) {
+            log.error("AoI " + classifier.name() + " for " + cls2 + " doesn;t exist");
+            }          
           }  
         }
       }
