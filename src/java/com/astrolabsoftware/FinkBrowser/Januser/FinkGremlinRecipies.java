@@ -704,65 +704,75 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     // Double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
     for (String cls1 : types) {
-      soi1 = g().V().has("lbl",        "SourcesOfInterest").
-                     has("classifier", classifier.name()  ).
-                     has("cls",        cls1               ).
-                     next();
-      for (String cls2 : types) {
-        if (corrS.containsKey(Pair.of(cls1, cls2))) {
-          try {
-            soi2 = g().V().has("lbl",        "SourcesOfInterest").
-                           has("classifier", classifier.name()  ).
-                           has("cls",        cls2               ).
-                           next();
-            addEdge(g().V(soi1).next(),
-                    g().V(soi2).next(),
-                    "overlaps",
-                    new String[]{"intersection",                
-                                 "sizeIn",            
-                                 "sizeOut"},
-                    new Double[]{corrS.get(Pair.of(cls1, cls2)),
-                                 sizeS.get(cls1),
-                                 sizeS.get(cls2)},
-                    true);
-            ns++;
-            }
-          catch (NoSuchElementException e) {
-            log.error("SoI " + classifier.name() + " for " + cls2 + " doesn;t exist");
-            }          
-          }  
+      try {
+        soi1 = g().V().has("lbl",        "SourcesOfInterest").
+                       has("classifier", classifier.name()  ).
+                       has("cls",        cls1               ).
+                       next();
+        for (String cls2 : types) {
+          if (corrS.containsKey(Pair.of(cls1, cls2))) {
+            try {
+              soi2 = g().V().has("lbl",        "SourcesOfInterest").
+                             has("classifier", classifier.name()  ).
+                             has("cls",        cls2               ).
+                             next();
+              addEdge(g().V(soi1).next(),
+                      g().V(soi2).next(),
+                      "overlaps",
+                      new String[]{"intersection",                
+                                   "sizeIn",            
+                                   "sizeOut"},
+                      new Double[]{corrS.get(Pair.of(cls1, cls2)),
+                                   sizeS.get(cls1),
+                                   sizeS.get(cls2)},
+                      true);
+              ns++;
+              }
+            catch (NoSuchElementException e) {
+              log.error("SoI " + classifier.name() + " for " + cls2 + " doesn't exist");
+              }          
+            }  
+          }
         }
+      catch (NoSuchElementException e) {
+        log.error("SoI " + classifier.name() + " for " + cls1 + " doesn't exist");
+        }          
       }
     // Double-loop over AoI and create overlaps Edge AoI-AoI if non empty 
     for (String cls1 : types) {
-      aoi1 = g().V().has("lbl",        "AlertsOfInterest").
-                     has("classifier", classifier.name() ). 
-                     has("cls",        cls1              ).
-                     next();
-      for (String cls2 : types) {
-        if (corrA.containsKey(Pair.of(cls1, cls2))) {
-          try {
-            aoi2 = g().V().has("lbl",        "AlertsOfInterest").
-                           has("classifier", classifier.name() ).
-                           has("cls",        cls2              ).
-                           next();
-            addEdge(g().V(aoi1).next(),
-                    g().V(aoi2).next(),
-                    "overlaps",
-                    new String[]{"intersection",                
-                                 "sizeIn",            
-                                 "sizeOut"},
-                    new Double[]{corrA.get(Pair.of(cls1, cls2)),
-                                 sizeA.get(cls1),
-                                 sizeA.get(cls2)},
-                    true);
-            na++;
-            }
-          catch (NoSuchElementException e) {
-            log.error("AoI " + classifier.name() + " for " + cls2 + " doesn;t exist");
-            }          
-          }  
+      try {
+        aoi1 = g().V().has("lbl",        "AlertsOfInterest").
+                       has("classifier", classifier.name() ). 
+                       has("cls",        cls1              ).
+                       next();
+        for (String cls2 : types) {
+          if (corrA.containsKey(Pair.of(cls1, cls2))) {
+            try {
+              aoi2 = g().V().has("lbl",        "AlertsOfInterest").
+                             has("classifier", classifier.name() ).
+                             has("cls",        cls2              ).
+                             next();
+              addEdge(g().V(aoi1).next(),
+                      g().V(aoi2).next(),
+                      "overlaps",
+                      new String[]{"intersection",                
+                                   "sizeIn",            
+                                   "sizeOut"},
+                      new Double[]{corrA.get(Pair.of(cls1, cls2)),
+                                   sizeA.get(cls1),
+                                   sizeA.get(cls2)},
+                      true);
+              na++;
+              }
+            catch (NoSuchElementException e) {
+              log.error("AoI " + classifier.name() + " for " + cls2 + " doesn't exist");
+              }          
+            }  
+          }
         }
+      catch (NoSuchElementException e) {
+        log.error("SoI " + classifier.name() + " for " + cls1 + " doesn't exist");
+        }          
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     log.info("" + ns + ", " + na + " source-source and source-alert correlations generated");
