@@ -164,7 +164,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       JSONArray ja;
       JSONObject jo;
       for (String cls : clss) {
-        log.info("*** " + cls + ":");
         cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, -nLimit);
         d = cal.getTime();
@@ -186,8 +185,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           jo = ja.getJSONObject(i);
           oids.add(jo.getString("i:objectId"));
           }
+        log.info("*** " + cls + "[" + ja.length() + "]:");
         }
-      log.info("\t" + ja.length());
       }
     int size = oids.size();
     int n = 0;
