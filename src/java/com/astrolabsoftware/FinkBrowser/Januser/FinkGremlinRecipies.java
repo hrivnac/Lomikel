@@ -187,6 +187,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           oids.add(jo.getString("i:objectId"));
           }
         }
+      log.info("\t" + ja.length());
       }
     int size = oids.size();
     int n = 0;
