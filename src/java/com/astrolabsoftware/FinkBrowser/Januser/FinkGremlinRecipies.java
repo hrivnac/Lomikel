@@ -604,9 +604,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     log.info("Generating correlations for Sources and Alerts of Interest for " + classifier.name());
     // Clean all correlations 
     g().E().has("lbl", "overlaps").drop().iterate();
+    g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifier.name()).bothE().has("lbl", "overlaps").drop().iterate();
+    g().V().has("lbl", "SourcesOfInterest").has("classifier", classifier.name()).bothE().has("lbl", "overlaps").drop().iterate();
     // Remove wrong SoI, AoI
-    g().V().has("lbl", "AlertsOfInterest" ).not(has("cls")).drop().iterate();
-    g().V().has("lbl", "SourcesOfInterest").not(has("cls")).drop().iterate();
+    g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifier.name()).not(has("cls")).drop().iterate();
+    g().V().has("lbl", "SourcesOfInterest").has("classifier", classifier.name()).not(has("cls")).drop().iterate();
     // Accumulate correlations and sizes
     Map<String, Double>               weights0 = new HashMap<>(); // cls -> weight (for one source)
     Map<Pair<String, String>, Double> corrS    = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between SoI-SoI)
