@@ -590,8 +590,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         addEdge(g().V(aoi).next(),
                 g().V(alert).next(),
                 "contains",
-                new String[]{},
-                new String[]{},
+                new String[]{"classifier"},
+                new String[]{classifier.name()},
                 true);
         }
       }
