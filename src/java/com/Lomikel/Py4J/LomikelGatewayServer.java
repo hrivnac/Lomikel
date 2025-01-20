@@ -1,6 +1,6 @@
 package com.Lomikel.Py4J;
 
-import com.Lomikel.Utils;
+import com.Lomikel.Utils.NotifierURL;
 
 // Py4J
 import py4j.GatewayServer;
