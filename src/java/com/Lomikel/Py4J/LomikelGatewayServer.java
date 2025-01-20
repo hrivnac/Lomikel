@@ -1,5 +1,7 @@
 package com.Lomikel.Py4J;
 
+import com.Lomikel.Utils;
+
 // Py4J
 import py4j.GatewayServer;
 
@@ -26,6 +28,12 @@ public class LomikelGatewayServer {
     GatewayServer gatewayServer = new GatewayServer(new LomikelGatewayServer());
     gatewayServer.start();
     log.info("Gateway Server Started");
+    try {
+      NotifierURL.notify("", "Lomikel-GatewayServer", Info.release());
+      }
+    catch (Exception e) {
+      System.err.println(e);
+      }
     }
   
   /** Logging . */
