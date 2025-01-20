@@ -291,10 +291,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
     
   /** Give all overlaps.
-    * @param lbl The label of {@link Vertex}es to use for overlap search.
-    *            Optional. 
-    * @return    The overlaps. */
-  def Map overlaps(String lbl = null) {
+    * @param lbl        The label of {@link Vertex}es to use for overlap search.
+    *                   Optional. 
+    * @param classifier The name of classifier to use for overlap search.
+    *                   Optional. 
+    * @return           The overlaps. */
+  def Map overlaps(String lbl        = null,
+                   String classifier = null) {
     def overlaps = [:];
     g().E().has('lbl', 'overlaps').
             order().
@@ -308,7 +311,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
-                  if (lbl == null || v['xlbl'].equals(lbl) || v['ylbl'].equals(lbl)) {
+                  if ((lbl        == null || v['xlbl'       ].equals(lbl       ) || v['ylbl'       ].equals(lbl       )) &&
+                      (classifier == null || v['xclassifier'].equals(classifier) || v['yclassifier'].equals(classifier))) {
                     overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['ycls']] = v['intersection'];
                     }
                   };
