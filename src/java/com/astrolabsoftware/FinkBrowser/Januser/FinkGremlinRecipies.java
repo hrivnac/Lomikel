@@ -603,7 +603,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void generateCorrelations(Classifiers classifier) {
     log.info("Generating correlations for Sources and Alerts of Interest for " + classifier.name());
     // Clean all correlations 
-    g().E().has("lbl", "overlaps").drop().iterate();
     g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifier.name()).bothE().has("lbl", "overlaps").drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").has("classifier", classifier.name()).bothE().has("lbl", "overlaps").drop().iterate();
     // Remove wrong SoI, AoI
