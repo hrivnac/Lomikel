@@ -608,6 +608,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Remove wrong SoI, AoI
     g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifier.name()).not(has("cls")).drop().iterate();
     g().V().has("lbl", "SourcesOfInterest").has("classifier", classifier.name()).not(has("cls")).drop().iterate();
+    g().getGraph().tx().commit(); // TBD: should use just commit()
     // Accumulate correlations and sizes
     Map<String, Double>               weights0 = new HashMap<>(); // cls -> weight (for one source)
     Map<Pair<String, String>, Double> corrS    = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between SoI-SoI)
