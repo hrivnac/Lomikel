@@ -303,8 +303,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     addEdge(g().V(soi).next(),
             g().V(s).next(),
             "deepcontains",
-            new String[]{"classifier",      "weight",    "instances"                                                     },
-            new String[]{classifier.name(), "" + weight, instances.toString().replaceFirst("\\[", "").replaceAll("]", "")},
+            new String[]{"weight",    "instances"                                                     },
+            new String[]{"" + weight, instances.toString().replaceFirst("\\[", "").replaceAll("]", "")},
             true);
     if (enhance) {
       try {
@@ -590,8 +590,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         addEdge(g().V(aoi).next(),
                 g().V(alert).next(),
                 "contains",
-                new String[]{"classifier"},
-                new String[]{classifier.name()},
+                new String[]{},
+                new String[]{},
                 true);
         }
       }
@@ -620,7 +620,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex source;
     Iterator<Edge> deepcontainsIt;
     Edge deepcontains;
-    String classifierName;
     double weight;
     double weight1;
     double weight2;
@@ -641,14 +640,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       while (deepcontainsIt.hasNext()) {
         deepcontains = deepcontainsIt.next();
         weight = (Double)(deepcontains.property("weight").value());
-        classifierName = deepcontains.property("classifier").value().toString();
-        if (classifier.name().equals(classifierName)) {
-          soi1 = deepcontains.outVertex();
-          cls = soi1.property("cls").value().toString();
-          types0.add(cls);
-          types.add(cls);
-          weights0.put(cls, weight);
-          }
+        soi1 = deepcontains.outVertex();
+        cls = soi1.property("cls").value().toString();
+        types0.add(cls);
+        types.add(cls);
+        weights0.put(cls, weight);
         }
       // Double loop over accumulated weights and fill weights between SoIs/AoIs
       for (String cls1 : types0) {
