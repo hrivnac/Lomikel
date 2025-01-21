@@ -1,9 +1,9 @@
 #!/usr/bin/bash -l
 NOW=`date +"%Y%m%d%H%M%s"`
-LOG=/tmp/fillLC-${NOW}.log
-LOCK=/tmp/fillLC.lock 
+LOG=/tmp/fillES-${NOW}.log
+LOCK=/tmp/fillES.lock 
 if [[ -e ${LOCK} ]]; then
-  echo "Already filling LightCurves with ${LOCK}"
+  echo "Already filling ES with ${LOCK}"
   exit
   fi
 PID=$$
