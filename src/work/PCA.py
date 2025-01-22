@@ -17,8 +17,8 @@ from math import sqrt
 
 spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 
+print("*** DF ***")
 mapping = "rowkey STRING :key, " + \
-          "jd DOUBLE i:jd, " + \
           "magpsf FLOAT i:magpsf, " + \
           "sigmapsf FLOAT i:sigmapsf, " + \
           "magnr FLOAT i:magnr, " + \
@@ -30,10 +30,9 @@ cols = ["magpsf",
         "sigmagnr",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(1000)
-
-print ("*** DF ***")
 df.show()
 
+print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
 
 print ("*** PCA ***")
