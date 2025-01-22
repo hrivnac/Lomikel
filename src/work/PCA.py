@@ -18,7 +18,7 @@ import requests
 import json
 
 def classify(objectId):
-  print(objectId)
+  x={"objectId": objectId, "output-format": "json"}
   #r = requests.post("https://api.fink-portal.org/api/v1/objects", json={"objectId": objectId, "output-format": "json"})
   return objectId
   
@@ -63,7 +63,7 @@ print("*** Clustering ***")
 kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
 kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
-#clustered_result.select("rowkey", "xpos", "ypos", "objectId", "classification", "pcaFeatures", "cluster").show(n=100, truncate=False)
+clustered_result.select("rowkey", "xpos", "ypos", "objectId", "classification", "pcaFeatures", "cluster").show(n=100, truncate=False)
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
