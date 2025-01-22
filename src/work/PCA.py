@@ -22,7 +22,7 @@ import json
 
 
 def classify(objectId):
-  x={"objectId": aaa, "output-format": "json"}
+  x={"objectId": "aaa", "output-format": "json"}
   r = requests.post("https://api.fink-portal.org/api/v1/objects", json=x)
   return objectId
   
