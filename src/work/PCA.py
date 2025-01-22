@@ -36,6 +36,8 @@ df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.ma
 
 df.withColumn("zpos", lit(1))
 
+df.show()
+
 print("*** VectorAssembler ***")
 #vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
 
