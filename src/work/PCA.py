@@ -44,10 +44,11 @@ kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPrediction
 kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
 
-clustered_result.show()
+print("*** Clusters ***")
+#clustered_result.show()
 
 print("*** Results ***")
-#clustered_result.select("pcaFeatures", "cluster").show(truncate=False)
+clustered_result.select("pcaFeatures", "cluster").show(truncate=False)
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
