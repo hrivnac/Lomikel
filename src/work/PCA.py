@@ -34,6 +34,7 @@ df.show()
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
+vecAssembler.show()
 
 print ("*** PCA ***")
 #pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
