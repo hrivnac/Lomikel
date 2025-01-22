@@ -40,7 +40,7 @@ pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
 pipeline = Pipeline(stages=[vecAssembler, pca])
 model = pipeline.fit(df)
 result = model.transform(df).select("pcaFeatures")
-print(result)
+result.show()
 
 print("*** Clustering ***")
 #kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
