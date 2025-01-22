@@ -14,20 +14,6 @@ from pyspark.ml.clustering import KMeans
 from pyspark.ml.evaluation import ClusteringEvaluator
 from numpy import array
 from math import sqrt
-import requests
-import json
-
-#x={"objectId": "aaaa", "output-format": "json"}
-#r = requests.post("https://api.fink-portal.org/api/v1/objects", json=x)
-
-
-def classify(objectId):
-  x={"objectId": "aaa", "output-format": "json"}
-  r = requests.post("https://134.158.75.100/api/v1/objects", json=x)
-  return objectId
-  
-#  s = json.loads(r.text)
-#  return s[0]["v:classification"]
 
 spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 
@@ -49,10 +35,6 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(100)
 
-#df = df.withColumn("classification", df.xpos + df.ypos)
-
-df = df.withColumn("classification", F.col(classify(df.objectId)))
-
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
 
@@ -67,7 +49,9 @@ print("*** Clustering ***")
 kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
 kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
-clustered_result.select("rowkey", "xpos", "ypos", "objectId", "classification", "pcaFeatures", "cluster").show(n=100, truncate=False)
+clustered_result.select("rowkey", "xpos", "ypos", "objectId", "pcaFeatures", "cluster").show(n=100, truncate=False)
+
+clustered_result.write.csv("a.csv")
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
