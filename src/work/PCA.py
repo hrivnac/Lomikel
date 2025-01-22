@@ -43,9 +43,9 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(100)
 
-#df = df.withColumn("zpos", df.xpos + df.ypos)
+df = df.withColumn("classification", df.xpos + df.ypos)
 
-df = df.withColumn("classification", classify(df.objectId))
+#df = df.withColumn("classification", classify(df.objectId))
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
