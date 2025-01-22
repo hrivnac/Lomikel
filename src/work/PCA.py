@@ -18,10 +18,12 @@ import requests
 import json
 
 def classify(objectId):
-  r = requests.post("https://api.fink-portal.org/api/v1/objects",
-                    json={"objectId": objectId, "output-format": "json"})
-  s = json.loads(r.text)
-  return s[0]["v:classification"]
+  return objectId
+  
+#  r = requests.post("https://api.fink-portal.org/api/v1/objects",
+#                    json={"objectId": objectId, "output-format": "json"})
+#  s = json.loads(r.text)
+#  return s[0]["v:classification"]
 
 spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 
