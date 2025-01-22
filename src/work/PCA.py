@@ -51,12 +51,12 @@ print("*** Results ***")
 #clustered_result.select("pcaFeatures", "cluster").show(truncate=False)
 
 print("*** Centers ***")
-centers = kmeans_model.clusterCenters()
-for idx, center in enumerate(centers):
-    print(f"Cluster {idx}: {center}")
+#centers = kmeans_model.clusterCenters()
+#for idx, center in enumerate(centers):
+#    print(f"Cluster {idx}: {center}")
 
 print("*** Counts ***")
-#clustered_result.groupBy("cluster").count().show()
+clustered_result.groupBy("cluster").count().show()
 
 #print("*** Stats ***")
 #get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
