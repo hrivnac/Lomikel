@@ -552,7 +552,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     long time = System.currentTimeMillis();
     long now = time;
     if (stop == 0) {
-      stop = now;
+      stop = time;
       }
     Map<String, Map<String, Map<Long, String>>> results = new TreeMap<>();
     Map<String, Map<Long, String>> result;
