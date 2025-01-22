@@ -19,7 +19,7 @@ import json
 
 def classify(objectId):
   r = requests.post("https://api.fink-portal.org/api/v1/objects",
-                    json={"objectId": "ZTF17aaaagww", "output-format": "json"})
+                    json={"objectId": objectId, "output-format": "json"})
   s = json.loads(r.text)
   return s[0]["v:classification"]
 
@@ -43,9 +43,9 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(100)
 
-df = df.withColumn("classification", df.xpos + df.ypos)
+#df = df.withColumn("classification", df.xpos + df.ypos)
 
-#df = df.withColumn("classification", classify(df.objectId))
+df = df.withColumn("classification", classify(df.objectId))
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
