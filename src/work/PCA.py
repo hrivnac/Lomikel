@@ -51,7 +51,7 @@ df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.ma
 
 #df = df.withColumn("classification", df.xpos + df.ypos)
 
-df = df.withColumn("classification", classify(df.objectId))
+df = df.withColumn("classification", F.col(classify(df.objectId)))
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
