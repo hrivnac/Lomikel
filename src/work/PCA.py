@@ -62,16 +62,16 @@ print("*** Counts ***")
 #clustered_result.groupBy("cluster").count().show()
 
 print("*** Stats ***")
-get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
-clustered_result = clustered_result.withColumn("pca_1", get_element("pcaFeatures", lit(0))) \
-                                   .withColumn("pca_2", get_element("pcaFeatures", lit(1)))
-cluster_stats = clustered_result.groupBy("cluster").agg(
-    mean("pca_1").alias("mean_pca_1"),
-    stddev("pca_1").alias("stddev_pca_1"),
-    mean("pca_2").alias("mean_pca_2"),
-    stddev("pca_2").alias("stddev_pca_2")
-)
-cluster_stats.show(truncate=False)
+#get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
+#clustered_result = clustered_result.withColumn("pca_1", get_element("pcaFeatures", lit(0))) \
+#                                   .withColumn("pca_2", get_element("pcaFeatures", lit(1)))
+#cluster_stats = clustered_result.groupBy("cluster").agg(
+#    mean("pca_1").alias("mean_pca_1"),
+#    stddev("pca_1").alias("stddev_pca_1"),
+#    mean("pca_2").alias("mean_pca_2"),
+#    stddev("pca_2").alias("stddev_pca_2")
+#)
+#cluster_stats.show(truncate=False)
 
 #evaluator = ClusteringEvaluator(featuresCol="pcaFeatures", predictionCol="cluster", metricName="silhouette")
 #silhouette = evaluator.evaluate(clustered_result)
