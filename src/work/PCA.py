@@ -36,23 +36,21 @@ df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.ma
 
 df = df.withColumn("zpos", df.xpos + df.ypos)
 
-df.show()
-
 print("*** VectorAssembler ***")
-#vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
+vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
 
 print ("*** PCA ***")
-#pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
-#pipeline = Pipeline(stages=[vecAssembler, pca])
-#model = pipeline.fit(df)
-#result = model.transform(df)
+pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
+pipeline = Pipeline(stages=[vecAssembler, pca])
+model = pipeline.fit(df)
+result = model.transform(df)
 #result.show(truncate=False)
 
 print("*** Clustering ***")
-#kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
-#kmeans_model = kmeans.fit(result)
-#clustered_result = kmeans_model.transform(result)
-#clustered_result.select("rowkey", "xpos", "ypos", "zpos", "pcaFeatures", "cluster").show(n=100, truncate=False)
+kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
+kmeans_model = kmeans.fit(result)
+clustered_result = kmeans_model.transform(result)
+clustered_result.select("rowkey", "xpos", "ypos", "zpos", "pcaFeatures", "cluster").show(n=100, truncate=False)
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
