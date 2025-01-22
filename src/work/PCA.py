@@ -18,7 +18,7 @@ import requests
 import json
 
 def classify(objectId):
-  r = requests.post("https://api.fink-portal.org/api/v1/objects", json={"objectId": F.col(objectId), "output-format": "json"})
+  #r = requests.post("https://api.fink-portal.org/api/v1/objects", json={"objectId": objectId, "output-format": "json"})
   return objectId
   
 #  s = json.loads(r.text)
