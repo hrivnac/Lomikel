@@ -17,13 +17,13 @@ from math import sqrt
 import requests
 import json
 
-x={"objectId": "aaaa", "output-format": "json"}
-r = requests.post("https://api.fink-portal.org/api/v1/objects", json=x)
+#x={"objectId": "aaaa", "output-format": "json"}
+#r = requests.post("https://api.fink-portal.org/api/v1/objects", json=x)
 
 
 def classify(objectId):
-  #x={"objectId": objectId, "output-format": "json"}
-  #r = requests.post("https://api.fink-portal.org/api/v1/objects", json=x)
+  x={"objectId": aaa, "output-format": "json"}
+  r = requests.post("https://api.fink-portal.org/api/v1/objects", json=x)
   return objectId
   
 #  s = json.loads(r.text)
