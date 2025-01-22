@@ -31,18 +31,21 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(1000)
 
+print ("*** DF ***")
+print(df)
+
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
 
 print ("*** PCA ***")
-pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
-pipeline = Pipeline(stages=[vecAssembler, pca])
-model = pipeline.fit(df)
-result = model.transform(df).select("pcaFeatures")
+#pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
+#pipeline = Pipeline(stages=[vecAssembler, pca])
+#model = pipeline.fit(df)
+#result = model.transform(df).select("pcaFeatures")
 
 print("*** Clustering ***")
-kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
-kmeans_model = kmeans.fit(result)
-clustered_result = kmeans_model.transform(result)
+#kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
+#kmeans_model = kmeans.fit(result)
+#clustered_result = kmeans_model.transform(result)
 
 print("*** Clusters ***")
 #clustered_result.show()
@@ -58,7 +61,7 @@ print("*** Centers ***")
 print("*** Counts ***")
 #clustered_result.groupBy("cluster").count().show()
 
-#print("*** Stats ***")
+print("*** Stats ***")
 get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
 clustered_result = clustered_result.withColumn("pca_1", get_element("pcaFeatures", lit(0))) \
                                    .withColumn("pca_2", get_element("pcaFeatures", lit(1)))
