@@ -51,8 +51,6 @@ kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
 clustered_result.select("rowkey", "xpos", "ypos", "objectId", "pcaFeatures", "cluster").show(n=100, truncate=False)
 
-clustered_result.write.csv("a.csv")
-
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
 #for idx, center in enumerate(centers):
