@@ -50,17 +50,15 @@ df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.ma
 
 df = df.withColumn("classification", classification_udf(df.objectId))
 
-df.show()
-
-#  print("*** VectorAssembler ***")
-#  vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
-#  
-#  print ("*** PCA ***")
-#  pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
-#  pipeline = Pipeline(stages=[vecAssembler, pca])
-#  model = pipeline.fit(df)
-#  result = model.transform(df)
-#  #result.show(truncate=False)
+print("*** VectorAssembler ***")
+vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
+  
+print ("*** PCA ***")
+pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
+pipeline = Pipeline(stages=[vecAssembler, pca])
+model = pipeline.fit(df)
+result = model.transform(df)
+result.show(truncate=False)
 #  
 #  print("*** Clustering ***")
 #  kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
