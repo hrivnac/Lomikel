@@ -32,7 +32,7 @@ def classification(objectId):
       classifications[objectId] = t
     except:
       classifications[objettId] = "failed"
-    return classification[objectId]
+  return classifications[objectId]
  
 classification_udf = udf(lambda x: classification(x), StringType())
 
