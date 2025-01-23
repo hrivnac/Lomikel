@@ -17,12 +17,14 @@ from math import sqrt
 import requests
 import json
 
-r = requests.post("https://api.fink-portal.org/api/v1/objects",
-                  json={"objectId": "ZTF17aaaagww", "output-format": "json"})
-
-s = json.loads(r.text)
-
-t = s[0]["v:classification"]
+def classification(objectId):
+  r = requests.post("https://api.fink-portal.org/api/v1/objects",
+                    json={"objectId": "ZTF17aaaagww", "output-format": "json"})  
+  s = json.loads(r.text)  
+  t = s[0]["v:classification"]
+  return t
+  
+t = classification("a")
 
 spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 
