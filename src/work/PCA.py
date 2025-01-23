@@ -14,6 +14,15 @@ from pyspark.ml.clustering import KMeans
 from pyspark.ml.evaluation import ClusteringEvaluator
 from numpy import array
 from math import sqrt
+import requests
+import json
+
+r = requests.post("https://api.fink-portal.org/api/v1/objects",
+                  json={"objectId": "ZTF17aaaagww", "output-format": "json"})
+
+s = json.loads(r.text)
+
+print(s[0]["v:classification"])
 
 spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 
