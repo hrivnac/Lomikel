@@ -21,14 +21,12 @@ from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
 
 def classification(objectId):
-  return objectId
+  r = requests.post("https://api.fink-portal.org/api/v1/objects",
+                    json={"objectId": objectId, "output-format": "json"})  
+  s = json.loads(r.text)  
+  return s[0]["v:classification"]
   
-#  r = requests.post("https://api.fink-portal.org/api/v1/objects",
-#                    json={"objectId": objectId, "output-format": "json"})  
-#  s = json.loads(r.text)  
-#  return s[0]["v:classification"]
-  
-my_udf = udf(lambda x: classification(x), StringType())
+classification_udf = udf(lambda x: classification(x), StringType())
 
 spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 
@@ -50,7 +48,7 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(10)
 
-df = df.withColumn("classification", my_udf(df.objectId))
+df = df.withColumn("classification", classification_udf(df.objectId))
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
