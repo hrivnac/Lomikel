@@ -71,7 +71,7 @@ result = model.transform(df)
   
 print("*** Clustering ***")
 kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
-#  kmeans_model = kmeans.fit(result)
+kmeans_model = kmeans.fit(result)
 #  clustered_result = kmeans_model.transform(result)
 #  clustered_result.select("rowkey", "xpos", "ypos", "objectId", "classification", "pcaFeatures", "cluster").show(n=100, truncate=False)
 
