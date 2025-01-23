@@ -29,7 +29,7 @@ def classification(objectId):
                         json={"objectId": objectId, "output-format": "json"})  
       s = json.loads(r.text)  
       t = s[0]["v:classification"]
-      aclassifications[objectId] = t
+      classifications[objectId] = t
       classifications[objectId] = objectId
     except:
       classifications[objectId] = "failed:" + objectId
