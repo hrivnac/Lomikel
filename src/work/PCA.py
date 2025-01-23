@@ -30,9 +30,8 @@ def classification(objectId):
       s = json.loads(r.text)  
       t = s[0]["v:classification"]
       classifications[objectId] = t
-      classifications[objectId] = objectId
     except:
-      classifications[objectId] = "failed:" + objectId
+      classifications[objectId] = "failed"
   return classifications[objectId]
  
 classification_udf = udf(lambda x: classification(x), StringType())
