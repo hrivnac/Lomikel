@@ -27,9 +27,9 @@ def classification(objectId):
     try:
       r = requests.post("https://api.fink-portal.org/api/v1/objects",
                         json={"objectId": objectId, "output-format": "json"})  
-      #s = json.loads(r.text)  
-      #t = s[0]["v:classification"]
-      #classifications[objectId] = t
+      s = json.loads(r.text)  
+      t = s[0]["v:classification"]
+      classifications[objectId] = t
       classifications[objectId] = objectId
     except:
       classifications[objettId] = "failed"
