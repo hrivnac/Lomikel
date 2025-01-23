@@ -42,6 +42,7 @@ spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 print("*** DF ***")
 mapping = "rowkey STRING :key, " + \
           "objectId STRING i:objectId, " + \
+          "classification STRING i:objectId, " + \
           "jd FLOAT i:jd, " + \
           "xpos FLOAT i:xpos, " + \
           "ypos FLOAT i:ypos, " + \
@@ -57,7 +58,7 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(100)
 
-#df = df.withColumn("classification", classification_udf(df.objectId))
+df = df.withColumn("classification", classification_udf(df.objectId))
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
