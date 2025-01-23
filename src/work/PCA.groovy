@@ -71,7 +71,6 @@ if (id >= 0) {
     if (resultString != null) {
       result = new JSONObject(resultString);
       statex = result.getString("state");
-      println(statex)
       if (statex0 == null) {
         statex0 = statex;
         println("State: " + statex);
