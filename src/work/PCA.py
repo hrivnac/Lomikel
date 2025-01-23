@@ -21,10 +21,14 @@ from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
 
 def classification(objectId):
-  r = requests.post("https://api.fink-portal.org/api/v1/objects",
-                    json={"objectId": objectId, "output-format": "json"})  
-  s = json.loads(r.text)  
-  return s[0]["v:classification"]
+  try:
+    r = requests.post("https://api.fink-portal.org/api/v1/objects",
+                      json={"objectId": objectId, "output-format": "json"})  
+    s = json.loads(r.text)  
+    t = s[0]["v:classification"]
+    return t
+  except:
+    return "failed"
   
 classification_udf = udf(lambda x: classification(x), StringType())
 
@@ -58,7 +62,7 @@ pca = PCA(k=3, inputCol="features", outputCol="pcaFeatures")
 pipeline = Pipeline(stages=[vecAssembler, pca])
 model = pipeline.fit(df)
 result = model.transform(df)
-df.show(truncate=False)
+result.show(truncate=False)
 #  
 #  print("*** Clustering ***")
 #  kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
