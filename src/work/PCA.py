@@ -21,10 +21,12 @@ from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
 
 def classification(objectId):
-  r = requests.post("https://api.fink-portal.org/api/v1/objects",
-                    json={"objectId": objectId, "output-format": "json"})  
-  s = json.loads(r.text)  
-  return s[0]["v:classification"]
+  return objectId
+  
+#  r = requests.post("https://api.fink-portal.org/api/v1/objects",
+#                    json={"objectId": objectId, "output-format": "json"})  
+#  s = json.loads(r.text)  
+#  return s[0]["v:classification"]
   
 my_udf = udf(lambda x: classification(x), StringType())
 
@@ -46,7 +48,7 @@ cols = ["magpsf",
         "magnr",
         "sigmagnr",
         "magzpsci"]
-df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(100)
+df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(10)
 
 df = df.withColumn("classification", my_udf(df.objectId))
 
