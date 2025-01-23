@@ -22,7 +22,7 @@ r = requests.post("https://api.fink-portal.org/api/v1/objects",
 
 s = json.loads(r.text)
 
-print(s[0]["v:classification"])
+t = s[0]["v:classification"]
 
 spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 
@@ -61,6 +61,7 @@ clustered_result = kmeans_model.transform(result)
 #clustered_result.select("rowkey", "xpos", "ypos", "objectId", "pcaFeatures", "cluster").show(n=100, truncate=False)
 
 print("*** Centers ***")
+print(t)
 #centers = kmeans_model.clusterCenters()
 #for idx, center in enumerate(centers):
 #    print(f"Cluster {idx}: {center}")
