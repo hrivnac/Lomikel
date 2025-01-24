@@ -70,14 +70,13 @@ print("*** Clustering ***")
 kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
 kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
-#clustered_result.select("objectId", "cluster")
 cr = clustered_result.select("objectId", "cluster").withColumn("classification", classification_udf(df.objectId))
-cr.show(n=1000, truncate=False)
+#cr.show(n=1000, truncate=False)
 
 print("*** Centers ***")
-#centers = kmeans_model.clusterCenters()
-#for idx, center in enumerate(centers):
-#    print(f"Cluster {idx}: {center}")
+centers = kmeans_model.clusterCenters()
+for idx, center in enumerate(centers):
+    print(f"Cluster {idx}: {center}")
 
 print("*** Counts ***")
 #clustered_result.groupBy("cluster").count().show()
