@@ -70,7 +70,7 @@ print("*** Clustering ***")
 kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
 kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
-clustered_result.select("rowkey", "xpos", "ypos", "objectId", "pcaFeatures", "cluster")
+clustered_result.select("objectId", "cluster")
 cr = clustered_result.withColumn("classification", classification_udf(df.objectId))
 cr.show(n=200, truncate=False)
 
