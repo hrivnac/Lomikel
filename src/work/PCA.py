@@ -54,9 +54,7 @@ cols = ["magpsf",
         "magnr",
         "sigmagnr",
         "magzpsci"]
-df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(100)
-
-#df = df.withColumn("classification", classification_udf(df.objectId))
+df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(1000)
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
@@ -73,9 +71,8 @@ kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPrediction
 kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
 clustered_result.select("rowkey", "xpos", "ypos", "objectId", "pcaFeatures", "cluster")
-
 cr = clustered_result.withColumn("classification", classification_udf(df.objectId))
-cr.show(n=100, truncate=False)
+cr.show(n=200, truncate=False)
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
