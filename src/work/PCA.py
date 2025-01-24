@@ -72,7 +72,7 @@ kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
 #clustered_result.select("objectId", "cluster")
 cr = clustered_result.select("objectId", "cluster").withColumn("classification", classification_udf(df.objectId))
-cr.show(n=200, truncate=False)
+cr.show(n=1000, truncate=False)
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
