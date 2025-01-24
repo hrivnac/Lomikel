@@ -74,9 +74,9 @@ cr = clustered_result.select("objectId", "cluster").withColumn("classification",
 #cr.show(n=1000, truncate=False)
 
 print("*** Centers ***")
-centers = kmeans_model.clusterCenters()
-for idx, center in enumerate(centers):
-    print(f"Cluster {idx}: {center}")
+#centers = kmeans_model.clusterCenters()
+#for idx, center in enumerate(centers):
+#  print(f"Cluster {idx}: {center}")
 
 print("*** Counts ***")
 #clustered_result.groupBy("cluster").count().show()
