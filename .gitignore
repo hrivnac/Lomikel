@@ -2,6 +2,8 @@
 /ant/Notes.txt
 /ant/db
 /ant/log
+/bin/*
+/data/*
 /lib/*
 /build/*
 /run/*
