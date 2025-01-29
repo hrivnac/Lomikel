@@ -20,7 +20,6 @@ import org.apache.hadoop.hbase.TableExistsException;
 
 // Java
 import java.lang.Math;
-import static java.lang.Math.PI;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;

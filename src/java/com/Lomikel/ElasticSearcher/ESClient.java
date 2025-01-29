@@ -1,6 +1,7 @@
 package com.Lomikel.ElasticSearcher;
 
 import com.Lomikel.Utils.SmallHttpClient;
+import static com.Lomikel.Utils.Constants.π;
 import com.Lomikel.Utils.LomikelException;
 
 // org.json      
@@ -35,6 +36,7 @@ public class ESClient {
   public ESClient(String url) {
     log.info("Connection to " + url);
     _url = url;
+    String Δ = "a";
     }
     
   // Create index ==============================================================  
@@ -193,7 +195,7 @@ public class ESClient {
                                      double ang) throws LomikelException {
     double lat = dec;
     double lon = ra - 180;
-    double dist = ang * Math.PI * 6371008.7714 / 180.0; //org.elasticsearch.common.geo.GeoUtils.EARTH_MEAN_RADIUS                                                                                                                                               
+    double dist = ang * π * 6371008.7714 / 180.0; //org.elasticsearch.common.geo.GeoUtils.EARTH_MEAN_RADIUS                                                                                                                                               
     return search(idxName, new JSONObject().put("query",
                            new JSONObject().put("geo_distance",
                                                 new JSONObject().put(fieldName,

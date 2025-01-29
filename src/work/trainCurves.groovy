@@ -57,6 +57,8 @@ testSize =  (int)(numLabelClasses * blockSize - trainSize);
 nEpochs = 40;
 
 // Get data
+// gr.lst file should contain numLabelClasses sets of training data,
+//        each set with blockSize of cases
 
 c = new DataOrganizer("../data/lc/");
 data = new File("../data/gr.lst").text;

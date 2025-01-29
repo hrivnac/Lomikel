@@ -11,6 +11,8 @@ import com.Lomikel.Utils.LomikelException;
 public interface Classifier {
   
   /** Classify <em>source</em> and expand them to alerts (if requested).
+    * It should register classes corresponding to specified <tt>objectId</tt>
+    * using {@link FinkGremlinRecipies#registerSourcesOfInterest(Classifiers, String, String, double, String, String, boolean, String)}.
     * @param recipies   The {@link FinkGremlinRecipies} caller.
     * @param oid        The <tt>objectId</tt> of source to be added.
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
