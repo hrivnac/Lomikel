@@ -1,13 +1,13 @@
-// https://fink-portal.org/api
+// https://api.fink-portal.org/api
 
 import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 
-FINK_OBJECTS_WS = "https://fink-portal.org/api/v1/objects";
-FINK_LATESTS_WS = "https://fink-portal.org/api/v1/latests";
-FINK_ANOMALY_WS = "https://fink-portal.org/api/v1/anomaly";
+FINK_OBJECTS_WS = "https://api.fink-portal.org/api/v1/objects";
+FINK_LATESTS_WS = "https://api.fink-portal.org/api/v1/latests";
+FINK_ANOMALY_WS = "https://api.fink-portal.org/api/v1/anomaly";
 
 cal = Calendar.getInstance();
 cal.add(Calendar.HOUR, -1);

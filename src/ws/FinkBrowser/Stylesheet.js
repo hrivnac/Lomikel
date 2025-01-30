@@ -106,7 +106,7 @@ stylesheet.nodes.source = {
   actions:[                                                                 
     {name:"Show",        url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"                    }, target:"result"  },
     {name:"Table",       url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"                   }, target:"table"   },
-    {name:"Fink Portal", url:{gremlin:"values('objectId').toList()[0].replaceFirst(\"^\", \"https://fink-portal.org/\")"}, target:"external"}    
+    {name:"Fink Portal", url:{gremlin:"values('objectId').toList()[0].replaceFirst(\"^\", \"https://api.fink-portal.org/\")"}, target:"external"}    
     ]
   }
 stylesheet.nodes.PCA = {

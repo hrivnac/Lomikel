@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkPortalClassifier</code> classifies sources according to
-  * <a href="https://fink-portal.org/api">Fink Portal</a> REST service
+  * <a href="https://api.fink-portal.org/api">Fink Portal</a> REST service
   * and smears results by 10%.
   * @opt attributes
   * @opt operations
