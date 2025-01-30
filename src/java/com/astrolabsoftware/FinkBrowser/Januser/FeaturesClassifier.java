@@ -71,6 +71,7 @@ public class FeaturesClassifier implements Classifier {
                              toArray();
           for (int i = 0; i < 26; i++) {
             if (featuresD[i] != Double.NaN) {
+              log.info(featuresD[i]);
               cl = c + i;
               if (classes.containsKey(cl)) {
                 jds = classes.get(cl);
