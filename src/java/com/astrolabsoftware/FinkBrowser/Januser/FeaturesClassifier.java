@@ -91,7 +91,7 @@ public class FeaturesClassifier implements Classifier {
     for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
       key = cls.getKey();
       val = cls.getValue();
-      weight = totals.get(cls) / val.size();
+      weight = totals.get(key) / val.size();
       log.info("\t" + key + " in " + weight + " alerts: " + val);
       //recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
