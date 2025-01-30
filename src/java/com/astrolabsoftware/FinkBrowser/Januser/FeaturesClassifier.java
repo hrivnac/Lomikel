@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // Java
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
@@ -33,47 +34,66 @@ public class FeaturesClassifier implements Classifier {
                        String              hbaseUrl,
                        boolean             enhance,
                        String              columns) throws LomikelException {
-    log.info(client(hbaseUrl));
-    //JSONArray ja;
-    //JSONObject jo;
-    //Map<String, Set<Double>> classes; // cls -> [jd]
-    //String cl;
-    //double jd;
-    //Set<Double> jds;
-    //String key;
-    //Set<Double> val;
-    //int weight;
-    //ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
-    //                                  put("output-format", "json"));
-    //classes =  new TreeMap<>();
-    //// get all alerts (jd) and their classes
-    //for (int i = 0; i < ja.length(); i++) {
-    //  jo = ja.getJSONObject(i);
-    //  cl = jo.getString("v:classification");
-    //  jd = jo.getDouble("i:jd");
-    //  if (!cl.equals("Unknown")) {
-    //    if (classes.containsKey(cl)) {
-    //      jds = classes.get(cl);
-    //      jds.add(jd);
-    //      }
-    //    else {
-    //      jds = new TreeSet<Double>();
-    //      jds.add(jd);
-    //      classes.put(cl, jds);
-    //      }
-    //    }
-    //  }
-    //for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
-    //  key = cls.getKey();
-    //  val = cls.getValue();
-    //  weight = val.size();
-    //  log.info("\t" + key + " in " + weight + " alerts");
-    //  recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
-    //  }
+    double jd;
+    String cl;
+    double[] featuresR;
+    double[] featuresG;
+    Map<String, Set<Double>> classes; // cl -> [jd]
+    Set<Double> jds;
+    String key;
+    Set<Double> val;
+    int weight;
+    Map<String, Map<String, String>> alerts = client(hbaseUrl).scan(null,
+                                                                    "key:key:" + oid + ":prefix",
+                                                                    "i:jd,d:lc_features_g,d:lc_features_r",
+                                                                    0,
+                                                                    0,
+                                                                    false,
+                                                                    false);
+    classes =  new TreeMap<>();
+    // get all alerts (jd) and their features (classses)
+    for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
+      jd = Double.parseDouble(entry.getValue().get("i:jd"));
+      featuresR = Arrays.stream(entry.getValue().get("d:lc_features_r").replaceFirst("[", "").replaceAll("]$", "").split(",")).mapToDouble(Double::parseDouble).toArray();
+      featuresG = Arrays.stream(entry.getValue().get("d:lc_features_g").replaceFirst("[", "").replaceAll("]$", "").split(",")).mapToDouble(Double::parseDouble).toArray();
+      for (int i = 0; i < 26; i++) {
+        if (featuresR[i] != Double.NaN) {
+          cl = "r" + i;
+          if (classes.containsKey(cl)) {
+            jds = classes.get(cl);
+            jds.add(jd);
+            }
+          else {
+            jds = new TreeSet<Double>();
+            jds.add(jd);
+            classes.put(cl, jds);
+            }
+          }
+        if (featuresG[i] != Double.NaN) {
+          cl = "g" + i;
+          if (classes.containsKey(cl)) {
+            jds = classes.get(cl);
+            jds.add(jd);
+            }
+          else {
+            jds = new TreeSet<Double>();
+            jds.add(jd);
+            classes.put(cl, jds);
+            }
+          }
+        }    
+      }
+    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
+      key = cls.getKey();
+      val = cls.getValue();
+      weight = val.size();
+      log.info("\t" + key + " in " + weight + " alerts: " + val);
+      recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
+      }
     }
     
   /** TBD */
-  private HBaseClient client(String hbaseUrl) throws LomikelException{
+  private HBaseClient client(String hbaseUrl) throws LomikelException {
     if (_client == null) {
       String[] hbaseUrlA = hbaseUrl.split(":");
       if (hbaseUrlA.length < 4) {
