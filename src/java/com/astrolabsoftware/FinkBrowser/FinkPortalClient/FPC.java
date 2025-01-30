@@ -33,7 +33,7 @@ public class FPC {
     }
      
   /** Call <em>Fink Science Portal <b>latests</b></em> Web Service.
-    * <a href="https://fink-portal.org/api/v1/latests">https://fink-portal.org/api/v1/latests</a>.
+    * <a href="https://api.fink-portal.org/api/v1/latests">https://fink-portal.org/api/v1/latests</a>.
     * @param request  The requested formulated as {@link JSONObject}.
     * @param endpoint The service endpoint.
     * @return         The answer formulated as {@link JSONArray}.
@@ -69,7 +69,7 @@ public class FPC {
 
   public static SmallHttpClient shc = new SmallHttpClient();
   
-  private static String FINK_SCIENCE_PORTAL = "https://fink-portal.org/api/v1";
+  private static String FINK_SCIENCE_PORTAL = "https://api.fink-portal.org/api/v1";
   private static String OBJECTS_WS = "objects";
   private static String LATESTS_WS = "latests";
   private static String ANOMALY_WS = "anomaly";
