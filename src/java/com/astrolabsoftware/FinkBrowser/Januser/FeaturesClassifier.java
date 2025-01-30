@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// BUG: jd should be String or long
 public class FeaturesClassifier implements Classifier {
   
   @Override
@@ -40,10 +41,11 @@ public class FeaturesClassifier implements Classifier {
     String[] featuresS;
     double[] featuresD;
     Map<String, Set<Double>> classes; // cl -> [jd]
+    Map<String, Double>      totals;  // cl -> total weight
     Set<Double> jds;
     String key;
     Set<Double> val;
-    int weight;
+    double weight;
     Map<String, Map<String, String>> alerts = client(hbaseUrl).scan(null,
                                                                     "key:key:" + oid + ":prefix",
                                                                     "i:jd,d:lc_features_g,d:lc_features_r",
@@ -51,7 +53,8 @@ public class FeaturesClassifier implements Classifier {
                                                                     0,
                                                                     false,
                                                                     false);
-    classes =  new TreeMap<>();
+    classes = new TreeMap<>();
+    totals  = new TreeMap<>();
     // get all alerts (jd) and their features (classses)
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       value = entry.getValue();
@@ -72,11 +75,13 @@ public class FeaturesClassifier implements Classifier {
               if (classes.containsKey(cl)) {
                 jds = classes.get(cl);
                 jds.add(jd);
+                totals.put(cl, featuresD[i]);
                 }
               else {
                 jds = new TreeSet<Double>();
                 jds.add(jd);
                 classes.put(cl, jds);
+                totals.put(cl, totals.get(cl) + featuresD[i]);
                 }
               }
             }    
@@ -86,7 +91,7 @@ public class FeaturesClassifier implements Classifier {
     for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
       key = cls.getKey();
       val = cls.getValue();
-      weight = val.size();
+      weight = totals.get(cls) / val.size();
       log.info("\t" + key + " in " + weight + " alerts: " + val);
       //recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
