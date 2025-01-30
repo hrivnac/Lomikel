@@ -55,6 +55,7 @@ public class FeaturesClassifier implements Classifier {
     // get all alerts (jd) and their features (classses)
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       jd = Double.parseDouble(entry.getValue().get("i:jd"));
+      log.info(entry.getValue());
       features = entry.getValue().get("d:lc_features_r").replaceFirst("[", "").replaceAll("]$", "").split(",");
       featuresR = Arrays.stream(features).mapToDouble(Double::parseDouble).toArray();
       features = entry.getValue().get("d:lc_features_g").replaceFirst("[", "").replaceAll("]$", "").split(",");
