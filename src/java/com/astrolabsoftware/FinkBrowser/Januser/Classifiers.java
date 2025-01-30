@@ -19,6 +19,12 @@ public enum Classifiers {
       return new FinkPortal10Classifier();
       }
     },
+  FEATURES {
+    @Override
+    public Classifier instance() {
+      return new FeaturesClassifier();
+      }
+    },
   UNKNOWN {
     @Override
     public Classifier instance() {

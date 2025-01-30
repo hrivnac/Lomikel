@@ -1,5 +1,12 @@
-# Filling
-# src/sh/cron/fillES.sh
+# functional
+# runs daily from cron
+# uses Asych HBase client
+# ToDo:
+#   add more types
+#   use full ES deployment
+
+# Filling (daily from cron)
+src/sh/cron/fillES.sh
 
 # Using
-# src/groovy/testESClient.groovy
+src/groovy/testESClient.groovy

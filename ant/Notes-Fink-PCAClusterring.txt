@@ -1,3 +1,6 @@
+# ToDo:
+#   use sources instead of alerts
+
 # at Livy
 hadoop fs -put -f PCA.py
 

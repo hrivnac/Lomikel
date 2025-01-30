@@ -1,2 +1,8 @@
-# src/work/collectCurves.groovy
-# src/work/trainCurves.groovy
+# ToDo:
+#   use full LightCurves
+
+# Filling
+src/work/collectCurves.groovy
+
+# Classification
+src/work/trainCurves.groovy
