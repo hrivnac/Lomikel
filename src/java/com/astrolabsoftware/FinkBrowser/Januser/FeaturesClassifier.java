@@ -36,9 +36,9 @@ public class FeaturesClassifier implements Classifier {
                        String              columns) throws LomikelException {
     double jd;
     String cl;
-    String[] features;
-    double[] featuresR;
-    double[] featuresG;
+    Map<String, String> value;
+    String[] featuresS;
+    double[] featuresD;
     Map<String, Set<Double>> classes; // cl -> [jd]
     Set<Double> jds;
     String key;
@@ -54,45 +54,35 @@ public class FeaturesClassifier implements Classifier {
     classes =  new TreeMap<>();
     // get all alerts (jd) and their features (classses)
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
-      jd = Double.parseDouble(entry.getValue().get("i:jd"));
-      log.info(entry.getValue());
-      //features = entry.getValue().get("d:lc_features_r").replaceFirst("[", "").replaceAll("]$", "").split(",");
-      //featuresR = Arrays.stream(features).mapToDouble(Double::parseDouble).toArray();
-      //features = entry.getValue().get("d:lc_features_g").replaceFirst("[", "").replaceAll("]$", "").split(",");
-      //featuresG = Arrays.stream(features).mapToDouble(Double::parseDouble).toArray();
-      //for (int i = 0; i < 26; i++) {
-      //  if (featuresR[i] != Double.NaN) {
-      //    cl = "r" + i;
-      //    if (classes.containsKey(cl)) {
-      //      jds = classes.get(cl);
-      //      jds.add(jd);
-      //      }
-      //    else {
-      //      jds = new TreeSet<Double>();
-      //      jds.add(jd);
-      //      classes.put(cl, jds);
-      //      }
-      //    }
-      //  if (featuresG[i] != Double.NaN) {
-      //    cl = "g" + i;
-      //    if (classes.containsKey(cl)) {
-      //      jds = classes.get(cl);
-      //      jds.add(jd);
-      //      }
-      //    else {
-      //      jds = new TreeSet<Double>();
-      //      jds.add(jd);
-      //      classes.put(cl, jds);
-      //      }
-      //    }
-      //  }    
+      value = entry.getValue();
+      jd = Double.parseDouble(value.get("i:jd"));
+      for (String c : new String[]{"r", "g"}) {
+        if (value.containsKey("d:lc_features_" + c)) {
+          featuresS = entry.getValue().get("d:lc_features_" + c).replaceFirst("[", "").replaceAll("]$", "").split(",");
+          featuresD = Arrays.stream(featuresS).mapToDouble(Double::parseDouble).toArray();
+          for (int i = 0; i < 26; i++) {
+            if (featuresD[i] != Double.NaN) {
+              cl = c + i;
+              if (classes.containsKey(cl)) {
+                jds = classes.get(cl);
+                jds.add(jd);
+                }
+              else {
+                jds = new TreeSet<Double>();
+                jds.add(jd);
+                classes.put(cl, jds);
+                }
+              }
+            }    
+          }
+        }
       }
     for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
       key = cls.getKey();
       val = cls.getValue();
       weight = val.size();
       log.info("\t" + key + " in " + weight + " alerts: " + val);
-      recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
+      //recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     }
     
