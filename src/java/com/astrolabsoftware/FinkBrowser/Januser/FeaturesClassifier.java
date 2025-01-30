@@ -58,6 +58,7 @@ public class FeaturesClassifier implements Classifier {
       jd = Double.parseDouble(value.get("i:jd"));
       for (String c : new String[]{"r", "g"}) {
         if (value.containsKey("d:lc_features_" + c)) {
+          log.info(value.get("d:lc_features_" + c));
           featuresS = value.get("d:lc_features_" + c).replaceFirst("\\[", "").replaceAll("]$", "").split(",");
           featuresD = Arrays.stream(featuresS).mapToDouble(Double::parseDouble).toArray();
           for (int i = 0; i < 26; i++) {

@@ -34,7 +34,7 @@ public class FinkPortalClassifier implements Classifier {
                        String              columns) throws LomikelException {
     JSONArray ja;
     JSONObject jo;
-    Map<String, Set<Double>> classes; // cls -> [jd]
+    Map<String, Set<Double>> classes; // cl -> [jd]
     String cl;
     double jd;
     Set<Double> jds;

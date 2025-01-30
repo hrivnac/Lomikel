@@ -195,12 +195,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     long startTime = System.currentTimeMillis();
     // loop over all sources
     for (String oid : oids) {
+      log.info(oid + " (" + n + " of " + size + "):");
       try {
         classifySource(classifier, oid, hbaseUrl, enhance, columns);
         n++;
         dt = (System.currentTimeMillis() - startTime) / 1000;
         freq = (double)n / (double)dt;
-        log.info(oid + " (" + n + " of " + size + " with " + String.format("%.2f", freq) + " Hz):");
+        log.info("\t\twith " + String.format("%.2f", freq) + " Hz):");
         }
       catch (LomikelException e) {
         log.error("Cannot get classification for " + oid);
