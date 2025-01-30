@@ -43,7 +43,7 @@ public class FPC {
     }
     
   /** Call <em>Fink Science Portal <b>anomaly</b></em> Web Service.
-    * <a href="https://fink-portal.org/api/v1/anomaly">https://fink-portal.org/api/v1/anomaly</a>.
+    * <a href="https://api.fink-portal.org/api/v1/anomaly">https://fink-portal.org/api/v1/anomaly</a>.
     * @param request  The requested formulated as {@link JSONObject}.
     * @param endpoint The service endpoint.
     * @return         The answer formulated as {@link JSONArray}.
