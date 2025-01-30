@@ -36,6 +36,7 @@ public class FeaturesClassifier implements Classifier {
                        String              columns) throws LomikelException {
     double jd;
     String cl;
+    String[] features;
     double[] featuresR;
     double[] featuresG;
     Map<String, Set<Double>> classes; // cl -> [jd]
@@ -54,8 +55,10 @@ public class FeaturesClassifier implements Classifier {
     // get all alerts (jd) and their features (classses)
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       jd = Double.parseDouble(entry.getValue().get("i:jd"));
-      featuresR = Arrays.stream(entry.getValue().get("d:lc_features_r").replaceFirst("[", "").replaceAll("]$", "").split(",")).mapToDouble(Double::parseDouble).toArray();
-      featuresG = Arrays.stream(entry.getValue().get("d:lc_features_g").replaceFirst("[", "").replaceAll("]$", "").split(",")).mapToDouble(Double::parseDouble).toArray();
+      features = entry.getValue().get("d:lc_features_r").replaceFirst("[", "").replaceAll("]$", "").split(",");
+      featuresR = Arrays.stream(features).mapToDouble(Double::parseDouble).toArray();
+      features = entry.getValue().get("d:lc_features_g").replaceFirst("[", "").replaceAll("]$", "").split(",");
+      featuresG = Arrays.stream(features).mapToDouble(Double::parseDouble).toArray();
       for (int i = 0; i < 26; i++) {
         if (featuresR[i] != Double.NaN) {
           cl = "r" + i;
