@@ -75,13 +75,13 @@ public class FeaturesClassifier implements Classifier {
               if (classes.containsKey(cl)) {
                 jds = classes.get(cl);
                 jds.add(jd);
-                totals.put(cl, featuresD[i]);
+                totals.put(cl, totals.get(cl) + featuresD[i]);
                 }
               else {
                 jds = new TreeSet<Double>();
                 jds.add(jd);
                 classes.put(cl, jds);
-                totals.put(cl, totals.get(cl) + featuresD[i]);
+                totals.put(cl, featuresD[i]);
                 }
               }
             }    
