@@ -201,7 +201,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         n++;
         dt = (System.currentTimeMillis() - startTime) / 1000;
         freq = (double)n / (double)dt;
-        log.info("\t\twith " + String.format("%.2f", freq) + " Hz):");
+        log.info("\t\twith " + String.format("%.2f", freq) + " Hz");
         }
       catch (LomikelException e) {
         log.error("Cannot get classification for " + oid);
