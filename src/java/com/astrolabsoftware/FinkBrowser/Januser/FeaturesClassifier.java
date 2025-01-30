@@ -92,7 +92,7 @@ public class FeaturesClassifier implements Classifier {
       key = cls.getKey();
       val = cls.getValue();
       weight = totals.get(key) / val.size();
-      log.info("\t" + key + " in " + weight + " alerts: " + val);
+      log.info("\t" + key + " in " + weight + " alerts");
       //recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     }
