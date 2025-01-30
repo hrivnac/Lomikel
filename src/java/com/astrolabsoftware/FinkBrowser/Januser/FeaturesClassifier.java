@@ -59,7 +59,7 @@ public class FeaturesClassifier implements Classifier {
       for (String c : new String[]{"r", "g"}) {
         if (value.containsKey("d:lc_features_" + c)) {
           log.info(value.get("d:lc_features_" + c));
-          featuresS = value.get("d:lc_features_" + c).replaceFirst("\\[", "").replaceAll("]$", "").split(",").replaceAll("null", "0.0");
+          featuresS = value.get("d:lc_features_" + c).replaceFirst("\\[", "").replaceAll("]$", "").replaceAll("null", "0.0").split(",");
           featuresD = Arrays.stream(featuresS).mapToDouble(Double::parseDouble).toArray();
           for (int i = 0; i < 26; i++) {
             if (featuresD[i] != Double.NaN) {
