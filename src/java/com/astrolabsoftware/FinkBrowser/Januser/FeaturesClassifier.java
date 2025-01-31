@@ -96,8 +96,10 @@ public class FeaturesClassifier implements Classifier {
       recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     }
-    
-  /** TBD */
+  
+  /** Give {@link HBaseClient} to current database. Singleton.
+    * @param hbaseUrl The full HBase url <tt>ip:port:table:schema</tt>.
+    * @return         The corresponding {@link HBaseClient}. */
   private HBaseClient client(String hbaseUrl) throws LomikelException {
     if (_client == null) {
       String[] hbaseUrlA = hbaseUrl.split(":");

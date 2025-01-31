@@ -182,13 +182,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
-    * @param m0 The first classifier {@link Map}.
-    * @param m  The second classifier {@link Map}.
-    *           Entries, not present also in m0, will be ignored.
-    * @return   The distance  between two {@link Map}s. */
+    * @param m0            The first classifier {@link Map}.
+    * @param m             The second classifier {@link Map}.
+    *                      Entries, not present also in m0, will be ignored.
+    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
+    *                      Default: <tt>false</tt>.
+    * @return              The distance between two {@link Map}s. */
   def double sourceDistance(Map<String, Double> m0,
-                            Map<String, Double> m) {
-    def dist = 0;
+                            Map<String, Double> m,
+                            boolean             ignorePartial = false) {
+    def dist = Double.MAX_VALUE;
     def key1;
     def key2;
     def w01;
@@ -208,11 +211,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           w02 = entry2.getValue();
           wx1 = m[key1] == null ? 0 : m[key1];
           wx2 = m[key2] == null ? 0 : m[key2];
-          w012 = w01 + w02;
-          wx12 = wx1 + wx2;
-          w0 = w012 == 0 ? 0 : Math.abs(w01 - w02) / w012;
-          wx = wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12;
-          dist += Math.pow(w0 - wx, 2);
+          if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
+            w012 = w01 + w02;
+            wx12 = wx1 + wx2;
+            w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
+            wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
+            dist += Math.pow(w0 - wx, 2);
+            }
           }
         }
       }
