@@ -94,21 +94,24 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give {@link Map} of other <em>source</em>s ordered
     * by distance to the specified <em>source</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
-    * @param oid0       The <em>objectOd</em> of the <em>source</em>.
-    * @param oidS       A {@link List} of <em>source</em> objectIds to only avaluated.
-    *                   If <tt>null</tt>, all <em>source</em>s will be evaluated.
-    * @param classes0A  A {@link List} of <em>SourceOfInterest</em> classes to be
-    *                   used in comparison.
-    *                   All <em>SourceOfInterest</em> classes of thr specified
-    *                  <em>source</em> will be used if <tt>null</tt>.
-    * @param classifier The classifier name to be used.
-    * @param nmax       The number of closest <em>source</em>s to give.
-    *                   All are given, if missing.
-    * @return           The distances to other sources, order by the distance. */
+    * @param oid0          The <em>objectOd</em> of the <em>source</em>.
+    * @param oidS          A {@link List} of <em>source</em> objectIds to only avaluated.
+    *                      If <tt>null</tt>, all <em>source</em>s will be evaluated.
+    * @param classes0A     A {@link List} of <em>SourceOfInterest</em> classes to be
+    *                      used in comparison.
+    *                      All <em>SourceOfInterest</em> classes of thr specified
+    *                      <em>source</em> will be used if <tt>null</tt>.
+    * @param classifier    The classifier name to be used.
+    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
+    *                      Default: <tt>false</tt>.
+    * @param nmax          The number of closest <em>source</em>s to give.
+    *                      All are given, if missing.
+    * @return              The distances to other sources, order by the distance. */
   def Map<String, Double> sourceNeighborhood(String       oid0,
                                              List<String> oidS,
                                              List<String> classes0,
                                              String       classifier,
+                                             boolean      ignorePartial = false) {
                                              int          nmax = Integer.MAX_VALUE) {
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
