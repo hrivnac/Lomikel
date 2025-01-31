@@ -114,7 +114,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
       }
-    def classifierClasses = g.V().has('lbl', 'SourcesOfInterest').has('classifier', 'FINK_PORTAL').values('cls').toSet().next();
+    def classifierClasses = g().V().has('lbl', 'SourcesOfInterest').has('classifier', 'FINK_PORTAL').values('cls').toSet().next();
     log.info(classifierClasses);
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
@@ -124,9 +124,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    by(outV().values('cls')).
                    by(values('weight')).
                    each {it ->
-                         if (it['classifier'] = classifier) {
-                           if (classes0 == null || it['cls'] in classes0) {
-                             m0[it['cls']] = it['w'];
+                         if (it['classifier'] == classifier) {
+                           if (it['cls'] in classifierClasses) {
+                             if (classes0 == null || it['cls'] in classes0) {
+                               m0[it['cls']] = it['w'];
+                               }
                              }
                            }
                          }
