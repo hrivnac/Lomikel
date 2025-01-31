@@ -111,7 +111,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                              List<String> oidS,
                                              List<String> classes0,
                                              String       classifier,
-                                             boolean      ignorePartial = false) {
+                                             boolean      ignorePartial = false,
                                              int          nmax = Integer.MAX_VALUE) {
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
@@ -176,7 +176,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                    }
                                  }
                   m = normalizeMap(m);
-                  def dist = sourceDistance(m0, m);
+                  def dist = sourceDistance(m0, m, ignorePartial);
                   if (dist > 0) {
                     distances[oid] = dist;
                     }     
