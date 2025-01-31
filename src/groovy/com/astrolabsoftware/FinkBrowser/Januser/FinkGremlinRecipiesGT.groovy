@@ -80,13 +80,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give {@link Map} of other <em>source</em>s ordered
     * by distance to the specified <em>source</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
-    * @param oid0       The <em>objectOd</em> of the <em>source</em>.
-    * @param classifier The classifier name to be used.
-    * @param nmax       The number of closest <em>source</em>s to give.
-    *                   All are given, if missing.
-    * @return           The distances to other sources, order by the distance. */
+    * @param oid0          The <em>objectOd</em> of the <em>source</em>.
+    * @param classifier    The classifier name to be used.
+    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
+    *                      Default: <tt>false</tt>.
+    * @param nmax          The number of closest <em>source</em>s to give.
+    *                      All are given, if missing.
+    * @return              The distances to other sources, order by the distance. */
   def Map<String, Double> sourceNeighborhood(String       oid0,
                                              String       classifier,
+                                             boolean      ignorePartial = false,
                                              int          nmax = Integer.MAX_VALUE) {
     return sourceNeighborhood(oid0, null, null, classifier, nmax);
     }
@@ -214,14 +217,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           w02 = entry2.getValue();
           wx1 = m[key1] == null ? 0 : m[key1];
           wx2 = m[key2] == null ? 0 : m[key2];
-          if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
+          //if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
             w012 = w01 + w02;
             wx12 = wx1 + wx2;
             w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
             wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
             dist += Math.pow(w0 - wx, 2);
             }
-          }
+          //}
         }
       }
     return dist;
