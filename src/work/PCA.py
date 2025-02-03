@@ -72,31 +72,31 @@ df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull()
 split_g = split(df["lc_features_g"], ",")
 split_r = split(df["lc_features_r"], ",")
 
-df = df.withColumn("g00", split_g.getItem(0).cast(DoubleType)).\
-        withColumn("g01", split_g.getItem(1).cast(DoubleType)).\
-        withColumn("g02", split_g.getItem(2).cast(DoubleType)).\
-        withColumn("g03", split_g.getItem(3).cast(DoubleType)).\
-        withColumn("g04", split_g.getItem(4).cast(DoubleType)).\
-        withColumn("g05", split_g.getItem(5).cast(DoubleType)).\
-        withColumn("g06", split_g.getItem(6).cast(DoubleType)).\
-        withColumn("g07", split_g.getItem(7).cast(DoubleType)).\
-        withColumn("g08", split_g.getItem(8).cast(DoubleType)).\
-        withColumn("g09", split_g.getItem(9).cast(DoubleType)).\
-        withColumn("g10", split_g.getItem(10).cast(DoubleType)).\
-        withColumn("g11", split_g.getItem(11).cast(DoubleType)).\
-        withColumn("g12", split_g.getItem(12).cast(DoubleType)).\
-        withColumn("g13", split_g.getItem(13).cast(DoubleType)).\
-        withColumn("g14", split_g.getItem(14).cast(DoubleType)).\
-        withColumn("g15", split_g.getItem(15).cast(DoubleType)).\
-        withColumn("g16", split_g.getItem(16).cast(DoubleType)).\
-        withColumn("g17", split_g.getItem(17).cast(DoubleType)).\
-        withColumn("g18", split_g.getItem(18).cast(DoubleType)).\
-        withColumn("g19", split_g.getItem(19).cast(DoubleType)).\
-        withColumn("g20", split_g.getItem(20).cast(DoubleType)).\
-        withColumn("g21", split_g.getItem(21).cast(DoubleType)).\
-        withColumn("g22", split_g.getItem(22).cast(DoubleType)).\
-        withColumn("g23", split_g.getItem(23).cast(DoubleType)).\
-        withColumn("g24", split_g.getItem(24).cast(DoubleType))
+df = df.withColumn("g00", split_g.getItem(0).cast(DoubleType))
+##         withColumn("g01", split_g.getItem(1).cast(DoubleType)).\
+##         withColumn("g02", split_g.getItem(2).cast(DoubleType)).\
+##         withColumn("g03", split_g.getItem(3).cast(DoubleType)).\
+##         withColumn("g04", split_g.getItem(4).cast(DoubleType)).\
+##         withColumn("g05", split_g.getItem(5).cast(DoubleType)).\
+##         withColumn("g06", split_g.getItem(6).cast(DoubleType)).\
+##         withColumn("g07", split_g.getItem(7).cast(DoubleType)).\
+##         withColumn("g08", split_g.getItem(8).cast(DoubleType)).\
+##         withColumn("g09", split_g.getItem(9).cast(DoubleType)).\
+##         withColumn("g10", split_g.getItem(10).cast(DoubleType)).\
+##         withColumn("g11", split_g.getItem(11).cast(DoubleType)).\
+##         withColumn("g12", split_g.getItem(12).cast(DoubleType)).\
+##         withColumn("g13", split_g.getItem(13).cast(DoubleType)).\
+##         withColumn("g14", split_g.getItem(14).cast(DoubleType)).\
+##         withColumn("g15", split_g.getItem(15).cast(DoubleType)).\
+##         withColumn("g16", split_g.getItem(16).cast(DoubleType)).\
+##         withColumn("g17", split_g.getItem(17).cast(DoubleType)).\
+##         withColumn("g18", split_g.getItem(18).cast(DoubleType)).\
+##         withColumn("g19", split_g.getItem(19).cast(DoubleType)).\
+##         withColumn("g20", split_g.getItem(20).cast(DoubleType)).\
+##         withColumn("g21", split_g.getItem(21).cast(DoubleType)).\
+##         withColumn("g22", split_g.getItem(22).cast(DoubleType)).\
+##         withColumn("g23", split_g.getItem(23).cast(DoubleType)).\
+##         withColumn("g24", split_g.getItem(24).cast(DoubleType))
         
 ## df = df.withColumn("r00", split_r.getItem(0).cast(DoubleType)).\
 ##         withColumn("r01", split_r.getItem(1).cast(DoubleType)).\
