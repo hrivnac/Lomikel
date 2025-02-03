@@ -56,23 +56,25 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(1000)
 
-print("*** VectorAssembler ***")
-vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
-  
-print ("*** PCA ***")
-pca = PCA(k=5, inputCol="features", outputCol="pcaFeatures")
-pipeline = Pipeline(stages=[vecAssembler, pca])
-model = pipeline.fit(df)
-result = model.transform(df)
-#result.show(truncate=False)
-  
-print("*** Clustering ***")
-kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
-kmeans_model = kmeans.fit(result)
-clustered_result = kmeans_model.transform(result)
-cr = clustered_result.select("objectId", "cluster").withColumn("classification", classification_udf(df.objectId))
-#cr.show(n=1000, truncate=False)
-cr.write.format("csv").save("/tmp/cr")
+df.show(truncate=False)
+
+##print("*** VectorAssembler ***")
+##vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
+##  
+##print ("*** PCA ***")
+##pca = PCA(k=5, inputCol="features", outputCol="pcaFeatures")
+##pipeline = Pipeline(stages=[vecAssembler, pca])
+##model = pipeline.fit(df)
+##result = model.transform(df)
+###result.show(truncate=False)
+##  
+##print("*** Clustering ***")
+##kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
+##kmeans_model = kmeans.fit(result)
+##clustered_result = kmeans_model.transform(result)
+##cr = clustered_result.select("objectId", "cluster").withColumn("classification", classification_udf(df.objectId))
+###cr.show(n=1000, truncate=False)
+##cr.write.format("csv").save("/tmp/cr")
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
