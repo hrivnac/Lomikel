@@ -64,7 +64,7 @@ df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull()
 
 print(df.select(df.lc_features_g).schema)
                    
-df.show(truncate=False)
+#df.show(truncate=False)
 
 ##print("*** VectorAssembler ***")
 ##vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
