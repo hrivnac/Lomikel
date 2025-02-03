@@ -72,8 +72,8 @@ df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull()
 split_g = split(df["lc_features_g"], ",")
 split_r = split(df["lc_features_r"], ",")
 
-df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType())).\
-        withColumn("g01", split_g.getItem( 1).cast(DoubleType()))
+df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()).na.fill(0, Seq("g01")).\
+        withColumn("g01", split_g.getItem( 1).cast(DoubleType()).na.fill(0, Seq("g02"))
 ##         withColumn("g02", split_g.getItem( 2).cast(DoubleType())).\
 ##         withColumn("g03", split_g.getItem( 3).cast(DoubleType())).\
 ##         withColumn("g04", split_g.getItem( 4).cast(DoubleType())).\
@@ -97,9 +97,9 @@ df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType())).\
 ##         withColumn("g22", split_g.getItem(22).cast(DoubleType())).\
 ##         withColumn("g23", split_g.getItem(23).cast(DoubleType())).\
 ##         withColumn("g24", split_g.getItem(24).cast(DoubleType()))
-##         
-## df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType())).\
-##         withColumn("r01", split_r.getItem( 1).cast(DoubleType())).\
+         
+df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()).na.fill(0, Seq("r00")).\
+        withColumn("r01", split_r.getItem( 1).cast(DoubleType()).na.fill(0, Seq("r01"))
 ##         withColumn("r02", split_r.getItem( 2).cast(DoubleType())).\
 ##         withColumn("r03", split_r.getItem( 3).cast(DoubleType())).\
 ##         withColumn("r04", split_r.getItem( 4).cast(DoubleType())).\
