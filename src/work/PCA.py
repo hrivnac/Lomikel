@@ -63,8 +63,11 @@ df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull()
 
 #df = df.select("lc_features_g.*").toDF("g00","g01","g02","g03","g04","g05","g06","g07","g08","g09","g10","g11","g12","g13","g14","g15","g16","g17","g18","g19","g20","g21","g22","g23","g24")
 
-df = df.select(split(col("lc_features_g"), ","))
-                   
+#df = df.select(split(col("lc_features_g"), ","))
+
+split_col = split(df["lc_features_g"], ",")
+df = df.withColumn('NAME1', split_col.getItem(0))
+df = df.withColumn('NAME2', split_col.getItem(1))     
 df.show(truncate=False)
 
 ##print("*** VectorAssembler ***")
