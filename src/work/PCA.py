@@ -65,9 +65,58 @@ df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull()
 
 #df = df.select(split(col("lc_features_g"), ","))
 
-split_col = split(df["lc_features_g"], ",")
-df = df.withColumn('g00', split_col.getItem(0)).\
-        withColumn('g01', split_col.getItem(1))     
+split_g = split(df["lc_features_g"], ",")
+split_r = split(df["lc_features_r"], ",")
+df = df.withColumn("g00", split_g.getItem(0)).\
+        withColumn("g01", split_g.getItem(1)).\     
+        withColumn("g02", split_g.getItem(2)).\     
+        withColumn("g03", split_g.getItem(3)).\     
+        withColumn("g04", split_g.getItem(4)).\     
+        withColumn("g05", split_g.getItem(5)).\     
+        withColumn("g06", split_g.getItem(6)).\     
+        withColumn("g07", split_g.getItem(7)).\     
+        withColumn("g08", split_g.getItem(8)).\     
+        withColumn("g09", split_g.getItem(9)).\     
+        withColumn("g10", split_g.getItem(10)).\
+        withColumn("g11", split_g.getItem(11)).\     
+        withColumn("g12", split_g.getItem(12)).\     
+        withColumn("g13", split_g.getItem(13)).\     
+        withColumn("g14", split_g.getItem(14)).\     
+        withColumn("g15", split_g.getItem(15)).\     
+        withColumn("g16", split_g.getItem(16)).\     
+        withColumn("g17", split_g.getItem(17)).\     
+        withColumn("g18", split_g.getItem(18)).\     
+        withColumn("g19", split_g.getItem(19)).\     
+        withColumn("g20", split_g.getItem(20)).\     
+        withColumn("g21", split_g.getItem(21)).\     
+        withColumn("g22", split_g.getItem(22)).\     
+        withColumn("g23", split_g.getItem(23)).\     
+        withColumn("g24", split_g.getItem(24))
+df = df.withColumn("r00", split_r.getItem(0)).\
+        withColumn("r01", split_r.getItem(1)).\     
+        withColumn("r02", split_r.getItem(2)).\     
+        withColumn("r03", split_r.getItem(3)).\     
+        withColumn("r04", split_r.getItem(4)).\     
+        withColumn("r05", split_r.getItem(5)).\     
+        withColumn("r06", split_r.getItem(6)).\     
+        withColumn("r07", split_r.getItem(7)).\     
+        withColumn("r08", split_r.getItem(8)).\     
+        withColumn("r09", split_r.getItem(9)).\     
+        withColumn("r10", split_r.getItem(10)).\
+        withColumn("r11", split_r.getItem(11)).\     
+        withColumn("r12", split_r.getItem(12)).\     
+        withColumn("r13", split_r.getItem(13)).\     
+        withColumn("r14", split_r.getItem(14)).\     
+        withColumn("r15", split_r.getItem(15)).\     
+        withColumn("r16", split_r.getItem(16)).\     
+        withColumn("r17", split_r.getItem(17)).\     
+        withColumn("r18", split_r.getItem(18)).\     
+        withColumn("r19", split_r.getItem(19)).\     
+        withColumn("r20", split_r.getItem(20)).\     
+        withColumn("r21", split_r.getItem(21)).\     
+        withColumn("r22", split_r.getItem(22)).\     
+        withColumn("r23", split_r.getItem(23)).\     
+        withColumn("r24", split_r.getItem(24))
 df.show(truncate=False)
 
 ##print("*** VectorAssembler ***")
