@@ -153,7 +153,7 @@ lc_features = ("g00",
                "r21",
                "r22",
                "r23",
-               "r24"))
+               "r24")
 
 df = spark.read\
           .format("org.apache.hadoop.hbase.spark")\
