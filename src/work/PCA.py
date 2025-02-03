@@ -140,31 +140,31 @@ df = df.withColumn("r00", split_r.getItem(0).cast(DoubleType)).\
 ## cr = clustered_result.select("objectId", "cluster").withColumn("classification", classification_udf(df.objectId))
 ## cr.show(n=1000, truncate=False)
 ## #cr.write.format("csv").save("/tmp/cr")
-
-print("*** Centers ***")
-#centers = kmeans_model.clusterCenters()
-#for idx, center in enumerate(centers):
-#  print(f"Cluster {idx}: {center}")
-
-print("*** Counts ***")
-#clustered_result.groupBy("cluster").count().show()
-
-print("*** Stats ***")
-#get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
-#clustered_result = clustered_result.withColumn("pca_1", get_element("pcaFeatures", lit(0))) \
-#                                   .withColumn("pca_2", get_element("pcaFeatures", lit(1)))
-#cluster_stats = clustered_result.groupBy("cluster").agg(
-#    mean("pca_1").alias("mean_pca_1"),
-#    stddev("pca_1").alias("stddev_pca_1"),
-#    mean("pca_2").alias("mean_pca_2"),
-#    stddev("pca_2").alias("stddev_pca_2")
-#)
-#cluster_stats.show(truncate=False)
-
-#evaluator = ClusteringEvaluator(featuresCol="pcaFeatures", predictionCol="cluster", metricName="silhouette")
-#silhouette = evaluator.evaluate(clustered_result)
-#print(silhouette)
-
+## 
+## print("*** Centers ***")
+## #centers = kmeans_model.clusterCenters()
+## #for idx, center in enumerate(centers):
+## #  print(f"Cluster {idx}: {center}")
+## 
+## print("*** Counts ***")
+## #clustered_result.groupBy("cluster").count().show()
+## 
+## print("*** Stats ***")
+## #get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
+## #clustered_result = clustered_result.withColumn("pca_1", get_element("pcaFeatures", lit(0))) \
+## #                                   .withColumn("pca_2", get_element("pcaFeatures", lit(1)))
+## #cluster_stats = clustered_result.groupBy("cluster").agg(
+## #    mean("pca_1").alias("mean_pca_1"),
+## #    stddev("pca_1").alias("stddev_pca_1"),
+## #    mean("pca_2").alias("mean_pca_2"),
+## #    stddev("pca_2").alias("stddev_pca_2")
+## #)
+## #cluster_stats.show(truncate=False)
+## 
+## #evaluator = ClusteringEvaluator(featuresCol="pcaFeatures", predictionCol="cluster", metricName="silhouette")
+## #silhouette = evaluator.evaluate(clustered_result)
+## #print(silhouette)
+## 
 spark.stop()
 
 
