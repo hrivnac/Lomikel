@@ -124,7 +124,7 @@ df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()))\
 ##         withColumn("r23", split_r.getItem(23).cast(DoubleType())).\
 ##         withColumn("r24", split_r.getItem(24).cast(DoubleType()))
 
-df = df.na.fill(0, {"g00", "g01", "r00", "r01"})
+df = df.na.fill(0, ("g00", "g01", "r00", "r01"))
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
