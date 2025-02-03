@@ -66,8 +66,8 @@ df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull()
 #df = df.select(split(col("lc_features_g"), ","))
 
 split_col = split(df["lc_features_g"], ",")
-df = df.withColumn('NAME1', split_col.getItem(0))
-df = df.withColumn('NAME2', split_col.getItem(1))     
+df = df.withColumn('g00', split_col.getItem(0)).\
+        withColumn('g01', split_col.getItem(1))     
 df.show(truncate=False)
 
 ##print("*** VectorAssembler ***")
