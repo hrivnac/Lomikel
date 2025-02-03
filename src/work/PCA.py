@@ -98,8 +98,8 @@ df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()))\
 ##         withColumn("g23", split_g.getItem(23).cast(DoubleType())).\
 ##         withColumn("g24", split_g.getItem(24).cast(DoubleType()))
 ##         
-##df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()).na.fill(0, Seq("r00")).\
-##        withColumn("r01", split_r.getItem( 1).cast(DoubleType()).na.fill(0, Seq("r01"))
+df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()))\
+       .withColumn("r01", split_r.getItem( 1).cast(DoubleType()))
 ##         withColumn("r02", split_r.getItem( 2).cast(DoubleType())).\
 ##         withColumn("r03", split_r.getItem( 3).cast(DoubleType())).\
 ##         withColumn("r04", split_r.getItem( 4).cast(DoubleType())).\
