@@ -5,6 +5,7 @@ from pyspark.sql.functions import mean
 from pyspark.sql.functions import stddev
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import lit
+from pyspark.sql.functions import split
 from pyspark.sql.types import DoubleType
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import PCA
