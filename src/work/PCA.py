@@ -60,7 +60,7 @@ df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.ma
 
 df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull())
 
-df = df.select(f.split(df.lc_features_g, ",")).rdd.flatMap(lambda x: x).toDF(schema=["g00","g01","g02","g03","g04","g05","g06","g07","g08","g09","g10","g11","g12","g13","g14","g15","g16","g17","g18","g19","g20","g21","g22","g23","g24"])
+df = df.select("lc_features_g.*").toDF("g00","g01","g02","g03","g04","g05","g06","g07","g08","g09","g10","g11","g12","g13","g14","g15","g16","g17","g18","g19","g20","g21","g22","g23","g24")
 
 df.show(truncate=False)
 
