@@ -37,7 +37,9 @@ def classification(objectId):
  
 classification_udf = udf(lambda x: classification(x), StringType())
 
-spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
+spark = SparkSession.builder\
+                    .appName("PCA with HBase")\
+                    .getOrCreate()
 
 print("*** DF ***")
 mapping = "rowkey STRING :key, " + \
@@ -102,13 +104,68 @@ cols = ["g00",
         "r22",
         "r23",
         "r24"]
-df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(1000)
+lc_features = ("g00",
+               "g01",
+               "g02",
+               "g03",
+               "g04",
+               "g05",
+               "g06",
+               "g07",
+               "g08",
+               "g09",
+               "g10",
+               "g11",
+               "g12",
+               "g13",
+               "g14",
+               "g15",
+               "g16",
+               "g17",
+               "g18",
+               "g19",
+               "g20",
+               "g21",
+               "g22",
+               "g23",
+               "g24",
+               "r00",
+               "r01",
+               "r02",
+               "r03",
+               "r04",
+               "r05",
+               "r06",
+               "r07",
+               "r08",
+               "r09",
+               "r10",
+               "r11",
+               "r12",
+               "r13",
+               "r14",
+               "r15",
+               "r16",
+               "r17",
+               "r18",
+               "r19",
+               "r20",
+               "r21",
+               "r22",
+               "r23",
+               "r24"))
 
-df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull())
-
-#df = df.select("lc_features_g.*").toDF("g00","g01","g02","g03","g04","g05","g06","g07","g08","g09","g10","g11","g12","g13","g14","g15","g16","g17","g18","g19","g20","g21","g22","g23","g24")
-
-#df = df.select(split(col("lc_features_g"), ","))
+df = spark.read\
+          .format("org.apache.hadoop.hbase.spark")\
+          .option("hbase.columns.mapping", mapping)
+          .option("hbase.table", "ztf")\
+          .option("hbase.spark.use.hbasecontext", False)\
+          .option("hbase.spark.pushdown.columnfilter", True)\
+          .load()\
+          .filter(~F.col("rowkey").startswith("schema_"))\
+          .filter(df.lc_features_g.isNotNull())\
+          .filter(df.lc_features_r.isNotNull())\
+          .limit(1000)
 
 split_g = split(df["lc_features_g"], ",")
 split_r = split(df["lc_features_r"], ",")
@@ -165,56 +222,7 @@ df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()))\
        .withColumn("r23", split_r.getItem(23).cast(DoubleType()))\
        .withColumn("r24", split_r.getItem(24).cast(DoubleType()))
         
-df = df.na.fill(0, ("g00",
-                    "g01",
-                    "g02",
-                    "g03",
-                    "g04",
-                    "g05",
-                    "g06",
-                    "g07",
-                    "g08",
-                    "g09",
-                    "g10",
-                    "g11",
-                    "g12",
-                    "g13",
-                    "g14",
-                    "g15",
-                    "g16",
-                    "g17",
-                    "g18",
-                    "g19",
-                    "g20",
-                    "g21",
-                    "g22",
-                    "g23",
-                    "g24",
-                    "r00",
-                    "r01",
-                    "r02",
-                    "r03",
-                    "r04",
-                    "r05",
-                    "r06",
-                    "r07",
-                    "r08",
-                    "r09",
-                    "r10",
-                    "r11",
-                    "r12",
-                    "r13",
-                    "r14",
-                    "r15",
-                    "r16",
-                    "r17",
-                    "r18",
-                    "r19",
-                    "r20",
-                    "r21",
-                    "r22",
-                    "r23",
-                    "r24"))
+df = df.na.fill(0, lc_features)
 
 print("*** VectorAssembler ***")
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
