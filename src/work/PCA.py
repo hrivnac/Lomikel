@@ -21,6 +21,8 @@ import json
 from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
 
+# classification from Fink Portal ----------------------------------------------
+
 classifications = {}
 
 def classification(objectId):
@@ -37,11 +39,9 @@ def classification(objectId):
  
 classification_udf = udf(lambda x: classification(x), StringType())
 
-spark = SparkSession.builder\
-                    .appName("PCA with HBase")\
-                    .getOrCreate()
 
-print("*** DF ***")
+# parameters -------------------------------------------------------------------
+
 mapping = "rowkey STRING :key, " + \
           "objectId STRING i:objectId, " + \
           "lc_features_g STRING d:lc_features_g, " \
@@ -54,6 +54,7 @@ mapping = "rowkey STRING :key, " + \
           "magnr FLOAT i:magnr, " + \
           "sigmagnr FLOAT i:sigmagnr, " + \
           "magzpsci FLOAT i:magzpsci"
+          
 cols = ["g00",
         "g01",
         "g02",
@@ -104,6 +105,7 @@ cols = ["g00",
         "r22",
         "r23",
         "r24"]
+        
 lc_features = ("g00",
                "g01",
                "g02",
@@ -155,6 +157,17 @@ lc_features = ("g00",
                "r23",
                "r24")
 
+n_pca = 5
+n_clusterts = 5
+
+# new session ------------------------------------------------------------------
+
+spark = SparkSession.builder\
+                    .appName("PCA with HBase")\
+                    .getOrCreate()
+
+# read HBase into DataGram -----------------------------------------------------
+
 df = spark.read\
           .format("org.apache.hadoop.hbase.spark")\
           .option("hbase.columns.mapping", mapping)\
@@ -167,13 +180,9 @@ df = spark.read\
           .filter(F.col("lc_features_r").isNotNull())\
           .limit(1000)
 
-#df = df.filter(df.lc_features_g.isNotNull())\
-#       .filter(df.lc_features_r.isNotNull())
-
+# convert lc_features arrays into columns --------------------------------------
 
 split_g = split(df["lc_features_g"], ",")
-split_r = split(df["lc_features_r"], ",")
-
 df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()))\
        .withColumn("g01", split_g.getItem( 1).cast(DoubleType()))\
        .withColumn("g02", split_g.getItem( 2).cast(DoubleType()))\
@@ -200,6 +209,7 @@ df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()))\
        .withColumn("g23", split_g.getItem(23).cast(DoubleType()))\
        .withColumn("g24", split_g.getItem(24).cast(DoubleType()))
         
+split_r = split(df["lc_features_r"], ",")
 df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()))\
        .withColumn("r01", split_r.getItem( 1).cast(DoubleType()))\
        .withColumn("r02", split_r.getItem( 2).cast(DoubleType()))\
@@ -228,23 +238,29 @@ df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()))\
         
 df = df.na.fill(0, lc_features)
 
-print("*** VectorAssembler ***")
+# PCA --------------------------------------------------------------------------
+
 vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
-  
-print ("*** PCA ***")
-pca = PCA(k=5, inputCol="features", outputCol="pcaFeatures")
+pca = PCA(k=n_pca, inputCol="features", outputCol="pcaFeatures")
 pipeline = Pipeline(stages=[vecAssembler, pca])
 model = pipeline.fit(df)
 result = model.transform(df)
 #result.show(truncate=False)
   
-print("*** Clustering ***")
-kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
+# Clustering -------------------------------------------------------------------  
+  
+kmeans = KMeans().setK(n_clusters)\
+                 .setSeed(1)\
+                 .setFeaturesCol("pcaFeatures")\
+                 .setPredictionCol("cluster")
 kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
-cr = clustered_result.select("objectId", "cluster").withColumn("classification", classification_udf(df.objectId))
+cr = clustered_result.select("objectId", "cluster")\
+                     .withColumn("classification", classification_udf(df.objectId))
 cr.show(n=1000, truncate=False)
 #cr.write.format("csv").save("/tmp/cr")
+
+# statistics -------------------------------------------------------------------
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
@@ -269,6 +285,8 @@ print("*** Stats ***")
 #evaluator = ClusteringEvaluator(featuresCol="pcaFeatures", predictionCol="cluster", metricName="silhouette")
 #silhouette = evaluator.evaluate(clustered_result)
 #print(silhouette)
+
+# end --------------------------------------------------------------------------
 
 spark.stop()
 
