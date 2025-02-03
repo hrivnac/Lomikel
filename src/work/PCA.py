@@ -42,6 +42,7 @@ print("*** DF ***")
 mapping = "rowkey STRING :key, " + \
           "objectId STRING i:objectId, " + \
           "lc_features_g STRING d:lc_features_g, " \
+          "lc_features_r STRING d:lc_features_r, " \
           "jd FLOAT i:jd, " + \
           "xpos FLOAT i:xpos, " + \
           "ypos FLOAT i:ypos, " + \
