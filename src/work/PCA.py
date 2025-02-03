@@ -72,7 +72,7 @@ df = df.filter(df.lc_features_g.isNotNull()).filter(df.lc_features_r.isNotNull()
 split_g = split(df["lc_features_g"], ",")
 split_r = split(df["lc_features_r"], ",")
 
-df = df.withColumn("g00", split_g.getItem(0)).withColumn("g00".col("g00").cast(DoubleType))
+df = df.withColumn("g00", split_g.getItem(0)).withColumn("g00", "g00".cast(DoubleType))
 ##         withColumn("g01", split_g.getItem(1).cast(DoubleType)).\
 ##         withColumn("g02", split_g.getItem(2).cast(DoubleType)).\
 ##         withColumn("g03", split_g.getItem(3).cast(DoubleType)).\
