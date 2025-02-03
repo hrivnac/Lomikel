@@ -58,7 +58,7 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(1000)
 
-df.show(truncate=False)
+df.show(truncate=False, n=1000)
 
 ##print("*** VectorAssembler ***")
 ##vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
