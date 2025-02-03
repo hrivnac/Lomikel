@@ -165,6 +165,6 @@ df = df.withColumn("r00", split_r.getItem(0).cast(DoubleType)).\
 ## #silhouette = evaluator.evaluate(clustered_result)
 ## #print(silhouette)
 ## 
-spark.stop()
+## spark.stop()
 
 
