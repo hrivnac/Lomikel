@@ -123,23 +123,23 @@ df = df.withColumn("r00", split_r.getItem(0).cast(DoubleType)).\
         withColumn("r23", split_r.getItem(23).cast(DoubleType)).\
         withColumn("r24", split_r.getItem(24).cast(DoubleType))
 
-print("*** VectorAssembler ***")
-vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
-  
-print ("*** PCA ***")
-pca = PCA(k=5, inputCol="features", outputCol="pcaFeatures")
-pipeline = Pipeline(stages=[vecAssembler, pca])
-model = pipeline.fit(df)
-result = model.transform(df)
-#result.show(truncate=False)
-  
-print("*** Clustering ***")
-kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
-kmeans_model = kmeans.fit(result)
-clustered_result = kmeans_model.transform(result)
-cr = clustered_result.select("objectId", "cluster").withColumn("classification", classification_udf(df.objectId))
-cr.show(n=1000, truncate=False)
-#cr.write.format("csv").save("/tmp/cr")
+## print("*** VectorAssembler ***")
+## vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
+##   
+## print ("*** PCA ***")
+## pca = PCA(k=5, inputCol="features", outputCol="pcaFeatures")
+## pipeline = Pipeline(stages=[vecAssembler, pca])
+## model = pipeline.fit(df)
+## result = model.transform(df)
+## #result.show(truncate=False)
+##   
+## print("*** Clustering ***")
+## kmeans = KMeans().setK(5).setSeed(1).setFeaturesCol("pcaFeatures").setPredictionCol("cluster")
+## kmeans_model = kmeans.fit(result)
+## clustered_result = kmeans_model.transform(result)
+## cr = clustered_result.select("objectId", "cluster").withColumn("classification", classification_udf(df.objectId))
+## cr.show(n=1000, truncate=False)
+## #cr.write.format("csv").save("/tmp/cr")
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
