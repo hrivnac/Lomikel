@@ -58,7 +58,7 @@ cols = ["magpsf",
         "magzpsci"]
 df = spark.read.format("org.apache.hadoop.hbase.spark").option("hbase.columns.mapping", mapping).option("hbase.table", "ztf").option("hbase.spark.use.hbasecontext", False).option("hbase.spark.pushdown.columnfilter", True).load().filter(~F.col("rowkey").startswith("schema_")).limit(1000)
 
-df = df.filter(df.lc_features_g != "null" and df.lc_features_r != "null" )
+df = df.filter(df.lc_features_g != None)
 
 df.show(truncate=False)
 
