@@ -123,6 +123,10 @@ df = df.withColumn("g00", split_g.getItem(0).cast(DoubleType))
 ##         withColumn("r22", split_r.getItem(22).cast(DoubleType)).\
 ##         withColumn("r23", split_r.getItem(23).cast(DoubleType)).\
 ##         withColumn("r24", split_r.getItem(24).cast(DoubleType))
+
+
+df.show(truncate=False)
+
 ## 
 ## print("*** VectorAssembler ***")
 ## vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
