@@ -41,6 +41,7 @@ spark = SparkSession.builder.appName("PCA with HBase").getOrCreate()
 print("*** DF ***")
 mapping = "rowkey STRING :key, " + \
           "objectId STRING i:objectId, " + \
+          "lc_features_g STRING d:lc_features_g, " \
           "jd FLOAT i:jd, " + \
           "xpos FLOAT i:xpos, " + \
           "ypos FLOAT i:ypos, " + \
