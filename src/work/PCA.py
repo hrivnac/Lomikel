@@ -163,9 +163,11 @@ df = spark.read\
           .option("hbase.spark.pushdown.columnfilter", True)\
           .load()\
           .filter(~F.col("rowkey").startswith("schema_"))\
-          .filter(df.lc_features_g.isNotNull())\
-          .filter(df.lc_features_r.isNotNull())\
           .limit(1000)
+
+df = df.filter(df.lc_features_g.isNotNull())\
+       .filter(df.lc_features_r.isNotNull())
+
 
 split_g = split(df["lc_features_g"], ",")
 split_r = split(df["lc_features_r"], ",")
