@@ -259,11 +259,11 @@ kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
 cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df.objectId))
-cr.show(truncate=False)
-cr.write\
-  .mode("overwrite")\
-  .format("csv")\
-  .save("/tmp/cr")
+#cr.show(truncate=False)
+#cr.write\
+#  .mode("overwrite")\
+#  .format("csv")\
+#  .save("/tmp/cr")
 
 # statistics -------------------------------------------------------------------
 
@@ -273,7 +273,7 @@ print("*** Centers ***")
 #  print(f"Cluster {idx}: {center}")
 
 print("*** Counts ***")
-#clustered_result.groupBy("cluster").count().show()
+clustered_result.groupBy("cluster").count().show()
 
 print("*** Stats ***")
 #get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
