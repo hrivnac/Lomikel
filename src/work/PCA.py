@@ -260,7 +260,10 @@ clustered_result = kmeans_model.transform(result)
 cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df.objectId))
 cr.show(truncate=False)
-cr.write.format("csv").save("/tmp/cr")
+cr.write\
+  .mode("overwrite")\
+  .format("csv")\
+  .save("/tmp/cr")
 
 # statistics -------------------------------------------------------------------
 
