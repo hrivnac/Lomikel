@@ -178,7 +178,7 @@ df = spark.read\
           .filter(~col("rowkey").startswith("schema_"))\
           .filter(col("lc_features_g").isNotNull())\
           .filter(col("lc_features_r").isNotNull())\
-          .limit(1000)
+          .limit(10000)
 
 # convert lc_features arrays into columns --------------------------------------
 
