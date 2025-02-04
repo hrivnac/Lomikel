@@ -157,6 +157,7 @@ lc_features = ("g00",
                "r23",
                "r24")
 
+n_sample = 10000
 n_pca = 25
 n_clusters = 10
 
@@ -179,7 +180,7 @@ df = spark.read\
 df = df.filter(df.rowkey >= "ZTF24")\
        .filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
-       .limit(10000)
+       .limit(n_sample)
 
 # convert lc_features arrays into columns --------------------------------------
 
@@ -258,8 +259,8 @@ kmeans_model = kmeans.fit(result)
 clustered_result = kmeans_model.transform(result)
 cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df.objectId))
-cr.show(n=1000, truncate=False)
-#cr.write.format("csv").save("/tmp/cr")
+cr.show(truncate=False)
+cr.write.format("csv").save("/tmp/cr")
 
 # statistics -------------------------------------------------------------------
 
