@@ -180,7 +180,7 @@ df = spark.read\
           .filter(F.col("lc_features_g").isNotNull())\
           .filter(F.col("lc_features_r").isNotNull())\
           .limit(1000)
- 
+
 # convert lc_features arrays into columns --------------------------------------
 
 split_g = split(df["lc_features_g"], ",")
