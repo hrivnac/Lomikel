@@ -175,9 +175,9 @@ df = spark.read\
           .option("hbase.spark.use.hbasecontext", False)\
           .option("hbase.spark.pushdown.columnfilter", True)\
           .load()\
-          .filter(~F.col("rowkey").startswith("schema_"))\
-          .filter(F.col("lc_features_g").isNotNull())\
-          .filter(F.col("lc_features_r").isNotNull())\
+          .filter(~col("rowkey").startswith("schema_"))\
+          .filter(col("lc_features_g").isNotNull())\
+          .filter(col("lc_features_r").isNotNull())\
           .limit(1000)
 
 # convert lc_features arrays into columns --------------------------------------
