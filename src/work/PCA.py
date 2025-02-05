@@ -6,28 +6,32 @@ from pyspark.sql.functions import stddev
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import lit
 from pyspark.sql.functions import split
+from pyspark.sql.functions import udf
+from pyspark.sql.types import StringType
 from pyspark.sql.types import DoubleType
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import PCA
 from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.feature import StandardScaler
 from pyspark.ml.linalg import Vectors
 from pyspark.ml.clustering import KMeans
 from pyspark.ml.evaluation import ClusteringEvaluator
+
+import numpy as np
 from numpy import array
-from math import sqrt
-import requests
-import json
 
 import matplotlib
 import matplotlib.pyplot as plt
-import numpy as np
+
 import seaborn as sns
+
 from mpl_toolkits.mplot3d import Axes3D
 
-from pyspark.sql.functions import udf
-from pyspark.sql.types import StringType
-from pyspark.ml.feature import StandardScaler
+from math import sqrt
 
+import requests
+
+import json
 
 # classification from Fink Portal ----------------------------------------------
 
@@ -165,7 +169,7 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 1000
+n_sample = 10000
 n_pca = 10
 n_clusters = 10
 
@@ -265,7 +269,11 @@ pca = PCA(k=n_pca,
           inputCol="scaled_features",
           outputCol="pca_features")
 pca_model = pca.fit(df_standardized)
+df_pca = pca_model.transform(df_standardized)
+
+# report
 print(pca_model.explainedVariance)
+# plot
 explained_variance = np.array(pca_model.explainedVariance)
 cumValues = np.cumsum(explained_variance)
 n_components = len(cumValues)
@@ -278,9 +286,9 @@ plt.title('variance by components')
 plt.xlabel('num of components')
 plt.ylabel('cumulative explained variance')
 plt.grid(True)
-plt.savefig("/tmp/PCA_Variance.png")
-# use number of components with variance about 80%
-df_pca = pca_model.transform(df_standardized)
+plt.savefig("/tmp/PCA_Variance.png") # use number of components with variance about 80%
+
+# show
 #df_pca.show(truncate=False)
 
 # Clustering -------------------------------------------------------------------  
@@ -293,44 +301,31 @@ kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
 cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df_pca.objectId))
-cr.show(truncate=False)
-
+                     
+# plot                     
 pdf = cr.select("cluster", "classification").toPandas()
-
-
-# Count occurrences of each (classification, cluster) pair
 grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="count")
-
-# Extract values
-x_labels = grouped["classification"].astype(str)  # Convert to string for categorical labels
+x_labels = grouped["classification"].astype(str)
 y_labels = grouped["cluster"]
 z_values = grouped["count"]
-
-# Convert categorical x-labels to numerical indices
 x_unique = sorted(x_labels.unique())
 x_mapping = {label: i for i, label in enumerate(x_unique)}
 x_values = x_labels.map(x_mapping)
-
-# Create 3D figure
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection="3d")
-
-# Plot 3D bars
 ax.bar3d(x_values, y_labels, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
-
-# Set labels
 ax.set_xlabel("Classification")
 ax.set_ylabel("Cluster")
 ax.set_zlabel("Count")
-ax.set_title("3D Lego Plot of Classification vs Cluster")
-
-# Set categorical labels on x-axis
+ax.set_title("Classification vs Cluster")
 ax.set_xticks(range(len(x_unique)))
 ax.set_xticklabels(x_unique, rotation=45)
-
-
 plt.savefig("/tmp/Classification_Clusters.png")
 
+# show
+cr.show(truncate=False)
+
+# export
 #cr.write\
 #  .mode("overwrite")\
 #  .format("csv")\
