@@ -170,7 +170,7 @@ lc_features = ("g00",
                "r24")
 
 n_sample = 10000
-n_pca = 10
+n_pca = 25
 n_clusters = 10
 
 # new session ------------------------------------------------------------------
@@ -303,24 +303,24 @@ cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df_pca.objectId))
                      
 # plot                     
-pdf = cr.select("cluster", "classification").toPandas()
+pdf = spark_df.select("cluster", "classification").toPandas()
 grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="count")
-x_labels = grouped["cluster"]
-y_labels = grouped["classification"].astype(str)
+x_labels = grouped["classification"].astype(str)
+y_labels = grouped["cluster"]
 z_values = grouped["count"]
-y_unique = sorted(x_labels.unique())
-y_mapping = {label: i for i, label in enumerate(y_unique)}
-y_values = y_labels.map(y_mapping)
+x_unique = sorted(x_labels.unique())
+x_mapping = {label: i for i, label in enumerate(x_unique)}
+x_values = x_labels.map(x_mapping)
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection="3d")
-ax.bar3d(x_labels, y_values, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
-ax.set_xlabel("Cluster")
-ax.set_ylabel("Classification")
+ax.bar3d(y_labels, x_values, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
+ax.set_xlabel("Classification")
+ax.set_ylabel("Cluster")
 ax.set_zlabel("Count")
 ax.set_title("Classification vs Cluster")
-ax.set_yticks(range(len(y_unique)))
-ax.set_yticklabels(y_unique, rotation=45)
-plt.savefig("/tmp/Classification_Clusters.png")
+ax.set_xticks(range(len(x_unique)))
+ax.set_xticklabels(x_unique, rotation=45)
+plt.savefig("/tmp/Classification_ClustersXY.png")
 
 # show
 cr.show(truncate=False)
