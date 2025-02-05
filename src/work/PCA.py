@@ -294,9 +294,10 @@ cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df_pca.objectId))
 cr.show(truncate=False)
 
-pdf = spark_df.select("cluster", "classification").toPandas()
+pdf = cr.select("cluster", "classification").toPandas()
 plt.figure(figsize=(10,6))
 sns.countplot(data=pdf, x="cluster", hue="classification", palette="viridis")
+sns.scatterplot(data=pdf, x="cluster", y="classification", hue="classification", palette="coolwarm")
 plt.xlabel("Cluster")
 plt.ylabel("Count")
 plt.title("Distribution of Classifications in Clusters")
