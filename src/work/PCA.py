@@ -170,7 +170,7 @@ lc_features = ("g00",
                "r24")
 
 n_sample = 10000
-n_pca = 25
+n_pca = 10
 n_clusters = 10
 
 # new session ------------------------------------------------------------------
@@ -280,11 +280,11 @@ n_components = len(cumValues)
 plt.figure(figsize=(10, 8))
 plt.plot(range(1, n_components + 1),
          cumValues,
-         marker='o',
-         linestyle='--')
-plt.title('variance by components')
-plt.xlabel('num of components')
-plt.ylabel('cumulative explained variance')
+         marker="o",
+         linestyle="--")
+plt.title("variance by components")
+plt.xlabel("num of components")
+plt.ylabel("Cumulative Explained Variance")
 plt.grid(True)
 plt.savefig("/tmp/PCA_Variance.png") # use number of components with variance about 80%
 
@@ -305,21 +305,21 @@ cr = clustered_result.select("objectId", "cluster")\
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
 grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="count")
-x_labels = grouped["classification"].astype(str)
-y_labels = grouped["cluster"]
+x_labels = grouped["cluster"]
+y_labels = grouped["classification"].astype(str)
 z_values = grouped["count"]
-x_unique = sorted(x_labels.unique())
-x_mapping = {label: i for i, label in enumerate(x_unique)}
-x_values = x_labels.map(x_mapping)
+y_unique = sorted(x_labels.unique())
+y_mapping = {label: i for i, label in enumerate(y_unique)}
+y_values = y_labels.map(x_mapping)
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection="3d")
 ax.bar3d(x_values, y_labels, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
-ax.set_xlabel("Classification")
-ax.set_ylabel("Cluster")
+ax.set_xlabel("Cluster")
+ax.set_ylabel("Classification")
 ax.set_zlabel("Count")
 ax.set_title("Classification vs Cluster")
-ax.set_xticks(range(len(x_unique)))
-ax.set_xticklabels(x_unique, rotation=45)
+ax.set_yticks(range(len(y_unique)))
+ax.set_yticklabels(y_unique, rotation=45)
 plt.savefig("/tmp/Classification_Clusters.png")
 
 # show
