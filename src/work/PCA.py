@@ -21,6 +21,7 @@ import json
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
@@ -292,6 +293,18 @@ clustered_result = kmeans_model.transform(df_pca)
 cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df_pca.objectId))
 cr.show(truncate=False)
+
+pdf = spark_df.select("cluster", "classification").toPandas()
+plt.figure(figsize=(10,6))
+sns.countplot(data=pdf, x="cluster", hue="classification", palette="viridis")
+plt.xlabel("Cluster")
+plt.ylabel("Count")
+plt.title("Distribution of Classifications in Clusters")
+plt.legend(title="Classification")
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.savefig("/tmp/Classification_Clusters.png")
+
 #cr.write\
 #  .mode("overwrite")\
 #  .format("csv")\
