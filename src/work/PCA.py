@@ -164,7 +164,7 @@ lc_features = ("g00",
                "r24")
 
 n_sample = 10000
-n_pca = 25
+n_pca = 10
 n_clusters = 10
 
 # new session ------------------------------------------------------------------
@@ -291,11 +291,11 @@ kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
 cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df_pca.objectId))
-cr.show(truncate=False)
-#cr.write\
-#  .mode("overwrite")\
-#  .format("csv")\
-#  .save("/tmp/cr")
+#cr.show(truncate=False)
+cr.write\
+  .mode("overwrite")\
+  .format("csv")\
+  .save("/tmp/cr")
 
 # statistics -------------------------------------------------------------------
 
