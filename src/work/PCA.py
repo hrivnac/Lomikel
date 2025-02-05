@@ -268,7 +268,10 @@ explained_variance = np.array(pca_model.explainedVariance)
 cumValues = np.cumsum(explained_variance)
 n_components = len(cumValues)
 plt.figure(figsize=(10, 8))
-plt.plot(range(1, n_components + 1), cumValues, marker='o', linestyle='--')
+plt.plot(range(1, n_components + 1),
+         cumValues,
+         marker='o',
+         linestyle='--')
 plt.title('variance by components')
 plt.xlabel('num of components')
 plt.ylabel('cumulative explained variance')
@@ -276,19 +279,19 @@ plt.grid(True)
 plt.savefig("/tmp/PCA_Variance.png")
 # use number of components with variance about 80%
 df_pca = pca_model.transform(df_standardized)
-df_pca.show(truncate=False)
+#df_pca.show(truncate=False)
 
 # Clustering -------------------------------------------------------------------  
   
-## kmeans = KMeans().setK(n_clusters)\
-##                  .setSeed(1)\
-##                  .setFeaturesCol("pcaFeatures")\
-##                  .setPredictionCol("cluster")
-## kmeans_model = kmeans.fit(result)
-## clustered_result = kmeans_model.transform(result)
-## cr = clustered_result.select("objectId", "cluster")\
-##                      .withColumn("classification", classification_udf(df.objectId))
-#cr.show(truncate=False)
+kmeans = KMeans().setK(n_clusters)\
+                 .setSeed(1)\
+                 .setFeaturesCol("pcaFeatures")\
+                 .setPredictionCol("cluster")
+kmeans_model = kmeans.fit(df_pca)
+clustered_result = kmeans_model.transform(df_pca)
+cr = clustered_result.select("objectId", "cluster")\
+                     .withColumn("classification", classification_udf(df_pca.objectId))
+cr.show(truncate=False)
 #cr.write\
 #  .mode("overwrite")\
 #  .format("csv")\
