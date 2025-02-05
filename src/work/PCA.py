@@ -310,7 +310,7 @@ y_labels = grouped["classification"].astype(str)
 z_values = grouped["count"]
 y_unique = sorted(x_labels.unique())
 y_mapping = {label: i for i, label in enumerate(y_unique)}
-y_values = y_labels.map(x_mapping)
+y_values = y_labels.map(y_mapping)
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection="3d")
 ax.bar3d(x_values, y_labels, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
