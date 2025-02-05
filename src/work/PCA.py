@@ -285,7 +285,7 @@ df_pca = pca_model.transform(df_standardized)
   
 kmeans = KMeans().setK(n_clusters)\
                  .setSeed(1)\
-                 .setFeaturesCol("pcaFeatures")\
+                 .setFeaturesCol("pca_features")\
                  .setPredictionCol("cluster")
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
