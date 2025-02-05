@@ -169,8 +169,8 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 10000
-n_pca = 25
+n_sample = 1000
+n_pca = 10
 n_clusters = 10
 
 # new session ------------------------------------------------------------------
@@ -304,6 +304,7 @@ cr = clustered_result.select("objectId", "cluster")\
                      
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
+pdf["cluster"] = pdf["cluster"].astype(str)
 grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="count")
 
 
