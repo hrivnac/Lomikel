@@ -9,6 +9,9 @@ lomikel_hbase -s PCA.groovy
 
 --------------------------------------------------------------------------------
 
+scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/plot.png ./
+
+
    "    extract_fink_classification(\n",
     "        df['cdsxmatch'],\n",
     "        df['roid'],\n",
