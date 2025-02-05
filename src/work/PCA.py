@@ -303,7 +303,7 @@ cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df_pca.objectId))
                      
 # plot                     
-pdf = spark_df.select("cluster", "classification").toPandas()
+pdf = cr.select("cluster", "classification").toPandas()
 grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="count")
 x_labels = grouped["classification"].astype(str)
 y_labels = grouped["cluster"]
@@ -320,7 +320,7 @@ ax.set_zlabel("Count")
 ax.set_title("Classification vs Cluster")
 ax.set_xticks(range(len(x_unique)))
 ax.set_xticklabels(x_unique, rotation=45)
-plt.savefig("/tmp/Classification_ClustersXY.png")
+plt.savefig("/tmp/Classification_Clusters.png")
 
 # show
 cr.show(truncate=False)
