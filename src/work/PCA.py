@@ -326,8 +326,8 @@ grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="co
 plt.figure(figsize=(12, 6))
 sns.scatterplot(
     data=grouped,
-    x="classification",
-    y="cluster",
+    x="cluster",
+    y="classification",
     size="count",
     hue="count",
     palette="viridis",
