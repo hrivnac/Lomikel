@@ -250,28 +250,24 @@ df = df.na.fill(0, lc_features)
 
 vec_assembler = VectorAssembler(inputCols=cols, outputCol="features")
 df_vector = vec_assembler.transform(df)
-scaler = StandardScaler(inputCol="features", outputCol="scaled_features", withMean=True, withStd=True)
+scaler = StandardScaler(inputCol="features",
+                        outputCol="scaled_features",
+                        withMean=True,
+                        withStd=True)
 scaler_model = scaler.fit(df_vector)
 df_standardized = scaler_model.transform(df_vector)
-#df_standardized.show(truncate=False)
-
-pca = PCA(k=n_pca, inputCol="scaled_features", outputCol="pcaFeatures")
-pca_model = pca.fit(df_standardized)
-
 
 # PCA --------------------------------------------------------------------------
 
-## vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
-## pca = PCA(k=n_pca, inputCol="features", outputCol="pcaFeatures")
-## pipeline = Pipeline(stages=[vecAssembler, pca])
-## model = pipeline.fit(df)
-## pca_model = model.stages[1]
-## 
+pca = PCA(k=n_pca,
+          inputCol="scaled_features",
+          outputCol="pca_features")
+pca_model = pca.fit(df_standardized)
 print(pca_model.explainedVariance)
 explained_variance = np.array(pca_model.explainedVariance)
 cumValues = np.cumsum(explained_variance)
 n_components = len(cumValues)
-plt.figure(figsize=(10,8))
+plt.figure(figsize=(10, 8))
 plt.plot(range(1, n_components + 1), cumValues, marker='o', linestyle='--')
 plt.title('variance by components')
 plt.xlabel('num of components')
@@ -279,10 +275,8 @@ plt.ylabel('cumulative explained variance')
 plt.grid(True)
 plt.savefig("/tmp/PCA_Variance.png")
 # use number of components with variance about 80%
-## 
-## result = model.transform(df)
-## #result.show(truncate=False)
-
+df_pca = pca_model.transform(df_standardized)
+df_pca.show(truncate=False)
 
 # Clustering -------------------------------------------------------------------  
   
