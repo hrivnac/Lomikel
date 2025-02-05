@@ -248,14 +248,16 @@ df = df.na.fill(0, lc_features)
 
 # normalisation ----------------------------------------------------------------
 
-df.show(truncate=False)
-
 vec_assembler = VectorAssembler(inputCols=cols, outputCol="features")
 df_vector = vec_assembler.transform(df)
 scaler = StandardScaler(inputCol="features", outputCol="scaled_features", withMean=True, withStd=True)
 scaler_model = scaler.fit(df_vector)
 df_standardized = scaler_model.transform(df_vector)
-df_standardized.show(truncate=False)
+#df_standardized.show(truncate=False)
+
+pca = PCA(k=n_pca, inputCol="scaled_features", outputCol="pcaFeatures")
+model = pca.fit(df)
+
 
 # PCA --------------------------------------------------------------------------
 
