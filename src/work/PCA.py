@@ -22,6 +22,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from mpl_toolkits.mplot3d import Axes3D
 
 from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
@@ -296,45 +297,39 @@ cr.show(truncate=False)
 
 pdf = cr.select("cluster", "classification").toPandas()
 
-plt.figure(figsize=(10,6))
-sns.countplot(data=pdf, x="cluster", hue="classification", palette="viridis")
-plt.xlabel("Cluster")
-plt.ylabel("Count")
-plt.title("Distribution of Classifications in Clusters")
-plt.legend(title="Classification")
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.savefig("/tmp/Classification_Clusters1.png")
 
-plt.figure(figsize=(10,6))
-sns.scatterplot(data=pdf, x="cluster", y="classification", hue="classification", palette="coolwarm")
-plt.xlabel("Cluster")
-plt.ylabel("Count")
-plt.title("Distribution of Classifications in Clusters")
-plt.legend(title="Classification")
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.savefig("/tmp/Classification_Clusters2.png")
+# Count occurrences of each (classification, cluster) pair
+grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="count")
 
-plt.figure(figsize=(10,6))
-sns.countplot(data=pdf, x="classification", hue="cluster", palette="viridis")
-plt.xlabel("Cluster")
-plt.ylabel("Count")
-plt.title("Distribution of Classifications in Clusters")
-plt.legend(title="Classification")
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.savefig("/tmp/Classification_Clusters3.png")
+# Extract values
+x_labels = grouped["classification"].astype(str)  # Convert to string for categorical labels
+y_labels = grouped["cluster"]
+z_values = grouped["count"]
 
-plt.figure(figsize=(10,6))
-sns.scatterplot(data=pdf, x="classification", y="cluster", hue="cluster", palette="coolwarm")
-plt.xlabel("Cluster")
-plt.ylabel("Count")
-plt.title("Distribution of Classifications in Clusters")
-plt.legend(title="Classification")
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.savefig("/tmp/Classification_Clusters4.png")
+# Convert categorical x-labels to numerical indices
+x_unique = sorted(x_labels.unique())
+x_mapping = {label: i for i, label in enumerate(x_unique)}
+x_values = x_labels.map(x_mapping)
+
+# Create 3D figure
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection="3d")
+
+# Plot 3D bars
+ax.bar3d(x_values, y_labels, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
+
+# Set labels
+ax.set_xlabel("Classification")
+ax.set_ylabel("Cluster")
+ax.set_zlabel("Count")
+ax.set_title("3D Lego Plot of Classification vs Cluster")
+
+# Set categorical labels on x-axis
+ax.set_xticks(range(len(x_unique)))
+ax.set_xticklabels(x_unique, rotation=45)
+
+
+plt.savefig("/tmp/Classification_Clusters.png")
 
 #cr.write\
 #  .mode("overwrite")\
