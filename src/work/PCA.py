@@ -248,44 +248,38 @@ df = df.na.fill(0, lc_features)
 
 # normalisation ----------------------------------------------------------------
 
-#vec_assembler = VectorAssembler(inputCols=cols, outputCol="features")
-#df_vector = vec_assembler.transform(df)
-#scaler = StandardScaler(inputCol="features", outputCol="scaled_features", withMean=True, withStd=True)
-#scaler_model = scaler.fit(df_vector)
-#df_standardized = scaler_model.transform(df_vector)
-#df_standardized.show(truncate=False)
+df.show(truncate=False)
 
-scaler = StandardScaler(inputCol=col,
-                        outputCol="scaledFeatures",
-                        withStd=True,
-                        withMean=True)
-scalerModel = scaler.fit(df)
-df_scaled = scalerModel.transform(df)
-df_scaled.show(truncate=False)
+vec_assembler = VectorAssembler(inputCols=cols, outputCol="features")
+df_vector = vec_assembler.transform(df)
+scaler = StandardScaler(inputCol="features", outputCol="scaled_features", withMean=True, withStd=True)
+scaler_model = scaler.fit(df_vector)
+df_standardized = scaler_model.transform(df_vector)
+df_standardized.show(truncate=False)
 
 # PCA --------------------------------------------------------------------------
 
-## bvecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
-## bpca = PCA(k=n_pca, inputCol="features", outputCol="pcaFeatures")
-## bpipeline = Pipeline(stages=[vecAssembler, pca])
-## bmodel = pipeline.fit(df)
-## bpca_model = model.stages[1]
-## b
-## bprint(pca_model.explainedVariance)
-## bexplained_variance = np.array(pca_model.explainedVariance)
-## bcumValues = np.cumsum(explained_variance)
-## bn_components = len(cumValues)
-## bplt.figure(figsize=(10,8))
-## bplt.plot(range(1, n_components + 1), cumValues, marker='o', linestyle='--')
-## bplt.title('variance by components')
-## bplt.xlabel('num of components')
-## bplt.ylabel('cumulative explained variance')
-## bplt.grid(True)
-## bplt.savefig("/tmp/PCA_Variance.png")
-## b# use number of components with variance about 80%
-## b
-## bresult = model.transform(df)
-## b#result.show(truncate=False)
+## vecAssembler = VectorAssembler(inputCols=cols, outputCol="features")
+## pca = PCA(k=n_pca, inputCol="features", outputCol="pcaFeatures")
+## pipeline = Pipeline(stages=[vecAssembler, pca])
+## model = pipeline.fit(df)
+## pca_model = model.stages[1]
+## 
+## print(pca_model.explainedVariance)
+## explained_variance = np.array(pca_model.explainedVariance)
+## cumValues = np.cumsum(explained_variance)
+## n_components = len(cumValues)
+## plt.figure(figsize=(10,8))
+## plt.plot(range(1, n_components + 1), cumValues, marker='o', linestyle='--')
+## plt.title('variance by components')
+## plt.xlabel('num of components')
+## plt.ylabel('cumulative explained variance')
+## plt.grid(True)
+## plt.savefig("/tmp/PCA_Variance.png")
+## # use number of components with variance about 80%
+## 
+## result = model.transform(df)
+## #result.show(truncate=False)
 
 
 # Clustering -------------------------------------------------------------------  
