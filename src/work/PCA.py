@@ -305,21 +305,46 @@ cr = clustered_result.select("objectId", "cluster")\
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
 grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="count")
-x_labels = grouped["classification"].astype(str)
-y_labels = grouped["cluster"]
-z_values = grouped["count"]
-x_unique = sorted(x_labels.unique())
-x_mapping = {label: i for i, label in enumerate(x_unique)}
-x_values = x_labels.map(x_mapping)
-fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection="3d")
-ax.bar3d(y_labels, x_values, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
-ax.set_xlabel("Classification")
-ax.set_ylabel("Cluster")
-ax.set_zlabel("Count")
-ax.set_title("Classification vs Cluster")
-ax.set_xticks(range(len(x_unique)))
-ax.set_xticklabels(x_unique, rotation=45)
+
+
+## x_labels = grouped["classification"].astype(str)
+## y_labels = grouped["cluster"]
+## z_values = grouped["count"]
+## x_unique = sorted(x_labels.unique())
+## x_mapping = {label: i for i, label in enumerate(x_unique)}
+## x_values = x_labels.map(x_mapping)
+## fig = plt.figure(figsize=(10, 8))
+## ax = fig.add_subplot(111, projection="3d")
+## ax.bar3d(x_values, y_labels, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
+## ax.set_xlabel("Classification")
+## ax.set_ylabel("Cluster")
+## ax.set_zlabel("Count")
+## ax.set_title("Classification vs Cluster")
+## ax.set_xticks(range(len(x_unique)))
+## ax.set_xticklabels(x_unique, rotation=45)
+
+plt.figure(figsize=(12, 6))
+sns.scatterplot(
+    data=grouped,
+    x="classification",
+    y="cluster",
+    size="count",
+    hue="count",
+    palette="viridis",
+    sizes=(50, 500),  # Control bubble size range
+    edgecolor="black",
+    alpha=0.75  # Transparency for better visibility
+)
+
+# Labels and Titles
+plt.xlabel("Classification")
+plt.ylabel("Cluster")
+plt.title("Cluster vs Classification Scatter Plot (Bubble Size = Count)")
+plt.xticks(rotation=45)  # Rotate for better readability
+plt.grid(True)
+plt.legend(title="Count")
+
+
 plt.savefig("/tmp/Classification_Clusters.png")
 
 # show
