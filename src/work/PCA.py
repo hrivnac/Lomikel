@@ -268,7 +268,7 @@ plt.title('variance by components')
 plt.xlabel('num of components')
 plt.ylabel('cumulative explained variance')
 plt.grid(True)
-plt.savefig('/tmp/plot.png')
+plt.savefig("plot.png")
 
 # Clustering -------------------------------------------------------------------  
   
@@ -294,7 +294,7 @@ print("*** Centers ***")
 #  print(f"Cluster {idx}: {center}")
 
 print("*** Counts ***")
-clustered_result.groupBy("cluster").count().show()
+#clustered_result.groupBy("cluster").count().show()
 
 print("*** Stats ***")
 #get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
