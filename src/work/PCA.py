@@ -164,7 +164,7 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 10000
+n_sample = 1000
 n_pca = 10
 n_clusters = 10
 
@@ -295,8 +295,18 @@ cr = clustered_result.select("objectId", "cluster")\
 cr.show(truncate=False)
 
 pdf = cr.select("cluster", "classification").toPandas()
+
 plt.figure(figsize=(10,6))
 sns.countplot(data=pdf, x="cluster", hue="classification", palette="viridis")
+plt.xlabel("Cluster")
+plt.ylabel("Count")
+plt.title("Distribution of Classifications in Clusters")
+plt.legend(title="Classification")
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.savefig("/tmp/Classification_Clusters1.png")
+
+plt.figure(figsize=(10,6))
 sns.scatterplot(data=pdf, x="cluster", y="classification", hue="classification", palette="coolwarm")
 plt.xlabel("Cluster")
 plt.ylabel("Count")
@@ -304,7 +314,27 @@ plt.title("Distribution of Classifications in Clusters")
 plt.legend(title="Classification")
 plt.xticks(rotation=45)
 plt.grid(True)
-plt.savefig("/tmp/Classification_Clusters.png")
+plt.savefig("/tmp/Classification_Clusters2.png")
+
+plt.figure(figsize=(10,6))
+sns.countplot(data=pdf, x="classification", hue="cluster", palette="viridis")
+plt.xlabel("Cluster")
+plt.ylabel("Count")
+plt.title("Distribution of Classifications in Clusters")
+plt.legend(title="Classification")
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.savefig("/tmp/Classification_Clusters3.png")
+
+plt.figure(figsize=(10,6))
+sns.scatterplot(data=pdf, x="classification", y="cluster", hue="cluster", palette="coolwarm")
+plt.xlabel("Cluster")
+plt.ylabel("Count")
+plt.title("Distribution of Classifications in Clusters")
+plt.legend(title="Classification")
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.savefig("/tmp/Classification_Clusters4.png")
 
 #cr.write\
 #  .mode("overwrite")\
