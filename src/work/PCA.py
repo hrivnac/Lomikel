@@ -20,6 +20,7 @@ import json
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 
 from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
@@ -254,12 +255,19 @@ result = model.transform(df)
 #result.show(truncate=False)
 
 print(pca_model.explainedVariance)
-cumValues = pca_model.explainedVariance.cumsum()
+
+explained_variance = np.array(pca_model.explainedVariance)  # Convert to NumPy array
+cumValues = np.cumsum(explained_variance)  # Compute cumulative variance
+
+# Ensure x-axis matches the number of principal components
+n_components = len(cumValues)
 plt.figure(figsize=(10,8))
-plt.plot(range(1,9), cumValues, marker = 'o', linestyle='--')
+plt.plot(range(1, n_components + 1), cumValues, marker='o', linestyle='--')
+
 plt.title('variance by components')
 plt.xlabel('num of components')
 plt.ylabel('cumulative explained variance')
+plt.grid(True)
 plt.savefig('/tmp/plot.png')
 
 # Clustering -------------------------------------------------------------------  
