@@ -257,9 +257,9 @@ df_standardized = scaler_model.transform(df_vector)
 
 # PCA --------------------------------------------------------------------------
 
-#vecAssembler = VectorAssembler(inputCols="scaled_features", outputCol="prePcafeatures")
+#vecAssembler = VectorAssembler(inputCols=cols, outputCol="prePcaFeatures")
 pca = PCA(k=n_pca, inputCol="scaled_features", outputCol="pcaFeatures")
-pipeline = Pipeline(stages=[vecAssembler, pca])
+pipeline = Pipeline(stages=[vec_assembler, pca])
 model = pipeline.fit(df_standardized)
 pca_model = model.stages[1]
 
