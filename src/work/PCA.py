@@ -18,6 +18,9 @@ from math import sqrt
 import requests
 import json
 
+import matplotlib
+import matplotlib.pyplot as plt
+
 from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
 
@@ -248,17 +251,26 @@ pipeline = Pipeline(stages=[vecAssembler, pca])
 model = pipeline.fit(df)
 result = model.transform(df)
 #result.show(truncate=False)
-  
+
+print(model.explainedVariance)
+cumValues = model.explainedVariance.cumsum()
+plt.figure(figsize=(10,8))
+plt.plot(range(1,9), cumValues, marker = 'o', linestyle='--')
+plt.title('variance by components')
+plt.xlabel('num of components')
+plt.ylabel('cumulative explained variance')
+plt.savefig('/tmp/plot.png')
+
 # Clustering -------------------------------------------------------------------  
   
-kmeans = KMeans().setK(n_clusters)\
-                 .setSeed(1)\
-                 .setFeaturesCol("pcaFeatures")\
-                 .setPredictionCol("cluster")
-kmeans_model = kmeans.fit(result)
-clustered_result = kmeans_model.transform(result)
-cr = clustered_result.select("objectId", "cluster")\
-                     .withColumn("classification", classification_udf(df.objectId))
+## kmeans = KMeans().setK(n_clusters)\
+##                  .setSeed(1)\
+##                  .setFeaturesCol("pcaFeatures")\
+##                  .setPredictionCol("cluster")
+## kmeans_model = kmeans.fit(result)
+## clustered_result = kmeans_model.transform(result)
+## cr = clustered_result.select("objectId", "cluster")\
+##                      .withColumn("classification", classification_udf(df.objectId))
 #cr.show(truncate=False)
 #cr.write\
 #  .mode("overwrite")\
