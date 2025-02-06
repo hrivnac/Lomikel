@@ -196,7 +196,7 @@ df = df.filter(df.rowkey >= "ZTF22")\
        
 # Classification ---------------------------------------------------------------
 
-df = df.withColumn("classification", classification_udf(df_pca.objectId))
+df = df.withColumn("classification", classification_udf(df.objectId))
 df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # convert lc_features arrays into columns --------------------------------------
