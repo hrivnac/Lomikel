@@ -162,14 +162,14 @@ lc_features = ("g00",
                "r16",
                "r17",
                "r18",
-               "r19",
+               "r19",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
                "r20",
                "r21",
                "r22",
                "r23",
                "r24")
 
-n_sample = 10000
+n_sample = 1000
 n_pca = 10
 n_clusters = 5
 
@@ -193,6 +193,11 @@ df = df.filter(df.rowkey >= "ZTF22")\
        .filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
        .limit(n_sample)
+       
+# Classification ---------------------------------------------------------------
+
+df = df.withColumn("classification", classification_udf(df_pca.objectId))
+df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # convert lc_features arrays into columns --------------------------------------
 
@@ -299,8 +304,7 @@ kmeans = KMeans().setK(n_clusters)\
                  .setPredictionCol("cluster")
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
-cr = clustered_result.select("objectId", "cluster")\
-                     .withColumn("classification", classification_udf(df_pca.objectId))
+cr = clustered_result.select("objectId", "cluster", "classification")
                      
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
