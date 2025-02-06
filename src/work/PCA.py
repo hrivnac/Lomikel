@@ -189,7 +189,7 @@ df = spark.read\
           .option("hbase.spark.pushdown.columnfilter", True)\
           .load()
 
-df = df.filter(df.rowkey >= "ZTF24")\
+df = df.filter(df.rowkey >= "ZTF22")\
        .filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
        .limit(n_sample)
