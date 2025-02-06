@@ -289,11 +289,12 @@ plt.grid(True)
 plt.savefig("/tmp/PCA_Variance.png") # use number of components with variance about 80%
 
 # show
-#df_pca.show(truncate=False)
 
 # Classification ---------------------------------------------------------------  
    
-df_pca = df_pca.withColumn("classification", classification_udf(df_pca.objectId))
+df_pca = df_pca.withColumn("classification", classification_udf(df_pca.objectId))\
+               .filter((df_pca.classification != "failed") & (df_pca.classification != "Unknown"))                     
+df_pca.show(truncate=False)
 
 # Clustering -------------------------------------------------------------------  
    
@@ -304,7 +305,6 @@ kmeans = KMeans().setK(n_clusters)\
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
 cr = clustered_result.select("objectId", "cluster", "classification")
-#df = df.filter((df.A != 'NA') & (df.B != 'NA') & (df.C != 'NA'))                     
                      
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
@@ -353,7 +353,7 @@ plt.legend(title="Count")
 plt.savefig("/tmp/Classification_Clusters.png")
 
 # show
-cr.show(truncate=False)
+#cr.show(truncate=False)
 
 # export
 #cr.write\
