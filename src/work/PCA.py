@@ -292,8 +292,8 @@ plt.savefig("/tmp/PCA_Variance.png") # use number of components with variance ab
 
 # Classification ---------------------------------------------------------------  
    
-df_pca = df_pca.withColumn("classification", classification_udf(df_pca.objectId))\
-               .filter((df_pca.classification != "failed") & (df_pca.classification != "Unknown"))                     
+df_pca = df_pca.withColumn("classification", classification_udf(df_pca.objectId))
+df_pca = df_pca.filter((df_pca.classification != "failed") & (df_pca.classification != "Unknown"))                     
 df_pca.show(truncate=False)
 
 # Clustering -------------------------------------------------------------------  
