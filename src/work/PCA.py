@@ -297,7 +297,7 @@ kmeans = KMeans().setK(n_clusters)\
                  .setSeed(1)\
                  .setFeaturesCol("scaled_features")\
                  .setPredictionCol("cluster")
-kmeans_model = kmeans.fit(df_pca)
+kmeans_model = kmeans.fit(df_standardised)
 clustered_result = kmeans_model.transform(df_pca)
 cr = clustered_result.select("objectId", "cluster")\
                      .withColumn("classification", classification_udf(df_pca.objectId))
