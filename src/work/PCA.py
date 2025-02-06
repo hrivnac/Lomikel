@@ -162,7 +162,7 @@ lc_features = ("g00",
                "r16",
                "r17",
                "r18",
-               "r19",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
+               "r19",
                "r20",
                "r21",
                "r22",
