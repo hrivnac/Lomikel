@@ -298,9 +298,9 @@ kmeans = KMeans().setK(n_clusters)\
                  .setFeaturesCol("scaled_features")\
                  .setPredictionCol("cluster")
 kmeans_model = kmeans.fit(df_standardized)
-clustered_result = kmeans_model.transform(df_pca)
+clustered_result = kmeans_model.transform(df_standardized)
 cr = clustered_result.select("objectId", "cluster")\
-                     .withColumn("classification", classification_udf(df_pca.objectId))
+                     .withColumn("classification", classification_udf(df_standardized.objectId))
                      
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
