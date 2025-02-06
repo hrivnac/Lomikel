@@ -169,7 +169,7 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 1000
+n_sample = 100
 n_pca = 10
 n_clusters = 5
 
@@ -273,6 +273,10 @@ df_standardized = scaler_model.transform(df_vector)
 pca = PCA(k=n_pca,
           inputCol="scaled_features",
           outputCol="pca_features")
+
+
+
+
 pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
 
