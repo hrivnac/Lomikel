@@ -291,16 +291,19 @@ plt.savefig("/tmp/PCA_Variance.png") # use number of components with variance ab
 # show
 #df_pca.show(truncate=False)
 
+# Classification ---------------------------------------------------------------  
+   
+df_pca = df_pca.withColumn("classification", classification_udf(df_pca.objectId))
+
 # Clustering -------------------------------------------------------------------  
-  
+   
 kmeans = KMeans().setK(n_clusters)\
                  .setSeed(1)\
                  .setFeaturesCol("pca_features")\
                  .setPredictionCol("cluster")
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
-cr = clustered_result.select("objectId", "cluster")\
-                     .withColumn("classification", classification_udf(df_pca.objectId))
+cr = clustered_result.select("objectId", "cluster", "classification")
 #df = df.filter((df.A != 'NA') & (df.B != 'NA') & (df.C != 'NA'))                     
                      
 # plot                     
