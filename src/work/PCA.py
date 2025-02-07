@@ -101,7 +101,7 @@ cols = ["g00",
         "r06",
         "r07",
         "r08",
-        "r09",
+        "r09",ZTF18acyygzd
         "r10",
         "r11",
         "r12",
@@ -169,7 +169,7 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 10000
+n_sample = 100
 n_pca = 10
 n_clusters = 10
 
@@ -254,7 +254,7 @@ df = df.na.fill(0, lc_features)
 
 # Classification ---------------------------------------------------------------  
    
-df = df.withColumn("classification", classification_udf(df.objectId))
+df = df.withColumn("classification", classification_udf(df.jd))
 df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # Normalisation ----------------------------------------------------------------
@@ -276,10 +276,10 @@ pca = PCA(k=n_pca,
 pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
 
-# Report
+# report
 print(pca_model.explainedVariance)
 
-# Plot
+# plot
 explained_variance = np.array(pca_model.explainedVariance)
 cumValues = np.cumsum(explained_variance)
 n_components = len(cumValues)
