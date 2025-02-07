@@ -216,8 +216,7 @@ df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()))\
        .withColumn("g16", split_g.getItem(16).cast(DoubleType()))\
        .withColumn("g17", split_g.getItem(17).cast(DoubleType()))\
        .withColumn("g18", split_g.getItem(18).cast(DoubleType()))\
-       .withColumn("g19", split_g.getItem(19)._pca
-_pcacast(DoubleType()))\
+       .withColumn("g19", split_g.getItem(19).cast(DoubleType()))\
        .withColumn("g20", split_g.getItem(20).cast(DoubleType()))\
        .withColumn("g21", split_g.getItem(21).cast(DoubleType()))\
        .withColumn("g22", split_g.getItem(22).cast(DoubleType()))\
