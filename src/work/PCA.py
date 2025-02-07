@@ -298,7 +298,7 @@ plt.savefig("/tmp/PCA_Variance.png")
 
 # Clustering -------------------------------------------------------------------  
 
-df_pca.select(col("pca_features")).show(truncate=false)
+df_pca.select(col("pca_features")).show(truncate=False)
 
 
 ## silhouette_score = [] 
