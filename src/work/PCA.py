@@ -292,17 +292,18 @@ plt.title("variance by components")
 plt.xlabel("num of components")
 plt.ylabel("Cumulative Explained Variance")
 plt.grid(True)
-plt.savefig("/tmp/PCA_Variance.png") # use number of components with variance about 80%
+plt.savefig("/tmp/PCA_Variance.png")
 
 # show
 df_pca.show(truncate=False)
 
-# Clustering -------------------------------------------------------------------  
+# use n_components for variance about 80%
 
+# Clustering -------------------------------------------------------------------  
 
 silhouette_score=[] 
   
-evaluator = ClusteringEvaluator(predictionCol = "cluster", 
+evaluator = ClusteringEvaluator(predictionCol = "prediction", 
                                 featuresCol = "pca_features",
                                 metricName = "silhouette",  
                                 distanceMeasure = "squaredEuclidean") 
@@ -310,7 +311,7 @@ evaluator = ClusteringEvaluator(predictionCol = "cluster",
 for i in range(2, 10): 
   kmeans = KMeans(featuresCol = "pca_features", k = i) 
   model = kmeans.fit(df_pca) 
-  predictions = model.transform(df_pca) 
+  predictions = model.transform(df_pca)
   score = evaluator.evaluate(predictions) 
   silhouette_score.append(score) 
   print("Silhouette Score for k =", i, "is", score)
@@ -321,6 +322,8 @@ plt.ylabel("within set sum of squared errors")
 plt.title("Elbow Method for Optimal K") 
 plt.grid()
 plt.savefig("/tmp/Silhouette_Score.png")
+
+# use n_clusters at maximum
 
 ## kmeans = KMeans(featuresCol='scaledFeatures',k=3) 
 ## model = kmeans.fit(final_data) 
