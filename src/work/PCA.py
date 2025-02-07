@@ -318,7 +318,7 @@ for i in range(5, 15):
 
 # plot
 plt.figure(figsize=(10, 8))
-plt.plot(range(5, 12), silhouette_score) 
+plt.plot(range(5, 25), silhouette_score) 
 plt.xlabel("number of clusters") 
 plt.ylabel("within set sum of squared errors") 
 plt.title("Elbow Method for Optimal K") 
