@@ -305,7 +305,7 @@ evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
                                  .setMetricName("silhouette",)\
                                  .setDistanceMeasure("squaredEuclidean")
   
-for i in range(2, 10): 
+for i in range(3, 10): 
   kmeans = KMeans().setK(i)\
                    .setFeaturesCol("pca_features") 
   model = kmeans.fit(df_pca) 
@@ -314,7 +314,7 @@ for i in range(2, 10):
   silhouette_score.append(score) 
   print("Silhouette Score for k =", i, "is", score)
 
-plt.plot(range(2, 10), silhouette_score) 
+plt.plot(range(3, 10), silhouette_score) 
 plt.xlabel("number of clusters") 
 plt.ylabel("within set sum of squared errors") 
 plt.title("Elbow Method for Optimal K") 
