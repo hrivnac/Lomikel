@@ -316,9 +316,10 @@ for i in range(2, 10):
   print("Silhouette Score for k =", i, "is", score)
 
 plt.plot(range(2, 10), silhouette_score) 
-plt.xlabel("k") 
-plt.ylabel("silhouette score") 
-plt.title("Silhouette Score") 
+plt.xlabel("number of clusters") 
+plt.ylabel("within set sum of squared errors") 
+plt.title("Elbow Method for Optimal K") 
+plt.grid()
 plt.savefig("/tmp/Silhouette_Score.png")
 
 ## kmeans = KMeans(featuresCol='scaledFeatures',k=3) 
