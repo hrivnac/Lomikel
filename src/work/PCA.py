@@ -257,7 +257,7 @@ df = df.na.fill(0, lc_features)
 df = df.withColumn("classification", classification_udf(df.rowkey))
 df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
-# Normalisation ----------------------------------------------------------------
+# Standardisation --------------------------------------------------------------
 
 vec_assembler = VectorAssembler(inputCols=cols, outputCol="features")
 df_vector = vec_assembler.transform(df)
@@ -293,9 +293,6 @@ plt.xlabel("num of components")
 plt.ylabel("Cumulative Explained Variance")
 plt.grid(True)
 plt.savefig("/tmp/PCA_Variance.png")
-
-# show
-df_pca.show(truncate=False)
 
 # use n_components for variance about 80%
 
