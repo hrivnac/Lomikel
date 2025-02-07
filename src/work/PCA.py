@@ -33,7 +33,7 @@ import requests
 
 import json
 
-# classification from Fink Portal ----------------------------------------------
+# Classification from Fink Portal ----------------------------------------------
 
 classifications = {}
 
@@ -52,7 +52,7 @@ def classification(objectId):
 classification_udf = udf(lambda x: classification(x), StringType())
 
 
-# parameters -------------------------------------------------------------------
+# Parameters -------------------------------------------------------------------
 
 mapping = "rowkey STRING :key, " + \
           "objectId STRING i:objectId, " + \
@@ -173,13 +173,13 @@ n_sample = 1000
 n_pca = 10
 n_clusters = 5
 
-# new session ------------------------------------------------------------------
+# New session ------------------------------------------------------------------
 
 spark = SparkSession.builder\
                     .appName("PCA with HBase")\
                     .getOrCreate()
 
-# read HBase into DataGram -----------------------------------------------------
+# Read HBase into DataGram -----------------------------------------------------
 
 df = spark.read\
           .format("org.apache.hadoop.hbase.spark")\
@@ -194,7 +194,7 @@ df = df.filter(df.rowkey >= "ZTF22")\
        .filter(df.lc_features_r.isNotNull())\
        .limit(n_sample)
 
-# convert lc_features arrays into columns --------------------------------------
+# Convert lc_features arrays into columns --------------------------------------
 
 split_g = split(df["lc_features_g"], ",")
 df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()))\
@@ -216,7 +216,8 @@ df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()))\
        .withColumn("g16", split_g.getItem(16).cast(DoubleType()))\
        .withColumn("g17", split_g.getItem(17).cast(DoubleType()))\
        .withColumn("g18", split_g.getItem(18).cast(DoubleType()))\
-       .withColumn("g19", split_g.getItem(19).cast(DoubleType()))\
+       .withColumn("g19", split_g.getItem(19)._pca
+_pcacast(DoubleType()))\
        .withColumn("g20", split_g.getItem(20).cast(DoubleType()))\
        .withColumn("g21", split_g.getItem(21).cast(DoubleType()))\
        .withColumn("g22", split_g.getItem(22).cast(DoubleType()))\
@@ -252,7 +253,12 @@ df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()))\
         
 df = df.na.fill(0, lc_features)
 
-# normalisation ----------------------------------------------------------------
+# Classification ---------------------------------------------------------------  
+   
+df = df.withColumn("classification", classification_udf(df.objectId))
+df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
+
+# Normalisation ----------------------------------------------------------------
 
 vec_assembler = VectorAssembler(inputCols=cols, outputCol="features")
 df_vector = vec_assembler.transform(df)
@@ -271,9 +277,10 @@ pca = PCA(k=n_pca,
 pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
 
-# report
+# Report
 print(pca_model.explainedVariance)
-# plot
+
+# Plot
 explained_variance = np.array(pca_model.explainedVariance)
 cumValues = np.cumsum(explained_variance)
 n_components = len(cumValues)
@@ -289,11 +296,6 @@ plt.grid(True)
 plt.savefig("/tmp/PCA_Variance.png") # use number of components with variance about 80%
 
 # show
-
-# Classification ---------------------------------------------------------------  
-   
-df_pca = df_pca.withColumn("classification", classification_udf(df_pca.objectId))
-df_pca = df_pca.filter((df_pca.classification != "failed") & (df_pca.classification != "Unknown"))                     
 df_pca.show(truncate=False)
 
 # Clustering -------------------------------------------------------------------  
@@ -305,51 +307,29 @@ kmeans = KMeans().setK(n_clusters)\
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
 cr = clustered_result.select("objectId", "cluster", "classification")
-                     
+
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
 pdf["cluster"] = pdf["cluster"].astype(str)
-grouped = pdf.groupby(["classification", "cluster"]).size().reset_index(name="count")
-
-
-## x_labels = grouped["classification"].astype(str)
-## y_labels = grouped["cluster"]
-## z_values = grouped["count"]
-## x_unique = sorted(x_labels.unique())
-## x_mapping = {label: i for i, label in enumerate(x_unique)}
-## x_values = x_labels.map(x_mapping)
-## fig = plt.figure(figsize=(10, 8))
-## ax = fig.add_subplot(111, projection="3d")
-## ax.bar3d(x_values, y_labels, np.zeros_like(z_values), 0.6, 0.6, z_values, shade=True)
-## ax.set_xlabel("Classification")
-## ax.set_ylabel("Cluster")
-## ax.set_zlabel("Count")
-## ax.set_title("Classification vs Cluster")
-## ax.set_xticks(range(len(x_unique)))
-## ax.set_xticklabels(x_unique, rotation=45)
-
+grouped = pdf.groupby(["classification", "cluster"])\
+             .size()\
+             .reset_index(name="count")
 plt.figure(figsize=(12, 6))
-sns.scatterplot(
-    data=grouped,
-    x="cluster",
-    y="classification",
-    size="count",
-    hue="count",
-    palette="viridis",
-    sizes=(50, 500),  # Control bubble size range
-    edgecolor="black",
-    alpha=0.75  # Transparency for better visibility
-)
-
-# Labels and Titles
+sns.scatterplot(data=grouped,
+                x="cluster",
+                y="classification",
+                size="count",
+                hue="count",
+                palette="viridis",
+                sizes=(50, 500),
+                edgecolor="black",
+                alpha=0.75)
 plt.xlabel("Classification")
 plt.ylabel("Cluster")
 plt.title("Cluster vs Classification Scatter Plot (Bubble Size = Count)")
-plt.xticks(rotation=45)  # Rotate for better readability
+plt.xticks(rotation=45)
 plt.grid(True)
 plt.legend(title="Count")
-
-
 plt.savefig("/tmp/Classification_Clusters.png")
 
 # show
@@ -361,7 +341,7 @@ plt.savefig("/tmp/Classification_Clusters.png")
 #  .format("csv")\
 #  .save("/tmp/cr")
 
-# statistics -------------------------------------------------------------------
+# Statistics -------------------------------------------------------------------
 
 print("*** Centers ***")
 #centers = kmeans_model.clusterCenters()
@@ -387,7 +367,7 @@ print("*** Stats ***")
 #silhouette = evaluator.evaluate(clustered_result)
 #print(silhouette)
 
-# end --------------------------------------------------------------------------
+# End --------------------------------------------------------------------------
 
 spark.stop()
 
