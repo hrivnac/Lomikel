@@ -301,7 +301,7 @@ df_pca.show(truncate=False)
 
 # Clustering -------------------------------------------------------------------  
 
-silhouette_score=[] 
+silhouette_score = [] 
   
 evaluator = ClusteringEvaluator(predictionCol = "prediction", 
                                 featuresCol = "pca_features",
