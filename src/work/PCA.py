@@ -298,28 +298,31 @@ plt.savefig("/tmp/PCA_Variance.png")
 
 # Clustering -------------------------------------------------------------------  
 
-silhouette_score = [] 
-  
-evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
-                                 .setFeaturesCol("pca_features")\
-                                 .setMetricName("silhouette",)\
-                                 .setDistanceMeasure("squaredEuclidean")
-  
-for i in range(2, 10): 
-  kmeans = KMeans().setK(i)\
-                   .setFeaturesCol("pca_features") 
-  model = kmeans.fit(df_pca) 
-  predictions = model.transform(df_pca)
-  score = evaluator.evaluate(predictions) 
-  silhouette_score.append(score) 
-  print("Silhouette Score for k =", i, "is", score)
+df_pca.select(col("pca_features")).show(truncate=false)
 
-plt.plot(range(2, 10), silhouette_score) 
-plt.xlabel("number of clusters") 
-plt.ylabel("within set sum of squared errors") 
-plt.title("Elbow Method for Optimal K") 
-plt.grid()
-plt.savefig("/tmp/Silhouette_Score.png")
+
+## silhouette_score = [] 
+##   
+## evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
+##                                  .setFeaturesCol("pca_features")\
+##                                  .setMetricName("silhouette",)\
+##                                  .setDistanceMeasure("squaredEuclidean")
+##   
+## for i in range(2, 10): 
+##   kmeans = KMeans().setK(i)\
+##                    .setFeaturesCol("pca_features") 
+##   model = kmeans.fit(df_pca) 
+##   predictions = model.transform(df_pca)
+##   score = evaluator.evaluate(predictions) 
+##   silhouette_score.append(score) 
+##   print("Silhouette Score for k =", i, "is", score)
+## 
+## plt.plot(range(2, 10), silhouette_score) 
+## plt.xlabel("number of clusters") 
+## plt.ylabel("within set sum of squared errors") 
+## plt.title("Elbow Method for Optimal K") 
+## plt.grid()
+## plt.savefig("/tmp/Silhouette_Score.png")
 
 # use n_clusters at maximum
 
