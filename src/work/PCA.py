@@ -254,7 +254,7 @@ df = df.na.fill(0, lc_features)
 
 # Classification ---------------------------------------------------------------  
    
-df = df.withColumn("classification", classification_udf(df.jd))
+df = df.withColumn("classification", classification_udf(df.rowkey))
 df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # Normalisation ----------------------------------------------------------------
@@ -298,38 +298,60 @@ plt.savefig("/tmp/PCA_Variance.png") # use number of components with variance ab
 df_pca.show(truncate=False)
 
 # Clustering -------------------------------------------------------------------  
-   
-kmeans = KMeans().setK(n_clusters)\
-                 .setSeed(1)\
-                 .setFeaturesCol("pca_features")\
-                 .setPredictionCol("cluster")
-kmeans_model = kmeans.fit(df_pca)
-clustered_result = kmeans_model.transform(df_pca)
-cr = clustered_result.select("objectId", "cluster", "classification")
 
-# plot                     
-pdf = cr.select("cluster", "classification").toPandas()
-pdf["cluster"] = pdf["cluster"].astype(str)
-grouped = pdf.groupby(["classification", "cluster"])\
-             .size()\
-             .reset_index(name="count")
-plt.figure(figsize=(12, 6))
-sns.scatterplot(data=grouped,
-                x="cluster",
-                y="classification",
-                size="count",
-                hue="count",
-                palette="viridis",
-                sizes=(50, 500),
-                edgecolor="black",
-                alpha=0.75)
-plt.xlabel("Classification")
-plt.ylabel("Cluster")
-plt.title("Cluster vs Classification Scatter Plot (Bubble Size = Count)")
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.legend(title="Count")
-plt.savefig("/tmp/Classification_Clusters.png")
+
+silhouette_score=[] 
+  
+evaluator = ClusteringEvaluator(predictionCol="cluster", 
+                                featuresCol="pca_features",
+                                metricName="silhouette",  
+                                distanceMeasure="squaredEuclidean") 
+  
+for i in range(2, 10): 
+  kmeans = KMeans(featuresCol="pca_features", k=i) 
+  model = kmeans.fit(final_data) 
+  predictions = model.transform(final_data) 
+  score = evaluator.evaluate(predictions) 
+  silhouette_score.append(score) 
+  print("Silhouette Score for k =", i, "is", score)
+
+plt.plot(range(2, 10), silhouette_score) 
+plt.xlabel("k") 
+plt.ylabel("silhouette score") 
+plt.title("Silhouette Score") 
+plt.savefig("/tmp/Silhouette_Score.png")
+
+## kmeans = KMeans().setK(n_clusters)\
+##                  .setSeed(1)\
+##                  .setFeaturesCol("pca_features")\
+##                  .setPredictionCol("cluster")
+## kmeans_model = kmeans.fit(df_pca)
+## clustered_result = kmeans_model.transform(df_pca)
+## cr = clustered_result.select("objectId", "cluster", "classification")
+## 
+## # plot                     
+## pdf = cr.select("cluster", "classification").toPandas()
+## pdf["cluster"] = pdf["cluster"].astype(str)
+## grouped = pdf.groupby(["classification", "cluster"])\
+##              .size()\
+##              .reset_index(name="count")
+## plt.figure(figsize=(12, 6))
+## sns.scatterplot(data=grouped,
+##                 x="cluster",
+##                 y="classification",
+##                 size="count",
+##                 hue="count",
+##                 palette="viridis",
+##                 sizes=(50, 500),
+##                 edgecolor="black",
+##                 alpha=0.75)
+## plt.xlabel("Classification")
+## plt.ylabel("Cluster")
+## plt.title("Cluster vs Classification Scatter Plot (Bubble Size = Count)")
+## plt.xticks(rotation=45)
+## plt.grid(True)
+## plt.legend(title="Count")
+## plt.savefig("/tmp/Classification_Clusters.png")
 
 # show
 #cr.show(truncate=False)
