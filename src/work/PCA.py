@@ -303,10 +303,10 @@ df_pca.show(truncate=False)
 
 silhouette_score = [] 
   
-evaluator = ClusteringEvaluator().setPredictionCol("prediction")\ 
+evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
                                  .setFeaturesCol("pca_features")\
-                                 .setMetricName("silhouette",)\ 
-                                 .setDistanceMeasure("squaredEuclidean") 
+                                 .setMetricName("silhouette",)\
+                                 .setDistanceMeasure("squaredEuclidean")
   
 for i in range(2, 10): 
   kmeans = KMeans().setK(i)\
