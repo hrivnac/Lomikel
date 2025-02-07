@@ -176,7 +176,7 @@ n_clusters = 10
 # New session ------------------------------------------------------------------
 
 spark = SparkSession.builder\
-                    .appName("PCA with HBase")\Silhouette
+                    .appName("PCA with HBase")\
                     .getOrCreate()
 
 # Read HBase into DataGram -----------------------------------------------------
@@ -302,13 +302,13 @@ df_pca.show(truncate=False)
 
 silhouette_score=[] 
   
-evaluator = ClusteringEvaluator(predictionCol="cluster", 
-                                featuresCol="pca_features",
-                                metricName="silhouette",  
-                                distanceMeasure="squaredEuclidean") 
+evaluator = ClusteringEvaluator(predictionCol = "cluster", 
+                                featuresCol = "pca_features",
+                                metricName = "silhouette",  
+                                distanceMeasure = "squaredEuclidean") 
   
 for i in range(2, 10): 
-  kmeans = KMeans(featuresCol="pca_features", k=i) 
+  kmeans = KMeans(featuresCol = "pca_features", k = i) 
   model = kmeans.fit(df_pca) 
   predictions = model.transform(df_pca) 
   score = evaluator.evaluate(predictions) 
