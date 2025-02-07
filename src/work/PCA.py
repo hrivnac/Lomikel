@@ -169,7 +169,7 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 100
+n_sample = 200
 n_pca = 10
 n_clusters = 10
 
@@ -305,7 +305,7 @@ evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
                                  .setMetricName("silhouette",)\
                                  .setDistanceMeasure("squaredEuclidean")
   
-for i in range(3, 10): 
+for i in range(2, 10): 
   kmeans = KMeans().setK(i)\
                    .setFeaturesCol("pca_features") 
   model = kmeans.fit(df_pca) 
