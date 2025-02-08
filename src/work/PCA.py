@@ -305,7 +305,7 @@ evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
                                  .setMetricName("silhouette",)\
                                  .setDistanceMeasure("squaredEuclidean")
   
-for i in range(5, 15):
+for i in range(5, 25):
   try:
     kmeans = KMeans().setK(i)\
                      .setFeaturesCol("pca_features") 
