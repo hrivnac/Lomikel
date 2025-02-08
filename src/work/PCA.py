@@ -172,6 +172,9 @@ lc_features = ("g00",
 n_sample = 1000
 n_pca = 50
 n_clusters = 10
+silhouette = False
+classify = True
+cluster_features = "scaled_features"
 
 # New session ------------------------------------------------------------------
 
@@ -254,8 +257,9 @@ df = df.na.fill(0, lc_features)
 
 # Classification ---------------------------------------------------------------  
    
-#df = df.withColumn("classification", classification_udf(df.rowkey))
-#df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
+if classify:
+  df = df.withColumn("classification", classification_udf(df.rowkey))
+  df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # Standardisation --------------------------------------------------------------
 
@@ -271,7 +275,7 @@ df_standardized = scaler_model.transform(df_vector)
 # PCA --------------------------------------------------------------------------
 
 pca = PCA(k=n_pca,
-          inputCol="features",
+          inputCol="scaled_features",
           outputCol="pca_features")
 pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
@@ -297,81 +301,72 @@ plt.savefig("/tmp/PCA_Variance.png")
 # use n_components for variance about 80%
 
 # Clustering -------------------------------------------------------------------  
-
-silhouette_score = [] 
-  
-## evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
-##                                  .setFeaturesCol("pca_features")\
-##                                  .setMetricName("silhouette",)\
-##                                  .setDistanceMeasure("squaredEuclidean")
+    
 evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
-                                 .setFeaturesCol("features")\
+                                 .setFeaturesCol(cluster_features)\
                                  .setMetricName("silhouette",)\
                                  .setDistanceMeasure("squaredEuclidean")
-  
-for i in range(5, 25):
-  try:
-    kmeans = KMeans().setK(i)\
-                     .setFeaturesCol("features") 
-    model = kmeans.fit(df_pca)
-    predictions = model.transform(df_pca)
-    score = evaluator.evaluate(predictions) 
-    silhouette_score.append(score)
-  except:
-    print("Failed for i = ", i)
-    silhouette_score.append(0)
 
-# plot
-plt.figure(figsize=(10, 8))
-plt.plot(range(5, 25), silhouette_score) 
-plt.xlabel("number of clusters") 
-plt.ylabel("within set sum of squared errors") 
-plt.title("Elbow Method for Optimal K") 
-plt.grid()
-plt.savefig("/tmp/Silhouette_Score.png")
+if silhouette:
+  silhouette_score = [] 
+    
+  for i in range(5, 25):
+    try:
+      kmeans = KMeans().setK(i)\
+                       .setFeaturesCol(cluster_features) 
+      model = kmeans.fit(df_pca)
+      predictions = model.transform(df_pca)
+      score = evaluator.evaluate(predictions) 
+      silhouette_score.append(score)
+    except:
+      print("Failed for i = ", i)
+      silhouette_score.append(0)
+  # plot
+  plt.figure(figsize=(10, 8))
+  plt.plot(range(5, 25), silhouette_score) 
+  plt.xlabel("number of clusters") 
+  plt.ylabel("within set sum of squared errors") 
+  plt.title("Elbow Method for Optimal K") 
+  plt.grid()
+  plt.savefig("/tmp/Silhouette_Score.png")  
+  # use n_clusters at maximum
+    
+kmeans = KMeans().setK(n_clusters)\
+                 .setSeed(1)\
+                 .setFeaturesCol("pca_features")\
+                 .setPredictionCol("cluster")
+kmeans_model = kmeans.fit(df_pca)
+clustered_result = kmeans_model.transform(df_pca)
+cr = clustered_result.select("objectId", "cluster", "classification")
 
-# use n_clusters at maximum
+# plot                     
+pdf = cr.select("cluster", "classification").toPandas()
+pdf["cluster"] = pdf["cluster"].astype(str)
+grouped = pdf.groupby(["classification", "cluster"])\
+             .size()\
+             .reset_index(name="count")
+plt.figure(figsize=(12, 6))
+sns.scatterplot(data=grouped,
+                x="cluster",
+                y="classification",
+                size="count",
+                hue="count",
+                palette="viridis",
+                sizes=(50, 500),
+                edgecolor="black",
+                alpha=0.75)
+plt.xlabel("Classification")
+plt.ylabel("Cluster")
+plt.title("Cluster vs Classification Scatter Plot (Bubble Size = Count)")
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.legend(title="Count")
+plt.savefig("/tmp/Classification_Clusters.png")
 
-## kmeans = KMeans(featuresCol='scaledFeatures',k=3) 
-## model = kmeans.fit(final_data) 
-## predictions = model.transform(final_data)
-## 
 ## centers = model.clusterCenters() 
 ## print("Cluster Centers: ") 
 ## for center in centers: 
 ##     print(center)
-    
-## kmeans = KMeans().setK(n_clusters)\
-##                  .setSeed(1)\
-##                  .setFeaturesCol("pca_features")\
-##                  .setPredictionCol("cluster")
-## kmeans_model = kmeans.fit(df_pca)
-## clustered_result = kmeans_model.transform(df_pca)
-## cr = clustered_result.select("objectId", "cluster", "classification")
-## 
-## # plot                     
-## pdf = cr.select("cluster", "classification").toPandas()
-## pdf["cluster"] = pdf["cluster"].astype(str)
-## grouped = pdf.groupby(["classification", "cluster"])\
-##              .size()\
-##              .reset_index(name="count")
-## plt.figure(figsize=(12, 6))
-## sns.scatterplot(data=grouped,
-##                 x="cluster",
-##                 y="classification",
-##                 size="count",
-##                 hue="count",
-##                 palette="viridis",
-##                 sizes=(50, 500),
-##                 edgecolor="black",
-##                 alpha=0.75)
-## plt.xlabel("Classification")
-## plt.ylabel("Cluster")
-## plt.title("Cluster vs Classification Scatter Plot (Bubble Size = Count)")
-## plt.xticks(rotation=45)
-## plt.grid(True)
-## plt.legend(title="Count")
-## plt.savefig("/tmp/Classification_Clusters.png")
 
 # show
 #cr.show(truncate=False)
