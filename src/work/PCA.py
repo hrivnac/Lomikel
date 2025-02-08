@@ -169,7 +169,7 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 100
+n_sample = 1000
 n_pca = 50
 n_clusters = 10
 silhouette = False
