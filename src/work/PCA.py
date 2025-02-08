@@ -333,7 +333,7 @@ if silhouette:
     
 kmeans = KMeans().setK(n_clusters)\
                  .setSeed(1)\
-                 .setFeaturesCol("pca_features")\
+                 .setFeaturesCol(cluster_features)\
                  .setPredictionCol("cluster")
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
