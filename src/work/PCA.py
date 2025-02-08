@@ -170,7 +170,7 @@ lc_features = ("g00",
                "r24")
 
 n_sample = 1000
-n_pca = 15
+n_pca = 50
 n_clusters = 10
 
 # New session ------------------------------------------------------------------
@@ -300,15 +300,19 @@ plt.savefig("/tmp/PCA_Variance.png")
 
 silhouette_score = [] 
   
+## evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
+##                                  .setFeaturesCol("pca_features")\
+##                                  .setMetricName("silhouette",)\
+##                                  .setDistanceMeasure("squaredEuclidean")
 evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
-                                 .setFeaturesCol("pca_features")\
+                                 .setFeaturesCol("scaled_features")\
                                  .setMetricName("silhouette",)\
                                  .setDistanceMeasure("squaredEuclidean")
   
 for i in range(5, 25):
   try:
     kmeans = KMeans().setK(i)\
-                     .setFeaturesCol("pca_features") 
+                     .setFeaturesCol("scaled_features") 
     model = kmeans.fit(df_pca)
     predictions = model.transform(df_pca)
     score = evaluator.evaluate(predictions) 
