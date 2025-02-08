@@ -169,8 +169,8 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 200
-n_pca = 10
+n_sample = 1000
+n_pca = 50
 n_clusters = 10
 
 # New session ------------------------------------------------------------------
@@ -254,8 +254,8 @@ df = df.na.fill(0, lc_features)
 
 # Classification ---------------------------------------------------------------  
    
-df = df.withColumn("classification", classification_udf(df.rowkey))
-df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
+#df = df.withColumn("classification", classification_udf(df.rowkey))
+#df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # Standardisation --------------------------------------------------------------
 
