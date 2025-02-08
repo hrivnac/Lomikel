@@ -315,6 +315,7 @@ for i in range(5, 25):
     silhouette_score.append(score)
   except:
     print("Failed for i = ", i)
+    silhouette_score.append(0)
 
 # plot
 plt.figure(figsize=(10, 8))
