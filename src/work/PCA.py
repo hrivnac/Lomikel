@@ -305,14 +305,14 @@ silhouette_score = []
 ##                                  .setMetricName("silhouette",)\
 ##                                  .setDistanceMeasure("squaredEuclidean")
 evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
-                                 .setFeaturesCol("scaled_features")\
+                                 .setFeaturesCol("features")\
                                  .setMetricName("silhouette",)\
                                  .setDistanceMeasure("squaredEuclidean")
   
 for i in range(5, 25):
   try:
     kmeans = KMeans().setK(i)\
-                     .setFeaturesCol("scaled_features") 
+                     .setFeaturesCol("features") 
     model = kmeans.fit(df_pca)
     predictions = model.transform(df_pca)
     score = evaluator.evaluate(predictions) 
