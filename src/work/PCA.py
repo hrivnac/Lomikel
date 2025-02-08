@@ -271,7 +271,7 @@ df_standardized = scaler_model.transform(df_vector)
 # PCA --------------------------------------------------------------------------
 
 pca = PCA(k=n_pca,
-          inputCol="scaled_features",
+          inputCol="features",
           outputCol="pca_features")
 pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
