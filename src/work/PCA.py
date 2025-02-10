@@ -179,7 +179,7 @@ n_pca = 10
 n_clusters = 10
 silhouette = False
 classify = True
-cluster_features = "scaled_features"
+cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
 
