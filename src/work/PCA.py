@@ -67,7 +67,12 @@ mapping = "rowkey STRING :key, " + \
           "sigmagnr FLOAT i:sigmagnr, " + \
           "magzpsci FLOAT i:magzpsci"
           
-cols = ["g00",
+cols = ["magpsf",
+        "sigmapsf",
+        "magnr",
+        "sigmagnr",
+        "magzpsci",
+        "g00",
         "g01",
         "g02",
         "g03",
@@ -169,12 +174,12 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 1000
-n_pca = 50
+n_sample = 100
+n_pca = 10
 n_clusters = 10
 silhouette = False
 classify = True
-cluster_features = "scaled_features"
+cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
 
