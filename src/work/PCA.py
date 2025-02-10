@@ -316,6 +316,7 @@ if silhouette:
   silhouette_score = [] 
     
   for i in range(5, 25):
+
     try:
       kmeans = KMeans().setK(i)\
                        .setFeaturesCol(cluster_features) 
@@ -368,10 +369,10 @@ plt.grid(True)
 plt.legend(title="Count")
 plt.savefig("/tmp/Classification_Clusters.png")
 
-## centers = model.clusterCenters() 
-## print("Cluster Centers: ") 
-## for center in centers: 
-##     print(center)
+centers = kmeans_model.clusterCenters() 
+print("Cluster Centers:") 
+for center in centers: 
+  print(center)
 
 # show
 #cr.show(truncate=False)
