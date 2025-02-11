@@ -67,12 +67,7 @@ mapping = "rowkey STRING :key, " + \
           "sigmagnr FLOAT i:sigmagnr, " + \
           "magzpsci FLOAT i:magzpsci"
           
-cols = ["magpsf",
-        "sigmapsf",
-        "magnr",
-        "sigmagnr",
-        "magzpsci",
-        "g00",
+cols = ["g00",
         "g01",
         "g02",
         "g03",
