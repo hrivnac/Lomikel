@@ -71,7 +71,57 @@ cols = ["magpsf",
         "sigmapsf",
         "magnr",
         "sigmagnr",
-        "magzpsci"]
+        "magzpsci",
+        "g00",
+        "g01",
+        "g02",
+        "g03",
+        "g04",
+        "g05",
+        "g06",
+        "g07",
+        "g08",
+        "g09",
+        "g10",
+        "g11",
+        "g12",
+        "g13",
+        "g14",
+        "g15",
+        "g16",
+        "g17",
+        "g18",
+        "g19",
+        "g20",
+        "g21",
+        "g22",
+        "g23",
+        "g24",
+        "r00",
+        "r01",
+        "r02",
+        "r03",
+        "r04",
+        "r05",
+        "r06",
+        "r07",
+        "r08",
+        "r09",
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r15",
+        "r16",
+        "r17",
+        "r18",
+        "r19",
+        "r20",
+        "r21",
+        "r22",
+        "r23",
+        "r24"]
         
 lc_features = ("g00",
                "g01",
@@ -125,7 +175,7 @@ lc_features = ("g00",
                "r24")
 
 n_sample = 1000
-n_pca = 5
+n_pca = 10
 n_clusters = 10
 silhouette = False
 classify = True
@@ -147,7 +197,7 @@ df = spark.read\
           .option("hbase.spark.pushdown.columnfilter", True)\
           .load()
 
-df = df.filter(df.rowkey >= "ZTF22")\
+df = df.filter(df.rowkey >= "ZTF24")\
        .filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
        .limit(n_sample)
