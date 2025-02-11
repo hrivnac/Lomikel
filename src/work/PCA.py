@@ -125,7 +125,7 @@ lc_features = ("g00",
                "r24")
 
 n_sample = 1000
-n_pca = 10
+n_pca = 5
 n_clusters = 10
 silhouette = False
 classify = True
