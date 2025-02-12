@@ -174,7 +174,7 @@ lc_features = ("g0",
                "r23",
                "r24")
 
-n_sample = 1000
+n_sample = 100
 n_pca = 10
 n_clusters = 10
 silhouette = False
@@ -277,7 +277,9 @@ if classify:
 
 # Standardisation --------------------------------------------------------------
 
-vec_assembler = VectorAssembler(inputCols=cols, outputCol="features")
+vec_assembler = VectorAssembler(inputCols=cols,
+                                outputCol="features",
+                                handleInvalid="skip")
 df_vector = vec_assembler.transform(df)
 scaler = StandardScaler(inputCol="features",
                         outputCol="scaled_features",
