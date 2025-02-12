@@ -174,7 +174,7 @@ lc_features = ("g00",
                "r23",
                "r24")
 
-n_sample = 10000
+n_sample = 1000
 n_pca = 10
 n_clusters = 10
 silhouette = False
@@ -204,61 +204,68 @@ df = df.filter(df.rowkey >= "ZTF24")\
 
 # Convert lc_features arrays into columns --------------------------------------
 
-split_g = split(df["lc_features_g"], ",")
-df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()))\
-       .withColumn("g01", split_g.getItem( 1).cast(DoubleType()))\
-       .withColumn("g02", split_g.getItem( 2).cast(DoubleType()))\
-       .withColumn("g03", split_g.getItem( 3).cast(DoubleType()))\
-       .withColumn("g04", split_g.getItem( 4).cast(DoubleType()))\
-       .withColumn("g05", split_g.getItem( 5).cast(DoubleType()))\
-       .withColumn("g06", split_g.getItem( 6).cast(DoubleType()))\
-       .withColumn("g07", split_g.getItem( 7).cast(DoubleType()))\
-       .withColumn("g08", split_g.getItem( 8).cast(DoubleType()))\
-       .withColumn("g09", split_g.getItem( 9).cast(DoubleType()))\
-       .withColumn("g10", split_g.getItem(10).cast(DoubleType()))\
-       .withColumn("g11", split_g.getItem(11).cast(DoubleType()))\
-       .withColumn("g12", split_g.getItem(12).cast(DoubleType()))\
-       .withColumn("g13", split_g.getItem(13).cast(DoubleType()))\
-       .withColumn("g14", split_g.getItem(14).cast(DoubleType()))\
-       .withColumn("g15", split_g.getItem(15).cast(DoubleType()))\
-       .withColumn("g16", split_g.getItem(16).cast(DoubleType()))\
-       .withColumn("g17", split_g.getItem(17).cast(DoubleType()))\
-       .withColumn("g18", split_g.getItem(18).cast(DoubleType()))\
-       .withColumn("g19", split_g.getItem(19).cast(DoubleType()))\
-       .withColumn("g20", split_g.getItem(20).cast(DoubleType()))\
-       .withColumn("g21", split_g.getItem(21).cast(DoubleType()))\
-       .withColumn("g22", split_g.getItem(22).cast(DoubleType()))\
-       .withColumn("g23", split_g.getItem(23).cast(DoubleType()))\
-       .withColumn("g24", split_g.getItem(24).cast(DoubleType()))
-        
-split_r = split(df["lc_features_r"], ",")
-df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()))\
-       .withColumn("r01", split_r.getItem( 1).cast(DoubleType()))\
-       .withColumn("r02", split_r.getItem( 2).cast(DoubleType()))\
-       .withColumn("r03", split_r.getItem( 3).cast(DoubleType()))\
-       .withColumn("r04", split_r.getItem( 4).cast(DoubleType()))\
-       .withColumn("r05", split_r.getItem( 5).cast(DoubleType()))\
-       .withColumn("r06", split_r.getItem( 6).cast(DoubleType()))\
-       .withColumn("r07", split_r.getItem( 7).cast(DoubleType()))\
-       .withColumn("r08", split_r.getItem( 8).cast(DoubleType()))\
-       .withColumn("r09", split_r.getItem( 9).cast(DoubleType()))\
-       .withColumn("r10", split_r.getItem(10).cast(DoubleType()))\
-       .withColumn("r11", split_r.getItem(11).cast(DoubleType()))\
-       .withColumn("r12", split_r.getItem(12).cast(DoubleType()))\
-       .withColumn("r13", split_r.getItem(13).cast(DoubleType()))\
-       .withColumn("r14", split_r.getItem(14).cast(DoubleType()))\
-       .withColumn("r15", split_r.getItem(15).cast(DoubleType()))\
-       .withColumn("r16", split_r.getItem(16).cast(DoubleType()))\
-       .withColumn("r17", split_r.getItem(17).cast(DoubleType()))\
-       .withColumn("r18", split_r.getItem(18).cast(DoubleType()))\
-       .withColumn("r19", split_r.getItem(19).cast(DoubleType()))\
-       .withColumn("r20", split_r.getItem(20).cast(DoubleType()))\
-       .withColumn("r21", split_r.getItem(21).cast(DoubleType()))\
-       .withColumn("r22", split_r.getItem(22).cast(DoubleType()))\
-       .withColumn("r23", split_r.getItem(23).cast(DoubleType()))\
-       .withColumn("r24", split_r.getItem(24).cast(DoubleType()))
-        
-df = df.na.fill(0, lc_features)
+#split_g = split(df["lc_features_g"], ",")
+#df = df.withColumn("g00", split_g.getItem( 0).cast(DoubleType()))\
+#       .withColumn("g01", split_g.getItem( 1).cast(DoubleType()))\
+#       .withColumn("g02", split_g.getItem( 2).cast(DoubleType()))\
+#       .withColumn("g03", split_g.getItem( 3).cast(DoubleType()))\
+#       .withColumn("g04", split_g.getItem( 4).cast(DoubleType()))\
+#       .withColumn("g05", split_g.getItem( 5).cast(DoubleType()))\
+#       .withColumn("g06", split_g.getItem( 6).cast(DoubleType()))\
+#       .withColumn("g07", split_g.getItem( 7).cast(DoubleType()))\
+#       .withColumn("g08", split_g.getItem( 8).cast(DoubleType()))\
+#       .withColumn("g09", split_g.getItem( 9).cast(DoubleType()))\
+#       .withColumn("g10", split_g.getItem(10).cast(DoubleType()))\
+#       .withColumn("g11", split_g.getItem(11).cast(DoubleType()))\
+#       .withColumn("g12", split_g.getItem(12).cast(DoubleType()))\
+#       .withColumn("g13", split_g.getItem(13).cast(DoubleType()))\
+#       .withColumn("g14", split_g.getItem(14).cast(DoubleType()))\
+#       .withColumn("g15", split_g.getItem(15).cast(DoubleType()))\
+#       .withColumn("g16", split_g.getItem(16).cast(DoubleType()))\
+#       .withColumn("g17", split_g.getItem(17).cast(DoubleType()))\
+#       .withColumn("g18", split_g.getItem(18).cast(DoubleType()))\
+#       .withColumn("g19", split_g.getItem(19).cast(DoubleType()))\
+#       .withColumn("g20", split_g.getItem(20).cast(DoubleType()))\
+#       .withColumn("g21", split_g.getItem(21).cast(DoubleType()))\
+#       .withColumn("g22", split_g.getItem(22).cast(DoubleType()))\
+#       .withColumn("g23", split_g.getItem(23).cast(DoubleType()))\
+#       .withColumn("g24", split_g.getItem(24).cast(DoubleType()))
+#        
+#split_r = split(df["lc_features_r"], ",")
+#df = df.withColumn("r00", split_r.getItem( 0).cast(DoubleType()))\
+#       .withColumn("r01", split_r.getItem( 1).cast(DoubleType()))\
+#       .withColumn("r02", split_r.getItem( 2).cast(DoubleType()))\
+#       .withColumn("r03", split_r.getItem( 3).cast(DoubleType()))\
+#       .withColumn("r04", split_r.getItem( 4).cast(DoubleType()))\
+#       .withColumn("r05", split_r.getItem( 5).cast(DoubleType()))\
+#       .withColumn("r06", split_r.getItem( 6).cast(DoubleType()))\
+#       .withColumn("r07", split_r.getItem( 7).cast(DoubleType()))\
+#       .withColumn("r08", split_r.getItem( 8).cast(DoubleType()))\
+#       .withColumn("r09", split_r.getItem( 9).cast(DoubleType()))\
+#       .withColumn("r10", split_r.getItem(10).cast(DoubleType()))\
+#       .withColumn("r11", split_r.getItem(11).cast(DoubleType()))\
+#       .withColumn("r12", split_r.getItem(12).cast(DoubleType()))\
+#       .withColumn("r13", split_r.getItem(13).cast(DoubleType()))\
+#       .withColumn("r14", split_r.getItem(14).cast(DoubleType()))\
+#       .withColumn("r15", split_r.getItem(15).cast(DoubleType()))\
+#       .withColumn("r16", split_r.getItem(16).cast(DoubleType()))\
+#       .withColumn("r17", split_r.getItem(17).cast(DoubleType()))\
+#       .withColumn("r18", split_r.getItem(18).cast(DoubleType()))\
+#       .withColumn("r19", split_r.getItem(19).cast(DoubleType()))\
+#       .withColumn("r20", split_r.getItem(20).cast(DoubleType()))\
+#       .withColumn("r21", split_r.getItem(21).cast(DoubleType()))\
+#       .withColumn("r22", split_r.getItem(22).cast(DoubleType()))\
+#       .withColumn("r23", split_r.getItem(23).cast(DoubleType()))\
+#       .withColumn("r24", split_r.getItem(24).cast(DoubleType()))
+       
+df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i}" for i in range(25)))
+df = df.selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i}" for i in range(25)))     
+
+#df = df.na.fill(0, lc_features)
+
+for col_name in lc_features:
+  mean_value = df.select(F.mean(col_name)).collect()[0][0]
+  df = df.fillna({col_name: mean_value})
 
 # Classification ---------------------------------------------------------------  
    
