@@ -27,7 +27,7 @@ import seaborn as sns
 
 from mpl_toolkits.mplot3d import Axes3D
 
-from math import sqrt
+import math
 
 import requests
 
