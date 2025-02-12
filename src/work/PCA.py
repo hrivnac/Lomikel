@@ -51,7 +51,6 @@ def classification(objectId):
  
 classification_udf = udf(lambda x: classification(x), StringType())
 
-
 # Parameters -------------------------------------------------------------------
 
 mapping = "rowkey STRING :key, " + \
@@ -69,7 +68,7 @@ mapping = "rowkey STRING :key, " + \
           
 extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 
-n_sample = 1000
+n_sample = 100
 n_pca = 10
 n_clusters = 10
 silhouette = False
@@ -101,7 +100,8 @@ df = df.filter(df.rowkey >= "ZTF24")\
        
 lc_features = tuple(f"g{i:02d}" for i in range(25)) + tuple(f"r{i:02d}" for i in range(25))
 
-cols = extra_cols + list(lc_features)
+#cols = list(lc_features) + extra_cols 
+cols = list(lc_features)
 
 df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(25)))
 df = df.selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(25)))   
