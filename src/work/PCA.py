@@ -103,10 +103,19 @@ lc_features = tuple(f"g{i:02d}" for i in range(25)) + tuple(f"r{i:02d}" for i in
 #cols = list(lc_features) + extra_cols 
 cols = list(lc_features)
 
-df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(25)))
-df = df.selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(25)))   
+df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(25)))\
+       .selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(25)))   
+      
+df = df.drop("lc_features_g")\
+       .drop("lc_features_r")
 
-df = df.na.fill(0, lc_features)
+#df = df.na.fill(0, lc_features)
+mean_values = df.select([mean(col(c))\
+                .alias(c) for c in lc_features])\
+                .collect()[0]\
+                .asDict()
+mean_values = {k: (v if (v is not None and not math.isnan(v)) else 0) for k, v in mean_values.items()}
+df = df.na.fill(mean_values)
 
 df.show(truncate=False)
     
