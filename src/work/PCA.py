@@ -262,11 +262,13 @@ df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{
 df = df.selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i}" for i in range(25)))     
 
 #df = df.na.fill(0, lc_features)
-
+  
 for col_name in lc_features:
-  mean_value = df.select(F.mean(col_name)).collect()[0][0]
-  df = df.fillna({col_name: mean_value})
-
+  non_null_count = df.filter(col(col_name).isNotNull()).count()
+  if non_null_count > 0:
+    mean_value = df.select(F.mean(col_name)).collect()[0][0]
+    df = df.fillna({col_name: mean_value})
+    
 # Classification ---------------------------------------------------------------  
    
 if classify:
