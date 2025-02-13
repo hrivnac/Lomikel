@@ -139,9 +139,7 @@ mean_values = df.select([mean(col(c))\
                 .asDict()
 mean_values = {k: (v if (v is not None and not math.isnan(v)) else 0) for k, v in mean_values.items()}
 df = df.na.fill(mean_values)
-
-df.show(truncate=False)
-    
+                   
 # Classification ---------------------------------------------------------------  
    
 if classify:
@@ -170,7 +168,7 @@ pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
 
 # report
-print(pca_model.explainedVariance)
+#print(pca_model.explainedVariance)
 
 # plot
 explained_variance = np.array(pca_model.explainedVariance)
