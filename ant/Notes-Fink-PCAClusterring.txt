@@ -1,54 +1,21 @@
-# ToDo:
-#   use sources instead of alerts
+# data preparation
+# @janusgraph
+work/preparePCA.gremlin
+# @home
+scp centos@134.158.74.85:'/tmp/*.csv' ./
+scp *csv julius.hrivnac@vm-75222.lal.in2p3.fr:'/tmp'
 
 # at Livy
-hadoop fs -put -f PCA.py
-
-# at JanusGraph
-lomikel_hbase -s PCA.groovy    
-
---------------------------------------------------------------------------------
-
-# Livy
-scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/plot.png ./
-# Janusgraph
-scp centos@134.158.74.85:'/tmp/*.csv' ./
-
-
 git pull;hadoop fs -put -f ../src/work/PCA.py;hadoop fs -put -f PCA-sample.csv /tmp
 
-   "    extract_fink_classification(\n",
-    "        df['cdsxmatch'],\n",
-    "        df['roid'],\n",
-    "        df['mulens'],\n",
-    "        df['snn_snia_vs_nonia'],\n",
-    "        df['snn_sn_vs_all'],\n",
-    "        df['rf_snia_vs_nonia'],\n",
-    "        df['candidate.ndethist'],\n",
-    "        df['candidate.drb'],\n",
-    "        df['candidate.classtar'],\n",
-    "        df['candidate.jd'],\n",
-    "        df['candidate.jdstarthist'],\n",
-    "        df['rf_kn_vs_nonkn'],\n",
-    "        df['tracklet']\n",
+# at JanusGraph
+lomikel_hbase -s PCA.groovy  
 
-      "# extract columns of interest\n",
-    "cols = [\n",
-    "    'objectId',\n",
-    "    'finkclass',\n",
-    "    'candidate.jd',\n",
-    "    'candidate.jdstarthist',\n",
-    "    'candidate.fid', \n",
-    "    'candidate.isdiffpos',\n",
-    "    'rf_kn_vs_nonkn',\n",
-    "    'rf_snia_vs_nonia',\n",
-    "    'snn_sn_vs_all',\n",
-    "    'snn_snia_vs_nonia',\n",
-    "    'candidate.neargaia',\n",
-    "    'candidate.sgscore1',\n",
-    "    'candidate.classtar'\n",
+# @home
+scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/plot.png ./
+
+--------------------------------------------------------------------------------
    
-    
         {d:DR3Name=string, d:Plx=float, d:cdsxmatch=string, d:e_Plx=float, d:gcvs=string, d:mulens=double, d:nalerthist=integer, d:rf_kn_vs_nonkn=double, d:rf_snia_vs_nonia=double, d:roid=integer, d:snn_sn_vs_all=double, d:snn_snia_vs_nonia=double, d:tracklet=string, d:vsx=string, i:aimage=float, i:aimagerat=float, i:bimage=float, i:bimagerat=float, i:candid=long, i:chinr=float, i:chipsf=float, i:classtar=float, i:clrcoeff=float, i:clrcounc=float, i:clrmed=float, i:clrrms=float, i:dec=double, i:decnr=double, i:diffmaglim=float, i:distnr=float, i:distpsnr1=float, i:distpsnr2=float, i:distpsnr3=float, i:drb=float, i:drbversion=string, i:dsdiff=float, i:dsnrms=float, i:elong=float, i:exptime=float, i:fid=integer, i:field=integer, i:fink_broker_version=string, i:fink_science_version=string, i:fwhm=float, i:isdiffpos=string, i:jd=double, i:jdendhist=double, i:jdendref=double, i:jdstarthist=double, i:jdstartref=double, i:magap=float, i:magapbig=float, i:magdiff=float, i:magfromlim=float, i:maggaia=float, i:maggaiabright=float, i:magnr=float, i:magpsf=float, i:magzpsci=float, i:magzpscirms=float, i:magzpsciunc=float, i:mindtoedge=float, i:nbad=integer, i:ncovhist=integer, i:ndethist=integer, i:neargaia=float, i:neargaiabright=float, i:nframesref=integer, i:nid=integer, i:nmatches=integer, i:nmtchps=integer, i:nneg=integer, i:objectId=string, i:objectidps1=long, i:objectidps2=long, i:objectidps3=long, i:pdiffimfilename=string, i:pid=long, i:programid=integer, i:programpi=string, i:publisher=string, i:ra=double, i:ranr=double, i:rb=float, i:rbversion=string, i:rcid=integer, i:rfid=long, i:schemavsn=string, i:scorr=double, i:seeratio=float, i:sgmag1=float, i:sgmag2=float, i:sgmag3=float, i:sgscore1=float, i:sgscore2=float, i:sgscore3=float, i:sharpnr=float, i:sigmagap=float, i:sigmagapbig=float, i:sigmagnr=float, i:sigmapsf=float, i:simag1=float, i:simag2=float, i:simag3=float, i:sky=float, i:srmag1=float, i:srmag2=float, i:srmag3=float, i:ssdistnr=float, i:ssmagnr=float, i:ssnamenr=string, i:ssnrms=float, i:sumrat=float, i:szmag1=float, i:szmag2=float, i:szmag3=float, i:tblid=long, i:tooflag=integer, i:xpos=float, i:ypos=float, i:zpclrcov=float, i:zpmed=float}   nullnull
         
         

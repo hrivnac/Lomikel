@@ -95,6 +95,7 @@ with open(pca_sample, newline='') as csvfile:
       classifications[rk] = row[0]
       rks.append(rk)
 random.shuffle(rks)
+rks = rks[0:n_sample]
 
 # New session ------------------------------------------------------------------
 
@@ -110,14 +111,10 @@ df = spark.read\
           .option("hbase.table", "ztf")\
           .option("hbase.spark.use.hbasecontext", False)\
           .option("hbase.spark.pushdown.columnfilter", True)\
+          .option("hbase.spark.query.rowkeys", ",".join(rks))\
           .load()
 
-#df = df.filter(df.rowkey >= "ZTF24")\
-#       .filter(df.lc_features_g.isNotNull())\
-#       .filter(df.lc_features_r.isNotNull())\
-#       .limit(n_sample)
-df = df.filter(col("rowkey").isin(rks))\
-       .filter(df.lc_features_g.isNotNull())\
+df = df.filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
        .limit(n_sample)
 
