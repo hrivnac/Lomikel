@@ -116,7 +116,7 @@ df = spark.read\
 #       .filter(df.lc_features_g.isNotNull())\
 #       .filter(df.lc_features_r.isNotNull())\
 #       .limit(n_sample)
-df = df.filter(col("rowkey").isin(rks)))\
+df = df.filter(col("rowkey").isin(rks))\
        .filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
        .limit(n_sample)
