@@ -31,6 +31,8 @@ import math
 
 import requests
 
+import random
+
 import json
 
 import csv
@@ -55,7 +57,7 @@ classification_udf = udf(lambda x: classification(x), StringType())
 
 # Parameters -------------------------------------------------------------------
 
-pca_sample = "PCA-sample.csv"
+pca_sample = "/tmp/PCA-sample.csv"
 
 mapping = "rowkey STRING :key, " + \
           "objectId STRING i:objectId, " + \
@@ -72,7 +74,8 @@ mapping = "rowkey STRING :key, " + \
           
 extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 
-n_sample = 1000
+pca_sample = "PCA-sample.csv"
+n_sample = 100
 n_pca = 10
 n_clusters = 10
 silhouette = False
@@ -82,15 +85,16 @@ cluster_features = "pca_features"
 # Read PCA sample --------------------------------------------------------------
 
 rks = []
-with open('PCA-sample.csv', newline='') as csvfile:
+with open(pca_sample, newline='') as csvfile:
   csvreader = csv.reader(csvfile, delimiter=',')
   for row in csvreader:
     objectId = row[1]
     jdList = row[2].split(';')
     for jd in jdList:
       rk = objectId + "_" + jd
-      classification[rk] = row[0]
+      classifications[rk] = row[0]
       rks.append(rk)
+random.shuffle(rks)
 
 # New session ------------------------------------------------------------------
 
