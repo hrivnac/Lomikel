@@ -9,7 +9,13 @@ lomikel_hbase -s PCA.groovy
 
 --------------------------------------------------------------------------------
 
+# Livy
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/plot.png ./
+# Janusgraph
+scp centos@134.158.74.85:'/tmp/*.csv' ./
+
+
+git pull;hadoop fs -put -f ../src/work/PCA.py;hadoop fs -put -f PCA-sample.csv
 
 
    "    extract_fink_classification(\n",

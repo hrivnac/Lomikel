@@ -33,6 +33,8 @@ import requests
 
 import json
 
+import csv
+
 # Classification from Fink Portal ----------------------------------------------
 
 classifications = {}
@@ -52,6 +54,8 @@ def classification(objectId):
 classification_udf = udf(lambda x: classification(x), StringType())
 
 # Parameters -------------------------------------------------------------------
+
+pca_sample = "PCA-sample.csv"
 
 mapping = "rowkey STRING :key, " + \
           "objectId STRING i:objectId, " + \
@@ -75,6 +79,19 @@ silhouette = False
 classify = True
 cluster_features = "pca_features"
 
+# Read PCA sample --------------------------------------------------------------
+
+rks = []
+with open('PCA-sample.csv', newline='') as csvfile:
+  csvreader = csv.reader(csvfile, delimiter=',')
+  for row in csvreader:
+    objectId = row[1]
+    jdList = row[2].split(';')
+    for jd in jdList:
+      rk = objectId + "_" + jd
+      classification[rk] = row[0]
+      rks.append(rk)
+
 # New session ------------------------------------------------------------------
 
 spark = SparkSession.builder\
@@ -91,7 +108,11 @@ df = spark.read\
           .option("hbase.spark.pushdown.columnfilter", True)\
           .load()
 
-df = df.filter(df.rowkey >= "ZTF24")\
+#df = df.filter(df.rowkey >= "ZTF24")\
+#       .filter(df.lc_features_g.isNotNull())\
+#       .filter(df.lc_features_r.isNotNull())\
+#       .limit(n_sample)
+df = df.filter(col("rowkey").isin(rks)))\
        .filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
        .limit(n_sample)
