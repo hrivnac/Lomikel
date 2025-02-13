@@ -75,7 +75,7 @@ mapping = "rowkey STRING :key, " + \
 extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 
 pca_sample = "/tmp/PCA-sample.csv"
-n_sample = 10
+n_sample = 100
 n_pca = 10
 n_clusters = 10
 silhouette = False
