@@ -109,26 +109,17 @@ spark = SparkSession.builder\
 
 # Read HBase into DataGram -----------------------------------------------------
 
-df = None
+df = spark.read\
+          .format("org.apache.hadoop.hbase.spark")\
+          .option("hbase.columns.mapping", mapping)\
+          .option("hbase.table", "ztf")\
+          .option("hbase.spark.use.hbasecontext", False)\
+          .option("hbase.spark.pushdown.columnfilter", True)\
+          .load()
 
 if read_sample:
-  df = spark.read\
-            .format("org.apache.hadoop.hbase.spark")\
-            .option("hbase.columns.mapping", mapping)\
-            .option("hbase.table", "ztf")\
-            .option("hbase.spark.use.hbasecontext", False)\
-            .option("hbase.spark.pushdown.columnfilter", True)\
-            .load()
-  for rk in rks:
-    df = df.filter(df.rowkey.isin(rk))
+  df = df.filter(df.rowkey.isin(rks))
 else:  
-  df = spark.read\
-            .format("org.apache.hadoop.hbase.spark")\
-            .option("hbase.columns.mapping", mapping)\
-            .option("hbase.table", "ztf")\
-            .option("hbase.spark.use.hbasecontext", False)\
-            .option("hbase.spark.pushdown.columnfilter", True)\
-            .load()
   df = df.filter(df.rowkey >= rowkey_start)
 
 df = df.filter(df.lc_features_g.isNotNull())\
