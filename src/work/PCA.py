@@ -120,8 +120,7 @@ if read_sample:
             .option("hbase.spark.pushdown.columnfilter", True)\
             .load()
   for rk in rks:
-    df = df.filter(df.rowkey == rk)
-    
+    df = df.filter(df.rowkey.isin(rk))
 else:  
   df = spark.read\
             .format("org.apache.hadoop.hbase.spark")\
