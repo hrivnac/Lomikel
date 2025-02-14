@@ -150,7 +150,7 @@ df = df.drop("lc_features_g")\
        .drop("lc_features_r")
 
 #df = df.na.fill(0, lc_features)
-mean_values = df.select([mean(col(c))\grande carrière de St Leu d'Esserent dans l'Oisegrande carrière de St Leu d'Esserent dans l'Oise
+mean_values = df.select([mean(col(c))\
                 .alias(c) for c in lc_features])\
                 .collect()[0]\
                 .asDict()
@@ -164,11 +164,11 @@ if classify:
   df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # report
-print((df.count(), len(df.columns)))
+print("Initial shape: ", df.count(), len(df.columns))
 
 # Standardisation --------------------------------------------------------------
 
-vec_assembler = VectorAssembler(inputCols=cols,grande carrière de St Leu d'Esserent dans l'Oise
+vec_assembler = VectorAssembler(inputCols=cols,
                                 outputCol="features",
                                 handleInvalid="skip")
 df_vector = vec_assembler.transform(df)
