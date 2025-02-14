@@ -75,6 +75,7 @@ mapping = "rowkey STRING :key, " + \
 extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 
 pca_sample = "/tmp/PCA-sample.csv"
+rowkey_start = "ZTF24"
 n_sample = 100
 n_pca = 10
 n_clusters = 10
@@ -103,7 +104,7 @@ if read_sample:
 # New session ------------------------------------------------------------------
 
 spark = SparkSession.builder\
-                    .appName("PCA with HBase")\
+                    .appName("PCA CLustering with HBase")\
                     .getOrCreate()
 
 # Read HBase into DataGram -----------------------------------------------------
@@ -127,7 +128,7 @@ else:
             .option("hbase.spark.use.hbasecontext", False)\
             .option("hbase.spark.pushdown.columnfilter", True)\
             .load()
-  df = df.filter(df.rowkey >= "ZTF24")
+  df = df.filter(df.rowkey >= rowkey_start)
 
 df = df.filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
