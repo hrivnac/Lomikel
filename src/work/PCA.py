@@ -78,6 +78,8 @@ pca_sample = "/tmp/PCA-sample.csv"
 n_sample = 100
 n_pca = 10
 n_clusters = 10
+read_sample = True
+add_extra_cols = False
 silhouette = False
 classify = True
 cluster_features = "pca_features"
@@ -85,17 +87,18 @@ cluster_features = "pca_features"
 # Read PCA sample --------------------------------------------------------------
 
 rks = []
-with open(pca_sample, newline='') as csvfile:
-  csvreader = csv.reader(csvfile, delimiter=',')
-  for row in csvreader:
-    objectId = row[1]
-    jdList = row[2].split(';')
-    for jd in jdList:
-      rk = objectId + "_" + jd
-      classifications[rk] = row[0]
-      rks.append(rk)
-random.shuffle(rks)
-rks = rks[0:n_sample]
+if read_sample:
+  with open(pca_sample, newline='') as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',')
+    for row in csvreader:
+      objectId = row[1]
+      jdList = row[2].split(';')
+      for jd in jdList:
+        rk = objectId + "_" + jd
+        classifications[rk] = row[0]
+        rks.append(rk)
+  random.shuffle(rks)
+  rks = rks[0:n_sample]
 
 # New session ------------------------------------------------------------------
 
@@ -105,14 +108,26 @@ spark = SparkSession.builder\
 
 # Read HBase into DataGram -----------------------------------------------------
 
-df = spark.read\
-          .format("org.apache.hadoop.hbase.spark")\
-          .option("hbase.columns.mapping", mapping)\
-          .option("hbase.table", "ztf")\
-          .option("hbase.spark.use.hbasecontext", False)\
-          .option("hbase.spark.pushdown.columnfilter", True)\
-          .option("hbase.spark.query.rowkeys", ",".join(rks))\
-          .load()
+df = None
+
+if read_sample:
+  df = spark.read\
+            .format("org.apache.hadoop.hbase.spark")\
+            .option("hbase.columns.mapping", mapping)\
+            .option("hbase.table", "ztf")\
+            .option("hbase.spark.use.hbasecontext", False)\
+            .option("hbase.spark.pushdown.columnfilter", True)\
+            .option("hbase.spark.query.rowkeys", ",".join(rks))\
+            .load()
+else:  
+  df = spark.read\
+            .format("org.apache.hadoop.hbase.spark")\
+            .option("hbase.columns.mapping", mapping)\
+            .option("hbase.table", "ztf")\
+            .option("hbase.spark.use.hbasecontext", False)\
+            .option("hbase.spark.pushdown.columnfilter", True)\
+            .load()
+  df = df.filter(df.rowkey >= "ZTF24")
 
 df = df.filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
@@ -123,8 +138,9 @@ df = df.filter(df.lc_features_g.isNotNull())\
 lc_features = tuple(f"g{i:02d}" for i in range(25)) \
             + tuple(f"r{i:02d}" for i in range(25))
 
-#cols = list(lc_features) + extra_cols 
 cols = list(lc_features)
+if add_extra_cols:
+    cols =+ extra_cols
 
 df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(25)))\
        .selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(25)))   
@@ -133,7 +149,7 @@ df = df.drop("lc_features_g")\
        .drop("lc_features_r")
 
 #df = df.na.fill(0, lc_features)
-mean_values = df.select([mean(col(c))\
+mean_values = df.select([mean(col(c))\grande carrière de St Leu d'Esserent dans l'Oisegrande carrière de St Leu d'Esserent dans l'Oise
                 .alias(c) for c in lc_features])\
                 .collect()[0]\
                 .asDict()
@@ -146,9 +162,12 @@ if classify:
   df = df.withColumn("classification", classification_udf(df.rowkey))
   df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
+# report
+print((df.count(), len(df.columns)))
+
 # Standardisation --------------------------------------------------------------
 
-vec_assembler = VectorAssembler(inputCols=cols,
+vec_assembler = VectorAssembler(inputCols=cols,grande carrière de St Leu d'Esserent dans l'Oise
                                 outputCol="features",
                                 handleInvalid="skip")
 df_vector = vec_assembler.transform(df)
