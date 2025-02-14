@@ -118,8 +118,10 @@ if read_sample:
             .option("hbase.table", "ztf")\
             .option("hbase.spark.use.hbasecontext", False)\
             .option("hbase.spark.pushdown.columnfilter", True)\
-            .option("hbase.spark.query.rowkeys", ",".join(rks))\
             .load()
+  for rk in rks:
+    df = df.filter(df.rowkey == rk)
+    
 else:  
   df = spark.read\
             .format("org.apache.hadoop.hbase.spark")\
