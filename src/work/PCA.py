@@ -28,13 +28,9 @@ import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
 
 import math
-
 import requests
-
 import random
-
 import json
-
 import csv
 
 # Classification from Fink Portal ----------------------------------------------

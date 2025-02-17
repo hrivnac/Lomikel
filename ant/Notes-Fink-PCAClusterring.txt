@@ -48,4 +48,16 @@ curl --header "Content-Type: application/json" \
   http://134.158.75.222:21111/batches
   
    
-   
+---
+
+3. Clustering (KMeans) Issues
+a. Silhouette Score Calculation in a Loop
+You perform multiple KMeans fits inside a loop (for i in range(5, 25)) to find the best number of clusters.
+Problem: Each iteration re-trains KMeans, which is computationally expensive.
+Optimization: Use Bisecting KMeans, which is more efficient and works better with large datasets:
+python
+￼Copy
+￼Edit
+from pyspark.ml.clustering import BisectingKMeans
+bkm = BisectingKMeans().setK(n_clusters).setFeaturesCol(cluster_features)
+model = bkm.fit(df_pca)
