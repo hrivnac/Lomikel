@@ -171,6 +171,14 @@ scaler = StandardScaler(inputCol="features",
 scaler_model = scaler.fit(df_vector)
 df_standardized = scaler_model.transform(df_vector)
 
+# export
+scaler_params = {
+  "mean": scaler_model.mean.toArray().tolist(),
+  "std": scaler_model.std.toArray().tolist()
+  }
+with open("/tmp/scaler_params.json", "w") as f:
+  json.dump(scaler_params, f)
+
 # PCA --------------------------------------------------------------------------
 
 pca = PCA(k=n_pca,
@@ -182,6 +190,14 @@ df_pca = pca_model.transform(df_standardized)
 # report
 #print(pca_model.explainedVariance)
 
+# export
+pca_params = {
+  "components": [row.tolist() for row in pca_model.pc.toArray()],
+  "explained_variance": pca_model.explainedVariance.toArray().tolist()
+  }
+with open("/tmp/pca_params.json", "w") as f:
+    json.dump(pca_params, f)
+    
 # plot
 explained_variance = np.array(pca_model.explainedVariance)
 cumValues = np.cumsum(explained_variance)
@@ -238,6 +254,12 @@ kmeans = KMeans().setK(n_clusters)\
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
 cr = clustered_result.select("objectId", "cluster", "classification")
+
+# export
+cluster_centers = [center.tolist() for center in kmeans_model.clusterCenters()]
+
+with open("/tmp/cluster_centers.json", "w") as f:
+  json.dump(cluster_centers, f)
 
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
