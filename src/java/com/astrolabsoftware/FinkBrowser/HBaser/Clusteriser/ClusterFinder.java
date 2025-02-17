@@ -11,15 +11,9 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>FinkHBaseClient</code> handles connectionto HBase table
-  * with specific Fink functionality. 
-  * It expects the main table with schema and two schemaless aux tables:
-  * <ul>
-  * <li><b>*.jd</b> table with <code>key = jd.alert</code> and one
-  * column <code>i:objectId</code>.</li>
-  * <li><b>*.pixel</b> table with <code>key = pixel_jd</code> and
-  * columns <code>i:objectId,i:dec,i:ra</code><li>
-  * </ul>
+/** <code>ClusterFinder</code> identifies HBase rows with
+  * clusters defined by previous clustering algorithm, read from
+  * <tt>JSON</tt> model files.
   * @opt attributes
   * @opt operations
   * @opt types
