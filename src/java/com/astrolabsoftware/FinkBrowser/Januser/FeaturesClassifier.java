@@ -63,7 +63,7 @@ public class FeaturesClassifier implements Classifier {
       jd = Double.parseDouble(value.get("i:jd"));
       if (value.containsKey("d:lc_features_g") &&
           value.containsKey("d:lc_features_r")) {
-        featuresS = (value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "") +
+        featuresS = (value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "") + "," +
                      value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "")).replaceAll("null", "0.0").
                                                                                                 replaceAll("NaN", "0.0").
                                                                                                 split(",");
