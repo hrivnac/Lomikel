@@ -327,8 +327,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
-                  if ((lbl        == null || v['xlbl'       ].equals(lbl       ) || v['ylbl'       ].equals(lbl       )) &&
-                      (classifier == null || v['xclassifier'].equals(classifier) || v['yclassifier'].equals(classifier))) {
+                  if ((lbl        == null ||  v['xlbl'       ].equals(lbl       ) || v['ylbl'       ].equals(lbl       )) &&
+                      (classifier == null || (v['xclassifier'].equals(classifier) && v['yclassifier'].equals(classifier)))) {
                     overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['ycls']] = v['intersection'];
                     }
                   };
