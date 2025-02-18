@@ -125,7 +125,7 @@ public class JanusClient implements ModifyingGremlinClient {
   @Override
   public void commit() {
     _graph.tx().commit();
-    log.info("Commited");
+    log.debug("Commited");
     }
     
   @Override
