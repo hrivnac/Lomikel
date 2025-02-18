@@ -279,7 +279,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         String      hbaseUrl,
                                         boolean     enhance,
                                         String      columns) {   
-    log.info("\t\tregistering " + objectId + " as " + cls);
+    log.info("\tregistering " + objectId + " as " + cls + " with weight " + weight);
     Vertex soi = g().V().has("lbl",        "SourcesOfInterest").
                          has("classifier", classifier.name()).
                          has("cls",        cls).

@@ -89,7 +89,6 @@ public class FeaturesClassifier implements Classifier {
       key = cls.getKey();
       val = cls.getValue();
       weight = val.size();
-      log.info("\t" + key + " = " + weight + " for alerts");
       recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     }
