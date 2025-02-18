@@ -91,7 +91,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                              String       classifier,
                                              boolean      ignorePartial = false,
                                              int          nmax = Integer.MAX_VALUE) {
-    return sourceNeighborhood(oid0, null, null, classifier, nmax);
+    return sourceNeighborhood(oid0, null, null, classifier, ignorePartial, nmax);
     }
         
   /** Give {@link Map} of other <em>source</em>s ordered

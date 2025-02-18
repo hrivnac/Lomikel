@@ -45,7 +45,6 @@ public class FeaturesClassifier implements Classifier {
     String fg;
     String fr;
     Map<String, Set<Double>> classes; // cl -> [jd]
-    Map<String, Double>      totals;  // cl -> total weight
     Set<Double> jds;
     String key;
     Set<Double> val;
@@ -58,11 +57,11 @@ public class FeaturesClassifier implements Classifier {
                                                                     false,
                                                                     false);
     classes = new TreeMap<>();
-    totals  = new TreeMap<>();
-    // get all alerts (jd) and their features (classses)
+    // get all alerts (jd) and their classses
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       value = entry.getValue();
       jd = Double.parseDouble(value.get("i:jd"));
+      log.info(oid + " " + jd);
       if (value.containsKey("d:lc_features_g") &&
           value.containsKey("d:lc_features_r")) {
         fg = value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "");
@@ -114,14 +113,16 @@ public class FeaturesClassifier implements Classifier {
     
   /** Give {@link ClusterFinder} to current database. Singleton.
     * @return The corresponding {@link ClusterFinder}. 
-     * @throws LomikelExceltion If {@link ClusterFinder} cannot be created. */
- // TBD: parametrise json files
+    * @throws LomikelExceltion If {@link ClusterFinder} cannot be created. */
   private ClusterFinder finder() throws LomikelException {
     if (_finder == null) {
+      if (_dirName == null) {
+        _dirName = "/tmp";
+        }
       try {
-        _finder = new ClusterFinder("/tmp/scaler_params.json",
-                                    "/tmp/pca_params.json",
-                                    "/tmp/cluster_centers.json");
+        _finder = new ClusterFinder(_dirName + "/scaler_params.json",
+                                    _dirName + "/pca_params.json",
+                                    _dirName + "/cluster_centers.json");
         }
       catch (IOException e) {
         throw new LomikelException("Cannot create Cluster Finder", e);
@@ -130,9 +131,19 @@ public class FeaturesClassifier implements Classifier {
     return _finder;
     }
     
+  /** Set the directory for model json files
+    * <tt>scaler_params.json, pca_params.json, cluster_centers.json</tt>.
+    * If not set, <tt>/tmp</tt> will be used.
+    * @param dirName The directory for model json files. */
+  public void setModelDirectory(String dirName) {
+    _dirName = dirName;
+    }
+    
   private static HBaseClient _client;
   
   private static ClusterFinder _finder;
+  
+  private static String _dirName;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(FeaturesClassifier.class);
