@@ -72,11 +72,11 @@ extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 
 pca_sample = "/tmp/PCA-sample.csv"
 rowkey_start = "ZTF24"
-n_sample = 100
+n_sample = 1000
 n_pca = 10
 n_clusters = 10
 read_sample = True
-add_extra_cols = True
+add_extra_cols = False
 silhouette = False
 classify = True
 cluster_features = "pca_features"
@@ -131,8 +131,8 @@ cols = list(lc_features)
 if add_extra_cols:
     cols += extra_cols
 
-df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(25)))\
-       .selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(25)))   
+df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(26)))\
+       .selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(26)))   
       
 df = df.drop("lc_features_g")\
        .drop("lc_features_r")
@@ -222,7 +222,6 @@ if silhouette:
   silhouette_score = [] 
     
   for i in range(5, 25):
-
     try:
       ## kmeans = KMeans().setK(i)\
       ##                  .setFeaturesCol(cluster_features) 

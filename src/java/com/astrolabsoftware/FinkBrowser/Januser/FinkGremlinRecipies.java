@@ -446,7 +446,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void generateSourcesOfInterestCorrelations(Classifiers classifier) {
     log.info("Generating correlations for Sources of Interest for " + classifier.name());
     // Accumulating weights
-    GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
+    GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest").has("classifier", classifier.name());
     Map<Pair<String, String>, Double>      weights   = new HashMap<>(); // cls, objectId -> weight
     Set<String>                            types     = new HashSet<>(); // [cls]
     Set<String>                            objectIds = new HashSet<>(); // [objectId]
