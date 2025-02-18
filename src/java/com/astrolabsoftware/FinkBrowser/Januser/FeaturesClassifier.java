@@ -61,9 +61,9 @@ public class FeaturesClassifier implements Classifier {
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       value = entry.getValue();
       jd = Double.parseDouble(value.get("i:jd"));
-      log.info(oid + " " + jd);
       if (value.containsKey("d:lc_features_g") &&
           value.containsKey("d:lc_features_r")) {
+        log.info(oid + " " + jd);
         fg = value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "");
         fg = fg.substring(0, fg.lastIndexOf(","));
         fr = value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "");
