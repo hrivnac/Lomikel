@@ -3,6 +3,7 @@ package com.astrolabsoftware.FinkBrowser.Januser;
 import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Utils.LomikelException;
 import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
+import com.astrolabsoftware.FinkBrowser.HBaser.Clusteriser.ClusterFinder;
 
 // org.json
 import org.json.JSONArray;
@@ -14,6 +15,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
 import java.util.TreeMap;
+import java.io.IOException;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -59,32 +61,24 @@ public class FeaturesClassifier implements Classifier {
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       value = entry.getValue();
       jd = Double.parseDouble(value.get("i:jd"));
-      for (String c : new String[]{"r", "g"}) {
-        if (value.containsKey("d:lc_features_" + c)) {
-          featuresS = value.get("d:lc_features_" + c).
-                            replaceFirst("\\[", "").
-                            replaceAll("]$", "").
-                            replaceAll("null", "0.0").
-                            split(",");
-          featuresD = Arrays.stream(featuresS).
-                             mapToDouble(Double::parseDouble).
-                             toArray();
-          for (int i = 0; i < 26; i++) {
-            if (!Double.isNaN(featuresD[i])) {
-              cl = c + i;
-              if (classes.containsKey(cl)) {
-                jds = classes.get(cl);
-                jds.add(jd);
-                totals.put(cl, totals.get(cl) + featuresD[i]);
-                }
-              else {
-                jds = new TreeSet<Double>();
-                jds.add(jd);
-                classes.put(cl, jds);
-                totals.put(cl, featuresD[i]);
-                }
-              }
-            }    
+      if (value.containsKey("d:lc_features_g") &&
+          value.containsKey("d:lc_features_r")) {
+        featuresS = (value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "") +
+                     value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "")).replaceAll("null", "0.0").
+                                                                                                replaceAll("NaN", "0.0").
+                                                                                                split(",");
+        featuresD = Arrays.stream(featuresS).
+                           mapToDouble(Double::parseDouble).
+                           toArray();
+        cl = String.valueOf(finder().transformAndPredict(featuresD));                  
+        if (classes.containsKey(cl)) {
+          jds = classes.get(cl);
+          jds.add(jd);
+          }
+        else {
+          jds = new TreeSet<Double>();
+          jds.add(jd);
+          classes.put(cl, jds);
           }
         }
       }
@@ -99,7 +93,8 @@ public class FeaturesClassifier implements Classifier {
   
   /** Give {@link HBaseClient} to current database. Singleton.
     * @param hbaseUrl The full HBase url <tt>ip:port:table:schema</tt>.
-    * @return         The corresponding {@link HBaseClient}. */
+    * @return         The corresponding {@link HBaseClient}.
+    * @throws LomikelExceltion If {@link HBaseClient} cannot be created. */
   private HBaseClient client(String hbaseUrl) throws LomikelException {
     if (_client == null) {
       String[] hbaseUrlA = hbaseUrl.split(":");
@@ -112,7 +107,27 @@ public class FeaturesClassifier implements Classifier {
     return _client;
     }
     
+  /** Give {@link ClusterFinder} to current database. Singleton.
+    * @return The corresponding {@link ClusterFinder}. 
+     * @throws LomikelExceltion If {@link ClusterFinder} cannot be created. */
+ // TBD: parametrise json files
+  private ClusterFinder finder() throws LomikelException {
+    if (_finder == null) {
+      try {
+        _finder = new ClusterFinder("/tmp/scaler_params.json",
+                                    "/tmp/pca_params.json",
+                                    "/tmp/cluster_centers.json");
+        }
+      catch (IOException e) {
+        throw new LomikelException("Cannot create Cluster Finder", e);
+        }
+      }
+    return _finder;
+    }
+    
   private static HBaseClient _client;
+  
+  private static ClusterFinder _finder;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(FeaturesClassifier.class);
