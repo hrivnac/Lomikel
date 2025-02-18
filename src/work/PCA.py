@@ -6,7 +6,6 @@ from pyspark.sql.functions import stddev
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import lit
 from pyspark.sql.functions import split
-from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
 from pyspark.sql.types import DoubleType
 from pyspark.ml import Pipeline
@@ -15,6 +14,7 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.feature import StandardScaler
 from pyspark.ml.linalg import Vectors
 from pyspark.ml.clustering import KMeans
+from pyspark.ml.clustering import BisectingKMeans
 from pyspark.ml.evaluation import ClusteringEvaluator
 
 import numpy as np
