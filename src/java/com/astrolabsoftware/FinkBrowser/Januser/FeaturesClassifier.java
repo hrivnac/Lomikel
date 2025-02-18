@@ -85,7 +85,6 @@ public class FeaturesClassifier implements Classifier {
           }
         }
       }
-    log.info(oid + " " + classes);
     for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
       key = cls.getKey();
       val = cls.getValue();
