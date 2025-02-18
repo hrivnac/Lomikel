@@ -3,9 +3,10 @@ package com.astrolabsoftware.FinkBrowser.HBaser.Clusteriser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.math3.linear.*;
 
+import java.util.List;
+import java.util.Arrays;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -68,7 +69,12 @@ public class ClusterFinder {
   private double[] standardize(double[] input) {
     double[] standardized = new double[input.length];
     for (int i = 0; i < input.length; i++) {
-      standardized[i] = (input[i] - _mean[i]) / _std[i];
+      if (_std[i] == 0) {
+        standardized[i] = 0;
+        }
+      else {
+        standardized[i] = (input[i] - _mean[i]) / _std[i];
+        }
       }
     log.debug("Standardized: " + standardized.length);
     return standardized;

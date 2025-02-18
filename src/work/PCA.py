@@ -125,8 +125,7 @@ df = df.filter(df.lc_features_g.isNotNull())\
 # Convert lc_features arrays into columns --------------------------------------
        
 lc_features = tuple(f"g{i:02d}" for i in range(25)) \
-            + tuple(f"r{i:02d}" for 
-i in range(25))
+            + tuple(f"r{i:02d}" for i in range(25))
 
 cols = list(lc_features)
 if add_extra_cols:
