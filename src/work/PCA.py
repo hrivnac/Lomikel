@@ -76,7 +76,7 @@ n_sample = 100
 n_pca = 10
 n_clusters = 10
 read_sample = True
-add_extra_cols = False
+add_extra_cols = True
 silhouette = False
 classify = True
 cluster_features = "pca_features"
@@ -125,7 +125,8 @@ df = df.filter(df.lc_features_g.isNotNull())\
 # Convert lc_features arrays into columns --------------------------------------
        
 lc_features = tuple(f"g{i:02d}" for i in range(25)) \
-            + tuple(f"r{i:02d}" for i in range(25))
+            + tuple(f"r{i:02d}" for 
+i in range(25))
 
 cols = list(lc_features)
 if add_extra_cols:
@@ -224,8 +225,10 @@ if silhouette:
   for i in range(5, 25):
 
     try:
-      kmeans = KMeans().setK(i)\
-                       .setFeaturesCol(cluster_features) 
+      ## kmeans = KMeans().setK(i)\
+      ##                  .setFeaturesCol(cluster_features) 
+      kmeans = BisectingKMeans().setK(i)\
+                                .setFeaturesCol(cluster_features)
       model = kmeans.fit(df_pca)
       predictions = model.transform(df_pca)
       score = evaluator.evaluate(predictions) 
@@ -243,6 +246,10 @@ if silhouette:
   plt.savefig("/tmp/Silhouette_Score.png")  
   # use n_clusters at maximum
     
+## kmeans = KMeans().setK(n_clusters)\
+##                  .setSeed(1)\
+##                  .setFeaturesCol(cluster_features)\
+##                  .setPredictionCol("cluster")
 kmeans = KMeans().setK(n_clusters)\
                  .setSeed(1)\
                  .setFeaturesCol(cluster_features)\
