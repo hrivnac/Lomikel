@@ -42,6 +42,8 @@ public class FeaturesClassifier implements Classifier {
     Map<String, String> value;
     String[] featuresS;
     double[] featuresD;
+    String fg;
+    String fr;
     Map<String, Set<Double>> classes; // cl -> [jd]
     Map<String, Double>      totals;  // cl -> total weight
     Set<Double> jds;
@@ -63,10 +65,13 @@ public class FeaturesClassifier implements Classifier {
       jd = Double.parseDouble(value.get("i:jd"));
       if (value.containsKey("d:lc_features_g") &&
           value.containsKey("d:lc_features_r")) {
-        featuresS = (value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "") + "," +
-                     value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "")).replaceAll("null", "0.0").
-                                                                                                replaceAll("NaN", "0.0").
-                                                                                                split(",");
+        fg = value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "");
+        fg = fg.substring(0, fg.lastIndexOf(","));
+        fr = value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "");
+        fr = fr.substring(0, fr.lastIndexOf(","));
+        featuresS = (fg + "," + fr).replaceAll("null", "0.0").
+                                    replaceAll("NaN", "0.0").
+                                    split(",");
         featuresD = Arrays.stream(featuresS).
                            mapToDouble(Double::parseDouble).
                            toArray();
