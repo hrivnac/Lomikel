@@ -130,7 +130,7 @@ i in range(25))
 
 cols = list(lc_features)
 if add_extra_cols:
-    cols =+ extra_cols
+    cols += extra_cols
 
 df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(25)))\
        .selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(25)))   
