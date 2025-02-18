@@ -468,9 +468,9 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/snakeyaml-2.2.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/spatial4j-0.8.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/tinkergraph-gremlin-3.7.0.jar"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-core-2.15.3.jar"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-annotations-2.15.3.jar"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-databind-2.15.3.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-core-2.15.3.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-annotations-2.15.3.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-databind-2.15.3.jar"/>
       <!--zipgroupfileset dir="${janusgraph_dir}/lib" includes="*hadoop*/*.jar"/-->
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
