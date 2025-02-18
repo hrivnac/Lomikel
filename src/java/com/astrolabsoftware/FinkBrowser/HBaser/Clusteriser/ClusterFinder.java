@@ -22,15 +22,21 @@ import org.apache.logging.log4j.LogManager;
 public class ClusterFinder {
   
   public static void main(String[] args) throws IOException {
-    ClusterFinder transformer = new ClusterFinder("/tmp/scaler_params.json",
-                                                  "/tmp/pca_params.json",
-                                                  "/tmp/cluster_centers.json");
-    double[] newData = {1.2, 3.4, 5.6, 7.8, 2.1, 4.3, 6.5, 8.7, 3.2, 5.4};  // Example input
-    int cluster = transformer.transformAndPredict(newData);
+    ClusterFinder finder = new ClusterFinder("/tmp/scaler_params.json",
+                                             "/tmp/pca_params.json",
+                                             "/tmp/cluster_centers.json");
+    double[] newData = {1.2, 3.4, 5.6, 7.8, 2.1, 4.3, 6.5, 8.7, 3.2, 5.4,
+                        1.2, 3.4, 5.6, 7.8, 2.1, 4.3, 6.5, 8.7, 3.2, 5.4,
+                        1.2, 3.4, 5.6, 7.8, 2.1, 4.3, 6.5, 8.7, 3.2, 5.4,
+                        1.2, 3.4, 5.6, 7.8, 2.1, 4.3, 6.5, 8.7, 3.2, 5.4,
+                        1.2, 3.4, 5.6, 7.8, 2.1, 4.3, 6.5, 8.7, 3.2, 5.4,};  // Example input
+    int cluster = finder.transformAndPredict(newData);
     log.info("Assigned cluster: " + cluster);
     }
 
-  public ClusterFinder(String scalerFile, String pcaFile, String clustersFile) throws IOException {
+  public ClusterFinder(String scalerFile,
+                       String pcaFile,
+                       String clustersFile) throws IOException {
     loadScalerParams(scalerFile);
     loadPCAParams(pcaFile);
     loadClusterCenters(clustersFile);
@@ -41,6 +47,7 @@ public class ClusterFinder {
     ScalerParams params = objectMapper.readValue(new File(filePath), ScalerParams.class);
     _mean = params.mean;
     _std = params.std;
+    log.debug("Scaler: " + _mean.length);
     }
   
   private void loadPCAParams(String filePath) throws IOException {
@@ -48,25 +55,29 @@ public class ClusterFinder {
     PCAParams params = objectMapper.readValue(new File(filePath), PCAParams.class);
     _pcaComponents = new Array2DRowRealMatrix(params.components);
     _explainedVariance = params.explained_variance;
+    log.debug("PCA Components: " + _pcaComponents.getColumnDimension() + " * " + _pcaComponents.getRowDimension());
     }
-  
+    
   private void loadClusterCenters(String filePath) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    ClusterCenters centers = objectMapper.readValue(new File(filePath), ClusterCenters.class);
-    _clusterCenters = new Array2DRowRealMatrix(centers.centers);
-    }
+    _clusterCenters = new Array2DRowRealMatrix(objectMapper.readValue(new File(filePath), double[][].class));
+    log.debug("Cluster Centers: " + _clusterCenters.getColumnDimension() + " * " + _clusterCenters.getRowDimension());
+    }    
+    
   
   private double[] standardize(double[] input) {
     double[] standardized = new double[input.length];
     for (int i = 0; i < input.length; i++) {
       standardized[i] = (input[i] - _mean[i]) / _std[i];
       }
+    log.debug("Standardized: " + standardized.length);
     return standardized;
     }
   
   private double[] applyPCA(double[] standardizedInput) {
     RealVector inputVector = new ArrayRealVector(standardizedInput);
-    RealVector transformed = _pcaComponents.operate(inputVector);
+    RealVector transformed = _pcaComponents.transpose().operate(inputVector);
+    log.debug("PCA Transformed: " + transformed.getDimension());
     return transformed.toArray();
     }
   
