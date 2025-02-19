@@ -188,7 +188,7 @@ pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
 
 # report
-log.info("Variance: " + pca_model.explainedVariance)
+log.info("Variance: " + str(pca_model.explainedVariance))
 
 # export
 pca_params = {
