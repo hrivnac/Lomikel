@@ -156,7 +156,7 @@ if classify:
   df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # report
-log.info("Initial shape: " + df.count() + len(df.columns))
+log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
 
 # Standardisation --------------------------------------------------------------
 
