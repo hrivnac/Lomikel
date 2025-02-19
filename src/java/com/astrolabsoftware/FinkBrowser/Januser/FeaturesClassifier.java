@@ -64,9 +64,7 @@ public class FeaturesClassifier implements Classifier {
       if (value.containsKey("d:lc_features_g") &&
           value.containsKey("d:lc_features_r")) {
         fg = value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "");
-        fg = fg.substring(0, fg.lastIndexOf(","));
         fr = value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "");
-        fr = fr.substring(0, fr.lastIndexOf(","));
         featuresS = (fg + "," + fr).replaceAll("null", "0.0").
                                     replaceAll("NaN", "0.0").
                                     split(",");
