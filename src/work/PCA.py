@@ -72,7 +72,7 @@ extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 
 pca_sample = "/tmp/PCA-sample.csv"
 rowkey_start = "ZTF24"
-n_sample = 1000
+n_sample = 100
 n_pca = 10
 n_clusters = 10
 read_sample = True
@@ -102,6 +102,10 @@ if read_sample:
 spark = SparkSession.builder\
                     .appName("PCA CLustering with HBase")\
                     .getOrCreate()
+                    
+log4jLogger = spark._jvm.org.apache.log4j
+log = log4jLogger.LogManager.getLogger("PCA")
+log.info("Starting...")
 
 # Read HBase into DataGram -----------------------------------------------------
 
@@ -124,8 +128,8 @@ df = df.filter(df.lc_features_g.isNotNull())\
 
 # Convert lc_features arrays into columns --------------------------------------
        
-lc_features = tuple(f"g{i:02d}" for i in range(25)) \
-            + tuple(f"r{i:02d}" for i in range(25))
+lc_features = tuple(f"g{i:02d}" for i in range(26)) \
+            + tuple(f"r{i:02d}" for i in range(26))
 
 cols = list(lc_features)
 if add_extra_cols:
@@ -152,7 +156,7 @@ if classify:
   df = df.filter((df.classification != "failed") & (df.classification != "Unknown"))                     
 
 # report
-print("Initial shape: ", df.count(), len(df.columns))
+log.info("Initial shape: " + df.count() + len(df.columns))
 
 # Standardisation --------------------------------------------------------------
 
@@ -184,7 +188,7 @@ pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
 
 # report
-#print(pca_model.explainedVariance)
+log.info("Variance: " + pca_model.explainedVariance)
 
 # export
 pca_params = {
@@ -192,7 +196,7 @@ pca_params = {
   "explained_variance": pca_model.explainedVariance.toArray().tolist()
   }
 with open("/tmp/pca_params.json", "w") as f:
-    json.dump(pca_params, f)
+  json.dump(pca_params, f)
     
 # plot
 explained_variance = np.array(pca_model.explainedVariance)
@@ -232,7 +236,7 @@ if silhouette:
       score = evaluator.evaluate(predictions) 
       silhouette_score.append(score)
     except:
-      print("Failed for i = ", i)
+      log.error("Failed for i = ", i)
       silhouette_score.append(0)
   # plot
   plt.figure(figsize=(10, 8))
@@ -258,9 +262,14 @@ cr = clustered_result.select("objectId", "cluster", "classification")
 
 # export
 cluster_centers = [center.tolist() for center in kmeans_model.clusterCenters()]
-
 with open("/tmp/cluster_centers.json", "w") as f:
   json.dump(cluster_centers, f)
+  
+# export
+cr.write\
+  .mode("overwrite")\
+  .format("csv")\
+  .save("/tmp/cr")
 
 # plot                     
 pdf = cr.select("cluster", "classification").toPandas()
@@ -286,45 +295,16 @@ plt.grid(True)
 plt.legend(title="Count")
 plt.savefig("/tmp/Classification_Clusters.png")
 
+# report
+log.info("Cluster Centers:") 
 centers = kmeans_model.clusterCenters() 
-print("Cluster Centers:") 
 for center in centers: 
-  print(center)
+  log.info(center)
+log.info("Cluster Groups:")
+cr.groupBy("cluster").count().show()
 
 # show
 #cr.show(truncate=False)
-
-# export
-#cr.write\
-#  .mode("overwrite")\
-#  .format("csv")\
-#  .save("/tmp/cr")
-
-# Statistics -------------------------------------------------------------------
-
-print("*** Centers ***")
-#centers = kmeans_model.clusterCenters()
-#for idx, center in enumerate(centers):
-#  print(f"Cluster {idx}: {center}")
-
-print("*** Counts ***")
-#clustered_result.groupBy("cluster").count().show()
-
-print("*** Stats ***")
-#get_element = udf(lambda vector, idx: float(vector[idx]), DoubleType())
-#clustered_result = clustered_result.withColumn("pca_1", get_element("pcaFeatures", lit(0))) \
-#                                   .withColumn("pca_2", get_element("pcaFeatures", lit(1)))
-#cluster_stats = clustered_result.groupBy("cluster").agg(
-#    mean("pca_1").alias("mean_pca_1"),
-#    stddev("pca_1").alias("stddev_pca_1"),
-#    mean("pca_2").alias("mean_pca_2"),
-#    stddev("pca_2").alias("stddev_pca_2")
-#)
-#cluster_stats.show(truncate=False)
-
-#evaluator = ClusteringEvaluator(featuresCol="pcaFeatures", predictionCol="cluster", metricName="silhouette")
-#silhouette = evaluator.evaluate(clustered_result)
-#print(silhouette)
 
 # End --------------------------------------------------------------------------
 
