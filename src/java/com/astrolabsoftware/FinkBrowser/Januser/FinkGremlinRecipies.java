@@ -602,13 +602,27 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
     * @param classifier The {@link Classifier} to be used. */
   public void generateCorrelations(Classifiers classifier) {
-    log.info("Generating correlations for Sources and Alerts of Interest for " + classifier.name());
-    // Clean all correlations 
-    g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifier.name()).bothE().has("lbl", "overlaps").drop().iterate();
-    g().V().has("lbl", "SourcesOfInterest").has("classifier", classifier.name()).bothE().has("lbl", "overlaps").drop().iterate();
-    // Remove wrong SoI, AoI
-    g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifier.name()).not(has("cls")).drop().iterate();
-    g().V().has("lbl", "SourcesOfInterest").has("classifier", classifier.name()).not(has("cls")).drop().iterate();
+    generateCorrelations(classifier, null);
+    }
+    
+  /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
+    * Possibly between two {@link Classifier}s.
+    * @param classifier1 The first {@link Classifier} to be used. 
+    * @param classifier2 The second {@link Classifier} to be used (may be <tt>null</tt> . */
+  // TBD: allow more classifiers
+  // BUG (?): classifiers cannot have same classes
+  public void generateCorrelations(Classifiers classifier1,
+                                   Classifiers classifier2) {
+    String[] classifierNames = (classifier2 == null) ? new String[]{classifier1.name()} : new String[]{classifier1.name(), classifier2.name()};
+    log.info("Generating correlations for Sources and Alerts of Interest for " + Arrays.toString(classifierNames));
+    for (String classifierName : classifierNames) {
+      // Clean all correlations 
+      g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifierName).bothE().has("lbl", "overlaps").drop().iterate();
+      g().V().has("lbl", "SourcesOfInterest").has("classifier", classifierName).bothE().has("lbl", "overlaps").drop().iterate();
+      // Remove wrong SoI, AoI
+      g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifierName).not(has("cls")).drop().iterate();
+      g().V().has("lbl", "SourcesOfInterest").has("classifier", classifierName).not(has("cls")).drop().iterate();
+      }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     // Accumulate correlations and sizes
     Map<String, Double>               weights0 = new HashMap<>(); // cls -> weight (for one source)
@@ -692,32 +706,34 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Loop over SoI and create AoI
     String hbaseUrl = g().V().has("lbl", "SourcesOfInterest").limit(1).values("url").value().toString();
     for (String cls1 : types) {
-      g().V().has("lbl",        "AlertsOfInterest").
-              has("classifier", classifier.name() ).
-              has("cls",        cls1              ).
-              fold().
-              coalesce(unfold(), 
-                       addV("AlertsOfInterest").
-                       property("lbl",        "AlertsOfInterest").
-                       property("classifier", classifier.name() ).
-                       property("cls",        cls1              ).
-                       property("technology", "HBase"           ).
-                       property("url",        hbaseUrl          )).
-              iterate();
+      for (String classifierName : classifierNames) {
+        g().V().has("lbl",        "AlertsOfInterest").
+                has("classifier", classifierName    ).
+                has("cls",        cls1              ).
+                fold().
+                coalesce(unfold(), 
+                         addV("AlertsOfInterest").
+                         property("lbl",        "AlertsOfInterest").
+                         property("classifier", classifierName    ).
+                         property("cls",        cls1              ).
+                         property("technology", "HBase"           ).
+                         property("url",        hbaseUrl          )).
+                iterate();
+        }
       }
     // Double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
     for (String cls1 : types) {
       try {
-        soi1 = g().V().has("lbl",        "SourcesOfInterest").
-                       has("classifier", classifier.name()  ).
-                       has("cls",        cls1               ).
+        soi1 = g().V().has("lbl",        "SourcesOfInterest"    ).
+                       has("classifier", within(classifierNames)).
+                       has("cls",        cls1                   ).
                        next();
         for (String cls2 : types) {
           if (corrS.containsKey(Pair.of(cls1, cls2))) {
             try {
-              soi2 = g().V().has("lbl",        "SourcesOfInterest").
-                             has("classifier", classifier.name()  ).
-                             has("cls",        cls2               ).
+              soi2 = g().V().has("lbl",        "SourcesOfInterest"    ).
+                             has("classifier", within(classifierNames)).
+                             has("cls",        cls2                   ).
                              next();
               addEdge(g().V(soi1).next(),
                       g().V(soi2).next(),
@@ -732,28 +748,28 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               ns++;
               }
             catch (NoSuchElementException e) {
-              log.error("SoI " + classifier.name() + " for " + cls2 + " doesn't exist");
+              log.error("SoI for " + cls2 + " doesn't exist");
               }          
             }  
           }
         }
       catch (NoSuchElementException e) {
-        log.error("SoI " + classifier.name() + " for " + cls1 + " doesn't exist");
+        log.error("SoI for " + cls1 + " doesn't exist");
         }          
       }
     // Double-loop over AoI and create overlaps Edge AoI-AoI if non empty 
     for (String cls1 : types) {
       try {
-        aoi1 = g().V().has("lbl",        "AlertsOfInterest").
-                       has("classifier", classifier.name() ). 
-                       has("cls",        cls1              ).
+        aoi1 = g().V().has("lbl",        "AlertsOfInterest"     ).
+                       has("classifier", within(classifierNames)). 
+                       has("cls",        cls1                   ).
                        next();
         for (String cls2 : types) {
           if (corrA.containsKey(Pair.of(cls1, cls2))) {
             try {
-              aoi2 = g().V().has("lbl",        "AlertsOfInterest").
-                             has("classifier", classifier.name() ).
-                             has("cls",        cls2              ).
+              aoi2 = g().V().has("lbl",        "AlertsOfInterest"     ).
+                             has("classifier", within(classifierNames)).
+                             has("cls",        cls2                   ).
                              next();
               addEdge(g().V(aoi1).next(),
                       g().V(aoi2).next(),
@@ -768,13 +784,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               na++;
               }
             catch (NoSuchElementException e) {
-              log.error("AoI " + classifier.name() + " for " + cls2 + " doesn't exist");
+              log.error("AoI for " + cls2 + " doesn't exist");
               }          
             }  
           }
         }
       catch (NoSuchElementException e) {
-        log.error("SoI " + classifier.name() + " for " + cls1 + " doesn't exist");
+        log.error("SoI for " + cls1 + " doesn't exist");
         }          
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
