@@ -471,6 +471,7 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-core-2.15.3.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-annotations-2.15.3.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jackson-databind-2.15.3.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/htrace-core4-4.2.0-incubating.jar"/>
       <!--zipgroupfileset dir="${janusgraph_dir}/lib" includes="*hadoop*/*.jar"/-->
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
