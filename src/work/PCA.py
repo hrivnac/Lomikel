@@ -77,7 +77,7 @@ n_pca = 10
 n_clusters = 10
 read_sample = True
 add_extra_cols = False
-silhouette = False
+silhouette = True
 classify = True
 cluster_features = "pca_features"
 
