@@ -236,7 +236,7 @@ if silhouette:
       score = evaluator.evaluate(predictions) 
       silhouette_score.append(score)
     except:
-      log.error("Failed for i = ", i)
+      log.error("Failed for i = " + str(i))
       silhouette_score.append(0)
   # plot
   plt.figure(figsize=(10, 8))
