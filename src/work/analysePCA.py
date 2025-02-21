@@ -2,10 +2,10 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-types = '"SourcesOfInterest"'
+types = '"AlertsOfInterest"'
 classifier1 = '"FINK_PORTAL"'
 classifier2 = '"FEATURES"'
-limit = 50
+limit = 5000
 
 df = pd.read_csv('overlaps.csv').\
         query('type1 == ' + types).\

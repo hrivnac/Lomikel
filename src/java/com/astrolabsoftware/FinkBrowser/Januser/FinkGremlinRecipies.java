@@ -642,6 +642,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex aoi1;
     Vertex aoi2;
     String cls;
+    String cls01;
+    String cls02;
+    String[] types0A;
     Pair<String, String> rel;
     // Loop over sources and accumulated weights to each source
     while (sourceT.hasNext()) {
@@ -660,11 +663,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         weights0.put(cls, weight);
         }
       // Double loop over accumulated weights and fill weights between SoIs/AoIs
-      for (String cls1 : types0) {
-        weight1 = weights0.get(cls1);
-        for (String cls2 : types0) {
-          weight2 = weights0.get(cls2);
-          rel = Pair.of(cls1, cls2);
+      types0A = types0.toArray(new String[0]);
+      //for (String cls1 : types0) {
+      for (int i1 = 0; i1 < types0.length; i1++) {
+        cls01 = types0[i1];
+        weight1 = weights0.get(cls01);
+        //for (String cls2 : types0) {
+        for (int i2 = 0; i2 <= i1; i2++) {
+          cls02 = types0[i2];
+          weight2 = weights0.get(cls02));
+          rel = Pair.of(cls01, cls02);
           // SoI-SoI
           if (!corrS.containsKey(rel)) {
             corrS.put(rel, 0.0);
