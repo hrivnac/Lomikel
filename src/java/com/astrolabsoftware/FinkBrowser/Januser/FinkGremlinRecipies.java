@@ -598,17 +598,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()
     }
-    
-  /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
-    * @param classifier The {@link Classifier} to be used. */
-  public void generateCorrelations(Classifiers classifier) {
-    generateCorrelations(classifier, null);
-    }
-    
+        
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
     * Possibly between two {@link Classifier}s.
     * @param classifiers The {@link Classifier}s to be used. */
-  // BUG (?): classifiers cannot have same classes
   public void generateCorrelations(Classifiers... classifiers) {
     String[] classifierNames = Arrays.stream(classifiers).map(c -> c.name()).toArray(String[]::new);
     log.info("Generating correlations for Sources and Alerts of Interest for " + Arrays.toString(classifierNames));
@@ -700,7 +693,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Create overlaps
     int ns = 0;
     int na = 0;
-    // Loop over SoI and create AoI
+    // Loop over classes and create AoI
     String hbaseUrl = g().V().has("lbl", "SourcesOfInterest").limit(1).values("url").value().toString();
     for (String cls1 : types) {
       for (String classifierName : classifierNames) {
