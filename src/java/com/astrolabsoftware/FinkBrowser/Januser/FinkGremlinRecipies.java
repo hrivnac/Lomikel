@@ -665,12 +665,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       // Double loop over accumulated weights and fill weights between SoIs/AoIs
       types0A = types0.toArray(new String[0]);
       //for (String cls1 : types0) {
-      for (int i1 = 0; i1 < types0.length; i1++) {
-        cls01 = types0[i1];
+      for (int i1 = 0; i1 < types0A.length; i1++) {
+        cls01 = types0A[i1];
         weight1 = weights0.get(cls01);
         //for (String cls2 : types0) {
         for (int i2 = 0; i2 <= i1; i2++) {
-          cls02 = types0[i2];
+          cls02 = types0A[i2];
           weight2 = weights0.get(cls02);
           rel = Pair.of(cls01, cls02);
           // SoI-SoI
