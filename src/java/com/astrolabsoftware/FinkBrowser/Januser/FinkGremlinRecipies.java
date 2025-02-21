@@ -671,7 +671,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         //for (String cls2 : types0) {
         for (int i2 = 0; i2 <= i1; i2++) {
           cls02 = types0[i2];
-          weight2 = weights0.get(cls02));
+          weight2 = weights0.get(cls02);
           rel = Pair.of(cls01, cls02);
           // SoI-SoI
           if (!corrS.containsKey(rel)) {
