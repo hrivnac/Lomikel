@@ -607,13 +607,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
     * Possibly between two {@link Classifier}s.
-    * @param classifier1 The first {@link Classifier} to be used. 
-    * @param classifier2 The second {@link Classifier} to be used (may be <tt>null</tt> . */
-  // TBD: allow more classifiers
+    * @param classifiers The {@link Classifier}s to be used. */
   // BUG (?): classifiers cannot have same classes
-  public void generateCorrelations(Classifiers classifier1,
-                                   Classifiers classifier2) {
-    String[] classifierNames = (classifier2 == null) ? new String[]{classifier1.name()} : new String[]{classifier1.name(), classifier2.name()};
+  public void generateCorrelations(Classifiers... classifiers) {
+    String[] classifierNames = Arrays.stream(classifiers).map(c -> c.name()).toArray(String[]::new);
     log.info("Generating correlations for Sources and Alerts of Interest for " + Arrays.toString(classifierNames));
     for (String classifierName : classifierNames) {
       // Clean all correlations 

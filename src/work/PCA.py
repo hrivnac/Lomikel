@@ -227,10 +227,10 @@ if silhouette:
     
   for i in range(5, 25):
     try:
-      ## kmeans = KMeans().setK(i)\
-      ##                  .setFeaturesCol(cluster_features) 
-      kmeans = BisectingKMeans().setK(i)\
-                                .setFeaturesCol(cluster_features)
+      kmeans = KMeans().setK(i)\
+                       .setFeaturesCol(cluster_features) 
+      ## kmeans = BisectingKMeans().setK(i)\
+      ##                           .setFeaturesCol(cluster_features)
       model = kmeans.fit(df_pca)
       predictions = model.transform(df_pca)
       score = evaluator.evaluate(predictions) 
