@@ -252,10 +252,6 @@ kmeans = KMeans().setK(n_clusters)\
                  .setSeed(1)\
                  .setFeaturesCol(cluster_features)\
                  .setPredictionCol("cluster")
-## kmeans = KMeans().setK(n_clusters)\
-##                  .setSeed(1)\
-##                  .setFeaturesCol(cluster_features)\
-##                  .setPredictionCol("cluster")
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
 cr = clustered_result.select("objectId", "cluster", "classification")
