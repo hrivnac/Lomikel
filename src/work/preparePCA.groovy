@@ -1,7 +1,7 @@
 outputFile = new File("/tmp/PCA-sample.csv")
-n_cls = 10
-n_objectId = 100
-n_jd = 100
+n_cls = 1000000
+n_objectId = 1000
+n_jd = 10000
 
 classes = []
 g.V().has('lbl', 'SourcesOfInterest').

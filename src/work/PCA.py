@@ -74,10 +74,10 @@ pca_sample = "/tmp/PCA-sample.csv"
 rowkey_start = "ZTF24"
 n_sample = 1000
 n_pca = 10
-n_clusters = 10
+n_clusters = 11
 read_sample = True
 add_extra_cols = False
-silhouette = True
+silhouette = False
 classify = True
 cluster_features = "pca_features"
 
