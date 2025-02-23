@@ -1,7 +1,8 @@
 outputFile = new File("/tmp/PCA-sample.csv")
 n_cls = 1000000
-n_objectId = 1000
-n_jd = 10000
+n_objectId = 10000
+min_jd = 100
+max_jd = 10000
 
 classes = []
 g.V().has('lbl', 'SourcesOfInterest').
@@ -15,7 +16,7 @@ g.V().has('lbl', 'SourcesOfInterest').
       toList().
       each {x -> classes += (x['cls'])}
 
-//outputFile.write("cls,objectId,jd_list\n")
+outputFile.write("cls,objectId,jd_list\n")
 classes.each {cls -> def results = g.V().has('lbl', 'SourcesOfInterest').
                                          has('classifier', 'FINK_PORTAL').
                                          has('cls', cls).
@@ -31,10 +32,12 @@ classes.each {cls -> def results = g.V().has('lbl', 'SourcesOfInterest').
                      results.each {row -> def objectId = row.get("objectId")
                                           def jdList = row.get("jd").split(',')
                                           def n = jdList.size()
-                                          if (n > n_jd) {
-                                            jdList = jdList[0..(n_jd-1)]
+                                          if (n >= min_jd) {
+                                            if (n > max_jd) {
+                                              jdList = jdList[0..(n_jd-1)]
+                                              }
+                                            outputFile.append("${cls},${objectId},${jdList.join(';').replaceAll(' ', '')}\n")
                                             }
-                                          outputFile.append("${cls},${objectId},${jdList.join(';').replaceAll(' ', '')}\n")
                                     }
                }
     
