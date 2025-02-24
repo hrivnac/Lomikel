@@ -78,7 +78,7 @@ n_clusters = 11
 read_sample = True
 add_extra_cols = False
 silhouette = False
-classify = True
+classify = False
 cluster_features = "pca_features"
 
 # Read PCA sample --------------------------------------------------------------

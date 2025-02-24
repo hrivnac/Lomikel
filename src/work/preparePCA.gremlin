@@ -34,7 +34,7 @@ classes.each {cls -> def results = g.V().has('lbl', 'SourcesOfInterest').
                                           def n = jdList.size()
                                           if (n >= min_jd) {
                                             if (n > max_jd) {
-                                              jdList = jdList[0..(n_jd-1)]
+                                              jdList = jdList[0..(min_jd-1)]
                                               }
                                             outputFile.append("${cls},${objectId},${jdList.join(';').replaceAll(' ', '')}\n")
                                             }
