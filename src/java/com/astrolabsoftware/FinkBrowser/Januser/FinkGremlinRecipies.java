@@ -716,24 +716,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                        property("url",        hbaseUrl          )).
               iterate();
       }
-    // Loop over classes and create AoI
-    //    String hbaseUrl = g().V().has("lbl", "SourcesOfInterest").limit(1).values("url").value().toString();
-    //    for (String cls1 : types) {
-    //      for (String classifierName : classifierNames) {
-    //        g().V().has("lbl",        "AlertsOfInterest").
-    //                has("classifier", classifierName    ).
-    //                has("cls",        cls1              ).
-    //                fold().
-    //                coalesce(unfold(), 
-    //                         addV("AlertsOfInterest").
-    //                         property("lbl",        "AlertsOfInterest").
-    //                         property("classifier", classifierName    ).
-    //                         property("cls",        cls1              ).
-    //                         property("technology", "HBase"           ).
-    //                         property("url",        hbaseUrl          )).
-    //                iterate();
-    //        }
-    //      }
     // Double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
     for (String cls1 : types) {
       try {

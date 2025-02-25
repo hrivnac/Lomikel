@@ -2,50 +2,51 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from tabulate import tabulate
-
-#classifier1 = 'FINK_PORTAL'
-#classifier2 = 'FEATURES'
-#types = 'SourcesOfInterest'
-#limit = 0.04
-
-classifier1 = 'FINK_PORTAL'
-classifier2 = 'FEATURES'
-types = 'AlertsOfInterest'
-limit = 0.6
+                                      
+classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
+classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
+types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
+limits       = [0.57,                0.0,                 0.9,                  0.7,               0.0,                0.9               ]
 
 df = pd.read_csv('overlaps.csv')
 
-df = df.query('type1 == @types').\
-        query('type2 == @types').\
-        query('classifier1 == @classifier1').\
-        query('classifier2 == @classifier2').\
-        query('class1 != "FC--1"').\
-        query('class2 != "FC--1"')
-        
-df['normalized_overlap1'] = df.groupby('class1')['overlap'].\
-                               transform(lambda x: x / x.sum())
-df['normalized_overlap2'] = df.groupby('class2')['normalized_overlap1'].\
-                               transform(lambda x: x / x.sum())
-                               
-df = df.query('normalized_overlap2 > @limit')                             
-                                                
-print(tabulate(df, headers = 'keys', tablefmt = 'psql'))
+fig, axes = plt.subplots(2, 3, figsize = (20, 15))  
 
-plt.figure(figsize=(12, 6))
-sns.scatterplot(
-    data=df,      
-    x='class1',    
-    y='class2',    
-    hue='normalized_overlap2',   
-    size='normalized_overlap2',  
-    sizes=(0, 500), 
-    alpha=0.6,        
-    palette='viridis')
-plt.title('Scatterplot of ' + types)
-plt.xlabel(classifier1)
-plt.ylabel(classifier2)
-plt.grid(True)
-plt.legend(title='overlap')
-plt.xticks(rotation=45)
+for i, ax in enumerate(axes.flat): 
+  classifier1 = classifiers1[i] 
+  classifier2 = classifiers2[i]
+  type = types[i]
+  limit = limits[i] 
+  dfx = df.query('type1 == @type').\
+           query('type2 == @type').\
+           query('classifier1 == @classifier1').\
+           query('classifier2 == @classifier2')
+  dfx['normalized_overlap1'] = dfx.groupby('class1')['overlap'].\
+                                   transform(lambda x: x / x.sum())
+  dfx['normalized_overlap2'] = dfx.groupby('class2')['normalized_overlap1'].\
+                                   transform(lambda x: x / x.sum())
+                               
+  dfx = dfx.query('normalized_overlap2 > @limit')                             
+  sns.scatterplot(data    = dfx,      
+                  x       = 'class1',    
+                  y       = 'class2',    
+                  hue     = 'normalized_overlap2',   
+                  size    = 'normalized_overlap2',  
+                  sizes   = (0, 500), 
+                  alpha   = 0.6,        
+                  palette = 'viridis',
+                  ax      = ax)
+  ax.set_title(type + ' of ' + classifier1 + ' * ' + classifier2)
+  ax.set_xlabel(classifiers1[i])
+  ax.set_ylabel(classifiers2[i])
+  ax.grid(True)
+  ax.legend(title = 'overlap')
+  ax.tick_params(axis = 'x', rotation = 45)
+    
+    
 plt.tight_layout()
+plt.savefig("Overlaps.png")
 plt.show()
+
+                                           
+#print(tabulate(df, headers = 'keys', tablefmt = 'psql'))
