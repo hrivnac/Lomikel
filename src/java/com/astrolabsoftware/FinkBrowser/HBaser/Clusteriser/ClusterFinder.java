@@ -91,9 +91,13 @@ public class ClusterFinder {
     RealVector transformedVector = new ArrayRealVector(transformedData);
     double minDistance = Double.MAX_VALUE;
     int closestCluster = -1;
+    RealVector clusterCenter;
+    double distance;
+    log.info("DISTANCE");
     for (int i = 0; i < _clusterCenters.getRowDimension(); i++) {
-      RealVector clusterCenter = _clusterCenters.getRowVector(i);
-      double distance = transformedVector.getDistance(clusterCenter);
+      clusterCenter = _clusterCenters.getRowVector(i);
+      distance = transformedVector.getDistance(clusterCenter);
+      log.info("\t" + distance);
       if (distance < minDistance) {
         minDistance = distance;
         closestCluster = i;
