@@ -3,9 +3,13 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from tabulate import tabulate
 
+#classifier1 = 'FINK_PORTAL'
+#classifier2 = 'FEATURES'
+#types = 'SourcesOfInterest'
+#limit = 0.04
+
 classifier1 = 'FINK_PORTAL'
 classifier2 = 'FEATURES'
-#types = 'SourcesOfInterest'
 types = 'AlertsOfInterest'
 limit = 0.6
 
@@ -14,7 +18,9 @@ df = pd.read_csv('overlaps.csv')
 df = df.query('type1 == @types').\
         query('type2 == @types').\
         query('classifier1 == @classifier1').\
-        query('classifier2 == @classifier2')
+        query('classifier2 == @classifier2').\
+        query('class1 != "FC--1"').\
+        query('class2 != "FC--1"')
         
 df['normalized_overlap1'] = df.groupby('class1')['overlap'].\
                                transform(lambda x: x / x.sum())
@@ -36,8 +42,8 @@ sns.scatterplot(
     alpha=0.6,        
     palette='viridis')
 plt.title('Scatterplot of ' + types)
-plt.xlabel(classifier2)
-plt.ylabel(classifier1)
+plt.xlabel(classifier1)
+plt.ylabel(classifier2)
 plt.grid(True)
 plt.legend(title='overlap')
 plt.xticks(rotation=45)

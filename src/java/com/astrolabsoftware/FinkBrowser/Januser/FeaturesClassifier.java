@@ -72,14 +72,16 @@ public class FeaturesClassifier implements Classifier {
                            mapToDouble(Double::parseDouble).
                            toArray();
         cl = String.valueOf(finder().transformAndPredict(featuresD));                  
-        if (classes.containsKey(cl)) {
-          jds = classes.get(cl);
-          jds.add(jd);
-          }
-        else {
-          jds = new TreeSet<Double>();
-          jds.add(jd);
-          classes.put(cl, jds);
+        if (!cl.equals("-1")) {
+          if (classes.containsKey(cl)) {
+            jds = classes.get(cl);
+            jds.add(jd);
+            }
+          else {
+            jds = new TreeSet<Double>();
+            jds.add(jd);
+            classes.put(cl, jds);
+            }
           }
         }
       }

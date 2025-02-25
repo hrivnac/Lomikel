@@ -87,6 +87,10 @@ public class ClusterFinder {
     return transformed.toArray();
     }
   
+  /** Find the closest cluster from the transformed data.
+    * @param  transformedData The transformed input data.
+    * @return                 The (number of) the closest cluster.
+    *                         <tt>-1</tt> if it cannot be found with sufficient resolution. */
   private int findClosestCluster(double[] transformedData) {
     RealVector transformedVector = new ArrayRealVector(transformedData);
     double minDistance  = Double.MAX_VALUE;
@@ -114,6 +118,10 @@ public class ClusterFinder {
     return -1;
     }
   
+  /** Transform provided data array and find the closest cluster.
+    * @param  inputData The original input data.
+    * @return           The (number of) the closest cluster.
+    *                   <tt>-1</tt> if it cannot be found with sufficient resolution. */
   public int transformAndPredict(double[] inputData) {
     double[] standardized = standardize(inputData);
     double[] pcaTransformed = applyPCA(standardized);

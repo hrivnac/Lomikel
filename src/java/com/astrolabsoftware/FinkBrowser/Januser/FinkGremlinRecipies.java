@@ -622,7 +622,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<String, Double>               sizeA    = new HashMap<>(); // cls -> total (for all sources of AoI)
     SortedSet<String>                 types0   = new TreeSet<>(); // [cls] (for one source)
     SortedSet<String>                 types    = new TreeSet<>(); // [cls] (for all sources)
-    GraphTraversal<Vertex, Vertex> sourceT = g().V().has("lbl", "source");
     Vertex source;
     Iterator<Edge> deepcontainsIt;
     Edge deepcontains;
@@ -630,6 +629,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     double weight1;
     double weight2;
     double cor;
+    Vertex soi;
     Vertex soi1;
     Vertex soi2;
     Vertex aoi1;
@@ -637,6 +637,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String cls;
     Pair<String, String> rel;
     // Loop over sources and accumulated weights to each source
+    GraphTraversal<Vertex, Vertex> sourceT = g().V().has("lbl", "source");
     while (sourceT.hasNext()) {
       weights0.clear();
       types0.clear();
@@ -693,24 +694,46 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Create overlaps
     int ns = 0;
     int na = 0;
-    // Loop over classes and create AoI
-    String hbaseUrl = g().V().has("lbl", "SourcesOfInterest").limit(1).values("url").value().toString();
-    for (String cls1 : types) {
-      for (String classifierName : classifierNames) {
-        g().V().has("lbl",        "AlertsOfInterest").
-                has("classifier", classifierName    ).
-                has("cls",        cls1              ).
-                fold().
-                coalesce(unfold(), 
-                         addV("AlertsOfInterest").
-                         property("lbl",        "AlertsOfInterest").
-                         property("classifier", classifierName    ).
-                         property("cls",        cls1              ).
-                         property("technology", "HBase"           ).
-                         property("url",        hbaseUrl          )).
-                iterate();
-        }
+    // Loop over SoI and create AoI
+    String hbaseUrl;
+    String classifierName;
+    GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SourcesOfInterest");
+    while (soiT.hasNext()) {
+      soi = soiT.next();
+      hbaseUrl = soi.property("url").value().toString();
+      classifierName = soi.property("classifier").value().toString();
+      cls = soi.property("cls").value().toString();
+      g().V().has("lbl",        "AlertsOfInterest").
+              has("classifier", classifierName    ).
+              has("cls",        cls               ).
+              fold().
+              coalesce(unfold(), 
+                       addV("AlertsOfInterest").
+                       property("lbl",        "AlertsOfInterest").
+                       property("classifier", classifierName    ).
+                       property("cls",        cls               ).
+                       property("technology", "HBase"           ).
+                       property("url",        hbaseUrl          )).
+              iterate();
       }
+    // Loop over classes and create AoI
+    //    String hbaseUrl = g().V().has("lbl", "SourcesOfInterest").limit(1).values("url").value().toString();
+    //    for (String cls1 : types) {
+    //      for (String classifierName : classifierNames) {
+    //        g().V().has("lbl",        "AlertsOfInterest").
+    //                has("classifier", classifierName    ).
+    //                has("cls",        cls1              ).
+    //                fold().
+    //                coalesce(unfold(), 
+    //                         addV("AlertsOfInterest").
+    //                         property("lbl",        "AlertsOfInterest").
+    //                         property("classifier", classifierName    ).
+    //                         property("cls",        cls1              ).
+    //                         property("technology", "HBase"           ).
+    //                         property("url",        hbaseUrl          )).
+    //                iterate();
+    //        }
+    //      }
     // Double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
     for (String cls1 : types) {
       try {

@@ -27,6 +27,7 @@ scp centos@134.158.74.85:/tmp/overlaps.csv ./
 python ../src/work/analysePCA.py
 
 --------------------------------------------------------------------------------
+gr.overlaps().each{o -> println(o)}
 
 preparePCA.gremlin
 ------------------
