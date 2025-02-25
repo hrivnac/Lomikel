@@ -84,7 +84,7 @@ public class FeaturesClassifier implements Classifier {
         }
       }
     for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
-      key = cls.getKey();
+      key = "FC-" + cls.getKey();
       val = cls.getValue();
       weight = val.size();
       recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
