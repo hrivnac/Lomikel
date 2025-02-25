@@ -111,7 +111,7 @@ public class ClusterFinder {
         }
       }
     log.info("" + minDistance + " " + minDistance2);
-    if (minDistance > 0.5 * minDistance2) {
+    if (minDistance > _separation * minDistance2) {
       return -1;
       }
     return closestCluster;
@@ -122,7 +122,13 @@ public class ClusterFinder {
     double[] pcaTransformed = applyPCA(standardized);
     return findClosestCluster(pcaTransformed);
     }
+    
+  private static void setSeparation(double separation) {
+    _separation = separation;
+    }
   
+  private static double _separation = 0.5;  
+    
   private double[] _mean;
   
   private double[] _std;
