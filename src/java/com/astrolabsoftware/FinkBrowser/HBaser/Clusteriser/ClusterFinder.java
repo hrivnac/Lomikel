@@ -94,11 +94,9 @@ public class ClusterFinder {
     int closestCluster = -1;
     RealVector clusterCenter;
     double distance;
-    log.info("DISTANCE");
     for (int i = 0; i < _clusterCenters.getRowDimension(); i++) {
       clusterCenter = _clusterCenters.getRowVector(i);
       distance = transformedVector.getDistance(clusterCenter);
-      log.info("\t" + distance);
       if (distance < minDistance2) {
         if (distance < minDistance) {
           minDistance2  = minDistance;
@@ -110,7 +108,6 @@ public class ClusterFinder {
           }
         }
       }
-    log.info("" + minDistance + " " + minDistance2);
     if (minDistance < _separation * minDistance2) {
       return closestCluster;
       }
