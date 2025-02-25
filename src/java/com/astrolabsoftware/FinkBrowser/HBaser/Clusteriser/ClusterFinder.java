@@ -101,8 +101,8 @@ public class ClusterFinder {
       log.info("\t" + distance);
       if (distance < minDistance2) {
         if (distance < minDistance) {
-          minDistance   = distance;
           minDistance2  = minDistance;
+          minDistance   = distance;
           closestCluster = i;
           }
         else {
