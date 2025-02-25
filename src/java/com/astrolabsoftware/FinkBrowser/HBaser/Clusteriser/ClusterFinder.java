@@ -111,10 +111,10 @@ public class ClusterFinder {
         }
       }
     log.info("" + minDistance + " " + minDistance2);
-    if (minDistance > _separation * minDistance2) {
-      return -1;
+    if (minDistance < _separation * minDistance2) {
+      return closestCluster;
       }
-    return closestCluster;
+    return -1;
     }
   
   public int transformAndPredict(double[] inputData) {
@@ -123,6 +123,12 @@ public class ClusterFinder {
     return findClosestCluster(pcaTransformed);
     }
     
+  /** Set the minimal separation quotient.
+    * @param separation The minimal separation quotient.
+    *                   The ration between distance to closest and second closest
+    *                   cluster should be smaller than <tt>separation</tt>,
+    *                   otherwise cluster is not considered reliable.
+    *                   <tt>1</tt> gives no restriction. The default is <tt>0.5</tt>. */
   private static void setSeparation(double separation) {
     _separation = separation;
     }
