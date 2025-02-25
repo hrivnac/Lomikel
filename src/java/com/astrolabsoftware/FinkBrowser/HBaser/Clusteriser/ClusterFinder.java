@@ -100,10 +100,13 @@ public class ClusterFinder {
       distance = transformedVector.getDistance(clusterCenter);
       log.info("\t" + distance);
       if (distance < minDistance2) {
-        minDistance2 = distance;
         if (distance < minDistance) {
-          minDistance  = distance;
+          minDistance   = distance;
+          minDistance2  = minDistance;
           closestCluster = i;
+          }
+        else {
+          minDistance2 = distance;
           }
         }
       }
