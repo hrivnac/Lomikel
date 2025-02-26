@@ -542,6 +542,9 @@
         <include name="log4j.xml"/>
         </classes>
       <lib file="../lib/Lomikel-${version}-Janus.exe.jar"/>
+      <lib file="../lib/Lomikel-${version}-Janus.jar"/>
+      <lib file="../lib/Lomikel-${version}.jar"/>
+      <lib file="../lib/Lomikel-${version}-ext.exe.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -608,6 +611,9 @@
         <include name="log4j.xml"/>
         </classes>
       <lib file="../lib/Lomikel-${version}-Janus.exe.jar"/>
+      <lib file="../lib/Lomikel-${version}-Janus.jar"/>
+      <lib file="../lib/Lomikel-${version}.jar"/>
+      <lib file="../lib/Lomikel-${version}-ext.exe.jar"/>
       <lib file="${orgjson_jar}"/>
       <lib file="${javaxmail_jar}"/>
       <lib file="${hbasecommon_jar}"/>
