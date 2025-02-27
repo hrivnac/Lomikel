@@ -743,13 +743,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               ns++;
               }
             catch (NoSuchElementException e) {
-              log.error("SoI for " + cls2 + " doesn't exist");
+              log.debug("SoI for " + cls2 + " doesn't exist");
               }          
             }  
           }
         }
       catch (NoSuchElementException e) {
-        log.error("SoI for " + cls1 + " doesn't exist");
+        log.debug("SoI for " + cls1 + " doesn't exist");
         }          
       }
     // Double-loop over AoI and create overlaps Edge AoI-AoI if non empty 
@@ -779,13 +779,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               na++;
               }
             catch (NoSuchElementException e) {
-              log.error("AoI for " + cls2 + " doesn't exist");
+              log.debug("AoI for " + cls2 + " doesn't exist");
               }          
             }  
           }
         }
       catch (NoSuchElementException e) {
-        log.error("SoI for " + cls1 + " doesn't exist");
+        log.debug("SoI for " + cls1 + " doesn't exist");
         }          
       }
     g().getGraph().tx().commit(); // TBD: should use just commit()

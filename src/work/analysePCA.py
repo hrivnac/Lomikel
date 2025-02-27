@@ -7,6 +7,7 @@ classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       '
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
 limits       = [0.57,                0.0,                 0.9,                  0.7,               0.0,                0.9               ]
+#limits       = [0.0,                 0.0,                 0.0,                  0.0,               0.0,                0.0               ]
 
 df = pd.read_csv('overlaps.csv')
 
