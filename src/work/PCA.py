@@ -74,10 +74,10 @@ pca_sample = "/tmp/PCA-sample.csv"
 rowkey_start = "ZTF24"
 n_sample = 10000000
 n_pca = 10
-n_clusters = 11
+n_clusters = 20
 read_sample = True
 add_extra_cols = False
-silhouette = False
+silhouette = True
 classify = True
 cluster_features = "pca_features"
 
@@ -223,9 +223,8 @@ evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
                                  .setDistanceMeasure("squaredEuclidean")
 
 if silhouette:
-  silhouette_score = [] 
-    
-  for i in range(5, 25):
+  silhouette_score = []   
+  for i in range(5, n_clusters):
     try:
       kmeans = KMeans().setK(i)\
                        .setFeaturesCol(cluster_features) 
@@ -240,7 +239,7 @@ if silhouette:
       silhouette_score.append(0)
   # plot
   plt.figure(figsize=(10, 8))
-  plt.plot(range(5, 25), silhouette_score) 
+  plt.plot(range(5, n_clusters), silhouette_score) 
   plt.xlabel("number of clusters") 
   plt.ylabel("within set sum of squared errors") 
   plt.title("Elbow Method for Optimal K") 
