@@ -37,7 +37,7 @@ max_jd = 100
 
 cleaning
 
-=> n_pca = 10
+=> n_pca = 13
 
 ...
 n_clusters = 11
