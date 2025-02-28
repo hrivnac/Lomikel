@@ -73,11 +73,11 @@ extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 pca_sample = "/tmp/PCA-sample.csv"
 rowkey_start = "ZTF24"
 n_sample = 10000000
-n_pca = 10
+n_pca = 15
 n_clusters = 20
 read_sample = True
 add_extra_cols = False
-silhouette = True
+silhouette = False
 classify = True
 cluster_features = "pca_features"
 

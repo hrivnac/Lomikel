@@ -33,7 +33,9 @@ preparePCA.gremlin
 n_cls = 1000
 n_objectId = 1000
 min_jd = 100
-max_jd = 1000
+max_jd = 100
+
+cleaning
 
 => n_pca = 10
 
