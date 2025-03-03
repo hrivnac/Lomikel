@@ -4,6 +4,18 @@ n_objectId = 1000
 min_jd = 100
 max_jd = 100
 
+def reduceCls(String cls) {
+  switch(cls) {            
+    case 'EB*_Candidate' -> 'EB*';
+    case 'Candidate_EB*' -> 'EB*';
+    case 'LP*_Candidate' -> 'LP*';
+    case 'Candidate_LP*' -> 'LP*';
+    case 'CV*_Candidate' -> 'CV*';
+    case 'Candidate_CV*' -> 'CV*';
+    default              -> return cls; 
+    }
+  }
+
 classes = []
 g.V().has('lbl', 'SourcesOfInterest').
       has('classifier', 'FINK_PORTAL').
@@ -14,7 +26,7 @@ g.V().has('lbl', 'SourcesOfInterest').
       by(select('size'), desc).
       limit(n_cls).
       toList().
-      each {x -> classes += (x['cls'])}
+      each {x -> classes += (reduce(x['cls']))}
 
 outputFile.write("cls,objectId,jd_list\n")
 classes.each {cls -> def results = g.V().has('lbl', 'SourcesOfInterest').

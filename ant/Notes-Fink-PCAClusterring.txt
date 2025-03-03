@@ -35,7 +35,7 @@ n_objectId = 1000
 min_jd = 100
 max_jd = 100
 
-cleaning
+cleaning => 13 classes
 
 => n_pca = 13
 
