@@ -135,8 +135,9 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   @Override
   public Table connect(String tableName,
                        String schemaName) throws LomikelException {
-     return connect(tableName, schemaName, 0);
-     }  
+   log.info(schemaName);
+   return connect(tableName, schemaName, 0);
+   }  
      
   @Override
   public Table connect(String tableName,
