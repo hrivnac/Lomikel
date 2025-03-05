@@ -184,7 +184,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     Map<String, String> searchMap = new TreeMap<>();
     try {
       HBaseClient client = new HBaseClient(zookeepers(), clientPort());
-      client.connect(tableName() + ".jd");
+      client.connect(tableName() + ".jd", null);
       client.setReversed(reversed);
       client.setLimit(limit());
       client.setSearchLimit(searchLimit());
