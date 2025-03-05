@@ -156,6 +156,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                 null,
                                 timeLimit,
                                 true);
+      log.info(oids);
       }
     else {
       Calendar cal;
@@ -909,10 +910,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     if (url.length >= 4) {
       schema = url[3];
       }
-    log.info(ip);
-    log.info(port);
-    log.info(table);
-    log.info(schema);
     _fhclient = new FinkHBaseClient(ip, port);
     _fhclient.connect(table, schema);
     return _fhclient;
