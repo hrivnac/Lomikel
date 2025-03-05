@@ -151,7 +151,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                        int    timeout,
                        int    retries) throws LomikelException {
     // Table setup
-    log.debug("Connecting to " + tableName);
+    log.debug("Connecting to " + tableName + ", schema " + schemaName);
     setTableName(tableName);
     if (timeout > 0) {
       log.debug("\tglobal timeout = " + timeout);
