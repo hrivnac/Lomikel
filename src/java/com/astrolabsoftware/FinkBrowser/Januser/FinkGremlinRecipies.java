@@ -5,6 +5,7 @@ import com.Lomikel.Utils.NotifierURL;
 import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
+import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.ModifyingGremlinClient;
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
@@ -152,10 +153,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       SmallHttpClient httpClient = new SmallHttpClient();
       fhclient(hbaseUrl);
       fhclient().setLimit(nLimit);
-      oids = fhclient().latests("i:objectId",
-                                null,
-                                timeLimit,
-                                true);
+      oids = ((HBaseClient)fhclient()).latests("i:objectId",
+                                               null,
+                                               timeLimit,
+                                               true);
       log.info(oids);
       }
     else {
