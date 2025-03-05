@@ -341,6 +341,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     * @param minutes        How far into the past it should search. 
     * @param getValues      Whether to get column values or row keys.
     * @return               The {@link Set} of different values of that column. */
+  @Override
   public Set<String> latests(String  columnName,
                              String  prefixValue,
                              long    minutes,
@@ -359,6 +360,22 @@ public class FinkHBaseClient extends HBaseSQLClient {
       l.add(getValues ? entry.getValue().get(columnName) : entry.getKey());
       }
     return l;
+    }
+    
+  /** Give all recent values of the column.
+    * The original implementation from {@link HBaseClient}.
+    * Results are ordered by the row key, so evetual limits on results
+    * number will be apllied to them and not to the time.
+    * @param columnName     The name of the column.
+    * @param substringValue The column value substring to search for.
+    * @param minutes        How far into the past it should search (in minutes). 
+    * @param getValues      Whether to get column values or row keys.
+    * @return               The {@link Set} of different values of that column. */
+  public Set<String> latestsT(String  columnName,
+                              String  prefixValue,
+                              long    minutes,
+                              boolean getValues) {
+    return super.latests(columnName, prefixValue, minutes, getValues);
     }
   
   /** Create aux pixel map hash table.

@@ -153,10 +153,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       SmallHttpClient httpClient = new SmallHttpClient();
       fhclient(hbaseUrl);
       fhclient().setLimit(nLimit);
-      oids = ((HBaseClient)fhclient()).latests("i:objectId",
-                                               null,
-                                               timeLimit,
-                                               true);
+      oids = fhclient().latestsT("i:objectId",
+                                 null,
+                                 timeLimit,
+                                 true);
       log.info(oids);
       }
     else {
