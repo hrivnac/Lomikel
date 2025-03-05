@@ -1168,12 +1168,15 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     if (prefixValue != null) {
       search += columnName + ":" + prefixValue + ":prefix";
       }
+    boolean reversed = isReversed();
+    setReversed(true);
     Map<String, Map<String, String>> results = scan(null, search, columnName, minutes, false, false);
     for (Map.Entry<String, Map<String, String>> entry : results.entrySet()) {
       if (!entry.getKey().startsWith("schema")) {
         l.add(getValues ? entry.getValue().get(columnName) : entry.getKey());
         }
       }
+    setReversed(reversed);
     return l;
     }
 

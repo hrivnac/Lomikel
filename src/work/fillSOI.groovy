@@ -11,7 +11,5 @@ gr = new FinkGremlinRecipies(jc)
 gr.processSourcesOfInterest('FINK_PORTAL', 'hbase-1.lal.in2p3.fr:2183:ztf:schema_3.1_5.6.2', 1000000000, 1500, new String[]{'*'},  false, null)
 gr.processSourcesOfInterest('FEATURES',    'hbase-1.lal.in2p3.fr:2183:ztf:schema_3.1_5.6.2', 1000000000, 1500, new String[]{'*'},  false, null)
 gr.generateCorrelations(Classifiers.valueOf("FEATURES"), Classifiers.valueOf("FINK_PORTAL"))
-csv = "type1,classifier1,class1,type2,classifier2,class2,overlap\n"
-gr.overlaps().each{o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"}
-new File("/tmp/overlaps.csv").text = csv
+gr.overlaps(null, null, "/tmp/overlaps.csv")
  
