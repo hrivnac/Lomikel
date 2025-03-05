@@ -311,9 +311,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                   Optional. 
     * @param classifier The name of classifier to use for overlap search.
     *                   Optional. 
+    * @param outputCSV  The filename for CSV file with overlaps.
+    *                   Optional.
     * @return           The overlaps. */
   def Map overlaps(String lbl        = null,
-                   String classifier = null) {
+                   String classifier = null,
+                   String outputCSV  = null) {
     def overlaps = [:];
     g().E().has('lbl', 'overlaps').
             order().
@@ -332,7 +335,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['ycls']] = v['intersection'];
                     }
                   };
-    return overlaps.sort{-it.value};
+    overlaps = overlaps.sort{-it.value};
+    if (outputCSV != null) {
+      csv = "type1,classifier1,class1,type2,classifier2,class2,overlap\n";
+      gr.overlaps().each{o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"};
+      new File(outputCSV).text = csv;
+      return null;
+      }
+    return overlaps;
     }
     
   /** Export all <em>AlertsOfInterest</em> and <em?SourcesOfInterest</em>

@@ -1,61 +1,80 @@
-# data preparation
-# @janusgraph
+# training set preparation #####################################################
+
+# @janusgraph (gremlin)
 work/preparePCA.gremlin
+
 # @home
-scp centos@134.158.74.85:'/tmp/*.csv' ./
-scp *csv julius.hrivnac@vm-75222.lal.in2p3.fr:'/tmp'
+scp centos@134.158.74.85:'/tmp/PCA-sample.csv' ./
+
+# training #####################################################################
+
+# @home
+edit PCA-sample.csv
+scp PCA-sample.csv julius.hrivnac@vm-75222.lal.in2p3.fr:'/tmp'
 
 # @livy
 git pull;hadoop fs -put -f ../src/work/PCA.py;hadoop fs -put -f PCA-sample.csv /tmp
 
 # @janusgraph
 lomikel_hbase -s PCA.groovy  
+---------------------------
+n_cls = 1000
+n_objectId = 1000
+min_jd = 100
+max_jd = 100
+
+PCA_Variance.png => n_pca = 13
+Silhouette_Score.png => n_clusters = 11
+
++-------+-----+
+|cluster|count|
++-------+-----+
+|     10| 1368|
+|      8|  389|
+|      9|  381|
+|      6|  548|
+|      4|  327|
+|      0|  467|
+|      2|  169|
+|      1| 1157|
+|      3| 1042|
+|      5|  487|
+|      7|    6|
++-------+-----+
+
+
+ "+-------+-----+",
+    "|cluster|count|",
+    "+-------+-----+",
+    "|      9| 1398|",
+    "|      3| 1392|",
+    "|      0| 5152|",
+    "|     11| 1135|",
+    "|      1| 1293|",
+    "|      4|  839|",
+    "|      2|  730|",
+    "|     12|  628|",
+    "|      5|  524|",
+    "|     10|  417|",
+    "|      7|    2|",
+    "|      8|   84|",
+    "|      6|    8|",
+    "+-------+-----+",
+    "",
+
 
 # @home
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.png' ./
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.json' ./
 scp *json centos@134.158.74.85:/tmp
 
+# testing results ##############################################################
+
 # @janusgraph (gremlin)
-gr.generateCorrelations(Classifiers.valueOf("FEATURES"), Classifiers.valueOf("FINK_PORTAL"))
-csv = "type1,classifier1,class1,type2,classifier2,class2,overlap\n"
-gr.overlaps().each{o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"}
-new File("/tmp/overlaps.csv").text=csv
+/tmp/overlaps.csv
 
 # @home
 scp centos@134.158.74.85:/tmp/overlaps.csv ./
 python ../src/work/analysePCA.py
 
 --------------------------------------------------------------------------------
-
-preparePCA.gremlin
-------------------
-n_cls = 1000
-n_objectId = 1000
-min_jd = 100
-max_jd = 100
-
-cleaning => 13 classes
-
-=> n_pca = 13
-
-...
-n_clusters = 11
-
- "+-------+-----+",
-    "|cluster|count|",
-    "+-------+-----+",
-    "|     10| 1368|",
-    "|      8|  389|",
-    "|      9|  381|",
-    "|      6|  548|",
-    "|      4|  327|",
-    "|      0|  467|",
-    "|      2|  169|",
-    "|      1| 1157|",
-    "|      3| 1042|",
-    "|      5|  487|",
-    "|      7|    6|",
-    "+-------+-----+",
-    
-    --------------------------------------------------------------------------------

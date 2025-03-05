@@ -5,14 +5,15 @@ min_jd = 100
 max_jd = 100
 
 def reduceCls(String cls) {
+  cls = cls.replaceAll('Candidate_', '').replaceAll('_Candidate', '')
   switch(cls) {            
-    case 'EB*_Candidate' -> 'EB*';
-    case 'Candidate_EB*' -> 'EB*';
-    case 'LP*_Candidate' -> 'LP*';
-    case 'Candidate_LP*' -> 'LP*';
-    case 'CV*_Candidate' -> 'CV*';
-    case 'Candidate_CV*' -> 'CV*';
-    default              -> return cls; 
+    case 'EB*_Candidate' -> 'EB*'
+    case 'Candidate_EB*' -> 'EB*'
+    case 'LP*_Candidate' -> 'LP*'
+    case 'Candidate_LP*' -> 'LP*'
+    case 'CV*_Candidate' -> 'CV*'
+    case 'Candidate_CV*' -> 'CV*'
+    default              -> cls
     }
   }
 
@@ -26,7 +27,7 @@ g.V().has('lbl', 'SourcesOfInterest').
       by(select('size'), desc).
       limit(n_cls).
       toList().
-      each {x -> classes += (reduce(x['cls']))}
+      each {x -> classes += (x['cls'])}
 
 outputFile.write("cls,objectId,jd_list\n")
 classes.each {cls -> def results = g.V().has('lbl', 'SourcesOfInterest').
@@ -48,7 +49,8 @@ classes.each {cls -> def results = g.V().has('lbl', 'SourcesOfInterest').
                                             if (n > max_jd) {
                                               jdList = jdList[0..(min_jd-1)]
                                               }
-                                            outputFile.append("${cls},${objectId},${jdList.join(';').replaceAll(' ', '')}\n")
+                                            reducedCls = reduceCls(cls)
+                                            outputFile.append("${reducedCls},${objectId},${jdList.join(';').replaceAll(' ', '')}\n")
                                             }
                                     }
                }

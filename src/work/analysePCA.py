@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from tabulate import tabulate
            
-normalised = True           
+normalised = True          
                                       
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
