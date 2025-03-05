@@ -113,7 +113,8 @@ public abstract class Client<T, S extends Schema> {
     if (searchMsg != null && searchMsg.length() > 80) {
       searchMsg = searchMsg.substring(0, 80) + "...";
       }
-    log.debug("Searching for key: " + key + 
+    log.debug("Searching table " + _tableName +
+              " for key: " + key + 
               ", search: " + searchMsg + 
               ", filter: " + filter +
               ", delay: "  + delay + " min" + 
@@ -154,7 +155,8 @@ public abstract class Client<T, S extends Schema> {
     if (searchMsg != null && searchMsg.length() > 80) {
       searchMsg = searchMsg.substring(0, 80) + "...";
       }
-    log.debug("Searching for key: " + key + 
+    log.debug("Searching table " + _tableName +
+              " for key: " + key + 
               ", search: "  + searchMsg + 
               ", filter: "  + filter +
               ", delay: "   + delay + " min" +
@@ -198,7 +200,8 @@ public abstract class Client<T, S extends Schema> {
     if (search != null && search.length() > 80) {
       searchMsg = search.substring(0, 80) + "...";
       }
-    log.debug("Searching for key: " + key + 
+    log.debug("Searching table " + _tableName +
+              " for key: " + key + 
               ", search: " + searchMsg + 
               ", filter: " + filter +
               ", interval: " + start + " ms - " + stop + " ms" +
@@ -260,7 +263,8 @@ public abstract class Client<T, S extends Schema> {
     if (search != null && search.length() > 80) {
       searchMsg = search.substring(0, 80) + "...";
       }
-    log.debug("Searching for key: " + key + 
+    log.debug("Searching table " + _tableName +
+              " for key: " + key + 
               ", search: "   + searchMsg + 
               ", filter: "   + filter +
               ", interval: " + start + " ms - " + stop + " ms" +
