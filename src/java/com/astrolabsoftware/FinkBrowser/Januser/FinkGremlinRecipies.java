@@ -905,7 +905,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String ip     = url[0];
     String port   = url[1];
     String table  = url[2];
-    String schema = url[3];
+    String schema = "";
+    if (url.length >= 4) {
+      schema = url[3];
+      }
     _fhclient = new FinkHBaseClient(ip, port);
     _fhclient.connect(table, schema);
     return _fhclient;
