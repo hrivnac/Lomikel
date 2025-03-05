@@ -185,7 +185,7 @@ public class FinkHBaseClient extends HBaseSQLClient {
     try {
       HBaseClient client = new HBaseClient(zookeepers(), clientPort());
       log.info(client.schema());
-      client.connect(tableName() + ".jd", null);
+      client.connect(tableName() + ".jd");
       log.info(client.schema());
       client.setReversed(reversed);
       client.setLimit(limit());
