@@ -3,13 +3,14 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from tabulate import tabulate
            
-normalised = True          
+normalised = False          
                                       
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
 limits_norm  = [0.1,                 0.0,                 0.2,                  0.15,              0.0,                0.2               ]
-limits_unorm = [120,                 0.0,                 100,                  1200,              0.0,                10000             ]
+#limits_unorm = [120,                 0.0,                 100,                  1200,              0.0,                10000             ]
+limits_unorm = [0,                 0.0,                 0,                  0,              0.0,                10000             ]
 
 if normalised:
   name    = 'normalised'
