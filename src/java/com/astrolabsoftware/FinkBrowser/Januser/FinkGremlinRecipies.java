@@ -157,7 +157,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                  null,
                                  timeLimit,
                                  true);
-      log.info(oids);
       }
     else {
       Calendar cal;
