@@ -23,8 +23,8 @@ n_objectId = 1000
 min_jd = 100
 max_jd = 100
 
-PCA_Variance.png => n_pca = 13
-Silhouette_Score.png => n_clusters = 11
+PCA_Variance.png => n_pca = 15
+Silhouette_Score.png => n_clusters = 15
 
 +-------+-----+
 |cluster|count|

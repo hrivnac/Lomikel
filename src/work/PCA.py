@@ -73,8 +73,8 @@ extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 pca_sample = "/tmp/PCA-sample.csv"
 rowkey_start = "ZTF24"
 n_sample = 10000000
-n_pca = 13
-n_clusters = 13
+n_pca = 15
+n_clusters = 15
 read_sample = True
 add_extra_cols = False
 silhouette = False
@@ -213,7 +213,7 @@ plt.ylabel("Cumulative Explained Variance")
 plt.grid(True)
 plt.savefig("/tmp/PCA_Variance.png")
 
-# use n_components for variance about 80%
+# use n_pca for variance about 80%
 
 # Clustering -------------------------------------------------------------------  
     
