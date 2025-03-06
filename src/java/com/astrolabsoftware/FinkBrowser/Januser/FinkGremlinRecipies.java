@@ -205,7 +205,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         log.info("\t\twith " + String.format("%.2f", freq) + " Hz");
         }
       catch (LomikelException e) {
-        log.error("Cannot get classification for " + oid);
+        log.error("Cannot get classification for " + oid, e);
         }
       }
     }

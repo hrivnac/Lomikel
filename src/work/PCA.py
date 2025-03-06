@@ -217,12 +217,11 @@ plt.savefig("/tmp/PCA_Variance.png")
 
 # Clustering -------------------------------------------------------------------  
     
-evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
-                                 .setFeaturesCol(cluster_features)\
-                                 .setMetricName("silhouette",)\
-                                 .setDistanceMeasure("squaredEuclidean")
-
 if silhouette:
+  evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
+                                   .setFeaturesCol(cluster_features)\
+                                   .setMetricName("silhouette",)\
+                                   .setDistanceMeasure("squaredEuclidean")
   silhouette_score = []   
   for i in range(5, n_clusters):
     try:
@@ -246,7 +245,7 @@ if silhouette:
   plt.grid()
   plt.savefig("/tmp/Silhouette_Score.png")  
   # use n_clusters at maximum
-    
+
 kmeans = KMeans().setK(n_clusters)\
                  .setSeed(1)\
                  .setFeaturesCol(cluster_features)\
