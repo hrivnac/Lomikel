@@ -76,12 +76,39 @@ log4jLogger = spark._jvm.org.apache.log4j
 log = log4jLogger.LogManager.getLogger("PCA")
 log.info("Starting...")
 
-# Read Parquet filr into DataFrame ---------------------------------------------
+# Read Parquet file into DataFrame ---------------------------------------------
 
 df = spark.read\
           .format("parquet")\
           .load(dataFn)
 
+df = df.filter(df.lc_features_g.isNotNull())\
+       .filter(df.lc_features_r.isNotNull())\
+       .limit(n_sample)
+
+# Convert lc_features arrays into columns --------------------------------------
+       
+lc_features = tuple(f"g{i:02d}" for i in range(26)) \
+            + tuple(f"r{i:02d}" for i in range(26))
+
+cols = list(lc_features)
+if add_extra_cols:
+    cols += extra_cols
+
+df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(26)))\
+       .selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(26)))   
+      
+df = df.drop("lc_features_g")\
+       .drop("lc_features_r")
+
+#df = df.na.fill(0, lc_features)
+mean_values = df.select([mean(col(c))\
+                .alias(c) for c in lc_features])\
+                .collect()[0]\
+                .asDict()
+mean_values = {k: (v if (v is not None and not math.isnan(v)) else 0) for k, v in mean_values.items()}
+df = df.na.fill(mean_values)
+                   
 df.show()
 
 # End --------------------------------------------------------------------------
