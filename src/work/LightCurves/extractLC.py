@@ -80,4 +80,7 @@ df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(
 
 df_grouped.show()
 
+# End --------------------------------------------------------------------------
+
+spark.stop()
 
