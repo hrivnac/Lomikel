@@ -136,8 +136,8 @@ feature_names = ["mean",
                  "skew",
                  "stetson_K"]
 
-columns = [col("class")]
-        + [col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names]
+columns = [col("class")]\
+        + [col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names]\
         + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]
 
 df = df.select(*columns)\
@@ -150,6 +150,33 @@ mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "clas
 mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}
 
 df = df.na.fill(mean_values)
+
+# Standardisation --------------------------------------------------------------
+
+cols = [c for c in df.columns if c != "class"]
+
+vec_assembler = VectorAssembler(inputCols     = cols,
+                                outputCol     = "features",
+                                handleInvalid = "skip")
+df_vector = vec_assembler.transform(df)
+scaler = StandardScaler(inputCol  = "features",
+                        outputCol = "scaled_features",
+                        withMean  = True,
+                        withStd   = True)
+scaler_model = scaler.fit(df_vector)
+df_standardized = scaler_model.transform(df_vector)
+
+# export
+scaler_params = {
+  "mean": scaler_model.mean\
+                      .toArray()\
+                      .tolist(),
+  "std": scaler_model.std\
+                     .toArray()\
+                     .tolist()
+  }
+with open("/tmp/scaler_params.json", "w") as f:
+  json.dump(scaler_params, f)
            
 df.show()
 
