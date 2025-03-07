@@ -109,14 +109,32 @@ df = df.withColumn("class", extract_fink_classification(*args))
 
 # Convert lc_features arrays into columns --------------------------------------
       
-feature_names = ["mean", "weighted_mean", "standard_deviation", "median", "amplitude", 
-    "beyond_1_std", "cusum", "inter_percentile_range_10", "kurtosis", 
-    "linear_trend", "linear_trend_sigma", "linear_trend_noise", 
-    "linear_fit_slope", "linear_fit_slope_sigma", "linear_fit_reduced_chi2", 
-    "magnitude_percentage_ratio_40_5", "magnitude_percentage_ratio_20_10", 
-    "maximum_slope", "median_absolute_deviation", "median_buffer_range_percentage_10", 
-    "percent_amplitude", "mean_variance", "anderson_darling_normal", 
-    "chi2", "skew", "stetson_K"]
+feature_names = ["mean",
+                 "weighted_mean",
+                 "standard_deviation",
+                 "median",
+                 "amplitude", 
+                 "beyond_1_std",
+                 "cusum",
+                 "inter_percentile_range_10",
+                 "kurtosis", 
+                 "linear_trend",
+                 "linear_trend_sigma",
+                 "linear_trend_noise", 
+                 "linear_fit_slope",
+                 "linear_fit_slope_sigma",
+                 "linear_fit_reduced_chi2", 
+                 "magnitude_percentage_ratio_40_5",
+                 "magnitude_percentage_ratio_20_10", 
+                 "maximum_slope",
+                 "median_absolute_deviation",
+                 "median_buffer_range_percentage_10", 
+                 "percent_amplitude",
+                 "mean_variance",
+                 "anderson_darling_normal", 
+                 "chi2",
+                 "skew",
+                 "stetson_K"]
 
 # Generate column selections dynamically
 columns = [col("class")] + [
@@ -128,12 +146,16 @@ columns = [col("class")] + [
 # Select and drop original struct columns
 df = df.select(*columns).drop("lc_features_g", "lc_features_r")      
 
-mean_values = df.select([mean(col(c))\
-                .alias(c) for c in feature_names])\
-                .collect()[0]\
-                .asDict()
-mean_values = {k: (v if (v is not None and not math.isnan(v)) else 0) for k, v in mean_values.items()}
+mean_values = df.select([
+    mean(col(c)).alias(c) for c in df.columns if c != "class"  # Exclude "class" column
+]).collect()[0].asDict()
+
+# Replace NaN and None values with 0
+mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}
+
+# Fill missing values in the dataframe
 df = df.na.fill(mean_values)
+
              
 df.show()
 
