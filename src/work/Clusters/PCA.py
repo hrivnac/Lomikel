@@ -136,27 +136,21 @@ feature_names = ["mean",
                  "skew",
                  "stetson_K"]
 
-# Generate column selections dynamically
-columns = [col("class")] + [
-    col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names
-] + [
-    col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names
-]
+columns = [col("class")]
+        + [col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names]
+        + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]
 
-# Select and drop original struct columns
-df = df.select(*columns).drop("lc_features_g", "lc_features_r")      
+df = df.select(*columns)\
+       .drop("lc_features_g", "lc_features_r")      
 
-mean_values = df.select([
-    mean(col(c)).alias(c) for c in df.columns if c != "class"  # Exclude "class" column
-]).collect()[0].asDict()
+mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
+                .collect()[0]\
+                .asDict()
 
-# Replace NaN and None values with 0
 mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}
 
-# Fill missing values in the dataframe
 df = df.na.fill(mean_values)
-
-             
+           
 df.show()
 
 # End --------------------------------------------------------------------------
