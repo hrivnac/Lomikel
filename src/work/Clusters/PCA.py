@@ -39,21 +39,6 @@ import csv
 # Parameters -------------------------------------------------------------------
 
 dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
-pca_sample = "/tmp/PCA-sample.csv"
-
-mapping = "rowkey STRING :key, " + \
-          "objectId STRING i:objectId, " + \
-          "lc_features_g STRING d:lc_features_g, " \
-          "lc_features_r STRING d:lc_features_r, " \
-          "jd FLOAT i:jd, " + \
-          "xpos FLOAT i:xpos, " + \
-          "ypos FLOAT i:ypos, " + \
-          "magpsf FLOAT i:magpsf, " + \
-          "sigmapsf FLOAT i:sigmapsf, " + \
-          "magnr FLOAT i:magnr, " + \
-          "sigmagnr FLOAT i:sigmagnr, " + \
-          "magzpsci FLOAT i:magzpsci"
-          
 n_sample = 10000000
 n_pca = 13
 n_clusters = 13
@@ -128,6 +113,8 @@ feature_names = ["mean",
                  "stetson_K"]
 
 columns = [col("class")]\
+        + [col("objectId")]\
+        + [col("jd")]\
         + [col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names]\
         + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]
 
@@ -144,7 +131,7 @@ df = df.na.fill(mean_values)
 
 # Standardisation --------------------------------------------------------------
 
-cols = [c for c in df.columns if c != "class"]
+cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
 
 vec_assembler = VectorAssembler(inputCols     = cols,
                                 outputCol     = "features",
