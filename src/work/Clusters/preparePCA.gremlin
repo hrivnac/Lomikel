@@ -1,8 +1,8 @@
 outputFile = new File("/tmp/PCA-sample.csv")
 n_cls = 1000
-n_objectId = 1000
-min_jd = 100
-max_jd = 100
+n_objectId = 10000
+min_jd = 10
+max_jd = 1000
 
 def reduceCls(String cls) {
   cls = cls.replaceAll('Candidate_', '').replaceAll('_Candidate', '')

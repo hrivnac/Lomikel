@@ -2,6 +2,11 @@
 
 # @janusgraph (gremlin)
 work/Clusters/preparePCA.gremlin
+-----------------
+n_cls = 1000
+n_objectId = 10000
+min_jd = 10
+max_jd = 1000
 
 # @home
 scp centos@134.158.74.85:'/tmp/PCA-sample.csv' ./
@@ -18,10 +23,10 @@ git pull;hadoop fs -put -f ../src/work/Clusters/PCA.py;hadoop fs -put -f /tmp/PC
 # @janusgraph
 lomikel_hbase -s ../src/work/Clusters/PCA.groovy  
 ---------------------------
-n_cls = 1000
-n_objectId = 1000
-min_jd = 100
-max_jd = 100
+n_sample = 10000000
+n_pca = 5
+n_clusters = 3
+
 
 PCA_Variance.png => n_pca = 15
 Silhouette_Score.png => n_clusters = 15

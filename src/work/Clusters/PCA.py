@@ -17,6 +17,8 @@ from pyspark.ml.clustering import KMeans
 from pyspark.ml.clustering import BisectingKMeans
 from pyspark.ml.evaluation import ClusteringEvaluator
 
+from fink_filters.classification import extract_fink_classification
+
 import numpy as np
 from numpy import array
 
@@ -73,8 +75,8 @@ extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
 pca_sample = "/tmp/PCA-sample.csv"
 rowkey_start = "ZTF24"
 n_sample = 10000000
-n_pca = 15
-n_clusters = 15
+n_pca = 5
+n_clusters = 3
 read_sample = True
 add_extra_cols = False
 silhouette = False
@@ -107,7 +109,7 @@ log4jLogger = spark._jvm.org.apache.log4j
 log = log4jLogger.LogManager.getLogger("PCA")
 log.info("Starting...")
 
-# Read HBase into DataGram -----------------------------------------------------
+# Read HBase into DataFrame ----------------------------------------------------
 
 df = spark.read\
           .format("org.apache.hadoop.hbase.spark")\
@@ -167,7 +169,7 @@ df_vector = vec_assembler.transform(df)
 scaler = StandardScaler(inputCol="features",
                         outputCol="scaled_features",
                         withMean=True,
-                        withStd=True)
+                        withStd=True)PCA
 scaler_model = scaler.fit(df_vector)
 df_standardized = scaler_model.transform(df_vector)
 

@@ -3,9 +3,9 @@ from pyspark.sql.functions import pandas_udf
 from pyspark.sql.functions import col
 from pyspark.sql.types import StringType
 
-import numpy as np
-
 from fink_filters.classification import extract_fink_classification
+
+import numpy as np
 
 # Max occurence ----------------------------------------------------------------
 
