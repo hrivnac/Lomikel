@@ -114,7 +114,7 @@ feature_names = ["mean",
 
 columns = [col("class")]\
         + [col("objectId")]\
-        + [col("jd")]\
+        + [col("candidate.jd").alias("jd")]\
         + [col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names]\
         + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]
 
