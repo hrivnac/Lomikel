@@ -130,63 +130,6 @@ columns = [col("class")] + [
 # Select and drop original struct columns
 df = df.select(*columns).drop("lc_features_g", "lc_features_r")      
 
-      
-df = df.select(col("class"),
-               col("lc_features_g.mean"                             ).alias("g_mean"                             ),
-               col("lc_features_g.weighted_mean"                    ).alias("g_weighted_mean"                    ),
-               col("lc_features_g.standard_deviation"               ).alias("g_standard_deviation"               ),
-               col("lc_features_g.median"                           ).alias("g_median"                           ),
-               col("lc_features_g.amplitude"                        ).alias("g_amplitude"                        ),
-               col("lc_features_g.beyond_1_std"                     ).alias("g_beyond_1_std"                     ),
-               col("lc_features_g.cusum"                            ).alias("g_cusum"                            ),
-               col("lc_features_g.inter_percentile_range_10"        ).alias("g_inter_percentile_range_10"        ),
-               col("lc_features_g.kurtosis"                         ).alias("g_kurtosis"                         ),
-               col("lc_features_g.linear_trend"                     ).alias("g_linear_trend"                     ),
-               col("lc_features_g.linear_trend_sigma"               ).alias("g_linear_trend_sigma"               ),
-               col("lc_features_g.linear_trend_noise"               ).alias("g_linear_trend_noise"               ),
-               col("lc_features_g.linear_fit_slope"                 ).alias("g_linear_fit_slope"                 ),
-               col("lc_features_g.linear_fit_slope_sigma"           ).alias("g_linear_fit_slope_sigma"           ),
-               col("lc_features_g.linear_fit_reduced_chi2"          ).alias("g_linear_fit_reduced_chi2"          ),
-               col("lc_features_g.magnitude_percentage_ratio_40_5"  ).alias("g_magnitude_percentage_ratio_40_5"  ),
-               col("lc_features_g.magnitude_percentage_ratio_20_10" ).alias("g_magnitude_percentage_ratio_20_10" ),
-               col("lc_features_g.maximum_slope"                    ).alias("g_maximum_slope"                    ),
-               col("lc_features_g.median_absolute_deviation"        ).alias("g_median_absolute_deviation"        ),
-               col("lc_features_g.median_buffer_range_percentage_10").alias("g_median_buffer_range_percentage_10"),
-               col("lc_features_g.percent_amplitude"                ).alias("g_percent_amplitude"                ),
-               col("lc_features_g.mean_variance"                    ).alias("g_mean_variance"                    ),
-               col("lc_features_g.anderson_darling_normal"          ).alias("g_anderson_darling_normal"          ),
-               col("lc_features_g.chi2"                             ).alias("g_chi2"                             ),
-               col("lc_features_g.skew"                             ).alias("g_skew"                             ),
-               col("lc_features_g.stetson_K"                        ).alias("g_stetson_K"                        ),
-               col("lc_features_r.mean"                             ).alias("r_mean"                             ),
-               col("lc_features_r.weighted_mean"                    ).alias("r_weighted_mean"                    ),
-               col("lc_features_r.standard_deviation"               ).alias("r_standard_deviation"               ),
-               col("lc_features_r.median"                           ).alias("r_median"                           ),
-               col("lc_features_r.amplitude"                        ).alias("r_amplitude"                        ),
-               col("lc_features_r.beyond_1_std"                     ).alias("r_beyond_1_std"                     ),
-               col("lc_features_r.cusum"                            ).alias("r_cusum"                            ),
-               col("lc_features_r.inter_percentile_range_10"        ).alias("r_inter_percentile_range_10"        ),
-               col("lc_features_r.kurtosis"                         ).alias("r_kurtosis"                         ),
-               col("lc_features_r.linear_trend"                     ).alias("r_linear_trend"                     ),
-               col("lc_features_r.linear_trend_sigma"               ).alias("r_linear_trend_sigma"               ),
-               col("lc_features_r.linear_trend_noise"               ).alias("r_linear_trend_noise"               ),
-               col("lc_features_r.linear_fit_slope"                 ).alias("r_linear_fit_slope"                 ),
-               col("lc_features_r.linear_fit_slope_sigma"           ).alias("r_linear_fit_slope_sigma"           ),
-               col("lc_features_r.linear_fit_reduced_chi2"          ).alias("r_linear_fit_reduced_chi2"          ),
-               col("lc_features_r.magnitude_percentage_ratio_40_5"  ).alias("r_magnitude_percentage_ratio_40_5"  ),
-               col("lc_features_r.magnitude_percentage_ratio_20_10" ).alias("r_magnitude_percentage_ratio_20_10" ),
-               col("lc_features_r.maximum_slope"                    ).alias("r_maximum_slope"                    ),
-               col("lc_features_r.median_absolute_deviation"        ).alias("r_median_absolute_deviation"        ),
-               col("lc_features_r.median_buffer_range_percentage_10").alias("r_median_buffer_range_percentage_10"),
-               col("lc_features_r.percent_amplitude"                ).alias("r_percent_amplitude"                ),
-               col("lc_features_r.mean_variance"                    ).alias("r_mean_variance"                    ),
-               col("lc_features_r.anderson_darling_normal"          ).alias("r_anderson_darling_normal"          ),
-               col("lc_features_r.chi2"                             ).alias("r_chi2"                             ),
-               col("lc_features_r.skew"                             ).alias("r_skew"                             ),
-               col("lc_features_r.stetson_K"                        ).alias("r_stetson_K"                        ))\
-       .drop("lc_features_g")\
-       .drop("lc_features_r")
-
 mean_values = df.select([mean(col(c))\
                 .alias(c) for c in lc_features])\
                 .collect()[0]\
