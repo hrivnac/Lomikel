@@ -86,9 +86,31 @@ df = df.filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
        .limit(n_sample)
 
+# Define the arguments for classification extraction ---------------------------
+
+args = ["cdsxmatch",
+        "roid",
+        "mulens",
+        "snn_snia_vs_nonia",
+        "snn_sn_vs_all",
+        "rf_snia_vs_nonia",
+        "candidate.ndethist",
+        "candidate.drb",
+        "candidate.classtar",
+        "candidate.jd",
+        "candidate.jdstarthist",
+        "rf_kn_vs_nonkn",
+        "tracklet"]
+
+# Extract classifications and select relevant columns --------------------------
+
+df = df.withColumn("class", extract_fink_classification(*args))
+
 # Convert lc_features arrays into columns --------------------------------------
        
-df = df.select(col("lc_features_g.mean"                             ).alias("g_mean"                             ),
+df = df.select(col("class"),
+               col("tracklet"),
+               col("lc_features_g.mean"                             ).alias("g_mean"                             ),
                col("lc_features_g.weighted_mean"                    ).alias("g_weighted_mean"                    ),
                col("lc_features_g.standard_deviation"               ).alias("g_standard_deviation"               ),
                col("lc_features_g.median"                           ).alias("g_median"                           ),
