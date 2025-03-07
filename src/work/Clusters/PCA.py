@@ -55,15 +55,10 @@ mapping = "rowkey STRING :key, " + \
           "sigmagnr FLOAT i:sigmagnr, " + \
           "magzpsci FLOAT i:magzpsci"
           
-extra_cols = ["magpsf", "sigmapsf", "magnr", "sigmagnr", "magzpsci"]
-rowkey_start = "ZTF24"
 n_sample = 10000000
-n_pca = 5
+n_pca = 25
 n_clusters = 3
-read_sample = True
-add_extra_cols = False
 silhouette = False
-classify = True
 cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
@@ -76,7 +71,7 @@ log4jLogger = spark._jvm.org.apache.log4j
 log = log4jLogger.LogManager.getLogger("PCA")
 log.info("Starting...")
 
-# Read Parquet file into DataFrame ---------------------------------------------
+# Reading Parquet file into DataFrame ------------------------------------------
 
 df = spark.read\
           .format("parquet")\
@@ -84,12 +79,9 @@ df = spark.read\
 
 df = df.filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())\
-       .limit(n_sample)
+       .limit(n_sample)        
 
-# Define the arguments for classification extraction ---------------------------
-        
-
-# Extract classifications ------------------------------------------------------
+# Classification ---------------------------------------------------------------
 
 args = ["cdsxmatch",
         "roid",
@@ -107,7 +99,7 @@ args = ["cdsxmatch",
 
 df = df.withColumn("class", extract_fink_classification(*args))
 
-# Convert lc_features arrays into columns --------------------------------------
+# Converting lc_features arrays into columns -----------------------------------
       
 feature_names = ["mean",
                  "weighted_mean",
@@ -177,8 +169,46 @@ scaler_params = {
   }
 with open("/tmp/scaler_params.json", "w") as f:
   json.dump(scaler_params, f)
-           
-df.show()
+
+# PCA --------------------------------------------------------------------------
+
+pca = PCA(k         = n_pca,
+          inputCol  = "scaled_features",
+          outputCol = "pca_features")
+pca_model = pca.fit(df_standardized)
+df_pca = pca_model.transform(df_standardized)
+
+# report
+log.info("Variance: " + str(pca_model.explainedVariance))
+
+# export
+pca_params = {
+  "components": [row.tolist() for row in pca_model.pc\
+                                                  .toArray()],
+  "explained_variance": pca_model.explainedVariance\
+                                 .toArray()\
+                                 .tolist()
+  }
+with open("/tmp/pca_params.json", "w") as f:
+  json.dump(pca_params, f)
+    
+# plot
+explained_variance = np.array(pca_model.explainedVariance)
+cumValues = np.cumsum(explained_variance)
+n_components = len(cumValues)
+plt.figure(figsize=(10, 8))
+plt.plot(range(1, n_components + 1),
+         cumValues,
+         marker="o",
+         linestyle="--")
+plt.title("variance by components")
+plt.xlabel("num of components")
+plt.ylabel("Cumulative Explained Variance")
+plt.grid(True)
+plt.savefig("/tmp/PCA_Variance.png")
+
+# use n_pca for variance about 80%
+
 
 # End --------------------------------------------------------------------------
 

@@ -183,9 +183,9 @@ with open("/tmp/scaler_params.json", "w") as f:
 
 # PCA --------------------------------------------------------------------------
 
-pca = PCA(k=n_pca,
-          inputCol="scaled_features",
-          outputCol="pca_features")
+pca = PCA(k         = n_pca,
+          inputCol  = "scaled_features",
+          outputCol = "pca_features")
 pca_model = pca.fit(df_standardized)
 df_pca = pca_model.transform(df_standardized)
 
@@ -194,8 +194,11 @@ log.info("Variance: " + str(pca_model.explainedVariance))
 
 # export
 pca_params = {
-  "components": [row.tolist() for row in pca_model.pc.toArray()],
-  "explained_variance": pca_model.explainedVariance.toArray().tolist()
+  "components": [row.tolist() for row in pca_model.pc\
+                                                  .toArray()],
+  "explained_variance": pca_model.explainedVariance\
+                                 .toArray()\
+                                 .tolist()
   }
 with open("/tmp/pca_params.json", "w") as f:
   json.dump(pca_params, f)
