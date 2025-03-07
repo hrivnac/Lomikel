@@ -41,8 +41,8 @@ import csv
 dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
 n_sample = 10000000
 n_pca = 13
-n_clusters = 13
-silhouette = False
+n_clusters = 20
+silhouette = True
 cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
