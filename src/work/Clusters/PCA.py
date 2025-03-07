@@ -88,26 +88,33 @@ df = df.filter(df.lc_features_g.isNotNull())\
 
 # Convert lc_features arrays into columns --------------------------------------
        
-lc_features = tuple(f"g{i:02d}" for i in range(26)) \
-            + tuple(f"r{i:02d}" for i in range(26))
-
-cols = list(lc_features)
-if add_extra_cols:
-    cols += extra_cols
-
-df = df.selectExpr("*", *(f"CAST(split(lc_features_g, ',')[{i}] AS DOUBLE) AS g{i:02d}" for i in range(26)))\
-       .selectExpr("*", *(f"CAST(split(lc_features_r, ',')[{i}] AS DOUBLE) AS r{i:02d}" for i in range(26)))   
-      
-df = df.drop("lc_features_g")\
-       .drop("lc_features_r")
-
-#df = df.na.fill(0, lc_features)
-mean_values = df.select([mean(col(c))\
-                .alias(c) for c in lc_features])\
-                .collect()[0]\
-                .asDict()
-mean_values = {k: (v if (v is not None and not math.isnan(v)) else 0) for k, v in mean_values.items()}
-df = df.na.fill(mean_values)
+df_split = df.select("*",  # Keep all existing columns
+                     col("lc_features_g.mean").alias("mean"),
+                     col("lc_features_g.weighted_mean").alias("weighted_mean"),
+                     col("lc_features_g.standard_deviation").alias("standard_deviation"),
+                     col("lc_features_g.median").alias("median"),
+                     col("lc_features_g.amplitude").alias("amplitude"),
+                     col("lc_features_g.beyond_1_std").alias("beyond_1_std"),
+                     col("lc_features_g.cusum").alias("cusum"),
+                     col("lc_features_g.inter_percentile_range_10").alias("inter_percentile_range_10"),
+                     col("lc_features_g.kurtosis").alias("kurtosis"),
+                     col("lc_features_g.linear_trend").alias("linear_trend"),
+                     col("lc_features_g.linear_trend_sigma").alias("linear_trend_sigma"),
+                     col("lc_features_g.linear_trend_noise").alias("linear_trend_noise"),
+                     col("lc_features_g.linear_fit_slope").alias("linear_fit_slope"),
+                     col("lc_features_g.linear_fit_slope_sigma").alias("linear_fit_slope_sigma"),
+                     col("lc_features_g.linear_fit_reduced_chi2").alias("linear_fit_reduced_chi2"),
+                     col("lc_features_g.magnitude_percentage_ratio_40_5").alias("magnitude_percentage_ratio_40_5"),
+                     col("lc_features_g.magnitude_percentage_ratio_20_10").alias("magnitude_percentage_ratio_20_10"),
+                     col("lc_features_g.maximum_slope").alias("maximum_slope"),
+                     col("lc_features_g.median_absolute_deviation").alias("median_absolute_deviation"),
+                     col("lc_features_g.median_buffer_range_percentage_10").alias("median_buffer_range_percentage_10"),
+                     col("lc_features_g.percent_amplitude").alias("percent_amplitude"),
+                     col("lc_features_g.mean_variance").alias("mean_variance"),
+                     col("lc_features_g.anderson_darling_normal").alias("anderson_darling_normal"),
+                     col("lc_features_g.chi2").alias("chi2"),
+                     col("lc_features_g.skew").alias("skew"),
+                     col("lc_features_g.stetson_K").alias("stetson_K")).drop("lc_features_g") 
                    
 df.show()
 
