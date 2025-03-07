@@ -87,6 +87,9 @@ df = df.filter(df.lc_features_g.isNotNull())\
        .limit(n_sample)
 
 # Define the arguments for classification extraction ---------------------------
+        
+
+# Extract classifications and select relevant columns --------------------------
 
 args = ["cdsxmatch",
         "roid",
@@ -101,66 +104,33 @@ args = ["cdsxmatch",
         "candidate.jdstarthist",
         "rf_kn_vs_nonkn",
         "tracklet"]
-        
-lc_features = ["g_mean"                             ,
-               "g_weighted_mean"                    ,
-               "g_standard_deviation"               ,
-               "g_median"                           ,
-               "g_amplitude"                        ,
-               "g_beyond_1_std"                     ,
-               "g_cusum"                            ,
-               "g_inter_percentile_range_10"        ,
-               "g_kurtosis"                         ,
-               "g_linear_trend"                     ,
-               "g_linear_trend_sigma"               ,
-               "g_linear_trend_noise"               ,
-               "g_linear_fit_slope"                 ,
-               "g_linear_fit_slope_sigma"           ,
-               "g_linear_fit_reduced_chi2"          ,
-               "g_magnitude_percentage_ratio_40_5"  ,
-               "g_magnitude_percentage_ratio_20_10" ,
-               "g_maximum_slope"                    ,
-               "g_median_absolute_deviation"        ,
-               "g_median_buffer_range_percentage_10",
-               "g_percent_amplitude"                ,
-               "g_mean_variance"                    ,
-               "g_anderson_darling_normal"          ,
-               "g_chi2"                             ,
-               "g_skew"                             ,
-               "g_stetson_K"                        ,
-               "r_mean"                             ,
-               "r_weighted_mean"                    ,
-               "r_standard_deviation"               ,
-               "r_median"                           ,
-               "r_amplitude"                        ,
-               "r_beyond_1_std"                     ,
-               "r_cusum"                            ,
-               "r_inter_percentile_range_10"        ,
-               "r_kurtosis"                         ,
-               "r_linear_trend"                     ,
-               "r_linear_trend_sigma"               ,
-               "r_linear_trend_noise"               ,
-               "r_linear_fit_slope"                 ,
-               "r_linear_fit_slope_sigma"           ,
-               "r_linear_fit_reduced_chi2"          ,
-               "r_magnitude_percentage_ratio_40_5"  ,
-               "r_magnitude_percentage_ratio_20_10" ,
-               "r_maximum_slope"                    ,
-               "r_median_absolute_deviation"        ,
-               "r_median_buffer_range_percentage_10",
-               "r_percent_amplitude"                ,
-               "r_mean_variance"                    ,
-               "r_anderson_darling_normal"          ,
-               "r_chi2"                             ,
-               "r_skew"                             ,
-               "r_stetson_K"]
-
-# Extract classifications and select relevant columns --------------------------
 
 df = df.withColumn("class", extract_fink_classification(*args))
 
 # Convert lc_features arrays into columns --------------------------------------
-       
+      
+feature_names = [
+    "mean", "weighted_mean", "standard_deviation", "median", "amplitude", 
+    "beyond_1_std", "cusum", "inter_percentile_range_10", "kurtosis", 
+    "linear_trend", "linear_trend_sigma", "linear_trend_noise", 
+    "linear_fit_slope", "linear_fit_slope_sigma", "linear_fit_reduced_chi2", 
+    "magnitude_percentage_ratio_40_5", "magnitude_percentage_ratio_20_10", 
+    "maximum_slope", "median_absolute_deviation", "median_buffer_range_percentage_10", 
+    "percent_amplitude", "mean_variance", "anderson_darling_normal", 
+    "chi2", "skew", "stetson_K"
+]
+
+# Generate column selections dynamically
+columns = [col("class")] + [
+    col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names
+] + [
+    col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names
+]
+
+# Select and drop original struct columns
+df = df.select(*columns).drop("lc_features_g", "lc_features_r")      
+
+      
 df = df.select(col("class"),
                col("lc_features_g.mean"                             ).alias("g_mean"                             ),
                col("lc_features_g.weighted_mean"                    ).alias("g_weighted_mean"                    ),
