@@ -97,53 +97,56 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Execute full chain of new sources correlations analyses.
-    * @param classifierName The name of the {@link Classifier} to be used.
-    * @param hbaseUrl       The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
-    * @param nLimit         The maximal number of alerts getting from HBase or Fink Portal.
-    * @param timeLimit      How far into the past the search should search (in minutes).
-    * @param clss           An array of <em>classes</em> taken from {@link FPC},
-    *                       if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
-    *                       if <tt>null</tt>, analyse <em>sources</em> from HBase database.
-    * @param enhance        Whether expand tree under all <em>SourcesOfInterest</em> with alerts
-    *                       possibly filled with requested HBase columns.
-    * @param columns        HBase columns to be copied into graph alerts. May be <tt>null</tt>.
-    * @throws LomikelException If anhything fails. */
-  public void processSourcesOfInterest(String   classifierName,
+    * @param classifierNames The names of the {@link Classifier} to be used.
+    * @param hbaseUrl        The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
+    * @param nLimit          The maximal number of alerts getting from HBase or Fink Portal.
+    * @param timeLimit       How far into the past the search should search (in minutes).
+    * @param clss            An array of <em>classes</em> taken from {@link FPC},
+    *                        if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
+    *                        if <tt>null</tt>, analyse <em>sources</em> from HBase database.
+    * @param enhance         Whether expand tree under all <em>SourcesOfInterest</em> with alerts
+    *                        possibly filled with requested HBase columns.
+    * @param columns         HBase columns to be copied into graph alerts. May be <tt>null</tt>.
+    * @throws LomikelException If anything fails. */
+  public void processSourcesOfInterest(String[] classifierNames,
                                        String   hbaseUrl,
                                        int      nLimit,
                                        int      timeLimit,
                                        String[] clss,
                                        boolean  enhance,
                                        String   columns) throws LomikelException {
-    Classifiers classifier = Classifiers.valueOf(classifierName);
-    fillSourcesOfInterest(classifier, hbaseUrl, nLimit, timeLimit, clss, enhance, columns);
-    generateCorrelations(classifier);
+    Classifiers[] classifiers = new Classifiers[classifierNames.length];
+    for (int i = 0; i < classifierNames.length; i++) {
+      classifiers[i] = Classifiers.valueOf(classifierNames[i]);
+      }
+    fillSourcesOfInterest(classifiers, hbaseUrl, nLimit, timeLimit, clss, enhance, columns);
+    generateCorrelations(classifiers);
     }
         
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts (if requested).
-    * @param classifier The {@link Classifier} to be used.
-    * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
-    * @param nLimit     The maximal number of alerts getting from HBase or Fink Portal.
-    * @param timeLimit  How far into the past the search should search (in minutes).
-    * @param clss       An array of <em>classes</em> taken from {@link FPC},
-    *                   if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
-    *                   if <tt>null</tt>, analyse <em>sources</em> from HBase database.
-    * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
-    *                   possibly filled with requested HBase columns.
-    * @param columns    The HBase columns to be copied into graph alerts. May be <tt>null</tt>.
+    * @param classifiers The {@link Classifiers}s to be used.
+    * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
+    * @param nLimit      The maximal number of alerts getting from HBase or Fink Portal.
+    * @param timeLimit   How far into the past the search should search (in minutes).
+    * @param clss        An array of <em>classes</em> taken from {@link FPC},
+    *                    if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
+    *                    if <tt>null</tt>, analyse <em>sources</em> from HBase database.
+    * @param enhance     Whether expand tree under all <em>SourcesOfInterest</em> with alerts
+    *                    possibly filled with requested HBase columns.
+    * @param columns     The HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
-  public void fillSourcesOfInterest(Classifiers classifier,
-                                    String      hbaseUrl,
-                                    int         nLimit,
-                                    int         timeLimit,
-                                    String[]    clss,
-                                    boolean     enhance,
-                                    String      columns) throws LomikelException {
+  public void fillSourcesOfInterest(Classifiers[] classifiers,
+                                    String        hbaseUrl,
+                                    int           nLimit,
+                                    int           timeLimit,
+                                    String[]      clss,
+                                    boolean       enhance,
+                                    String        columns) throws LomikelException {
     String clssDesc = "";
     if (clss != null) {
       clssDesc = "of " + Arrays.toString(clss);
       }
-    log.info("Filling SourcesOfInterest " + clssDesc + " using " + classifier + " classifier, nLimit = " + nLimit + ", timeLimit = " + timeLimit);
+    log.info("Filling SourcesOfInterest " + clssDesc + " using " + Arrays.toString(classifiers) + " classifiers, nLimit = " + nLimit + ", timeLimit = " + timeLimit);
     if (enhance) {
       log.info("\tenhancing with " + columns);
       }
@@ -197,16 +200,18 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // loop over all sources
     for (String oid : oids) {
       log.info(oid + " (" + n + " of " + size + "):");
-      try {
-        classifySource(classifier, oid, hbaseUrl, enhance, columns);
+      for (Classifiers classifier : classifiers) {
+        try {
+          classifySource(classifier, oid, hbaseUrl, enhance, columns);
+          }
+        catch (LomikelException e) {
+          log.error("Cannot get classification for " + oid, e);
+          }
+        }
         n++;
         dt = (System.currentTimeMillis() - startTime) / 1000;
         freq = (double)n / (double)dt;
         log.info("\t\twith " + String.format("%.2f", freq) + " Hz");
-        }
-      catch (LomikelException e) {
-        log.error("Cannot get classification for " + oid, e);
-        }
       }
     }
     
