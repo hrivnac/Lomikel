@@ -1,7 +1,7 @@
 # training set preparation #####################################################
 
 # @janusgraph (gremlin)
-work/preparePCA.gremlin
+work/Clusters/preparePCA.gremlin
 
 # @home
 scp centos@134.158.74.85:'/tmp/PCA-sample.csv' ./
@@ -13,10 +13,10 @@ edit PCA-sample.csv
 scp PCA-sample.csv julius.hrivnac@vm-75222.lal.in2p3.fr:'/tmp'
 
 # @livy
-git pull;hadoop fs -put -f ../src/work/PCA.py;hadoop fs -put -f /tmp/PCA-sample.csv /tmp
+git pull;hadoop fs -put -f ../src/work/Clusters/PCA.py;hadoop fs -put -f /tmp/PCA-sample.csv /tmp
 
 # @janusgraph
-lomikel_hbase -s PCA.groovy  
+lomikel_hbase -s ../src/work/Clusters/PCA.groovy  
 ---------------------------
 n_cls = 1000
 n_objectId = 1000
@@ -25,64 +25,6 @@ max_jd = 100
 
 PCA_Variance.png => n_pca = 15
 Silhouette_Score.png => n_clusters = 15
-
-+-------+-----+
-|cluster|count|
-+-------+-----+
-|     10| 1368|
-|      8|  389|
-|      9|  381|
-|      6|  548|
-|      4|  327|
-|      0|  467|
-|      2|  169|
-|      1| 1157|
-|      3| 1042|
-|      5|  487|
-|      7|    6|
-+-------+-----+
-
-
- "+-------+-----+",
-    "|cluster|count|",
-    "+-------+-----+",
-    "|      9| 1398|",
-    "|      3| 1392|",
-    "|      0| 5152|",
-    "|     11| 1135|",
-    "|      1| 1293|",
-    "|      4|  839|",
-    "|      2|  730|",
-    "|     12|  628|",
-    "|      5|  524|",
-    "|     10|  417|",
-    "|      7|    2|",
-    "|      8|   84|",
-    "|      6|    8|",
-    "+-------+-----+",
-    "",
-    
-  "+-------+-----+",
-    "|cluster|count|",
-    "+-------+-----+",
-    "|     14|  194|",
-    "|      8|  162|",
-    "|      9|  413|",
-    "|     10| 1182|",
-    "|      0| 4212|",
-    "|     13| 1762|",
-    "|      6|  358|",
-    "|      3|  190|",
-    "|      4|  921|",
-    "|     11|    1|",
-    "|     12| 1705|",
-    "|      2|   98|",
-    "|      7|  115|",
-    "|      1|    1|",
-    "|      5|    1|",
-    "+-------+-----+",
-    
-
 
 # @home
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.png' ./
@@ -96,6 +38,6 @@ scp *json centos@134.158.74.85:/tmp
 
 # @home
 scp centos@134.158.74.85:/tmp/overlaps.csv ./
-python ../src/work/analysePCA.py
+python ../src/work/Clusters/analyseOverlaps.py
 
 --------------------------------------------------------------------------------

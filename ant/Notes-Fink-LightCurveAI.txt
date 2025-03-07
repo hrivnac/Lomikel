@@ -1,3 +1,17 @@
+# data extraction ##############################################################
+
+# @livy
+git pull;hadoop fs -put -f ../src/work/LightCurves/extractLC.py
+
+# @janusgraph
+lomikel_hbase -s ../src/work/LightCurves/extractLC.groovy  
+
+
+
+
+
+
+
 # ToDo:
 #   use full LightCurves
 
