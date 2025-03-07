@@ -169,7 +169,7 @@ df_vector = vec_assembler.transform(df)
 scaler = StandardScaler(inputCol="features",
                         outputCol="scaled_features",
                         withMean=True,
-                        withStd=True)PCA
+                        withStd=True)
 scaler_model = scaler.fit(df_vector)
 df_standardized = scaler_model.transform(df_vector)
 
