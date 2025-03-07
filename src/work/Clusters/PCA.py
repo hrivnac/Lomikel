@@ -89,7 +89,7 @@ df = df.filter(df.lc_features_g.isNotNull())\
 # Define the arguments for classification extraction ---------------------------
         
 
-# Extract classifications and select relevant columns --------------------------
+# Extract classifications ------------------------------------------------------
 
 args = ["cdsxmatch",
         "roid",
@@ -109,16 +109,14 @@ df = df.withColumn("class", extract_fink_classification(*args))
 
 # Convert lc_features arrays into columns --------------------------------------
       
-feature_names = [
-    "mean", "weighted_mean", "standard_deviation", "median", "amplitude", 
+feature_names = ["mean", "weighted_mean", "standard_deviation", "median", "amplitude", 
     "beyond_1_std", "cusum", "inter_percentile_range_10", "kurtosis", 
     "linear_trend", "linear_trend_sigma", "linear_trend_noise", 
     "linear_fit_slope", "linear_fit_slope_sigma", "linear_fit_reduced_chi2", 
     "magnitude_percentage_ratio_40_5", "magnitude_percentage_ratio_20_10", 
     "maximum_slope", "median_absolute_deviation", "median_buffer_range_percentage_10", 
     "percent_amplitude", "mean_variance", "anderson_darling_normal", 
-    "chi2", "skew", "stetson_K"
-]
+    "chi2", "skew", "stetson_K"]
 
 # Generate column selections dynamically
 columns = [col("class")] + [
@@ -131,7 +129,7 @@ columns = [col("class")] + [
 df = df.select(*columns).drop("lc_features_g", "lc_features_r")      
 
 mean_values = df.select([mean(col(c))\
-                .alias(c) for c in lc_features])\
+                .alias(c) for c in feature_names])\
                 .collect()[0]\
                 .asDict()
 mean_values = {k: (v if (v is not None and not math.isnan(v)) else 0) for k, v in mean_values.items()}
