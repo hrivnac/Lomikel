@@ -232,7 +232,7 @@ kmeans = KMeans().setK(n_clusters)\
                  .setPredictionCol("cluster")
 kmeans_model = kmeans.fit(df_pca)
 clustered_result = kmeans_model.transform(df_pca)
-cr = clustered_result.select("objectId", "cluster", "classification")
+cr = clustered_result.select("objectId", "cluster", "class")
 
 # export
 cluster_centers = [center.tolist() for center in kmeans_model.clusterCenters()]
@@ -246,28 +246,28 @@ cr.write\
   .save("/tmp/cr")
 
 # plot                     
-pdf = cr.select("cluster", "classification").toPandas()
+pdf = cr.select("cluster", "class").toPandas()
 pdf["cluster"] = pdf["cluster"].astype(str)
-grouped = pdf.groupby(["classification", "cluster"])\
+grouped = pdf.groupby(["class", "cluster"])\
              .size()\
              .reset_index(name="count")
 plt.figure(figsize=(12, 6))
 sns.scatterplot(data=grouped,
                 x="cluster",
-                y="classification",
+                y="class",
                 size="count",
                 hue="count",
                 palette="viridis",
                 sizes=(50, 500),
                 edgecolor="black",
                 alpha=0.75)
-plt.xlabel("Classification")
+plt.xlabel("Class")
 plt.ylabel("Cluster")
-plt.title("Cluster vs Classification Scatter Plot (Bubble Size = Count)")
+plt.title("Cluster vs Class Scatter Plot (Bubble Size = Count)")
 plt.xticks(rotation=45)
 plt.grid(True)
 plt.legend(title="Count")
-plt.savefig("/tmp/Classification_Clusters.png")
+plt.savefig("/tmp/Class_Clusters.png")
 
 # report
 log.info("Cluster Centers:") 
