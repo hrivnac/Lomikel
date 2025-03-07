@@ -38,7 +38,6 @@ import csv
 
 # Parameters -------------------------------------------------------------------
 
-
 dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
 pca_sample = "/tmp/PCA-sample.csv"
 
@@ -56,8 +55,8 @@ mapping = "rowkey STRING :key, " + \
           "magzpsci FLOAT i:magzpsci"
           
 n_sample = 10000000
-n_pca = 25
-n_clusters = 3
+n_pca = 13
+n_clusters = 13
 silhouette = False
 cluster_features = "pca_features"
 
@@ -209,6 +208,90 @@ plt.savefig("/tmp/PCA_Variance.png")
 
 # use n_pca for variance about 80%
 
+# Clustering -------------------------------------------------------------------  
+    
+if silhouette:
+  evaluator = ClusteringEvaluator().setPredictionCol("prediction")\
+                                   .setFeaturesCol(cluster_features)\
+                                   .setMetricName("silhouette",)\
+                                   .setDistanceMeasure("squaredEuclidean")
+  silhouette_score = []   
+  for i in range(5, n_clusters):
+    try:
+      kmeans = KMeans().setK(i)\
+                       .setFeaturesCol(cluster_features) 
+      ## kmeans = BisectingKMeans().setK(i)\
+      ##                           .setFeaturesCol(cluster_features)
+      model = kmeans.fit(df_pca)
+      predictions = model.transform(df_pca)
+      score = evaluator.evaluate(predictions) 
+      silhouette_score.append(score)
+    except:
+      log.error("Failed for i = " + str(i))
+      silhouette_score.append(0)
+  # plot
+  plt.figure(figsize=(10, 8))
+  plt.plot(range(5, n_clusters), silhouette_score) 
+  plt.xlabel("number of clusters") 
+  plt.ylabel("within set sum of squared errors") 
+  plt.title("Elbow Method for Optimal K") 
+  plt.grid()
+  plt.savefig("/tmp/Silhouette_Score.png")  
+  # use n_clusters at maximum
+
+kmeans = KMeans().setK(n_clusters)\
+                 .setSeed(1)\
+                 .setFeaturesCol(cluster_features)\
+                 .setPredictionCol("cluster")
+kmeans_model = kmeans.fit(df_pca)
+clustered_result = kmeans_model.transform(df_pca)
+cr = clustered_result.select("objectId", "cluster", "classification")
+
+# export
+cluster_centers = [center.tolist() for center in kmeans_model.clusterCenters()]
+with open("/tmp/cluster_centers.json", "w") as f:
+  json.dump(cluster_centers, f)
+  
+# export
+cr.write\
+  .mode("overwrite")\
+  .format("csv")\
+  .save("/tmp/cr")
+
+# plot                     
+pdf = cr.select("cluster", "classification").toPandas()
+pdf["cluster"] = pdf["cluster"].astype(str)
+grouped = pdf.groupby(["classification", "cluster"])\
+             .size()\
+             .reset_index(name="count")
+plt.figure(figsize=(12, 6))
+sns.scatterplot(data=grouped,
+                x="cluster",
+                y="classification",
+                size="count",
+                hue="count",
+                palette="viridis",
+                sizes=(50, 500),
+                edgecolor="black",
+                alpha=0.75)
+plt.xlabel("Classification")
+plt.ylabel("Cluster")
+plt.title("Cluster vs Classification Scatter Plot (Bubble Size = Count)")
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.legend(title="Count")
+plt.savefig("/tmp/Classification_Clusters.png")
+
+# report
+log.info("Cluster Centers:") 
+centers = kmeans_model.clusterCenters() 
+for center in centers: 
+  log.info(center)
+log.info("Cluster Groups:")
+cr.groupBy("cluster").count().show()
+
+# show
+#cr.show(truncate=False)
 
 # End --------------------------------------------------------------------------
 
