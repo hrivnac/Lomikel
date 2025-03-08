@@ -39,6 +39,8 @@ import csv
 # Parameters -------------------------------------------------------------------
 
 dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
+skipNaN = True
+replaceNaNbyMean = False
 n_sample = 10000000
 n_pca = 13
 n_clusters = 12
@@ -119,19 +121,25 @@ columns = [col("class")]\
         + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]
 
 df = df.select(*columns)\
-       .drop("lc_features_g", "lc_features_r")      
+       .drop("lc_features_g", "lc_features_r")  
+       
+cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
 
-mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
-                .collect()[0]\
-                .asDict()
+if skipNaN:
+  df = df.na.drop(subset = cols)
+  df = df.filter(~(isnan(col(c)) for c in cols))
 
-mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}
-
-df = df.na.fill(mean_values)
+if replaceNaNbyMean:
+  mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
+                  .collect()[0]\
+                  .asDict()
+  mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}  
+  df = df.na.fill(mean_values)
+  
+log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
 
 # Standardisation --------------------------------------------------------------
 
-cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
 
 vec_assembler = VectorAssembler(inputCols     = cols,
                                 outputCol     = "features",
