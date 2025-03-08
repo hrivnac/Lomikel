@@ -6,6 +6,7 @@ from pyspark.sql.functions import stddev
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import lit
 from pyspark.sql.functions import split
+from pyspark.sql.functions import isnan
 from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import StringType
 from pyspark.sql.types import DoubleType
@@ -44,7 +45,7 @@ dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
 skipNaN = True
 replaceNaNbyMean = False
 n_sample = 10000000
-n_pca = 13
+n_pca = 25
 n_clusters = 12
 silhouette = False
 cluster_features = "pca_features"
