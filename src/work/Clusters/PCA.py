@@ -44,7 +44,7 @@ import csv
 dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
 skipNaN = True
 replaceNaNbyMean = False
-n_sample = 10000000
+n_sample = 10000
 n_pca = 25
 n_clusters = 12
 silhouette = False
