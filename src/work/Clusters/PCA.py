@@ -41,14 +41,14 @@ import csv
 
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
+dataFn = "/user/julien.peloton/archive/science/year=2024"
 skipNaN = False
 replaceNaNbyMean = False
 replaceNaNbyZero = True
-n_sample = 100000
+n_sample = 1000000
 n_pca = 12
-n_clusters = 20
-silhouette = True
+n_clusters = 12
+silhouette = False
 cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
