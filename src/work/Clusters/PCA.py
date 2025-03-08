@@ -20,6 +20,8 @@ from pyspark.ml.evaluation import ClusteringEvaluator
 
 from fink_filters.classification import extract_fink_classification
 
+from functools import reduce
+
 import numpy as np
 from numpy import array
 
@@ -127,7 +129,7 @@ cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd"
 
 if skipNaN:
   df = df.na.drop(subset = cols)
-  df = df.filter(~(isnan(col(c))).any() for c in cols)
+  df = df.filter(reduce(lambda x, y: x & ~isnan(col(y)), cols, lit(True)))
 
 if replaceNaNbyMean:
   mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
