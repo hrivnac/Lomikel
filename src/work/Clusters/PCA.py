@@ -42,9 +42,10 @@ import csv
 # Parameters -------------------------------------------------------------------
 
 dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
-skipNaN = True
+skipNaN = False
 replaceNaNbyMean = False
-n_sample = 1000
+replaceNaNbyZero = True
+n_sample = 100000
 n_pca = 25
 n_clusters = 12
 silhouette = False
@@ -128,7 +129,7 @@ df = df.select(*columns)\
        
 cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
 
-if skipNaN:
+if skipNaN: # cuts number of alerts to 1/4
   df = df.na.drop(subset = cols)
   df = df.filter(reduce(lambda x, y: x & ~isnan(col(y)), cols, lit(True)))
 
@@ -138,6 +139,9 @@ if replaceNaNbyMean:
                   .asDict()
   mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}  
   df = df.na.fill(mean_values)
+  
+if replaceNaNbyZero:
+  df = df.na.fill(0)  
   
 log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
 
