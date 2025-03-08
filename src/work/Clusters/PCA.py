@@ -127,7 +127,7 @@ cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd"
 
 if skipNaN:
   df = df.na.drop(subset = cols)
-  df = df.filter(~(isnan(col(c)) for c in cols))
+  df = df.filter(~(isnan(col(c))).any() for c in cols)
 
 if replaceNaNbyMean:
   mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
