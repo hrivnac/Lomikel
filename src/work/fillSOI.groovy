@@ -14,7 +14,7 @@ classes = new String[]{"(CTA) Blazar",
                        "Solar System candidate",
                        "Solar System MPC",
                        "Tracklet"}
-//gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, 'hbase-1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 10000, 1500, null, false, null)
+gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, 'hbase-1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 10000, 1500, null, false, null)
 gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, 'hbase-1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 10000, 1500, classes, false, null)
 gr.generateCorrelations(Classifiers.valueOf("FEATURES"), Classifiers.valueOf("FINK_PORTAL"))
 gr.overlaps(null, null, "/tmp/overlaps.csv")

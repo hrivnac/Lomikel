@@ -9,7 +9,7 @@ normalised = True
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
-limits_norm  = [8,                 0.0,                 0.0,                 0.0,                0.0,                0.0               ]
+limits_norm  = [4,                   0,                   0,                   10,                 0,                  0                 ]
 limits_unorm = [0,                   0,                   0,                   0,                  0,                  0                 ]
 
 if normalised:
@@ -21,14 +21,14 @@ else:
   limits  = limits_unorm
   overlap = 'overlap'
 
-sample = pd.read_csv('PCA-sample.csv')
-cls_values = sample['cls'].unique()
-print(cls_values)
+#sample = pd.read_csv('PCA-sample.csv')
+#cls_values = sample['cls'].unique()
+#print(cls_values)
 
 df = pd.read_csv('overlaps.csv')
-df = df[((df['classifier1'] != 'FINK_PORTAL') | (df['class1'].isin(cls_values))) &
-        ((df['classifier2'] != 'FINK_PORTAL') | (df['class2'].isin(cls_values))) &
-        ((df['classifier1'] != 'FEATURES'   ) | (df['class1'] != "FC--1"      )) &
+#df = df[((df['classifier1'] != 'FINK_PORTAL') | (df['class1'].isin(cls_values))) &
+#        ((df['classifier2'] != 'FINK_PORTAL') | (df['class2'].isin(cls_values)))] 
+df = df[((df['classifier1'] != 'FEATURES'   ) | (df['class1'] != "FC--1"      )) &
         ((df['classifier2'] != 'FEATURES'   ) | (df['class2'] != "FC--1"      ))]
 
 fig, axes = plt.subplots(2, 3, figsize = (20, 15))  
