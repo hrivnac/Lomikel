@@ -45,7 +45,7 @@ dataFn = "/user/julien.peloton/archive/science/year=2024"
 skipNaN = False
 replaceNaNbyMean = False
 replaceNaNbyZero = True
-n_sample = 1000000
+n_sample = 10000
 n_pca = 12
 n_clusters = 12
 silhouette = False
