@@ -21,8 +21,9 @@ def max_occurrence(classcol):
   
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
-n_sample = 100000
+dataFn       = "/user/julien.peloton/archive/science/year=2024/month=10"
+n_sample     = 10000000
+curve_length = 100
 
 # New session ------------------------------------------------------------------
 
@@ -73,8 +74,8 @@ df_grouped = df.groupBy("objectId")\
                      "jd":     "collect_list",
                      "fid":    "collect_list",
                      "class":  "collect_list"})
-
-# Applying the max_occurrence function to the collected class lists ------------
+               
+df_grouped = df_grouped.filter((size(col("collect_list(magpsf)")) >= curve_length))
 
 df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(class)")))
 
