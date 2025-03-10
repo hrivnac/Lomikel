@@ -80,10 +80,10 @@ df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(
 
 # Export -----------------------------------------------------------------------
 
-cr.write\
-  .mode("overwrite")\
-  .format("csv")\
-  .save("/tmp/LightCurves")
+df_grouped.write\
+          .mode("overwrite")\
+          .format("csv")\
+          .save("/tmp/LightCurves")
 
 # show
 df_grouped.show(truncate=False)
