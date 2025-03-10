@@ -80,7 +80,7 @@ df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(
 
 # Export -----------------------------------------------------------------------
           
-df_grouped = df_grouped.select([col(c).cast("string") if "collect_list" in c else col(c) for c in df.columns])
+df_grouped = df_grouped.select([col(f"`{c}`").cast("string") if "collect_list" in c else col(c) for c in df.columns])
 
 # Save as CSV (without header)
 df.write.mode("overwrite").option("header", "true").csv("output.csv")          
