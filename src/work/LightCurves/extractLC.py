@@ -92,10 +92,10 @@ df_grouped = df_grouped.withColumn("collect_list(magpsf)", array_join(col("colle
 
 
 
-df.write\
-   .mode("overwrite")\
-   .option("header", "true")\
-   .csv("/tmp/LightCurves")          
+df_grouped.write\
+          .mode("overwrite")\
+          .option("header", "true")\
+          .csv("/tmp/LightCurves")          
 
 # show
 df_grouped.show(truncate=False)
