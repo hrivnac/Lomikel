@@ -71,7 +71,7 @@ df = df.filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())
        
 if n_sample > 0:
-df = df.limit(n_sample)        
+  df = df.limit(n_sample)        
 
 # Classification ---------------------------------------------------------------
 
