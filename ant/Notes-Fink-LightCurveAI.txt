@@ -7,11 +7,12 @@ git pull;hadoop fs -put -f ../src/work/LightCurves/extractLC.py
 lomikel_hbase -s ../src/work/LightCurves/extractLC.groovy  
 
 # @livy
-rm -rf /tmp/LightCurves;hadoop fs -get /tmp/LightCurves
+rm -rf LightCurves;hadoop fs -get /tmp/LightCurves
 
 # @home
 rm -rf LightCurves;scp -r julius.hrivnac@vm-75222.lal.in2p3.fr:/home/julius.hrivnac/Lomikel/ant/LightCurves ./
-groovy ../src/work/LightCurves/prepareLC.groovy LightCurves/*csv ../data
+rm -f LighCurves.csv; awk '(NR == 1) || (FNR > 1)' LightCurves/*csv > LighCurves.csv
+groovy ../src/work/LightCurves/prepareLC.groovy LightCurves.csv ../data
 
 
 # ToDo:

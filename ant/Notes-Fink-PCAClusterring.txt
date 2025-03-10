@@ -43,9 +43,17 @@ n_pca = 10
 n_clusters = 15
 silhouette = True
 cluster_features = "pca_features"
-
-
-Silhouette_Score.png => n_clusters = 15
+=> Silhouette_Score-10.png => n_clusters = 11
+------------------------------------
+dataFn = "/user/julien.peloton/archive/science/year=2024"
+skipNaN = False
+replaceNaNbyMean = True
+replaceNaNbyZero = False
+n_sample = 1000000
+n_pca = 10
+n_clusters = 11
+silhouette = False
+cluster_features = "pca_features"
 
 # @home
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.png' ./
