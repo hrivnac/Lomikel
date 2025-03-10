@@ -70,9 +70,9 @@ df = df.select(["objectId",
 
 df_grouped = df.groupBy("objectId")\
                .agg({"magpsf": "collect_list",
-                      "jd":    "collect_list",
-                      "fid":   "collect_list",
-                      "class": "collect_list"})
+                     "jd":     "collect_list",
+                     "fid":    "collect_list",
+                     "class":  "collect_list"})
 
 # Applying the max_occurrence function to the collected class lists ------------
 
@@ -82,8 +82,10 @@ df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(
           
 df_grouped = df_grouped.select([col(f"`{c}`").cast("string") if "collect_list" in c else col(c) for c in df_grouped.columns])
 
-# Save as CSV (without header)
-df.write.mode("overwrite").option("header", "true").csv("output.csv")          
+df.write\
+   .mode("overwrite")\
+   .option("header", "true")\
+   .csv("/tmp/LightCurves.csv")          
 
 # show
 df_grouped.show(truncate=False)
