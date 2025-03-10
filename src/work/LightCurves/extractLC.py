@@ -82,7 +82,14 @@ df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(
 
 # Export -----------------------------------------------------------------------
           
-df_grouped = df_grouped.select([col(f"`{c}`").cast("string") if "collect_list" in c else col(c) for c in df_grouped.columns])
+#df_grouped = df_grouped.select([col(f"`{c}`").cast("string") if "collect_list" in c else col(c) for c in df_grouped.columns])
+
+df_grouped = df_grouped.withColumn("collect_list(magpsf)", array_join(col("collect_list(magpsf)"), ";")) \
+                       .withColumn("collect_list(jd)", array_join(col("collect_list(jd)"), ";")) \
+                       .withColumn("collect_list(fid)", array_join(col("collect_list(fid)"), ";")) \
+                       .withColumn("collect_list(class)", array_join(col("collect_list(class)"), ";"))
+
+
 
 df.write\
    .mode("overwrite")\
