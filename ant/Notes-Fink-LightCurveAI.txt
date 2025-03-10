@@ -10,7 +10,8 @@ lomikel_hbase -s ../src/work/LightCurves/extractLC.groovy
 rm -rf /tmp/LightCurves;hadoop fs -get /tmp/LightCurves
 
 # @home
-rm -rf LightCurves;scp -r julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/LightCurves ./
+rm -rf LightCurves;scp -r julius.hrivnac@vm-75222.lal.in2p3.fr:/home/julius.hrivnac/Lomikel/ant/LightCurves ./
+groovy ../src/work/LightCurves/prepareLC.groovy LightCurves/*csv ../data
 
 
 # ToDo:

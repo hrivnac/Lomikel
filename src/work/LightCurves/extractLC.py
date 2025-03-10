@@ -24,7 +24,7 @@ def max_occurrence(classcol):
 # Parameters -------------------------------------------------------------------
 
 dataFn       = "/user/julien.peloton/archive/science/year=2024/month=10"
-n_sample     = 1000000000
+n_sample     = 0
 curve_length = 25
 
 # New session ------------------------------------------------------------------
@@ -43,7 +43,8 @@ df = spark.read\
           .format("parquet")\
           .load(dataFn)
           
-df = df.limit(n_sample)        
+if n_sample > 0:
+  df = df.limit(n_sample)        
 
 # Classification ---------------------------------------------------------------
 
