@@ -22,7 +22,8 @@ def max_occurrence(classcol):
 # Parameters -------------------------------------------------------------------
 
 dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
-   
+n_sample = 100000
+
 # New session ------------------------------------------------------------------
 
 spark = SparkSession.builder\
@@ -33,13 +34,15 @@ log4jLogger = spark._jvm.org.apache.log4j
 log = log4jLogger.LogManager.getLogger("LC")
 log.info("Starting...")
 
-# Read Parquet file into DataFrame ---------------------------------------------
+# Reading Parquet file into DataFrame ------------------------------------------
 
 df = spark.read\
           .format("parquet")\
           .load(dataFn)
+          
+df = df.limit(n_sample)        
 
-# Define the arguments for classification extraction ---------------------------
+# Classification ---------------------------------------------------------------
 
 args = ["cdsxmatch",
         "roid",
@@ -55,16 +58,15 @@ args = ["cdsxmatch",
         "rf_kn_vs_nonkn",
         "tracklet"]
 
-# Extract classifications and select relevant columns --------------------------
-
 df = df.withColumn("class", extract_fink_classification(*args))
+
+# Grouping by objectId and collect lists of specified columns ------------------
+
 df = df.select(["objectId",
                 "candidate.magpsf",
                 "candidate.jd",
                 "candidate.fid",
                 "class"])
-
-# Group by objectId and collect lists of specified columns ---------------------
 
 df_grouped = df.groupBy("objectId")\
                .agg({"magpsf": "collect_list",
@@ -72,13 +74,13 @@ df_grouped = df.groupBy("objectId")\
                       "fid":   "collect_list",
                       "class": "collect_list"})
 
-# Apply the max_occurrence function to the collected class lists ---------------
+# Applying the max_occurrence function to the collected class lists ------------
 
 df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(class)")))
 
 # Show -------------------------------------------------------------------------
 
-df_grouped.show()
+df_grouped.show(truncate=False)
 
 # End --------------------------------------------------------------------------
 
