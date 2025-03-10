@@ -2,6 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import pandas_udf
 from pyspark.sql.functions import col
 from pyspark.sql.functions import size
+from pyspark.sql.functions import array_join
 from pyspark.sql.types import StringType
 
 from fink_filters.classification import extract_fink_classification

@@ -7,10 +7,10 @@ git pull;hadoop fs -put -f ../src/work/LightCurves/extractLC.py
 lomikel_hbase -s ../src/work/LightCurves/extractLC.groovy  
 
 # @livy
-hadoop fs -get /tmp/LightCurves
+rm -rf /tmp/LightCurves;hadoop fs -get /tmp/LightCurves
 
 # @home
-scp -r julius.hrivnac@vm-75222.lal.in2p3.fr:/home/julius.hrivnac/Lomikel/ant/LightCurves ./
+rm -rf LightCurves;scp -r julius.hrivnac@vm-75222.lal.in2p3.fr:/home/julius.hrivnac/Lomikel/ant/LightCurves ./
 
 
 # ToDo:
