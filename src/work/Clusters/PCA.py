@@ -43,10 +43,10 @@ import csv
 
 dataFn = "/user/julien.peloton/archive/science/year=2024"
 skipNaN = False
-replaceNaNbyMean = False
-replaceNaNbyZero = True
-n_sample = 10000
-n_pca = 12
+replaceNaNbyMean = True
+replaceNaNbyZero = False
+n_sample = 100000
+n_pca = 25
 n_clusters = 12
 silhouette = False
 cluster_features = "pca_features"
