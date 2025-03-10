@@ -257,7 +257,7 @@ with open("/tmp/cluster_centers.json", "w") as f:
 cr.write\
   .mode("overwrite")\
   .format("csv")\
-  .save("/tmp/cr")
+  .save("/tmp/Clusters")
 
 # plot                     
 pdf = cr.select("cluster", "class").toPandas()

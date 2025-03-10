@@ -79,11 +79,11 @@ df_grouped = df.groupBy("objectId")\
 df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(class)")))
 
 # Export -----------------------------------------------------------------------
+          
+df_grouped = df_grouped.select([col(c).cast("string") if "collect_list" in c else col(c) for c in df.columns])
 
-df_grouped.write\
-          .mode("overwrite")\
-          .format("csv")\
-          .save("/tmp/LightCurves")
+# Save as CSV (without header)
+df.write.mode("overwrite").option("header", "true").csv("output.csv")          
 
 # show
 df_grouped.show(truncate=False)
