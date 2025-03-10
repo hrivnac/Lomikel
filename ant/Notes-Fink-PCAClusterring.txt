@@ -23,30 +23,20 @@ git pull;hadoop fs -put -f ../src/work/Clusters/PCA.py;hadoop fs -put -f /tmp/PC
 # @janusgraph
 lomikel_hbase -s ../src/work/Clusters/PCA.groovy  
 ---------------------------
-n_sample = 10000000
-n_pca = 5
-n_clusters = 3
-
- "+-------+------+",
-    "|cluster| count|",
-    "+-------+------+",
-    "|      3|403489|",
-    "|     10|589191|",
-    "|      8|177235|",
-    "|      7|338560|",
-    "|      9|170458|",
-    "|      0|337231|",
-    "|      4| 11628|",
-    "|      5|196821|",
-    "|      1|656938|",
-    "|      6| 62903|",
-    "|     11|    29|",
-    "|      2|     2|",
-    "|     12|     1|",
-    "+-------+------+",
+dataFn = "/user/julien.peloton/archive/science/year=2024"
+skipNaN = False
+replaceNaNbyMean = True
+replaceNaNbyZero = False
+n_sample = 100000
+n_pca = 25
+n_clusters = 12
+silhouette = False
+cluster_features = "pca_features"
 
 
-PCA_Variance.png => n_pca = 15
+=> PCA_Variance-25.png => n_pca = 10
+
+
 Silhouette_Score.png => n_clusters = 15
 
 # @home
