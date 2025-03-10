@@ -85,7 +85,7 @@ df_grouped = df_grouped.select([col(f"`{c}`").cast("string") if "collect_list" i
 df.write\
    .mode("overwrite")\
    .option("header", "true")\
-   .csv("/tmp/LightCurves.csv")          
+   .csv("/tmp/LightCurves")          
 
 # show
 df_grouped.show(truncate=False)
