@@ -24,7 +24,7 @@ def max_occurrence(classcol):
 
 dataFn       = "/user/julien.peloton/archive/science/year=2024/month=10"
 n_sample     = 100000000
-curve_length = 100
+curve_length = 50
 
 # New session ------------------------------------------------------------------
 
