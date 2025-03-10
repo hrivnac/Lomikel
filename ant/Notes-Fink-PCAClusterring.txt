@@ -54,6 +54,22 @@ n_pca = 10
 n_clusters = 11
 silhouette = False
 cluster_features = "pca_features"
+=>
++-------+------+
+|cluster| count|
++-------+------+
+|     10|107657|
+|      7|124769|
+|      0|284944|
+|      9|121692|
+|      3|169099|
+|      6| 33598|
+|      1|  3279|
+|      2|145260|
+|      5|  6056|
+|      8|    11|
+|      4|  3635|
++-------+------+
 
 # @home
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.png' ./
@@ -67,6 +83,6 @@ scp *json centos@134.158.74.85:/tmp
 
 # @home
 scp centos@134.158.74.85:/tmp/overlaps.csv ./
-python ../src/work/Clusters/analyseOverlaps.py
+python ../src/work/analyseOverlaps.py
 
 --------------------------------------------------------------------------------

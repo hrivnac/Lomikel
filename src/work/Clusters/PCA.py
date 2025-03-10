@@ -45,9 +45,9 @@ dataFn = "/user/julien.peloton/archive/science/year=2024"
 skipNaN = False
 replaceNaNbyMean = True
 replaceNaNbyZero = False
-n_sample = 1000000
-n_pca = 10
-n_clusters = 11
+n_sample = 0
+n_pca = 25
+n_clusters = 12
 silhouette = False
 cluster_features = "pca_features"
 
@@ -68,8 +68,10 @@ df = spark.read\
           .load(dataFn)
 
 df = df.filter(df.lc_features_g.isNotNull())\
-       .filter(df.lc_features_r.isNotNull())\
-       .limit(n_sample)        
+       .filter(df.lc_features_r.isNotNull())
+       
+if n_sample > 0:
+df = df.limit(n_sample)        
 
 # Classification ---------------------------------------------------------------
 

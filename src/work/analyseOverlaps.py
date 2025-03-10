@@ -9,7 +9,7 @@ normalised = True
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
-limits_norm  = [4,                   0,                   0,                   10,                 0,                  0                 ]
+limits_norm  = [8,                   0,                   0,                   8,                  0,                  0                 ]
 limits_unorm = [0,                   0,                   0,                   0,                  0,                  0                 ]
 
 if normalised:
