@@ -78,8 +78,14 @@ df_grouped = df.groupBy("objectId")\
 
 df_grouped = df_grouped.withColumn("maxclass", max_occurrence(col("collect_list(class)")))
 
-# Show -------------------------------------------------------------------------
+# Export -----------------------------------------------------------------------
 
+cr.write\
+  .mode("overwrite")\
+  .format("csv")\
+  .save("/tmp/LightCurves")
+
+# show
 df_grouped.show(truncate=False)
 
 # End --------------------------------------------------------------------------
