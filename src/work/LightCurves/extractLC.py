@@ -23,7 +23,7 @@ def max_occurrence(classcol):
 # Parameters -------------------------------------------------------------------
 
 dataFn       = "/user/julien.peloton/archive/science/year=2024/month=10"
-n_sample     = 10000000
+n_sample     = 100000000
 curve_length = 100
 
 # New session ------------------------------------------------------------------
