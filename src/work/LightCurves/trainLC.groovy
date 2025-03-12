@@ -50,8 +50,8 @@ import java.util.Random;
 log = LogManager.getLogger(this.class);
 
 miniBatchSize = 10;
-numLabelClasses = 3;
-blockSize = 100;
+numLabelClasses = 5;
+blockSize = 50;
 trainSize = (int)(numLabelClasses * blockSize * 0.75);
 testSize =  (int)(numLabelClasses * blockSize - trainSize);
 nEpochs = 40;

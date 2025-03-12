@@ -23,7 +23,7 @@ def max_occurrence(classcol):
   
 # Parameters -------------------------------------------------------------------
 
-dataFn       = "/user/julien.peloton/archive/science/year=2024/month=10"
+dataFn       = "/user/julien.peloton/archive/science/year=2024"
 n_sample     = 0
 curve_length = 25
 
@@ -90,8 +90,6 @@ df_grouped = df_grouped.withColumn("collect_list(magpsf)", array_join(col("colle
                        .withColumn("collect_list(jd)", array_join(col("collect_list(jd)"), ";")) \
                        .withColumn("collect_list(fid)", array_join(col("collect_list(fid)"), ";")) \
                        .withColumn("collect_list(class)", array_join(col("collect_list(class)"), ";"))
-
-
 
 df_grouped.write\
           .mode("overwrite")\

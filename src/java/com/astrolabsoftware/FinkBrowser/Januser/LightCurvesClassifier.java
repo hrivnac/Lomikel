@@ -29,7 +29,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // BUG: jd should be String or long
-public class FeaturesClassifier implements Classifier {
+public class LightCurvesClassifier implements Classifier {
   
   @Override
   public void classify(FinkGremlinRecipies recipies,
@@ -144,7 +144,7 @@ public class FeaturesClassifier implements Classifier {
   private static String _dirName;
 
   /** Logging . */
-  private static Logger log = LogManager.getLogger(FeaturesClassifier.class);
+  private static Logger log = LogManager.getLogger(LightCurvesClassifier.class);
   
   }
            

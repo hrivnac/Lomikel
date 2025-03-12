@@ -1,7 +1,7 @@
 # data extraction ##############################################################
 
 # @livy
-git pull;hadoop fs -put -f ../src/work/LightCurves/extractLC.py
+git pull; hadoop fs -put -f ../src/work/LightCurves/extractLC.py
 
 # @janusgraph
 lomikel_hbase -s ../src/work/LightCurves/extractLC.groovy  
@@ -11,15 +11,11 @@ rm -rf LightCurves;hadoop fs -get /tmp/LightCurves
 
 # @home
 rm -rf LightCurves;scp -r julius.hrivnac@vm-75222.lal.in2p3.fr:/home/julius.hrivnac/Lomikel/ant/LightCurves ./
-rm -f LighCurves.csv; awk '(NR == 1) || (FNR > 1)' LightCurves/*csv > LighCurves.csv
-groovy ../src/work/LightCurves/prepareLC.groovy LightCurves.csv ../data
+rm -f LighCurves.csv; awk '(NR == 1) || (FNR > 1)' LightCurves/*csv > LightCurves.csv
+rm -rf ../data/*; lomikel_janus -s ../src/work/LightCurves/prepareLC.groovy -b
+cat ../data/*.lst > ../data/gr.lst
 
+# classification ###############################################################
 
-# ToDo:
-#   use full LightCurves
-
-# Filling
-src/work/collectCurves.groovy
-
-# Classification
-src/work/trainCurves.groovy
+# @home
+lomikel_dl4j -s ../src/work/LightCurves/trainLC.groovy -b
