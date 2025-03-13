@@ -16,9 +16,20 @@ import org.apache.logging.log4j.LogManager;
 def csvFN    = "LightCurves.csv"
 def curvesDN = "../data"
 
-jdLength = 60
-jdSize   = 50
-fidSelection = '1'
+jdMinSize = 10     // minimal number of LC points
+jdLength  = 60     // number of LC points after renormalisation
+jdSize    = 100    // number of samples (smaler cases will be skipped, larger cases will be shortened)
+fidSelection = '2' // LC filter
+
+def reduceCls(String cls) {
+  cls = cls.replaceAll('Candidate_', '').replaceAll('_Candidate', '')
+  //switch(cls) {            
+  //  case 'EB*_Candidate' -> 'EB*'
+  //  case 'Candidate_EB*' -> 'EB*'
+  //  default              -> cls
+  //  }
+  }
+
 
 log = LogManager.getLogger(this.class);
 
@@ -45,13 +56,14 @@ rows.each {row -> def objectId   = row["objectId"]
                                                             dataPoints  = dataPoints.collect {[it.key, it.value]} 
                                                             def jds     = dataPoints.collect {it[0]} as double[]
                                                             def magpsfs = dataPoints.collect {it[1]} as double[]
+                                                            if (jds.size() < jdMinSize) return
                                                             double minJD = jds.min()
                                                             double maxJD = jds.max()
                                                             def normalizedJDs = (0..<jdLength).collect {i -> minJD + i * (maxJD - minJD) / (jdLength - 1)} as double[]
                                                             def interpolator = new LinearInterpolator()
                                                             def splineFunction = interpolator.interpolate(jds, magpsfs)
                                                             def normalizedMagpsfs = normalizedJDs.collect {jd -> splineFunction.value(jd)} as double[]
-                                                            def maxclassFixed = maxclass.replaceAll("/", "_")
+                                                            def maxclassFixed = reduceCls(maxclass.replaceAll("/", "_"))
                                                             def idxFile = new File("${curvesDN}/${maxclassFixed}_${fid}.idx")
                                                             def lstFile = new File("${curvesDN}/${maxclassFixed}_${fid}.lst")                     
                                                             def jdFile  = new File("${curvesDN}/${maxclassFixed}_${fid}.jd" )                     

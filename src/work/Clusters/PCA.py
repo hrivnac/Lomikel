@@ -45,10 +45,10 @@ dataFn = "/user/julien.peloton/archive/science/year=2024"
 skipNaN = False
 replaceNaNbyMean = True
 replaceNaNbyZero = False
-n_sample = 0
+n_sample = 1000000
 n_pca = 13
 n_clusters = 15
-silhouette = True
+silhouette = False
 cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
