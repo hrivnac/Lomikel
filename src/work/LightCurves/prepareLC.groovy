@@ -15,11 +15,13 @@ import org.apache.logging.log4j.LogManager;
 
 def csvFN    = "LightCurves.csv"
 def curvesDN = "../data"
+def normalize = false
 
 jdMinSize = 10     // minimal number of LC points
 jdLength  = 60     // number of LC points after renormalisation
 jdSize    = 100    // number of samples (smaler cases will be skipped, larger cases will be shortened)
 fidSelection = '2' // LC filter
+normalize = false  // normalize data or fill missing with 0s
 
 def reduceCls(String cls) {
   cls = cls.replaceAll('Candidate_', '').replaceAll('_Candidate', '')
@@ -57,19 +59,35 @@ rows.each {row -> def objectId   = row["objectId"]
                                                             def jds     = dataPoints.collect {it[0]} as double[]
                                                             def magpsfs = dataPoints.collect {it[1]} as double[]
                                                             if (jds.size() < jdMinSize) return
-                                                            double minJD = jds.min()
-                                                            double maxJD = jds.max()
-                                                            def normalizedJDs = (0..<jdLength).collect {i -> minJD + i * (maxJD - minJD) / (jdLength - 1)} as double[]
-                                                            def interpolator = new LinearInterpolator()
-                                                            def splineFunction = interpolator.interpolate(jds, magpsfs)
-                                                            def normalizedMagpsfs = normalizedJDs.collect {jd -> splineFunction.value(jd)} as double[]
                                                             def maxclassFixed = reduceCls(maxclass.replaceAll("/", "_"))
                                                             def idxFile = new File("${curvesDN}/${maxclassFixed}_${fid}.idx")
                                                             def lstFile = new File("${curvesDN}/${maxclassFixed}_${fid}.lst")                     
                                                             def jdFile  = new File("${curvesDN}/${maxclassFixed}_${fid}.jd" )                     
                                                             idxFile.append("$objectId\n")
-                                                            lstFile.append(normalizedMagpsfs.collect {sprintf("%.6f", it)}.join(" ") + "\n")
-                                                            jdFile.append(normalizedJDs.collect {sprintf("%.6f", it)}.join(" ") + "\n")
+                                                            if (normalize) {
+                                                              double minJD = jds.min()
+                                                              double maxJD = jds.max()
+                                                              def normalizedJDs = (0..<jdLength).collect {i -> minJD + i * (maxJD - minJD) / (jdLength - 1)} as double[]
+                                                              def interpolator = new LinearInterpolator()
+                                                              def splineFunction = interpolator.interpolate(jds, magpsfs)
+                                                              def normalizedMagpsfs = normalizedJDs.collect {jd -> splineFunction.value(jd)} as double[]
+                                                              lstFile.append(normalizedMagpsfs.collect {sprintf("%.6f", it)}.join(" ") + "\n")
+                                                              jdFile.append(normalizedJDs.collect {sprintf("%.6f", it)}.join(" ") + "\n")
+                                                              }
+                                                            else {
+                                                              if (jds.size() > jdLength) {
+                                                                jds = jds[0..<jdLength]
+                                                                magpsfs = magpsfs[0..<jdLength]
+                                                                }
+                                                             else {
+                                                                jds = (jds as List) + ((jds.size()..<jdLength).collect {0.0})
+                                                                jds = jds as double[]
+                                                                magpsfs = (magpsfs as List) + ((magpsfs.size()..<jdLength).collect {0.0})
+                                                                magpsfs = magpsfs as double[]
+                                                                }
+                                                              lstFile.append(magpsfs.collect {sprintf("%.6f", it)}.join(" ") + "\n")
+                                                              jdFile.append(jds.collect {sprintf("%.6f", it)}.join(" ") + "\n")
+                                                              }
                                                             fileRowCount[idxFile.path] += 1
                                                             fileRowCount[lstFile.path] += 1
                                                             fileRowCount[jdFile.path ] += 1

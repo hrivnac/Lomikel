@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-cls = "Star"
+cls = "RotV*"
 fid   = "2"
 
 lst = np.loadtxt("../data/" + cls + "_" + fid + ".lst") 
@@ -13,7 +13,11 @@ if lst.shape != jd.shape:
 
 plt.figure(figsize = (20, 10))
 for i in range(lst.shape[0]):
-    plt.plot(jd[i], lst[i], label = idx[i])
+  mask = (jd[i] != 0) 
+  filtered_jd  = jd[ i][mask]
+  filtered_lst = lst[i][mask]
+  if len(filtered_jd) > 0:
+    plt.plot(filtered_jd, filtered_lst, label = idx[i])
 
 plt.xlabel("Julian Date")
 plt.ylabel("Values")

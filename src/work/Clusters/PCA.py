@@ -41,7 +41,7 @@ import csv
 
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2024"
+dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
 skipNaN = False
 replaceNaNbyMean = True
 replaceNaNbyZero = False
