@@ -1,7 +1,7 @@
 # training #####################################################################
 
 # @livy
-git pull;hadoop fs -put -f ../src/work/Clusters/PCA.py;hadoop fs -put -f /tmp/PCA-sample.csv /tmp
+git pull;hadoop fs -put -f ../src/work/Clusters/PCA.py
 
 # @janusgraph
 lomikel_hbase -s ../src/work/Clusters/PCA.groovy  
@@ -17,13 +17,13 @@ silhouette = False
 cluster_features = "pca_features"
 => PCA_Variance-25.png => n_pca = 13
 ------------------------------------
-dataFn = "/user/julien.peloton/archive/science/year=2024"
+dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
 skipNaN = False
 replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
 n_pca = 13
-n_clusters = 15
+n_clusters = 20
 silhouette = True
 cluster_features = "pca_features"
 => Silhouette_Score-10.png => n_clusters = 11
