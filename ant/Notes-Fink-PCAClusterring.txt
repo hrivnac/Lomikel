@@ -1,21 +1,4 @@
-# training set preparation #####################################################
-
-# @janusgraph (gremlin)
-work/Clusters/preparePCA.gremlin
------------------
-n_cls = 1000
-n_objectId = 10000
-min_jd = 10
-max_jd = 1000
-
-# @home
-scp centos@134.158.74.85:'/tmp/PCA-sample.csv' ./
-
 # training #####################################################################
-
-# @home
-edit PCA-sample.csv
-scp PCA-sample.csv julius.hrivnac@vm-75222.lal.in2p3.fr:'/tmp'
 
 # @livy
 git pull;hadoop fs -put -f ../src/work/Clusters/PCA.py;hadoop fs -put -f /tmp/PCA-sample.csv /tmp
