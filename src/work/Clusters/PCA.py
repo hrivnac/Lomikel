@@ -47,7 +47,7 @@ replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
 n_pca = 13
-n_clusters = 30
+n_clusters = 50
 silhouette = True
 cluster_features = "pca_features"
 
@@ -219,7 +219,7 @@ if silhouette:
                                    .setMetricName("silhouette",)\
                                    .setDistanceMeasure("squaredEuclidean")
   silhouette_score = []   
-  for i in range(5, n_clusters):
+  for i in range(5, n_clusters - 4):
     try:
       kmeans = KMeans().setK(i)\
                        .setFeaturesCol(cluster_features) 
@@ -291,7 +291,7 @@ centers = kmeans_model.clusterCenters()
 for center in centers: 
   log.info(center)
 log.info("Cluster Groups:")
-cr.groupBy("cluster").count().show()
+cr.groupBy("cluster").count().show(n_clusters)
 
 # show
 #cr.show(truncate=False)

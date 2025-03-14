@@ -26,33 +26,8 @@ n_pca = 13
 n_clusters = 25
 silhouette = True
 cluster_features = "pca_features"
-=> Silhouette_Score-10.png => n_clusters = 11
+=> Silhouette_Score-25.png => n_clusters = 25
 ------------------------------------
-dataFn = "/user/julien.peloton/archive/science/year=2024"
-skipNaN = False
-replaceNaNbyMean = True
-replaceNaNbyZero = False
-n_sample = 1000000
-n_pca = 10
-n_clusters = 11
-silhouette = False
-cluster_features = "pca_features"
-=>
-+-------+------+
-|cluster| count|
-+-------+------+
-|     10|107657|
-|      7|124769|
-|      0|284944|
-|      9|121692|
-|      3|169099|
-|      6| 33598|
-|      1|  3279|
-|      2|145260|
-|      5|  6056|
-|      8|    11|
-|      4|  3635|
-+-------+------+
 
 # @home
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.png' ./
