@@ -234,7 +234,7 @@ if silhouette:
       silhouette_score.append(0)
   # plot
   plt.figure(figsize=(10, 8))
-  plt.plot(range(5, n_clusters), silhouette_score) 
+  plt.plot(range(5, n_clusters - 4), silhouette_score) 
   plt.xlabel("number of clusters") 
   plt.ylabel("within set sum of squared errors") 
   plt.title("Elbow Method for Optimal K") 
