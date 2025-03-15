@@ -47,8 +47,8 @@ replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
 n_pca = 13
-n_clusters = 50
-silhouette = True
+n_clusters = 45
+silhouette = False
 cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
@@ -219,7 +219,7 @@ if silhouette:
                                    .setMetricName("silhouette",)\
                                    .setDistanceMeasure("squaredEuclidean")
   silhouette_score = []   
-  for i in range(5, n_clusters - 4):
+  for i in range(5, n_clusters):
     try:
       kmeans = KMeans().setK(i)\
                        .setFeaturesCol(cluster_features) 
@@ -234,7 +234,7 @@ if silhouette:
       silhouette_score.append(0)
   # plot
   plt.figure(figsize=(10, 8))
-  plt.plot(range(5, n_clusters - 4), silhouette_score) 
+  plt.plot(range(5, n_clusters), silhouette_score) 
   plt.xlabel("number of clusters") 
   plt.ylabel("within set sum of squared errors") 
   plt.title("Elbow Method for Optimal K") 
@@ -269,18 +269,18 @@ grouped = pdf.groupby(["class", "cluster"])\
              .reset_index(name="count")
 plt.figure(figsize=(12, 6))
 sns.scatterplot(data=grouped,
-                x="cluster",
-                y="class",
-                size="count",
-                hue="count",
-                palette="viridis",
-                sizes=(50, 500),
-                edgecolor="black",
-                alpha=0.75)
+                x         = "cluster",
+                y         = "class",
+                size      = "count",
+                hue       = "count",
+                palette   = "viridis",
+                sizes     = (50, 500),
+                edgecolor = "black",
+                alpha     = 0.75)
 plt.xlabel("Class")
 plt.ylabel("Cluster")
 plt.title("Cluster vs Class Scatter Plot (Bubble Size = Count)")
-plt.xticks(rotation=45)
+plt.xticks(rotation = 45)
 plt.grid(True)
 plt.legend(title="Count")
 plt.savefig("/tmp/Class_Clusters.png")

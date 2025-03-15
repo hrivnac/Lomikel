@@ -23,11 +23,23 @@ replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
 n_pca = 13
-n_clusters = 25
+n_clusters = 45
 silhouette = True
 cluster_features = "pca_features"
-=> Silhouette_Score-25.png => n_clusters = 25
+=> Silhouette_Score-45.png => n_clusters = 45
 ------------------------------------
+dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
+skipNaN = False
+replaceNaNbyMean = True
+replaceNaNbyZero = False
+n_sample = 0
+n_pca = 13
+n_clusters = 45
+silhouette = False
+cluster_features = "pca_features"
+=>
+
+
 
 # @home
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.png' ./
