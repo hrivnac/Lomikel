@@ -1,9 +1,9 @@
 import com.Lomikel.Januser.JanusClient;
-import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies;
+import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 import com.astrolabsoftware.FinkBrowser.Januser.Classifiers;
 
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties")
-gr = new FinkGremlinRecipies(jc)
+gr = new FinkGremlinRecipiesG(jc)
 
 classes = new String[]{"(CTA) Blazar",
                        "Ambiguous",
