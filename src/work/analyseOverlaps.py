@@ -3,15 +3,39 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from tabulate import tabulate
 import math
-           
+
+--------------------------------------------------------------------------------
+
 normalised = True          
-                                      
+    
+merges = {"SOLAR":   ["Solar System candidate", "Solar System MPC"],
+          "FC-3+11": ["FC-3", "FC-11"]}
+
+no_values = ["FC--1"]
+                                  
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
 limits_norm  = [0,                   0,                   0,                   0,                  0,                  0                 ]
 limits_unorm = [0,                   0,                   0,                   0,                  0,                  0                 ]
 
+--------------------------------------------------------------------------------
+
+def merge4Class(df, class_col, result_col, merged_cols):
+   mask = df[class_col].isin(merged_cols)
+   grouped = df[mask].groupby([col for col in df.columns if col not in [class_col, "overlap"]], as_index = False).\
+                      agg({"overlap": "sum"})
+   grouped[class_col] = result_col
+   df = pd.concat([df[~mask], grouped], ignore_index = True)
+   return df 
+   
+def merge(df, result_col, merged_cols):
+  df = merge4Class(df, "class1", result_col, merged_cols)
+  df = merge4Class(df, "class2", result_col, merged_cols)
+  return df
+        
+--------------------------------------------------------------------------------
+        
 if normalised:
   name    = 'normalised'
   limits  = limits_norm
@@ -21,16 +45,13 @@ else:
   limits  = limits_unorm
   overlap = 'overlap'
 
-yes_values = []
-no_values = ["Solar System MPC", "Tracklet", "SN candidate"]
-
 df = pd.read_csv('overlaps.csv')
-df = df[((df['classifier1'] != 'FINK_PORTAL') | (df['class1'].isin(yes_values))) &
-        ((df['classifier2'] != 'FINK_PORTAL') | (df['class2'].isin(yes_values)))] 
+
 df = df[((df['classifier1'] != 'FINK_PORTAL') | (~df['class1'].isin(no_values))) &
         ((df['classifier2'] != 'FINK_PORTAL') | (~df['class2'].isin(no_values)))] 
-#df = df[((df['classifier1'] != 'FEATURES'   ) | (df['class1'] != "FC--1"      )) &
-#        ((df['classifier2'] != 'FEATURES'   ) | (df['class2'] != "FC--1"      ))]
+
+for mrg in merges:
+  df = merge(df, mrg, merges[mrg])
 
 fig, axes = plt.subplots(2, 3, figsize = (20, 15))  
 
@@ -47,7 +68,6 @@ for i, ax in enumerate(axes.flat):
                                   transform(lambda x: x / math.sqrt(x.sum()))
 
   dfx = dfx.query(overlap + ' > @limit') 
-  print(dfx)                             
   sns.scatterplot(data    = dfx,      
                   x       = 'class1',    
                   y       = 'class2',    
