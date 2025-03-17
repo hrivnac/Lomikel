@@ -4,12 +4,22 @@ import matplotlib.pyplot as plt
 from tabulate import tabulate
 import math
 
---------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 normalised = True          
     
-merges = {"SOLAR":   ["Solar System candidate", "Solar System MPC"],
-          "FC-3+11": ["FC-3", "FC-11"]}
+merges = {"SOLAR":   ["Solar System candidate",
+                      "Solar System MPC"],
+          "SN":      ["SN candidate",
+                      "Early SN Ia candidate"],
+          "FC-A":    ["FC-3",
+                      "FC-11"],
+          "FC-B":    ["FC-6",
+                      "FC-8",
+                      "FC-10",
+                      "FC-22",
+                      "FC-26",
+                      "FC-44"]}
 
 no_values = ["FC--1"]
                                   
@@ -19,7 +29,7 @@ types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', '
 limits_norm  = [0,                   0,                   0,                   0,                  0,                  0                 ]
 limits_unorm = [0,                   0,                   0,                   0,                  0,                  0                 ]
 
---------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 def merge4Class(df, class_col, result_col, merged_cols):
    mask = df[class_col].isin(merged_cols)
@@ -34,7 +44,7 @@ def merge(df, result_col, merged_cols):
   df = merge4Class(df, "class2", result_col, merged_cols)
   return df
         
---------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
         
 if normalised:
   name    = 'normalised'

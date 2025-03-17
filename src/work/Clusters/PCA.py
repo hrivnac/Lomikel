@@ -47,7 +47,7 @@ replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
 n_pca = 13
-n_clusters = 45
+n_clusters = 9
 silhouette = False
 cluster_features = "pca_features"
 
