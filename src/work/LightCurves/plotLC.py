@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 cls = "RotV*"
 fid   = "2"
 
-lst = np.loadtxt("../data/" + cls + "_" + fid + ".lst") 
-jd  = np.loadtxt("../data/" + cls + "_" + fid + ".jd")   
-idx = np.loadtxt("../data/" + cls + "_" + fid + ".idx", dtype=str) 
+lst = np.loadtxt("../run/" + cls + "_" + fid + ".lst") 
+jd  = np.loadtxt("../run/" + cls + "_" + fid + ".jd")   
+idx = np.loadtxt("../run/" + cls + "_" + fid + ".idx", dtype=str) 
 
 if lst.shape != jd.shape:
   raise ValueError("Mismatch in dimensions")

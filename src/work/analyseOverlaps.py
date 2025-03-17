@@ -6,6 +6,8 @@ import math
 
 #-------------------------------------------------------------------------------
 
+overlaps_csv = "../data/Clusters/13-45/overlaps.csv"
+
 normalised = True          
     
 merges = {"SOLAR":   ["Solar System candidate",
@@ -55,7 +57,7 @@ else:
   limits  = limits_unorm
   overlap = 'overlap'
 
-df = pd.read_csv('overlaps.csv')
+df = pd.read_csv(overlaps_csv)
 
 df = df[((df['classifier1'] != 'FINK_PORTAL') | (~df['class1'].isin(no_values))) &
         ((df['classifier2'] != 'FINK_PORTAL') | (~df['class2'].isin(no_values)))] 

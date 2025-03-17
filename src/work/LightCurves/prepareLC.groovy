@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 def csvFN    = "LightCurves.csv"
-def curvesDN = "../data"
+def curvesDN = "../run"
 def normalize = false
 
 jdMinSize = 10     // minimal number of LC points

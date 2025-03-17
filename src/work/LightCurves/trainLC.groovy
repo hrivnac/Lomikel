@@ -60,8 +60,8 @@ nEpochs = 40;
 // gr.lst file should contain numLabelClasses sets of training data,
 //        each set with blockSize of cases
 
-c = new DataOrganizer("../data/lc/");
-data = new File("../data/gr.lst").text;
+c = new DataOrganizer("../run/lc/");
+data = new File("../run/gr.lst").text;
 c.prepareData(data, blockSize, trainSize);
 
 // Initialise data
