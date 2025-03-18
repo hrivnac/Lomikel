@@ -503,7 +503,7 @@ public abstract class Client<T, S extends Schema> {
       }
     return report;
     }
-                         
+                      
   /** Set the table name.
     * @param schema The table name to set. */
   public void setTableName(String tableName) {

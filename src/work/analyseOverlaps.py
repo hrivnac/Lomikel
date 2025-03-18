@@ -6,14 +6,16 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_dir = "13-45"
+overlaps_dir = "13-9"
 
 normalised = False          
     
-merges = {"SOLAR":   ["Solar System candidate",
-                      "Solar System MPC"]}
+merges = []
+#merges = {"SOLAR":   ["Solar System candidate",
+#                      "Solar System MPC"]}
 
-no_values = ["FC--1"]
+no_values = []
+#no_values = ["FC--1"]
                                   
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]

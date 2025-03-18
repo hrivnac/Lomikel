@@ -345,6 +345,43 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return overlaps;
     }
     
+  /** Give all overlaps.
+    * @param lbl        The label of {@link Vertex}es to use for overlap search.
+    *                   Optional. 
+    * @param classifier The name of classifier to use for overlap search.
+    *                   Optional. 
+    * @param outputCSV  The filename for CSV file with overlaps.
+    *                   Optional.
+    * @return           The overlaps. */
+  def Map classify(String cls,
+                   String lbl,
+                   String srcClassifier,
+                   String dstClassifier) {
+    def classification = [:];
+    g().E().has('lbl', 'overlaps').
+            order().
+            by('intersection', asc).
+            project('xlbl', 'xclassifier', 'xcls', 'ylbl', 'yclassifier', 'ycls', 'intersection').
+            by(inV().values('lbl')).
+            by(inV().values('classifier')).
+            by(inV().values('cls')).
+            by(outV().values('lbl')).
+            by(outV().values('classifier')).
+            by(outV().values('cls')).
+            by(values('intersection')).
+            each {v -> 
+                  if (v['xlbl'       ].equals(lbl          ) &&
+                      v['ylbl'       ].equals(lbl          ) &&
+                      v['xcls'       ].equals(cls          ) &&
+                      v['xclassifier'].equals(srcClassifier) &&
+                      v['yclassifier'].equals(dstClassifier)) {
+                    classification[v['ycls']] = v['intersection'];
+                    }
+                  };
+    classification = classification.sort{-it.value};
+    return classification;
+    }
+    
   /** Export all <em>AlertsOfInterest</em> and <em?SourcesOfInterest</em>
     * {@link Vertex}es with connecting <em>overlaps</em> {@link Edge}s
     * into <em>GraphML</em> file.
