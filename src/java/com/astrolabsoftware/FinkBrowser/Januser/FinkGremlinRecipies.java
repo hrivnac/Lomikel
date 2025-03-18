@@ -192,6 +192,22 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         log.info("*** " + cls + "[" + ja.length() + "]:");
         }
       }
+    classifySources(classifiers, oids, hbaseUrl, enhance, columns);
+    }
+    
+  /** Classify <em>source</em> and expand them to alerts (if requested).
+    * @param classifiers The {@link Classifiers}s to be used.
+    * @param oids        The {@link Set} of <tt>objectId</tt>s of source to be added.
+    * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
+    * @param enhance     Whether expand tree under all <em>SourcesOfInterest</em> with alerts
+    *                    possibly filled with requested HBase columns.
+    * @param columns     The HBase columns to be copied into graph alerts. May be <tt>null</tt>. 
+    * @throws LomikelException If anything fails. */
+  public void classifySources(Classifiers[] classifiers,
+                              Set<String>   oids,
+                              String        hbaseUrl,
+                              boolean       enhance,
+                              String        columns) throws LomikelException {
     int size = oids.size();
     int n = 0;
     long dt;
@@ -208,10 +224,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           log.error("Cannot get classification for " + oid, e);
           }
         }
-        n++;
-        dt = (System.currentTimeMillis() - startTime) / 1000;
-        freq = (double)n / (double)dt;
-        log.info("\t\twith " + String.format("%.2f", freq) + " Hz");
+      n++;
+      dt = (System.currentTimeMillis() - startTime) / 1000;
+      freq = (double)n / (double)dt;
+      log.info("\t\twith " + String.format("%.2f", freq) + " Hz");
       }
     }
     

@@ -6,22 +6,12 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_csv = "../data/Clusters/13-45/overlaps.csv"
+overlaps_dir = "13-45"
 
-normalised = True          
+normalised = False          
     
 merges = {"SOLAR":   ["Solar System candidate",
-                      "Solar System MPC"],
-          "SN":      ["SN candidate",
-                      "Early SN Ia candidate"],
-          "FC-A":    ["FC-3",
-                      "FC-11"],
-          "FC-B":    ["FC-6",
-                      "FC-8",
-                      "FC-10",
-                      "FC-22",
-                      "FC-26",
-                      "FC-44"]}
+                      "Solar System MPC"]}
 
 no_values = ["FC--1"]
                                   
@@ -57,6 +47,7 @@ else:
   limits  = limits_unorm
   overlap = 'overlap'
 
+overlaps_csv = "../data/Clusters/" + overlaps_dir + "/overlaps.csv"
 df = pd.read_csv(overlaps_csv)
 
 df = df[((df['classifier1'] != 'FINK_PORTAL') | (~df['class1'].isin(no_values))) &
@@ -100,7 +91,7 @@ for i, ax in enumerate(axes.flat):
     
     
 plt.tight_layout()
-plt.savefig('Overlaps-' + name + '.png')
+plt.savefig('Overlaps-' + overlaps_dir + "-" + name + '.png')
 plt.show()
                                           
 #print(tabulate(dfx, headers = 'keys', tablefmt = 'psql'))
