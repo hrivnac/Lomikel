@@ -6,13 +6,23 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_dir = "13-9"
+overlaps_dir = "13-20"
 
-normalised = False          
+normalised = True          
     
-merges = []
-#merges = {"SOLAR":   ["Solar System candidate",
-#                      "Solar System MPC"]}
+# 45    
+merges = {"FC-A":   ["FC-38",
+                     "FC-10"],
+          "FC-B":   ["FC-3",
+                     "FC-11"]}
+merges = {}
+# 20
+merges = {"FC-A":   ["FC-6",
+                     "FC-13",
+                     "FC-15",
+                     "FC-17"],
+          "FC-B":   ["FC-3",
+                     "FC-11"]}
 
 no_values = []
 #no_values = ["FC--1"]

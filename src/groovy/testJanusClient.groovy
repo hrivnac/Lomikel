@@ -8,6 +8,7 @@ gr.sourceNeighborhood("ZTF18actbfgh", "FINK_PORTAL", 10);
 gr.stat();
 gr.classification("ZTF18actbfgh");
 gr.overlaps();
+gr.classify("FC-3", "SourcesOfInterest", "FEATURES", "FINK_PORTAL")
 gr.standardDeviationE('deepcontains', ['weight']);
 gr.exportAoISoI('/tmp/Overlaps.graphml');
 // sum of weights (= number od alerts) per source

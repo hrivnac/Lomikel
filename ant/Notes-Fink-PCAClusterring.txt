@@ -147,6 +147,17 @@ cluster_features = "pca_features"
 |      1|     1|
 +-------+------+
 ------------------------------------
+dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
+skipNaN = False
+replaceNaNbyMean = True
+replaceNaNbyZero = False
+n_sample = 0
+n_pca = 13
+n_clusters = 60
+silhouette = False
+cluster_features = "pca_features"
+=>
+------------------------------------
 
 # @home
 scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.png' ./

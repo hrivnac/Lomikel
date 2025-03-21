@@ -307,6 +307,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
     
   /** Give all overlaps.
+    * Using accumulated data in graph.
     * @param lbl        The label of {@link Vertex}es to use for overlap search.
     *                   Optional. 
     * @param classifier The name of classifier to use for overlap search.
@@ -345,14 +346,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return overlaps;
     }
     
-  /** Give all overlaps.
-    * @param lbl        The label of {@link Vertex}es to use for overlap search.
-    *                   Optional. 
-    * @param classifier The name of classifier to use for overlap search.
-    *                   Optional. 
-    * @param outputCSV  The filename for CSV file with overlaps.
-    *                   Optional.
-    * @return           The overlaps. */
+  /** Give classification from another {@link Classifier}.
+    * Using accumulated data in graph.
+    * @param cls        The class in the source classifier. 
+    * @param lbl        The label of {@link Vertex}es. 
+    * @param srcClassifier The name of classifier of the source (known) class.
+    * @param dstClassifier The name of classifier of the destination (required) class.
+    * @return           The new classification. */
   def Map classify(String cls,
                    String lbl,
                    String srcClassifier,
