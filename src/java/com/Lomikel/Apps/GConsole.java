@@ -16,12 +16,13 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public final class GConsole extends Console implements Runnable {
 
-  /** TBD */
+  /** Create Groovy {@link Console} with {@link Binding}.
+    * @param binding The associated {@link Binding}. */
   public GConsole(Binding binding) {
     super(binding);
     }
 
-  /** TBD */
+  /** Create Groovy {@link Console}. */
   public GConsole() {
     super();
     }

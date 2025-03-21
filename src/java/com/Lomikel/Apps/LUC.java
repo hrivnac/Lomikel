@@ -3,7 +3,6 @@ package com.Lomikel.Apps;
 import com.Lomikel.Utils.Init;
 import com.Lomikel.Utils.Info;
 import com.Lomikel.Apps.CLI;
-import com.Lomikel.Apps.BSCLI;
 import com.Lomikel.Apps.GCLI;
 import com.Lomikel.GUI.Icons;
 
@@ -37,15 +36,7 @@ public class LUC {
   public static String doit(String[] args) {
     Init.init();
     CLI.parseArgs(args, "java -jar Lomikel.exe.jar");
-    if (CLI.api().equals("bsh") ) {
-      log.info("Starting Lomikel Universal Client in BeanShell");
-      _cli = new BSCLI(Icons.lomikel,
-                       "<html><h3>http://cern.ch/hrivnac/Activities/Packages/Lomikel</h3></html>",
-                       "Welcome to Lomikel Universal Client " + Info.release() + "\nhttp://cern.ch/hrivnac/Activities/Packages/Lomikel\n" + CLI.help(),
-                       null,
-                       null);
-      }
-    else if (CLI.api().equals("groovy") ) {
+    if (CLI.api().equals("groovy") ) {
       log.info("Starting Lomikel Universal Client in Groovy");
       _cli = new GCLI(null,
                       null);

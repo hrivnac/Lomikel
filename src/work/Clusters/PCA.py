@@ -47,8 +47,9 @@ replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
 n_pca = 13
+n_clusters_start = 40
 n_clusters = 60
-silhouette = False
+silhouette = True
 cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
@@ -219,7 +220,7 @@ if silhouette:
                                    .setMetricName("silhouette",)\
                                    .setDistanceMeasure("squaredEuclidean")
   silhouette_score = []   
-  for i in range(5, n_clusters):
+  for i in range(n_clusters_start, n_clusters):
     try:
       kmeans = KMeans().setK(i)\
                        .setFeaturesCol(cluster_features) 
@@ -234,7 +235,7 @@ if silhouette:
       silhouette_score.append(0)
   # plot
   plt.figure(figsize=(10, 8))
-  plt.plot(range(5, n_clusters), silhouette_score) 
+  plt.plot(range(n_clusters_start, n_clusters), silhouette_score) 
   plt.xlabel("number of clusters") 
   plt.ylabel("within set sum of squared errors") 
   plt.title("Elbow Method for Optimal K") 

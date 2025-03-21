@@ -66,15 +66,15 @@ public abstract class CLI {
     options.addOption("q", "quiet",    false, "minimal direct feedback");
     options.addOption("g", "gui",      false, "run in a graphical window");
     options.addOption("b", "batch",    false, "run in a batch");
-    options.addOption("w", "web",      false, "run as a web service");
-    options.addOption("n", "notebook", false, "run in an notebook");
+    //options.addOption("w", "web",      false, "run as a web service");
+    //options.addOption("n", "notebook", false, "run in an notebook");
     options.addOption(OptionBuilder.withLongOpt("source")
                                    .withDescription("source script file (init.<language> is also sourced)")
                                    .hasArg()
                                    .withArgName("file")
                                    .create("s"));
     options.addOption(OptionBuilder.withLongOpt("api")
-                                   .withDescription("cli language: [bsh|groovy|python] (othewise taken from source extension, defauld is groovy")
+                                   .withDescription("cli language: [groovy|python] (othewise taken from source extension, defauld is groovy")
                                    .hasArg()
                                    .withArgName("language")
                                    .create("a"));
@@ -106,9 +106,6 @@ public abstract class CLI {
         String[] parts = _source.split("\\.");
         String ext = parts[parts.length - 1];
         switch (ext) {
-          case "bsh":
-            _api = "bsh";
-            break;
           case "groovy":
             _api = "groovy";
             break;
@@ -121,11 +118,8 @@ public abstract class CLI {
           }
         }
       if (cline.hasOption("help")) {
-        StringWriter out    = new StringWriter();
-        PrintWriter  writer = new PrintWriter(out);
-        new HelpFormatter().printHelp(writer, 80, helpMsg, "", options, 0, 0, "", true);
-        writer.flush();
-        _help = out.toString();
+        new HelpFormatter().printHelp(helpMsg, options);
+        return null;
         }
       return cline;
       }
