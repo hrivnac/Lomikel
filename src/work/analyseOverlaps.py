@@ -6,7 +6,7 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_dir = "13-20"
+overlaps_dir = "13-60"
 
 normalised = True          
     
@@ -15,7 +15,6 @@ merges = {"FC-A":   ["FC-38",
                      "FC-10"],
           "FC-B":   ["FC-3",
                      "FC-11"]}
-merges = {}
 # 20
 merges = {"FC-A":   ["FC-6",
                      "FC-13",
@@ -23,6 +22,7 @@ merges = {"FC-A":   ["FC-6",
                      "FC-17"],
           "FC-B":   ["FC-3",
                      "FC-11"]}
+merges = {}
 
 no_values = []
 #no_values = ["FC--1"]
@@ -30,7 +30,7 @@ no_values = []
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
-limits_norm  = [0,                   0,                   0,                   0,                  0,                  0                 ]
+limits_norm  = [3,                   0,                   0,                   3,                  0,                  0                 ]
 limits_unorm = [0,                   0,                   0,                   0,                  0,                  0                 ]
 
 #-------------------------------------------------------------------------------
