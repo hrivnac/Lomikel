@@ -38,9 +38,9 @@ public class GCLI extends CLI {
       _shell = new GroovyShell(_sharedData);
       }
     else if (gui()) {
-      _console = new GConsole(_sharedData);
-      _shell = _console.getShell();
-      new Thread(_console).start();
+      GConsole console = new GConsole(_sharedData);
+      _shell = console.console().getShell();
+      new Thread(console).start();
       }
     else {
       _shell = new GroovyShell(_sharedData);
@@ -77,7 +77,7 @@ public class GCLI extends CLI {
     if (profile() != null) {
       try {
         sr = new StringResource(profile() + ".groovy");
-        if (sr.content() != null) { https://blog.nareshak.com/groovy-scripts-exploring-binding/
+        if (sr.content() != null) { 
           log.info("Loading profile: " + profile());  
           result += _shell.evaluate(sr.content());
           }
@@ -144,8 +144,6 @@ public class GCLI extends CLI {
   public GroovyShell shell() {
     return _shell;
     }  
-    
-  private GConsole _console;  
      
   protected static Binding  _sharedData;
   

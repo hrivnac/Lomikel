@@ -3,34 +3,38 @@ package com.Lomikel.Apps;
 // Groovy
 import groovy.lang.Binding;
 import groovy.console.ui.Console;
+import org.codehaus.groovy.control.CompilerConfiguration;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** Groovy {@link Console} as {@linki Runnable}
+/** Groovy {@link Console} as {@link Runnable}
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public final class GConsole extends Console implements Runnable {
-
+public final class GConsole implements Runnable {
+  
   /** Create Groovy {@link Console} with {@link Binding}.
     * @param binding The associated {@link Binding}. */
   public GConsole(Binding binding) {
-    super(binding);
-    }
-
-  /** Create Groovy {@link Console}. */
-  public GConsole() {
-    super();
+    _console = new Console(binding);
     }
   
   @Override
   public void run() {
-    super.run();
+    _console.run();
     }
+    
+  /** Give connected Groovy {@link Console}.
+    * @return The connected Groovy {@link Console}. */
+  public Console console() {
+    return _console;
+    }
+    
+  private Console _console;
   
   /** Logging . */
   private static Logger log = LogManager.getLogger(Console.class);
