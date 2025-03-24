@@ -2,8 +2,6 @@ package com.Lomikel.Apps;
 
 // Groovy
 import groovy.lang.Binding;
-import groovy.console.ui.Console;
-import org.codehaus.groovy.control.CompilerConfiguration;
 import org.apache.groovy.groovysh.Groovysh;
 import org.codehaus.groovy.tools.shell.IO;
 

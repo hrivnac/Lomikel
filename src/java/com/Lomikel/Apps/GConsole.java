@@ -3,7 +3,6 @@ package com.Lomikel.Apps;
 // Groovy
 import groovy.lang.Binding;
 import groovy.console.ui.Console;
-import org.codehaus.groovy.control.CompilerConfiguration;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
