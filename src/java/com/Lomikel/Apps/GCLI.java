@@ -10,6 +10,8 @@ import org.apache.commons.cli.CommandLine;
 // Groovy
 import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
+import org.apache.groovy.groovysh.Groovysh;
+import org.codehaus.groovy.tools.shell.IO;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -43,7 +45,10 @@ public class GCLI extends CLI {
       new Thread(console).start();
       }
     else {
-      _shell = new GroovyShell(_sharedData);
+      IO io = new IO();
+      GShell shell = new GShell(_sharedData);
+      _sh = shell.shell();
+      new Thread(shell).start();
       }
     return setupShell();
     }
@@ -66,7 +71,7 @@ public class GCLI extends CLI {
       sf = new StringFile("init.groovy");
       if (sf.content() != null) {
         log.info("Sourcing init.groovy");
-        result += _shell.evaluate(sf.content());
+        result += evaluate(sf.content());
         }
       }
     catch (LomikelException e) {
@@ -79,7 +84,7 @@ public class GCLI extends CLI {
         sr = new StringResource(profile() + ".groovy");
         if (sr.content() != null) { 
           log.info("Loading profile: " + profile());  
-          result += _shell.evaluate(sr.content());
+          result += evaluate(sr.content());
           }
         }
       catch (LomikelException e) {
@@ -92,7 +97,7 @@ public class GCLI extends CLI {
       sf = new StringFile(".state.groovy");
       if (sf.content() != null) {
         log.debug("Sourcing .state.groovy");
-        result += _shell.evaluate(sf.content());
+        result += evaluate(sf.content());
         }
       }
     catch (LomikelException e) {
@@ -105,7 +110,7 @@ public class GCLI extends CLI {
         sf = new StringFile(source());
         if (sf.content() != null) {
           log.info("Sourcing " + source());
-          result += _shell.evaluate(sf.content());
+          result += evaluate(sf.content());
           }
         }
       catch (LomikelException e) {
@@ -139,15 +144,51 @@ public class GCLI extends CLI {
     return parseArgs(args, helpMsg, null);
     }
    
+  /** Evaluate command in appropriate groovy shell
+    * ({@link GroovyShell} or {@link Groovysh}).
+    * @param cmd The commands to be evaluated.
+    * @return    The result of the last command. */
+  private String evaluate(String cmd) {
+    if (shell() != null) {
+      String result = "";
+      Object resultO = shell().evaluate(cmd);
+      if (resultO != null) {
+        return resultO.toString();
+        }
+      }
+    else if (sh() != null) {
+      String result = "";
+      Object resultO;
+      for (String line : cmd.split("\\n")) {
+        resultO = sh().execute(line);
+        if (resultO != null) {
+          result = resultO.toString();
+          }
+        }
+      }
+    else {
+      log.error("No available shell, cannot evaluate " + cmd);
+      }
+    return "";
+    }
+    
   /** Give {@link GroovyShell}.
     * @return The {@link GroovyShell}. */
   public GroovyShell shell() {
     return _shell;
     }  
+   
+  /** Give {@link Groovysh}.
+    * @return The {@link Groovysh}. */
+  public Groovysh sh() {
+    return _sh;
+    }  
      
   protected static Binding  _sharedData;
   
   protected static GroovyShell _shell;
+  
+  protected static Groovysh _sh;
  
   /** Logging . */
   private static Logger log = LogManager.getLogger(GCLI.class);

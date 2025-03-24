@@ -318,6 +318,7 @@
 			<zipfileset includes="**/*" src="${groovy_ant_jar}"/>
 			<zipfileset includes="**/*" src="${groovy_sql_jar}"/>
       <zipfileset includes="**/*" src="${groovysh_jar}"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-2.14.6.jar"/>     
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-4.0.9.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-4.0.9.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-4.0.9.jar"/>
@@ -430,7 +431,6 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcabi-manifests-2.1.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jcl-over-slf4j-1.7.36.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jctools-core-4.0.1.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-3.9.0.jar"/>     
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/metrics-core-4.2.21.jar"/>     
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-all-4.1.100.Final.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/netty-buffer-4.1.100.Final.jar"/>
