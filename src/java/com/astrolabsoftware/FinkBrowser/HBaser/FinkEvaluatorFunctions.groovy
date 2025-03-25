@@ -1,0 +1,12 @@
+import com.astrolabsoftware.FinkBrowser.HBaser.FinkEvaluatorFunctions;
+
+/** <code>EvaluatorFuctions</code> provide static functions available to
+  * {@link Evaluator}. They interpreted within Evaluator process so that
+  * have access to all its variables and functions.
+  * In most cases, it just provides interface to {@link EvaluatorFunctions}
+  * class.
+  * @opt attributes
+  * @opt operations
+  * @opt types
+  * @opt visibility
+  * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
