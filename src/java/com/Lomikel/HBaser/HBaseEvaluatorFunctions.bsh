@@ -5,6 +5,7 @@ import com.Lomikel.HBaser.HBaseEvaluatorFunctions;
   * have access to all its variables and functions.
   * In most cases, it just provides interface to {@link HBaseEvaluatorFunctions}
   * class.
+  * @deprecated
   * @opt attributes
   * @opt operations
   * @opt types

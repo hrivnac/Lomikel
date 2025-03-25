@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 /** <code>Evaluator</code> evaluates formulas.
+  * @deprecated
   * @opt attributes
   * @opt operations
   * @opt types
@@ -65,11 +66,6 @@ public class Evaluator {
     String r = eval(values, formula, "boolean");
     return Boolean.parseBoolean(r);
     }    
-   public static double qdistance0(double v1, double v2, double v3, double v4) {
-    double distance = Math.pow(v1-v2, 2) + Math.pow(v3-v4, 2);
-    return Math.sqrt(distance);
-    }
-
 
   /** Evaluate double formula with supplied variables and values.
     * @param values  The names and values of variables.

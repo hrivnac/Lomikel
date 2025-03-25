@@ -5,6 +5,7 @@ import com.Lomikel.Januser.GremlinEvaluatorFunctions;
   * have access to all its variables and functions.
   * In most cases, it just provides interface to {@link GremlinEvaluatorFunctions}
   * class.
+  * @deprecated
   * @opt attributes
   * @opt operations
   * @opt types

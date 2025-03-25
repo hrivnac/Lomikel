@@ -76,7 +76,7 @@ results = client.scan(null,
                       null,
                       0,
                       false,
-                      false);import com.Lomikel.HBaser.AsynchHBaseClient;
+                      false);
 
 print(client.results2String(results)); 
 

@@ -5,6 +5,7 @@ import com.astrolabsoftware.FinkBrowser.HBaser.FinkEvaluatorFunctions;
   * have access to all its variables and functions.
   * In most cases, it just provides interface to {@link EvaluatorFunctions}
   * class.
+  * @deprecated
   * @opt attributes
   * @opt operations
   * @opt types

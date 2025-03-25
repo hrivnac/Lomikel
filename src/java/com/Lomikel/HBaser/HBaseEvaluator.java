@@ -1,7 +1,7 @@
 package com.Lomikel.HBaser;
 
 import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.DB.Evaluator;
+import com.Lomikel.DB.GroovyEvaluator;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class HBaseEvaluator extends Evaluator {
+public class HBaseEvaluator extends GroovyEvaluator {
   
   /** Create.
     * @param schema The {@link HBaseSchema} to use to interpret types.
@@ -21,8 +21,8 @@ public class HBaseEvaluator extends Evaluator {
   public HBaseEvaluator(HBaseSchema schema) throws LomikelException {
     super(schema);
     log.info("\tas HBaseEvaluator");
-    setEvaluatorFunctions("com.Lomikel.HBaser.HBaseEvaluatorFunctions", "com/Lomikel/HBaser/HBaseEvaluatorFunctions.bsh");
-    setEvaluatorFunctions(null, "com/Lomikel/WebService/HBaseColumnsProcessor.bsh");  
+    setEvaluatorFunctions("com.Lomikel.HBaser.HBaseEvaluatorFunctions", "com/Lomikel/HBaser/HBaseEvaluatorFunctions.groovy");
+    setEvaluatorFunctions(null, "com/Lomikel/WebService/HBaseColumnsProcessor.groovy");  
     }
     
   @Override

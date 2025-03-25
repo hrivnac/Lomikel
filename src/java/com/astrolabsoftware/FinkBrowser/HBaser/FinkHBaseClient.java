@@ -89,8 +89,8 @@ public class FinkHBaseClient extends HBaseSQLClient {
   /** Setup the default sets of evaluation functions. */
   private void setFinkEvaluatorFunctions() {
     try {
-      evaluator().setEvaluatorFunctions("com.astrolabsoftware.FinkBrowser.HBaser.FinkEvaluatorFunctions", "com/astrolabsoftware/FinkBrowser/HBaser/FinkEvaluatorFunctions.bsh");
-      evaluator().setEvaluatorFunctions(null, "com/astrolabsoftware/FinkBrowser/WebService/FinkHBaseColumnsProcessor.bsh");
+      evaluator().setEvaluatorFunctions("com.astrolabsoftware.FinkBrowser.HBaser.FinkEvaluatorFunctions", "com/astrolabsoftware/FinkBrowser/HBaser/FinkEvaluatorFunctions.groovy");
+      evaluator().setEvaluatorFunctions(null, "com/astrolabsoftware/FinkBrowser/WebService/FinkHBaseColumnsProcessor.groovy");
       }
     catch (LomikelException e) {
       log.error("Cannot set EvaluatorFunctions", e);
