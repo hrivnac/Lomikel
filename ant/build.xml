@@ -1150,7 +1150,6 @@
       <group title="LehmanUtils"        packages="de.lehmannet.om.util*"/>
       <link href="http://docs.oracle.com/javase/11/docs/api"/>
       <link href="http://docs.groovy-lang.org/latest/html/api"/>
-      <link href="http://www.beanshell.org/javadoc/"/>
       <link href="https://logging.apache.org/log4j/1.2/apidocs"/>
       <link href="https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs"/>
       <link href="http://stleary.github.io/JSON-java"/>
