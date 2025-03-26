@@ -1,7 +1,7 @@
 package com.Lomikel.Januser;
 
 import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.DB.Evaluator;
+import com.Lomikel.DB.GroovyEvaluator;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class GremlinEvaluator extends Evaluator {
+public class GremlinEvaluator extends GroovyEvaluator {
   
   /** Create.
     * @param schema The {@link GremlinSchema} to use to interpret types.

@@ -69,7 +69,6 @@
     <fileset dir="../extlib">
       <include name="*.jar"/>
       </fileset>
-    <pathelement path="${bsh_jar}"/>
     </path>
 
   <path id="umlDoclet.classpath">
@@ -148,8 +147,8 @@
     <mkdir dir="../dist"/>
     <mkdir dir="../doc/JavaDoc"/>
     <copy todir="../extlib/import">
-			<fileset file="${bsh_jar}"/>
-			<fileset file="${cli_jar}"/>
+
+    <fileset file="${cli_jar}"/>
 			<fileset file="${javaxmail_jar}"/>
 			<fileset file="${healpix_jar}"/>
 			<fileset file="${orgjson_jar}"/>
@@ -268,21 +267,18 @@
       <fileset dir="../src/java"   includes="log4j2.xml"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.properties"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.xml"/>
-      <fileset dir="../src/java"   includes="com/Lomikel/**/*.bsh"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.txt"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.png"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.gif"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.css"/>
       <fileset dir="../src/java"   includes="com/Lomikel/**/*.groovy"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.properties"/>
-      <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.bsh"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.txt"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.png"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.gif"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.css"/>
       <fileset dir="../src/java"   includes="com/astrolabsoftware/FinkBrowser/**/*.groovy"/>
       <fileset dir="../build"      includes="**/*.class"/>
-      <fileset dir="../src/bsh"    includes="*.bsh"/>
       <fileset dir="../src/groovy" includes="*.groovy"/>
       <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
         <provider classname="com.Lomikel.GremlinPlugin.LomikelConnector"/>
@@ -303,7 +299,6 @@
           description="Create exe JARs">
     <jar jarfile="../lib/Lomikel-${version}-ext.jar" index="no">
       <zipfileset includes="**/*" src="${cli_jar}"/>
-      <zipfileset includes="**/*" src="${bsh_jar}"/>
       <zipfileset includes="**/*" src="${joinery_jar}"/>
       <zipfileset includes="**/*" src="${javaxmail_jar}"/>
       <zipfileset includes="**/*" src="${healpix_jar}"/>
@@ -1096,10 +1091,6 @@
 			<fileset dir="../src/gremlin" includes="*.gremlin"/>
 			<fileset dir="../src/gremlin" includes="examples.gremlin"/>
 			<fileset dir="../src/gremlin" includes="examplesLomikel.gremlin"/>
-      </copy>
-    <mkdir dir="../doc/BeanShell"/>
- 		<copy todir="../doc/BeanShell">
-			<fileset dir="../src/bsh" includes="*.bsh"/>
       </copy>
     <mkdir dir="../doc/Python"/>
  		<copy todir="../doc/Python">

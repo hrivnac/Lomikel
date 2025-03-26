@@ -30,20 +30,6 @@ graph1.tx().commit()
 gr1 = new GremlinRecipies(g1)
 // drop all '
 Lomikel.drop(graph, 'distance', 100)
-// scan all PCAs
-// compute difference bewtween 'pca00' (that can be any formula using Vertex properties, giving double)
-// if the result <= 0.5 then add an Edge with name 'distance' and a property 'difference' with the result value,
-// do it only for 5 distances with the minimal value
-// (commit after each Integer.MAX_VALUE new Edges, so do not commit)
-// note: g1 does not have schema and indexes - so used variables should be specified 
-gr1.structurise(g1.V().has('lbl', 'PCA'), 'pca00[0]-pca00[1]', 'pca00', 0.5, 5, 'distance', 'difference', Integer.MAX_VALUE)
-// get some statistics about new Edges
-g1.E().has('lbl', 'distance').values('difference').union(min(), max(), sum(), mean(), count())
-// get the closest sources 
-g1.E().has('lbl', 'distance').order().by('difference').limit(1).bothV().in().has('lbl', 'source').values('objectId')
-// get all clusters containing at least 10 PCAs which are closer then 1.5
-FinkBrowser.findPCAClusters(g1, 'distance', 'difference', 10, 1.5);[]
-
 // write your new Graph into a file
 graph1.io(IoCore.gryo()).writeGraph('myfile.kryo')
 // to read it later (maybe into another graph)
