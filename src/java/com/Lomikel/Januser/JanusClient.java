@@ -34,7 +34,7 @@ public class JanusClient implements ModifyingGremlinClient {
     * @param args[3] The HBase table.
     * @throws Exception If fails. */ 
   public static void main(String[] args) throws Exception {
-    Init.init();
+    Init.init("JanusClient");
     if (args[0].trim().equals("extract")) {
       JanusClient jc = new JanusClient(args[1],
                                        Integer.valueOf(args[2]),
@@ -70,14 +70,14 @@ public class JanusClient implements ModifyingGremlinClient {
     _port     = port;
     _table    = table;
     _batch    = batch;
-    Init.init();
+    Init.init("JanusClient");
     open();
     }
     
   /** Create with connection properties file.
     * @param properties The file with the complete properties. */
   public JanusClient(String properties) {
-    Init.init();
+    Init.init("JanusClient");
     open(properties);
     }
     

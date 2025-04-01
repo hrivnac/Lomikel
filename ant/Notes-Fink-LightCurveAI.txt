@@ -10,17 +10,36 @@ lomikel_hbase -s ../src/work/LightCurves/extractLC.groovy
 rm -rf LightCurves;hadoop fs -get /tmp/LightCurves
 
 # @home
-rm -rf LightCurves; scp -r julius.hrivnac@vm-75222.lal.in2p3.fr:/home/julius.hrivnac/Lomikel/ant/LightCurves ./
-rm -f LighCurves.csv; awk '(NR == 1) || (FNR > 1)' LightCurves/*csv > LightCurves.csv
-rm -rf ../data/*; lomikel_janus -s ../src/work/LightCurves/prepareLC.groovy -b
-cat ../data/*.lst > ../data/gr.lst
+rm -rf ../data/LightCurves; scp -r julius.hrivnac@vm-75222.lal.in2p3.fr:/home/julius.hrivnac/Lomikel/ant/LightCurves ../data
+rm -f ../data/LighCurves.csv; awk '(NR == 1) || (FNR > 1)' ../data/LightCurves/*csv > ../data/LightCurves.csv
+rm -rf ../run/*; lomikel_janus -s ../src/work/LightCurves/prepareLC.groovy -b
 
 # visualisation ################################################################
 
 # @home
 python ../src/work/LightCurves/plotLC.py
 
+for X in `ls ../run/*_2.idx`;do
+  echo $X | sed 's\../run/\\g' | sed 's/_2.idx//g' | read Y 
+  python ../src/work/LightCurves/plotLC.py $Y
+  done
+
 # classification ###############################################################
 
 # @home
+/bin/rm -f ../run/gr.lst
+touch ../run/gr.lst
+for F in '(CTA) Blazar' \
+         'Ambiguous' \
+         'Early SN Ia candidate' \
+         'Kilonova candidate' \
+         'Microlensing candidate' \
+         'SN candidate' \
+         'Solar System candidate' \
+         'Solar System MPC' \
+         'Tracklet'; do
+#for F in 'C*'  'QSO'; do
+  cat ../run/${F}_2.lst >> ../run/gr.lst
+  done
+#cat ../run/*_2.lst >> ../run/gr.lst
 lomikel_dl4j -s ../src/work/LightCurves/trainLC.groovy -b

@@ -12,20 +12,42 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class Init {
 
-  /** Setup system. */
+  /** Setup system. Singleton.
+    * @param appName The concrete application name. */
+  public static void init(String appName) {
+    init(appName, false, false);
+    }
+
+  /** Setup system. Singleton. */
   public static void init() {
-    init(false, false);
+    init("", false, false);
     }
 
-  /** Setup system for Web Service. */
+  /** Setup system for Web Service. Singleton.
+    * @param appName The concrete application name. */
+  public static void initWS(String appName) {
+    init(appName, true, false);
+    }
+
+  /** Setup system for Web Service. Singleton. */
   public static void initWS() {
-    init(true, false);
+    init("", true, false);
     }
-
+    
   /** Setup system. Singleton.
     * @param ws    If initialise to run in a Web Service.
     * @param quiet If no outupt is required. */
   public static void init(boolean ws,
+                          boolean quiet) {
+    init("", ws, quiet);
+    }
+
+  /** Setup system. Singleton.
+    * @param appName The application name.
+    * @param ws      If initialise to run in a Web Service.
+    * @param quiet   If no outupt is required. */
+  public static void init(String  appName,
+                          boolean ws,
                           boolean quiet) {
     if (_initialised) {
       log.debug("Lomikel already initialised");
@@ -33,10 +55,10 @@ public class Init {
       }
     try {
       if (ws) {
-        NotifierURL.notify("", "LomikelWS", Info.release());
+        NotifierURL.notify(appName, "LomikelWS", Info.release());
         }
       else {
-        NotifierURL.notify("", "Lomikel", Info.release());
+        NotifierURL.notify(appName, "Lomikel", Info.release());
         }
       }
     catch (Exception e) {

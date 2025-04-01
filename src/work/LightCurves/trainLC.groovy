@@ -19,12 +19,16 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.api.InvocationType;
 import org.deeplearning4j.optimize.listeners.EvaluativeListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.eval.ROC;
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
 import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
+import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.learning.config.Nadam;
+import org.nd4j.linalg.learning.config.RmsProp;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.nd4j.common.primitives.Pair;
 
@@ -49,12 +53,12 @@ import java.util.Random;
 
 log = LogManager.getLogger(this.class);
 
-miniBatchSize = 10;
-numLabelClasses = 2;
-blockSize = 100;
+miniBatchSize = 10; // 10, 32, 64
+numLabelClasses = 5;
+blockSize = 1000;
 trainSize = (int)(numLabelClasses * blockSize * 0.75);
 testSize =  (int)(numLabelClasses * blockSize - trainSize);
-nEpochs = 40;
+nEpochs = 40; // 40, 100
 
 // Get data
 // gr.lst file should contain numLabelClasses sets of training data,
@@ -70,19 +74,13 @@ trainFeatures = new CSVSequenceRecordReader();
 trainFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTrain.getAbsolutePath() + "/%d.csv", 0, trainSize - 1));
 trainLabels = new CSVSequenceRecordReader();
 trainLabels.initialize(new NumberedFileInputSplit(c.labelsDirTrain.getAbsolutePath() + "/%d.csv", 0, trainSize - 1));
-
 trainData = new SequenceRecordReaderDataSetIterator(trainFeatures,
                                                     trainLabels,
                                                     miniBatchSize,
                                                     numLabelClasses,
                                                     false,
-                                                    SequenceRecordReaderDataSetIterator.AlignmentMode.ALIGN_END);
-
-normalizer = new NormalizerStandardize();
-normalizer.fit(trainData);
-trainData.reset();
-trainData.setPreProcessor(normalizer);
-
+                                                    SequenceRecordReaderDataSetIterator.AlignmentMode.ALIGN_START); // ALIGN_END, LIGN_START, EQUAL_LENGTH
+                                                
 testFeatures = new CSVSequenceRecordReader();
 testFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTest.getAbsolutePath() + "/%d.csv", 0, testSize - 1));
 testLabels = new CSVSequenceRecordReader();
@@ -95,6 +93,10 @@ testData = new SequenceRecordReaderDataSetIterator(testFeatures,
                                                    false,
                                                    SequenceRecordReaderDataSetIterator.AlignmentMode.ALIGN_END);
 
+normalizer = new NormalizerStandardize();
+//normalizer = new NormalizerMinMaxScaler(0, 1);
+normalizer.fit(trainData);
+trainData.setPreProcessor(normalizer);
 testData.setPreProcessor(normalizer);
 
 // Prepare NN configuration
@@ -102,16 +104,21 @@ testData.setPreProcessor(normalizer);
 conf = new NeuralNetConfiguration.Builder()
                                  .seed(123)
                                  .weightInit(WeightInit.XAVIER)
-                                 .updater(new Nadam())
+                                 .updater(new Nadam(0.002)) // Nadam(), Nadam(0.002), Adam(0.001) or RMSProp:
                                  .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-                                 .gradientNormalizationThreshold(0.5)
+                                 .gradientNormalizationThreshold(0.5) // 0.5, 5.0
                                  .list()
                                  .layer(new LSTM.Builder()
-                                                .activation(Activation.TANH)
+                                                .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
                                                 .nIn(1)
+                                                .nOut(20)
+                                                .build())
+                                 .layer(new LSTM.Builder()
+                                                .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
+                                                .nIn(20)
                                                 .nOut(10)
                                                 .build())
-                                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
+                                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT) // MCXENT, KL_DIVERGENCE, MSE
                                                           .activation(Activation.SOFTMAX)
                                                           .nIn(10)
                                                           .nOut(numLabelClasses)
@@ -121,7 +128,7 @@ conf = new NeuralNetConfiguration.Builder()
 net = new MultiLayerNetwork(conf);
 net.init();
 
-// Train
+// Trainorg.deeplearning4j.nn.multilayer.MultiLayerNetwork
 
 log.info("Starting training...");
 net.setListeners(new ScoreIterationListener(20), new EvaluativeListener(testData, 1, InvocationType.EPOCH_END));
@@ -132,6 +139,9 @@ net.fit(trainData, nEpochs);
 log.info("Evaluating...");
 eval = net.evaluate(testData);
 log.info(eval.stats());
+
+// Save
+net.save(new File("../run/network.model"));
 
 log.info("Complete");
 

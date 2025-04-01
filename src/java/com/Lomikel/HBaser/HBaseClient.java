@@ -88,7 +88,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * @throws LomikelException If anything goes wrong. */
   public HBaseClient(String zookeepers,
                      String clientPort) throws LomikelException {
-    Init.init();
+    Init.init("HBaseClient");
     setup(zookeepers, clientPort);
     log.debug("Opening " + zookeepers + " on port " + clientPort);
     _conf = HBaseConfiguration.create();

@@ -51,7 +51,7 @@ public class HDFSAvroImporter extends AvroImporter {
     * @param args[7] The data type, <tt>alert|pca</tt>. If <tt>null<tt>, then considering as <tt>alert</tt>.
     * @throws LomikelException If anything goes wrong. */
    public static void main(String[] args) throws IOException {
-    Init.init();
+    Init.init("HDFSAvroImporter");
     if (args.length != 8) {
       log.error("HDFSAvroImporter.exe.jar <JanusGraph properties> [<file>|<directory>] <hbaseUrl> <report limit> <commit limit> [create|reuse|drop] [alert|pca]");
       System.exit(-1);

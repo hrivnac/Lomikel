@@ -69,7 +69,7 @@ public class ParquetImporter extends JanusClient {
     * @param args[4] The creation strategy. <tt>drop,replace,getOrCreate</tt>.
     * @throws LomikelException If anything goes wrong. */
    public static void main(String[] args) throws IOException {
-    Init.init();
+    Init.init("ParquetImporter");
     if (args.length != 5) {
       log.error("ParquetImporter.exe.jar <JanusGraph properties> [<file>|<directory>] <report limit> <commit limit> [create|reuse|drop]");
       System.exit(-1);

@@ -27,7 +27,7 @@ public abstract class GremlinClient {
     * @param table    The Gremlin port. */
   public GremlinClient(String  hostname,
                        int     port) {
-    Init.init();
+    Init.init("GremlinClient");
     log.info("Opening " + hostname + ":" + port);
     open(hostname, port);
     connect();

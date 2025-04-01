@@ -37,7 +37,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
   /** Create and do not connect to Phoenix.
     * @throws LomikelException If anything goes wrong. */
   public PhoenixClient() throws LomikelException {
-    Init.init();
+    Init.init("PhoenixClient");
     log.info("Empty opening");
     }
     
@@ -45,7 +45,7 @@ public class PhoenixClient extends Client<String, PhoenixSchema> {
     * @param phoenixUrl The {@link Phoenix} url.
     * @throws LomikelException If anything goes wrong. */
   public PhoenixClient(String phoenixUrl) throws LomikelException {
-    Init.init();
+    Init.init("PhoenixClient");
     _phoenixUrl = phoenixUrl;
     if (phoenixUrl != null) {
       log.info("Opening " + phoenixUrl);

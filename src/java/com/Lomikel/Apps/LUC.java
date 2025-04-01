@@ -32,7 +32,7 @@ public class LUC {
   /** Start and pass arguments on.
     * @param args The arguments. */
   public static String doit(String[] args) {
-    Init.init();
+    Init.init("LUC");
     CLI.parseArgs(args, "java -jar Lomikel.exe.jar");
     if (CLI.api().equals("groovy") ) {
       log.info("Starting Lomikel Universal Client in Groovy");

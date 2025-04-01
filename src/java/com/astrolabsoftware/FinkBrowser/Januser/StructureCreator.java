@@ -71,7 +71,7 @@ public class StructureCreator extends JanusClient {
     * @param args[20] List of (coma separated) geopoint property name and HBase columns representing lat and long in deg.
     * @throws LomikelException If anything goes wrong. */
   public static void main(String[] args) throws Exception {
-    Init.init();
+    Init.init("StructureCreator");
     if (args[0].trim().equals("populate")) {
       String failedKey = args[9];
       do {
