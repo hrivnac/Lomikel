@@ -53,12 +53,12 @@ import java.util.Random;
 
 log = LogManager.getLogger(this.class);
 
-miniBatchSize = 10; // 10, 32, 64
+miniBatchSize = 64; // 10, 32, 64
 numLabelClasses = 5;
 blockSize = 1000;
 trainSize = (int)(numLabelClasses * blockSize * 0.75);
 testSize =  (int)(numLabelClasses * blockSize - trainSize);
-nEpochs = 40; // 40, 100
+nEpochs = 100; // 40, 100
 
 // Get data
 // gr.lst file should contain numLabelClasses sets of training data,

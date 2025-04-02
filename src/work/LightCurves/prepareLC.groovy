@@ -13,29 +13,30 @@ import java.nio.file.Paths
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-def csvFN    = "../data/LightCurves.csv"
-def curvesDN = "../run"
-def normalize = false
+csvFN      = "../data/LightCurves.csv"
+curvesDN   = "../run"
 
 jdMinSize  = 60     // minimal number of LC points
 jdSize     = 60     // number of LC points after renormalisation
-sampleSize = 1000   // number of samples (smaler cases will be skipped, larger cases will be shortened)
-normalize  = false  // normalize data or fill missing with 0s
+sampleSize = 1000   // number of LC samples (smaler cases will be skipped, larger cases will be shortened)
+normalize  = true   // normalize data or fill missing with 0s
+reduce     = false  // merge some classes
 
 def reduceCls(String cls) {
-  //cls = cls.replaceAll('Candidate_', '').replaceAll('_Candidate', '')
-  //cls = cls.replaceAll('candidate ', '').replaceAll(' candidate', '')
-  //cls = cls.replaceAll(' ', '')
-  //switch(cls) {            
-  //  case 'EB*_Candidate' -> 'EB*'
-  //  case 'Candidate_EB*' -> 'EB*'
-  //  default              -> cls
-  //  }
+  if (reduce) {
+    cls = cls.replaceAll('Candidate_', '').replaceAll('_Candidate', '')
+    cls = cls.replaceAll('candidate ', '').replaceAll(' candidate', '')
+    cls = cls.replaceAll(' ', '')
+    switch(cls) {            
+      case 'EB*_Candidate' -> 'EB*'
+      case 'Candidate_EB*' -> 'EB*'
+      default              -> cls
+      }
+    }
   return cls
   }
 
-
-log = LogManager.getLogger(this.class);
+def log = LogManager.getLogger(this.class);
 
 log.info("Creating Light Curves from " + csvFN + " in " + curvesDN)
 
@@ -103,7 +104,7 @@ def fileRowCount
                                                               fileRowCount[lstFile.path] += 1
                                                               fileRowCount[jdFile.path ] += 1
                                                               }
-                                                            }debug
+                                                            }
                     }
                     
                     
@@ -115,7 +116,9 @@ def fileRowCount
                                              }
                                            else if (rowCount > sampleSize) {
                                              log.info("Truncating ${filePath} to ${sampleSize} lines (from ${rowCount} lines)")
-                                             def lines = fl.readLines().take(sampleSize)
+                                             def lines = fl.readLines()
+                                             lines.shuffle()
+                                             lines = lines.take(sampleSize)
                                              fl.text = lines.join("\n") + "\n"
                                              nFiles++;
                                              }
