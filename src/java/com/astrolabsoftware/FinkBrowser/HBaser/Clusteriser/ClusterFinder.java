@@ -101,6 +101,7 @@ public class ClusterFinder {
     for (int i = 0; i < _clusterCenters.getRowDimension(); i++) {
       clusterCenter = _clusterCenters.getRowVector(i);
       distance = transformedVector.getDistance(clusterCenter);
+      log.info("" + i + " " + distance);
       if (distance < minDistance2) {
         if (distance < minDistance) {
           minDistance2  = minDistance;
