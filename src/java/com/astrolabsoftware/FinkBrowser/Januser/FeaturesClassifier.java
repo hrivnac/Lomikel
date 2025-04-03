@@ -37,6 +37,7 @@ public class FeaturesClassifier implements Classifier {
                        String              hbaseUrl,
                        boolean             enhance,
                        String              columns) throws LomikelException {
+    log.info(oid);
     double jd;
     String cl;
     Map<String, String> value;
