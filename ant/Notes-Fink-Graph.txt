@@ -14,7 +14,7 @@ import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties");
 gr = new FinkGremlinRecipiesG(jc);
-gr.processSourcesOfInterest('FINK_PORTAL', 'hbase-1.lal.in2p3.fr:2183:ztf:', 100, 1000, null, false, null)
+gr.processSourcesOfInterest('FINK_PORTAL', 'vdhbase1.lal.in2p3.fr:2183:ztf:', 100, 1000, null, false, null)
 
 # Using
 # src/groovy/testJanusClient.groovy
