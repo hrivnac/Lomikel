@@ -8,7 +8,7 @@ gr.sourceNeighborhood("ZTF18actbfgh", "FINK_PORTAL", 10);
 gr.stat();
 gr.classification("ZTF18actbfgh");
 gr.overlaps();
-gr.classifySource(Classifiers.FEATURES, 'ZTF25aaksfzy', 'hbase-1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
+gr.classifySource(Classifiers.FEATURES, 'ZTF25aaksfzy', 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
 gr.classify("FC-3", "SourcesOfInterest", "FEATURES", "FINK_PORTAL")
 gr.standardDeviationE('deepcontains', ['weight']);
 gr.exportAoISoI('/tmp/Overlaps.graphml');

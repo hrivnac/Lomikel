@@ -2,7 +2,7 @@ import com.Lomikel.HBaser.HBaseClient;
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 
 // Open HBase database (ip, port)
-client = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client = new HBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 // Connect to table with defined schema
 client.connect("ztf", "schema_2.2_2.0.0");
 // Set maximum number of results
@@ -86,7 +86,7 @@ client.close();
 
 // Get all schemas
 
-client1 = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client1 = new HBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 client1.connect("ztf", null);
 results = client1.scan(null,
                        "key:key:schema:prefix",
@@ -103,7 +103,7 @@ client1.close();
 
 // create HBase client put method
 
-client2 = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client2 = new HBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 
 client2.create("test1", new String[]{"i", "b", "d", "a"});
 
@@ -127,7 +127,7 @@ client2.close()
 
 // 3D searching
 
-client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client = new FinkHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 client.connect("ztf_cube", "string");
 client.search3D("ZTF17aaaehuf", "i:jd", "i:ra,i:dec", true, true, true);
 client.search3D("ZTF17aaaehuf",         "i:ra,i:dec", true, true, true);
@@ -135,9 +135,9 @@ client.search3D("ZTF17aaaehuf",         "i:ra,i:dec", true, true, true);
 // -----------------------------------------------------------------------------
 
 // Curves
-source = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+source = new FinkHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 source.connect("ztf");
-client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client = new FinkHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 //client.create("Curves", new String[]{"c:0"});
 client.connect("Curves", null);
 client.assembleCurves(source,
@@ -150,9 +150,9 @@ client.search3D("ZTF18abrymkr", "c:jd", "c:ra,c:dec", true, true, true).add("f",
 
                    
 // LightCurves
-source = new HBaseClient("hbase-1.lal.in2p3.fr", 2183);
+source = new HBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 source.connect("ztf");
-client = new FinkHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client = new FinkHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 //client.create("LightCurves", new String[]{"c:0"});
 client.connect("LightCurves", null);
 client.assembleLightCurves(source, "ZTF18acetjlq");

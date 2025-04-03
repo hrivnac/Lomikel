@@ -4,7 +4,7 @@ HADOOP_CLASSPATH=/opt/janusgraph/lib/RoaringBitmap-0.5.11.jar:/opt/janusgraph/li
   /opt/janusgraph/conf/gremlin-server/Local-batch.properties \
   ${1} \
   "" \
-  hbase-1.lal.in2p3.fr:2183:ztf:schema_2.2_2.0.0 \
+  vdhbase1.lal.in2p3.fr:2183:ztf:schema_2.2_2.0.0 \
   1000 \
   2000 \
   create \

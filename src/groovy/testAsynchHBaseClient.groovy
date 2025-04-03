@@ -1,6 +1,6 @@
 import com.Lomikel.HBaser.AsynchHBaseClient;
 
-client = new AsynchHBaseClient("hbase-1.lal.in2p3.fr", 2183);
+client = new AsynchHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 client.connect("ztf", "schema_3.1_5.6.2");
 
 client.setLimit(10000);

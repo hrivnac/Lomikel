@@ -6,7 +6,7 @@ import org.json.JSONObject;
 serverName     = 'LAL';
 urlLivy        = 'http://134.158.75.222:21111';
 urlSpark       = 'http://134.158.75.222:8020';
-//urlHBase       = 'http://hbase-1.lal.in2p3.fr:2183';
+//urlHBase       = 'http://vdhbase1.lal.in2p3.fr:2183';
 urlHBase       = null;
 fileName       = '/user/julius.hrivnac/test.py';
 className      = null;

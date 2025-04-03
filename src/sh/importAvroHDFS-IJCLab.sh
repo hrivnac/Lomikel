@@ -4,7 +4,7 @@ HADOOP_CLASSPATH=/opt/janusgraph/lib/HdrHistogram-2.1.12.jar:/opt/janusgraph/lib
   /opt/janusgraph/conf/gremlin-server/Local-batch.properties \
   ${1} \
   "" \
-  hbase-1.lal.in2p3.fr:2183:ztf:schema_2.2_2.0.0 \
+  vdhbase1.lal.in2p3.fr:2183:ztf:schema_2.2_2.0.0 \
   50 \
   100 \
   create \
