@@ -61,6 +61,7 @@ public class FeaturesClassifier implements Classifier {
     // get all alerts (jd) and their classses
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       value = entry.getValue();
+      log.info(entry);
       jd = Double.parseDouble(value.get("i:jd"));
       if (value.containsKey("d:lc_features_g") &&
           value.containsKey("d:lc_features_r")) {
