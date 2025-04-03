@@ -59,6 +59,7 @@ public class FeaturesClassifier implements Classifier {
                                                                     false);
     classes = new TreeMap<>();
     // get all alerts (jd) and their classses
+    boolean isClassified = false;
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       value = entry.getValue();
       log.info(entry);
@@ -85,6 +86,10 @@ public class FeaturesClassifier implements Classifier {
             classes.put(cl, jds);
             }
           }
+        isClassified = true;
+        }
+      else {
+        //log.warn("Alert " + entry.getKey() + " has no features");
         }
       }
     for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
@@ -92,6 +97,9 @@ public class FeaturesClassifier implements Classifier {
       val = cls.getValue();
       weight = val.size();
       recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
+      }
+    if (!isClassified) {
+      log.warn("Source " + oid + " cannot be classified because his alerts have no features");
       }
     }
   
