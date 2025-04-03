@@ -98,7 +98,7 @@ public class FeaturesClassifier implements Classifier {
       recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     if (!isClassified) {
-      log.warn("Source " + oid + " cannot be classified because his alerts have no features");
+      log.warn("Source " + oid + " cannot be classified because his alerts have no LC features");
       }
     }
   
