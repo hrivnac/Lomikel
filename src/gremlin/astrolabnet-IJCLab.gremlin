@@ -15,13 +15,13 @@ ijclab = g.addV('site').
            property('SparkHistory',     'https://wuip.lal.in2p3.fr:8443').
            property('Ganglia',          'http://vm-75222.lal.in2p3.fr/ganglia').
            property('Hadoop',           'http://vm-74078.lal.in2p3.fr:8188/cluster').
-           property('HBase',            'http://134.158.74.54:16010').
+           property('HBase',            'http://157.136.250.219:16010').
            property('Prometheus',       'http://134.158.75.113:24490/graph').
            property('Mesos',            'https://wuip.lal.in2p3.fr:20505').
            property('Grafana',          'https://supervision.lal.in2p3.fr').
            property('Zeppelin',         'https://wuip.lal.in2p3.fr:24443').
            property('Tomcat',           'http://134.158.74.221:8080').
-           property('HBase_ZTF_Season1','HBaseTable.jsp?hbase=http://134.158.74.54:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&limit=100').
+           property('HBase_ZTF_Season1','HBaseTable.jsp?hbase=http://157.136.250.219:2181&htable=ztf_season1&group=i:objectId&schema=schema_0.7.0_0.3.8&limit=100').
            next()
 
 imports = g.addV('Imports').
@@ -36,7 +36,7 @@ ijclabGraph = g.addV().
 ijclabHBase = g.addV().
                 property('lbl',        'datalink').
                 property('technology', 'HBase').
-                property('url',        '134.158.74.54:2183:ztf:schema').
+                property('url',        '157.136.250.219:2183:ztf:schema').
                 next()
 
 g.V(astrolabnet).addE('has').to(ijclab).iterate()
