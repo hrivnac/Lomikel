@@ -62,7 +62,6 @@ public class FeaturesClassifier implements Classifier {
     boolean isClassified = false;
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       value = entry.getValue();
-      log.info(entry);
       jd = Double.parseDouble(value.get("i:jd"));
       if (value.containsKey("d:lc_features_g") &&
           value.containsKey("d:lc_features_r")) {
