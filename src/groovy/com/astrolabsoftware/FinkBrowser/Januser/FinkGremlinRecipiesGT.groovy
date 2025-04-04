@@ -319,9 +319,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   //                 String classifier = null,
   //                 String outputCSV  = null) {
   def Map overlaps(Map args) {
-    lbl = args?.lbl;
-    classifier = args?.classifier;
-    outputCVS = args?.outputCVS;
+    def lbl = args?.lbl;
+    def classifier = args?.classifier;
+    def outputCVS = args?.outputCVS;
     def overlaps = [:];
     g().E().has('lbl', 'overlaps').
             order().
