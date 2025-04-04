@@ -84,8 +84,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier    The classifier name to be used.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
     *                      Default: <tt>false</tt>.
+    *                      Optional.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
+    *                      Optional.
     * @return              The distances to other sources, order by the distance. */
   def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
@@ -97,24 +99,20 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * by distance to the specified <em>source</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
     * @param oid0          The <em>objectOd</em> of the <em>source</em>.
+    * @param classifier    The classifier name to be used.
     * @param oidS          A {@link List} of <em>source</em> objectIds to only avaluated.
     *                      If <tt>null</tt>, all <em>source</em>s will be evaluated.
     * @param classes0      A {@link List} of <em>SourceOfInterest</em> classes to be
     *                      used in comparison.
     *                      All <em>SourceOfInterest</em> classes of the specified
     *                      <em>source</em> will be used if <tt>null</tt>.
-    * @param classifier    The classifier name to be used.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
+    *                      Optional.
     *                      Default: <tt>false</tt>.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
+    *                      Optional.
     * @return              The distances to other sources, order by the distance. */
-  //def Map<String, Double> sourceNeighborhood(String       oid0,
-  //                                           List<String> oidS,
-  //                                           List<String> classes0,
-  //                                           String       classifier,
-  //                                           boolean      ignorePartial = false,
-  //                                           int          nmax = Integer.MAX_VALUE) {
   def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
                                              String       classifier,
@@ -298,18 +296,40 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
   /** Give recorded classification.
     * @param oid The <em>source objectId</em>.
+    * @param lbl The cassification type.
+    *            Optional. <em>SourcesOfInterest</em> if missing.
     * @return    The recorded classification calculated
     *            by number of classified <em>alert</em>s. */
   // TBD: handle missing oids
-  def List classification(String oid) {
+  def List classification(String oid,
+                          String lbl = 'SourcesOfInterest') {
     return g().V().has('lbl', 'source').
                    has('objectId', oid).
                    inE().
                    project('weight', 'classifier', 'class').
                    by(values('weight')).
-                   by(outV().has('lbl', 'SourcesOfInterest').values('classifier')).
-                   by(outV().has('lbl', 'SourcesOfInterest').values('cls')).
+                   by(outV().has('lbl', lbl).values('classifier')).
+                   by(outV().has('lbl', lbl).values('cls')).
                    toList();
+    }
+    
+  def Map reclassification(String oid,
+                           String srcClassifier,
+                           String dstClassifier,
+                           String lbl = 'SourcesOfInterest') {                        
+    def classified = classification(oid, lbl);
+    def reclassified = [:];      
+    def w;
+    classified.each {it -> if (it.classifier == srcClassifier) {
+                             w = gr.classify(it.class, lbl, srcClassifier, dstClassifier);
+                             w.each {key, value -> if (reclassified[key] == null) {
+                                                     reclassified[key] = 0;
+                                                     }
+                                                   reclassified[key] += value;
+                             }
+                      }
+    }
+    return reclassified;
     }
     
   /** Give all overlaps.
@@ -355,8 +375,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     
   /** Give classification from another {@link Classifier}.
     * Using accumulated data in graph.
-    * @param cls        The class in the source classifier. 
-    * @param lbl        The label of {@link Vertex}es. 
+    * @param cls           The class in the source classifier. 
+    * @param lbl           The label of {@link Vertex}es. 
     * @param srcClassifier The name of classifier of the source (known) class.
     * @param dstClassifier The name of classifier of the destination (required) class.
     * @return           The new classification. */
