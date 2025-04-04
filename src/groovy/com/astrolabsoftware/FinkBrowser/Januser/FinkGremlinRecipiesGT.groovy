@@ -313,6 +313,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    toList();
     }
     
+  /** Give recorded classification.
+    * @param oid The <em>source objectId</em>.
+    * @param srcClassifier The classifier to be used for primary classification.
+    * @param dstClassifier The classifier to be used to interpret the classification.
+    * @param lbl The cassification type.
+    *            Optional. <em>SourcesOfInterest</em> if missing.
+    * @return    The recorded classification calculated
+    *            by number of classified <em>alert</em>s. */
+  // TBD: handle missing oids
   def Map reclassification(String oid,
                            String srcClassifier,
                            String dstClassifier,
@@ -321,7 +330,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def reclassified = [:];      
     def w;
     classified.each {it -> if (it.classifier == srcClassifier) {
-                             w = gr().classify(it.class, lbl, srcClassifier, dstClassifier);
+                             w = classify(it.class, lbl, srcClassifier, dstClassifier);
                              w.each {key, value -> if (reclassified[key] == null) {
                                                      reclassified[key] = 0;
                                                      }
