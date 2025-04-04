@@ -321,7 +321,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def reclassified = [:];      
     def w;
     classified.each {it -> if (it.classifier == srcClassifier) {
-                             w = gr.classify(it.class, lbl, srcClassifier, dstClassifier);
+                             w = gr().classify(it.class, lbl, srcClassifier, dstClassifier);
                              w.each {key, value -> if (reclassified[key] == null) {
                                                      reclassified[key] = 0;
                                                      }
