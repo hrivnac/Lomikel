@@ -87,11 +87,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
     * @return              The distances to other sources, order by the distance. */
-  def Map<String, Double> sourceNeighborhood(String       oid0,
-                                             String       classifier,
-                                             boolean      ignorePartial = false,
-                                             int          nmax = Integer.MAX_VALUE) {
-    return sourceNeighborhood(oid0, null, null, classifier, ignorePartial, nmax);
+  def Map<String, Double> sourceNeighborhood(Map          args,
+                                             String       oid0,
+                                             String       classifier) {
+    return sourceNeighborhood(args, oid0, classifier, null, null);
     }
         
   /** Give {@link Map} of other <em>source</em>s ordered
@@ -110,12 +109,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
     * @return              The distances to other sources, order by the distance. */
-  def Map<String, Double> sourceNeighborhood(String       oid0,
-                                             List<String> oidS,
-                                             List<String> classes0,
+  //def Map<String, Double> sourceNeighborhood(String       oid0,
+  //                                           List<String> oidS,
+  //                                           List<String> classes0,
+  //                                           String       classifier,
+  //                                           boolean      ignorePartial = false,
+  //                                           int          nmax = Integer.MAX_VALUE) {
+  def Map<String, Double> sourceNeighborhood(Map          args,
+                                             String       oid0,
                                              String       classifier,
-                                             boolean      ignorePartial = false,
-                                             int          nmax = Integer.MAX_VALUE) {
+                                             List<String> oidS,
+                                             List<String> classes0) {
+    def ignorePartial = args.ignorePartial ?: false;
+    def nmax          = args.nmax          ?: Integer.MAX_VALUE;
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
@@ -309,15 +315,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give all overlaps.
     * Using accumulated data in graph.
     * @param lbl        The label of {@link Vertex}es to use for overlap search.
-    *                   Optional. 
+    *                   Optional 
     * @param classifier The name of classifier to use for overlap search.
     *                   Optional. 
     * @param outputCSV  The filename for CSV file with overlaps.
     *                   Optional.
     * @return           The overlaps. */
-  //def Map overlaps(String lbl        = null,
-  //                 String classifier = null,
-  //                 String outputCSV  = null) {
   def Map overlaps(Map args) {
     def lbl        = args?.lbl;
     def classifier = args?.classifier;
