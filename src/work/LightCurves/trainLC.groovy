@@ -53,9 +53,9 @@ import java.util.Random;
 
 log = LogManager.getLogger(this.class);
 
-miniBatchSize = 64; // 10, 32, 64
-numLabelClasses = 5;
-blockSize = 1000;
+miniBatchSize = 10; // 10, 32, 64
+numLabelClasses = 2;
+blockSize = 100;
 trainSize = (int)(numLabelClasses * blockSize * 0.75);
 testSize =  (int)(numLabelClasses * blockSize - trainSize);
 nEpochs = 100; // 40, 100
@@ -104,12 +104,12 @@ testData.setPreProcessor(normalizer);
 conf = new NeuralNetConfiguration.Builder()
                                  .seed(123)
                                  .weightInit(WeightInit.XAVIER)
-                                 .updater(new Nadam(0.002)) // Nadam(), Nadam(0.002), Adam(0.001) or RMSProp:
+                                 .updater(new Nadam()) // Nadam(), Nadam(0.002), Adam(0.001) or RMSProp:
                                  .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-                                 .gradientNormalizationThreshold(0.5) // 0.5, 5.0
+                                 .gradientNormalizationThreshold(5.0) // 0.5, 5.0
                                  .list()
                                  .layer(new LSTM.Builder()
-                                                .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
+                                                .activation(Activation.RELU) // TANH, RELU, LEAKYRELU
                                                 .nIn(1)
                                                 .nOut(20)
                                                 .build())

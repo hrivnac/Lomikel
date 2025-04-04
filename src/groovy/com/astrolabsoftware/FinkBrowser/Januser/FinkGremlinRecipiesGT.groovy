@@ -100,9 +100,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param oid0          The <em>objectOd</em> of the <em>source</em>.
     * @param oidS          A {@link List} of <em>source</em> objectIds to only avaluated.
     *                      If <tt>null</tt>, all <em>source</em>s will be evaluated.
-    * @param classes0A     A {@link List} of <em>SourceOfInterest</em> classes to be
+    * @param classes0      A {@link List} of <em>SourceOfInterest</em> classes to be
     *                      used in comparison.
-    *                      All <em>SourceOfInterest</em> classes of thr specified
+    *                      All <em>SourceOfInterest</em> classes of the specified
     *                      <em>source</em> will be used if <tt>null</tt>.
     * @param classifier    The classifier name to be used.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
@@ -315,9 +315,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param outputCSV  The filename for CSV file with overlaps.
     *                   Optional.
     * @return           The overlaps. */
-  def Map overlaps(String lbl        = null,
-                   String classifier = null,
-                   String outputCSV  = null) {
+  //def Map overlaps(String lbl        = null,
+  //                 String classifier = null,
+  //                 String outputCSV  = null) {
+  def Map overlaps(Map args) {
+    lbl = args?.lbl;
+    classifier = args?.classifier;
+    outputCVS = args?.outputCVS;
     def overlaps = [:];
     g().E().has('lbl', 'overlaps').
             order().
