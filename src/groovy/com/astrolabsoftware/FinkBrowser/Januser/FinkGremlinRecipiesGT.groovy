@@ -87,7 +87,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
     * @return              The distances to other sources, order by the distance. */
-  def Map<String, Double> sourceNeighborhood(Map          args,
+  def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
                                              String       classifier) {
     return sourceNeighborhood(args, oid0, classifier, null, null);
@@ -115,7 +115,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   //                                           String       classifier,
   //                                           boolean      ignorePartial = false,
   //                                           int          nmax = Integer.MAX_VALUE) {
-  def Map<String, Double> sourceNeighborhood(Map          args,
+  def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
                                              String       classifier,
                                              List<String> oidS,
