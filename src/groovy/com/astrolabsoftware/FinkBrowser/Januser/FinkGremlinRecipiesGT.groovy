@@ -84,10 +84,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier    The classifier name to be used.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
     *                      Default: <tt>false</tt>.
-    *                      Optional.
+    *                      Optional named parameter.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
-    *                      Optional.
+    *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
   def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
@@ -107,11 +107,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      All <em>SourceOfInterest</em> classes of the specified
     *                      <em>source</em> will be used if <tt>null</tt>.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
-    *                      Optional.
+    *                      Optional naamed parameter.
     *                      Default: <tt>false</tt>.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
-    *                      Optional.
+    *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
   def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
@@ -294,18 +294,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return txt;
     }
 
-  /** Give recorded classification.
+  /** Give recorded classification for all {@link Classifiers}.
     * @param oid The <em>source objectId</em>.
-    * @param lbl The cassification type.
-    *            Optional. <em>SourcesOfInterest</em> if missing.
     * @return    The recorded classification calculated
     *            by number of classified <em>alert</em>s. */
   // TBD: handle missing oids
   def List classification(String oid,
-                          String lbl = 'SourcesOfInterest') {
+                          String classifier) {
     return g().V().has('lbl', 'source').
                    has('objectId', oid).
                    inE().
+                   has('classifier', classifier).
                    project('weight', 'classifier', 'class').
                    by(values('weight')).
                    by(outV().has('lbl', lbl).values('classifier')).
@@ -313,19 +312,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    toList();
     }
     
-  /** Give recorded classification.
+  /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
+    * to <tt>dstClassifier</tt>.
     * @param oid The <em>source objectId</em>.
     * @param srcClassifier The classifier to be used for primary classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
-    * @param lbl The cassification type.
-    *            Optional. <em>SourcesOfInterest</em> if missing.
     * @return    The recorded classification calculated
     *            by number of classified <em>alert</em>s. */
   // TBD: handle missing oids
   def Map reclassification(String oid,
                            String srcClassifier,
-                           String dstClassifier,
-                           String lbl = 'SourcesOfInterest') {                        
+                           String dstClassifier) {                        
     def classified = classification(oid, lbl);
     def reclassified = [:];      
     def w;
@@ -335,9 +332,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                      reclassified[key] = 0;
                                                      }
                                                    reclassified[key] += value;
-                             }
+                              }
                       }
-    }
+      }
+    reclassified = reclassified.sort{-it.value};
     return reclassified;
     }
     

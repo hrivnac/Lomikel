@@ -248,5 +248,27 @@ gr.overlaps(lbl:"SourcesOfInterest");
 gr.sourceNeighborhood("ZTF18aakpydc", "FINK_PORTAL")
 
 gr.classification("ZTF18aakpydc")
+gr.reclassification('ZTF18aakpydc', 'FEATURES', 'FINK_PORTAL')
 
 gr.classify("FC-3", "SourcesOfInterest", "FEATURES", "FINK_PORTAL")
+
+gr.classifySource(Classifiers.FEATURES, 'ZTF25aaksfzy', 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
+
+gr.exportAoISoI('/tmp/Overlaps.graphml');
+
+--------------------------------------------------------------------------------
+
+
+gremlin> gr.reclassification('ZTF25aaksfzy', 'FEATURES', 'FINK_PORTAL')
+==>Solar System candidate=555.0
+==>Tracklet=511.0
+==>SN candidate=318.0
+==>Early SN Ia candidate=11.0
+==>Solar System MPC=6.0
+==>Ambiguous=2.0
+==>Kilonova candidate=2.0
+==>Microlensing candidate=1.0
+==>BLLac=1.0
+gremlin> gr.classification('ZTF25aaksfzy')
+==>[weight:1.0,classifier:FINK_PORTAL,class:Solar System candidate]
+==>[weight:1.0,classifier:FEATURES,class:FC-3]
