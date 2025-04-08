@@ -303,18 +303,18 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   // TBD: handle missing oids
   def List classification(String oid,
                           String classifier = null) {
+    def classified = [];
     return g().V().has('lbl', 'source').
                    has('objectId', oid).
                    inE().
-                   choose(constant(classifier).is(null),
-                          identity(),
-                          outV().has('classifier', classifier)).
                    project('weight', 'classifier', 'class').
                    by(values('weight')).
                    by(outV().values('classifier')).
-                   by(outV().values('cls')).
-                   toList();
-    }    
+                   by(outV().values('cls')).each {it -> if (classifier == null || classifier == it.classifier) {
+                                                          classified += it;
+                                                          }
+                   }
+      }    
     
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt>.
@@ -330,12 +330,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
-    classified.each {it ->  w = classify(it.class, lbl, srcClassifier, dstClassifier);
-                            w.each {key, value -> if (reclassified[key] == null) {
-                                                    reclassified[key] = 0;
-                                                    }
-                                                  reclassified[key] += value;
-                            }
+    classified.each {it -> if (it.classifier == srcClassifier) {
+                             w = classify(it.class, lbl, srcClassifier, dstClassifier);
+                             w.each {key, value -> if (reclassified[key] == null) {
+                                                     reclassified[key] = 0;
+                                                     }
+                                                   reclassified[key] += value;
+                              }
+                      }
       }
     reclassified = reclassified.sort{-it.value};
     return reclassified;
