@@ -305,10 +305,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                           String classifier = null) {
     return g().V().has('lbl', 'source').
                    has('objectId', oid).
+                   inE().
                    choose(constant(classifier).is(null),
                           identity(),
                           has('classifier', classifier)).
-                   inE().
                    project('weight', 'classifier', 'class').
                    by(values('weight')).
                    by(outV().values('classifier')).
