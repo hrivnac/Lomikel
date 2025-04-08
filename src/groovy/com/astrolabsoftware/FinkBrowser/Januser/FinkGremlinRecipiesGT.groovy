@@ -297,10 +297,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
 
   /** Give recorded classification for all {@link Classifiers}.
-    * @param oid The <em>source objectId</em>.
+    * @param oid        The <em>source objectId</em>.
+    * @param classifier The {@link Classifier} to be used.
+    *                   Optional. If missing or <tt>null</tt>,
+    *                   {@link Classifier}s will be used.
     * @return    The recorded classification calculated
     *            by number of classified <em>alert</em>s. */
-  // TBD: handle missing oids
   def List classification(String oid,
                           String classifier = null) {
     def classified = [];
@@ -322,9 +324,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param oid The <em>source objectId</em>.
     * @param srcClassifier The classifier to be used for primary classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
-    * @return    The recorded classification calculated
-    *            by number of classified <em>alert</em>s. */
-  // TBD: handle missing oids
+    * @return              The recorded classification calculated
+    *                      by number of classified <em>alert</em>s. */
   def Map reclassification(String oid,
                            String srcClassifier,
                            String dstClassifier) {                        
@@ -332,7 +333,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def reclassified = [:];      
     def w;
     classified.each {it -> if (it.classifier == srcClassifier) {
-                             w = classify(it.class, lbl, srcClassifier, dstClassifier);
+                             w = reclassify(it.class, "SourcesOfInterest", srcClassifier, dstClassifier);
                              w.each {key, value -> if (reclassified[key] == null) {
                                                      reclassified[key] = 0;
                                                      }
@@ -347,11 +348,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give all overlaps.
     * Using accumulated data in graph.
     * @param lbl        The label of {@link Vertex}es to use for overlap search.
-    *                   Optional.
+    *                   Optional named parameter.
     * @param classifier The name of classifier to use for overlap search.
-    *                   Optional. 
+    *                   Optional named parameter. 
     * @param outputCSV  The filename for CSV file with overlaps.
-    *                   Optional.
+    *                   Optional named parameter.
     * @return           The overlaps. */
   def Map overlaps(Map args) {
     def lbl        = args?.lbl;
@@ -392,10 +393,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param srcClassifier The name of classifier of the source (known) class.
     * @param dstClassifier The name of classifier of the destination (required) class.
     * @return           The new classification. */
-  def Map classify(String cls,
-                   String lbl,
-                   String srcClassifier,
-                   String dstClassifier) {
+  def Map reclassify(String cls,
+                     String lbl,
+                     String srcClassifier,
+                     String dstClassifier) {
     def classification = [:];
     g().E().has('lbl', 'overlaps').
             order().
