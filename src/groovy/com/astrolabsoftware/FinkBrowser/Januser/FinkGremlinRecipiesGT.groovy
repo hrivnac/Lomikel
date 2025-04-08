@@ -226,8 +226,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           wx2 = m[key2] == null ? 0 : m[key2];
           if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
             w012 = w01 + w02;
-            wx12 = wx1 +     def classifier = args?.classifier;
-wx2;
+            wx12 = wx1 + wx2;
             w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
             wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
             dist += Math.pow(w0 - wx, 2);
@@ -270,7 +269,7 @@ wx2;
       tot = nCommit * ++i;
       def dt = (System.currentTimeMillis() - t0) / 1000;
       def per = 100 * tot / nMax;
-      def freq = tot / dt;
+      def freq = tot / dt;-
       def rest = (nMax - tot) / freq / 60 /60;
       log.info(tot + ' = ' + per + '% at ' + freq + 'Hz, ' + rest + 'h to go');
       }
