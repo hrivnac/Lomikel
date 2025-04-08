@@ -338,7 +338,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         log.error("Cannot enhance source", e);
         }
       }
-    commit(); // TBD: not needed if enhancing
+    g().getGraph().tx().commit(); // TBD: not needed if enhancing, should use just commit()
     }
         
   /** Expand tree under all <em>SourcesOfInterest</em> with alerts
