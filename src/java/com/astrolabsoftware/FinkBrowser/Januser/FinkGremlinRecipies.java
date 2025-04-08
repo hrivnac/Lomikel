@@ -338,7 +338,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         log.error("Cannot enhance source", e);
         }
       }
-    g().getGraph().tx().commit(); // TBD: not needed if enhancing, should use just commit()
+    commit(); // TBD: not needed if enhancing
     }
         
   /** Expand tree under all <em>SourcesOfInterest</em> with alerts
@@ -440,7 +440,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       addEdge(source, alert, "sends");
       assembleAlertsOfInterest(classifier, alert);
       }
-    g().getGraph().tx().commit(); // TBD: should use just commit()
+    commit();
     log.info("\t\t" + n + " alerts added");
     }
    
@@ -460,7 +460,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             out().
             drop().
             iterate();
-    g().getGraph().tx().commit(); // TBD: should use just commit()
+    commit();
     }
     
   /** Generate <em>overlaps</em> Edges between <em>SourcesOfInterest</em> Vertices.
@@ -557,7 +557,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       }
-    g().getGraph().tx().commit(); // TBD: should use just commit()
+    commit();
     log.info("" + n + " correlations generated");
     }
     
@@ -618,7 +618,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                 true);
         }
       }
-    g().getGraph().tx().commit(); // TBD: should use just commit()
+    commit();
     }
         
   /** Generate <em>overlaps</em> Edges between <em>AlertsOfInterest</em> and <em>SourcesOfInterest</em>.
@@ -635,7 +635,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       g().V().has("lbl", "AlertsOfInterest" ).has("classifier", classifierName).not(has("cls")).drop().iterate();
       g().V().has("lbl", "SourcesOfInterest").has("classifier", classifierName).not(has("cls")).drop().iterate();
       }
-    g().getGraph().tx().commit(); // TBD: should use just commit()
+    commit();
     // Accumulate correlations and sizes
     Map<String, Double>               weights0 = new HashMap<>(); // cls -> weight (for one source)
     Map<Pair<String, String>, Double> corrS    = new HashMap<>(); // [cls1, cls2] -> weight (for all sources between SoI-SoI)
@@ -810,7 +810,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         log.debug("SoI for " + cls1 + " doesn't exist");
         }          
       }
-    g().getGraph().tx().commit(); // TBD: should use just commit()
+    commit();
     log.info("" + ns + ", " + na + " source-source and source-alert correlations generated");
     }
     
@@ -910,7 +910,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       }
-    g().getGraph().tx().commit(); // TBD: should use just commit()
+    commit();
     log.info("" + n + " correlations generated");
     }
         
