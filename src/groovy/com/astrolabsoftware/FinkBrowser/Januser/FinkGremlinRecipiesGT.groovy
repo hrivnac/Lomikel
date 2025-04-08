@@ -269,7 +269,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       tot = nCommit * ++i;
       def dt = (System.currentTimeMillis() - t0) / 1000;
       def per = 100 * tot / nMax;
-      def freq = tot / dt;-
+      def freq = tot / dt;
       def rest = (nMax - tot) / freq / 60 /60;
       log.info(tot + ' = ' + per + '% at ' + freq + 'Hz, ' + rest + 'h to go');
       }
