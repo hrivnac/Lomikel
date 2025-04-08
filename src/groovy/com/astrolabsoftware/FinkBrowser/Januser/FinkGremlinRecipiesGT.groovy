@@ -34,6 +34,8 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.count;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.constant;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.identity;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.asc;
 
@@ -224,7 +226,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           wx2 = m[key2] == null ? 0 : m[key2];
           if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
             w012 = w01 + w02;
-            wx12 = wx1 + wx2;
+            wx12 = wx1 +     def classifier = args?.classifier;
+wx2;
             w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
             wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
             dist += Math.pow(w0 - wx, 2);
@@ -299,17 +302,20 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return    The recorded classification calculated
     *            by number of classified <em>alert</em>s. */
   // TBD: handle missing oids
-  def List classification(String oid) {
+  def List classification(String oid,
+                          String classifier = null) {
     return g().V().has('lbl', 'source').
                    has('objectId', oid).
+                   choose(__.constant(classifier).is(null),
+                          __.identity(),
+                          __.has('classifier', classifier)).
                    inE().
-                   project('weight', 'classifier', 'class', 'lbl').
+                   project('weight', 'classifier', 'class').
                    by(values('weight')).
                    by(outV().values('classifier')).
                    by(outV().values('cls')).
-                   by(outV().values('lbl')).
                    toList();
-    }
+    }    
     
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt>.
@@ -321,19 +327,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   // TBD: handle missing oids
   def Map reclassification(String oid,
                            String srcClassifier,
-                           String dstClassifier,
-                           String lbl = null) {                        
-    def classified = classification(oid, lbl);
+                           String dstClassifier) {                        
+    def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
-    classified.each {it -> if (it.classifier == srcClassifier) {
-                             w = classify(it.class, lbl, srcClassifier, dstClassifier);
-                             w.each {key, value -> if (reclassified[key] == null) {
-                                                     reclassified[key] = 0;
-                                                     }
-                                                   reclassified[key] += value;
-                              }
-                      }
+    classified.each {it ->  w = classify(it.class, lbl, srcClassifier, dstClassifier);
+                            w.each {key, value -> if (reclassified[key] == null) {
+                                                    reclassified[key] = 0;
+                                                    }
+                                                  reclassified[key] += value;
+                            }
       }
     reclassified = reclassified.sort{-it.value};
     return reclassified;
