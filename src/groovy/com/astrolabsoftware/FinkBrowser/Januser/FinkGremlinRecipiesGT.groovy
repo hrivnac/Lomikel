@@ -299,16 +299,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return    The recorded classification calculated
     *            by number of classified <em>alert</em>s. */
   // TBD: handle missing oids
-  def List classification(String oid,
-                          String classifier) {
+  def List classification(String oid) {
     return g().V().has('lbl', 'source').
                    has('objectId', oid).
                    inE().
-                   has('classifier', classifier).
-                   project('weight', 'classifier', 'class').
+                   project('weight', 'classifier', 'class', 'lbl').
                    by(values('weight')).
-                   by(outV().has('lbl', lbl).values('classifier')).
-                   by(outV().has('lbl', lbl).values('cls')).
+                   by(outV().values('classifier')).
+                   by(outV().values('cls')).
+                   by(outV().values('lbl')).
                    toList();
     }
     
@@ -322,7 +321,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   // TBD: handle missing oids
   def Map reclassification(String oid,
                            String srcClassifier,
-                           String dstClassifier) {                        
+                           String dstClassifier,
+                           String lbl = null) {                        
     def classified = classification(oid, lbl);
     def reclassified = [:];      
     def w;
@@ -342,7 +342,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give all overlaps.
     * Using accumulated data in graph.
     * @param lbl        The label of {@link Vertex}es to use for overlap search.
-    *                   Optional 
+    *                   Optional.
     * @param classifier The name of classifier to use for overlap search.
     *                   Optional. 
     * @param outputCSV  The filename for CSV file with overlaps.
