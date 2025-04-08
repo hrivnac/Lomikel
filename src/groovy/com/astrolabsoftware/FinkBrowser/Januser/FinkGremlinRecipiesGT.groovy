@@ -304,17 +304,18 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def List classification(String oid,
                           String classifier = null) {
     def classified = [];
-    return g().V().has('lbl', 'source').
-                   has('objectId', oid).
-                   inE().
-                   project('weight', 'classifier', 'class').
-                   by(values('weight')).
-                   by(outV().values('classifier')).
-                   by(outV().values('cls')).each {it -> if (classifier == null || classifier == it.classifier) {
-                                                          classified += it;
-                                                          }
-                   }
-      }    
+    g().V().has('lbl', 'source').
+            has('objectId', oid).
+            inE().
+            project('weight', 'classifier', 'class').
+            by(values('weight')).
+            by(outV().values('classifier')).
+            by(outV().values('cls')).each {it -> if (classifier == null || classifier == it.classifier) {
+                                                   classified += it;
+                                                   }
+            }
+    return classified;
+    }
     
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt>.
