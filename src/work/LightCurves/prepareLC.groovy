@@ -18,7 +18,7 @@ curvesDN   = "../run"
 
 jdMinSize  = 60     // minimal number of LC points
 jdSize     = 60     // number of LC points after renormalisation
-sampleSize = 100   // number of LC samples (smaler cases will be skipped, larger cases will be shortened)
+sampleSize = 100    // number of LC samples (smaler cases will be skipped, larger cases will be shortened)
 normalize  = true   // normalize data or fill missing with 0s
 reduce     = false  // merge some classes
 
