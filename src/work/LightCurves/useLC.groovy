@@ -32,10 +32,6 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 
-// Log
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 // Apache
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -49,21 +45,31 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+// Log
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 // -----------------------------------------------------------------------------
 
 log = LogManager.getLogger(this.class);
 
-conf = MultiLayerConfiguration.fromJson(new File("../data/LightCurves/network.json").text);
-net = new MultiLayerNetwork(conf);
+conf = evaluate(new File("../src/work/LightCurves/conf.groovy").text);
+log.info("Conf: " + conf);
+
+curvesDN        = conf.curvesDN;
+jdSize     = conf.jdSize;
+
+config = MultiLayerConfiguration.fromJson(new File(curvesDN + "/network.json").text);
+net = new MultiLayerNetwork(config);
 net.init();
-net.load(new File("../data/LightCurves/network.model"), false);
+net.load(new File(curvesDN + "/network.model"), false);
 
 batchSize = 1;    // Number of samples
 inputSize = 1;      // Number of features per time step (must match your network's input layer)
-timeSteps = 100;     // Number of time steps (adjust based on your model)
+timeSteps = jdSize;     // Number of time steps (adjust based on your model)
 
-arr = new double[100]
-(0..<100).each {i -> arr[i] = Math.random()}
+arr = new double[timeSteps]
+(0..<timeSteps).each {i -> arr[i] = Math.random()}
 
 curve = Nd4j.create(arr, new int[]{batchSize, inputSize, timeSteps});
 

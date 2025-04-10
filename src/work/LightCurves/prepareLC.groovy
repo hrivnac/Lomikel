@@ -23,7 +23,7 @@ def log = LogManager.getLogger(this.class);
 conf = evaluate(new File("../src/work/LightCurves/conf.groovy").text);
 log.info("Conf: " + conf);
 
-csvFN      = conf.csvFN;
+csvDN      = conf.csvDN;
 curvesDN   = conf.curvesDN;
 jdMinSize  = conf.jdMinSize;
 jdSize     = conf.jdSize;
@@ -45,7 +45,7 @@ def reduceCls(String cls) {
   return cls
   }
 
-log.info("Creating Light Curves from " + csvFN + " in " + curvesDN)
+log.info("Creating Light Curves from " + csvDN + "/all.csv in " + curvesDN)
 
 def dir = new File(curvesDN)
 dir.eachFile {file -> file.delete()}
@@ -59,7 +59,7 @@ def fileRowCount
   
   log.info("fid = " + fidSelection)
   
-  file = new File(csvFN)
+  file = new File(csvDN + "/all.csv")
   csvData = file.text
   rows = parseCsv(csvData, separator:',', quoteChar:'"')
   fileRowCount = [:].withDefault {0}

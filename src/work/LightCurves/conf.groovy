@@ -9,7 +9,7 @@ allFinkClasses = ["(CTA) Blazar",
                   "Tracklet"]
 CQSOClasses    = ["C*", "QSO"];      
 
-return [csvFN:          "../data/LightCurves/all.csv",
+return [csvDN:          "../data/LightCurves",
         curvesDN:       "../run/LightCurves",
         jdMinSize:       60,    // minimal number of LC points
         jdSize:          60,    // number of LC points after renormalisation
@@ -18,7 +18,7 @@ return [csvFN:          "../data/LightCurves/all.csv",
         miniBatchSize:   10,    // 10, 32, 64
         blockSize:      100,    // number of LC samples (smaler cases will be skipped, larger cases will be shortened)
         trainRate:      0.75,
-        trainClasses:   [],
+        trainClasses:   CQSOClasses,
         trainFid:       2,
         nEpochs:        100     // 40, 100
         ]

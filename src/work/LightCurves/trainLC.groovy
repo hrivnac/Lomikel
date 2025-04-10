@@ -163,8 +163,8 @@ log.info(eval.stats());
 
 // Save
 
-new File("../data/LightCurves/network.json").write(conf.toJson());
-net.save(new File("../data/LightCurves/network.model"));
+new File(curvesDN + "/network.json").write(conf.toJson());
+net.save(new File(curvesDN + "/network.model"));
 
 log.info("Complete");
 
