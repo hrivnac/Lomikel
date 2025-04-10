@@ -8,16 +8,15 @@ cls = "CataclyV*"
 if len(sys.argv) > 1:
   cls = sys.argv[1]
 
-
 doPlot = False
 
 fig, axes = plt.subplots(2, 1, figsize=(20, 20))
 
 for fid, ax in zip(["1", "2"], axes):
   
-  lst_file = f"../run/{cls}_{fid}.lst"
-  jd_file = f"../run/{cls}_{fid}.jd"
-  idx_file = f"../run/{cls}_{fid}.idx"
+  lst_file = f"../run/LightCurves/{cls}_{fid}.lst"
+  jd_file = f"../run/LightCurves/{cls}_{fid}.jd"
+  idx_file = f"../run/LightCurves/{cls}_{fid}.idx"
   
   if not (os.path.exists(lst_file) and os.path.exists(jd_file) and os.path.exists(idx_file)):
       ax.set_title(f"No data available for {cls}_{fid}")

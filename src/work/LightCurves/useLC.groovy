@@ -53,10 +53,10 @@ import java.util.Random;
 
 log = LogManager.getLogger(this.class);
 
-conf = MultiLayerConfiguration.fromJson(new File("../run/network.json").text);
+conf = MultiLayerConfiguration.fromJson(new File("../data/LightCurves/network.json").text);
 net = new MultiLayerNetwork(conf);
 net.init();
-net.load(new File("../run/network.model"), false);
+net.load(new File("../data/LightCurves/network.model"), false);
 
 batchSize = 1;    // Number of samples
 inputSize = 1;      // Number of features per time step (must match your network's input layer)

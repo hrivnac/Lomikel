@@ -1,11 +1,14 @@
 @Grab('com.xlson.groovycsv:groovycsv:1.3')
 
+// Groovy CSV
 import com.xlson.groovycsv.CsvParser
 import static com.xlson.groovycsv.CsvParser.parseCsv
 
+// Apache Math3
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction
 
+// Java
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -13,15 +16,21 @@ import java.nio.file.Paths
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-csvFN      = "../data/LightCurves.csv"
-curvesDN   = "../run"
+// -----------------------------------------------------------------------------
 
-jdMinSize  = 60     // minimal number of LC points
-jdSize     = 60     // number of LC points after renormalisation
-sampleSize = 100    // number of LC samples (smaler cases will be skipped, larger cases will be shortened)
-normalize  = true   // normalize data or fill missing with 0s
-reduce     = false  // merge some classes
+def log = LogManager.getLogger(this.class);
 
+conf = evaluate(new File("../src/work/LightCurves/conf.groovy").text);
+log.info("Conf: " + conf);
+
+csvFN      = conf.csvFN;
+curvesDN   = conf.curvesDN;
+jdMinSize  = conf.jdMinSize;
+jdSize     = conf.jdSize;
+blockSize  = conf.blockSize;
+normalize  = conf.normalize;
+reduce     = conf.reduce;
+                   
 def reduceCls(String cls) {
   if (reduce) {
     cls = cls.replaceAll('Candidate_', '').replaceAll('_Candidate', '')
@@ -36,9 +45,10 @@ def reduceCls(String cls) {
   return cls
   }
 
-def log = LogManager.getLogger(this.class);
-
 log.info("Creating Light Curves from " + csvFN + " in " + curvesDN)
+
+def dir = new File(curvesDN)
+dir.eachFile {file -> file.delete()}
 
 def file
 def csvData
@@ -110,15 +120,15 @@ def fileRowCount
                     
   def nFiles = 0; 
   fileRowCount.each {filePath, rowCount -> def fl = new File(filePath)
-                                           if (rowCount < sampleSize) {
+                                           if (rowCount < blockSize) {
                                              log.info("Deleting ${filePath} (only ${rowCount} lines)")
                                              fl.delete()
                                              }
-                                           else if (rowCount > sampleSize) {
-                                             log.info("Truncating ${filePath} to ${sampleSize} lines (from ${rowCount} lines)")
+                                           else if (rowCount > blockSize) {
+                                             log.info("Truncating ${filePath} to ${blockSize} lines (from ${rowCount} lines)")
                                              def lines = fl.readLines()
                                              lines.shuffle()
-                                             lines = lines.take(sampleSize)
+                                             lines = lines.take(blockSize)
                                              fl.text = lines.join("\n") + "\n"
                                              nFiles++;
                                              }
