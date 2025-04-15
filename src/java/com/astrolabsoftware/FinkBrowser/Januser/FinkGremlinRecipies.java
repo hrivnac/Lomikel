@@ -668,7 +668,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       // Get all weights to this source
       while (deepcontainsIt.hasNext()) {
         deepcontains = deepcontainsIt.next();
-        weight = (Double)(deepcontains.property("weight").value());
+        weight = Double.parseDouble(deepcontains.property("weight").value().toString());
         soi1 = deepcontains.outVertex();
         cls = soi1.property("cls").value().toString();
         types0.add(cls);

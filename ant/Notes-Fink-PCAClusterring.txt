@@ -248,6 +248,7 @@ gr.overlaps(lbl:"SourcesOfInterest");
 gr.sourceNeighborhood("ZTF18aakpydc", "FINK_PORTAL")
 
 gr.classification("ZTF18aakpydc")
+gr.classification("ZTF18aakpydc", "FINK_PORTAL")
 gr.reclassification('ZTF18aakpydc', 'FEATURES', 'FINK_PORTAL')
 
 gr.reclassify("FC-3", "SourcesOfInterest", "FEATURES", "FINK_PORTAL")

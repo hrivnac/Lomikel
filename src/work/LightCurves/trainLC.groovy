@@ -13,6 +13,7 @@ import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.LSTM;
+import org.deeplearning4j.nn.conf.layers.GravesLSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -125,23 +126,18 @@ testData.setPreProcessor(normalizer);
 conf = new NeuralNetConfiguration.Builder()
                                  .seed(123)
                                  .weightInit(WeightInit.XAVIER)
-                                 .updater(new Nadam()) // Nadam(), Nadam(0.002), Adam(0.001) or RMSProp:
+                                 .updater(new Adam(0.002)) // Nadam(), Nadam(0.002), Adam(0.001) or RMSProp:
                                  .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-                                 .gradientNormalizationThreshold(5.0) // 0.5, 5.0
+                                 .gradientNormalizationThreshold(0.5) // 0.5, 5.0
                                  .list()
                                  .layer(new LSTM.Builder()
-                                                .activation(Activation.RELU) // TANH, RELU, LEAKYRELU
+                                                .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
                                                 .nIn(1)
                                                 .nOut(20)
                                                 .build())
-                                 .layer(new LSTM.Builder()
-                                                .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
-                                                .nIn(20)
-                                                .nOut(10)
-                                                .build())
-                                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT) // MCXENT, KL_DIVERGENCE, MSE
+                                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE) // MCXENT, KL_DIVERGENCE, MSE
                                                           .activation(Activation.SOFTMAX)
-                                                          .nIn(10)
+                                                          .nIn(20)
                                                           .nOut(numLabelClasses)
                                                           .build())
                                  .build();
@@ -149,7 +145,7 @@ conf = new NeuralNetConfiguration.Builder()
 net = new MultiLayerNetwork(conf);
 net.init();
 
-// Trainorg.deeplearning4j.nn.multilayer.MultiLayerNetwork
+// Training
 
 log.info("Starting training...");
 net.setListeners(new ScoreIterationListener(20), new EvaluativeListener(testData, 1, InvocationType.EPOCH_END));
