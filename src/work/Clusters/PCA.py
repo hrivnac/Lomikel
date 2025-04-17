@@ -49,7 +49,7 @@ n_sample = 0
 n_pca = 13
 n_clusters_start = 5
 n_clusters = 100
-silhouette = True
+silhouette = False
 cluster_features = "pca_features"
 
 # New session ------------------------------------------------------------------
