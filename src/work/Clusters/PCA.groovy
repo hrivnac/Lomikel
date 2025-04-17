@@ -6,7 +6,7 @@ import org.json.JSONObject;
 FINK_HOME      = '/home/janusgraph/fink-broker';
 
 serverName     = 'LAL';
-urlLivy        = 'http://157.136.254.149:21111';
+urlLivy        = 'http://157.136.254.149:41111';
 urlSpark       = 'http://157.136.254.149:8020';
 //urlHBase       = 'http://vdhbase1.lal.in2p3.fr:2183';
 urlHBase       = null;
