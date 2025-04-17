@@ -19,7 +19,9 @@ from pyspark.ml.clustering import KMeans
 from pyspark.ml.clustering import BisectingKMeans
 from pyspark.ml.evaluation import ClusteringEvaluator
 
-from fink_filters.classification import extract_fink_classification
+#from fink_filters.classification import extract_fink_classification
+from fink_filters.ztf.classification import extract_fink_classification
+
 
 from functools import reduce
 
