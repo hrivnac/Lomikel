@@ -1042,11 +1042,7 @@
           depends="init"
           description="Run local FinkBrowser Server">
     <echo>Go to http://localhost:${jetty_port}/FinkBrowser</echo>
-    <java jar="${jetty_runner}" fork="true">
-      <arg value="--path"/>
-      <arg value="/FinkBrowser"/>
-      <arg value="--port"/>
-      <arg value="${jetty_port}"/>
+    <java jar="${jetty_runner}">
       <arg value="--stop-port"/>
       <arg value="${jetty_port_stop}"/>
       <arg value="--stop-key"/>
