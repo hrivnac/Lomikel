@@ -1007,6 +1007,8 @@
       <arg value="/Lomikel"/>
       <arg value="--port"/>
       <arg value="${jetty_port}"/>
+      <arg value="--stop-key"/>
+      <arg value="${jetty_port_stop}"/>
       <arg value="--log"/>
       <arg value="LomikelServer.log"/>
       <arg value="--out"/>
@@ -1024,6 +1026,8 @@
       <arg value="/FinkBrowser"/>
       <arg value="--port"/>
       <arg value="${jetty_port}"/>
+      <arg value="--stop-key"/>
+      <arg value="${jetty_port_stop}"/>
       <arg value="--log"/>
       <arg value="FinkBrowserServer.log"/>
       <arg value="--out"/>

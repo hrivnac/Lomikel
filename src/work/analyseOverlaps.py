@@ -8,20 +8,21 @@ import math
 
 overlaps_dir = "13-45"
 
-normalised = True          
+normalised = False          
 
 merges = {}
 no_values = []
+if overlaps_dir == "13-60":    
+  merges = {"FC-A":   ["FC-6",
+                       "FC-59"],
+            "FC-B":   ["FC-7",
+                       "FC-23",
+                       "FC-36"]}
 if overlaps_dir == "13-45":    
   merges = {"FC-A":   ["FC-38",
                        "FC-10"],
             "FC-B":   ["FC-3",
                        "FC-11"]}
-  no_values = ["FC-2",
-               "FC-8",
-               "FC-22",
-               "FC-36",
-               "FC-44"]
 elif overlaps_dir == "13-20":                       
   merges = {"FC-A":   ["FC-6",
                        "FC-13",

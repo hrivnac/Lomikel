@@ -1,5 +1,5 @@
 <%@ page import="com.Lomikel.Utils.Init" %>
 
 <%
-  Init.initWS();
+  Init.initWS("FinkBrowser");
   %>
