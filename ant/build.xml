@@ -1052,11 +1052,6 @@
       <arg value="--stop-key"/>
       <arg value="stop"/>
       <arg value="--stop"/>
-      <arg value="--log"/>
-      <arg value="FinkBrowserServer.log"/>
-      <arg value="--out"/>
-      <arg value="FinkBrowserServer.out"/>
-      <arg value="../lib/FinkBrowser.war"/>
       </java>
     </target>
     
