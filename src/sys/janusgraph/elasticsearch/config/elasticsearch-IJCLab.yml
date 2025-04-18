@@ -5,6 +5,6 @@ xpack.security.enabled: false
 cluster.name: janus-graph-el
 http.port: 20200
 network.bind_host: 0.0.0.0
-network.publish_host: 157.136.250.219
+network.publish_host: 157.136.253.253
 transport.host: 127.0.0.1
 http.host: 0.0.0.0
