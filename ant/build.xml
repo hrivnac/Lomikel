@@ -1026,8 +1026,10 @@
       <arg value="/FinkBrowser"/>
       <arg value="--port"/>
       <arg value="${jetty_port}"/>
-      <arg value="--stop-key"/>
+      <arg value="--stop-port"/>
       <arg value="${jetty_port_stop}"/>
+      <arg value="--stop-key"/>
+      <arg value="stop"/>
       <arg value="--log"/>
       <arg value="FinkBrowserServer.log"/>
       <arg value="--out"/>
