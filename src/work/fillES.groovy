@@ -4,7 +4,7 @@ import com.Lomikel.Utils.Timer;
 
 timer = new Timer("entries", 1000, 5);
 
-esclient = new ESClient("http://134.158.74.85:20200");
+esclient = new ESClient("http://157.136.253.253:20200");
 
 client = new AsynchHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 client.connect("ztf", "schema_3.1_5.6.2");
