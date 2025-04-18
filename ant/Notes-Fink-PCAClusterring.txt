@@ -224,9 +224,9 @@ cluster_features = "pca_features"
 ------------------------------------
 
 # @home
-scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.png' ./
-scp julius.hrivnac@vm-75222.lal.in2p3.fr:/tmp/'*.json' ./
-scp *json centos@134.158.74.85:/tmp
+scp julius.hrivnac@157.136.254.149:/tmp/'*.png' ./
+scp julius.hrivnac@157.136.254.149:/tmp/'*.json' ./
+scp *json centos@157.136.253.253:/tmp
 
 # testing results ##############################################################
 
@@ -234,7 +234,7 @@ scp *json centos@134.158.74.85:/tmp
 ../src/work/fillSIO.groovy
 
 # @home
-scp centos@134.158.74.85:/tmp/overlaps.csv ./
+scp centos@157.136.253.253:/tmp/overlaps.csv ./
 python ../src/work/analyseOverlaps.py
 
 --------------------------------------------------------------------------------

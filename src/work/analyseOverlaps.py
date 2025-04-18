@@ -6,25 +6,31 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_dir = "13-60"
+overlaps_dir = "13-45"
 
 normalised = True          
-    
-# 45    
-merges = {"FC-A":   ["FC-38",
-                     "FC-10"],
-          "FC-B":   ["FC-3",
-                     "FC-11"]}
-# 20
-merges = {"FC-A":   ["FC-6",
-                     "FC-13",
-                     "FC-15",
-                     "FC-17"],
-          "FC-B":   ["FC-3",
-                     "FC-11"]}
-merges = {}
 
+merges = {}
 no_values = []
+if overlaps_dir == "13-45":    
+  merges = {"FC-A":   ["FC-38",
+                       "FC-10"],
+            "FC-B":   ["FC-3",
+                       "FC-11"]}
+  no_values = ["FC-2",
+               "FC-8",
+               "FC-22",
+               "FC-36",
+               "FC-44"]
+elif overlaps_dir == "13-20":                       
+  merges = {"FC-A":   ["FC-6",
+                       "FC-13",
+                       "FC-15",
+                       "FC-17"],
+            "FC-B":   ["FC-3",
+                       "FC-11"]}
+                     
+   
 #no_values = ["FC--1"]
                                   
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
