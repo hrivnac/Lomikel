@@ -1007,7 +1007,7 @@
       <arg value="/Lomikel"/>
       <arg value="--port"/>
       <arg value="${jetty_port}"/>
-      <arg value="--stop-key"/>
+      <arg value="--stop-port"/>
       <arg value="${jetty_port_stop}"/>
       <arg value="--log"/>
       <arg value="LomikelServer.log"/>
