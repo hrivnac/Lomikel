@@ -31,7 +31,7 @@ conf           = '{"spark.mesos.principal":          "fink",' +
                    '"spark.cores.max":               "8",' +
                    '"spark.executor.cores":          "2",' +
                    '"name":                          "livy-batch",' +
-                   '"spark.jars":                    "hdfs://157.136.254.149:8020/user/julius.hrivnac/hbase-spark-hbase2.3.0_spark3.4.1_scala2.12.0_hadoop3.3.6.jar,hdfs://134.158.75.222:8020/user/julius.hrivnac/hbase-spark-protocol-shaded-hbase2.3.0_spark3.4.1_scala2.12.0_hadoop3.3.6.jar",' +
+                   '"spark.jars":                    "hdfs://157.136.254.149:8020/user/julius.hrivnac/hbase-spark-hbase2.3.0_spark3.4.1_scala2.12.0_hadoop3.3.6.jar,hdfs://157.136.254.149:8020/user/julius.hrivnac/hbase-spark-protocol-shaded-hbase2.3.0_spark3.4.1_scala2.12.0_hadoop3.3.6.jar",' +
                    '"spark.jars.packages":           "org.apache.spark:spark-streaming-kafka-0-10-assembly_2.12:3.4.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1,org.apache.spark:spark-avro_2.12:3.4.1,org.apache.hbase:hbase-shaded-mapreduce:2.2.7,org.slf4j:slf4j-log4j12:1.7.36,org.slf4j:slf4j-simple:1.7.36",' +
                    '"spark.executor.memory":         "4g"}';
 proxyUser      = 'livy';
