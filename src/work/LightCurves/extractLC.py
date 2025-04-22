@@ -5,7 +5,7 @@ from pyspark.sql.functions import size
 from pyspark.sql.functions import array_join
 from pyspark.sql.types import StringType
 
-from fink_filters.classification import extract_fink_classification
+from fink_filters.ztf.classification import extract_fink_classification
 
 import numpy as np
 

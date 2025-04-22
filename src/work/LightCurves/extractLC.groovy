@@ -25,9 +25,9 @@ files          = null
 archives       = null;
 queue          = null;
 jobName        = null;
-conf           = '{"spark.mesos.principal":          "lsst",' +
-                   '"spark.mesos.secret":            "secret",' +
-                   '"spark.mesos.role":              "lsst",' +
+conf           = '{"spark.mesos.principal":          "fink",' +
+                   '"spark.mesos.secret":            "secret_2025",' +
+                   '"spark.mesos.role":              "fink",' +
                    '"spark.cores.max":               "8",' +
                    '"spark.executor.cores":          "2",' +
                    '"name":                          "livy-batch",' +

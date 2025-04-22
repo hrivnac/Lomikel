@@ -21,7 +21,6 @@ from pyspark.ml.evaluation import ClusteringEvaluator
 
 from fink_filters.ztf.classification import extract_fink_classification
 
-
 from functools import reduce
 
 import numpy as np
