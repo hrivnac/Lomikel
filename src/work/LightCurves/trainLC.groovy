@@ -1,8 +1,17 @@
-// read light curve data from all.lst file
-// and train them using UCISequenceClassification
+@Grab('tech.tablesaw:tablesaw-core:0.43.1')
+@Grab('org.apache.commons:commons-math3:3.6.1')
+@Grab('org.deeplearning4j:deeplearning4j-core:1.0.0-M2.1')
+@Grab('org.nd4j:nd4j-native-platform:1.0.0-M2.1')
+@Grab('org.nd4j:nd4j-native:1.0.0-M2.1')
+@Grab('org.nd4j:nd4j-common:1.0.0-M2.1')
+@Grab('ch.qos.logback:logback-classic:1.2.11')
+@Grab('org.slf4j:slf4j-api:1.7.30')
+@Grab('org.apache.logging.log4j:log4j-api:2.24.3')
+@Grab('org.apache.logging.log4j:log4j-core:2.24.3')
+@Grab('org.codehaus.groovy:groovy-json:3.0.21')
 
-// Krakev
-import com.Krakev.deeplearning4j.Utils.DataOrganizer;
+// Groovy
+import groovy.json.JsonSlurper
 
 // Deeplearning4j
 import org.datavec.api.records.reader.SequenceRecordReader;
@@ -42,6 +51,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 // Java
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -53,62 +64,52 @@ import java.util.Random;
 // Log
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.Configurator;
 
 // -----------------------------------------------------------------------------
 
 // Initialise
 
-log = LogManager.getLogger(this.class);
+Configurator.initialize(null, "../src/java/log4j2.xml")
+def log = LogManager.getLogger(this.class);
 
-conf = evaluate(new File("../src/work/LightCurves/conf.groovy").text);
-log.info("Conf: " + conf);
+def conf1 = evaluate(new File("../src/work/LightCurves/conf.groovy").text);
+log.info("Conf1: " + conf1);
 
-curvesDN        = conf.curvesDN;
-miniBatchSize   = conf.miniBatchSize;
-numLabelClasses = conf.numLabelClasses;
-blockSize       = conf.blockSize;
-trainClasses    = conf.trainClasses;
-trainFid        = conf.trainFid;
-nEpochs         = conf.nEpochs;
+def csvDN           = conf1.csvDN
+def curvesDN        = conf1.curvesDN;
+def miniBatchSize   = conf1.miniBatchSize;
+def numLabelClasses = conf1.numLabelClasses;
+def blockSize       = conf1.blockSize;
+def trainClasses    = conf1.trainClasses;
+def trainFid        = conf1.trainFid;
+def nEpochs         = conf1.nEpochs;
+
+def conf2 = new JsonSlurper().parseText(Files.readString(Paths.get(csvDN + "/iterator_config.json")))
+log.info("Conf2: " + conf2);
+
+def trainFeatureDir = conf2.trainFeatureDir
+def trainLabelDir   = conf2.trainLabelDir
+def testFeatureDir  = conf2.testFeatureDir
+def testLabelDir    = conf2.testLabelDir
+def batchSize       = conf2.batchSize
+def numClasses      = conf2.numClasses
+def maxSeqLength    = conf2.maxSeqLength
+def fidValues       = conf2.fidValues
+def trainRate       = conf2.trainRate
+def trainSize       = conf2.trainSize
+def testSize        = conf2.testSize 
 
 // Get data
 
-/*
-//c = new DataOrganizer(curvesDN + "/lc/");
-
-def data;
-if (trainClasses == []) {
-  data = new File(curvesDN).listFiles()
-                           .findAll {it.isFile() && it.name.endsWith("_" + trainFid + ".lst")}
-                           .collect {trainClasses += [it.getName()
-                                                        .replaceAll("../run/", "")
-                                                        .replaceAll("_" + trainFid + ".lst", "")];
-                                     it.text}
-                           .join();
-  }
-else {
-  data = trainClasses.collect {new File(curvesDN, it + "_" + trainFid + ".lst").text}.join();
-  }
-log.info("Training for classes: " + trainClasses);
-numLabelClasses = trainClasses.size;
-trainSize       = (int)(numLabelClasses * blockSize * conf.trainRate);
-testSize        = (int)(numLabelClasses * blockSize - trainSize);
-//c.prepareData(data, blockSize, trainSize);
-return
-*/
 // Initialise data
 
-    baseDir          = new File(curvesDN + "/lstm_data");
-    baseTrainDir     = new File(baseDir,      "train");
-    featuresDirTrain = new File(baseTrainDir, "features");
-    labelsDirTrain   = new File(baseTrainDir, "labels");
-    baseTestDir      = new File(baseDir,      "test");
-    featuresDirTest  = new File(baseTestDir,  "features");
-    labelsDirTest    = new File(baseTestDir,  "labels");
-    
-    trainSize=6678
-    testSize=2227
-    numLabelClasses=76
+def featuresDirTrain = new File(trainFeatureDir);
+def labelsDirTrain   = new File(trainLabelDir);
+def featuresDirTest  = new File(testFeatureDir);
+def labelsDirTest    = new File(testLabelDir);
+
+numLabelClasses=numClasses
 
 trainFeatures = new CSVSequenceRecordReader();
 trainFeatures.initialize(new NumberedFileInputSplit(featuresDirTrain.getAbsolutePath() + "/seq_%d.csv", 0, trainSize - 1));
@@ -153,14 +154,9 @@ conf = new NeuralNetConfiguration.Builder()
                                                 .nIn(2)
                                                 .nOut(10)
                                                 .build())
-                                 .layer(new LSTM.Builder()
-                                                .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
-                                                .nIn(10)
-                                                .nOut(20)
-                                                .build())
                                  .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE) // MCXENT, KL_DIVERGENCE, MSE
                                                           .activation(Activation.SOFTMAX)
-                                                          .nIn(20)
+                                                          .nIn(10)
                                                           .nOut(numLabelClasses)
                                                           .build())
                                  .build();
@@ -228,7 +224,7 @@ net.init();
 // Training
 
 log.info("Starting training...");
-net.setListeners(new ScoreIterationListener(20), new EvaluativeListener(testData, 1, InvocationType.EPOCH_END));
+net.setListeners(new ScoreIterationListener(2), new EvaluativeListener(testData, 1, InvocationType.EPOCH_END));
 net.fit(trainData, nEpochs);
 
 // Test

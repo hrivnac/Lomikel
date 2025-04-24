@@ -40,11 +40,11 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 // Initialise
 
-Configurator.initialize(null, "../src/java/log4j2.xml");
-def log = LogManager.getLogger(this.class);
+Configurator.initialize(null, "../src/java/log4j2.xml")
+def log = LogManager.getLogger(this.class)
 
 def conf = evaluate(new File("../src/work/LightCurves/conf.groovy").text)
-log.info("Conf: " + conf);
+log.info("Conf: " + conf)
 
 def csvDN        = conf.csvDN
 def curvesDN     = conf.curvesDN
@@ -56,6 +56,8 @@ def reduce       = conf.reduce
 def fidValues    = conf.fidValues;fid_values = fidValues
 def trainRate    = conf.trainRate
 def maxSeqLength = conf.jdSize
+def classes      = conf.classes
+def merging      = conf.merging
 
 def cvsPath = csvDN + "/all.csv"
 def outputDir = Paths.get(curvesDN + "/lstm_data")
@@ -81,7 +83,7 @@ catch (Exception e) {
 def options = CsvReadOptions.builder(cvsPath)
                             .header(true)
                             .maxCharsPerColumn(100000)
-                            .sampleSize(10000)
+                            .sampleSize(1000)
                             .build()
 def table
 try {
@@ -94,26 +96,31 @@ catch (Exception e) {
   throw e
   }
 
+  
+  
+  
+  
+  
+  
 // Define array columns and their new names
 def arrayColumns = ["collect_list(fid)", "collect_list(magpsf)", "collect_list(jd)", "collect_list(class)"]
 def newColumnNames = ["fid", "magpsf", "jd", "class"]
 
 // Parse semicolon-separated arrays
-def parseArray = {String arrayStr, String targetType ->
-  try {
-    arrayStr = arrayStr?.trim()
-    if (!arrayStr) return []
-    def values = arrayStr.split(";").collect {it.trim()}
-    switch (targetType) {
-      case "STRING": return values
-      case "DOUBLE": return values.collect {it == "null" || it.isEmpty() ? Double.NaN : it.toDouble()}
-      default: throw new IllegalArgumentException("Unknown type: $targetType")
-      }
+def parseArray = { String arrayStr, String targetType ->
+    try {
+        arrayStr = arrayStr?.trim()
+        if (!arrayStr) return []
+        def values = arrayStr.split(";").collect { it.trim() }
+        switch (targetType) {
+            case "STRING": return values
+            case "DOUBLE": return values.collect { it == "null" || it.isEmpty() ? Double.NaN : it.toDouble() }
+            default: throw new IllegalArgumentException("Unknown type: $targetType")
+        }
+    } catch (Exception e) {
+        throw new RuntimeException("Parsing error: ${e.message}")
     }
-  catch (Exception e) {
-    throw new RuntimeException("Parsing error: ${e.message}")
-    }
-  }
+}
 
 // Explode the table
 def newColumns = []
@@ -143,8 +150,8 @@ table.forEach { row ->
         if (lengths.unique().size() > 1) {
             throw new RuntimeException("Array lengths differ: $lengths")
         }
-        if (!arrays.fid.every { it in fidValues }) {
-            throw new RuntimeException("Invalid fid values: ${arrays.fid}. Expected: $fidValues")
+        if (!arrays.fid.every { it in fid_values }) {
+            throw new RuntimeException("Invalid fid values: ${arrays.fid}. Expected: $fid_values")
         }
         def arrayLength = lengths[0]
         (0..<arrayLength).each { idx ->
@@ -187,17 +194,50 @@ if (explodedTable.column("objectId") instanceof TextColumn) {
     println "Converted objectId from TextColumn to StringColumn"
 }
 
-// Debug objectId column type
-println "objectId column type: ${explodedTable.column('objectId').type()}"
-
 // Debug maxclass and fid values
-def maxclassValues = explodedTable.stringColumn("maxclass").asList()
-def fidValuesInData = explodedTable.stringColumn("fid").asSet()
-println "maxclass unique values: ${maxclassValues.toSet()}"
-println "maxclass null count: ${maxclassValues.count { it == null || it.isEmpty() }}"
-println "maxclass sample (first 10): ${maxclassValues.take(10)}"
-println "fid unique values in data: $fidValuesInData"
-println "Expected fid values: $fidValues"
+def maxclassValues = explodedTable.stringColumn("maxclass").asSet().findAll { it != null && !it.isEmpty() }
+println "maxclass unique values: $maxclassValues"
+println "maxclass null count: ${explodedTable.stringColumn('maxclass').count { it == null || it.isEmpty() }}"
+println "fid unique values in data: ${explodedTable.stringColumn('fid').asSet()}"
+println "Expected fid values: $fid_values"
+
+// Validate classes
+if (classes) {
+    def missingClasses = classes.findAll { !maxclassValues.contains(it) }
+    if (missingClasses) {
+        println "Warning: Some specified classes not found in data: $missingClasses"
+    }
+    explodedTable = explodedTable.where(explodedTable.stringColumn("maxclass").isIn(classes))
+    println "Restricted to classes: $classes"
+    println "Table after class restriction: ${explodedTable.shape()}"
+    if (explodedTable.rowCount() == 0) {
+        println "Error: No data remains after class restriction"
+        return
+    }
+}
+
+// Apply class merging
+def classMapping = [:]
+if (merging) {
+    merging.each { mergedClass, originalClasses ->
+        originalClasses.each { origClass ->
+            classMapping[origClass] = mergedClass
+        }
+    }
+    // Validate merging classes
+    def relevantClasses = explodedTable.stringColumn("maxclass").asSet()
+    def applicableMappings = classMapping.findAll { origClass, mergedClass -> origClass in relevantClasses }
+    if (applicableMappings) {
+        println "Applying class mapping: $applicableMappings"
+        def newMaxclass = StringColumn.create("maxclass", 
+            explodedTable.stringColumn("maxclass").collect { classMapping[it] ?: it }
+        )
+        explodedTable.replaceColumn("maxclass", newMaxclass)
+        println "Table after class merging: ${explodedTable.shape()}"
+    } else {
+        println "No applicable class mappings for current data: $classMapping"
+    }
+}
 
 // Filter objectIds with sufficient data for all fid values
 def validIds
@@ -207,7 +247,7 @@ try {
     validIds = groupByTable.collect { g ->
         def gTable = g.asTable()
         def maxclass = g.getString(0, "maxclass")
-        def isValid = fidValues.every { fid ->
+        def isValid = fid_values.every { fid ->
             def fidTable = gTable.where(gTable.stringColumn("fid").isEqualTo(fid))
             def jd = fidTable.doubleColumn("jd").asList().findAll { it != null && !it.isNaN() }
             def jdUnique = jd.toSet().toList()
@@ -220,7 +260,11 @@ try {
     throw e
 }
 explodedTable = explodedTable.where(explodedTable.stringColumn("objectId").isIn(validIds))
-println "Filtered to ${explodedTable.rowCount()} rows with sufficient data for all fid values: $fidValues"
+println "Filtered to ${explodedTable.rowCount()} rows with sufficient data for all fid values: $fid_values"
+if (explodedTable.rowCount() == 0) {
+    println "Error: No data remains after filtering for sufficient fid data"
+    return
+}
 
 // Validate labelSet
 def labelSet = explodedTable.stringColumn("maxclass").asSet().findAll { it != null && !it.isEmpty() }.toList()
@@ -242,8 +286,6 @@ try {
     println "splitOn error: ${e.message}"
     throw e
 }
-
-
 
 // Process light curves
 def sequences = []
@@ -374,7 +416,7 @@ grouped.each { group ->
         def labelIdx = labelToIndex[maxclass]
         def labelArray
         try {
-            labelArray = Nd4j.create([labelIdx as double])
+            labelArray = Nd4j.create([labelIdx as int])
             println "Created label array for $objectId, maxclass='$maxclass', idx=$labelIdx: shape=${labelArray.shapeInfoToString()}"
         } catch (Exception e) {
             throw new RuntimeException("Failed to create label array for maxclass '$maxclass': ${e.message}")
@@ -464,67 +506,37 @@ sequences.eachWithIndex { seq, idx ->
     }
 }
 
+  
+  
+
 // Log saving errors
-if (errors.find { it.contains("saving sequence/label") }) {
-    println "Saving errors:"
-    errors.findAll { it.contains("saving sequence/label") }.each { println it }
-} else {
-    println "Successfully saved ${sequences.size()} sequence and label files (${trainIndices.size()} train, ${testIndices.size()} test)"
-}
-
-// DL4J Iterators for train and test
-try {
-    // Train iterator
-    def trainFeatureReader = new CSVSequenceRecordReader()
-    trainFeatureReader.initialize(new FileSplit(trainFeatureDir.toFile()))
-    def trainLabelReader = new CSVSequenceRecordReader()
-    trainLabelReader.initialize(new FileSplit(trainLabelDir.toFile()))
-
-    def trainIterator = new SequenceRecordReaderDataSetIterator(
-        trainFeatureReader, trainLabelReader, batchSize, numClasses, true,
-        SequenceRecordReaderDataSetIterator.AlignmentMode.EQUAL_LENGTH
-    )
-
-    println "Train iterator created with ${trainIndices.size()} sequences, $numClasses classes"
-    trainIterator.each { dataSet ->
-        println "Train batch: features=${dataSet.features.shapeInfoToString()}, labels=${dataSet.labels.shapeInfoToString()}"
-    }
-
-    // Test iterator
-    def testFeatureReader = new CSVSequenceRecordReader()
-    testFeatureReader.initialize(new FileSplit(testFeatureDir.toFile()))
-    def testLabelReader = new CSVSequenceRecordReader()
-    testLabelReader.initialize(new FileSplit(testLabelDir.toFile()))
-
-    def testIterator = new SequenceRecordReaderDataSetIterator(
-        testFeatureReader, testLabelReader, batchSize, numClasses, true,
-        SequenceRecordReaderDataSetIterator.AlignmentMode.EQUAL_LENGTH
-    )
-
-    println "Test iterator created with ${testIndices.size()} sequences, $numClasses classes"
-    testIterator.each { dataSet ->
-        println "Test batch: features=${dataSet.features.shapeInfoToString()}, labels=${dataSet.labels.shapeInfoToString()}"
-    }
-} catch (Exception e) {
-    println "Error creating iterator: ${e.message}"
-    e.printStackTrace()
-}
+if (errors.find {it.contains("saving sequence/label")}) {
+  log.warn("Saving errors:")
+  errors.findAll {it.contains("saving sequence/label")}.each {log.warn("\t" + it)}
+  }
+else {
+  log.info("Successfully saved ${sequences.size()} sequence and label files (${trainIndices.size()} train, ${testIndices.size()} test)")
+  }
 
 // Save iterator config
 def config = [
-    trainFeatureDir: trainFeatureDir.toString(),
-    trainLabelDir: trainLabelDir.toString(),
-    testFeatureDir: testFeatureDir.toString(),
-    testLabelDir: testLabelDir.toString(),
-    batchSize: batchSize,
-    numClasses: numClasses,
-    maxSeqLength: maxSeqLength,
-    fid_values: fid_values,
-    trainRate: trainRate
-]
+  trainFeatureDir: trainFeatureDir.toString(),
+  trainLabelDir: trainLabelDir.toString(),
+  testFeatureDir: testFeatureDir.toString(),
+  testLabelDir: testLabelDir.toString(),
+  numClasses: numClasses,
+  maxSeqLength: maxSeqLength,
+  fidValues: fidValues,
+  trainRate: trainRate,
+  classes: classes,
+  merging: merging,
+  trainSize: trainIndices.size(),
+  testSize: testIndices.size()
+  ]
 try {
-    Files.writeString(Paths.get("iterator_config.json"), groovy.json.JsonOutput.toJson(config))
-    println "Iterator config saved"
-} catch (Exception e) {
-    println "Error saving iterator config: ${e.message}"
-}
+  Files.writeString(Paths.get(csvDN + "/iterator_config.json"), groovy.json.JsonOutput.toJson(config))
+  log.info("Iterator config saved to ${csvDN}/iterator_config.json")
+  }
+catch (Exception e) {
+  log.error("Error saving iterator config: ${e.message}")
+  }

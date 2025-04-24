@@ -18,7 +18,8 @@ return [csvDN:          "../data/LightCurves/2024",
         miniBatchSize:   64,    // 10, 32, 64
         blockSize:      100,    // number of LC samples (smaler cases will be skipped, larger cases will be shortened)
         trainRate:      0.75,
-        trainClasses:   ["Mira", "LPV*"],
+        classes:       ["Mira", "LPV*", "C*", "QSO", "EB*", "Candidate_EB*", "EB*_Candidate"],
+        merging:       ["EB*": ["EB*", "Candidate_EB*"]],
         fidValues:      ["1", "2"],
         trainFid:       2,
         nEpochs:        100     // 40, 100
