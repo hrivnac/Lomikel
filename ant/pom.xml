@@ -3,77 +3,164 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com</groupId>
+  <groupId>com.hrivnac</groupId>
   <artifactId>Lomikel</artifactId>
   <version>@version@</version>
   <name>Lomikel</name>
-  <description>set of general purpose tools (exe)</description>
-  <url>http://cern.ch/hrivnac/Activities/Packages/Lomikel</url>
+  <description>set of general purpose tools</description>
+  <url>https://github.com/hrivnac/Lomikel</url>
   
   <licenses>
     <license>
-      <name>GNU General Public License</name>
-      <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+      <name>Apache License 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
       </license>
     </licenses>
 
   <developers>
     <developer>
+      <id>hrivnac</id>
       <name>Julius Hrivnac</name>
       <email>Julius.Hrivnac@cern.ch</email>
       </developer>
     </developers>  
-    
-  <scm>
-    <connection>scm:git:https://github.com/hrivnac/Lomikel</connection>
-    <developerConnection>scm:git:https://github.com/hrivnac/Lomikel</developerConnection>
-    <url>https://hrivnac.web.cern.ch/Activities/Packages/Lomikel</url>
+
+  <scm>    
+    <url>https://github.com/hrivnac/Lomikel</url>
+    <connection>scm:git:https://github.com/hrivnac/Lomikel.git</connection>
+    <developerConnection>scm:git:git@github.com:hrivnac/Lomikel.git</developerConnection>
     </scm> 
   
   <properties>
-    <lomikel.version>@version@</lomikel.version>
+    <cli.version>1.2</cli.version>
+    <joinery-dataframe.version>1.10</joinery-dataframe.version>
+    <jakarta.mail.version>2.1.3</jakarta.mail.version>
+    <healpix.version>1.0.0</healpix.version>
+    <orgjson.version>0.12.5</orgjson.version>
+    <parquethadoop.version>0.28.0</parquethadoop.version>
+    <math3.version>3.6.1</math3.version>
+    <groovy.version>4.0.21</groovy.version>
+    <parquet-avro.version>1.14.1</parquet-avro.version>
+    <hbase.version>2.6.0-hadoop3</hbase.version>
+    <log4j.version>2.23.1</log4j.version>
+    <logging.version>1.3.2</logging.version>
+    <hadoop.version>3.4.0</hadoop.version>
+    <jython.version>2.7.3</jython.version>
+    <httpclient.version>4.5.14</httpclient.version>
+    <janusgraph.version>1.0.0</janusgraph.version>
     </properties>
   
   <dependencies>
     <dependency>
-      <groupId>com</groupId>
-      <artifactId>Lomikel-core</artifactId>
-      <version>${lomikel.version}</version>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>${cli.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>sh.joinery</groupId>
+      <artifactId>joinery-dataframe</artifactId>
+      <version>${joinery-dataframe.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>jakarta.mail</groupId>
+      <artifactId>jakarta.mail-api</artifactId>
+      <version>${jakarta.mail.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>io.github.zycxnanwang</groupId>
+      <artifactId>healpix</artifactId>
+      <version>${healpix.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-orgjson</artifactId>
+      <version>${orgjson.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>io.deephaven</groupId>
+      <artifactId>deephaven-ParquetHadoop</artifactId>
+      <version>${parquethadoop.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>${math3.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy</artifactId>
+      <version>${groovy.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-console</artifactId>
+      <version>${groovy.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-ant</artifactId>
+      <version>${groovy.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-sql</artifactId>
+      <version>${groovy.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-groovysh</artifactId>
+      <version>${groovy.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-avro</artifactId>
+      <version>${parquet-avro.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-common</artifactId>
+      <version>${hbase.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-client</artifactId>
+      <version>${hbase.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>${logging.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>${hadoop.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <version>${jython.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>${httpclient.version}</version>
+      </dependency>
+    <dependency>
+      <groupId>org.janusgraph</groupId>
+      <artifactId>janusgraph-core</artifactId>
+      <version>${janusgraph.version}</version>
       </dependency>
     </dependencies>
-    
-  <build>
-    <defaultGoal>install</defaultGoal>
-    <directory>${basedir}/target</directory>
-    <finalName>${project.artifactId}-${project.version}</finalName>
-    <filters>
-      </filters>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.1.1</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>com.Lomikel.Apps.LUC</mainClass>
-              </manifest>
-            </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-            </descriptorRefs>
-          </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </build>
   
   </project>

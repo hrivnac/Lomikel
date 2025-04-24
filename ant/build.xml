@@ -290,6 +290,9 @@
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Implementation-Title" value="Lomikel"/>
+        <attribute name="Implementation-Version" value="${version}"/>
+        <attribute name="Implementation-Vendor-Id" value="com.hrivnac"/>
         </manifest>
       </jar>
     </target>

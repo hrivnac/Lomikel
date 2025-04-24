@@ -83,7 +83,7 @@ catch (Exception e) {
 def options = CsvReadOptions.builder(cvsPath)
                             .header(true)
                             .maxCharsPerColumn(100000)
-                            .sampleSize(1000)
+                            .sampleSize(10000)
                             .build()
 def table
 try {
