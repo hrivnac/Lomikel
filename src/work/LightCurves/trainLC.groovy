@@ -15,6 +15,10 @@ import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.LSTM;
 import org.deeplearning4j.nn.conf.layers.GravesLSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.recurrent.Bidirectional;
+import org.deeplearning4j.nn.conf.layers.DropoutLayer;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.api.InvocationType;
@@ -69,7 +73,8 @@ nEpochs         = conf.nEpochs;
 
 // Get data
 
-c = new DataOrganizer(curvesDN + "/lc/");
+/*
+//c = new DataOrganizer(curvesDN + "/lc/");
 
 def data;
 if (trainClasses == []) {
@@ -88,14 +93,27 @@ log.info("Training for classes: " + trainClasses);
 numLabelClasses = trainClasses.size;
 trainSize       = (int)(numLabelClasses * blockSize * conf.trainRate);
 testSize        = (int)(numLabelClasses * blockSize - trainSize);
-c.prepareData(data, blockSize, trainSize);
-
+//c.prepareData(data, blockSize, trainSize);
+return
+*/
 // Initialise data
 
+    baseDir          = new File(curvesDN + "/lstm_data");
+    baseTrainDir     = new File(baseDir,      "train");
+    featuresDirTrain = new File(baseTrainDir, "features");
+    labelsDirTrain   = new File(baseTrainDir, "labels");
+    baseTestDir      = new File(baseDir,      "test");
+    featuresDirTest  = new File(baseTestDir,  "features");
+    labelsDirTest    = new File(baseTestDir,  "labels");
+    
+    trainSize=6678
+    testSize=2227
+    numLabelClasses=76
+
 trainFeatures = new CSVSequenceRecordReader();
-trainFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTrain.getAbsolutePath() + "/%d.csv", 0, trainSize - 1));
+trainFeatures.initialize(new NumberedFileInputSplit(featuresDirTrain.getAbsolutePath() + "/seq_%d.csv", 0, trainSize - 1));
 trainLabels = new CSVSequenceRecordReader();
-trainLabels.initialize(new NumberedFileInputSplit(c.labelsDirTrain.getAbsolutePath() + "/%d.csv", 0, trainSize - 1));
+trainLabels.initialize(new NumberedFileInputSplit(labelsDirTrain.getAbsolutePath() + "/label_%d.csv", 0, trainSize - 1));
 trainData = new SequenceRecordReaderDataSetIterator(trainFeatures,
                                                     trainLabels,
                                                     miniBatchSize,
@@ -104,9 +122,9 @@ trainData = new SequenceRecordReaderDataSetIterator(trainFeatures,
                                                     SequenceRecordReaderDataSetIterator.AlignmentMode.ALIGN_START); // ALIGN_END, LIGN_START, EQUAL_LENGTH
                                                 
 testFeatures = new CSVSequenceRecordReader();
-testFeatures.initialize(new NumberedFileInputSplit(c.featuresDirTest.getAbsolutePath() + "/%d.csv", 0, testSize - 1));
+testFeatures.initialize(new NumberedFileInputSplit(featuresDirTest.getAbsolutePath() + "/seq_%d.csv", 0, testSize - 1));
 testLabels = new CSVSequenceRecordReader();
-testLabels.initialize(new NumberedFileInputSplit(c.labelsDirTest.getAbsolutePath() + "/%d.csv", 0, testSize - 1));
+testLabels.initialize(new NumberedFileInputSplit(labelsDirTest.getAbsolutePath() + "/label_%d.csv", 0, testSize - 1));
 
 testData = new SequenceRecordReaderDataSetIterator(testFeatures,
                                                    testLabels,
@@ -132,7 +150,12 @@ conf = new NeuralNetConfiguration.Builder()
                                  .list()
                                  .layer(new LSTM.Builder()
                                                 .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
-                                                .nIn(1)
+                                                .nIn(2)
+                                                .nOut(10)
+                                                .build())
+                                 .layer(new LSTM.Builder()
+                                                .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
+                                                .nIn(10)
                                                 .nOut(20)
                                                 .build())
                                  .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE) // MCXENT, KL_DIVERGENCE, MSE
@@ -142,6 +165,63 @@ conf = new NeuralNetConfiguration.Builder()
                                                           .build())
                                  .build();
 
+// ChatGPT
+//conf = new NeuralNetConfiguration.Builder()
+//                                 .seed(123)
+//                                 .weightInit(WeightInit.XAVIER)
+//                                 .updater(new Adam(0.002))
+//                                 .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+//                                 .gradientNormalizationThreshold(0.5)
+//                                 .list()
+//                                 .layer(new Bidirectional(Bidirectional.Mode.ADD,
+//                                        new LSTM.Builder()
+//                                                .nIn(1)
+//                                                .nOut(32)
+//                                                .activation(Activation.TANH)
+//                                                .build()))
+//                                 .layer(new LSTM.Builder()
+//                                                .nOut(64)
+//                                                .activation(Activation.TANH)
+//                                                .dropOut(0.2)
+//                                                .build())
+//                                 .layer(new DenseLayer.Builder()
+//                                                      .nOut(64)
+//                                                      .activation(Activation.RELU)
+//                                                      .build())
+//                                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
+//                                                          .activation(Activation.SOFTMAX)
+//                                                          .nOut(numLabelClasses)
+//                                                          .build())
+//                                 .setInputType(InputType.recurrent(1))
+//                                 .build();
+                                 
+// Gemini
+//conf = new NeuralNetConfiguration.Builder()
+//                                 .seed(123)
+//                                 .weightInit(WeightInit.XAVIER)
+//                                 .updater(new Adam(0.002))
+//                                 .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+//                                 .gradientNormalizationThreshold(0.5)
+//                                 .list()
+//                                 .layer(new LSTM.Builder()
+//                                                .activation(Activation.TANH)
+//                                                .nIn(1) // Assuming 1 feature (magnitude) per time step
+//                                                .nOut(32) // Increased hidden units
+//                                                .build())
+//                                 .layer(new DropoutLayer(0.2)) // Adding dropout
+//                                 .layer(new LSTM.Builder()
+//                                                .activation(Activation.TANH)
+//                                                .nIn(32)
+//                                                .nOut(64) // Further increased hidden units
+//                                                .build())
+//                                 .layer(new DropoutLayer(0.2)) // Adding dropout
+//                                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT) // Changed loss function
+//                                                          .activation(Activation.SOFTMAX)
+//                                                          .nIn(64)
+//                                                          .nOut(numLabelClasses)
+//                                                          .build())
+//                                 .build();
+        
 net = new MultiLayerNetwork(conf);
 net.init();
 
@@ -155,7 +235,7 @@ net.fit(trainData, nEpochs);
 
 log.info("Evaluating...");
 eval = net.evaluate(testData);
-log.info(eval.stats());
+log.info(eval.stats(false, true));
 
 // Save
 

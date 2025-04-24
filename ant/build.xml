@@ -998,7 +998,7 @@
 
   <!-- Run =================================================================-->
 
-  <target name="run-Lomikel"
+  <target name="start-Lomikel"
           depends="init"
           description="Run local Lomikel Server">
     <echo>Go to http://localhost:${jetty_port}/Lomikel</echo>
@@ -1017,7 +1017,7 @@
       </java>
     </target>
   
-  <target name="run-FinkBrowser"
+  <target name="start-FinkBrowser"
           depends="init"
           description="Run local FinkBrowser Server">
     <echo>Go to http://localhost:${jetty_port}/FinkBrowser</echo>
