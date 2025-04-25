@@ -83,7 +83,7 @@ catch (Exception e) {
 def options = CsvReadOptions.builder(cvsPath)
                             .header(true)
                             .maxCharsPerColumn(100000)
-                            .sampleSize(1000)
+                            .sampleSize(10000)
                             .build()
 def table
 try {
@@ -364,7 +364,7 @@ grouped.each {group -> processed++
                                                 def mag = processedFidData[fid].mag
                                                 try {
                                                   def poly = interpolator.interpolate(jd as double[], mag as double[])
-                                                  magInterps[fid] = commonJd.collect { poly.value(it) }
+                                                  magInterps[fid] = commonJd.collect {poly.value(it)}
                                                   }
                                                 catch (Exception e) {
                                                   throw new RuntimeException("Interpolation failed for fid=$fid: ${e.message}")
@@ -536,8 +536,12 @@ else {
 def config = [
   trainFeatureDir: trainFeatureDir.toString(),
   trainLabelDir: trainLabelDir.toString(),
+  trainJdDir: trainJdDir.toString(),
+  trainOidDir: trainOidDir.toString(),
   testFeatureDir: testFeatureDir.toString(),
   testLabelDir: testLabelDir.toString(),
+  testJdDir: testJdDir.toString(),
+  testOidDir: testOidDir.toString(),
   numClasses: numClasses,
   maxSeqLength: maxSeqLength,
   fidValues: fidValues,
