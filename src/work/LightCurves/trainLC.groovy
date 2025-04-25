@@ -5,117 +5,75 @@
 @Grab('org.slf4j:slf4j-api:1.7.30')
 @Grab('ch.qos.logback:logback-classic:1.2.11')
 @Grab('org.codehaus.groovy:groovy-json:3.0.21')
-
 @Grab('org.deeplearning4j:deeplearning4j-core:1.0.0-beta6')
-// ND4J native backend for numerical computations
 @Grab('org.nd4j:nd4j-native-platform:1.0.0-beta6')
 @Grab('org.nd4j:nd4j-native:1.0.0-beta6')
-// Logging dependencies (SLF4J with Logback)
-// Dependency for DataSetIteratorSplitter (optional, fallback if unavailable)
 @Grab('org.deeplearning4j:deeplearning4j-utility-iterators:1.0.0-beta6')
-
 
 // Groovy
 import groovy.json.JsonSlurper
 
-// Deeplearning4j
-import org.datavec.api.records.reader.SequenceRecordReader;
-import org.datavec.api.records.reader.impl.csv.CSVSequenceRecordReader;
-import org.datavec.api.split.NumberedFileInputSplit;
-import org.deeplearning4j.datasets.datavec.SequenceRecordReaderDataSetIterator;
-import org.deeplearning4j.nn.conf.GradientNormalization;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.layers.LSTM;
-import org.deeplearning4j.nn.conf.layers.GravesLSTM;
-import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.recurrent.Bidirectional;
-import org.deeplearning4j.nn.conf.layers.DropoutLayer;
-import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.api.InvocationType;
-import org.deeplearning4j.optimize.listeners.EvaluativeListener;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.eval.ROC;
-import org.nd4j.evaluation.classification.Evaluation;
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
-import org.nd4j.linalg.learning.config.Adam;
-import org.nd4j.linalg.learning.config.Nadam;
-import org.nd4j.linalg.learning.config.RmsProp;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
-//import org.nd4j.common.primitives.Pair;
-
-// Core DL4J imports for neural network configuration and layers
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.layers.LSTM;
-import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.datasets.datavec.SequenceRecordReaderDataSetIterator;
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-
-// Imports for preprocessing and data handling
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-
-// Imports for optimizers and learning rate schedules
-import org.nd4j.linalg.learning.config.Adam;
-import org.nd4j.linalg.schedule.ScheduleType;
-//import org.nd4j.linalg.schedule.ExponentialLearningRateSchedule;
-
-// Imports for loss functions and activations
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
-
-// Imports for early stopping
-import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
-import org.deeplearning4j.earlystopping.EarlyStoppingResult;
-import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer;
-import org.deeplearning4j.earlystopping.termination.MaxEpochsTerminationCondition;
-//import org.deeplearning4j.earlystopping.termination.MaxScoreIterationCondition;
-import org.deeplearning4j.earlystopping.scorecalc.DataSetLossCalculator;
-import org.deeplearning4j.earlystopping.saver.InMemoryModelSaver;
-
-// Imports for evaluation and listeners
-import org.deeplearning4j.eval.Evaluation;
-import org.deeplearning4j.optimize.listeners.EvaluativeListener;
-import org.deeplearning4j.optimize.api.InvocationType;
-
-
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize
+// DL4J
+import org.datavec.api.records.reader.impl.csv.CSVSequenceRecordReader
+import org.datavec.api.records.reader.SequenceRecordReader
+import org.datavec.api.split.NumberedFileInputSplit
+import org.deeplearning4j.datasets.datavec.SequenceRecordReaderDataSetIterator
+import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration
+import org.deeplearning4j.earlystopping.EarlyStoppingResult
+import org.deeplearning4j.earlystopping.saver.InMemoryModelSaver
+import org.deeplearning4j.earlystopping.scorecalc.DataSetLossCalculator
+import org.deeplearning4j.earlystopping.termination.MaxEpochsTerminationCondition
+import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer
+import org.deeplearning4j.eval.Evaluation
+import org.deeplearning4j.eval.ROC
+import org.deeplearning4j.nn.api.OptimizationAlgorithm
+import org.deeplearning4j.nn.conf.GradientNormalization
+import org.deeplearning4j.nn.conf.inputs.InputType
+import org.deeplearning4j.nn.conf.layers.DenseLayer
+import org.deeplearning4j.nn.conf.layers.DropoutLayer
+import org.deeplearning4j.nn.conf.layers.GravesLSTM
+import org.deeplearning4j.nn.conf.layers.LSTM
+import org.deeplearning4j.nn.conf.layers.recurrent.Bidirectional
+import org.deeplearning4j.nn.conf.layers.RnnOutputLayer
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
+import org.deeplearning4j.nn.weights.WeightInit
+import org.deeplearning4j.optimize.api.InvocationType
+import org.deeplearning4j.optimize.listeners.EvaluativeListener
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener
+import org.nd4j.evaluation.classification.Evaluation
+import org.nd4j.linalg.activations.Activation
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
+import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize
 import org.nd4j.linalg.dataset.DataSet
-//import org.nd4j.linalg.dataset.api.iterator.data.ListDataSetIterator
-//import org.nd4j.linalg.dataset.ListDataSetIterator
-//import org.nd4j.linalg.dataset.ListDataSetIterator // Corrected import
-
+import org.nd4j.linalg.learning.config.Adam
+import org.nd4j.linalg.learning.config.Nadam
+import org.nd4j.linalg.learning.config.RmsProp
+import org.nd4j.linalg.lossfunctions.LossFunctions
+import org.nd4j.linalg.schedule.ScheduleType
 
 // Apache Commons
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 
 // Java
+import java.io.File
+import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.io.File;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.nio.charset.Charset
+import java.util.ArrayList
+import java.util.Collections
+import java.util.List
+import java.util.Random
 
 // Log
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.Logger
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.core.config.Configurator
 
 // -----------------------------------------------------------------------------
 
@@ -124,7 +82,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 Configurator.initialize(null, "../src/java/log4j2.xml")
 def log = LogManager.getLogger(this.class);
 
-def conf1 = evaluate(new File("../src/work/LightCurves/conf.groovy").text);
+def conf1 = evaluate(new File("../src/work/LightCurves/conf.groovy").text)
 log.info("Conf1: " + conf1);
 
 def csvDN           = conf1.csvDN
@@ -190,23 +148,25 @@ trainData.setPreProcessor(normalizer);
 testData.setPreProcessor(normalizer);
 
 // Prepare NN configuration
-/*
+
 conf = new NeuralNetConfiguration.Builder()
                                  .seed(123)
                                  .weightInit(WeightInit.XAVIER)
                                  .updater(new Adam(0.002)) // Nadam(), Nadam(0.002), Adam(0.001) or RMSProp:
                                  .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
                                  .gradientNormalizationThreshold(0.5) // 0.5, 5.0
+                                 .l2(0.001)
                                  .list()
                                  .layer(new LSTM.Builder()
                                                 .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
                                                 .nIn(2)
                                                 .nOut(10)
+                                                .dropOut(0.1)
                                                 .build())
                                  .layer(new LSTM.Builder()
                                                 .nOut(10)
                                                 .activation(Activation.TANH)
-                                                .dropOut(0.2)
+                                                .dropOut(0.3)
                                                 .build())
                                  .layer(new DenseLayer.Builder()
                                                       .nOut(10)
@@ -217,91 +177,6 @@ conf = new NeuralNetConfiguration.Builder()
                                                           .nOut(numLabelClasses)
                                                           .build())
                                  .build();
-
-// ChatGPT
-conf = new NeuralNetConfiguration.Builder()
-                                 .seed(123)
-                                 .weightInit(WeightInit.XAVIER)
-                                 .updater(new Adam(0.002))
-                                 .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-                                 .gradientNormalizationThreshold(0.5)
-                                 .list()
-                                 .layer(new Bidirectional(Bidirectional.Mode.ADD,
-                                        new LSTM.Builder()
-                                                .nIn(2)
-                                                .nOut(32)
-                                                .activation(Activation.TANH)
-                                                .build()))
-                                 .layer(new LSTM.Builder()
-                                                .nOut(64)
-                                                .activation(Activation.TANH)
-                                                .dropOut(0.2)
-                                                .build())
-                                 .layer(new DenseLayer.Builder()
-                                                      .nOut(64)
-                                                      .activation(Activation.RELU)
-                                                      .build())
-                                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
-                                                          .activation(Activation.SOFTMAX)
-                                                          .nOut(numLabelClasses)
-                                                          .build())
-                                 .setInputType(InputType.recurrent(1))
-                                 .build();
-*/                                 
-// Gemini
-//conf = new NeuralNetConfiguration.Builder()
-//                                 .seed(123)
-//                                 .weightInit(WeightInit.XAVIER)
-//                                 .updater(new Adam(0.002))
-//                                 .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-//                                 .gradientNormalizationThreshold(0.5)
-//                                 .list()
-//                                 .layer(new LSTM.Builder()
-//                                                .activation(Activation.TANH)
-//                                                .nIn(1) // Assuming 1 feature (magnitude) per time step
-//                                                .nOut(32) // Increased hidden units
-//                                                .build())
-//                                 .layer(new DropoutLayer(0.2)) // Adding dropout
-//                                 .layer(new LSTM.Builder()
-//                                                .activation(Activation.TANH)
-//                                                .nIn(32)
-//                                                .nOut(64) // Further increased hidden units
-//                                                .build())
-//                                 .layer(new DropoutLayer(0.2)) // Adding dropout
-//                                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT) // Changed loss function
-//                                                          .activation(Activation.SOFTMAX)
-//                                                          .nIn(64)
-//                                                          .nOut(numLabelClasses)
-//                                                          .build())
-//                                 .build();
-        /*
-*/
-    
-conf = new NeuralNetConfiguration.Builder()
-    .seed(123)
-    .weightInit(WeightInit.XAVIER)
-    .updater(new Adam(0.2))
-    //.updater(new Adam(new ExponentialLearningRateSchedule(ScheduleType.EPOCH, 0.001, 0.95)))
-    .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-    .gradientNormalizationThreshold(0.5)
-    .l2(0.001) // Add L2 regularization
-    .list()
-    .layer(new LSTM.Builder()
-        .activation(Activation.TANH)
-        .nIn(2)
-        .nOut(64)
-        .dropOut(0.1)
-        .build())
-    .layer(new LSTM.Builder()
-        .nOut(32)
-        .activation(Activation.TANH)
-        .dropOut(0.3)
-        .build())
-    .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
-        .activation(Activation.SOFTMAX)
-        .nOut(numLabelClasses)
-        .build())
-    .build();
 
 net = new MultiLayerNetwork(conf);
 net.init();
@@ -317,7 +192,6 @@ net.fit(trainData, nEpochs);
 log.info("Evaluating...");
 eval = net.evaluate(testData);
 log.info(eval.stats(true, true));
-
 
 // Save
 

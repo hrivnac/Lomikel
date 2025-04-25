@@ -12,7 +12,7 @@ rm -rf LightCurves;hadoop fs -get /tmp/LightCurves
 # @home
 scp -r julius.hrivnac@157.136.254.149:/localhome/julius.hrivnac/Lomikel/ant/LightCurves ../data/LightCurves/2025/src
 rm -f ../data/LighCurves/2025/all.csv; awk '(NR == 1) || (FNR > 1)' ../data/LightCurves/2025/src/*csv > ../data/LightCurves/2025/all.csv
-rm -rf ../run/LightCurves/*;lomikel_janus -s ../src/work/LightCurves/prepareLC.groovy -b
+rm -rf ../run/LightCurves/*; /opt/groovy/bin/groovy ../src/work/LightCurves/prepareLC.groovy
 
 # visualisation ################################################################
 
@@ -27,7 +27,7 @@ for X in `ls ../run/LightCurves/*_2.idx`;do
 # classification ###############################################################
 
 # @home
-lomikel_dl4j -s ../src/work/LightCurves/trainLC.groovy -b
+/opt/groovy/bin/groovy ../src/work/LightCurves/trainLC.groovy
 
 --------------------------------------------------------------------------------
 'C*'  'QSO'
