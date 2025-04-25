@@ -294,6 +294,7 @@ catch (Exception e) {
 
 // Process light curves
 def sequences = []
+def jds       = []
 def labels    = []
 def oids      = []
 def groupCount = grouped.size()
@@ -352,12 +353,10 @@ grouped.each {group -> processed++
                          def maxJd = fid_values.collect {processedFidData[it].jd.max()}.min()
                          if (minJd == null || maxJd == null || minJd >= maxJd) {
                            throw new RuntimeException("Invalid or non-overlapping jd range: minJd=$minJd, maxJd=$maxJd")
-                           }
-        
+                           }        
                          // Sample commonJd
                          def step = (maxJd - minJd) / (maxSeqLength - 1)
-                         def commonJd = (0..<maxSeqLength).collect {minJd + it * step}
-        
+                         def commonJd = (0..<maxSeqLength).collect {minJd + it * step}   
                         // Interpolate magpsf for each fid
                         def interpolator = new LinearInterpolator()
                         def magInterps = [:]
@@ -394,14 +393,16 @@ grouped.each {group -> processed++
                         else if (sequence.size() > maxSeqLength) {
                           sequence = sequence[0..<maxSeqLength]
                           }                    
-                        // Create sequence and label arrays
+                        // Create sequence,jd and label,oid arrays
                         def seqArray
+                        def jdArray
                         try {
                           seqArray = Nd4j.create(sequence as double[][])
-                          log.debug("Created sequence array for $objectId: shape=${seqArray.shapeInfoToString()}")
+                          jdArray  = Nd4j.create(commonJd as double[])
+                          log.debug("Created sequence,jd array for $objectId: shape=${seqArray.shapeInfoToString()}")
                           }
                         catch (Exception e) {
-                          throw new RuntimeException("Failed to create sequence array: ${e.message}")
+                          throw new RuntimeException("Failed to create sequence,jd array: ${e.message}")
                           }
                         def labelIdx = labelToIndex[maxclass]
                         def labelArray
@@ -415,6 +416,7 @@ grouped.each {group -> processed++
                           throw new RuntimeException("Failed to create label array for maxclass '$maxclass': ${e.message}")
                           }
                         sequences << seqArray
+                        jds       << jdArray
                         labels    << labelArray
                         oids      << oidArray
                         }
@@ -479,13 +481,14 @@ sequences.eachWithIndex {seq, idx -> try {
                                          }
                                        def isTrain = idx in trainIndices
                                        def featureDir = isTrain ? trainFeatureDir : testFeatureDir
+                                       def jdDir      = isTrain ? trainJdDir      : testJdDir
                                        def labelDir   = isTrain ? trainLabelDir   : testLabelDir
                                        def oidDir     = isTrain ? trainOidDir     : testOidDir
                                        def seqIndex   = isTrain ? trainSeqCounter++ : testSeqCounter++
                                        def seqPath    = featureDir.resolve("seq_${seqIndex}.csv")
                                        def seqData    = (0..<seq.rows()).collect {t -> def row = seq.getRow(t)
                                                                                        row ? row.toDoubleVector().join(",") : ""
-                                                                                       }.findAll { it }.join("\n")
+                                                                                       }.findAll {it}.join("\n")
                                        if (seqData.empty) {
                                          throw new RuntimeException("Empty sequence data at index $idx")
                                          }
@@ -493,22 +496,29 @@ sequences.eachWithIndex {seq, idx -> try {
                                        log.debug("Saved sequence $seqIndex to $seqPath")
                                        def labelArray = labels[idx]
                                        def oidArray   = oids[  idx]
+                                       def jdArray    = jds[  idx]
                                        if (labelArray == null) {
                                          throw new RuntimeException("Null label at index $idx")
                                          }
                                        if (oidArray == null) {
                                          throw new RuntimeException("Null oid at index $idx")
                                          }
+                                       if (jdArray == null) {
+                                         throw new RuntimeException("Null jd at index $idx")
+                                         }
                                        def labelPath = labelDir.resolve("label_${seqIndex}.csv")
                                        def oidPath   = oidDir.resolve(  "oid_${seqIndex}.csv")
+                                       def jdPath    = jdDir.resolve(   "jd_${seqIndex}.csv")
                                        def labelData = labelArray.getInt(0).toString()
                                        def oidData   = oidArray.getString(0)
+                                       jdData = jdArray.join("\n")
                                        Files.writeString(labelPath, labelData)
                                        Files.writeString(oidPath,   oidData)
-                                       log.debug("Saved label,oid$seqIndex to $labelPath,$oidPath")
+                                       Files.writeString(jdPath,    jdData)
+                                       log.debug("Saved label,oid,jd $seqIndex to $labelPath,$oidPath")
                                        }
                                      catch (Exception e) {
-                                       errors << "Error saving sequence/label/oid $idx: ${e.message}"
+                                       errors << "Error saving sequence/label/oid,jd $idx: ${e.message}"
                                        e.printStackTrace()
                                        }
                                      }
