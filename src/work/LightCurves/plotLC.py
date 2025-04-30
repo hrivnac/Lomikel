@@ -1,25 +1,30 @@
 import csv
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 
 doPlot = False
-dir = '../run/LightCurves/lstm_data'
-filename = '../data/LightCurves/2024/all.csv'
+dirRun = '../run/LightCurves/lstm_data'
+dirData = '../data/LightCurves/2024'
 set = 'train'
-for n in range(0,10):
+
+with open(dirData + '/iterator_config.json', 'r') as file:
+  data = json.load(file)
   
-  jd  = np.loadtxt(dir + '/' + set + '/jds/jd_'       + str(n) + '.csv', delimiter=',') 
-  seq = np.loadtxt(dir + '/' + set + '/features/seq_' + str(n) + '.csv', delimiter=',')
+maxclassValues = data['maxclassValues']  
+
+for n in range(0,20):
   
-  with open(dir + '/' + set + '/oids/oid_' + str(n) + '.csv', 'r') as f:
+  jd  = np.loadtxt(dirRun + '/' + set + '/jds/jd_'       + str(n) + '.csv', delimiter=',') 
+  seq = np.loadtxt(dirRun + '/' + set + '/features/seq_' + str(n) + '.csv', delimiter=',')
+  
+  with open(dirRun + '/' + set + '/oids/oid_' + str(n) + '.csv', 'r') as f:
     oid = f.readline().strip()
     
-  with open(dir + '/' + set + '/labels/label_' + str(n) + '.csv', 'r') as f:
-    clazz = ':' + f.readline().strip()
+  with open(dirRun + '/' + set + '/labels/label_' + str(n) + '.csv', 'r') as f:
+    clazz = maxclassValues[int(f.readline().strip())]
 
-  print(oid)
-
-  with open(filename, 'r') as f:
+  with open(dirData + '/all.csv', 'r') as f:
     reader = csv.DictReader(f)
     for row in reader:
       if row['objectId'] == oid:
@@ -35,6 +40,8 @@ for n in range(0,10):
         break
     
   title = oid + ':' + clazz
+  fn    = clazz + ':' + oid
+  print(title)
   
   fig, axes = plt.subplots(2, 1, figsize=(10, 6))  
 
@@ -60,7 +67,7 @@ for n in range(0,10):
   axes[1].grid(True)
 
   plt.tight_layout()
-  plt.savefig(title + '.png')
+  plt.savefig(fn + '.png')
   
   if doPlot:
     plt.show()

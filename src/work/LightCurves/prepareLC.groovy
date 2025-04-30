@@ -48,12 +48,9 @@ log.info("Conf: " + conf)
 
 def csvDN        = conf.csvDN
 def curvesDN     = conf.curvesDN
+def sampleSize   = conf.sampleSize
 def jdMinSize    = conf.jdMinSize
-def jdSize       = conf.jdSize
-def blockSize    = conf.blockSize
-def normalize    = conf.normalize
-def reduce       = conf.reduce
-def fidValues    = conf.fidValues;fid_values = fidValues
+def fidValues    = conf.fidValues
 def trainRate    = conf.trainRate
 def maxSeqLength = conf.jdSize
 def classes      = conf.classes
@@ -83,7 +80,7 @@ catch (Exception e) {
 def options = CsvReadOptions.builder(cvsPath)
                             .header(true)
                             .maxCharsPerColumn(100000)
-                            .sampleSize(10000)
+                            .sampleSize(sampleSize)
                             .build()
 def table
 try {
@@ -146,8 +143,8 @@ table.forEach {row -> try {
                         if (lengths.unique().size() > 1) {
                           throw new RuntimeException("Array lengths differ: $lengths")
                           }
-                        if (!arrays.fid.every { it in fid_values }) {
-                          throw new RuntimeException("Invalid fid values: ${arrays.fid}. Expected: $fid_values")
+                        if (!arrays.fid.every { it in fidValues }) {
+                          throw new RuntimeException("Invalid fid values: ${arrays.fid}. Expected: $fidValues")
                           }
                         def arrayLength = lengths[0]
                         (0..<arrayLength).each {idx -> def newRow = explodedTable.appendRow()
@@ -199,7 +196,7 @@ def maxclassValues = explodedTable.stringColumn("maxclass").asSet().findAll {it 
 log.info("maxclass unique values: $maxclassValues")
 log.info("maxclass null count: ${explodedTable.stringColumn('maxclass').count {it == null || it.isEmpty()}}")
 log.info("fid unique values in data: ${explodedTable.stringColumn('fid').asSet()}")
-log.info("Expected fid values: $fid_values")
+log.info("Expected fid values: $fidValues")
 
 // Validate classes
 if (classes) {
@@ -241,7 +238,7 @@ try {
   log.info("Grouped ${groupByTable.size()} objectIds for validIds filtering")
   validIds = groupByTable.collect {g -> def gTable = g.asTable()
                                         def maxclass = g.getString(0, "maxclass")
-                                        def isValid = fid_values.every {fid -> def fidTable = gTable.where(gTable.stringColumn("fid").isEqualTo(fid))
+                                        def isValid = fidValues.every {fid -> def fidTable = gTable.where(gTable.stringColumn("fid").isEqualTo(fid))
                                                                                def jd = fidTable.doubleColumn("jd").asList().findAll {it != null && !it.isNaN()}
                                                                                def jdUnique = jd.toSet().toList()
                                                                                fidTable.rowCount() > 0 && jdUnique.size() >= 2
@@ -254,7 +251,7 @@ catch (Exception e) {
   throw e
   }
 explodedTable = explodedTable.where(explodedTable.stringColumn("objectId").isIn(validIds))
-log.info("Filtered to ${explodedTable.rowCount()} rows with sufficient data for all fid values: $fid_values")
+log.info("Filtered to ${explodedTable.rowCount()} rows with sufficient data for all fid values: $fidValues")
 if (explodedTable.rowCount() == 0) {
   log.info("Error: No data remains after filtering for sufficient fid data")
   return
@@ -314,13 +311,13 @@ grouped.each {group -> processed++
                            }        
                          // Process each fid value
                          def fidData = [:]
-                         fid_values.each {fid -> def fidTable = group.asTable().where(group.stringColumn("fid").isEqualTo(fid))
+                         fidValues.each {fid -> def fidTable = group.asTable().where(group.stringColumn("fid").isEqualTo(fid))
                                                  def jdRaw  = fidTable.doubleColumn("jd"    ).asList().findAll {it != null && !it.isNaN()}
                                                  def magRaw = fidTable.doubleColumn("magpsf").asList().findAll {it != null && !it.isNaN()}
                                                  fidData[fid] = [jd: jdRaw, mag: magRaw]
                                                  }       
                          // Validate data for each fid
-                         fid_values.each {fid -> def data = fidData[fid]
+                         fidValues.each {fid -> def data = fidData[fid]
                                                  if (data.jd.size() == 0 || data.mag.size() == 0) {
                                                    throw new RuntimeException("Empty data for fid=$fid: jd size=${data.jd.size()}, mag size=${data.mag.size()}")
                                                    }
@@ -341,16 +338,19 @@ grouped.each {group -> processed++
                                                                     [sorted.collect {it.key}, sorted.collect { it.value }]
                                                                     }                         
                          def processedFidData = [:]
-                         fid_values.each {fid ->  def (jd, mag) = processData(fidData[fid].jd, fidData[fid].mag, fid)
+                         fidValues.each {fid ->  def (jd, mag) = processData(fidData[fid].jd, fidData[fid].mag, fid)
+                                                  if (jd.size < jdMinSize) {
+                                                    throw new RuntimeException("Insufficient data after deduplication for fid=$fid: jd size=${jd.size()} < $jdMinSize")
+                                                    }
                                                   if (jd.size() < 2) {
-                                                    throw new RuntimeException("Insufficient data after deduplication for fid=$fid: jd size=${jd.size()}")
+                                                    throw new RuntimeException("Insufficient data after deduplication for fid=$fid: jd size=${jd.size()} < 2")
                                                     }
                                                   processedFidData[fid] = [jd: jd, mag: mag]
                                                   }
         
                          // Create commonJd within overlapping range
-                         def minJd = fid_values.collect {processedFidData[it].jd.min()}.max()
-                         def maxJd = fid_values.collect {processedFidData[it].jd.max()}.min()
+                         def minJd = fidValues.collect {processedFidData[it].jd.min()}.max()
+                         def maxJd = fidValues.collect {processedFidData[it].jd.max()}.min()
                          if (minJd == null || maxJd == null || minJd >= maxJd) {
                            throw new RuntimeException("Invalid or non-overlapping jd range: minJd=$minJd, maxJd=$maxJd")
                            }        
@@ -360,7 +360,7 @@ grouped.each {group -> processed++
                         // Interpolate magpsf for each fid
                         def interpolator = new LinearInterpolator()
                         def magInterps = [:]
-                        fid_values.each {fid -> def jd = processedFidData[fid].jd
+                        fidValues.each {fid -> def jd = processedFidData[fid].jd
                                                 def mag = processedFidData[fid].mag
                                                 try {
                                                   def poly = interpolator.interpolate(jd as double[], mag as double[])
@@ -371,7 +371,7 @@ grouped.each {group -> processed++
                                                   }
                                                 }        
                         // Create sequence
-                        def sequence = (0..<commonJd.size()).collect {idx -> def row = fid_values.collect {fid -> magInterps[fid][idx]}
+                        def sequence = (0..<commonJd.size()).collect {idx -> def row = fidValues.collect {fid -> magInterps[fid][idx]}
                                                                              row.every {it != null && !it.isNaN()} ? row : null
                                                                              }.findAll {it != null}                       
                         if (sequence.empty) {
@@ -388,7 +388,7 @@ grouped.each {group -> processed++
                           }
                         sequence = sequence.collect {row -> row.collect {v -> (v - minMag) / (maxMag - minMag)}}                        
                         if (sequence.size() < maxSeqLength) {
-                          sequence += [[0.0] * fid_values.size()] * (maxSeqLength - sequence.size())
+                          sequence += [[0.0] * fidValues.size()] * (maxSeqLength - sequence.size())
                           }
                         else if (sequence.size() > maxSeqLength) {
                           sequence = sequence[0..<maxSeqLength]
@@ -549,7 +549,8 @@ def config = [
   classes: classes,
   merging: merging,
   trainSize: trainIndices.size(),
-  testSize: testIndices.size()
+  testSize: testIndices.size(),
+  maxclassValues: maxclassValues 
   ]
 try {
   Files.writeString(Paths.get(csvDN + "/iterator_config.json"), groovy.json.JsonOutput.toJson(config))

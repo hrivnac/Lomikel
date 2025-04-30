@@ -89,7 +89,6 @@ def csvDN           = conf1.csvDN
 def curvesDN        = conf1.curvesDN;
 def miniBatchSize   = conf1.miniBatchSize;
 def numLabelClasses = conf1.numLabelClasses;
-def blockSize       = conf1.blockSize;
 def trainClasses    = conf1.trainClasses;
 def trainFid        = conf1.trainFid;
 def nEpochs         = conf1.nEpochs;
@@ -108,6 +107,7 @@ def fidValues       = conf2.fidValues
 def trainRate       = conf2.trainRate
 def trainSize       = conf2.trainSize
 def testSize        = conf2.testSize 
+def maxclassValues  = conf2.maxclassValues
 
 // Initialise data
 
@@ -160,13 +160,13 @@ conf = new NeuralNetConfiguration.Builder()
                                  .layer(new LSTM.Builder()
                                                 .activation(Activation.TANH) // TANH, RELU, LEAKYRELU
                                                 .nIn(2)
-                                                .nOut(10)
-                                                .dropOut(0.1)
+                                                .nOut(20)
+                                                //.dropOut(0.1)
                                                 .build())
                                  .layer(new LSTM.Builder()
-                                                .nOut(10)
+                                                .nOut(20)
                                                 .activation(Activation.TANH)
-                                                .dropOut(0.3)
+                                                //.dropOut(0.3)
                                                 .build())
                                  .layer(new DenseLayer.Builder()
                                                       .nOut(10)

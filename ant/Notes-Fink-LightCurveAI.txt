@@ -17,12 +17,8 @@ rm -rf ../run/LightCurves/*; /opt/groovy/bin/groovy ../src/work/LightCurves/prep
 # visualisation ################################################################
 
 # @home
+python ../src/work/LightCurves/plotStat.py
 python ../src/work/LightCurves/plotLC.py
-
-for X in `ls ../run/LightCurves/*_2.idx`;do
-  echo $X | sed 's\../run/LightCurves/\\g' | sed 's/_2.idx//g' | read Y 
-  python ../src/work/LightCurves/plotLC.py $Y
-  done
 
 # classification ###############################################################
 
