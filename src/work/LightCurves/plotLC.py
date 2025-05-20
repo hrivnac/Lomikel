@@ -13,7 +13,7 @@ with open(dirData + '/iterator_config.json', 'r') as file:
   
 maxclassValues = data['maxclassValues']  
 
-for n in range(0,20):
+for n in range(0, 100):
   
   jd  = np.loadtxt(dirRun + '/' + set + '/jds/jd_'       + str(n) + '.csv', delimiter=',') 
   seq = np.loadtxt(dirRun + '/' + set + '/features/seq_' + str(n) + '.csv', delimiter=',')
@@ -43,7 +43,7 @@ for n in range(0,20):
   fn    = clazz + ':' + oid
   print(title)
   
-  fig, axes = plt.subplots(2, 1, figsize=(10, 6))  
+  fig, axes = plt.subplots(2, 2, figsize=(10, 6))  
 
   y1 = seq[:, 0]
   y2 = seq[:, 1]
@@ -51,20 +51,30 @@ for n in range(0,20):
   sorted_idx_fid1 = np.argsort(jd_fid1)
   sorted_idx_fid2 = np.argsort(jd_fid2)
   
-  axes[0].plot(jd, y1, label='1', color='orange', marker='o')
-  axes[0].plot(jd, y2, label='2', color='blue',   marker='o')
-  axes[0].set_xlabel('JD')
-  axes[0].set_ylabel('LC')
-  axes[0].set_title(title)
-  axes[0].legend()
-  axes[0].grid(True)
-  axes[1].plot(jd_fid1[sorted_idx_fid1], mag_fid1[sorted_idx_fid1], label='1', color='orange', marker='o')
-  axes[1].plot(jd_fid2[sorted_idx_fid2], mag_fid2[sorted_idx_fid2], label='2', color='blue',   marker='o')
-  axes[1].set_xlabel('JD')
-  axes[1].set_ylabel('LC')
-  axes[1].set_title(title)
-  axes[1].legend()
-  axes[1].grid(True)
+  axes[0, 0].plot(jd, y1, label='1', color='orange', marker='o')
+  axes[0, 0].plot(jd, y2, label='2', color='blue',   marker='o')
+  axes[0, 0].set_xlabel('JD')
+  axes[0, 0].set_ylabel('LC')
+  axes[0, 0].set_title(title + ' modified')
+  axes[0, 0].legend()
+  axes[0, 0].grid(True)
+  axes[1, 0].plot(jd_fid1[sorted_idx_fid1], mag_fid1[sorted_idx_fid1], label='1', color='orange', marker='o')
+  axes[1, 0].plot(jd_fid2[sorted_idx_fid2], mag_fid2[sorted_idx_fid2], label='2', color='blue',   marker='o')
+  axes[1, 0].set_xlabel('JD')
+  axes[1, 0].set_ylabel('LC')
+  axes[1, 0].set_title(title + ' original')
+  axes[1, 0].legend()
+  axes[1, 0].grid(True)
+  axes[0, 1].plot(y1, y2, color='red', marker='o')
+  axes[0, 1].set_xlabel('LC1')
+  axes[0, 1].set_ylabel('LC2')
+  axes[0, 1].set_title(title)
+  axes[0, 1].grid(True)
+  axes[1, 1].plot(y1 + y2, y1 - y2, color='red', marker='o')
+  axes[1, 1].set_xlabel('LC1+LC2')
+  axes[1, 1].set_ylabel('LC1-LC2')
+  axes[1, 1].set_title(title)
+  axes[1, 1].grid(True)
 
   plt.tight_layout()
   plt.savefig(fn + '.png')

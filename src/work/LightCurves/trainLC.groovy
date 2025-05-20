@@ -181,7 +181,7 @@ conf = new NeuralNetConfiguration.Builder()
 net = new MultiLayerNetwork(conf);
 net.init();
 
-// Training
+// Train
 
 log.info("Starting training...");
 net.setListeners(new ScoreIterationListener(20), new EvaluativeListener(testData, 1, InvocationType.EPOCH_END));

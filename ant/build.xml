@@ -317,12 +317,12 @@
 			<zipfileset includes="**/*" src="${groovy_sql_jar}"/>
       <zipfileset includes="**/*" src="${groovysh_jar}"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/jline-2.14.6.jar"/>     
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-4.0.9.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-4.0.9.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-4.0.9.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-templates-4.0.9.jar"/>
-      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-xml-4.0.9.jar"/>
-			<zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-4.0.9.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-cli-picocli-${groovy_version}.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-json-${groovy_version}.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-jsr223-${groovy_version}.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-templates-${groovy_version}.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-xml-${groovy_version}.jar"/>
+			<zipfileset includes="**/*" src="${janusgraph_dir}/lib/groovy-swing-${groovy_version}.jar"/>
 			<zipfileset includes="**/*" src="${janusgraph_dir}/lib/javaparser-core-3.25.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar"/>
