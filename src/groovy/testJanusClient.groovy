@@ -4,7 +4,7 @@ import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties");
 gr = new FinkGremlinRecipiesG(jc);
 jc.g().V().limit(1).valueMap().next();
-gr.sourceNeighborhood("ZTF18actbfgh", "FINK_PORTAL", 10);
+gr.sourceNeighborhood("ZTF25aaomelt", "FINK_PORTAL");
 gr.stat();
 gr.classification("ZTF18actbfgh");
 gr.overlaps();
