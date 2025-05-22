@@ -49,6 +49,7 @@ public class LightCurvesClassifier implements Classifier {
     String key;
     Set<Double> val;
     double weight;
+    double totalWeight;
     Map<String, Map<String, String>> alerts = client(hbaseUrl).scan(null,
                                                                     "key:key:" + oid + ":prefix",
                                                                     "i:jd,d:lc_features_g,d:lc_features_r",
@@ -85,10 +86,14 @@ public class LightCurvesClassifier implements Classifier {
           }
         }
       }
+    totalWeight = 0;
+    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
+      totalWeight += cls.getValue().size();
+      }
     for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
       key = "FC-" + cls.getKey();
       val = cls.getValue();
-      weight = val.size();
+      weight = val.size() / totalWeight;
       recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     }

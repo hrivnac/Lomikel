@@ -246,7 +246,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                              String      columns) throws LomikelException {
     classifier.instance().classify(this, oid, hbaseUrl, enhance, columns);
     }
-    
+       
   /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
     * @param classifier The {@link Classifier} to be used.
     * @param cls        The type (class) of <em>SourcesOfInterest</em> {@link Vertex}.

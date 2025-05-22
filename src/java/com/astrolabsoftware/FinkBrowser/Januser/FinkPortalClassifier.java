@@ -40,7 +40,8 @@ public class FinkPortalClassifier implements Classifier {
     Set<Double> jds;
     String key;
     Set<Double> val;
-    int weight;
+    double weight;
+    double totalWeight;
     ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
                                       put("output-format", "json"));
     classes =  new TreeMap<>();
@@ -61,10 +62,14 @@ public class FinkPortalClassifier implements Classifier {
           }
         }
       }
+    totalWeight = 0;
+    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
+      totalWeight += cls.getValue().size();
+      }
     for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
       key = cls.getKey();
       val = cls.getValue();
-      weight = val.size();
+      weight = val.size() / totalWeight;
       recipies.registerSourcesOfInterest(Classifiers.FINK_PORTAL, key, oid, weight, val, hbaseUrl, enhance, columns);
       }
     }

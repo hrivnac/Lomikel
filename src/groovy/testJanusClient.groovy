@@ -4,12 +4,22 @@ import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties");
 gr = new FinkGremlinRecipiesG(jc);
 jc.g().V().limit(1).valueMap().next();
-gr.sourceNeighborhood("ZTF25aaomelt", "FINK_PORTAL");
 gr.stat();
-gr.classification("ZTF18actbfgh");
 gr.overlaps();
-gr.classifySource(Classifiers.FEATURES, 'ZTF25aaksfzy', 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
-gr.classify("FC-3", "SourcesOfInterest", "FEATURES", "FINK_PORTAL")
+
+oid = "ZTF25aaomelt";
+
+gr.classifySource(Classifiers.FEATURES, oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
+
+gr.classification(oid);
+gr.classification(oid, "FINK_PORTAL");
+gr.classification(oid, "FEATURES");
+
+gr.reclassification(oid, "FEATURES", "FINK_PORTAL");
+
+gr.sourceNeighborhood(oid, "FINK_PORTAL");
+gr.sourceNeighborhood(oid, "FEATURES");
+
 gr.standardDeviationE('deepcontains', ['weight']);
 gr.exportAoISoI('/tmp/Overlaps.graphml');
 // sum of weights (= number od alerts) per source
