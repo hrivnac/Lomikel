@@ -1,1 +1,3 @@
-13-45 model
+13-45 PCA-clustering model from 2024 data
+Put into dirName and specify via
+com.astrolabsoftware.FinkBrowser.Januser.setModelDirectory(String dirName)
