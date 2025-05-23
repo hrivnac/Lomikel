@@ -155,7 +155,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Set<String> oids = new HashSet<>();;
     if (clss == null) { 
       log.info("Importing from " + hbaseUrl + ":");
-      SmallHttpClient httpClient = new SmallHttpClient();
       fhclient(hbaseUrl);
       if (nLimit > 0) {
         fhclient().setLimit(nLimit);

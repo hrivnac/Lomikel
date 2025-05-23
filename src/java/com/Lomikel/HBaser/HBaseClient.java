@@ -790,8 +790,10 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       }
     // evaluate non-schema rows
     if (!key.startsWith("schema") &&_evaluator != null && !evaluateResult(r)) {
+      log.info("0");
       return false;
       }
+    log.info("1");
     String[] ff;
     String ref;
     if (r.getRow() != null) {
@@ -1151,7 +1153,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     * Results are ordered by the row key, so evetual limits on results
     * number will be apllied to them and not to the time.
     * @param columnName     The name of the column.
-    * @param substringValue The column value substring to search for.
+    * @param prefixValue    The column value substring to search for.
     * @param minutes        How far into the past it should search (in minutes). 
     * @param getValues      Whether to get column values or row keys.
     * @return               The {@link Set} of different values of that column. */
