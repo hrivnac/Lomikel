@@ -162,7 +162,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     if (clss == null) { 
       log.info("Importing from " + hbaseUrl + ":");
       fhclient(hbaseUrl);
-      fhclient.setEvaluation(filter);
+      fhclient().setEvaluation(filter);
       if (nLimit > 0) {
         fhclient().setLimit(nLimit);
         }
@@ -170,7 +170,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                  null,
                                  timeLimit,
                                  true);
-      fhclient.setEvaluation(null);
+      fhclient().setEvaluation(null);
       }
     else {
       Calendar cal;
