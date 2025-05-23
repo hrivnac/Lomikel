@@ -918,7 +918,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param hbaseUrl The HBase url as <tt>ip:port:table[:schema]</tt>.
     * @return          The corresponding {@link FinkHBaseClient}, created and initialised if needed.
     * @throws LomikelException If cannot be created. */
-  private FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
+  public FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
     if (hbaseUrl == null || hbaseUrl.equals(_fhclientUrl)) {
       return _fhclient;
       }
@@ -939,7 +939,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Get existing {@link FinkHBaseClient}.
     * @return The corresponding {@link FinkHBaseClient}.
     * @throws LomikelException If not yet created. */
-  private FinkHBaseClient fhclient() throws LomikelException {
+  public FinkHBaseClient fhclient() throws LomikelException {
     if (_fhclient == null) {
       throw new LomikelException("FinkHBaseClient not initialised");
       }
