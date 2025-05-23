@@ -98,6 +98,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Execute full chain of new sources correlations analyses.
     * @param classifierNames The names of the {@link Classifier} to be used.
+    * @param filter          The HBase evaluation formula to be applied.
+    *                        Ignored if <tt>clss</tt> are specified.
     * @param hbaseUrl        The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param nLimit          The maximal number of alerts getting from HBase or Fink Portal.
     *                        <tt>0</tt> means no limit.
@@ -110,6 +112,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param columns         HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
   public void processSourcesOfInterest(String[] classifierNames,
+                                       String   filter,
                                        String   hbaseUrl,
                                        int      nLimit,
                                        int      timeLimit,
@@ -120,12 +123,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     for (int i = 0; i < classifierNames.length; i++) {
       classifiers[i] = Classifiers.valueOf(classifierNames[i]);
       }
-    fillSourcesOfInterest(classifiers, hbaseUrl, nLimit, timeLimit, clss, enhance, columns);
+    fillSourcesOfInterest(classifiers, filter, hbaseUrl, nLimit, timeLimit, clss, enhance, columns);
     generateCorrelations(classifiers);
     }
         
   /** Fill graph with <em>SourcesOfInterest</em> and expand them to alerts (if requested).
     * @param classifiers The {@link Classifiers}s to be used.
+    * @param filter          The HBase evaluation formula to be applied.
+    *                        Ignored if <tt>clss</tt> are specified.
     * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param nLimit      The maximal number of alerts getting from HBase or Fink Portal.
     *                    <tt>0</tt> means no limit.
@@ -138,6 +143,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param columns     The HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
   public void fillSourcesOfInterest(Classifiers[] classifiers,
+                                    String        filter,
                                     String        hbaseUrl,
                                     int           nLimit,
                                     int           timeLimit,
@@ -156,6 +162,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     if (clss == null) { 
       log.info("Importing from " + hbaseUrl + ":");
       fhclient(hbaseUrl);
+      fhclient.setEvaluation(filter);
       if (nLimit > 0) {
         fhclient().setLimit(nLimit);
         }
@@ -163,6 +170,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                  null,
                                  timeLimit,
                                  true);
+      fhclient.setEvaluation(null);
       }
     else {
       Calendar cal;
