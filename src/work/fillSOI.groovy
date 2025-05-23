@@ -16,7 +16,7 @@ classes = new String[]{"(CTA) Blazar",
                        "Tracklet",
                        "Anomaly"}
 gr.fhclient('vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1').setEvaluation("roid != 3 && ndethist >= 3");
-gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 10000, 1500, null, false, null)
-//gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 10000, 1500, classes, false, null)
+gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 100, 1500, null, false, null)
+//gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 100, 1500, classes, false, null)
 gr.generateCorrelations(Classifiers.valueOf("FEATURES"), Classifiers.valueOf("FINK_PORTAL"))
 gr.overlaps("outputCSV":"/tmp/overlaps.csv")
