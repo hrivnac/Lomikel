@@ -19,10 +19,16 @@ public enum Classifiers {
       return new FeaturesClassifier();
       }
     },
-  Light_CURVES {
+  LIGHTCURVES {
     @Override
     public Classifier instance() {
       return new LightCurvesClassifier();
+      }
+    },
+  TAG {
+    @Override
+    public Classifier instance() {
+      return new TagClassifier();
       }
     },
   UNKNOWN {
