@@ -100,6 +100,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param classifierNames The names of the {@link Classifier} to be used.
     * @param hbaseUrl        The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param nLimit          The maximal number of alerts getting from HBase or Fink Portal.
+    *                        <tt>0</tt> means no limit.
     * @param timeLimit       How far into the past the search should search (in minutes).
     * @param clss            An array of <em>classes</em> taken from {@link FPC},
     *                        if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
@@ -127,6 +128,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param classifiers The {@link Classifiers}s to be used.
     * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param nLimit      The maximal number of alerts getting from HBase or Fink Portal.
+    *                    <tt>0</tt> means no limit.
     * @param timeLimit   How far into the past the search should search (in minutes).
     * @param clss        An array of <em>classes</em> taken from {@link FPC},
     *                    if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
@@ -155,7 +157,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       log.info("Importing from " + hbaseUrl + ":");
       SmallHttpClient httpClient = new SmallHttpClient();
       fhclient(hbaseUrl);
-      fhclient().setLimit(nLimit);
+      if (nLimit > 0) {
+        fhclient().setLimit(nLimit);
+        }
       oids = fhclient().latestsT("i:objectId",
                                  null,
                                  timeLimit,
