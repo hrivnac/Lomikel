@@ -794,7 +794,9 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     if (!key.startsWith("schema") &&_evaluator != null && !evaluateResult(r)) {
       return false;
       }
-    log.info(nnn++);
+    else {
+      log.info(nnn++);
+      }
     String[] ff;
     String ref;
     if (r.getRow() != null) {
