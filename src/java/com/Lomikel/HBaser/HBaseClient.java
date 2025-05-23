@@ -766,6 +766,8 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return results;
     }    
     
+  private int nnn = 0;  
+    
   /** Add {@link Result} into result {@link Map}.
     * To be used with single-version results.
     * @param r       The {@link Result} to add.
@@ -790,10 +792,9 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       }
     // evaluate non-schema rows
     if (!key.startsWith("schema") &&_evaluator != null && !evaluateResult(r)) {
-      log.info("0");
       return false;
       }
-    log.info("1");
+    log.info(nnn);
     String[] ff;
     String ref;
     if (r.getRow() != null) {
