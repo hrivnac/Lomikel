@@ -6,7 +6,7 @@ jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties")
 gr = new FinkGremlinRecipiesG(jc)
 
 formula = "cdsxmatch != 'Unknown' && roid != 3 && ndethist >= 3";
-gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, formula, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 0, 1500, null, false, null)
+gr.processSourcesOfInterest(new String[]{'FINK_PORTAL', 'FEATURES'}, formula, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 10000, 1500, null, false, null)
 
 //classes = new String[]{"(CTA) Blazar",
 //                       "Ambiguous",
