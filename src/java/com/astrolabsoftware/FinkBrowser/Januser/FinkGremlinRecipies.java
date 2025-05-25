@@ -281,7 +281,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         boolean     enhance,
                                         String      columns) {   
     Set<Double> instances = new HashSet<>();
-    if (instanceS != null && !instancesS.trim().equals(""))
+    if (instancesS != null && !instancesS.trim().equals("")) {
       for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
         instances.add(Double.parseDouble(instance));
         }
