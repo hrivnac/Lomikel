@@ -15,6 +15,7 @@ import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.otherV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.has;
@@ -244,18 +245,36 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Classify <em>source</em> and expand them to alerts (if requested).
     * @param classifier The {@link Classifier} to be used.
-    * @param oid        The <tt>objectId</tt> of source to be added.
+    * @param objectId   The <tt>objectId</tt> of source to be added.
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
     *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be copied into graph alerts. May be <tt>null</tt>. 
     * @throws LomikelException If anything fails. */
   public void classifySource(Classifiers classifier,
-                             String      oid,
+                             String      objectId,
                              String      hbaseUrl,
                              boolean     enhance,
-                             String      columns) throws LomikelException {
-    classifier.instance().classify(this, oid, enhance, columns);
+                             String      columns) throws LomikelException {    
+    Vertex v1 = g().V().has("lbl", "source").has("objectId", objectId).next();
+    List<Vertex> v2s = g().V(v1).in().
+                                 has("lbl", "SourcesOfInterest").
+                                 has("classifier", classifier.name()).
+                                 toList();
+    Iterator<Edge> edges;
+    for (Vertex v2 : v2s) {
+      edges = g().V(v1).inE().
+                        has("lbl", "deepcontains").
+                        where(otherV().
+                        is(v2)).
+                        toStream().
+                        iterator();
+      while (edges.hasNext()) {
+        edges.next().remove(); 
+        }
+      }
+    // will be commited in registration
+    classifier.instance().classify(this, objectId, enhance, columns);
     }
        
   /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
