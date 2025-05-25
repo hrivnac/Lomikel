@@ -81,7 +81,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
   /** The same method as {@link #sourceNeighborhood(Map, String, String},
     * appropriate for direct call from Java (instead of Groovy). */
-  def Map<String, Map<String, Double>> sourceNeighborhood(String oid0,
+  def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String oid0,
                                                           String       classifier,
                                                           int          nmax) {
     def z = [:]
@@ -101,7 +101,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                                                   zz[e['cls']] = e['weight']
                                                                                                   }
                                                                                                 }
-                                                            z[n.key] = zz
+                                                            z[n] = zz
                                                             }
     return z
     }
