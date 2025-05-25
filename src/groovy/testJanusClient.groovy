@@ -10,6 +10,8 @@ gr.overlaps();
 oid = "ZTF19abasthk";
 
 gr.classifySource(Classifiers.FEATURES, oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
+gr.classifySource(Classifiers.FEATURES, oid, null, false, null)
+gr.fhclient('vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
 
 gr.classification(oid);
 gr.classification(oid, "FINK_PORTAL");

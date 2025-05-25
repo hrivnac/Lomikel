@@ -64,6 +64,11 @@ public class GremlinRecipies {
     _g      = client.g();
     }
   
+public GraphTraversal<Vertex, Vertex> allV() {
+    return g().V();
+}    
+    
+    
   /** Extract implicite schema. */
   public void createMetaSchema() {
     log.info("Cleaning MetaGraph");
