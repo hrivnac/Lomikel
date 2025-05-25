@@ -79,11 +79,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
     }
 
-  /** The same method as {@link #sourceNeighborhood(Map, String, String},
     * appropriate for direct call from Java (instead of Groovy). */
+  /** Give {@link Map} of other <em>source</em>s ordered
+    * by distance to the specified <em>source</em> with respect
+    * to weights to all (or selected) <em>SourceOfInterest</em> classes.
+    * Include classification for each neighbour.
+    * @param oid0          The <em>objectOd</em> of the <em>source</em>.
+    * @param classifier    The classifier name to be used.
+    * @param nmax          The number of closest <em>source</em>s to give.
+    *                      All are given, if missing.
+    * @return              The full neigbouthood informatin. */
   def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String oid0,
-                                                          String       classifier,
-                                                          int          nmax) {
+                                                                       String classifier,
+                                                                       int    nmax) {
     def z = [:]
     def zz
     sourceNeighborhood("nmax":nmax, oid0, classifier).each {n ->

@@ -255,6 +255,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                              String      hbaseUrl,
                              boolean     enhance,
                              String      columns) throws LomikelException {
+    if (hbaseUrl == null) {
+      hbaseUrl = _hbaseUrl;
+      }
     classifier.instance().classify(this, oid, hbaseUrl, enhance, columns);
     }
        
