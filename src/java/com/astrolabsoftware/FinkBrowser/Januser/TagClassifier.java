@@ -43,7 +43,7 @@ public class TagClassifier implements Classifier {
   public void tag(String oid,
                   String tags) {
     if (!tags.contains(",")) {
-      _recipies.registerSourcesOfInterest(Classifiers.TAG, tags, oid, 1.0, "", _hbaseUrl, false, null);
+      _recipies.registerSourcesOfInterest(Classifiers.TAG, tags, oid, 1.0, "", false, null);
       return;
       }
     Map<String, Double> tagMap = new TreeMap<>();
@@ -62,28 +62,24 @@ public class TagClassifier implements Classifier {
       }
     // renormalize
     for (Map.Entry<String, Double> entry : tagMap.entrySet()) {
-      _recipies.registerSourcesOfInterest(Classifiers.TAG, entry.getKey(), oid, entry.getValue(), "", _hbaseUrl, false, null);
+      _recipies.registerSourcesOfInterest(Classifiers.TAG, entry.getKey(), oid, entry.getValue(), "", false, null);
       }
     }
   
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid,
-                       String              hbaseUrl,
                        boolean             enhance,
                        String              columns) throws LomikelException {
     log.warn("Cannot classify automatically, use tag method to classify.");
     }
     
-  public void init(FinkGremlinRecipies recipies,
-                   String hbaseUrl) {
+  /** TBD */
+  public void init(FinkGremlinRecipies recipies) {
     _recipies = recipies;
-    _hbaseUrl = hbaseUrl;
     }
     
   private FinkGremlinRecipies _recipies;
-  
-  private String _hbaseUrl;
     
   /** Logging . */
   private static Logger log = LogManager.getLogger(TagClassifier.class);

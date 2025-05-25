@@ -155,13 +155,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       clssDesc = "of " + Arrays.toString(clss);
       }
     log.info("Filling SourcesOfInterest " + clssDesc + " using " + Arrays.toString(classifiers) + " classifiers, nLimit = " + nLimit + ", timeLimit = " + timeLimit);
+    log.info("Importing from " + hbaseUrl + ":");
+    fhclient(hbaseUrl);
     if (enhance) {
       log.info("\tenhancing with " + columns);
       }
     Set<String> oids = new HashSet<>();;
     if (clss == null) { 
-      log.info("Importing from " + hbaseUrl + ":");
-      fhclient(hbaseUrl);
       fhclient().setEvaluation(filter);
       if (nLimit > 0) {
         fhclient().setLimit(nLimit);
@@ -255,10 +255,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                              String      hbaseUrl,
                              boolean     enhance,
                              String      columns) throws LomikelException {
-    if (hbaseUrl == null) {
-      hbaseUrl = _hbaseUrl;
-      }
-    classifier.instance().classify(this, oid, hbaseUrl, enhance, columns);
+    classifier.instance().classify(this, oid, enhance, columns);
     }
        
   /** Register  <em>source</em> in <em>SourcesOfInterest</em>.
@@ -271,8 +268,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   Usualy the number of <em>Alerts</em> of this type. 
     * @param instanceS  The <em>jd</em> of related <em>Alerts</em> as strings separated by comma.
     *                   Potential square brackets are removed.
-    * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
-    *                   as <tt>ip:port:table:schema</tt>. 
     * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
     *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
@@ -282,14 +277,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         String      objectId,
                                         double      weight,
                                         String      instancesS,
-                                        String      hbaseUrl,
                                         boolean     enhance,
                                         String      columns) {   
     Set<Double> instances = new HashSet<>();
     for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
       instances.add(Double.parseDouble(instance));
       }
-    registerSourcesOfInterest(classifier, cls, objectId, weight, instances, hbaseUrl, enhance, columns);
+    registerSourcesOfInterest(classifier, cls, objectId, weight, instances, enhance, columns);
     }
     
   /** Register <em>source</em> in <em>SourcesOfInterest</em>.
@@ -301,8 +295,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param weight     The weight of the connection.
     *                   Usualy the number of <em>Alerts</em> of this type. 
     * @param instances  The <em>jd</em> of related <em>Alerts</em>.
-    * @param hbaseUrl   The url of the HBase carrying full <em>Alert</em> data
-    *                   as <tt>ip:port:table:schema</tt>.
     * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
     *                   filled with requested HBase columns.
     * @param columns The HBase columns to be filled into alerts. May be <tt>null</tt>.
@@ -312,7 +304,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         String      objectId,
                                         double      weight,
                                         Set<Double> instances,
-                                        String      hbaseUrl,
                                         boolean     enhance,
                                         String      columns) {   
     log.info("\tregistering " + objectId + " as " + cls + " with weight " + weight);
@@ -326,7 +317,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                   property("classifier", classifier.name()  ).
                                   property("cls",        cls                ).
                                   property("technology", "HBase"            ).
-                                  property("url",        hbaseUrl           )).
+                                  property("url",        hbaseUrl()         )).
                          next();
     Vertex s = g().V().has("lbl", "source").
                        has("objectId", objectId).
@@ -345,7 +336,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             true);
     if (enhance) {
       try {
-        fhclient(hbaseUrl);
         enhanceSource(classifier, s, instances.toString().replaceFirst("\\[", "").replaceAll("]", "").split(","), columns);
         }
       catch (LomikelException e) {
@@ -958,6 +948,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       throw new LomikelException("FinkHBaseClient not initialised");
       }
     return _fhclient;
+    }
+    
+  /** Give HBase url.
+    * @return The HBase url as <tt>ip:port:table[:schema]</tt>. */
+  public String hbaseUrl() {
+    return _fhclientUrl;
     }
     
   private FinkHBaseClient _fhclient;

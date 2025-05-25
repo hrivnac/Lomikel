@@ -79,7 +79,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
     }
 
-    * appropriate for direct call from Java (instead of Groovy). */
   /** Give {@link Map} of other <em>source</em>s ordered
     * by distance to the specified <em>source</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.

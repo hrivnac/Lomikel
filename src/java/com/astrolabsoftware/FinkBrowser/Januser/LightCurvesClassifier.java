@@ -34,7 +34,6 @@ public class LightCurvesClassifier implements Classifier {
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid,
-                       String              hbaseUrl,
                        boolean             enhance,
                        String              columns) throws LomikelException {
     double jd;
@@ -50,13 +49,13 @@ public class LightCurvesClassifier implements Classifier {
     Set<Double> val;
     double weight;
     double totalWeight;
-    Map<String, Map<String, String>> alerts = client(hbaseUrl).scan(null,
-                                                                    "key:key:" + oid + ":prefix",
-                                                                    "i:jd,d:lc_features_g,d:lc_features_r",
-                                                                    0,
-                                                                    0,
-                                                                    false,
-                                                                    false);
+    Map<String, Map<String, String>> alerts = recipies.fhclient().scan(null,
+                                                                       "key:key:" + oid + ":prefix",
+                                                                       "i:jd,d:lc_features_g,d:lc_features_r",
+                                                                       0,
+                                                                       0,
+                                                                       false,
+                                                                       false);
     classes = new TreeMap<>();
     // get all alerts (jd) and their classses
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
@@ -94,24 +93,8 @@ public class LightCurvesClassifier implements Classifier {
       key = "FC-" + cls.getKey();
       val = cls.getValue();
       weight = val.size() / totalWeight;
-      recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, hbaseUrl, enhance, columns);
+      recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, enhance, columns);
       }
-    }
-  
-  /** Give {@link HBaseClient} to current database. Singleton.
-    * @param hbaseUrl The full HBase url <tt>ip:port:table:schema</tt>.
-    * @return         The corresponding {@link HBaseClient}.
-    * @throws LomikelExceltion If {@link HBaseClient} cannot be created. */
-  private HBaseClient client(String hbaseUrl) throws LomikelException {
-    if (_client == null) {
-      String[] hbaseUrlA = hbaseUrl.split(":");
-      if (hbaseUrlA.length < 4) {
-        throw new LomikelException("Cannot create HBase client, hbaseUrl uncomplete: " + hbaseUrl);
-        }
-      _client = new HBaseClient(hbaseUrlA[0], hbaseUrlA[1]);
-      _client.connect(hbaseUrlA[2], hbaseUrlA[3]);
-      }
-    return _client;
     }
     
   /** Give {@link ClusterFinder} to current database. Singleton.
@@ -141,8 +124,6 @@ public class LightCurvesClassifier implements Classifier {
   public void setModelDirectory(String dirName) {
     _dirName = dirName;
     }
-    
-  private static HBaseClient _client;
   
   private static ClusterFinder _finder;
   

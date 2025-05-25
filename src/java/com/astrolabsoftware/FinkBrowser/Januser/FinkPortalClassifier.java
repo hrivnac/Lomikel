@@ -29,7 +29,6 @@ public class FinkPortalClassifier implements Classifier {
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid,
-                       String              hbaseUrl,
                        boolean             enhance,
                        String              columns) throws LomikelException {
     JSONArray ja;
@@ -70,7 +69,7 @@ public class FinkPortalClassifier implements Classifier {
       key = cls.getKey();
       val = cls.getValue();
       weight = val.size() / totalWeight;
-      recipies.registerSourcesOfInterest(Classifiers.FINK_PORTAL, key, oid, weight, val, hbaseUrl, enhance, columns);
+      recipies.registerSourcesOfInterest(Classifiers.FINK_PORTAL, key, oid, weight, val, enhance, columns);
       }
     }
 
