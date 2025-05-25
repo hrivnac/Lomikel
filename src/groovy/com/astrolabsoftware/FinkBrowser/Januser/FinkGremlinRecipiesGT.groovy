@@ -97,7 +97,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                      by(outV().values('classifier')).
                                                                      by(outV().values('cls')).
                                                                      by(values('weight')).each {e ->
-                                                                                                if (e['classifier'] == classifier) 
+                                                                                                if (e['classifier'] == classifier) {
                                                                                                   zz[e['cls']] = e['weight']
                                                                                                   }
                                                                                                 }
