@@ -84,7 +84,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<String, Map<String, Double>> sourceNeighborhood(String       oid0,
                                              String       classifier,
                                              int          nmax) {
-    sourceNeighborhood("nmax":nmax, oid0, classifier).each {v = g().V().has('lbl', 'source').has('objectId', it.key).id().next()
+    def z = [:]
+    def zz
+    sourceNeighborhood("nmax":nmax, oid0, classifier).each {def v = g().V().has('lbl', 'source').has('objectId', it.key).id().next()
                                                             zz = [:]
                                                             g().V(v).inE().project('cls', 'weight').by(outV().values('cls')).by(values('weight')).each{e -> zz[e['cls']] = e['weight']}
                                                             z[it.key] = zz
