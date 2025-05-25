@@ -81,15 +81,25 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
   /** The same method as {@link #sourceNeighborhood(Map, String, String},
     * appropriate for direct call from Java (instead of Groovy). */
-  def Map<String, Map<String, Double>> sourceNeighborhood(String       oid0,
-                                             String       classifier,
-                                             int          nmax) {
+  def Map<String, Map<String, Double>> sourceNeighborhood(String oid0,
+                                                          String       classifier,
+                                                          int          nmax) {
     def z = [:]
     def zz
-    sourceNeighborhood("nmax":nmax, oid0, classifier).each {def v = g().V().has('lbl', 'source').has('objectId', it.key).id().next()
+    sourceNeighborhood("nmax":nmax, oid0, classifier).each {n ->
+                                                            def v = g().V().has('lbl', 'source').
+                                                                            has('objectId', n.key).
+                                                                            id().
+                                                                            next()
                                                             zz = [:]
-                                                            g().V(v).inE().project('cls', 'weight').by(outV().values('cls')).by(values('weight')).each{e -> zz[e['cls']] = e['weight']}
-                                                            z[it.key] = zz
+                                                            g().V(v).inE().
+                                                                     project('classifier', 'cls', 'weight').
+                                                                     by(outV().values('classifier')).
+                                                                     by(outV().values('cls')).
+                                                                     by(values('weight')).each {e -> zz[e['cls']] = e['weight']}
+                                                            if (e['classifier'] == classifier) {
+                                                              z[n.key] = zz
+                                                              }
                                                             }
     return z
     }
