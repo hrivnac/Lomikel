@@ -130,7 +130,7 @@ public class FeaturesClassifier implements Classifier {
     * <tt>scaler_params.json, pca_params.json, cluster_centers.json</tt>.
     * If not set, <tt>/tmp</tt> will be used.
     * @param dirName The directory for model json files. */
-  public void setModelDirectory(String dirName) {
+  public static void setModelDirectory(String dirName) {
     _dirName = dirName;
     }
   
