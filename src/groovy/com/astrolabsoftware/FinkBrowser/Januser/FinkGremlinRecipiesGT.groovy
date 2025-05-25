@@ -83,6 +83,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * appropriate for direct call from Java (instead of Groovy). */
   def Map<String, Double> sourceNeighborhood(String       oid0,
                                              String       classifier,
+                                             int          nmax) {
+    return sourceNeighborhood("nmax":nmax, oid0, classifier);
+    }
+
+  /** The same method as {@link #sourceNeighborhood(Map, String, String},
+    * appropriate for direct call from Java (instead of Groovy). */
+  def Map<String, Double> sourceNeighborhood(String       oid0,
+                                             String       classifier,
                                              Map          args) {
     return sourceNeighborhood(args, oid0, classifier);
     }
