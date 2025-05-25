@@ -57,13 +57,13 @@ public class HDFSAvroImporter extends AvroImporter {
       System.exit(-1);
       }
     try {
-      HDFSAvroImporter importer = new HDFSAvroImporter(            args[0],
-                                                       new Integer(args[4]),
-                                                       new Integer(args[5]),
-                                                                   args[6],
-                                                                   args[2],
-                                                                   args[3],
-                                                                   args[7]);
+      HDFSAvroImporter importer = new HDFSAvroImporter(                args[0],
+                                                       Integer.valueOf(args[4]),
+                                                       Integer.valueOf(args[5]),
+                                                                       args[6],
+                                                                       args[2],
+                                                                       args[3],
+                                                                       args[7]);
       importer.timerStart();
       importer.process(args[1]);
       if (!importer.skip()) {

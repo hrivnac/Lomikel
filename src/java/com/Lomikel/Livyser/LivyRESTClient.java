@@ -150,7 +150,7 @@ public class LivyRESTClient extends LivyClient {
       }
     JSONArray statements = new JSONObject(result).getJSONArray("statements");
     for (int i = 0; i < statements.length(); i++) {
-      ss.add(new Integer(statements.getJSONObject(i).getInt("id")));
+      ss.add(Integer.valueOf(statements.getJSONObject(i).getInt("id")));
       }
     return ss;
     }

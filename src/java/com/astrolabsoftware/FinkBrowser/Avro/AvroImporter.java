@@ -70,13 +70,13 @@ public class AvroImporter extends JanusClient {
       System.exit(-1);
       }
     try {
-      AvroImporter importer = new AvroImporter(            args[0],
-                                               new Integer(args[4]),
-                                               new Integer(args[5]),
-                                                           args[6],
-                                                           args[2],
-                                                           args[3],
-                                                           args[7]);
+      AvroImporter importer = new AvroImporter(                args[0],
+                                               Integer.valueOf(args[4]),
+                                               Integer.valueOf(args[5]),
+                                                               args[6],
+                                                               args[2],
+                                                               args[3],
+                                                               args[7]);
       importer.timerStart();                    
       importer.process(args[1]);
       if (!importer.skip()) {
@@ -363,7 +363,7 @@ public class AvroImporter extends JanusClient {
       v.property(entry.getKey(), entry.getValue());
       }
     if (record.get("dec") != null && record.get("ra") != null) {
-      v.property("direction", Geoshape.point(new Double(record.get("dec").toString()), new Double(record.get("ra").toString()) - 180));
+      v.property("direction", Geoshape.point(Double.valueOf(record.get("dec").toString()), Double.valueOf(record.get("ra").toString()) - 180));
       }
     _gr.addEdge(mother, v, edgeName);
     if (hbaseUrl() != null) {
