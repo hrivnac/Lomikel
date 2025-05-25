@@ -255,25 +255,27 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                              String      objectId,
                              String      hbaseUrl,
                              boolean     enhance,
-                             String      columns) throws LomikelException {    
-    Vertex v1 = g().V().has("lbl", "source").has("objectId", objectId).next();
-    List<Vertex> v2s = g().V(v1).in().
-                                 has("lbl", "SourcesOfInterest").
-                                 has("classifier", classifier.name()).
-                                 toList();
-    Iterator<Edge> edges;
-    for (Vertex v2 : v2s) {
-      edges = g().V(v1).inE().
-                        has("lbl", "deepcontains").
-                        where(otherV().
-                        is(v2)).
-                        toStream().
-                        iterator();
-      while (edges.hasNext()) {
-        edges.next().remove(); 
-        }
+                             String      columns) throws LomikelException {  
+    if (g().V().has("lbl", "source").has("objectId", objectId).hasNext()) {
+      Vertex v1 = g().V().has("lbl", "source").has("objectId", objectId).next();
+      List<Vertex> v2s = g().V(v1).in().
+                                   has("lbl", "SourcesOfInterest").
+                                   has("classifier", classifier.name()).
+                                   toList();
+      Iterator<Edge> edges;
+      for (Vertex v2 : v2s) {
+        edges = g().V(v1).inE().
+                          has("lbl", "deepcontains").
+                          where(otherV().
+                          is(v2)).
+                          toStream().
+                          iterator();
+        while (edges.hasNext()) {
+          edges.next().remove(); 
+          }
+        }        
+      // will be commited in registration
       }
-    // will be commited in registration
     classifier.instance().classify(this, objectId, enhance, columns);
     }
        
