@@ -96,10 +96,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                      project('classifier', 'cls', 'weight').
                                                                      by(outV().values('classifier')).
                                                                      by(outV().values('cls')).
-                                                                     by(values('weight')).each {e -> zz[e['cls']] = e['weight']}
-                                                            if (e['classifier'] == classifier) {
-                                                              z[n.key] = zz
-                                                              }
+                                                                     by(values('weight')).each {e ->
+                                                                                                if (e['classifier'] == classifier) 
+                                                                                                  zz[e['cls']] = e['weight']
+                                                                                                  }
+                                                                                                }
+                                                            z[n.key] = zz
                                                             }
     return z
     }
