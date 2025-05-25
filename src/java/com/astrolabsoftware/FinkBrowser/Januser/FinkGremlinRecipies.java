@@ -268,6 +268,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   Usualy the number of <em>Alerts</em> of this type. 
     * @param instanceS  The <em>jd</em> of related <em>Alerts</em> as strings separated by comma.
     *                   Potential square brackets are removed.
+    *                   May be <tt>null</tt> or empty.
     * @param enhance    Whether expand tree under all <em>SourcesOfInterest</em> with alerts
     *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
@@ -280,8 +281,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         boolean     enhance,
                                         String      columns) {   
     Set<Double> instances = new HashSet<>();
-    for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
-      instances.add(Double.parseDouble(instance));
+    if (instanceS != null && !instancesS.trim().equals(""))
+      for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
+        instances.add(Double.parseDouble(instance));
+        }
       }
     registerSourcesOfInterest(classifier, cls, objectId, weight, instances, enhance, columns);
     }
