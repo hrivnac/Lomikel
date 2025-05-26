@@ -255,7 +255,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   // BUG: 0 if close also if not related
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> m,
-                            boolean             ignorePartial = false) {
+                            boolean             ignorePartial = true) {
     def dist = 0;
     def key1;
     def key2;
