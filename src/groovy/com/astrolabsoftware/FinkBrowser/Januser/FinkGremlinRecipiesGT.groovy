@@ -127,7 +127,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param oid0          The <em>objectOd</em> of the <em>source</em>.
     * @param classifier    The classifier name to be used.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
-    *                      Default: <tt>false</tt>.
+    *                      Default: <tt>true</tt>.
     *                      Optional named parameter.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
@@ -162,7 +162,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      <em>source</em> will be used if <tt>null</tt>.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
     *                      Optional naamed parameter.
-    *                      Default: <tt>false</tt>.
+    *                      Default: <tt>true</tt>.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
     *                      Optional named parameter.
@@ -250,13 +250,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param m             The second classifier {@link Map}.
     *                      Entries, not present also in m0, will be ignored.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
-    *                      Default: <tt>false</tt>.
+    *                      Default: <tt>true</tt>.
     * @return              The distance between two {@link Map}s. */
-  // BUG: 0 if close also if not related
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> m,
                             boolean             ignorePartial = true) {
     def dist = 0;
+    def exists = false;
     def key1;
     def key2;
     def w01;
@@ -282,9 +282,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
             wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
             dist += Math.pow(w0 - wx, 2);
+            exists = true;
             }
           }
         }
+      }
+    if (!exists) {
+      dist = Integer.MAX_VALUE;
       }
     return dist;
     }
