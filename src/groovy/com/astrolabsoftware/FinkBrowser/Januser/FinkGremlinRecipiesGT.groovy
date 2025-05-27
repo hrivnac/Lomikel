@@ -300,7 +300,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           wx1 = m[cls1] == null ? 0 : m[cls1];
           wx2 = m[cls2] == null ? 0 : m[cls2];
           if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
-            if (metric == 2) {
+            if (metric == 1) {
               w0x1 = w01 + wx1;
               w0x2 = w02 + wx2;
               w1 = (w0x1 == 0 ? 0 : Math.abs(w01 - wx1) / w0x1);
