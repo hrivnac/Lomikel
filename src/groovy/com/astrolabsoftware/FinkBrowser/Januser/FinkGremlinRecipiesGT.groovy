@@ -254,7 +254,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return              The distance between two {@link Map}s. */
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> m,
-                            boolean             ignorePartial = true) {
+                            boolean             ignorePartial = false) {
     def dist = 0;
     def exists = false;
     def cls1;
