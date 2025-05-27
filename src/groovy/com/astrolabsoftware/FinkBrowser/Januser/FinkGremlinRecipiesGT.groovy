@@ -87,29 +87,39 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier    The classifier name to be used.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
+    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
+    *                      Default: <tt>true</tt>.
+    * @param metric        The metric to use <tt>1, 2</tt>.
+    *                      Default: <tt>1</tt>.
     * @return              The full neigbouthood informatin. */
   def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String oid0,
                                                                        String classifier,
-                                                                       int    nmax) {
+                                                                       int    nmax,
+                                                                       boolean ignorePartial = true,
+                                                                       int     metric        = 1) {
     def z = [:]
     def zz
-    sourceNeighborhood("nmax":nmax, oid0, classifier).each {n ->
-                                                            def v = g().V().has('lbl', 'source').
-                                                                            has('objectId', n.key).
-                                                                            id().
-                                                                            next()
-                                                            zz = [:]
-                                                            g().V(v).inE().
-                                                                     project('classifier', 'cls', 'weight').
-                                                                     by(outV().values('classifier')).
-                                                                     by(outV().values('cls')).
-                                                                     by(values('weight')).each {e ->
-                                                                                                if (e['classifier'] == classifier) {
-                                                                                                  zz[e['cls']] = e['weight']
-                                                                                                  }
-                                                                                                }
-                                                            z[n] = zz
-                                                            }
+    sourceNeighborhood('nmax':nmax,
+                       'ignorePartial':true,
+                       'metric':2,
+                       oid0,
+                       classifier).each {n ->
+                                         def v = g().V().has('lbl', 'source').
+                                                         has('objectId', n.key).
+                                                         id().
+                                                         next()
+                                         zz = [:]
+                                         g().V(v).inE().
+                                                  project('classifier', 'cls', 'weight').
+                                                  by(outV().values('classifier')).
+                                                  by(outV().values('cls')).
+                                                  by(values('weight')).each {e ->
+                                                                             if (e['classifier'] == classifier) {
+                                                                               zz[e['cls']] = e['weight']
+                                                                               }
+                                                                             }
+                                         z[n] = zz
+                                         }
     return z
     }
 
@@ -132,6 +142,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
     *                      Optional named parameter.
+    * @param metric        The metric to use <tt>1, 2</tt>.
+    *                      Default: <tt>1</tt>.
     * @return              The distances to other sources, order by the distance. */
   def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
@@ -166,6 +178,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
     *                      Optional named parameter.
+    * @param metric        The metric to use <tt>1, 2</tt>.
+    *                      Default: <tt>1</tt>.
+    *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
   def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
@@ -174,6 +189,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                              List<String> classes0) {
     def ignorePartial = args.ignorePartial ?: false;
     def nmax          = args.nmax          ?: Integer.MAX_VALUE;
+    def metric        = args.metric        ?: 1;
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
@@ -237,7 +253,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                    }
                                  }
                   m = normalizeMap(m);
-                  def dist = sourceDistance(m0, m, ignorePartial);
+                  def dist = sourceDistance(m0, m, ignorePartial, metric);
                   if (dist > 0) {
                     distances[oid] = dist;
                     }     
@@ -251,24 +267,27 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      Entries, not present also in m0, will be ignored.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
     *                      Default: <tt>true</tt>.
+    * @param metric        The metric to use <tt>1, 2</tt>.
+    *                      Default: <tt>1</tt>.
     * @return              The distance between two {@link Map}s. */
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> m,
-                            boolean             ignorePartial = false) {
+                            boolean             ignorePartial = true,
+                            int                 metric        = 1) {
     def dist = 0;
     def exists = false;
     def cls1;
     def cls2;
     def w01;
     def w02;
-    //def w012;
-    //def wx12;
+    def w012;
+    def wx12;
     def w0x1;
     def w0x2;
     def wx1;
     def wx2;
-    //def w0;
-    //def wx;
+    def w0;
+    def wx;
     def w1;
     def w2;
     for (entry1 : m0.entrySet()) {
@@ -281,16 +300,20 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           wx1 = m[cls1] == null ? 0 : m[cls1];
           wx2 = m[cls2] == null ? 0 : m[cls2];
           if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
-            //w012 = w01 + w02;
-            //wx12 = wx1 + wx2;
-            //w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
-            //wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
-            //dist += Math.pow(w0 - wx, 2);
-            w0x1 = w01 + wx1;
-            w0x2 = w02 + wx2;
-            w1 = (w0x1 == 0 ? 0 : Math.abs(w01 - wx1) / w0x1);
-            w2 = (w0x2 == 0 ? 0 : Math.abs(w02 - wx2) / w0x2);
-            dist += Math.pow(w1 - w2, 2);
+            if (metric == 2) {
+              w0x1 = w01 + wx1;
+              w0x2 = w02 + wx2;
+              w1 = (w0x1 == 0 ? 0 : Math.abs(w01 - wx1) / w0x1);
+              w2 = (w0x2 == 0 ? 0 : Math.abs(w02 - wx2) / w0x2);
+              dist += Math.pow(w1 - w2, 2);
+              }
+            else {
+               w012 = w01 + w02;
+               wx12 = wx1 + wx2;
+               w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
+               wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
+               dist += Math.pow(w0 - wx, 2);
+               }
             exists = true;
             }
           }
