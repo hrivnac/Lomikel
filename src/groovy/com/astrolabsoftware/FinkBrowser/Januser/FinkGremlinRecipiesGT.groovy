@@ -246,8 +246,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
-    * @param m0            The first classifier {@link Map}.
-    * @param m             The second classifier {@link Map}.
+    * @param m0            The first classifier {@link Map} cls to weight.
+    * @param m             The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
     * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
     *                      Default: <tt>true</tt>.
@@ -257,30 +257,37 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                             boolean             ignorePartial = true) {
     def dist = 0;
     def exists = false;
-    def key1;
-    def key2;
+    def cls1;
+    def cls2;
     def w01;
     def w02;
-    def w012;
-    def wx12;
+    //def w012;
+    //def wx12;
+    def w0x1;
+    def w0x2;
     def wx1;
     def wx2;
     def w0;
     def wx;
     for (entry1 : m0.entrySet()) {
       for (entry2 : m0.entrySet()) {
-        key1 = entry1.getKey();
-        key2 = entry2.getKey();
-        if (key1 > key2) {
+        cls1 = entry1.getKey();
+        cls2 = entry2.getKey();
+        if (cls1 > cls2) {
           w01 = entry1.getValue();
           w02 = entry2.getValue();
-          wx1 = m[key1] == null ? 0 : m[key1];
-          wx2 = m[key2] == null ? 0 : m[key2];
+          wx1 = m[cls1] == null ? 0 : m[cls1];
+          wx2 = m[cls2] == null ? 0 : m[cls2];
           if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
-            w012 = w01 + w02;
-            wx12 = wx1 + wx2;
-            w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
-            wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
+            //w012 = w01 + w02;
+            //wx12 = wx1 + wx2;
+            //w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
+            //wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
+            //dist += Math.pow(w0 - wx, 2);
+            w0x1 = w01 + wx1;
+            w0x2 = w02 + wx2;
+            w0 = (w012 == 0 ? 0 : Math.abs(w01 - wx1) / w0x1);
+            wx = (wx12 == 0 ? 0 : Math.abs(w02 - wx2) / w0x2);
             dist += Math.pow(w0 - wx, 2);
             exists = true;
             }

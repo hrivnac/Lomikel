@@ -35,11 +35,8 @@ public class TagClassifier implements Classifier {
   /** Tag <em>source</em>.
     * @param oid  The <em>source</em> <tt>objectId</tt>.
     * @param tags The comma-separated tags to be attributed.
-    *             Each tag can contain a probablity, separated by doublecolon.
-    *             If probablities are missing, they will be attributed automatically.
-    *             If probablities are specified, they should be specified
-    *             for all tags or for all tags except one.
-    *             Example: <tt>tag1:0.5,tag2:0.3,tag3</tt>. */
+    *             Each tag should contain a weight, separated by doublecolon.
+    *             Example: <tt>tag1:0.5,tag2:0.3,tag3:0.2</tt>. */
   public void tag(String oid,
                   String tags) {
     if (!tags.contains(",")) {
@@ -47,16 +44,16 @@ public class TagClassifier implements Classifier {
       return;
       }
     Map<String, Double> tagMap = new TreeMap<>();
-    String[] t;
+    String[] t =  new String[]{};
     for (String tag : tags.split(",")) {
       if (tag.contains(":")) {
         t = tag.trim().split(":");
         if (t[1].trim().equals("")) {
-          t[1] = "0";
+          log.warn("Tag " + t[0] + " without weight, will be ignored");
           }
         }
       else {
-        t = new String[]{tag, "0"};
+        log.warn("Tag " + t + " without weight, will be ignored");
         } 
       tagMap.put(t[0], Double.parseDouble(t[1]));
       }
