@@ -267,8 +267,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def w0x2;
     def wx1;
     def wx2;
-    def w0;
-    def wx;
+    //def w0;
+    //def wx;
+    def w1;
+    def w2;
     for (entry1 : m0.entrySet()) {
       for (entry2 : m0.entrySet()) {
         cls1 = entry1.getKey();
@@ -286,9 +288,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             //dist += Math.pow(w0 - wx, 2);
             w0x1 = w01 + wx1;
             w0x2 = w02 + wx2;
-            w0 = (w012 == 0 ? 0 : Math.abs(w01 - wx1) / w0x1);
-            wx = (wx12 == 0 ? 0 : Math.abs(w02 - wx2) / w0x2);
-            dist += Math.pow(w0 - wx, 2);
+            w1 = (w0x1 == 0 ? 0 : Math.abs(w01 - wx1) / w0x1);
+            w2 = (w0x2 == 0 ? 0 : Math.abs(w02 - wx2) / w0x2);
+            dist += Math.pow(w1 - w2, 2);
             exists = true;
             }
           }
