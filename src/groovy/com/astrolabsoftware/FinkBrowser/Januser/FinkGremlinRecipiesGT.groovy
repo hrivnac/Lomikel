@@ -301,19 +301,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           wx2 = m[cls2] == null ? 0 : m[cls2];
           if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
             if (metric == 1) {
-              w0x1 = w01 + wx1;
-              w0x2 = w02 + wx2;
-              w1 = (w0x1 == 0 ? 0 : Math.abs(w01 - wx1) / w0x1);
-              w2 = (w0x2 == 0 ? 0 : Math.abs(w02 - wx2) / w0x2);
-              dist += Math.pow(w1 - w2, 2);
+              dist += Math.pow(alg(w01, w02, wx1, wx2), 2);
               }
             else {
-               w012 = w01 + w02;
-               wx12 = wx1 + wx2;
-               w0 = (w012 == 0 ? 0 : Math.abs(w01 - w02) / w012);
-               wx = (wx12 == 0 ? 0 : Math.abs(wx1 - wx2) / wx12);
-               dist += Math.pow(w0 - wx, 2);
-               }
+              dist += Math.pow(alg(w01, wx1, w02, wx2), 2);
+              }
             exists = true;
             }
           }
@@ -323,6 +315,30 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       dist = Integer.MAX_VALUE;
       }
     return dist;
+    }
+    
+  /** The distance measure/algorithm.
+    * It calculates the distance between difference between <tt>a,b</tt>
+    * and <tt>c,d</tt>:
+    * <pre>
+    * |a-b|/|a+b| - |c-d|/|c+d|
+    * </pre>
+    * If <tt>a+b, c+d == 0</tt> the corresponding difefrences are taken
+    * as <tt>Integer.MAX_VALUE</tt>.
+    * @param a The argument.
+    * @param b The argument.
+    * @param c The argument.
+    * @param d The argument.
+    * @return  The result. */
+  def double alg(double a,
+                 double b,
+                 double c,
+                 double d) {
+    def ab = a + b;
+    def cd = c + d;
+    def w0 = (ab == 0 ? Integer.MAX_VALUE : Math.abs(a - b) / ab);
+    def wx = (cd == 0 ? Integer.MAX_VALUE : Math.abs(c - d) / cd);
+    return w0 - wx;
     }
     
   /** Normalize {@link Map}.
