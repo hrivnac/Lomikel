@@ -92,16 +92,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param metric        The metric to use <tt>1, 2</tt>.
     *                      Default: <tt>1</tt>.
     * @return              The full neigbouthood informatin. */
-  def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String oid0,
-                                                                       String classifier,
-                                                                       int    nmax,
+  def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
+                                                                       String  classifier,
+                                                                       int     nmax,
                                                                        boolean ignorePartial = true,
                                                                        int     metric        = 1) {
     def z = [:]
     def zz
     sourceNeighborhood('nmax':nmax,
-                       'ignorePartial':true,
-                       'metric':2,
+                       'ignorePartial':ignorePartial,
+                       'metric':metric,
                        oid0,
                        classifier).each {n ->
                                          def v = g().V().has('lbl', 'source').
@@ -215,7 +215,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     for (entry : m0.entrySet()) {
       classes += [entry.getKey()];
       }
-    log.info('calculating source distances from ' + oid0 + m0 + " ...");
+    log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
     m0 = normalizeMap(m0);
     def distances = [:]
     def sources;
