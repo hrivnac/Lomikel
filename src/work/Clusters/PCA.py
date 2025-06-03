@@ -93,7 +93,7 @@ args = ["cdsxmatch",
 df = df.withColumn("class", extract_fink_classification(*args))
 
        
-df = df.filter(df.cdxmatch != "Unknown" && df.roid != 3 && df.ndethist >= 3)
+df = df.filter(df.cdxmatch != "Unknown" & df.roid != 3 & df.ndethist >= 3)
 
 # Converting lc_features arrays into columns -----------------------------------
       
