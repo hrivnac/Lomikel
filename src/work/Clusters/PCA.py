@@ -41,14 +41,14 @@ import csv
 
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2024/month=10"
+dataFn = "/user/julien.peloton/archive/science/year=2025"
 skipNaN = False
 replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
-n_pca = 13
+n_pca = 25
 n_clusters_start = 5
-n_clusters = 100
+n_clusters = 15
 silhouette = False
 cluster_features = "pca_features"
 
@@ -91,6 +91,11 @@ args = ["cdsxmatch",
         "tracklet"]
 
 df = df.withColumn("class", extract_fink_classification(*args))
+
+       
+df = df.filter(df.cdxmatch != "Unknown" &&
+               df.roid != 3 &&
+               df.ndethist >= 3)
 
 # Converting lc_features arrays into columns -----------------------------------
       
