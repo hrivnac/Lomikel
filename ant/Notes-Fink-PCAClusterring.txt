@@ -6,6 +6,21 @@ git pull;hadoop fs -put -f ../src/work/Clusters/PCA.py
 # @janusgraph
 lomikel_hbase -s ../src/work/Clusters/PCA.groovy -b
 ---------------------------
+dataFn = "/user/julien.peloton/archive/science/year=2025"
+skipNaN = False
+replaceNaNbyMean = True
+replaceNaNbyZero = False
+n_sample = 0
+n_pca = 25
+n_clusters_start = 5
+n_clusters = 15
+silhouette = False
+cluster_features = "pca_features"
+
+
+
+---------------------------
+---------------------------
 dataFn = "/user/julien.peloton/archive/science/year=2024"
 skipNaN = False
 replaceNaNbyMean = True
