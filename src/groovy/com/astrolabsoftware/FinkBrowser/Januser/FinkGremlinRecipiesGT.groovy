@@ -261,7 +261,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     }     
                   }
     if (nmax >= 1) {
-      return distances.sort{it.value}.take(nmax)
+      return distances.sort{it.value}.take((int)nmax)
       }
     def sortedEntries = distances.entrySet().sort{it.value}
     def result = []
@@ -274,8 +274,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         def v1 = sortedEntries[i - 1].value
         def v2 = sortedEntries[i    ].value
         if (v1 != v2) {
-          def ratio = (v2 - v1) / (v1 - v0)
-          if (ratio > nmax) {
+          def ratio = (v1 - v0) / (v2 - v1)
+          if (ratio < nmax) {
             break
             }
           }
