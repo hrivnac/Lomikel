@@ -272,9 +272,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         def v0 = distances[i - 2].value
         def v1 = distances[i - 1].value
         def v2 = distances[i    ].value
-        def ratio = (v2 - v1) / (v1 - v0)
-        if (ratio > nmax) {
-          break
+        if (v1 != v2) {
+          def ratio = (v2 - v1) / (v1 - v0)
+          if (ratio > nmax) {
+            break
+            }
           }
         result << distances[i]
         }
