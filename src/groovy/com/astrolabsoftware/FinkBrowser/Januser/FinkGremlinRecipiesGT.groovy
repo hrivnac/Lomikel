@@ -258,7 +258,28 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     distances[oid] = dist;
                     }     
                   }
-    return distances.sort{it.value}.take(nmax);
+    distances = distances.sort{it.value}.take(nmax);
+    if (nmax > 0) {
+      return distances.take(nmax)
+      }
+    nmax = - nmax
+    def result = []
+    for (int i = 0; i < distances.size(); i++) {
+      if (i < 2) {
+        result << distances[i]
+        }
+      else {
+        def v0 = distances[i - 2].value
+        def v1 = distances[i - 1].value
+        def v2 = distances[i    ].value
+        def ratio = (v2 - v1) / (v1 - v0)
+        if (ratio > nmax) {
+          break
+          }
+        result << distances[i]
+        }
+      }
+    return result.collectEntries {[(it.key): it.value]}
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.

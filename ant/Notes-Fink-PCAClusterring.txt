@@ -16,18 +16,9 @@ n_clusters_start = 5
 n_clusters = 15
 silhouette = False
 cluster_features = "pca_features"
-=> PCA_Variance-25.png => n_pca = 13
+=> PCA_Variance-25.png => 
 ------------------------------------
-dataFn = "/user/julien.peloton/archive/science/year=2025"
-skipNaN = False
-replaceNaNbyMean = True
-replaceNaNbyZero = False
-n_sample = 0
-n_pca = 13
-n_clusters_start = 5
-n_clusters = 60
-silhouette = True
-cluster_features = "pca_features"
+
 
 
 
