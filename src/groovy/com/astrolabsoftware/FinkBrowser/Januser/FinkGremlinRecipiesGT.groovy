@@ -94,7 +94,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return              The full neigbouthood informatin. */
   def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                        String  classifier,
-                                                                       int     nmax,
+                                                                       double  nmax,
                                                                        boolean ignorePartial = true,
                                                                        int     metric        = 1) {
     def z = [:]
