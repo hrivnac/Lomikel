@@ -140,7 +140,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      Default: <tt>true</tt>.
     *                      Optional named parameter.
     * @param nmax          The number of closest <em>source</em>s to give.
-    *                      If negative, the relative distance cutoff (the smaller means more selective). 
+    *                      If less then 1, the relative distance cutoff
+    *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
     * @param metric        The metric to use <tt>1, 2</tt>.
@@ -177,7 +178,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      Optional naamed parameter.
     *                      Default: <tt>true</tt>.
     * @param nmax          The number of closest <em>source</em>s to give.
-    *                      If negative, the relative distance cutoff (the smaller means more selective). 
+    *                      If less then 1, the relative distance cutoff
+    *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
     * @param metric        The metric to use <tt>1, 2</tt>.
