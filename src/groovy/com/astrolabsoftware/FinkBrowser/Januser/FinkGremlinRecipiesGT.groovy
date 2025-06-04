@@ -258,7 +258,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     distances[oid] = dist;
                     }     
                   }
-    distances = distances.sort{it.value}.take(nmax);
+    distances = distances.sort{it.value};
     if (nmax > 0) {
       return distances.take(nmax)
       }
