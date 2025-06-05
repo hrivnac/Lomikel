@@ -321,7 +321,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       cls1 = entry1.getKey();
       w01 = entry1.getValue();
       wx1 = m[cls1] == null ? 0 : m[cls1];
-      dist += w01 * w0x;
+      dist += w01 * wx1;
       n++;
       }
     return dist / n;
