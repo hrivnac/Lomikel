@@ -303,6 +303,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                             boolean             ignorePartial = true,
                             int                 metric        = 1) {
     def dist = 0;
+    def norm0 = 0;
+    def normx = 0;
     def exists = false;
     def cls1;
     def cls2;
@@ -326,9 +328,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       wx1 = m[cls1] == null ? 0 : m[cls1];
       wx1 = wx1 == 0 ? Integer.MAX_VALUE : 1 / wx1;
       dist += w01 * wx1;
+      norm0 += w01 * w01;
+      normx += wx1 * wx1;
       n++;
       }
-    return dist / n;
+    return dist / Math.sqrt(norm0 * normx);
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
