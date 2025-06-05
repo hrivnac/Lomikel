@@ -296,7 +296,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def wx;
     for (entry : m0.entrySet()) {
       cls = entry.getKey();
-      w0 = entry1.getValue();
+      w0 = entry.getValue();
       w0 = w0 == 0 ? Integer.MAX_VALUE : 1 / w0;
       wx = m[cls] == null ? 0 : m[cls];
       wx = wx == 0 ? Integer.MAX_VALUE : 1 / wx;
