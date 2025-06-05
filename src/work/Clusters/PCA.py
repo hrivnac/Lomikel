@@ -41,7 +41,7 @@ import csv
 
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2025"
+dataFn = "/user/julien.peloton/archive/science/year=2025/month=05"
 skipNaN = False
 replaceNaNbyMean = True
 replaceNaNbyZero = False
@@ -51,6 +51,7 @@ n_clusters_start = 5
 n_clusters = 100
 silhouette = True
 cluster_features = "pca_features"
+tag = "-Full"
 
 # New session ------------------------------------------------------------------
 
@@ -90,7 +91,7 @@ args = ["cdsxmatch",
         "rf_kn_vs_nonkn",
         "tracklet"]
 
-df = df.withColumn("class", extract_fink_classification(*args))
+#df = df.withColumn("class", extract_fink_classification(*args))
        
 df = df.filter(df.cdsxmatch != "Unknown")
 
@@ -210,7 +211,7 @@ plt.title("variance by components")
 plt.xlabel("num of components")
 plt.ylabel("Cumulative Explained Variance")
 plt.grid(True)
-plt.savefig("/tmp/PCA_Variance-" + str(n_pca) + ".png")
+plt.savefig("/tmp/PCA_Variance" + tag + "-" + str(n_pca) + ".png")
 
 # use n_pca for variance about 80%
 
@@ -242,7 +243,7 @@ if silhouette:
   plt.ylabel("within set sum of squared errors") 
   plt.title("Elbow Method for Optimal K") 
   plt.grid()
-  plt.savefig("/tmp/Silhouette_Score-" + str(n_clusters) + ".png")  
+  plt.savefig("/tmp/Silhouette_Score" + tag + "-" + str(n_clusters) + ".png")  
   # use n_clusters at maximum
 
 kmeans = KMeans().setK(n_clusters)\
@@ -286,7 +287,7 @@ plt.title("Cluster vs Class Scatter Plot (Bubble Size = Count)")
 plt.xticks(rotation = 45)
 plt.grid(True)
 plt.legend(title="Count")
-plt.savefig("/tmp/Class_Clusters-" + str(n_pca) + "-" + str(n_clusters) + ".png")
+plt.savefig("/tmp/Class_Clusters" + tag + "-" + str(n_pca) + "-" + str(n_clusters) + ".png")
 
 # report
 log.info("Cluster Centers:") 
