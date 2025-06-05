@@ -87,20 +87,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier    The classifier name to be used.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
-    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
-    *                      Default: <tt>true</tt>.
     * @param metric        The metric to use <tt>1, 2</tt>.
     *                      Default: <tt>1</tt>.
     * @return              The full neigbouthood informatin. */
   def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                        String  classifier,
                                                                        double  nmax,
-                                                                       boolean ignorePartial = true,
                                                                        int     metric        = 1) {
     def z = [:]
     def zz
     sourceNeighborhood('nmax':nmax,
-                       'ignorePartial':ignorePartial,
                        'metric':metric,
                        oid0,
                        classifier).each {n ->
@@ -136,9 +132,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
     * @param oid0          The <em>objectOd</em> of the <em>source</em>.
     * @param classifier    The classifier name to be used.
-    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
-    *                      Default: <tt>true</tt>.
-    *                      Optional named parameter.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      If less then 1, the relative distance cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
@@ -174,9 +167,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      used in comparison.
     *                      All <em>SourceOfInterest</em> classes of the specified
     *                      <em>source</em> will be used if <tt>null</tt>.
-    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
-    *                      Optional naamed parameter.
-    *                      Default: <tt>true</tt>.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      If less then 1, the relative distance cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
@@ -191,7 +181,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                              String       classifier,
                                              List<String> oidS,
                                              List<String> classes0) {
-    def ignorePartial = args.ignorePartial ?: false;
     def nmax          = args.nmax          ?: Integer.MAX_VALUE;
     def metric        = args.metric        ?: 1;
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
@@ -259,7 +248,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                    }
                                  }
                   m = normalizeMap(m);
-                  def dist = sourceDistance(m0, m, ignorePartial, metric);
+                  def dist = sourceDistance(m0, m, metric);
                   if (dist > 0) {
                     distances[oid] = dist;
                     }     
@@ -293,127 +282,29 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param m             The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
-    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
-    *                      Default: <tt>true</tt>.
     * @param metric        The metric to use <tt>1, 2</tt>.
     *                      Default: <tt>1</tt>.
     * @return              The distance between two {@link Map}s. */
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> m,
-                            boolean             ignorePartial = true,
-                            int                 metric        = 1) {
+                            int                 metric = 1) {
     def dist = 0;
     def norm0 = 0;
     def normx = 0;
-    def exists = false;
-    def cls1;
-    def cls2;
-    def w01;
-    def w02;
-    def w012;
-    def wx12;
-    def w0x1;
-    def w0x2;
-    def wx1;
-    def wx2;
+    def cls;
     def w0;
     def wx;
-    def w1;
-    def w2;
-    def n = 0;
-    for (entry1 : m0.entrySet()) {
-      cls1 = entry1.getKey();
-      w01 = entry1.getValue();
-      w01 = w01 == 0 ? Integer.MAX_VALUE : 1 / w01;
-      wx1 = m[cls1] == null ? 0 : m[cls1];
-      wx1 = wx1 == 0 ? Integer.MAX_VALUE : 1 / wx1;
-      dist += w01 * wx1;
-      norm0 += w01 * w01;
-      normx += wx1 * wx1;
-      n++;
+    for (entry : m0.entrySet()) {
+      cls = entry.getKey();
+      w0 = entry1.getValue();
+      w0 = w0 == 0 ? Integer.MAX_VALUE : 1 / w0;
+      wx = m[cls] == null ? 0 : m[cls];
+      wx = wx == 0 ? Integer.MAX_VALUE : 1 / wx;
+      dist += w0 * wx;
+      norm0 += w0 * w0;
+      normx += wx * wx;
       }
     return dist / Math.sqrt(norm0 * normx);
-    }
-    
-  /** Give distance (metric) between two classifier {@link Map}s.
-    * @param m0            The first classifier {@link Map} cls to weight.
-    * @param m             The second classifier {@link Map} cls to weight.
-    *                      Entries, not present also in m0, will be ignored.
-    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
-    *                      Default: <tt>true</tt>.
-    * @param metric        The metric to use <tt>1, 2</tt>.
-    *                      Default: <tt>1</tt>.
-    * @return              The distance between two {@link Map}s. */
-  def double sourceDistance0(Map<String, Double> m0,
-                            Map<String, Double> m,
-                            boolean             ignorePartial = true,
-                            int                 metric        = 1) {
-    def dist = 0;
-    def exists = false;
-    def cls1;
-    def cls2;
-    def w01;
-    def w02;
-    def w012;
-    def wx12;
-    def w0x1;
-    def w0x2;
-    def wx1;
-    def wx2;
-    def w0;
-    def wx;
-    def w1;
-    def w2;
-    for (entry1 : m0.entrySet()) {
-      for (entry2 : m0.entrySet()) {
-        cls1 = entry1.getKey();
-        cls2 = entry2.getKey();
-        if (cls1 > cls2) {
-          w01 = entry1.getValue();
-          w02 = entry2.getValue();
-          wx1 = m[cls1] == null ? 0 : m[cls1];
-          wx2 = m[cls2] == null ? 0 : m[cls2];
-          if (!ignorePartial || (w01 != 0 && w02 != 0 && wx1 != 0 && wx2 != 0)) {
-            if (metric == 1) {
-              dist += Math.pow(alg(w01, w02, wx1, wx2), 2);
-              }
-            else {
-              dist += Math.pow(alg(w01, wx1, w02, wx2), 2);
-              }
-            exists = true;
-            }
-          }
-        }
-      }
-    if (!exists) {
-      dist = Integer.MAX_VALUE;
-      }
-    return dist;
-    }
- 
-    
-  /** The distance measure/algorithm.
-    * It calculates the distance between difference between <tt>a,b</tt>
-    * and <tt>c,d</tt>:
-    * <pre>
-    * |a-b|/|a+b| - |c-d|/|c+d|
-    * </pre>
-    * If <tt>a+b, c+d == 0</tt> the corresponding difefrences are taken
-    * as <tt>Integer.MAX_VALUE</tt>.
-    * @param a The argument.
-    * @param b The argument.
-    * @param c The argument.
-    * @param d The argument.
-    * @return  The result. */
-  def double alg(double a,
-                 double b,
-                 double c,
-                 double d) {
-    def ab = a + b;
-    def cd = c + d;
-    def w0 = (ab == 0 ? Integer.MAX_VALUE : Math.abs(a - b) / ab);
-    def wx = (cd == 0 ? Integer.MAX_VALUE : Math.abs(c - d) / cd);
-    return w0 - wx;
     }
     
   /** Normalize {@link Map}.
@@ -425,7 +316,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return normalizedMap;
     }
   
-    
   /** Drop all {@link Vertex} with specified <em>importDate</em>.
     * @param importDate The <em>importDate</em> of {@link Vertex}es to drop.
     *                   It's format should be like <tt>Mon Feb 14 05:51:20 UTC 2022</tt>.
