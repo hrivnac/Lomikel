@@ -316,6 +316,46 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def wx;
     def w1;
     def w2;
+    def n = 0;
+    for (entry1 : m0.entrySet()) {
+      cls1 = entry1.getKey();
+      w01 = entry1.getValue();
+      wx1 = m[cls1] == null ? 0 : m[cls1];
+      dist += w01 * w0x;
+      n++;
+      }
+    return dist / n;
+    }
+    
+  /** Give distance (metric) between two classifier {@link Map}s.
+    * @param m0            The first classifier {@link Map} cls to weight.
+    * @param m             The second classifier {@link Map} cls to weight.
+    *                      Entries, not present also in m0, will be ignored.
+    * @param ignorePartial Whether ignore entries when one value is <tt>0</tt>.
+    *                      Default: <tt>true</tt>.
+    * @param metric        The metric to use <tt>1, 2</tt>.
+    *                      Default: <tt>1</tt>.
+    * @return              The distance between two {@link Map}s. */
+  def double sourceDistance0(Map<String, Double> m0,
+                            Map<String, Double> m,
+                            boolean             ignorePartial = true,
+                            int                 metric        = 1) {
+    def dist = 0;
+    def exists = false;
+    def cls1;
+    def cls2;
+    def w01;
+    def w02;
+    def w012;
+    def wx12;
+    def w0x1;
+    def w0x2;
+    def wx1;
+    def wx2;
+    def w0;
+    def wx;
+    def w1;
+    def w2;
     for (entry1 : m0.entrySet()) {
       for (entry2 : m0.entrySet()) {
         cls1 = entry1.getKey();
@@ -342,6 +382,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     return dist;
     }
+ 
     
   /** The distance measure/algorithm.
     * It calculates the distance between difference between <tt>a,b</tt>

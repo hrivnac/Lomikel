@@ -51,6 +51,7 @@ n_clusters_start = 5
 n_clusters = 100
 silhouette = True
 cluster_features = "pca_features"
+known = True
 tag = "-Full"
 
 # New session ------------------------------------------------------------------
@@ -93,7 +94,8 @@ args = ["cdsxmatch",
 
 df = df.withColumn("class", extract_fink_classification(*args))
        
-#df = df.filter(df.cdsxmatch != "Unknown")
+if known:
+  df = df.filter(df.cdsxmatch != "Unknown")
 
 # Converting lc_features arrays into columns -----------------------------------
       
