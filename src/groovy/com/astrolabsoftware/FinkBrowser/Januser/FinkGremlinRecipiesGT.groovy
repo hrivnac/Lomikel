@@ -311,6 +311,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           norm0 += (w0 + wx) * (w0 + wx);
           break;
         default:
+          dist += 0;
         }      
       }
     switch(metric) {
