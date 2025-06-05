@@ -300,11 +300,27 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       w0 = w0 == 0 ? Integer.MAX_VALUE : 1 / w0;
       wx = m[cls] == null ? 0 : m[cls];
       wx = wx == 0 ? Integer.MAX_VALUE : 1 / wx;
-      dist += w0 * wx;
-      norm0 += w0 * w0;
-      normx += wx * wx;
+      switch(metric) {
+        case 1:
+          dist += w0 * wx;
+          norm0 += w0 * w0;
+          normx += wx * wx;
+          break;
+        case 2:
+          dist += (w0 - wx) * (w0 - wx);
+          norm0 += (w0 + wx) * (w0 + wx);
+          break;
+        default:
+        }      
       }
-    return dist / Math.sqrt(norm0 * normx);
+    switch(metric) {
+      case 1:
+        return dist / Math.sqrt(norm0 * normx);
+      case 2:
+        return Math.sqrt(dist / norm0);
+      default:
+        return 0;
+      }
     }
     
   /** Normalize {@link Map}.
