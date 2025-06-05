@@ -321,10 +321,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       cls1 = entry1.getKey();
       w01 = entry1.getValue();
       wx1 = m[cls1] == null ? 0 : m[cls1];
-      dist += w01 * wx1;
+      dist += Math.sqrt((1.0 - w01) * (1.0 - wx1));
       n++;
       }
-    return dist / n;
+    return dist;
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
