@@ -91,9 +91,9 @@ args = ["cdsxmatch",
         "rf_kn_vs_nonkn",
         "tracklet"]
 
-#df = df.withColumn("class", extract_fink_classification(*args))
+df = df.withColumn("class", extract_fink_classification(*args))
        
-df = df.filter(df.cdsxmatch != "Unknown")
+#df = df.filter(df.cdsxmatch != "Unknown")
 
 # Converting lc_features arrays into columns -----------------------------------
       
