@@ -291,10 +291,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def dist = 0;
     def norm0 = 0;
     def normx = 0;
+    def cls;
     def w0;
     def wx;
-    for (cls : m0.entrySet() + m.entrySet()) {
-      w0 = m0[cls] == null ? 0 : m0[cls];
+    for (entry : m0.entrySet()) {
+      cls = entry.getKey();
+      w0 = entry.getValue();
       w0 = w0 == 0 ? Integer.MAX_VALUE : 1 / w0;
       wx = m[cls] == null ? 0 : m[cls];
       wx = wx == 0 ? Integer.MAX_VALUE : 1 / wx;
