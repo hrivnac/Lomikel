@@ -304,7 +304,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       norm0 += w0 * w0;
       normx += wx * wx;
       }
-    return dist / Math.sqrt(norm0 * normx);
+    return Math.sqrt(1 - (dist * dist) / (norm0 * normx));
     }
     
   /** Normalize {@link Map}.
