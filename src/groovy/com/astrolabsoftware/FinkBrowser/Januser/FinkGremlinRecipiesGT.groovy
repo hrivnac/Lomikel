@@ -246,12 +246,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   def oid = g().V(s).values('objectId').next();
                   def m = [:];
                   g().V(s).inE().
-                           project('cls', 'classifier', 'w').
+                           project('oid1', 'cls', 'classifier', 'w').
+                           by(inV().values('objectId')).
                            by(outV().values('cls')).
                            by(outV().values('classifier')).
                            by(values('weight')).
                            each {it ->
-                                 if (it['classifier'].equals(classifier) &&
+                                 if (!it['oid1'].equals(oid0) &&
+                                     it['classifier'].equals(classifier) &&
                                      it['cls'] in classes) {
                                    m[it['cls']] = it['w'];
                                    }
