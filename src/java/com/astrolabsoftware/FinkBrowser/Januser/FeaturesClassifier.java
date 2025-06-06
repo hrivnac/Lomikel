@@ -110,14 +110,13 @@ public class FeaturesClassifier implements Classifier {
     * @return The corresponding {@link ClusterFinder}. 
     * @throws LomikelExceltion If {@link ClusterFinder} cannot be created. */
   private ClusterFinder finder() throws LomikelException {
-    if (_finder == null) {
+    if (_finder == null || reset) {
       if (_resourceName == null && _dirName == null) {
         _resourceName = "Clusters/2024/13-60";
         }
       try {
         if (_resourceName != null) {
           ClassLoader classLoader = getClass().getClassLoader();
-          log.info(_resourceName);
           _finder = new ClusterFinder(classLoader.getResource(_resourceName + "/scaler_params.json"),
                                       classLoader.getResource(_resourceName + "/pca_params.json"),
                                       classLoader.getResource(_resourceName + "/cluster_centers.json"));
@@ -127,6 +126,7 @@ public class FeaturesClassifier implements Classifier {
                                       _dirName + "/pca_params.json",
                                       _dirName + "/cluster_centers.json");
           }
+        reset = false;
         }
       catch (IOException e) {
         throw new LomikelException("Cannot create Cluster Finder", e);
@@ -141,6 +141,7 @@ public class FeaturesClassifier implements Classifier {
     * @param dirName The directory for model json files. */
   public static void setModelDirectory(String dirName) {
     _dirName = dirName;
+    _reset = true;
     }
     
   /** Set the resource directory for model json files
@@ -149,6 +150,7 @@ public class FeaturesClassifier implements Classifier {
     * @param resourceName The resource directory for model json files. */
   public static void setModelResource(String resourceName) {
     _resourceName = resourceName;
+    _reset = true;
     }
   
   private static ClusterFinder _finder;
@@ -156,6 +158,8 @@ public class FeaturesClassifier implements Classifier {
   private static String _dirName;
   
   private static String _resourceName;
+  
+  private static boolean _reset;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(FeaturesClassifier.class);
