@@ -5,6 +5,7 @@ import org.apache.commons.math3.linear.*;
 
 import java.util.List;
 import java.util.Arrays;
+import java.net.URL;
 import java.io.File;
 import java.io.IOException;
 
@@ -42,6 +43,14 @@ public class ClusterFinder {
     loadPCAParams(pcaFile);
     loadClusterCenters(clustersFile);
     }
+
+  public ClusterFinder(URL scalerFile,
+                       URL pcaFile,
+                       URL clustersFile) throws IOException {
+    loadScalerParams(scalerFile);
+    loadPCAParams(pcaFile);
+    loadClusterCenters(clustersFile);
+    }
   
   private void loadScalerParams(String filePath) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -65,7 +74,28 @@ public class ClusterFinder {
     log.debug("Cluster Centers: " + _clusterCenters.getColumnDimension() + " * " + _clusterCenters.getRowDimension());
     }    
     
+  private void loadScalerParams(URL filePath) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    ScalerParams params = objectMapper.readValue(filePath, ScalerParams.class);
+    _mean = params.mean;
+    _std = params.std;
+    log.debug("Scaler: " + _mean.length);
+    }
   
+  private void loadPCAParams(URL filePath) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    PCAParams params = objectMapper.readValue(filePath, PCAParams.class);
+    _pcaComponents = new Array2DRowRealMatrix(params.components);
+    _explainedVariance = params.explained_variance;
+    log.debug("PCA Components: " + _pcaComponents.getColumnDimension() + " * " + _pcaComponents.getRowDimension());
+    }
+    
+  private void loadClusterCenters(URL filePath) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    _clusterCenters = new Array2DRowRealMatrix(objectMapper.readValue(filePath, double[][].class));
+    log.debug("Cluster Centers: " + _clusterCenters.getColumnDimension() + " * " + _clusterCenters.getRowDimension());
+    }    
+
   private double[] standardize(double[] input) {
     double[] standardized = new double[input.length];
     for (int i = 0; i < input.length; i++) {

@@ -111,13 +111,21 @@ public class FeaturesClassifier implements Classifier {
     * @throws LomikelExceltion If {@link ClusterFinder} cannot be created. */
   private ClusterFinder finder() throws LomikelException {
     if (_finder == null) {
-      if (_dirName == null) {
+      if (_resourceName == null && _dirName == null) {
         _dirName = "/tmp";
         }
       try {
-        _finder = new ClusterFinder(_dirName + "/scaler_params.json",
-                                    _dirName + "/pca_params.json",
-                                    _dirName + "/cluster_centers.json");
+        if (_resourceName != null) {
+          ClassLoader classLoader = getClass().getClassLoader();
+          _finder = new ClusterFinder(classLoader.getResource(_dirName + "/scaler_params.json"),
+                                      classLoader.getResource(_dirName + "/pca_params.json"),
+                                      classLoader.getResource(_dirName + "/cluster_centers.json"));
+          }
+        else {
+          _finder = new ClusterFinder(_dirName + "/scaler_params.json",
+                                      _dirName + "/pca_params.json",
+                                      _dirName + "/cluster_centers.json");
+          }
         }
       catch (IOException e) {
         throw new LomikelException("Cannot create Cluster Finder", e);
@@ -133,10 +141,20 @@ public class FeaturesClassifier implements Classifier {
   public static void setModelDirectory(String dirName) {
     _dirName = dirName;
     }
+    
+  /** Set the resource directory for model json files
+    * <tt>scaler_params.json, pca_params.json, cluster_centers.json</tt>.
+    * If not set, {@link #setModelDirectory} will be used.
+    * @param resourceName The resource directory for model json files. */
+  public static void setModelResource(String resourceName) {
+    _resourceName = resourceName;
+    }
   
   private static ClusterFinder _finder;
   
   private static String _dirName;
+  
+  private static String _resourceName;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(FeaturesClassifier.class);

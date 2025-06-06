@@ -41,18 +41,18 @@ import csv
 
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2025/month=05"
+dataFn = "/user/julien.peloton/archive/science/year=2025"
 skipNaN = False
 replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
 n_pca = 13
 n_clusters_start = 5
-n_clusters = 100
+n_clusters = 45
 silhouette = False
 cluster_features = "pca_features"
-known = False
-tag = ""
+known = True
+tag = "known"
 
 # New session ------------------------------------------------------------------
 
