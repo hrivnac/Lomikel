@@ -1,5 +1,6 @@
 import com.Lomikel.Januser.JanusClient;
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
+import com.astrolabsoftware.FinkBrowser.Januser.Classifiers;
 
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties");
 gr = new FinkGremlinRecipiesG(jc);

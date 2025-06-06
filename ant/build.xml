@@ -310,7 +310,7 @@
     </target>
     
   <target name="exe"
-          depends="jar"
+          depends="jar,data"
           description="Create exe JARs">
     <jar jarfile="../lib/Lomikel-${version}-ext.jar" index="no">
       <zipfileset includes="**/*" src="${cli_jar}"/>
