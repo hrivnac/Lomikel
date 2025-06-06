@@ -76,6 +76,7 @@ public class ClusterFinder {
     
   private void loadScalerParams(URL url) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
+    log.info(url);
     ScalerParams params = objectMapper.readValue(url, ScalerParams.class);
     _mean = params.mean;
     _std = params.std;
