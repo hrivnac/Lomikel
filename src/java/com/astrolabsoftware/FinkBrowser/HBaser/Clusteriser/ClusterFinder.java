@@ -47,6 +47,7 @@ public class ClusterFinder {
   public ClusterFinder(URL scalerUrl,
                        URL pcaUrl,
                        URL clustersUrl) throws IOException {
+    log.info(scalerUrl);
     loadScalerParams(scalerUrl);
     loadPCAParams(pcaUrl);
     loadClusterCenters(clustersUrl);
