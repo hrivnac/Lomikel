@@ -117,6 +117,7 @@ public class FeaturesClassifier implements Classifier {
       try {
         if (_resourceName != null) {
           ClassLoader classLoader = getClass().getClassLoader();
+          log.info(_resourceName);
           _finder = new ClusterFinder(classLoader.getResource(_resourceName + "/scaler_params.json"),
                                       classLoader.getResource(_resourceName + "/pca_params.json"),
                                       classLoader.getResource(_resourceName + "/cluster_centers.json"));
