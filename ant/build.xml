@@ -297,6 +297,18 @@
       </jar>
     </target>
     
+  <target name="data"
+          description="Create JAR">
+    <jar jarfile="../lib/Lomikel-${version}-data.jar" index="no">
+      <fileset dir="../data" includes="Clusters/2024/*/*.json"/>
+     <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelData"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        </manifest>
+      </jar>
+    </target>
+    
   <target name="exe"
           depends="jar"
           description="Create exe JARs">
@@ -344,7 +356,7 @@
         <attribute name="AppName"    value="Lomikel"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar Lomikel-${version}-data.jar"/>
         </manifest>
       </jar>    
     <jar jarfile="../lib/Lomikel-${version}-HBase.exe.jar" index="no">
@@ -353,7 +365,7 @@
         <attribute name="AppName"    value="LomikelwHBase"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar Lomikel-${version}-HBase.jar"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar Lomikel-${version}-HBase.jar Lomikel-${version}-data.jar"/>
         </manifest>
       </jar> 
     <!-- create from hbase classpath \-\-glob -->
@@ -383,7 +395,7 @@
         <attribute name="AppName"    value="LomikelwHBase"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar Lomikel-${version}-Janus.jar"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar Lomikel-${version}-Janus.jar Lomikel-${version}-data.jar"/>
         </manifest>
       </jar> 
     <!-- empirically assembled minimum -->
@@ -490,7 +502,7 @@
         <attribute name="AppName"    value="LomikelwDL4J"/>
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar dl4j-all.jar"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-${version}-ext.jar Lomikel-${version}-data.jar dl4j-all.jar"/>
         </manifest>
       </jar> 
     </target>
