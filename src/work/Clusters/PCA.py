@@ -51,7 +51,7 @@ n_sample = 0
 n_pca = 13
 n_clusters_start = 5
 n_clusters = 100
-silhouette = False
+silhouette = True
 cluster_features = "pca_features"
 known = True
 tag = "-known"
@@ -186,7 +186,7 @@ scaler_params = {
                      .toArray()\
                      .tolist()
   }
-with open("/tmp/scaler_params.json", "w") as f:
+with open("/tmp/scaler_params" + tag + ".json", "w") as f:
   json.dump(scaler_params, f)
 
 # PCA --------------------------------------------------------------------------
@@ -208,7 +208,7 @@ pca_params = {
                                  .toArray()\
                                  .tolist()
   }
-with open("/tmp/pca_params.json", "w") as f:
+with open("/tmp/pca_params" + tag + ".json", "w") as f:
   json.dump(pca_params, f)
     
 # plot
@@ -269,7 +269,7 @@ cr = clustered_result.select("objectId", "cluster", "class")
 
 # export
 cluster_centers = [center.tolist() for center in kmeans_model.clusterCenters()]
-with open("/tmp/cluster_centers.json", "w") as f:
+with open("/tmp/cluster_centers" + tag + ".json", "w") as f:
   json.dump(cluster_centers, f)
   
 # export
