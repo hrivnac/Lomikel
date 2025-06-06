@@ -112,14 +112,14 @@ public class FeaturesClassifier implements Classifier {
   private ClusterFinder finder() throws LomikelException {
     if (_finder == null) {
       if (_resourceName == null && _dirName == null) {
-        _dirName = "/tmp";
+        _resourceName = "Clusters/2024/13-60";
         }
       try {
         if (_resourceName != null) {
           ClassLoader classLoader = getClass().getClassLoader();
-          _finder = new ClusterFinder(classLoader.getResource(_dirName + "/scaler_params.json"),
-                                      classLoader.getResource(_dirName + "/pca_params.json"),
-                                      classLoader.getResource(_dirName + "/cluster_centers.json"));
+          _finder = new ClusterFinder(classLoader.getResource(_resourceName + "/scaler_params.json"),
+                                      classLoader.getResource(_resourceName + "/pca_params.json"),
+                                      classLoader.getResource(_resourceName + "/cluster_centers.json"));
           }
         else {
           _finder = new ClusterFinder(_dirName + "/scaler_params.json",

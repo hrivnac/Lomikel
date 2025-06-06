@@ -44,12 +44,12 @@ public class ClusterFinder {
     loadClusterCenters(clustersFile);
     }
 
-  public ClusterFinder(URL scalerFile,
-                       URL pcaFile,
-                       URL clustersFile) throws IOException {
-    loadScalerParams(scalerFile);
-    loadPCAParams(pcaFile);
-    loadClusterCenters(clustersFile);
+  public ClusterFinder(URL scalerUrl,
+                       URL pcaUrl,
+                       URL clustersUrl) throws IOException {
+    loadScalerParams(scalerUrl);
+    loadPCAParams(pcaUrl);
+    loadClusterCenters(clustersUrl);
     }
   
   private void loadScalerParams(String filePath) throws IOException {
@@ -74,25 +74,25 @@ public class ClusterFinder {
     log.debug("Cluster Centers: " + _clusterCenters.getColumnDimension() + " * " + _clusterCenters.getRowDimension());
     }    
     
-  private void loadScalerParams(URL filePath) throws IOException {
+  private void loadScalerParams(URL url) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    ScalerParams params = objectMapper.readValue(filePath, ScalerParams.class);
+    ScalerParams params = objectMapper.readValue(url, ScalerParams.class);
     _mean = params.mean;
     _std = params.std;
     log.debug("Scaler: " + _mean.length);
     }
   
-  private void loadPCAParams(URL filePath) throws IOException {
+  private void loadPCAParams(URL url) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    PCAParams params = objectMapper.readValue(filePath, PCAParams.class);
+    PCAParams params = objectMapper.readValue(url, PCAParams.class);
     _pcaComponents = new Array2DRowRealMatrix(params.components);
     _explainedVariance = params.explained_variance;
     log.debug("PCA Components: " + _pcaComponents.getColumnDimension() + " * " + _pcaComponents.getRowDimension());
     }
     
-  private void loadClusterCenters(URL filePath) throws IOException {
+  private void loadClusterCenters(URL url) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
-    _clusterCenters = new Array2DRowRealMatrix(objectMapper.readValue(filePath, double[][].class));
+    _clusterCenters = new Array2DRowRealMatrix(objectMapper.readValue(url, double[][].class));
     log.debug("Cluster Centers: " + _clusterCenters.getColumnDimension() + " * " + _clusterCenters.getRowDimension());
     }    
 
