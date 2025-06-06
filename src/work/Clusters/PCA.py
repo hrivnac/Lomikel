@@ -53,7 +53,7 @@ n_clusters_start = 5
 n_clusters = 100
 silhouette = False
 cluster_features = "pca_features"
-known = Truw
+known = True
 tag = "-known"
 clean = False
 
