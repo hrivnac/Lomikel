@@ -46,13 +46,13 @@ skipNaN = False
 replaceNaNbyMean = True
 replaceNaNbyZero = False
 n_sample = 0
-n_pca = 13
+n_pca = 25
 n_clusters_start = 5
 n_clusters = 100
-silhouette = True
+silhouette = False
 cluster_features = "pca_features"
-known = True
-tag = "-Full"
+known = False
+tag = ""
 
 # New session ------------------------------------------------------------------
 
@@ -245,7 +245,7 @@ if silhouette:
   plt.ylabel("within set sum of squared errors") 
   plt.title("Elbow Method for Optimal K") 
   plt.grid()
-  plt.savefig("/tmp/Silhouette_Score" + tag + "-" + str(n_clusters) + ".png")  
+  plt.savefig("/tmp/Silhouette_Score" + tag + "-" + str(n_pca) + "-" + str(n_clusters) + ".png")  
   # use n_clusters at maximum
 
 kmeans = KMeans().setK(n_clusters)\
