@@ -110,7 +110,7 @@ public class FeaturesClassifier implements Classifier {
     * @return The corresponding {@link ClusterFinder}. 
     * @throws LomikelExceltion If {@link ClusterFinder} cannot be created. */
   private ClusterFinder finder() throws LomikelException {
-    if (_finder == null || reset) {
+    if (_finder == null || _reset) {
       if (_resourceName == null && _dirName == null) {
         _resourceName = "Clusters/2024/13-60";
         }
@@ -126,7 +126,7 @@ public class FeaturesClassifier implements Classifier {
                                       _dirName + "/pca_params.json",
                                       _dirName + "/cluster_centers.json");
           }
-        reset = false;
+        _reset = false;
         }
       catch (IOException e) {
         throw new LomikelException("Cannot create Cluster Finder", e);
