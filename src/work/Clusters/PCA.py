@@ -55,7 +55,7 @@ silhouette = False
 cluster_features = "pca_features"
 known = False
 tag = ""
-clean = False
+clean = True
 
 # Clean ------------------------------------------------------------------------
 
