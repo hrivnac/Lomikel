@@ -301,6 +301,7 @@
           description="Create JAR">
     <jar jarfile="../lib/Lomikel-${version}-data.jar" index="no">
       <fileset dir="../data" includes="Clusters/2024/*/*.json"/>
+      <fileset dir="../data" includes="Clusters/2025/*/*.json"/>
      <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="LomikelData"/>
