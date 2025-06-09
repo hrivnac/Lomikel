@@ -112,7 +112,7 @@ public class FeaturesClassifier implements Classifier {
   private ClusterFinder finder() throws LomikelException {
     if (_finder == null || _reset) {
       if (_resourceName == null && _dirName == null) {
-        _resourceName = "Clusters/2024/13-60";
+        _resourceName = "Clusters/2025/13-50-known";
         }
       try {
         if (_resourceName != null) {
