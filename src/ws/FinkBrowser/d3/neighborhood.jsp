@@ -48,42 +48,29 @@
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
 
-  JSONObject data = new JSONObject();
-
-  JSONObject neighbor1 = new JSONObject();
-  neighbor1.put("distance", 0.0022675736961451087);
-
-  JSONObject classes1 = new JSONObject();
-  classes1.put("YSO_Candidate", 0.8571);
-  classes1.put("SN candidate", 0.1429);
-  neighbor1.put("classes", classes1);
-
-  data.put("ZTF19actbknb", neighbor1);
-
-  JSONObject neighbor2 = new JSONObject();
-  neighbor2.put("distance", 0.03628117913832199);
-
-  JSONObject classes2 = new JSONObject();
-  classes2.put("Radio", 0.4707);
-  classes2.put("YSO_Candidate", 0.0608);
-  neighbor2.put("classes", classes2);
-
-  data.put("ZTF19actfogx", neighbor2);
-
-  //String sourceId = "ZTF23abdlxeb";
-  
   JSONObject sourceClassification = new JSONObject();
-  
   for (Map<String, String> m : gr.classification(sourceId, classifier)) {
     sourceClassification.put(m.get("class"), m.get("weight"));
     }
+    
+  JSONObject data = new JSONObject();
+  JSONObject neighbor;
+  JSONObject classes;
+  String noid;
+  for (Map.Entry<Map<String, Double>, Map<String, Double>> m : gr.sourceNeighborhood(oid, classifier, nmax, alg)) {
+    classes = new JSONObject();
+    for (Map.Entry<String, Double> e : m.getValue().entrySet()) {
+      classes.put(e.getKey(), e.getValue());
+      }
+    neighbor = new JSONObject();
+    noid = m.getKey().getKey();
+    neighbor.put("distance", m.getKey().getValue());
+    neighbor.put("classes", classes);
+    data.put(noid, neighbor);
+    }
 
-  //sourceClassification.put("YSO_Candidate", 0.8333);
-  //sourceClassification.put("SN candidate", 0.1667);
-
-  request.setAttribute("data", data.toString());
-  //request.setAttribute("sourceId", sourceId);
   request.setAttribute("sourceClassJson", sourceClassification.toString());
+  request.setAttribute("data", data.toString());
   %>
 
 <script src="actions.js"     type="text/javascript"></script>

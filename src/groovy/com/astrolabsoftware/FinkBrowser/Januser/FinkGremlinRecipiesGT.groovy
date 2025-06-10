@@ -90,10 +90,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param metric        The metric to use <tt>1, 2</tt>.
     *                      Default: <tt>1</tt>.
     * @return              The full neigbouthood information. */
-  def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
-                                                                       String  classifier,
-                                                                       double  nmax,
-                                                                       int     metric        = 1) {
+  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
+                                                                             String  classifier,
+                                                                             double  nmax,
+                                                                             int     metric        = 1) {
     def z = [:]
     def zz
     sourceNeighborhood('nmax':nmax,
