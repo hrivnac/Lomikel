@@ -4,6 +4,13 @@
 <!-- @author Julius.Hrivnac@cern.ch -->
 
 <%@ page import="com.Lomikel.WebService.PropertiesProcessor" %>
+<%@ page import="com.Lomikel.Januser.JanusClient" %>
+<%@ page import="com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG" %>
+
+<%@ page import="org.json.JSONObject" %>
+<%@ page import="org.json.JSONArray" %>
+
+<%@ page import="java.util.Map" %>
 
 <%@ page import="org.apache.logging.log4j.Logger" %>
 <%@ page import="org.apache.logging.log4j.LogManager" %>
@@ -21,35 +28,67 @@
 <div id="tooltip"</div>
 
 <%
-//  String name  = request.getParameter("name");
-//  String url   = request.getParameter("url");
-//  String x     = request.getParameter("x");
-//  String y     = request.getParameter("y");
-//  String z     = request.getParameter("z");
-//  String s     = request.getParameter("s");
-//  String tdata = request.getParameter("tdata");
+  String sourceId   = request.getParameter("sourceId");
+  String classifier = request.getParameter("classifier");
+  String alg        = request.getParameter("alg");
+  String nmax       = request.getParameter("nmax");
   %>
 <%@include file="../PropertiesProcessor.jsp"%>
 <%
-//  String[] dd;
-//  String ts;
-//  String[] tdatas = tdata.split(",");
-//  for (int i = 0; i < tdatas.length; i++) { // TBD: should use JSON
-//    dd = tdatas[i].split(":");
-//    if (dd[0].equals("\"t\"")) {
-//      ts = dd[1].replaceAll("\"", "");
-//      ts = pp.getTimestamp(ts);
-//      tdatas[i] = "\"t\":\"" + ts + "\"";
-//      }
-//    }
-//  tdata = String.join(",", tdatas);
-  String sourceId = "ZTF23abdlxeb";
-  String sourceClassification = "{\"YSO_Candidate\": 0.8333, \"SN candidate\": 0.1667}";
+  if (classifier == null || classifier.isEmpty()) {
+    classifier = "FINK_PORTAL";
+    }
+  if (alg == null || alg.isEmpty()) {
+    alg = "1";
+    }
+  if (nmax == null || nmax.isEmpty()) {
+    nmax = "5";
+    }
+    
+  JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
+  FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
+
+  JSONObject data = new JSONObject();
+
+  JSONObject neighbor1 = new JSONObject();
+  neighbor1.put("distance", 0.0022675736961451087);
+
+  JSONObject classes1 = new JSONObject();
+  classes1.put("YSO_Candidate", 0.8571);
+  classes1.put("SN candidate", 0.1429);
+  neighbor1.put("classes", classes1);
+
+  data.put("ZTF19actbknb", neighbor1);
+
+  JSONObject neighbor2 = new JSONObject();
+  neighbor2.put("distance", 0.03628117913832199);
+
+  JSONObject classes2 = new JSONObject();
+  classes2.put("Radio", 0.4707);
+  classes2.put("YSO_Candidate", 0.0608);
+  neighbor2.put("classes", classes2);
+
+  data.put("ZTF19actfogx", neighbor2);
+
+  //String sourceId = "ZTF23abdlxeb";
+  
+  JSONObject sourceClassification = new JSONObject();
+  
+  for (Map<String, String> m : gr.classification(sourceId, classifier)) {
+    sourceClassification.put(m.get("class"), m.get("weight"));
+    }
+
+  //sourceClassification.put("YSO_Candidate", 0.8333);
+  //sourceClassification.put("SN candidate", 0.1667);
+
+  request.setAttribute("data", data.toString());
+  //request.setAttribute("sourceId", sourceId);
+  request.setAttribute("sourceClassJson", sourceClassification.toString());
   %>
 
 <script src="actions.js"     type="text/javascript"></script>
 <script src="neighborhood.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-  showNeighbors("a", "<%=sourceId%>", "<%=sourceClassification%>");
+  showNeighbors(<%=data%>, "<%=sourceId%>", <%=sourceClassification%>);
   </script>

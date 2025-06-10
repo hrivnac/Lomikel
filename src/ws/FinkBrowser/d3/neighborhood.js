@@ -1,5 +1,6 @@
 function showNeighbors(data, sourceId, sourceClassification) {
 
+/*
   data = {ZTF19actbknb: {distance: 0.0022675736961451087,
                          classes: {"YSO_Candidate": 0.8571,
                                    "SN candidate": 0.1429}},
@@ -17,7 +18,8 @@ function showNeighbors(data, sourceId, sourceClassification) {
     sourceId = "ZTF23abdlxeb";
     sourceClassification = {"YSO_Candidate": 0.8333,
                             "SN candidate": 0.1667};
-                            
+*/
+
     const tooltip = d3.select("#tooltip");
     
     let hideTimeout = null;

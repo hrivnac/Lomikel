@@ -89,7 +89,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      All are given, if missing.
     * @param metric        The metric to use <tt>1, 2</tt>.
     *                      Default: <tt>1</tt>.
-    * @return              The full neigbouthood informatin. */
+    * @return              The full neigbouthood information. */
   def Map<Map<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                        String  classifier,
                                                                        double  nmax,
@@ -389,8 +389,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                   {@link Classifier}s will be used.
     * @return    The recorded classification calculated
     *            by number of classified <em>alert</em>s. */
-  def List classification(String oid,
-                          String classifier = null) {
+  def List<Map<String, String>> classification(String oid,
+                                               String classifier = null) {
     def classified = [];
     g().V().has('lbl', 'source').
             has('objectId', oid).
