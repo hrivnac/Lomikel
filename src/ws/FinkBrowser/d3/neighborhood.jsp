@@ -57,7 +57,7 @@
   JSONObject neighbor;
   JSONObject classes;
   String noid;
-  for (Map.Entry<Map<String, Double>, Map<String, Double>> m : gr.sourceNeighborhood(sourceId, classifier, Double.parseDouble(nmax), Integer.parseInt(alg)).entrySet()) {
+  for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : gr.sourceNeighborhood(sourceId, classifier, Double.parseDouble(nmax), Integer.parseInt(alg)).entrySet()) {
     classes = new JSONObject();
     for (Map.Entry<String, Double> e : m.getValue().entrySet()) {
       classes.put(e.getKey(), e.getValue());
