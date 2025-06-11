@@ -1,3 +1,6 @@
+// ToDo:
+// - classes distributed according to their overlaps
+
 function showNeighbors(data, sourceId, sourceClassification) {
 
 /*
@@ -20,62 +23,37 @@ function showNeighbors(data, sourceId, sourceClassification) {
                             "SN candidate": 0.1667};
 
 */
-        const width = 800, height = 800, radius = 300;
-      const centerX = width / 2, centerY = height / 2;
 
-      const svg = d3.select("#viz")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-      const container = svg.append("g");
-
-      const zoom = d3.zoom()
-        .scaleExtent([0.5, 10])
-        .on("zoom", event => {
-          container.attr("transform", event.transform);
-        });
-
-      svg.call(zoom);
-
-      window.resetZoom = function() {
-        svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
-      };
-
-      const tooltip = d3.select("#tooltip");
-      let hideTimeout = null;
-
-      
-      
-      const allClasses = new Set();
-Object.keys(sourceClassification).forEach(c => allClasses.add(c));
-Object.values(data).forEach(obj => {
-  Object.keys(obj.classes).forEach(c => allClasses.add(c));
-});
-const classList = Array.from(allClasses);
-
-      const angleScale = d3.scaleLinear()
-        .domain([0, classList.length])
-        .range([0, 2 * Math.PI]);
-
-      const classPositions = {};
-      classList.forEach((cls, i) => {
-        const angle = angleScale(i);
-        classPositions[cls] = {
-          x: centerX + radius * Math.cos(angle),
-          y: centerY + radius * Math.sin(angle)
-        };
-
-        
-const jitter = 0.01; // radians
-
-classList.forEach((cls, i) => {
-  const angle = angleScale(i) + (Math.random() - 0.5) * jitter;
-  classPositions[cls] = {
-    x: centerX + radius * Math.cos(angle),
-    y: centerY + radius * Math.sin(angle)
-  };
-});
+  const width = 800, height = 800, radius = 300;
+  const centerX = width / 2, centerY = height / 2;
+  
+  const svg = d3.select("#viz")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+  
+  const container = svg.append("g");
+  
+  const zoom = d3.zoom()
+                 .scaleExtent([0.5, 10])
+                 .on("zoom", event => {container.attr("transform", event.transform);});
+  
+  svg.call(zoom);  
+  window.resetZoom = function() {svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);};
+  const tooltip = d3.select("#tooltip");
+  let hideTimeout = null;
+  const allClasses = new Set();
+  Object.keys(sourceClassification).forEach(c => allClasses.add(c));
+  Object.values(data).forEach(obj => {Object.keys(obj.classes).forEach(c => allClasses.add(c));});
+  const classList = Array.from(allClasses);
+  const angleScale = d3.scaleLinear()
+                       .domain([0, classList.length])
+                       .range([0, 2 * Math.PI]);
+  const classPositions = {};
+  const jitter = 0.01; // radians
+  classList.forEach((cls, i) => {const angle = angleScale(i) + (Math.random() - 0.5) * jitter;
+                                 classPositions[cls] = {x: centerX + radius * Math.cos(angle),
+                                                        y: centerY + radius * Math.sin(angle)};};);
 
         
         container.append("text")
