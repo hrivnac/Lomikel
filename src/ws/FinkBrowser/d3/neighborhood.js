@@ -20,7 +20,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
                             "SN candidate": 0.1667};
 */
 
-         const width = 800, height = 800, radius = 300;
+               const width = 800, height = 800, radius = 300;
       const centerX = width / 2, centerY = height / 2;
 
       const svg = d3.select("#viz")
@@ -49,10 +49,24 @@ function showNeighbors(data, sourceId, sourceClassification) {
       Object.values(data).forEach(obj => Object.keys(obj.classes).forEach(c => allClasses.add(c)));
 
       const originalClasses = Object.keys(sourceClassification);
-      const merged = [...allClasses].map(c => originalClasses.includes(c) ? c : "others");
+
+      // Map non-original classes to distinct 'othersN' pseudo-classes
+      let classMapping = {};
+      let otherCounter = 1;
+      const merged = [...allClasses].map(c => {
+        if (originalClasses.includes(c)) {
+          classMapping[c] = c;
+          return c;
+        } else {
+          const pseudo = `others${otherCounter++}`;
+          classMapping[c] = pseudo;
+          return pseudo;
+        }
+      });
+
       const classList = [...new Set(merged)].sort();
 
-      // Ensure at least two unique classes to avoid collapsing into a point
+      // Ensure at least two unique classes to avoid collapse
       const effectiveClassList = classList.length > 1 ? classList : [classList[0], `${classList[0]}_dummy`];
 
       const angleScale = d3.scaleLinear()
@@ -81,7 +95,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
         let sumX = 0, sumY = 0, total = 0;
         for (const cls in classMap) {
           const weight = classMap[cls];
-          const key = originalClasses.includes(cls) ? cls : "others";
+          const key = classMapping[cls];
           if (classPositions[key]) {
             sumX += classPositions[key].x * weight;
             sumY += classPositions[key].y * weight;
@@ -152,7 +166,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
           }, 300);
         });
     }
-       
+ 
   
 function resetZoom() {
   svg.transition()
