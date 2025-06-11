@@ -20,156 +20,139 @@ function showNeighbors(data, sourceId, sourceClassification) {
                             "SN candidate": 0.1667};
 */
 
-    const tooltip = d3.select("#tooltip");
-    
-    let hideTimeout = null;
+      const width = 800, height = 800, radius = 300;
+      const centerX = width / 2, centerY = height / 2;
 
-    const mainClasses = new Set(Object.keys(sourceClassification));
+      const svg = d3.select("#viz")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-    function mergeClasses(classes) {
-      const merged = {};
-      let othersWeight = 0;
-      for (const [cls, weight] of Object.entries(classes)) {
-        if (mainClasses.has(cls)) {
-          merged[cls] = weight;
-          }
-        else {
-          othersWeight += weight;
-          }
-        }
-      if (othersWeight > 0) merged.others = othersWeight;
-      return merged;
-      }
+      const container = svg.append("g");
 
-    const processedData = {};
-    for (const [id, info] of Object.entries(data)) {
-      processedData[id] = {
-        distance: info.distance,
-        classes: mergeClasses(info.classes),
+      const zoom = d3.zoom()
+        .scaleExtent([0.5, 10])
+        .on("zoom", event => {
+          container.attr("transform", event.transform);
+        });
+
+      svg.call(zoom);
+
+      window.resetZoom = function() {
+        svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+      };
+
+      const tooltip = d3.select("#tooltip");
+      let hideTimeout = null;
+
+      const allClasses = new Set(Object.keys(sourceClassification));
+      Object.values(data).forEach(obj => Object.keys(obj.classes).forEach(c => allClasses.add(c)));
+
+      const originalClasses = Object.keys(sourceClassification);
+      const merged = [...allClasses].map(c => originalClasses.includes(c) ? c : "others");
+      const classList = [...new Set(merged)].sort();
+
+      const angleScale = d3.scaleLinear().domain([0, classList.length]).range([0, 2 * Math.PI]);
+
+      const classPositions = {};
+      classList.forEach((cls, i) => {
+        const angle = angleScale(i);
+        classPositions[cls] = {
+          x: centerX + radius * Math.cos(angle),
+          y: centerY + radius * Math.sin(angle)
         };
-      }
-
-    const allClasses = new Set([...mainClasses]);
-    for (const obj of Object.values(processedData)) {
-      Object.keys(obj.classes).forEach((cls) => allClasses.add(cls));
-      }
-    const classList = Array.from(allClasses);
-    const n = classList.length;
-    const radius = 200;
-    const centerX = 400;
-    const centerY = 400;
-
-    const classPositions = {};
-    classList.forEach((cls, i) => {
-      const angle = (2 * Math.PI * i) / n;
-      classPositions[cls] = {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle),
-        };
+        container.append("text")
+          .attr("x", classPositions[cls].x)
+          .attr("y", classPositions[cls].y)
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "middle")
+          .text(cls)
+          .style("font-size", "12px");
       });
 
-    function computePosition(classWeights) {
-      let x = 0,
-          y = 0,
-          total = 0;
-      for (const [cls, weight] of Object.entries(classWeights)) {
-        const pos = classPositions[cls];
-        x += weight * pos.x;
-        y += weight * pos.y;
-        total += weight;
+      function weightedPosition(classMap) {
+        let sumX = 0, sumY = 0, total = 0;
+        for (const cls in classMap) {
+          const weight = classMap[cls];
+          const key = originalClasses.includes(cls) ? cls : "others";
+          if (classPositions[key]) {
+            sumX += classPositions[key].x * weight;
+            sumY += classPositions[key].y * weight;
+            total += weight;
+          }
         }
-      return { x: x / total, y: y / total };
+        return { x: sumX / total, y: sumY / total };
       }
 
-    const nodes = [];
-    const links = [];
-    const central = computePosition(sourceClassification);
-    nodes.push({ id: sourceId, ...central, color: "red" });
+      const sourcePos = weightedPosition(sourceClassification);
 
-    for (const [id, obj] of Object.entries(processedData)) {
-      const pos = computePosition(obj.classes);
-      nodes.push({ id, ...pos, color: "blue" });
-      links.push({ source: sourceId, target: id, distance: obj.distance });
+      container.append("path")
+        .attr("d", d3.symbol().type(d3.symbolStar).size(200))
+        .attr("transform", `translate(${sourcePos.x},${sourcePos.y})`)
+        .attr("fill", "red");
+
+      for (const [id, obj] of Object.entries(data)) {
+        const pos = weightedPosition(obj.classes);
+
+        // Blue star
+        container.append("path")
+          .attr("d", d3.symbol().type(d3.symbolStar).size(100))
+          .attr("transform", `translate(${pos.x},${pos.y})`)
+          .attr("fill", "blue")
+          .on("mouseover", function(event) {
+            clearTimeout(hideTimeout);
+            tooltip
+              .html(`<strong>${id}</strong><br><a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a>`)
+              .style("display", "block")
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 20) + "px");
+          })
+          .on("mousemove", function(event) {
+            tooltip
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 20) + "px");
+          })
+          .on("mouseout", function() {
+            hideTimeout = setTimeout(() => {
+              tooltip.style("display", "none");
+            }, 300);
+          });
+
+        // Distance line
+        container.append("line")
+          .attr("x1", sourcePos.x)
+          .attr("y1", sourcePos.y)
+          .attr("x2", pos.x)
+          .attr("y2", pos.y)
+          .attr("stroke", "#aaa")
+          .attr("stroke-dasharray", "2 2");
+
+        // Distance label
+        const labelX = (sourcePos.x + pos.x) / 2;
+        const labelY = (sourcePos.y + pos.y) / 2;
+        container.append("text")
+          .attr("x", labelX)
+          .attr("y", labelY)
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "middle")
+          .text(obj.distance.toFixed(4))
+          .style("font-size", "10px")
+          .style("fill", "#666");
       }
 
-    const svg = d3.select("#viz")
-                  .append("svg")
-                  .attr("width", 800)
-                  .attr("height", 800);
+      tooltip
+        .on("mouseover", () => clearTimeout(hideTimeout))
+        .on("mouseout", () => {
+          hideTimeout = setTimeout(() => {
+            tooltip.style("display", "none");
+          }, 300);
+        });
+    }
 
-    svg.append("circle")
-       .attr("cx", centerX)
-       .attr("cy", centerY)
-       .attr("r", radius)
-       .attr("stroke", "gray")
-       .attr("fill", "none")
-       .attr("stroke-dasharray", "4 2");
-
-    for (const [cls, pos] of Object.entries(classPositions)) {
-      svg.append("text")
-         .attr("x", pos.x)
-         .attr("y", pos.y)
-         .attr("text-anchor", "middle")
-         .attr("dy", "-0.5em")
-         .text(cls);
-      }
-
-    svg.selectAll("line")
-       .data(links)
-       .enter()
-       .append("line")
-       .attr("x1", (d) => nodes.find((n) => n.id === d.source).x)
-       .attr("y1", (d) => nodes.find((n) => n.id === d.source).y)
-       .attr("x2", (d) => nodes.find((n) => n.id === d.target).x)
-       .attr("y2", (d) => nodes.find((n) => n.id === d.target).y)
-       .attr("stroke", "gray");
-
-    svg.selectAll(".dist-label")
-       .data(links)
-       .enter()
-       .append("text")
-       .attr("class", "dist-label")
-       .attr("x",
-             (d) => (nodes.find((n) => n.id === d.source).x +
-                     nodes.find((n) => n.id === d.target).x) / 2)
-       .attr("y",
-             (d) => (nodes.find((n) => n.id === d.source).y +
-                     nodes.find((n) => n.id === d.target).y) / 2)
-       .attr("text-anchor", "middle")
-       .attr("dy", "-0.3em")
-       .attr("font-size", "10px")
-       .attr("fill", "green")
-       .text((d) => d.distance.toFixed(4));
-
-    svg.selectAll(".node")
-       .data(nodes)
-       .enter()
-       .append("path")
-       .attr("class", "node")
-       .attr("transform", (d) => `translate(${d.x},${d.y})`)
-       .attr("d", d3.symbol().type(d3.symbolStar).size(100))
-       .attr("fill", (d) => d.color)
-       .on("mouseover", function(event, d) {clearTimeout(hideTimeout);
-                                            tooltip.html(`<strong>${d.id}</strong><br><a href="https://fink-portal.org/${d.id}" target="_blank">View on Fink Portal</a>`)
-                                                   .style("display", "block")
-                                                   .style("left", (event.pageX + 10) + "px")
-                                                   .style("top", (event.pageY - 20) + "px");})
-       .on("mousemove", function(event) {tooltip.style("left", (event.pageX + 10) + "px")
-                                                .style("top", (event.pageY - 20) + "px");})
-       .on("mouseout", function() {hideTimeout = setTimeout(() => {tooltip.style("display", "none");}, 300);});
-       
-    svg.selectAll(".label")
-       .data(nodes)
-       .enter()
-       .append("text")
-       .attr("x", (d) => d.x)
-       .attr("y", (d) => d.y + 10)
-       .attr("text-anchor", "middle")
-       .attr("font-size", "10px")
-       .text((d) => d.id);
-    
-    tooltip.on("mouseover", () => {clearTimeout(hideTimeout);})
-           .on("mouseout", () => {hideTimeout = setTimeout(() => {tooltip.style("display", "none");}, 300);
-    });
            
+  
+function resetZoom() {
+  svg.transition()
+     .duration(500)
+     .call(zoom.transform, d3.zoomIdentity);
   }
