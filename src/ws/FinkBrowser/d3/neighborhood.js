@@ -29,6 +29,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
   
   const svg = d3.select("#viz")
                 .append("svg")
+        
                 .attr("width", width)
                 .attr("height", height);
   
@@ -76,7 +77,6 @@ function showNeighbors(data, sourceId, sourceClassification) {
            .attr("stroke-width", 1)
            .attr("stroke-dasharray", "4 2");      
       
-
   function weightedPosition(classMap) {
     let sumX = 0, sumY = 0, total = 0;
     for (const cls in classMap) {
@@ -89,101 +89,69 @@ function showNeighbors(data, sourceId, sourceClassification) {
         }
       }
     return { x: sumX / total, y: sumY / total };
-    }
-  
+    } 
   const sourcePos = weightedPosition(sourceClassification);
-
   container.append("path")
            .attr("d", d3.symbol().type(d3.symbolStar).size(200))
            .attr("transform", `translate(${sourcePos.x},${sourcePos.y})`)
            .attr("fill", "red")
-           .on("mouseover", function(event) {
-             clearTimeout(hideTimeout);
+           .on("mouseover", function(event) {clearTimeout(hideTimeout);           
+                                             const classEntries = Object.entries(sourceClassification)
+                                                                        .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
+                                                                        .join("");
            
-             const classEntries = Object.entries(sourceClassification)
-               .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
-               .join("");
-           
-             tooltip
-               .html(`<strong>${sourceId}</strong><br>
-                      <a href="https://fink-portal.org/${sourceId}" target="_blank">View on Fink Portal</a><br>
-                      <strong>Classes:</strong><ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
-               .style("display", "block")
-               .style("left", (event.pageX + 10) + "px")
-               .style("top", (event.pageY - 20) + "px");
-           })
-           .on("mousemove", function(event) {
-             tooltip
-               .style("left", (event.pageX + 10) + "px")
-               .style("top", (event.pageY - 20) + "px");
-           })
-           .on("mouseout", function() {
-             hideTimeout = setTimeout(() => {
-               tooltip.style("display", "none");
-             }, 300);
-           });
-               for (const [id, obj] of Object.entries(data)) {
-                 const pos = weightedPosition(obj.classes);
-           
-                 container.append("path")
-                   .attr("d", d3.symbol().type(d3.symbolStar).size(100))
-                   .attr("transform", `translate(${pos.x},${pos.y})`)
-                   .attr("fill", "blue")
-                   .on("mouseover", function(event, d) {
-                     clearTimeout(hideTimeout);
-                     const classEntries = Object.entries(obj.classes)
-           .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
-           .join("");
-
-            tooltip
-    .html(`<strong>${id}</strong><br>
-           <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
-           <strong>Classes:</strong><ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
-              .style("display", "block")
-              .style("left", (event.pageX + 10) + "px")
-              .style("top", (event.pageY - 20) + "px");
-          })
-          .on("mousemove", function(event) {
-            tooltip
-              .style("left", (event.pageX + 10) + "px")
-              .style("top", (event.pageY - 20) + "px");
-          })
-          .on("mouseout", function() {
-            hideTimeout = setTimeout(() => {
-              tooltip.style("display", "none");
-            }, 300);
-          });
-
-        container.append("line")
-          .attr("x1", sourcePos.x)
-          .attr("y1", sourcePos.y)
-          .attr("x2", pos.x)
-          .attr("y2", pos.y)
-          .attr("stroke", "#aaa")
-          .attr("stroke-dasharray", "2 2");
-
-        const labelX = (sourcePos.x + pos.x) / 2;
-        const labelY = (sourcePos.y + pos.y) / 2;
-        container.append("text")
-          .attr("x", labelX)
-          .attr("y", labelY)
-          .attr("text-anchor", "middle")
-          .attr("alignment-baseline", "middle")
-          .text(obj.distance.toFixed(4))
-          .style("font-size", "10px")
-          .style("fill", "#666");
-      }
-
-      tooltip
-        .on("mouseover", () => clearTimeout(hideTimeout))
-        .on("mouseout", () => {
-          hideTimeout = setTimeout(() => {
-            tooltip.style("display", "none");
-          }, 300);
-        });
+                                             tooltip.html(`<strong>${sourceId}</strong><br>
+                                                           <a href="https://fink-portal.org/${sourceId}" target="_blank">View on Fink Portal</a><br>
+                                                           <strong>Classes:</strong><ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
+                                                    .style("display", "block")
+                                                    .style("left", (event.pageX + 10) + "px")
+                                                    .style("top", (event.pageY - 20) + "px");})
+           .on("mousemove", function(event) {tooltip.style("left", (event.pageX + 10) + "px")
+                                                    .style("top", (event.pageY - 20) + "px");})
+           .on("mouseout", function() {hideTimeout = setTimeout(() => {tooltip.style("display", "none");}, 300);});
+  for (const [id, obj] of Object.entries(data)) {
+    const pos = weightedPosition(obj.classes);
+    container.append("path")
+            .attr("d", d3.symbol().type(d3.symbolStar).size(100))
+            .attr("transform", `translate(${pos.x},${pos.y})`)
+            .attr("fill", "blue")
+            .on("mouseover", function(event, d) {clearTimeout(hideTimeout);
+                                                 const classEntries = Object.entries(obj.classes)
+                                                                            .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
+                                                                            .join("");
+            
+                                                 tooltip.html(`<strong>${id}</strong><br>
+                                                               <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
+                                                               <strong>Classes:</strong><
+        ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
+                                                        .style("display", "block")
+                                                        .style("left", (event.pageX + 10) + "px")
+                                                        .style("top", (event.pageY - 20) + "px");})
+            .on("mousemove", function(event) {tooltip.style("left", (event.pageX + 10) + "px")
+                                                     .style("top", (event.pageY - 20) + "px");})
+           .on("mouseout", function() {hideTimeout = setTimeout(() => {tooltip.style("display", "none");}, 300);});
+    container.append("line").attr("x1", sourcePos.x)
+                            .attr("y1", sourcePos.y)
+                            .attr("x2", pos.x)
+                            .attr("y2", pos.y)
+                            .attr("stroke", "blue")
+                            .attr("stroke-dasharray", "2 2"); 
+    const labelX = (sourcePos.x + pos.x) / 2;
+    const labelY = (sourcePos.y + pos.y) / 2;
+    container.append("text")
+             .attr("x", labelX)
+             .attr("y", labelY)
+             .attr("text-anchor", "middle")
+             .attr("alignment-baseline", "middle")
+             .text(obj.distance.toFixed(4))
+             .style("font-size", "10px")
+             .style("fill", "blue");
     }
+
+  tooltip.on("mouseover", () => clearTimeout(hideTimeout))
+         .on("mouseout", () => {hideTimeout = setTimeout(() => {tooltip.style("display", "none");}, 300);});
+  }
         
-  
 function resetZoom() {
   svg.transition()
      .duration(500)

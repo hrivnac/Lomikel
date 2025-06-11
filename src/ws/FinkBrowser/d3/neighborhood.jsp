@@ -26,6 +26,7 @@
  
 <div id="viz"></div>
 <div id="tooltip"</div>
+<button onclick="resetZoom()">Reset Zoom</button>
 
 <%
   String sourceId   = request.getParameter("sourceId");
