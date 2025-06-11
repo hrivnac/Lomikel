@@ -20,7 +20,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
                             "SN candidate": 0.1667};
 
 
-               const width = 800, height = 800, radius = 300;
+        const width = 800, height = 800, radius = 300;
       const centerX = width / 2, centerY = height / 2;
 
       const svg = d3.select("#viz")
@@ -48,57 +48,37 @@ function showNeighbors(data, sourceId, sourceClassification) {
       const allClasses = new Set(Object.keys(sourceClassification));
       Object.values(data).forEach(obj => Object.keys(obj.classes).forEach(c => allClasses.add(c)));
 
-      const originalClasses = Object.keys(sourceClassification);
-
-      // Map non-original classes to distinct 'othersN' pseudo-classes
-      let classMapping = {};
-      let otherCounter = 1;
-      const merged = [...allClasses].map(c => {
-        if (originalClasses.includes(c)) {
-          classMapping[c] = c;
-          return c;
-        } else {
-          const pseudo = `others${otherCounter++}`;
-          classMapping[c] = pseudo;
-          return pseudo;
-        }
-      });
-
-      const classList = [...new Set(merged)].sort();
-
-      // Ensure at least two unique classes to avoid collapse
-      const effectiveClassList = classList.length > 1 ? classList : [classList[0], `${classList[0]}_dummy`];
+      const classList = [...allClasses].sort();
 
       const angleScale = d3.scaleLinear()
-        .domain([0, effectiveClassList.length - 1])
+        .domain([0, classList.length - 1])
         .range([0, 2 * Math.PI]);
 
       const classPositions = {};
-      effectiveClassList.forEach((cls, i) => {
+      classList.forEach((cls, i) => {
         const angle = angleScale(i);
         classPositions[cls] = {
           x: centerX + radius * Math.cos(angle),
           y: centerY + radius * Math.sin(angle)
         };
-        if (!cls.endsWith("_dummy")) {
-          container.append("text")
-            .attr("x", classPositions[cls].x)
-            .attr("y", classPositions[cls].y)
-            .attr("text-anchor", "middle")
-            .attr("alignment-baseline", "middle")
-            .text(cls)
-            .style("font-size", "12px");
-        }
+
+        container.append("text")
+          .attr("x", classPositions[cls].x)
+          .attr("y", classPositions[cls].y)
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "middle")
+          .text(cls)
+          .style("font-size", "12px");
       });
 
       function weightedPosition(classMap) {
         let sumX = 0, sumY = 0, total = 0;
         for (const cls in classMap) {
           const weight = classMap[cls];
-          const key = classMapping[cls];
-          if (classPositions[key]) {
-            sumX += classPositions[key].x * weight;
-            sumY += classPositions[key].y * weight;
+          const pos = classPositions[cls];
+          if (pos) {
+            sumX += pos.x * weight;
+            sumY += pos.y * weight;
             total += weight;
           }
         }
@@ -166,7 +146,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
           }, 300);
         });
     }
- 
+        
   
 function resetZoom() {
   svg.transition()
