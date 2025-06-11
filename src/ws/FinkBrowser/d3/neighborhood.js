@@ -122,8 +122,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
             
                                                  tooltip.html(`<strong>${id}</strong><br>
                                                                <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
-                                                               <strong>Classes:</strong><
-        ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
+                                                               <strong>Classes:</strong><ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
                                                         .style("display", "block")
                                                         .style("left", (event.pageX + 10) + "px")
                                                         .style("top", (event.pageY - 20) + "px");})
@@ -147,7 +146,6 @@ function showNeighbors(data, sourceId, sourceClassification) {
              .style("font-size", "10px")
              .style("fill", "blue");
     }
-
   tooltip.on("mouseover", () => clearTimeout(hideTimeout))
          .on("mouseout", () => {hideTimeout = setTimeout(() => {tooltip.style("display", "none");}, 300);});
   }
