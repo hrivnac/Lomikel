@@ -20,7 +20,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
                             "SN candidate": 0.1667};
 */
 
-       const width = 800, height = 800, radius = 300;
+      const width = 800, height = 800, radius = 300;
       const centerX = width / 2, centerY = height / 2;
 
       const svg = d3.select("#viz")
@@ -52,11 +52,11 @@ function showNeighbors(data, sourceId, sourceClassification) {
       const merged = [...allClasses].map(c => originalClasses.includes(c) ? c : "others");
       const classList = [...new Set(merged)].sort();
 
-      const angleScale = d3.scaleLinear().domain([0, classList.length]).range([0, 2 * Math.PI]);
+      const angleScale = d3.scaleLinear().domain([0, classList.length - 1]).range([0, 2 * Math.PI]);
 
       const classPositions = {};
       classList.forEach((cls, i) => {
-        const angle = angleScale(i + 0.5); // Adjust angle to spread evenly around the circle
+        const angle = angleScale(i); // Fixed angle calculation
         classPositions[cls] = {
           x: centerX + radius * Math.cos(angle),
           y: centerY + radius * Math.sin(angle)
