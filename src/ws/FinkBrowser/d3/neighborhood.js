@@ -55,7 +55,7 @@ Object.values(data).forEach(obj => {
 const classList = Array.from(allClasses);
 
       const angleScale = d3.scaleLinear()
-        .domain([0, classList.length + 1])
+        .domain([0, classList.length])
         .range([0, 2 * Math.PI]);
 
       const classPositions = {};
