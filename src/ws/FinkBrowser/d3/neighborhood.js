@@ -45,10 +45,14 @@ function showNeighbors(data, sourceId, sourceClassification) {
       const tooltip = d3.select("#tooltip");
       let hideTimeout = null;
 
-      const allClasses = new Set(Object.keys(sourceClassification));
-      Object.values(data).forEach(obj => Object.keys(obj.classes).forEach(c => allClasses.add(c)));
-
-      const classList = [...allClasses].sort();
+      
+      
+      const allClasses = new Set();
+Object.keys(sourceClassification).forEach(c => allClasses.add(c));
+Object.values(data).forEach(obj => {
+  Object.keys(obj.classes).forEach(c => allClasses.add(c));
+});
+const classList = [...allClasses].sort();
 
       const angleScale = d3.scaleLinear()
         .domain([0, classList.length - 1])
@@ -70,6 +74,22 @@ function showNeighbors(data, sourceId, sourceClassification) {
           .text(cls)
           .style("font-size", "12px");
       });
+      
+const classLine = d3.line()
+  .x(d => d.x)
+  .y(d => d.y)
+  .curve(d3.curveLinearClosed);
+
+const classPoints = classList.map(cls => classPositions[cls]);
+
+container.append("path")
+  .datum(classPoints)
+  .attr("d", classLine)
+  .attr("fill", "none")
+  .attr("stroke", "#ccc")
+  .attr("stroke-width", 1)
+  .attr("stroke-dasharray", "4 2");      
+      
 
       function weightedPosition(classMap) {
         let sumX = 0, sumY = 0, total = 0;
