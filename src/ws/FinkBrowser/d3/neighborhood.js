@@ -42,6 +42,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
   window.resetZoom = function() {svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);};
   const tooltip = d3.select("#tooltip");
   let hideTimeout = null;
+  
   const allClasses = new Set();
   Object.keys(sourceClassification).forEach(c => allClasses.add(c));
   Object.values(data).forEach(obj => {Object.keys(obj.classes).forEach(c => allClasses.add(c));});
@@ -53,15 +54,14 @@ function showNeighbors(data, sourceId, sourceClassification) {
   const jitter = 0.01; // radians
   classList.forEach((cls, i) => {const angle = angleScale(i) + (Math.random() - 0.5) * jitter;
                                  classPositions[cls] = {x: centerX + radius * Math.cos(angle),
-                                                        y: centerY + radius * Math.sin(angle)};});
-
-  container.append("text")
-           .attr("x", classPositions[cls].x)
-           .attr("y", classPositions[cls].y)
-           .attr("text-anchor", "middle")
-           .attr("alignment-baseline", "middle")
-           .text(cls)
-           .style("font-size", "12px");});
+                                                        y: centerY + radius * Math.sin(angle)};
+                                 container.append("text")
+                                          .attr("x", classPositions[cls].x)
+                                          .attr("y", classPositions[cls].y)
+                                          .attr("text-anchor", "middle")
+                                          .attr("alignment-baseline", "middle")
+                                          .text(cls)
+                                          .style("font-size", "12px");});
       
   const classLine = d3.line()
                       .x(d => d.x)
