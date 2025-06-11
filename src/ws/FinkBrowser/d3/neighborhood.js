@@ -24,6 +24,8 @@ function showNeighbors(data, sourceId, sourceClassification) {
 
 */
 
+  console.log(data);
+
   const width = 800, height = 800, radius = 300;
   const centerX = width / 2, centerY = height / 2;
   
