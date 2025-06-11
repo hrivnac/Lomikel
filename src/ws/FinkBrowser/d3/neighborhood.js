@@ -55,47 +55,43 @@ function showNeighbors(data, sourceId, sourceClassification) {
                                  classPositions[cls] = {x: centerX + radius * Math.cos(angle),
                                                         y: centerY + radius * Math.sin(angle)};};);
 
-        
-        container.append("text")
-          .attr("x", classPositions[cls].x)
-          .attr("y", classPositions[cls].y)
-          .attr("text-anchor", "middle")
-          .attr("alignment-baseline", "middle")
-          .text(cls)
-          .style("font-size", "12px");
-      });
+  container.append("text")
+           .attr("x", classPositions[cls].x)
+           .attr("y", classPositions[cls].y)
+           .attr("text-anchor", "middle")
+           .attr("alignment-baseline", "middle")
+           .text(cls)
+           .style("font-size", "12px");});
       
-const classLine = d3.line()
-  .x(d => d.x)
-  .y(d => d.y)
-  .curve(d3.curveLinearClosed);
-
-const classPoints = classList.map(cls => classPositions[cls]);
-
-container.append("path")
-  .datum(classPoints)
-  .attr("d", classLine)
-  .attr("fill", "none")
-  .attr("stroke", "#ccc")
-  .attr("stroke-width", 1)
-  .attr("stroke-dasharray", "4 2");      
+  const classLine = d3.line()
+                      .x(d => d.x)
+                      .y(d => d.y)
+                      .curve(d3.curveLinearClosed);
+  const classPoints = classList.map(cls => classPositions[cls]);
+  container.append("path")
+           .datum(classPoints)
+           .attr("d", classLine)
+           .attr("fill", "none")
+           .attr("stroke", "#ccc")
+           .attr("stroke-width", 1)
+           .attr("stroke-dasharray", "4 2");      
       
 
-      function weightedPosition(classMap) {
-        let sumX = 0, sumY = 0, total = 0;
-        for (const cls in classMap) {
-          const weight = classMap[cls];
-          const pos = classPositions[cls];
-          if (pos) {
-            sumX += pos.x * weight;
-            sumY += pos.y * weight;
-            total += weight;
-          }
+  function weightedPosition(classMap) {
+    let sumX = 0, sumY = 0, total = 0;
+    for (const cls in classMap) {
+      const weight = classMap[cls];
+      const pos = classPositions[cls];
+      if (pos) {
+        sumX += pos.x * weight;
+        sumY += pos.y * weight;
+        total += weight;
         }
-        return { x: sumX / total, y: sumY / total };
       }
-
-      const sourcePos = weightedPosition(sourceClassification);
+    return { x: sumX / total, y: sumY / total };
+    }
+  
+  const sourcePos = weightedPosition(sourceClassification);
 
   container.append("path")
   .attr("d", d3.symbol().type(d3.symbolStar).size(200))
