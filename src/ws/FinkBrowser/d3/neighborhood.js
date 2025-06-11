@@ -53,7 +53,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
                        .range([0, 2 * Math.PI]);
   const classPositions = {};
   const jitter = 0.01; // radians
-  classList.forEach((cls, i) => {const angle = angleScale(i) + (Math.random() - 0.5) * jitter;
+  classList.forEach((cls, i) => {const angle = angleScale(i) + Math.PI / 2 + (Math.random() - 0.5) * jitter;
                                  classPositions[cls] = {x: centerX + radius * Math.cos(angle),
                                                         y: centerY + radius * Math.sin(angle)};
                                  container.append("text")
@@ -102,7 +102,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
            
                                              tooltip.html(`<strong>${sourceId}</strong><br>
                                                            <a href="https://fink-portal.org/${sourceId}" target="_blank">View on Fink Portal</a><br>
-                                                           <strong>Classes:</strong><ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
+                                                           <ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
                                                     .style("display", "block")
                                                     .style("left", (event.pageX + 10) + "px")
                                                     .style("top", (event.pageY - 20) + "px");})
@@ -122,7 +122,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
             
                                                  tooltip.html(`<strong>${id}</strong><br>
                                                                <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
-                                                               <strong>Classes:</strong><ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
+                                                               <ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
                                                         .style("display", "block")
                                                         .style("left", (event.pageX + 10) + "px")
                                                         .style("top", (event.pageY - 20) + "px");})
