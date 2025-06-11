@@ -119,11 +119,35 @@ container.append("path")
 
       const sourcePos = weightedPosition(sourceClassification);
 
-      container.append("path")
-        .attr("d", d3.symbol().type(d3.symbolStar).size(200))
-        .attr("transform", `translate(${sourcePos.x},${sourcePos.y})`)
-        .attr("fill", "red");
+  container.append("path")
+  .attr("d", d3.symbol().type(d3.symbolStar).size(200))
+  .attr("transform", `translate(${sourcePos.x},${sourcePos.y})`)
+  .attr("fill", "red")
+  .on("mouseover", function(event) {
+    clearTimeout(hideTimeout);
 
+    const classEntries = Object.entries(sourceClassification)
+      .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
+      .join("");
+
+    tooltip
+      .html(`<strong>${sourceId}</strong><br>
+             <a href="https://fink-portal.org/${sourceId}" target="_blank">View on Fink Portal</a><br>
+             <strong>Classes:</strong><ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
+      .style("display", "block")
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 20) + "px");
+  })
+  .on("mousemove", function(event) {
+    tooltip
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 20) + "px");
+  })
+  .on("mouseout", function() {
+    hideTimeout = setTimeout(() => {
+      tooltip.style("display", "none");
+    }, 300);
+  });
       for (const [id, obj] of Object.entries(data)) {
         const pos = weightedPosition(obj.classes);
 
