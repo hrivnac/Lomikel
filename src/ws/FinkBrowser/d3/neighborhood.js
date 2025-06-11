@@ -24,8 +24,6 @@ function showNeighbors(data, sourceId, sourceClassification) {
 
 */
 
-  console.log(data);
-
   const width = 800, height = 800, radius = 300;
   const centerX = width / 2, centerY = height / 2;
   
@@ -144,7 +142,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
              .attr("y", labelY)
              .attr("text-anchor", "middle")
              .attr("alignment-baseline", "middle")
-             .text(obj.distance.toFixed(4))
+             .text(obj.distance.toExponential(3))
              .style("font-size", "10px")
              .style("fill", "blue");
     }
