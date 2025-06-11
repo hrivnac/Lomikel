@@ -20,7 +20,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
                             "SN candidate": 0.1667};
 */
 
-      const width = 800, height = 800, radius = 300;
+         const width = 800, height = 800, radius = 300;
       const centerX = width / 2, centerY = height / 2;
 
       const svg = d3.select("#viz")
@@ -52,22 +52,29 @@ function showNeighbors(data, sourceId, sourceClassification) {
       const merged = [...allClasses].map(c => originalClasses.includes(c) ? c : "others");
       const classList = [...new Set(merged)].sort();
 
-      const angleScale = d3.scaleLinear().domain([0, classList.length - 1]).range([0, 2 * Math.PI]);
+      // Ensure at least two unique classes to avoid collapsing into a point
+      const effectiveClassList = classList.length > 1 ? classList : [classList[0], `${classList[0]}_dummy`];
+
+      const angleScale = d3.scaleLinear()
+        .domain([0, effectiveClassList.length - 1])
+        .range([0, 2 * Math.PI]);
 
       const classPositions = {};
-      classList.forEach((cls, i) => {
-        const angle = angleScale(i); // Fixed angle calculation
+      effectiveClassList.forEach((cls, i) => {
+        const angle = angleScale(i);
         classPositions[cls] = {
           x: centerX + radius * Math.cos(angle),
           y: centerY + radius * Math.sin(angle)
         };
-        container.append("text")
-          .attr("x", classPositions[cls].x)
-          .attr("y", classPositions[cls].y)
-          .attr("text-anchor", "middle")
-          .attr("alignment-baseline", "middle")
-          .text(cls)
-          .style("font-size", "12px");
+        if (!cls.endsWith("_dummy")) {
+          container.append("text")
+            .attr("x", classPositions[cls].x)
+            .attr("y", classPositions[cls].y)
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "middle")
+            .text(cls)
+            .style("font-size", "12px");
+        }
       });
 
       function weightedPosition(classMap) {
@@ -94,7 +101,6 @@ function showNeighbors(data, sourceId, sourceClassification) {
       for (const [id, obj] of Object.entries(data)) {
         const pos = weightedPosition(obj.classes);
 
-        // Blue star
         container.append("path")
           .attr("d", d3.symbol().type(d3.symbolStar).size(100))
           .attr("transform", `translate(${pos.x},${pos.y})`)
@@ -118,7 +124,6 @@ function showNeighbors(data, sourceId, sourceClassification) {
             }, 300);
           });
 
-        // Distance line
         container.append("line")
           .attr("x1", sourcePos.x)
           .attr("y1", sourcePos.y)
@@ -127,7 +132,6 @@ function showNeighbors(data, sourceId, sourceClassification) {
           .attr("stroke", "#aaa")
           .attr("stroke-dasharray", "2 2");
 
-        // Distance label
         const labelX = (sourcePos.x + pos.x) / 2;
         const labelY = (sourcePos.y + pos.y) / 2;
         container.append("text")
@@ -148,7 +152,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
           }, 300);
         });
     }
-          
+       
   
 function resetZoom() {
   svg.transition()
