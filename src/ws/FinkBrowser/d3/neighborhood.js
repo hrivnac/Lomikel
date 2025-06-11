@@ -54,16 +54,6 @@ Object.values(data).forEach(obj => {
 });
 const classList = Array.from(allClasses);
 
-const jitter = 0.01; // radians
-
-classList.forEach((cls, i) => {
-  const angle = angleScale(i) + (Math.random() - 0.5) * jitter;
-  classPositions[cls] = {
-    x: centerX + radius * Math.cos(angle),
-    y: centerY + radius * Math.sin(angle)
-  };
-});
-
       const angleScale = d3.scaleLinear()
         .domain([0, classList.length - 1])
         .range([0, 2 * Math.PI]);
@@ -76,6 +66,18 @@ classList.forEach((cls, i) => {
           y: centerY + radius * Math.sin(angle)
         };
 
+        
+const jitter = 0.01; // radians
+
+classList.forEach((cls, i) => {
+  const angle = angleScale(i) + (Math.random() - 0.5) * jitter;
+  classPositions[cls] = {
+    x: centerX + radius * Math.cos(angle),
+    y: centerY + radius * Math.sin(angle)
+  };
+});
+
+        
         container.append("text")
           .attr("x", classPositions[cls].x)
           .attr("y", classPositions[cls].y)
