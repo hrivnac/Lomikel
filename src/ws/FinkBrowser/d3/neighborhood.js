@@ -53,7 +53,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
   const jitter = 0.01; // radians
   classList.forEach((cls, i) => {const angle = angleScale(i) + (Math.random() - 0.5) * jitter;
                                  classPositions[cls] = {x: centerX + radius * Math.cos(angle),
-                                                        y: centerY + radius * Math.sin(angle)};};);
+                                                        y: centerY + radius * Math.sin(angle)};});
 
   container.append("text")
            .attr("x", classPositions[cls].x)
