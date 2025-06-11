@@ -1,6 +1,6 @@
 function showNeighbors(data, sourceId, sourceClassification) {
 
-
+/*
   data = {ZTF19actbknb: {distance: 0.0022675736961451087,
                          classes: {"YSO_Candidate": 0.8571,
                                    "SN candidate": 0.1429}},
@@ -18,9 +18,9 @@ function showNeighbors(data, sourceId, sourceClassification) {
     sourceId = "ZTF23abdlxeb";
     sourceClassification = {"YSO_Candidate": 0.8333,
                             "SN candidate": 0.1667};
+*/
 
-
-      const width = 800, height = 800, radius = 300;
+       const width = 800, height = 800, radius = 300;
       const centerX = width / 2, centerY = height / 2;
 
       const svg = d3.select("#viz")
@@ -56,7 +56,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
 
       const classPositions = {};
       classList.forEach((cls, i) => {
-        const angle = angleScale(i);
+        const angle = angleScale(i + 0.5); // Adjust angle to spread evenly around the circle
         classPositions[cls] = {
           x: centerX + radius * Math.cos(angle),
           y: centerY + radius * Math.sin(angle)
@@ -148,8 +148,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
           }, 300);
         });
     }
-
-           
+          
   
 function resetZoom() {
   svg.transition()
