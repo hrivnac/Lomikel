@@ -6,24 +6,27 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_dir = "13-45"
+overlaps_dir = "2025/13-50-known"
 
-normalised = False          
+normalised = True          
 
 merges = {}
 no_values = []
-if overlaps_dir == "13-60":    
+if overlaps_dir == "2025/13-50-known":    
+  merges = {"FC-A":   ["FC-11",
+                       "FC-12"]}
+if overlaps_dir == "2024/13-60":    
   merges = {"FC-A":   ["FC-6",
                        "FC-59"],
             "FC-B":   ["FC-7",
                        "FC-23",
                        "FC-36"]}
-if overlaps_dir == "13-45":    
+if overlaps_dir == "2024/13-45":    
   merges = {"FC-A":   ["FC-38",
                        "FC-10"],
             "FC-B":   ["FC-3",
                        "FC-11"]}
-elif overlaps_dir == "13-20":                       
+elif overlaps_dir == "2024/13-20":                       
   merges = {"FC-A":   ["FC-6",
                        "FC-13",
                        "FC-15",
@@ -37,7 +40,7 @@ elif overlaps_dir == "13-20":
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
-limits_norm  = [3,                   0,                   0,                   3,                  0,                  0                 ]
+limits_norm  = [80,                   0,                   0,                   50,                  0,                  0                 ]
 limits_unorm = [0,                   0,                   0,                   0,                  0,                  0                 ]
 
 #-------------------------------------------------------------------------------
@@ -110,7 +113,7 @@ for i, ax in enumerate(axes.flat):
     
     
 plt.tight_layout()
-plt.savefig('Overlaps-' + overlaps_dir + "-" + name + '.png')
+plt.savefig('Overlaps-' + overlaps_dir.replace('/', '_') + "-" + name + '.png')
 plt.show()
                                           
 #print(tabulate(dfx, headers = 'keys', tablefmt = 'psql'))
