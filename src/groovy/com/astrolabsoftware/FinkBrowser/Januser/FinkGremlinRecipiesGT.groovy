@@ -280,35 +280,31 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     
   /** Give distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
-    * @param m             The second classifier {@link Map} cls to weight.
+    * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
     * @param metric        The metric to use <tt>1, 2</tt>.
     *                      Default: <tt>1</tt>.
     * @return              The distance between two {@link Map}s. */
   def double sourceDistance(Map<String, Double> m0,
-                            Map<String, Double> m,
+                            Map<String, Double> mx,
                             int                 metric = 1) {
     def dist = 0;
     def norm0 = 0;
     def normx = 0;
-    def cls;
     def w0;
     def wx;
-    for (entry : m0.entrySet()) {
-      cls = entry.getKey();
-      w0 = entry.getValue();
-      w0 = w0 == 0 ? Integer.MAX_VALUE : 1 / w0;
-      wx = m[cls] == null ? 0 : m[cls];
-      wx = wx == 0 ? Integer.MAX_VALUE : 1 / wx;
+    for (cls : m0.keySet()) {
+      if (mx.containsKey(cls))
+      w0 = m0[cls];
+      wx = mx[cls];
       switch(metric) {
         case 1:
           dist += w0 * wx;
           norm0 += w0 * w0;
-          normx += wx * wx;
+          normx+= wx * wx;
           break;
         case 2:
-          dist += (w0 - wx) * (w0 - wx);
-          norm0 += (w0 + wx) * (w0 + wx);
+          dist += (w0 - wx) * (w0 - wx) / (w0 + wx) * (w0 + wx);
           break;
         default:
           dist += 0;
@@ -318,7 +314,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       case 1:
         return dist / Math.sqrt(norm0 * normx);
       case 2:
-        return Math.sqrt(dist / norm0);
+        return Math.sqrt(dist);
       default:
         return 0;
       }
