@@ -294,21 +294,22 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def w0;
     def wx;
     for (cls : m0.keySet()) {
-      if (mx.containsKey(cls))
-      w0 = m0[cls];
-      wx = mx[cls];
-      switch(metric) {
-        case 1:
-          dist += w0 * wx;
-          norm0 += w0 * w0;
-          normx+= wx * wx;
-          break;
-        case 2:
-          dist += (w0 - wx) * (w0 - wx) / (w0 + wx) * (w0 + wx);
-          break;
-        default:
-          dist += 0;
-        }      
+      if (mx.containsKey(cls)) {
+        w0 = m0[cls];
+        wx = mx[cls];
+        switch(metric) {
+          case 1:
+            dist += w0 * wx;
+            norm0 += w0 * w0;
+            normx+= wx * wx;
+            break;
+          case 2:
+            dist += (w0 - wx) * (w0 - wx) / (w0 + wx) * (w0 + wx);
+            break;
+          default:
+            dist += 0;
+          }    
+        }
       }
     switch(metric) {
       case 1:
