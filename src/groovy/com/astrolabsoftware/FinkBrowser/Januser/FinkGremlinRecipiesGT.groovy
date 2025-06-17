@@ -240,7 +240,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   g().V(s).inE().
                           filter(and(inV().values('objectId').is(neq(oid0)),
                                      outV().values('classifier').is(eq(classifier)),
-                                     outV().values('cls').where(within(classes)))).
+                                     outV().values('cls').is(within(classes)))).
                            project('cls', 'w').
                            by(outV().values('cls')).
                            by(values('weight')).
