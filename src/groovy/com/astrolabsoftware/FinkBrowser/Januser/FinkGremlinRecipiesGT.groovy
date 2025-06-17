@@ -192,7 +192,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       return [:];
       }
     if (classes0 == null || classes0.isEmpty()) {
-      classes0 = g().V().has('lbl', 'SourcesOfInterest').has('classifier', classifier).values('cls').toSet();
+      classes0 = g().V().has('lbl', 'SourcesOfInterest').has('classifier', classifier).values('cls').toList();
       }
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
