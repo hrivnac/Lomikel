@@ -97,37 +97,39 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                              String  classifier,
                                                                              double  nmax,
-                                                                             int     metric        = 1) {
-    def z = [:]
-    def zz
-    sourceNeighborhood('nmax':nmax,
+                                                                             int     metric = 1) {
+    //def z = [:]
+    //def zz
+    //sourceNeighborhood('nmax':nmax,
+    //                   'metric':metric,
+    //                   oid0,
+    //                   classifier).each {n ->
+    //                                     def v = g().V().has('lbl', 'source').
+    //                                                     has('objectId', n.key).
+    //                                                     id().
+    //                                                     next()
+    //                                     zz = [:]
+    //                                     g().V(v).inE().
+    //                                              as('e').
+    //                                              filter(outV().values('classifier').is(eq(classifier))).
+    //                                              project('cls', 'w').
+    //                                              by(select('e').outV().values('cls')).
+    //                                              by(select('e').values('w')).
+    //                                              each {e -> zz[e['cls']] = e['w']}
+    //                                     z[n] = zz
+    //                                     }
+    //return z
+    return sourceNeighborhood('nmax':nmax,
                        'metric':metric,
                        oid0,
-                       classifier).each {n ->
-                                         def v = g().V().has('lbl', 'source').
-                                                         has('objectId', n.key).
-                                                         id().
-                                                         next()
-                                         zz = [:]
-                                         g().V(v).inE().
-                                                  project('classifier', 'cls', 'weight').
-                                                  by(outV().values('classifier')).
-                                                  by(outV().values('cls')).
-                                                  by(values('weight')).each {e ->
-                                                                             if (e['classifier'] == classifier) {
-                                                                               zz[e['cls']] = e['weight']
-                                                                               }
-                                                                             }
-                                         z[n] = zz
-                                         }
-    return z
+                       classifier)
     }
 
   /** The same method as {@link #sourceNeighborhood(Map, String, String},
     * appropriate for direct call from Java (instead of Groovy). */
-  def Map<String, Double> sourceNeighborhood(String       oid0,
-                                             String       classifier,
-                                             Map          args) {
+  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String oid0,
+                                                                             String classifier,
+                                                                             Map    args) {
     return sourceNeighborhood(args, oid0, classifier);
     }
         
@@ -144,19 +146,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param metric        The metric to use <tt>1, 2</tt>.
     *                      Default: <tt>1</tt>.
     * @return              The distances to other sources, order by the distance. */
-  def Map<String, Double> sourceNeighborhood(Map          args = [:],
-                                             String       oid0,
-                                             String       classifier) {
+  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map    args = [:],
+                                                                             String oid0,
+                                                                             String classifier) {
     return sourceNeighborhood(args, oid0, classifier, null, null);
     }
 
   /** The same method as {@link #sourceNeighborhood(Map, String, String, ListMString>, List<String>},
     * appropriate for direct call from Java (instead of Groovy). */
-  def Map<String, Double> sourceNeighborhood(String       oid0,
-                                             String       classifier,
-                                             Set<String>  oidS,
-                                             Set<String>  classes0,
-                                             Map          args) {
+  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String      oid0,
+                                                                             String      classifier,
+                                                                             Set<String> oidS,
+                                                                             Set<String> classes0,
+                                                                             Map         args) {
     return sourceNeighborhood(args, oid0, classifier, oidS, classes);
     }
         
@@ -180,11 +182,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      Default: <tt>1</tt>.
     *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
-  def Map<String, Double> sourceNeighborhood(Map          args = [:],
-                                             String       oid0,
-                                             String       classifier,
-                                             Set<String>  oidS,
-                                             Set<String>  classes0) {
+  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map          args = [:],
+                                                                             String       oid0,
+                                                                             String       classifier,
+                                                                             Set<String>  oidS,
+                                                                             Set<String>  classes0) {
     def nmax          = args.nmax          ?: Integer.MAX_VALUE;
     def metric        = args.metric        ?: 1;
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
@@ -220,19 +222,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     else {
       // BUG: Janus-all.jar doesn't allow complex operations
       if (client() == null) {
-        log.info("A");
         sources = g().V().has('lbl', 'SourcesOfInterest').
                           has('classifier', classifier).
                           has('cls', within(classes)).
                           out().
                           has('lbl', 'source').
-                          dedup();  
+                          dedup()  
         }
       else {
-        log.info("B");
-        sources = g().V().has('lbl', 'source');
+        sources = g().V().has('lbl', 'source')
         }
       }
+    def entry
+    def results = [:]
     sources.each {s -> 
                   def oid = g().V(s).values('objectId').next();
                   def m = [:];
@@ -248,32 +250,34 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   m = normalizeMap(m);
                   def dist = sourceDistance(m0, m, metric);
                   if (dist > 0) {
-                    distances[oid] = dist;
+                    entry = Map.entry(oid, dist)
+                    results[entry] = m
                     }     
                   }
-    if (nmax >= 1) {
-      return distances.sort{it.value}.take((int)nmax)
-      }
-    def sortedEntries = distances.entrySet().sort{it.value}
-    def result = []
-    for (int i = 0; i < sortedEntries.size(); i++) {
-      if (i < 2) {
-        result << sortedEntries[i]
-        }
-      else {
-        def v0 = sortedEntries[i - 2].value
-        def v1 = sortedEntries[i - 1].value
-        def v2 = sortedEntries[i    ].value
-        if (v1 != v2 && v1 != v0) {
-          def ratio = (v1 - v0) / (v2 - v1)
-          if (ratio < nmax) {
-            break
-            }
-          }
-        result << sortedEntries[i]
-        }
-      }
-    return result.collectEntries{[(it.key): it.value]}
+    //if (nmax >= 1) {
+    //  return distances.sort{it.value}.take((int)nmax)
+    //  }
+    //def sortedEntries = distances.entrySet().sort{it.value}
+    //def result = []
+    //for (int i = 0; i < sortedEntries.size(); i++) {
+    //  if (i < 2) {
+    //    result << sortedEntries[i]
+    //    }
+    //  else {
+    //    def v0 = sortedEntries[i - 2].value
+    //    def v1 = sortedEntries[i - 1].value
+    //    def v2 = sortedEntries[i    ].value
+    //    if (v1 != v2 && v1 != v0) {
+    //      def ratio = (v1 - v0) / (v2 - v1)
+    //      if (ratio < nmax) {
+    //        break
+    //        }
+    //      }
+    //    result << sortedEntries[i]
+    //    }
+    //  }
+    //return result.collectEntries{[(it.key): it.value]}
+    return results;
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
