@@ -253,11 +253,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     distances[distance] = m
                     }     
                   }
+    sortedDistances = [:]
     if (nmax >= 1) {
       distances = distances.entrySet().                        
                             sort{a, b -> a.key.value <=> b.key.value}.  
-                            take((int)nmax).                                   
-                            collectEntries(new LinkedHashMap<>()) {entry -> [(entry.key): entry.value]}
+                            take((int)nmax).
+                            each{a, b -> sortedDistances[a] = b}
+                            //collectEntries(new LinkedHashMap<>()) {entry -> [(entry.key): entry.value]}
       }
     //def sortedEntries = distances.entrySet().sort{it.value}
     //def result = []
@@ -279,7 +281,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     //    }
     //  }
     //return result.collectEntries{[(it.key): it.value]}
-    return distances;
+    return sortedDistances;
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
