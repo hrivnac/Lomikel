@@ -238,12 +238,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   def oid = g().V(s).values('objectId').next();
                   def m = [:];
                   g().V(s).inE().
-                          filter(and(inV().values('objectId').is(neq(oid0)),
-                                     outV().values('classifier').is(eq(classifier)),
-                                     outV().values('cls').is(within(classes)))).
+                           as('e').
+                           filter(and(inV().values('objectId').is(neq(oid0)),
+                                      outV().values('classifier').is(eq(classifier)),
+                                      outV().values('cls').is(within(classes)))).
                            project('cls', 'w').
-                           by(outV().values('cls')).
-                           by(values('weight')).
+                           by(select('e').outV().values('cls')).
+                           by(select('e').values('weight')).
                            each {it -> m[it['cls']] = it['w']}
                   m = normalizeMap(m);
                   def dist = sourceDistance(m0, m, metric);
