@@ -191,23 +191,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
       }
-    def classifierClasses = g().V().has('lbl', 'SourcesOfInterest').has('classifier', classifier).values('cls').toSet();
+    if (classes0 == null || classes0.isEmpty()) {
+      classes0 = g().V().has('lbl', 'SourcesOfInterest').has('classifier', classifier).values('cls').toSet();
+      }
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
     g().V(source0).inE().
-                   project('classifier', 'cls', 'w').
-                   by(outV().values('classifier')).
-                   by(outV().values('cls')).
-                   by(values('weight')).
-                   each {it ->
-                         if (it['classifier'] == classifier) {
-                           if (it['cls'] in classifierClasses) {
-                             if (classes0 == null || it['cls'] in classes0) {
-                               m0[it['cls']] = it['w'];
-                               }
-                             }
-                           }
-                         }
+                   as('e').
+                   filter(and(outV().values('classifier').is(eq(classifier)),
+                              outV().values('cls').is(within(classes0)))).                   
+                   project('cls', 'w').
+                   by(select('e').outV().values('cls')).
+                   by(select('e').values('weight')).
+                   each {it -> m0[it['cls']] = it['w']}
     def classes = [];
     for (entry : m0.entrySet()) {
       classes += [entry.getKey()];
@@ -224,6 +220,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     else {
       // BUG: Janus-all.jar doesn't allow complex operations
       if (client() == null) {
+        log.info("A");
         sources = g().V().has('lbl', 'SourcesOfInterest').
                           has('classifier', classifier).
                           has('cls', within(classes)).
@@ -232,6 +229,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                           dedup();  
         }
       else {
+        log.info("B");
         sources = g().V().has('lbl', 'source');
         }
       }
