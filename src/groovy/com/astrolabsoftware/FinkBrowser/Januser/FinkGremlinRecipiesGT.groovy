@@ -39,6 +39,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.identi
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.neq;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.and;
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.asc;
 
 // Janus Graph
