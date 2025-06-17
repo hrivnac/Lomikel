@@ -154,8 +154,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * appropriate for direct call from Java (instead of Groovy). */
   def Map<String, Double> sourceNeighborhood(String       oid0,
                                              String       classifier,
-                                             List<String> oidS,
-                                             List<String> classes0,
+                                             Set<String>  oidS,
+                                             Set<String>  classes0,
                                              Map          args) {
     return sourceNeighborhood(args, oid0, classifier, oidS, classes);
     }
@@ -183,8 +183,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<String, Double> sourceNeighborhood(Map          args = [:],
                                              String       oid0,
                                              String       classifier,
-                                             List<String> oidS,
-                                             List<String> classes0) {
+                                             Set<String>  oidS,
+                                             Set<String>  classes0) {
     def nmax          = args.nmax          ?: Integer.MAX_VALUE;
     def metric        = args.metric        ?: 1;
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
@@ -192,7 +192,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       return [:];
       }
     if (classes0 == null || classes0.isEmpty()) {
-      classes0 = g().V().has('lbl', 'SourcesOfInterest').has('classifier', classifier).values('cls').toList();
+      classes0 = g().V().has('lbl', 'SourcesOfInterest').has('classifier', classifier).values('cls').toSet();
       }
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
