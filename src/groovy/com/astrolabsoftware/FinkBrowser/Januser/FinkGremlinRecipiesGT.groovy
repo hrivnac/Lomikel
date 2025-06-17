@@ -36,10 +36,10 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.constant;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.identity;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.and;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.neq;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
-import static org.apache.tinkerpop.gremlin.process.traversal.P.and;
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.asc;
 
 // Janus Graph
