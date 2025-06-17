@@ -255,10 +255,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   }
     distances = distances.entrySet().sort {a, b -> a.key.value <=> b.key.value}
     if (nmax >= 1) {
-      distances.take((int)nmax)
+      return distances.take((int)nmax)
       }
-    //  return distances.sort{it.value}.take((int)nmax)
-    //  }
     //def sortedEntries = distances.entrySet().sort{it.value}
     //def result = []
     //for (int i = 0; i < sortedEntries.size(); i++) {
