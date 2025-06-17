@@ -233,8 +233,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         sources = g().V().has('lbl', 'source')
         }
       }
-    def entry
-    def results = [:]
+    def distance
     sources.each {s -> 
                   def oid = g().V(s).values('objectId').next();
                   def m = [:];
@@ -250,11 +249,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   m = normalizeMap(m);
                   def dist = sourceDistance(m0, m, metric);
                   if (dist > 0) {
-                    entry = Map.entry(oid, dist)
-                    results[entry] = m
+                    distance = Map.entry(oid, dist)
+                    distances[distance] = m
                     }     
                   }
-    //if (nmax >= 1) {
+    distances = distances.entrySet().sort {a, b -> a.key.value <=> b.key.value}
+    if (nmax >= 1) {
+      distances.take(nmax)
+      }
     //  return distances.sort{it.value}.take((int)nmax)
     //  }
     //def sortedEntries = distances.entrySet().sort{it.value}
@@ -277,7 +279,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     //    }
     //  }
     //return result.collectEntries{[(it.key): it.value]}
-    return results;
+    return distances;
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
