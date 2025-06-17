@@ -235,9 +235,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   def oid = g().V(s).values('objectId').next();
                   def m = [:];
                   g().V(s).inE().
-                          filter(and(__.inV().values('objectId').is(neq(oid0)),
-                                     __.outV().values('classifier').is(eq(classifier)),
-                                     __.outV().values('cls').where(within(classes)))).
+                          filter(and(inV().values('objectId').is(neq(oid0)),
+                                     outV().values('classifier').is(eq(classifier)),
+                                     outV().values('cls').where(within(classes)))).
                            project('cls', 'w').
                            by(outV().values('cls')).
                            by(values('weight')).
