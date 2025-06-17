@@ -253,7 +253,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     distances[distance] = m
                     }     
                   }
-    defsortedDistances = [:]
+    def sortedDistances = [:]
     if (nmax >= 1) {
       distances.entrySet().                        
                 sort{a, b -> a.key.value <=> b.key.value}.  
