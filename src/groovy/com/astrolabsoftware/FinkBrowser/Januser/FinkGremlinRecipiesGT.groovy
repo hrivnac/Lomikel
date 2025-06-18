@@ -187,8 +187,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                              String       classifier,
                                                                              Set<String>  oidS,
                                                                              Set<String>  classes0) {
-    def nmax          = args.nmax          ?: Integer.MAX_VALUE;
-    def metric        = args.metric        ?: 1;
+    def nmax   = args.nmax          ?: Integer.MAX_VALUE;
+    def metric = args.metric        ?: 1;
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
@@ -234,6 +234,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         }
       }
     def distance
+    def n = 0
     sources.each {s -> 
                   def oid = g().V(s).values('objectId').next();
                   def m = [:];
@@ -247,12 +248,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            by(select('e').values('weight')).
                            each {it -> m[it['cls']] = it['w']}
                   m = normalizeMap(m);
-                  def dist = sourceDistance(m0, m, metric);
+                  def dist = sourceDistance(m0, m, metric)
+                  n++
                   if (dist > 0) {
                     distance = Map.entry(oid, dist)
                     distances[distance] = m
                     }     
                   }
+    log.info('distance of ' + n + ' sources evaluated')
     if (nmax >= 1) {
       return distances.entrySet().                        
                        sort{a, b -> a.key.value <=> b.key.value}.  
