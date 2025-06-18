@@ -235,6 +235,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     def distance
     def n = 0
+    def t = System.currentTimeMillis()
     sources.each {s -> 
                   def oid = g().V(s).values('objectId').next();
                   def m = [:];
@@ -255,7 +256,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     distances[distance] = m
                     }     
                   }
-    log.info('distance of ' + n + ' sources evaluated')
+    t = System.currentTimeMillis() - t
+    log.info('distance of ' + n + ' sources evaluated in ' + t / 1000 + ' s')
     if (nmax >= 1) {
       return distances.entrySet().                        
                        sort{a, b -> a.key.value <=> b.key.value}.  
