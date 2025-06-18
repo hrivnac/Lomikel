@@ -253,34 +253,34 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     distances[distance] = m
                     }     
                   }
-    def sortedDistances = [:]
     if (nmax >= 1) {
       return distances.entrySet().                        
                        sort{a, b -> a.key.value <=> b.key.value}.  
                        take((int)nmax).
                        collectEntries(new LinkedHashMap<>()) {entry -> [(entry.key): entry.value]}
       }
-    //def sortedEntries = distances.entrySet().sort{it.value}
-    //def result = []
-    //for (int i = 0; i < sortedEntries.size(); i++) {
-    //  if (i < 2) {
-    //    result << sortedEntries[i]
-    //    }
-    //  else {
-    //    def v0 = sortedEntries[i - 2].value
-    //    def v1 = sortedEntries[i - 1].value
-    //    def v2 = sortedEntries[i    ].value
-    //    if (v1 != v2 && v1 != v0) {
-    //      def ratio = (v1 - v0) / (v2 - v1)
-    //      if (ratio < nmax) {
-    //        break
-    //        }
-    //      }
-    //    result << sortedEntries[i]
-    //    }
-    //  }
-    //return result.collectEntries{[(it.key): it.value]}
-    return sortedDistances;
+    else {
+      def distances1 = [:];
+      def distanceEntries = distances.entrySet().sort{a, b -> a.key.value <=> b.key.value}
+      for (int i = 0; i < distanceEntries.size(); i++) {
+        if (i < 2) {
+          distances1[distanceEntries[i].key] = distanceEntries[i].value
+          }
+        else {
+          def v0 = distanceEntries[i - 2].key.value
+          def v1 = distanceEntries[i - 1].key.value
+          def v2 = distanceEntries[i    ].key.value
+          if (v1 != v2 && v1 != v0) {
+            def ratio = (v1 - v0) / (v2 - v1)
+            if (ratio < nmax) {
+              break
+              }
+            }
+          distances1[distanceEntries[i].key] = distanceEntries[i].value
+          }
+        }
+      return distances1
+      }
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
