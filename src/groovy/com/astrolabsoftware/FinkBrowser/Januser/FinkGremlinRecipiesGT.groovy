@@ -98,30 +98,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                              String  classifier,
                                                                              double  nmax,
-                                                                             int     metric = 1) {
-    //def z = [:]
-    //def zz
-    //sourceNeighborhood('nmax':nmax,
-    //                   'metric':metric,
-    //                   oid0,
-    //                   classifier).each {n ->
-    //                                     def v = g().V().has('lbl', 'source').
-    //                                                     has('objectId', n.key).
-    //                                                     id().
-    //                                                     next()
-    //                                     zz = [:]
-    //                                     g().V(v).inE().
-    //                                              as('e').
-    //                                              filter(outV().values('classifier').is(eq(classifier))).
-    //                                              project('cls', 'w').
-    //                                              by(select('e').outV().values('cls')).
-    //                                              by(select('e').values('w')).
-    //                                              each {e -> zz[e['cls']] = e['w']}
-    //                                     z[n] = zz
-    //                                     }
-    //return z
-    return sourceNeighborhood('nmax':nmax,
+                                                                             int     metric = 1,
+                                                                             double  climit = 0.2) {
+     return sourceNeighborhood('nmax':nmax,
                        'metric':metric,
+                       'climit':climit,
                        oid0,
                        classifier)
     }
