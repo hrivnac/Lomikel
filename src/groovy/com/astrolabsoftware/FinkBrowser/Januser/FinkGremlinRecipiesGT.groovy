@@ -41,6 +41,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.select
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.neq;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.gte;
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.asc;
 
 // Janus Graph
@@ -203,7 +204,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    as('e').
                    filter(and(outV().values('classifier').is(eq(classifier)),
                               outV().values('cls').is(within(classes0)),
-                              values('weight').is(ge(climit)))).                   
+                              values('weight').is(gte(climit)))).                   
                    project('cls', 'w').
                    by(select('e').outV().values('cls')).
                    by(select('e').values('weight')).
