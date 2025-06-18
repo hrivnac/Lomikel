@@ -298,6 +298,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,
                             int                 metric = 1) {
+    if (metric == 0) {
+      return _random.nextDouble();
+      }
     def dist = 0;
     def norm0 = 0;
     def normx = 0;
@@ -535,7 +538,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             next().
             io(IoCore.graphml()).
             writeGraph(fn);
-    }  
+    }
+    
+  def Random _random = new Random()
     
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkGremlinRecipiesGT.class);
