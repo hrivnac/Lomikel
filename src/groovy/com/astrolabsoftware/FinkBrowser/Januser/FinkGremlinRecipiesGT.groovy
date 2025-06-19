@@ -243,7 +243,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            each {it -> m[it['cls']] = it['w']}
                   m = normalizeMap(m);
                   def dist = sourceDistance(m0, m, metric)
-                  log.info(oid + " " + dist)
+                  log.info(oid + " " + dist + " " + m0 + " " + m)
                   n++
                   if (dist > 0) {
                     distance = Map.entry(oid, dist)
