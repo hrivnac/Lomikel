@@ -231,7 +231,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def t = System.currentTimeMillis()
     sources.each {s -> 
                   def oid = g().V(s).values('objectId').next();
-                  log.info(oid)
                   def m = [:];
                   g().V(s).inE().
                            as('e').
@@ -244,6 +243,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            each {it -> m[it['cls']] = it['w']}
                   m = normalizeMap(m);
                   def dist = sourceDistance(m0, m, metric)
+                  log.info(oid + " " + dist)
                   n++
                   if (dist > 0) {
                     distance = Map.entry(oid, dist)
