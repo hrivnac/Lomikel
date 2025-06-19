@@ -251,6 +251,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   }
     t = System.currentTimeMillis() - t
     log.info('distance of ' + n + ' sources evaluated in ' + t / 1000 + ' s')
+    log.info(distances)
     if (nmax >= 1) {
       return distances.entrySet().                        
                        sort{a, b -> a.key.value <=> b.key.value}.  
