@@ -34,6 +34,7 @@
   String classifier = request.getParameter("classifier");
   String alg        = request.getParameter("alg");
   String nmax       = request.getParameter("nmax");
+  String climit     = request.getParameter("climit");
   %>
 <%@include file="../PropertiesProcessor.jsp"%>
 <%
@@ -46,7 +47,10 @@
   if (nmax == null || nmax.isEmpty()) {
     nmax = "5";
     }
-    
+   if (climit == null || climit.isEmpty()) {
+    climit = "0.2";
+    }
+   
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
 
@@ -59,7 +63,11 @@
   JSONObject neighbor;
   JSONObject classes;
   String noid;
-  for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : gr.sourceNeighborhood(sourceId, classifier, Double.parseDouble(nmax), Integer.parseInt(alg)).entrySet()) {
+  for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : gr.sourceNeighborhood(sourceId,
+                                                                                           classifier,
+                                                                                           Double.parseDouble(nmax),
+                                                                                           Integer.parseInt(alg),
+                                                                                           Double.parseDouble(climit)).entrySet()) {
     classes = new JSONObject();
     for (Map.Entry<String, Double> e : m.getValue().entrySet()) {
       classes.put(e.getKey(), e.getValue());
