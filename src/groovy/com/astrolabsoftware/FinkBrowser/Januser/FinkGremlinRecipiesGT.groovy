@@ -193,8 +193,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     g().V(source0).inE().
                    as('e').
                    filter(and(outV().values('classifier').is(eq(classifier)),
-                              outV().values('cls').is(within(classes0)),
-                              values('weight').is(gte(climit)))).                   
+                              outV().values('cls').is(within(classes0)))).                   
                    project('cls', 'w').
                    by(select('e').outV().values('cls')).
                    by(select('e').values('weight')).
@@ -204,7 +203,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       classes += [entry.getKey()];
       }
     log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
-    m0 = normalizeMap(m0);
+    m0 = normalizeMap(m0, climit);
     def distances = [:]
     def sources;
     if (oidS) {
@@ -241,8 +240,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            by(select('e').outV().values('cls')).
                            by(select('e').values('weight')).
                            each {it -> m[it['cls']] = it['w']}
-                  m = normalizeMap(m);
+                  m = normalizeMap(m, climit);
                   def dist = sourceDistance(m0, m, metric)
+                  log.info(oid + " " + dist + " " + m0 + " " + m)
                   n++
                   //if (dist > 0) {
                     distance = Map.entry(oid, dist)
@@ -331,9 +331,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Normalize {@link Map}.
     * @param inputMap The {@link Map} to be normalized.
     * @return         The normalized {@link Map}. */
-  def normalizeMap(Map<String, Double> inputMap) {
+  def normalizeMap(Map<String, Double> inputMap,
+                   double              climit) {
     def sum = inputMap.values().sum();
-    def normalizedMap = inputMap.collectEntries {key, value -> [(key): value / sum]}
+    def normalizedMap = inputMap.collectEntries{key, value -> [(key): value / sum]}.
+                                 entrySet().
+                                 removeIf(entry -> entry.getValue() < climit)
     return normalizedMap;
     }
   
