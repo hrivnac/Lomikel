@@ -1134,11 +1134,6 @@
 			<fileset dir="../src/python" includes="*.jy"/>
 			<fileset dir="../src/python" includes="*.sage"/>
       </copy>
-    <mkdir dir="../doc/Jupyter"/>
- 		<copy todir="../doc/Jupyter">
-			<fileset dir="../src/Jupyter" includes="*.nb"/>
-			<globmapper from="*.nb" to="*.nb-txt"/>
-      </copy>
     <javadoc packagenames="*"
              doclet="org.jboss.apiviz.APIviz"
              docletpath="../extlib/apiviz-1.3.4.jar:../extlib/jdepend-2.9.5.jar:../extlib/tools-1.8.0.jar"
