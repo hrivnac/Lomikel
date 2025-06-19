@@ -169,7 +169,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param metric        The metric to use <tt>0, 1, 2</tt>.
     *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
     *                      Optional named parameter.
-    * @param climit        The low limit fir the classification ration of the evaluated source.
+    * @param climit        The low limit for the classification ration of the evaluated source.
     *                      Default: <tt>0.2</tt>.
     *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
@@ -330,13 +330,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     
   /** Normalize {@link Map}.
     * @param inputMap The {@link Map} to be normalized.
+    * @param climit   The value limit. Remove all entries with smaller values
+    *                 (after normalization).
     * @return         The normalized {@link Map}. */
-  def normalizeMap(Map<String, Double> inputMap,
-                   double              climit) {
-    def sum = inputMap.values().sum();
-    def normalizedMap = inputMap.collectEntries{key, value -> [(key): value / sum]}.
-                                 entrySet().
-                                 removeIf(entry -> entry.getValue() < climit)
+  def Map<String, Double> normalizeMap(Map<String, Double> inputMap,
+                                       double              climit) {
+    def sum = inputMap.values().sum()
+    inputMap.entrySet().removeIf(entry -> entry.getValue() < climit)
+    def normalizedMap = inputMap.collectEntries{key, value -> [(key): value / sum]}
     return normalizedMap;
     }
   
