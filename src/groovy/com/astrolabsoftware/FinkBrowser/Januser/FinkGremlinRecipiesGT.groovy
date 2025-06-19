@@ -92,8 +92,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier    The classifier name to be used.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
-    * @param metric        The metric to use <tt>1, 2</tt>.
-    *                      Default: <tt>1</tt>.
+    * @param metric        The metric to use <tt>0, 1, 2</tt>.
+    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
+    * @param climit        The low limit fir the classification ration of the evaluated source.
+    *                      Default: <tt>0.2</tt>.
     * @return              The full neigbouthood information. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                              String  classifier,
@@ -125,8 +127,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
-    * @param metric        The metric to use <tt>1, 2</tt>.
-    *                      Default: <tt>1</tt>.
+    * @param metric        The metric to use <tt>0, 1, 2</tt>.
+    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
+    *                      Optional named parameter.
+    * @param climit        The low limit fir the classification ration of the evaluated source.
+    *                      Default: <tt>0.2</tt>.
+    *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map    args = [:],
                                                                              String oid0,
@@ -160,8 +166,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
-    * @param metric        The metric to use <tt>1, 2</tt>.
-    *                      Default: <tt>1</tt>.
+    * @param metric        The metric to use <tt>0, 1, 2</tt>.
+    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
+    *                      Optional named parameter.
+    * @param climit        The low limit fir the classification ration of the evaluated source.
+    *                      Default: <tt>0.2</tt>.
     *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map          args = [:],
@@ -276,8 +285,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
-    * @param metric        The metric to use <tt>1, 2</tt>.
-    *                      Default: <tt>1</tt>.
+    * @param metric        The metric to use <tt>0, 1, 2</tt>.
+    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
     * @return              The distance between two {@link Map}s. */
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,

@@ -25,6 +25,7 @@ gr.reclassification(oid, "FEATURES", "FINK_PORTAL");
 
 gr.sourceNeighborhood(oid, "FINK_PORTAL", 10, 2);
 gr.sourceNeighborhood(oid, "FEATURES", 10, 2);
+gr.sourceNeighborhood(oid, "FEATURES", 10, 2, 0.1);
 
 gr.standardDeviationE('deepcontains', ['weight']);
 gr.exportAoISoI('/tmp/Overlaps.graphml');
