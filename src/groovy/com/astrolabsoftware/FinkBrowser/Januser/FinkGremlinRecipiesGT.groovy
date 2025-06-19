@@ -300,15 +300,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def normx = 0;
     def w0;
     def wx;
+    def match = false;
     for (cls : m0.keySet()) {
       if (mx.containsKey(cls)) {
+        match = true;
         w0 = m0[cls];
         wx = mx[cls];
         switch(metric) {
           case 1:
             dist += w0 * wx;
             norm0 += w0 * w0;
-            normx+= wx * wx;
+            normx += wx * wx;
             break;
           case 2:
             dist += (w0 - wx) * (w0 - wx) / (w0 + wx) * (w0 + wx);
@@ -317,6 +319,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             dist += _random.nextDouble();
           }    
         }
+      }
+    if (!match) {
+      return 1.0
       }
     switch(metric) {
       case 1:
