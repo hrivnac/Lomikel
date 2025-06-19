@@ -243,12 +243,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            each {it -> m[it['cls']] = it['w']}
                   m = normalizeMap(m);
                   def dist = sourceDistance(m0, m, metric)
-                  log.info(oid + " " + dist + " " + m0 + " " + m)
                   n++
-                  if (dist > 0) {
+                  //if (dist > 0) {
                     distance = Map.entry(oid, dist)
                     distances[distance] = m
-                    }     
+                  //  }     
                   }
     t = System.currentTimeMillis() - t
     log.info('distance of ' + n + ' sources evaluated in ' + t / 1000 + ' s')
@@ -315,17 +314,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             dist += (w0 - wx) * (w0 - wx) / (w0 + wx) * (w0 + wx);
             break;
           default:
-            dist += 0;
+            dist += _random.nextDouble();
           }    
         }
       }
     switch(metric) {
       case 1:
-        return dist / Math.sqrt(norm0 * normx);
+        return 1.0 - dist / Math.sqrt(norm0 * normx);
       case 2:
         return Math.sqrt(dist);
       default:
-        return 0;
+        return _random.nextDouble();
       }
     }
     
