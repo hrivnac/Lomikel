@@ -208,6 +208,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    by(select('e').outV().values('cls')).
                    by(select('e').values('weight')).
                    each {it -> m0[it['cls']] = it['w']}
+    log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
+    if (climit > 0.0) {
+      m0.entrySet().removeIf(entry -> entry.getValue() < climit)
+      }
     def classes
     if (allClasses) {
       classes = classes0
@@ -217,10 +221,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       for (entry : m0.entrySet()) {
         classes += [entry.getKey()];
         }
-      }
-    log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
-    if (climit > 0.0) {
-      m0.entrySet().removeIf(entry -> entry.getValue() < climit)
+      log.info("\tsearching only in " + classes);
       }
     def distances = [:]
     def sources;
@@ -312,18 +313,42 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,
                             String              metric = 'JensenShannon') {
-                              log.info(m0 + " " + mx)
+    normalise = false
     if (m0.isEmpty() && mx.isEmpty()) return 1.0 // or 0 ?
     if (m0.isEmpty() || mx.isEmpty()) return 1.0
+    Set<String> keys = new HashSet<>(m0.keySet())
+    keys.addAll(mx.keySet())
+    double sum0 = m0.values().sum()
+    double sumx = mx.values().sum()
+    Map<String, Double> p = [:]
+    Map<String, Double> q = [:]
+    if (normalise) {
+      keys.each {k -> p[k] = m0.getOrDefault(k, 0.0) / sum0
+                      q[k] = mx.getOrDefault(k, 0.0) / sumx}
+      }
+    else { // complete
+      if ((1 - sum0) < 0.000001) {
+        def newkey = 'others0'
+        keys.add(newkey)
+        p[newkey] = 1.0 - sum0;
+        }
+      if ((1 - sumx) > 0.000001) {
+        def newkey = 'othersx'
+        keys.add(newkey)
+        p[newkey] = 1.0 - sumx;
+        }
+      p = m0
+      q = mx
+      }
     switch(metric) {
       case 'JensenShannon':
-        return sourceDistanceJensenShannon(m0, mx);
+        return sourceDistanceJensenShannon(p, q, keys);
         break;
       case 'Euclidean':
-        return sourceDistanceEuclidean(m0, mx);
+        return sourceDistanceEuclidean(p, q, keys);
         break;
       case 'Cosine':
-        return sourceDistanceCosine(m0, mx);
+        return sourceDistanceCosine(p, q, keys);
         break;
       default:
         return _random.nextDouble();
@@ -334,28 +359,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * (see <a href="https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence">Jensen–Shannon divergence</a>)
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
-    *                      Entries, not present also in m0, will be ignored.
+    * @param keys          Unity of keys for m0, mx.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistanceJensenShannon(Map<String, Double> m0,
-                                         Map<String, Double> mx) {
-                                                            
-    Set<String> keys = new HashSet<>(m0.keySet())
-    keys.addAll(mx.keySet())
-
-    // Create normalized distributions
-    double sum0 = m0.values().sum()
-    double sumx = mx.values().sum()
-    log.info("" + sum0 + " " + sumx)
-    Map<String, Double> p = [:]
-    Map<String, Double> q = [:]
-    keys.each {k -> p[k] = m0.getOrDefault(k, 0.0) / sum0
-                    q[k] = mx.getOrDefault(k, 0.0) / sumx}
-
-    // Compute M = 0.5 * (P + Q)
+                                         Map<String, Double> mx,
+                                         Set<String>         keys) {
     Map<String, Double> m = [:]
     keys.each {k -> m[k] = 0.5 * (p[k] + q[k])}
-
-    // Helper: KL divergence
     def kl = {Map<String, Double> a, Map<String, Double> b ->
                double klDiv = 0.0
                a.each {k, v ->
@@ -365,7 +375,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                  }
                return klDiv
                }
-
   double jsd = 0.5 * kl(p, m) + 0.5 * kl(q, m)
   return Math.sqrt(jsd)
   }                             
@@ -373,19 +382,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give Euclidian distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
-    *                      Entries, not present also in m0, will be ignored.
+    * @param keys          Unity of keys for m0, mx.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistanceEuclidean(Map<String, Double> m0,
-                                     Map<String, Double> mx) {
-    Set<String> keys = new HashSet<>(m0.keySet())
-    keys.addAll(mx.keySet())   
-    double sum0 = m0.values().sum()
-    double sumx = mx.values().sum()   
-    log.info("" + sum0 + " " + sumx)
+                                     Map<String, Double> mx,
+                                     Set<String>         keys) {
     double sumSq = 0.0
     keys.each {k ->
-      double v0 = m0.getOrDefault(k, 0.0) / sum0
-      double vx = mx.getOrDefault(k, 0.0) / sumx
+      double v0 = m0.getOrDefault(k, 0.0)
+      double vx = mx.getOrDefault(k, 0.0)
       sumSq += Math.pow(v0 - vx, 2)
       }   
    return Math.sqrt(sumSq) / Math.sqrt(2)
@@ -394,21 +399,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give Cosine distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
-    *                      Entries, not present also in m0, will be ignored.
+    * @param keys          Unity of keys for m0, mx.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistanceCosine(Map<String, Double> m0,
-                                  Map<String, Double> mx) {
-    Set<String> keys = new HashSet<>(m0.keySet())
-    keys.addAll(mx.keySet())
-    double sum0 = m0.values().sum()
-    double sumx = mx.values().sum()
-    log.info("" + sum0 + " " + sumx)
+                                  Map<String, Double> mx,
+                                  Set<String>         keys) {
     double dot = 0.0
     double norm0 = 0.0
     double normx = 0.0
     keys.each {k ->
-      double v0 = m0.getOrDefault(k, 0.0) / sum0
-      double vx = mx.getOrDefault(k, 0.0) / sumx
+      double v0 = m0.getOrDefault(k, 0.0)
+      double vx = mx.getOrDefault(k, 0.0)
       dot += v0 * vx
       norm0 += v0 * v0
       normx += vx * vx
