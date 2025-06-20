@@ -96,12 +96,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     * @param climit        The low limit fir the classification ration of the evaluated source.
     *                      Default: <tt>0.0</tt>.
+    * @param allClasses    Whether to consider also classes not available in original source.
+    *                      Default: <tt>false</tt>.
     * @return              The full neigbouthood information. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                              String  classifier,
                                                                              double  nmax,
                                                                              String  metric = 'JensenShannon',
-                                                                             double  climit = 0.0) {
+                                                                             double  climit = 0.0,
+                                                                             boolean allClasses = false) {
      return sourceNeighborhood('nmax':nmax,
                        'metric':metric,
                        'climit':climit,
@@ -132,6 +135,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      Optional named parameter.
     * @param climit        The low limit fir the classification ration of the evaluated source.
     *                      Default: <tt>0.0</tt>.
+    *                      Optional named parameter.
+    * @param allClasses    Whether to consider also classes not available in original source.
+    *                      Default: <tt>false</tt>.
     *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map    args = [:],
@@ -172,12 +178,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param climit        The low limit for the classification ration of the evaluated source.
     *                      Default: <tt>0.0</tt>.
     *                      Optional named parameter.
+    * @param allClasses    Whether to consider also classes not available in original source.
+    *                      Default: <tt>false</tt>.
     * @return              The distances to other sources, order by the distance. */
-  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map          args = [:],
-                                                                             String       oid0,
-                                                                             String       classifier,
-                                                                             Set<String>  oidS,
-                                                                             Set<String>  classes0) {
+  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map         args = [:],
+                                                                             String      oid0,
+                                                                             String      classifier,
+                                                                             Set<String> oidS,
+                                                                             Set<String> classes0) {
     def nmax   = args.nmax   ?: Integer.MAX_VALUE;
     def metric = args.metric ?: 1;
     def climit = args.climit ?: 0.0;
@@ -198,9 +206,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    by(select('e').outV().values('cls')).
                    by(select('e').values('weight')).
                    each {it -> m0[it['cls']] = it['w']}
-    def classes = [];
-    for (entry : m0.entrySet()) {
-      classes += [entry.getKey()];
+    def classes
+    if (allClasses) {
+      classes = classes0
+      }
+    else {
+      classes = [];
+      for (entry : m0.entrySet()) {
+        classes += [entry.getKey()];
+        }
       }
     log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
     if (climit > 0.0) {
@@ -218,7 +232,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       if (client() == null) {
         sources = g().V().has('lbl', 'SourcesOfInterest').
                           has('classifier', classifier).
-                          has('cls', within(classes0)).
+                          has('cls', within(classes)).
                           out().
                           has('lbl', 'source').
                           dedup()  
@@ -237,7 +251,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            as('e').
                            filter(and(inV().values('objectId').is(neq(oid0)),
                                       outV().values('classifier').is(eq(classifier)),
-                                      outV().values('cls').is(within(classes0)))).
+                                      outV().values('cls').is(within(classes)))).
                            project('cls', 'w').
                            by(select('e').outV().values('cls')).
                            by(select('e').values('weight')).
@@ -328,6 +342,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     // Create normalized distributions
     double sum0 = m0.values().sum()
     double sumx = mx.values().sum()
+    log.info("" + sum0 + " " + sumx)
     Map<String, Double> p = [:]
     Map<String, Double> q = [:]
     keys.each {k -> p[k] = m0.getOrDefault(k, 0.0) / sum0
@@ -363,6 +378,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     keys.addAll(mx.keySet())   
     double sum0 = m0.values().sum()
     double sumx = mx.values().sum()   
+    log.info("" + sum0 + " " + sumx)
     double sumSq = 0.0
     keys.each {k ->
       double v0 = m0.getOrDefault(k, 0.0) / sum0
@@ -383,6 +399,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     keys.addAll(mx.keySet())
     double sum0 = m0.values().sum()
     double sumx = mx.values().sum()
+    log.info("" + sum0 + " " + sumx)
     double dot = 0.0
     double norm0 = 0.0
     double normx = 0.0
