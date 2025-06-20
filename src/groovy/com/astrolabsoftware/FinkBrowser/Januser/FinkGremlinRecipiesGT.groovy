@@ -185,10 +185,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                              String      oid0,
                                                                              String      classifier,
                                                                              Set<String> oidS,
-                                                                             Set<String> classes0) {
-    def nmax   = args.nmax   ?: Integer.MAX_VALUE;
-    def metric = args.metric ?: 1;
-    def climit = args.climit ?: 0.0;
+                                                                             Set<String> classes0,
+                                                                             boolean     allClasses) {
+    def nmax       = args.nmax       ?: Integer.MAX_VALUE;
+    def metric     = args.metric     ?: 1;
+    def climit     = args.climit     ?: 0.0;
+    def allClasses = args.allClasses ?: false;
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
