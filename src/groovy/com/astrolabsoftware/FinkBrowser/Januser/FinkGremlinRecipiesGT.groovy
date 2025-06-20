@@ -218,7 +218,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       if (client() == null) {
         sources = g().V().has('lbl', 'SourcesOfInterest').
                           has('classifier', classifier).
-                          has('cls', within(classes)).
+                          has('cls', within(classes0)).
                           out().
                           has('lbl', 'source').
                           dedup()  
@@ -237,7 +237,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            as('e').
                            filter(and(inV().values('objectId').is(neq(oid0)),
                                       outV().values('classifier').is(eq(classifier)),
-                                      outV().values('cls').is(within(classes)))).
+                                      outV().values('cls').is(within(classes0)))).
                            project('cls', 'w').
                            by(select('e').outV().values('cls')).
                            by(select('e').values('weight')).
