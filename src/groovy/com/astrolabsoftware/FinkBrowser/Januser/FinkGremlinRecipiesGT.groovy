@@ -293,7 +293,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                             int                 metric = 1) {
                               
                               
-                              
+ log.info("m0 = " + m0 + ", mx = " + mx);                 
                               
  Set<String> keys = new HashSet<>(m0.keySet())
     keys.addAll(mx.keySet())
