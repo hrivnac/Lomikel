@@ -262,7 +262,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   if (climit > 0.0) {
                     m.entrySet().removeIf(entry -> entry.getValue() < climit)
                     }
-                  def dist = sourceDistance(m0, m, metric)
+                  def dist = sourceDistance(m0, m, metric, allClasses)
                   n++
                   distance = Map.entry(oid, dist)
                   distances[distance] = m
@@ -309,11 +309,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      <li>Euclidean:	    Interpreting probabilities as points in space, Sensitive to magnitude</li>
     *                      <li>Cosine:         Comparing class pattern rather than strength, 	Ignores magnitude of probabilities</li>
     *                      </ul>
+    * @param allClasses    Whether to consider also classes not available in original source.
+    *                      Default: <tt>false</tt>.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,
+                            boolean             allClasses,
                             String              metric = 'JensenShannon') {
-    normalise = false
     if (m0.isEmpty() && mx.isEmpty()) return 1.0 // or 0 ?
     if (m0.isEmpty() || mx.isEmpty()) return 1.0
     Set<String> keys = new HashSet<>(m0.keySet())
@@ -322,7 +324,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     double sumx = mx.values().sum()
     Map<String, Double> p = [:]
     Map<String, Double> q = [:]
-    if (normalise) {
+    if (allClasses) { // normalise
       keys.each {k -> p[k] = m0.getOrDefault(k, 0.0) / sum0
                       q[k] = mx.getOrDefault(k, 0.0) / sumx}
       }
