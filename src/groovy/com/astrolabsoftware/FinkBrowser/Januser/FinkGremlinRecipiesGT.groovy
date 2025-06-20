@@ -95,13 +95,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     * @param climit        The low limit fir the classification ration of the evaluated source.
-    *                      Default: <tt>0.2</tt>.
+    *                      Default: <tt>0.0</tt>.
     * @return              The full neigbouthood information. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                              String  classifier,
                                                                              double  nmax,
                                                                              String  metric = 'JensenShannon',
-                                                                             double  climit = 0.2) {
+                                                                             double  climit = 0.0) {
      return sourceNeighborhood('nmax':nmax,
                        'metric':metric,
                        'climit':climit,
@@ -131,7 +131,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      Optional named parameter.
     * @param climit        The low limit fir the classification ration of the evaluated source.
-    *                      Default: <tt>0.2</tt>.
+    *                      Default: <tt>0.0</tt>.
     *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map    args = [:],
@@ -170,7 +170,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      Optional named parameter.
     * @param climit        The low limit for the classification ration of the evaluated source.
-    *                      Default: <tt>0.2</tt>.
+    *                      Default: <tt>0.0</tt>.
     *                      Optional named parameter.
     * @return              The distances to other sources, order by the distance. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map          args = [:],
@@ -180,7 +180,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                              Set<String>  classes0) {
     def nmax   = args.nmax   ?: Integer.MAX_VALUE;
     def metric = args.metric ?: 1;
-    def climit = args.climit ?: 0.2;
+    def climit = args.climit ?: 0.0;
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
@@ -203,7 +203,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       classes += [entry.getKey()];
       }
     log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
-    m0 = normalizeMap(m0, climit);
+    if (climit > 0.0) {
+      m0.entrySet().removeIf(entry -> entry.getValue() < climit)
+      }
     def distances = [:]
     def sources;
     if (oidS) {
@@ -240,7 +242,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            by(select('e').outV().values('cls')).
                            by(select('e').values('weight')).
                            each {it -> m[it['cls']] = it['w']}
-                  m = normalizeMap(m, climit);
+                  if (climit > 0.0) {
+                    m.entrySet().removeIf(entry -> entry.getValue() < climit)
+                    }
                   def dist = sourceDistance(m0, m, metric)
                   n++
                   distance = Map.entry(oid, dist)
@@ -310,6 +314,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
     
  /** Give Jensen Shannon distance (metric) between two classifier {@link Map}s.
+    * (see <a href="https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence">Jensen–Shannon divergence</a>)
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
@@ -391,19 +396,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (norm0 == 0 || normx == 0) return 1.0  // Max distance if one is zero vector
     double cosineSim = dot / (Math.sqrt(norm0) * Math.sqrt(normx))
     return 1.0 - cosineSim
-    }
-
-  /** Normalize {@link Map}.
-    * @param inputMap The {@link Map} to be normalized.
-    * @param climit   The value limit. Remove all entries with smaller values
-    *                 (after normalization).
-    * @return         The normalized {@link Map}. */
-  def Map<String, Double> normalizeMap(Map<String, Double> inputMap,
-                                       double              climit) {
-    def sum = inputMap.values().sum()
-    inputMap.entrySet().removeIf(entry -> entry.getValue() < climit)
-    def normalizedMap = inputMap.collectEntries{key, value -> [(key): value / sum]}
-    return normalizedMap;
     }
   
   /** Drop all {@link Vertex} with specified <em>importDate</em>.

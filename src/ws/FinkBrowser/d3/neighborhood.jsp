@@ -48,7 +48,7 @@
     nmax = "5";
     }
    if (climit == null || climit.isEmpty()) {
-    climit = "0.2";
+    climit = "0.0";
     }
    
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");

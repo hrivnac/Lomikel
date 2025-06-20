@@ -25,7 +25,7 @@ gr.reclassification(oid, "FEATURES", "FINK_PORTAL");
 
 gr.sourceNeighborhood(oid, "FINK_PORTAL", 10, 'JensenShannon'); // Euclidean, Cosine
 gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon');
-gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon', 0.1);
+gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon', 0.2);
 
 gr.standardDeviationE('deepcontains', ['weight']);
 gr.exportAoISoI('/tmp/Overlaps.graphml');
