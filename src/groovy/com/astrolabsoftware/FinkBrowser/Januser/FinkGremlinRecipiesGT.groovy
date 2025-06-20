@@ -168,7 +168,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      All <em>SourceOfInterest</em> classes of the specified
     *                      <em>source</em> will be used if <tt>null</tt>.
     * @param nmax          The number of closest <em>source</em>s to give.
-    *                      If less then 1, the relative distance cutoff
+    *                      If less then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 1, the relative distance cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
@@ -311,6 +311,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,
                             String              metric = 'JensenShannon') {
+                              log.info(m0 + " " + mx)
     if (m0.isEmpty() && mx.isEmpty()) return 1.0 // or 0 ?
     if (m0.isEmpty() || mx.isEmpty()) return 1.0
     switch(metric) {
