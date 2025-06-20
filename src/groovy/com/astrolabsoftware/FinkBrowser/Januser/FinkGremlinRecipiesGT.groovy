@@ -185,8 +185,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                              String      oid0,
                                                                              String      classifier,
                                                                              Set<String> oidS,
-                                                                             Set<String> classes0,
-                                                                             boolean     allClasses) {
+                                                                             Set<String> classes0) {
     def nmax       = args.nmax       ?: Integer.MAX_VALUE;
     def metric     = args.metric     ?: 1;
     def climit     = args.climit     ?: 0.0;
