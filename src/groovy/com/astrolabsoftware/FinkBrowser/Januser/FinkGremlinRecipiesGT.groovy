@@ -92,15 +92,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier    The classifier name to be used.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
-    * @param metric        The metric to use <tt>0, 1, 2</tt>.
-    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidian or Cosine</tt>.
+    *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     * @param climit        The low limit fir the classification ration of the evaluated source.
     *                      Default: <tt>0.2</tt>.
     * @return              The full neigbouthood information. */
   def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
                                                                              String  classifier,
                                                                              double  nmax,
-                                                                             int     metric = 1,
+                                                                             String  metric = 'JensenShannon',
                                                                              double  climit = 0.2) {
      return sourceNeighborhood('nmax':nmax,
                        'metric':metric,
@@ -127,8 +127,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
-    * @param metric        The metric to use <tt>0, 1, 2</tt>.
-    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidian or Cosine</tt>.
+    *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      Optional named parameter.
     * @param climit        The low limit fir the classification ration of the evaluated source.
     *                      Default: <tt>0.2</tt>.
@@ -166,8 +166,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
-    * @param metric        The metric to use <tt>0, 1, 2</tt>.
-    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidian or Cosine</tt>.
+    *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      Optional named parameter.
     * @param climit        The low limit for the classification ration of the evaluated source.
     *                      Default: <tt>0.2</tt>.
@@ -250,7 +250,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   }
     t = System.currentTimeMillis() - t
     log.info('distance of ' + n + ' sources evaluated in ' + t / 1000 + ' s')
-    log.info(distances)
     if (nmax >= 1) {
       return distances.entrySet().                        
                        sort{a, b -> a.key.value <=> b.key.value}.  
@@ -284,20 +283,22 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
-    * @param metric        The metric to use <tt>0, 1, 2</tt>.
-    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidian or Cosine</tt>.
+    *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,
-                            int                 metric = 1) {
+                            String              metric = 'JensenShannon') {
+    if (m0.isEmpty() && mx.isEmpty()) return 1.0 // or 0 ?
+    if (m0.isEmpty() || mx.isEmpty()) return 1.0
     switch(metric) {
-      case 1:
+      case 'JensenShannon':
         return sourceDistanceJensenShannon(m0, mx);
         break;
-      case 2:
+      case 'Euclidian':
         return sourceDistanceEuclidian(m0, mx);
         break;
-      case 3:
+      case 'Cosine':
         return sourceDistanceCosine(m0, mx);
         break;
       default:
@@ -305,7 +306,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         }    
     }
     
- /** Give distance (metric) between two classifier {@link Map}s.
+ /** Give Jensen Shannon distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
@@ -313,9 +314,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def double sourceDistanceJensenShannon(Map<String, Double> m0,
                                          Map<String, Double> mx) {
                               
-if (m0.isEmpty() || mx.isEmpty()) {
-        return 1.0  // Max distance when one distribution is empty
-    }                              
                               
  Set<String> keys = new HashSet<>(m0.keySet())
     keys.addAll(mx.keySet())
@@ -351,7 +349,7 @@ if (m0.isEmpty() || mx.isEmpty()) {
     return Math.sqrt(jsd)
 }                             
     
- /** Give distance (metric) between two classifier {@link Map}s.
+ /** Give Euclidian distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
@@ -371,10 +369,10 @@ Set<String> keys = new HashSet<>(m0.keySet())
         sumSq += Math.pow(v0 - vx, 2)
     }
 
-    return Math.sqrt(sumSq)   
+    return Math.sqrt(sumSq) / Math.sqrt(2)
  }
  
-  /** Give distance (metric) between two classifier {@link Map}s.
+  /** Give Cosine distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.

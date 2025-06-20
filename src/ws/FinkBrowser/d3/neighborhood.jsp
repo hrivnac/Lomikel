@@ -42,7 +42,7 @@
     classifier = "FINK_PORTAL";
     }
   if (alg == null || alg.isEmpty()) {
-    alg = "1";
+    alg = "JensenShannon";
     }
   if (nmax == null || nmax.isEmpty()) {
     nmax = "5";
@@ -66,7 +66,7 @@
   for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : gr.sourceNeighborhood(sourceId,
                                                                                            classifier,
                                                                                            Double.parseDouble(nmax),
-                                                                                           Integer.parseInt(alg),
+                                                                                           alg,
                                                                                            Double.parseDouble(climit)).entrySet()) {
     classes = new JSONObject();
     for (Map.Entry<String, Double> e : m.getValue().entrySet()) {
