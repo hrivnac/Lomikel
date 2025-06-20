@@ -359,12 +359,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     
  /** Give Jensen Shannon distance (metric) between two classifier {@link Map}s.
     * (see <a href="https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence">Jensen–Shannon divergence</a>)
-    * @param m0            The first classifier {@link Map} cls to weight.
-    * @param mx            The second classifier {@link Map} cls to weight.
+    * @param p             The first classifier {@link Map} cls to weight.
+    * @param q             The second classifier {@link Map} cls to weight.
     * @param keys          Unity of keys for m0, mx.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
-  def double sourceDistanceJensenShannon(Map<String, Double> m0,
-                                         Map<String, Double> mx,
+  def double sourceDistanceJensenShannon(Map<String, Double> p,
+                                         Map<String, Double> q,
                                          Set<String>         keys) {
     Map<String, Double> m = [:]
     keys.each {k -> m[k] = 0.5 * (p[k] + q[k])}
@@ -382,42 +382,42 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   }                             
     
   /** Give Euclidian distance (metric) between two classifier {@link Map}s.
-    * @param m0            The first classifier {@link Map} cls to weight.
-    * @param mx            The second classifier {@link Map} cls to weight.
+    * @param p             The first classifier {@link Map} cls to weight.
+    * @param q             The second classifier {@link Map} cls to weight.
     * @param keys          Unity of keys for m0, mx.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
-  def double sourceDistanceEuclidean(Map<String, Double> m0,
-                                     Map<String, Double> mx,
+  def double sourceDistanceEuclidean(Map<String, Double> p,
+                                     Map<String, Double> q,
                                      Set<String>         keys) {
     double sumSq = 0.0
     keys.each {k ->
-      double v0 = m0.getOrDefault(k, 0.0)
-      double vx = mx.getOrDefault(k, 0.0)
-      sumSq += Math.pow(v0 - vx, 2)
+      double vp = p.getOrDefault(k, 0.0)
+      double vq = q.getOrDefault(k, 0.0)
+      sumSq += Math.pow(vp - vq, 2)
       }   
    return Math.sqrt(sumSq) / Math.sqrt(2)
    }
  
   /** Give Cosine distance (metric) between two classifier {@link Map}s.
-    * @param m0            The first classifier {@link Map} cls to weight.
-    * @param mx            The second classifier {@link Map} cls to weight.
+    * @param p             The first classifier {@link Map} cls to weight.
+    * @param q             The second classifier {@link Map} cls to weight.
     * @param keys          Unity of keys for m0, mx.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
-  def double sourceDistanceCosine(Map<String, Double> m0,
-                                  Map<String, Double> mx,
+  def double sourceDistanceCosine(Map<String, Double> p,
+                                  Map<String, Double> q,
                                   Set<String>         keys) {
     double dot = 0.0
-    double norm0 = 0.0
-    double normx = 0.0
+    double normp = 0.0
+    double normq = 0.0
     keys.each {k ->
-      double v0 = m0.getOrDefault(k, 0.0)
-      double vx = mx.getOrDefault(k, 0.0)
-      dot += v0 * vx
-      norm0 += v0 * v0
-      normx += vx * vx
+      double vp = p.getOrDefault(k, 0.0)
+      double vq = q.getOrDefault(k, 0.0)
+      dot += vp * vq
+      normp += vp * vp
+      normq += vq * vq
       }
-    if (norm0 == 0 || normx == 0) return 1.0  // Max distance if one is zero vector
-    double cosineSim = dot / (Math.sqrt(norm0) * Math.sqrt(normx))
+    if (normp == 0 || normq == 0) return 1.0  // Max distance if one is zero vector
+    double cosineSim = dot / (Math.sqrt(normp) * Math.sqrt(normq))
     return 1.0 - cosineSim
     }
   
