@@ -262,7 +262,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   if (climit > 0.0) {
                     m.entrySet().removeIf(entry -> entry.getValue() < climit)
                     }
-                  def dist = sourceDistance(m0, m, metric, allClasses)
+                  def dist = sourceDistance(m0, m, allClasses, metric)
                   n++
                   distance = Map.entry(oid, dist)
                   distances[distance] = m
@@ -302,6 +302,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
+    * @param allClasses    Whether to consider also classes not available in original source.
+    *                      Default: <tt>false</tt>.
     * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      <ul>
@@ -309,8 +311,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      <li>Euclidean:	    Interpreting probabilities as points in space, Sensitive to magnitude</li>
     *                      <li>Cosine:         Comparing class pattern rather than strength, 	Ignores magnitude of probabilities</li>
     *                      </ul>
-    * @param allClasses    Whether to consider also classes not available in original source.
-    *                      Default: <tt>false</tt>.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,
