@@ -92,7 +92,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier    The classifier name to be used.
     * @param nmax          The number of closest <em>source</em>s to give.
     *                      All are given, if missing.
-    * @param metric        The metric to use <tt>JensenShannon, Euclidian or Cosine</tt>.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     * @param climit        The low limit fir the classification ration of the evaluated source.
     *                      Default: <tt>0.2</tt>.
@@ -127,7 +127,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
-    * @param metric        The metric to use <tt>JensenShannon, Euclidian or Cosine</tt>.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      Optional named parameter.
     * @param climit        The low limit fir the classification ration of the evaluated source.
@@ -166,7 +166,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
-    * @param metric        The metric to use <tt>JensenShannon, Euclidian or Cosine</tt>.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      Optional named parameter.
     * @param climit        The low limit for the classification ration of the evaluated source.
@@ -243,10 +243,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   m = normalizeMap(m, climit);
                   def dist = sourceDistance(m0, m, metric)
                   n++
-                  //if (dist > 0) {
-                    distance = Map.entry(oid, dist)
-                    distances[distance] = m
-                  //  }     
+                  distance = Map.entry(oid, dist)
+                  distances[distance] = m
                   }
     t = System.currentTimeMillis() - t
     log.info('distance of ' + n + ' sources evaluated in ' + t / 1000 + ' s')
@@ -283,8 +281,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
-    * @param metric        The metric to use <tt>JensenShannon, Euclidian or Cosine</tt>.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
+    *                      <ul>
+    *                      <li>Jensen-Shannon:	Comparing probability distributions, Handles missing classes robustly</li>
+    *                      <li>Euclidean:	    Interpreting probabilities as points in space, Sensitive to magnitude</li>
+    *                      <li>Cosine:         Comparing class pattern rather than strength, 	Ignores magnitude of probabilities</li>
+    *                      </ul>
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,
@@ -295,8 +298,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       case 'JensenShannon':
         return sourceDistanceJensenShannon(m0, mx);
         break;
-      case 'Euclidian':
-        return sourceDistanceEuclidian(m0, mx);
+      case 'Euclidean':
+        return sourceDistanceEuclidean(m0, mx);
         break;
       case 'Cosine':
         return sourceDistanceCosine(m0, mx);
