@@ -331,13 +331,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     else { // complete
       p = m0
       q = mx
-      if ((1 - sum0) < 0.001) {
+      if ((1.0 - sum0) < 0.001) {
+        log.info(sum0);
         def newkey = 'others0'
         keys.add(newkey)
         p[newkey] = 1.0 - sum0;
         q[newkey] = 0.0;
         }
-      if ((1 - sumx) > 0.001) {
+      if ((1.0 - sumx) > 0.001) {
         def newkey = 'othersx'
         keys.add(newkey)
         p[newkey] = 0.0;
