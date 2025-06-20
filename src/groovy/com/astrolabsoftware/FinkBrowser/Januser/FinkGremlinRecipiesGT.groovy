@@ -313,64 +313,56 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistanceJensenShannon(Map<String, Double> m0,
                                          Map<String, Double> mx) {
-                              
-                              
- Set<String> keys = new HashSet<>(m0.keySet())
+                                                            
+    Set<String> keys = new HashSet<>(m0.keySet())
     keys.addAll(mx.keySet())
 
     // Create normalized distributions
     double sum0 = m0.values().sum()
     double sumx = mx.values().sum()
-
     Map<String, Double> p = [:]
     Map<String, Double> q = [:]
-    keys.each { k ->
-        p[k] = m0.getOrDefault(k, 0.0) / sum0
-        q[k] = mx.getOrDefault(k, 0.0) / sumx
-    }
+    keys.each {k -> p[k] = m0.getOrDefault(k, 0.0) / sum0
+                    q[k] = mx.getOrDefault(k, 0.0) / sumx}
 
     // Compute M = 0.5 * (P + Q)
     Map<String, Double> m = [:]
-    keys.each { k -> m[k] = 0.5 * (p[k] + q[k]) }
+    keys.each {k -> m[k] = 0.5 * (p[k] + q[k])}
 
     // Helper: KL divergence
-    def kl = { Map<String, Double> a, Map<String, Double> b ->
-        double klDiv = 0.0
-        a.each { k, v ->
-            if (v > 0 && b[k] > 0) {
-                klDiv += v * Math.log(v / b[k])
-            }
-        }
-        return klDiv
-    }
+    def kl = {Map<String, Double> a, Map<String, Double> b ->
+               double klDiv = 0.0
+               a.each {k, v ->
+                 if (v > 0 && b[k] > 0) {
+                   klDiv += v * Math.log(v / b[k])
+                   }
+                 }
+               return klDiv
+               }
 
-    double jsd = 0.5 * kl(p, m) + 0.5 * kl(q, m)
-
-    return Math.sqrt(jsd)
-}                             
+  double jsd = 0.5 * kl(p, m) + 0.5 * kl(q, m)
+  return Math.sqrt(jsd)
+  }                             
     
- /** Give Euclidian distance (metric) between two classifier {@link Map}s.
+  /** Give Euclidian distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistanceEuclidean(Map<String, Double> m0,
                                      Map<String, Double> mx) {
-Set<String> keys = new HashSet<>(m0.keySet())
-    keys.addAll(mx.keySet())
-
+    Set<String> keys = new HashSet<>(m0.keySet())
+    keys.addAll(mx.keySet())   
     double sum0 = m0.values().sum()
-    double sumx = mx.values().sum()
-
+    double sumx = mx.values().sum()   
     double sumSq = 0.0
-    keys.each { k ->
-        double v0 = m0.getOrDefault(k, 0.0) / sum0
-        double vx = mx.getOrDefault(k, 0.0) / sumx
-        sumSq += Math.pow(v0 - vx, 2)
-    }
-
-    return Math.sqrt(sumSq) / Math.sqrt(2)
- }
+    keys.each {k ->
+      double v0 = m0.getOrDefault(k, 0.0) / sum0
+      double vx = mx.getOrDefault(k, 0.0) / sumx
+      sumSq += Math.pow(v0 - vx, 2)
+      }   
+   return Math.sqrt(sumSq) / Math.sqrt(2)
+   }
  
   /** Give Cosine distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
@@ -378,32 +370,26 @@ Set<String> keys = new HashSet<>(m0.keySet())
     *                      Entries, not present also in m0, will be ignored.
     * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
   def double sourceDistanceCosine(Map<String, Double> m0,
-                                           Map<String, Double> mx) {
-Set<String> keys = new HashSet<>(m0.keySet())
+                                  Map<String, Double> mx) {
+    Set<String> keys = new HashSet<>(m0.keySet())
     keys.addAll(mx.keySet())
-
     double sum0 = m0.values().sum()
     double sumx = mx.values().sum()
-
     double dot = 0.0
     double norm0 = 0.0
     double normx = 0.0
-
-    keys.each { k ->
-        double v0 = m0.getOrDefault(k, 0.0) / sum0
-        double vx = mx.getOrDefault(k, 0.0) / sumx
-        dot += v0 * vx
-        norm0 += v0 * v0
-        normx += vx * vx
-    }
-
+    keys.each {k ->
+      double v0 = m0.getOrDefault(k, 0.0) / sum0
+      double vx = mx.getOrDefault(k, 0.0) / sumx
+      dot += v0 * vx
+      norm0 += v0 * v0
+      normx += vx * vx
+      }
     if (norm0 == 0 || normx == 0) return 1.0  // Max distance if one is zero vector
-
     double cosineSim = dot / (Math.sqrt(norm0) * Math.sqrt(normx))
     return 1.0 - cosineSim
-                                           }
+    }
 
-    
   /** Normalize {@link Map}.
     * @param inputMap The {@link Map} to be normalized.
     * @param climit   The value limit. Remove all entries with smaller values
