@@ -242,7 +242,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            each {it -> m[it['cls']] = it['w']}
                   m = normalizeMap(m, climit);
                   def dist = sourceDistance(m0, m, metric)
-                  log.info(oid + " " + dist + " " + m0 + " " + m)
                   n++
                   //if (dist > 0) {
                     distance = Map.entry(oid, dist)
@@ -282,14 +281,62 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     }
     
+ /** Give distance (metric) between two classifier {@link Map}s.
+    * @param m0            The first classifier {@link Map} cls to weight.
+    * @param mx            The second classifier {@link Map} cls to weight.
+    *                      Entries, not present also in m0, will be ignored.
+    * @param metric        The metric to use <tt>0, 1, 2</tt>.
+    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
+    * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
+  def double sourceDistance(Map<String, Double> m0,
+                            Map<String, Double> mx,
+                            int                 metric = 1) {
+                              
+                              
+                              
+                              
+ Set<String> keys = new HashSet<>(m0.keySet())
+    keys.addAll(mx.keySet())
+
+    // Create normalized distributions
+    double sum0 = m0.values().sum()
+    double sumx = mx.values().sum()
+
+    Map<String, Double> p = [:]
+    Map<String, Double> q = [:]
+    keys.each { k ->
+        p[k] = m0.getOrDefault(k, 0.0) / sum0
+        q[k] = mx.getOrDefault(k, 0.0) / sumx
+    }
+
+    // Compute M = 0.5 * (P + Q)
+    Map<String, Double> m = [:]
+    keys.each { k -> m[k] = 0.5 * (p[k] + q[k]) }
+
+    // Helper: KL divergence
+    def kl = { Map<String, Double> a, Map<String, Double> b ->
+        double klDiv = 0.0
+        a.each { k, v ->
+            if (v > 0 && b[k] > 0) {
+                klDiv += v * Math.log(v / b[k])
+            }
+        }
+        return klDiv
+    }
+
+    double jsd = 0.5 * kl(p, m) + 0.5 * kl(q, m)
+
+    return Math.sqrt(jsd)
+}                             
+    
   /** Give distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
     * @param metric        The metric to use <tt>0, 1, 2</tt>.
     *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
-    * @return              The distance between two {@link Map}s. */
-  def double sourceDistance(Map<String, Double> m0,
+    * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
+  def double sourceDistancex(Map<String, Double> m0,
                             Map<String, Double> mx,
                             int                 metric = 1) {
     if (metric == 0) {
