@@ -280,8 +280,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       return distances1
       }
     }
-    
- /** Give distance (metric) between two classifier {@link Map}s.
+  /** Give distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
     *                      Entries, not present also in m0, will be ignored.
@@ -291,6 +290,25 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def double sourceDistance(Map<String, Double> m0,
                             Map<String, Double> mx,
                             int                 metric = 1) {
+    switch(metric) {
+      case 1:
+        return sourceDistanceJensenShannon(m0, mx);
+        break;
+      case 2:
+        return sourceDistanceJensenShannon(m0, mx);
+        break;
+      default:
+        return _random.nextDouble();
+        }    
+    }
+    
+ /** Give distance (metric) between two classifier {@link Map}s.
+    * @param m0            The first classifier {@link Map} cls to weight.
+    * @param mx            The second classifier {@link Map} cls to weight.
+    *                      Entries, not present also in m0, will be ignored.
+    * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
+  def double sourceDistanceJensenShannon(Map<String, Double> m0,
+                                         Map<String, Double> mx) {
                               
                               
  log.info("m0 = " + m0 + ", mx = " + mx);                 
@@ -329,56 +347,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return Math.sqrt(jsd)
 }                             
     
-  /** Give distance (metric) between two classifier {@link Map}s.
-    * @param m0            The first classifier {@link Map} cls to weight.
-    * @param mx            The second classifier {@link Map} cls to weight.
-    *                      Entries, not present also in m0, will be ignored.
-    * @param metric        The metric to use <tt>0, 1, 2</tt>.
-    *                      Default: <tt>1</tt>. <tt>0</tt> gives random metric - for testing.
-    * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
-  def double sourceDistancex(Map<String, Double> m0,
-                            Map<String, Double> mx,
-                            int                 metric = 1) {
-    if (metric == 0) {
-      return _random.nextDouble();
-      }
-    def dist = 0;
-    def norm0 = 0;
-    def normx = 0;
-    def w0;
-    def wx;
-    def match = false;
-    for (cls : m0.keySet()) {
-      if (mx.containsKey(cls)) {
-        match = true;
-        w0 = m0[cls];
-        wx = mx[cls];
-        switch(metric) {
-          case 1:
-            dist += w0 * wx;
-            norm0 += w0 * w0;
-            normx += wx * wx;
-            break;
-          case 2:
-            dist += (w0 - wx) * (w0 - wx) / (w0 + wx) * (w0 + wx);
-            break;
-          default:
-            dist += _random.nextDouble();
-          }    
-        }
-      }
-    if (!match) {
-      return 1.0
-      }
-    switch(metric) {
-      case 1:
-        return 1.0 - dist / Math.sqrt(norm0 * normx);
-      case 2:
-        return Math.sqrt(dist);
-      default:
-        return _random.nextDouble();
-      }
-    }
     
   /** Normalize {@link Map}.
     * @param inputMap The {@link Map} to be normalized.
