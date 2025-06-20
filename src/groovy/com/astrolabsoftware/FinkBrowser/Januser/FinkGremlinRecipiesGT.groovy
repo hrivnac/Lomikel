@@ -295,7 +295,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         return sourceDistanceJensenShannon(m0, mx);
         break;
       case 2:
-        return sourceDistanceJensenShannon(m0, mx);
+        return sourceDistanceEuclidian(m0, mx);
+        break;
+      case 3:
+        return sourceDistanceCosine(m0, mx);
         break;
       default:
         return _random.nextDouble();
@@ -310,8 +313,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def double sourceDistanceJensenShannon(Map<String, Double> m0,
                                          Map<String, Double> mx) {
                               
-                              
- log.info("m0 = " + m0 + ", mx = " + mx);                 
+if (m0.isEmpty() || mx.isEmpty()) {
+        return 1.0  // Max distance when one distribution is empty
+    }                              
                               
  Set<String> keys = new HashSet<>(m0.keySet())
     keys.addAll(mx.keySet())
@@ -347,6 +351,60 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return Math.sqrt(jsd)
 }                             
     
+ /** Give distance (metric) between two classifier {@link Map}s.
+    * @param m0            The first classifier {@link Map} cls to weight.
+    * @param mx            The second classifier {@link Map} cls to weight.
+    *                      Entries, not present also in m0, will be ignored.
+    * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
+  def double sourceDistanceEuclidean(Map<String, Double> m0,
+                                     Map<String, Double> mx) {
+Set<String> keys = new HashSet<>(m0.keySet())
+    keys.addAll(mx.keySet())
+
+    double sum0 = m0.values().sum()
+    double sumx = mx.values().sum()
+
+    double sumSq = 0.0
+    keys.each { k ->
+        double v0 = m0.getOrDefault(k, 0.0) / sum0
+        double vx = mx.getOrDefault(k, 0.0) / sumx
+        sumSq += Math.pow(v0 - vx, 2)
+    }
+
+    return Math.sqrt(sumSq)   
+ }
+ 
+  /** Give distance (metric) between two classifier {@link Map}s.
+    * @param m0            The first classifier {@link Map} cls to weight.
+    * @param mx            The second classifier {@link Map} cls to weight.
+    *                      Entries, not present also in m0, will be ignored.
+    * @return              The distance between two {@link Map}s. <tt>0-1</tt>*/
+  def double sourceDistanceCosine(Map<String, Double> m0,
+                                           Map<String, Double> mx) {
+Set<String> keys = new HashSet<>(m0.keySet())
+    keys.addAll(mx.keySet())
+
+    double sum0 = m0.values().sum()
+    double sumx = mx.values().sum()
+
+    double dot = 0.0
+    double norm0 = 0.0
+    double normx = 0.0
+
+    keys.each { k ->
+        double v0 = m0.getOrDefault(k, 0.0) / sum0
+        double vx = mx.getOrDefault(k, 0.0) / sumx
+        dot += v0 * vx
+        norm0 += v0 * v0
+        normx += vx * vx
+    }
+
+    if (norm0 == 0 || normx == 0) return 1.0  // Max distance if one is zero vector
+
+    double cosineSim = dot / (Math.sqrt(norm0) * Math.sqrt(normx))
+    return 1.0 - cosineSim
+                                           }
+
     
   /** Normalize {@link Map}.
     * @param inputMap The {@link Map} to be normalized.
