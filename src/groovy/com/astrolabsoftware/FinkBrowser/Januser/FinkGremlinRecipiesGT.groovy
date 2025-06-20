@@ -329,8 +329,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                       q[k] = mx.getOrDefault(k, 0.0) / sumx}
       }
     else { // complete
-      p = m0
-      q = mx
+      keys.each {k -> p[k] = m0.getOrDefault(k, 0.0)
+                      q[k] = mx.getOrDefault(k, 0.0)}
       if (Math.abs(1.0 - sum0) > 0.000001) {
         def newkey = 'others0'
         keys.add(newkey)
@@ -394,9 +394,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                      Set<String>         keys) {
     double sumSq = 0.0
     keys.each {k ->
-      double vp = p.getOrDefault(k, 0.0)
-      double vq = q.getOrDefault(k, 0.0)
-      sumSq += Math.pow(vp - vq, 2)
+      sumSq += Math.pow(p[k] - q[k], 2)
       }   
    return Math.sqrt(sumSq) / Math.sqrt(2)
    }
@@ -413,11 +411,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     double normp = 0.0
     double normq = 0.0
     keys.each {k ->
-      double vp = p.getOrDefault(k, 0.0)
-      double vq = q.getOrDefault(k, 0.0)
-      dot += vp * vq
-      normp += vp * vp
-      normq += vq * vq
+      dot += p[k] * q[k]
+      normp += p[k] * p[k]
+      normq += q[k] * q[k]
       }
     if (normp == 0 || normq == 0) return 1.0  // Max distance if one is zero vector
     double cosineSim = dot / (Math.sqrt(normp) * Math.sqrt(normq))
