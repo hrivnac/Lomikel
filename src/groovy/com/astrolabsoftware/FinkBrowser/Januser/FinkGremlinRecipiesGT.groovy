@@ -329,6 +329,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                       q[k] = mx.getOrDefault(k, 0.0) / sumx}
       }
     else { // complete
+      p = m0
+      q = mx
       if ((1 - sum0) < 0.000001) {
         def newkey = 'others0'
         keys.add(newkey)
@@ -339,8 +341,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         keys.add(newkey)
         p[newkey] = 1.0 - sumx;
         }
-      p = m0
-      q = mx
       }
     log.info(p + " " + q + " " + keys)
     switch(metric) {
