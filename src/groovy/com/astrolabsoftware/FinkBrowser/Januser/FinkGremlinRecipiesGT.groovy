@@ -342,6 +342,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       p = m0
       q = mx
       }
+    log.info(p + " " + q + " " + keys)
     switch(metric) {
       case 'JensenShannon':
         return sourceDistanceJensenShannon(p, q, keys);
