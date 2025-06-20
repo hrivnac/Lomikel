@@ -108,6 +108,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
      return sourceNeighborhood('nmax':nmax,
                        'metric':metric,
                        'climit':climit,
+                       'allClasses':allClasses,
                        oid0,
                        classifier)
     }
