@@ -478,7 +478,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                            int    nmax = 10,
                                            String kind = 'SourcesOfInterest') {                        
     def classified = classification(oid, srcClassifier);
-    Map<String, Double> reclassified = [:];      
+    def reclassified = [:];      
     def w;
     classified.each {it -> if (it.classifier == srcClassifier) {
                              w = reclassify(it.class, kind, srcClassifier, dstClassifier);
@@ -493,8 +493,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return limit(reclassified, nmax)
     }
     
-  def Map<String, Double> limit(Map<String, Double> map,
-                                double              nmax) {
+  def Map<String, Double> limit(Map<Map.Entry<String, Double>, Double> map,
+                                double                                 nmax) {
     if (nmax >= 1) {
       return map.entrySet().                        
                  sort{a, b -> a.key.value <=> b.key.value}.  
