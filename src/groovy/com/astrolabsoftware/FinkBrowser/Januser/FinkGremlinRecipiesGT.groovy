@@ -269,7 +269,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   }
     t = System.currentTimeMillis() - t
     log.info('distance of ' + n + ' sources evaluated in ' + t / 1000 + ' s')
-    return limit(distances, nmax)
+    return limitMapMap(distances, nmax)
     }
     
   /** Give distance (metric) between two classifier {@link Map}s.
@@ -475,7 +475,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<String, Double> reclassification(String oid,
                                            String srcClassifier,
                                            String dstClassifier,
-                                           int    nmax = 10,
+                                           double nmax = 10,
                                            String kind = 'SourcesOfInterest') {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
@@ -489,11 +489,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                               }
                       }
       }
-    return limitx(reclassified, nmax)
+    return limitMap(reclassified, nmax)
     }
     
-  def Map<Map.Entry<String, Double>, Map<String, Double>> limit(Map<Map.Entry<String, Double>, Map<String, Double>> map,
-                                                                double                                              nmax) {
+  def Map<Map.Entry<String, Double>, Map<String, Double>> limitMapMap(Map<Map.Entry<String, Double>, Map<String, Double>> map,
+                                                                      double                                              nmax) {
     if (nmax >= 1) {
       return map.entrySet().                        
                  sort{a, b -> a.key.value <=> b.key.value}.  
@@ -524,8 +524,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     }
      
-  def Map<String, Double> limitx(Map<String, Double> map,
-                                 double              nmax) {
+  def Map<String, Double> limitMap(Map<String, Double> map,
+                                   double              nmax) {
     if (nmax >= 1) {
       return map.sort{-it.value}.  
                  take((int)nmax)
