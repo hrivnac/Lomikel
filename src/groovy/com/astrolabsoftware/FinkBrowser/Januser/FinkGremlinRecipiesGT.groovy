@@ -493,8 +493,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return limit(reclassified, nmax)
     }
     
-  def Map<String, Double> limit(Map<Map.Entry<String, Double>, Double> map,
-                                double                                 nmax) {
+  def Map<Map.Entry<String, Double>, Map<String, Double>> limit(Map<Map.Entry<String, Double>, Map<String, Double>> map,
+                                                                double                                              nmax) {
     if (nmax >= 1) {
       return map.entrySet().                        
                  sort{a, b -> a.key.value <=> b.key.value}.  
@@ -524,7 +524,37 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       return map1
       }
     }
-    
+     
+  def Map<String, Double> limit(Map<String, Double> map,
+                                double              nmax) {
+    if (nmax >= 1) {
+      return map.sort{-it.value}.  
+                 take((int)nmax)
+      }
+    else {
+      def map1 = [:];
+      def entries = map.entrySet().sort{-it.value}
+      for (int i = 0; i < entries.size(); i++) {
+        if (i < 2) {
+          map1[entries[i].key] = entries[i].value
+          }
+        else {
+          def v0 = entries[i - 2].key.value
+          def v1 = entries[i - 1].key.value
+          def v2 = entries[i    ].key.value
+          if (v1 != v2 && v1 != v0) {
+            def ratio = (v1 - v0) / (v2 - v1)
+            if (ratio < nmax) {
+              break
+              }
+            }
+          map1[entries[i].key] = entries[i].value
+          }
+        }
+      return map1
+      }
+    }
+   
   /** Give all overlaps.
     * Using accumulated data in graph.
     * @param lbl        The label of {@link Vertex}es to use for overlap search.
