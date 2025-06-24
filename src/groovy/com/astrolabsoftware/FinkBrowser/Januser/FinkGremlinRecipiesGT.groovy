@@ -321,7 +321,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     switch(metric) {
       case 'JensenShannon':
         return sourceDistanceJensenShannon(p, q, keys);
-        break;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
+        break;
       case 'Euclidean':
         return sourceDistanceEuclidean(p, q, keys);
         break;
