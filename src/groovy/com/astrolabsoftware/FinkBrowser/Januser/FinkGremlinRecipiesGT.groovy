@@ -506,7 +506,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       def entries = map.entrySet().sort{a, b -> a.key.value <=> b.key.value}
       for (int i = 0; i < entries.size(); i++) {
         if (i < 2) {
-          distances1[entries[i].key] = entries[i].value
+          map1[entries[i].key] = entries[i].value
           }
         else {
           def v0 = entries[i - 2].key.value
