@@ -169,7 +169,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      All <em>SourceOfInterest</em> classes of the specified
     *                      <em>source</em> will be used if <tt>null</tt>.
     * @param nmax          The number of closest <em>source</em>s to give.
-    *                      If less then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 1, the relative distance cutoff
+    *                      If less then 1, the relative distance cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
     *                      Optional named parameter.
@@ -321,7 +321,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     switch(metric) {
       case 'JensenShannon':
         return sourceDistanceJensenShannon(p, q, keys);
-        break;
+        break;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
       case 'Euclidean':
         return sourceDistanceEuclidean(p, q, keys);
         break;
@@ -470,6 +470,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param oid The <em>source objectId</em>.
     * @param srcClassifier The classifier to be used for primary classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
+    * @param nmax          The number of classes to give.
+    *                      If less then 1, the relative weight cutoff
+    *                      (the larger cutoff means more selective, 0 means no selection). 
+    *                      <tt>10</tt>, if missing.
+    * @param kind          The kind of collective vertex.
+    *                      <em>SourcesOfInterest</em> (default) or <em>AlertsOfInterest</em>.
     * @return              The recorded classification calculated
     *                      by number of classified <em>alert</em>s. */
   def Map<String, Double> reclassification(String oid,
@@ -492,6 +498,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return limitMap(reclassified, nmax)
     }
     
+  /** Limit {@link Map} based on its <tt>key.value</tt>.
+    * @param map  The fill {@link Map}>
+    * @param nmax  The number of closest <em>source</em>s to give.
+    *              If less then 1, the relative distance cutoff
+    *              (the larger cutoff means more selective, 0 means no selection). 
+    * @return     The limited {@link Map}. */
+  // TBD: rafactor with limitMap
   def Map<Map.Entry<String, Double>, Map<String, Double>> limitMapMap(Map<Map.Entry<String, Double>, Map<String, Double>> map,
                                                                       double                                              nmax) {
     if (nmax >= 1) {
@@ -524,6 +537,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     }
      
+  /** Limit {@link Map} based on its <tt>value</tt>.
+    * @param map  The fill {@link Map}>
+    * @param nmax  The number of closest <em>source</em>s to give.
+    *              If less then 1, the relative distance cutoff
+    *              (the larger cutoff means more selective, 0 means no selection). 
+    * @return     The limited {@link Map}. */
   def Map<String, Double> limitMap(Map<String, Double> map,
                                    double              nmax) {
     if (nmax >= 1) {
