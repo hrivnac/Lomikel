@@ -538,9 +538,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           map1[entries[i].key] = entries[i].value
           }
         else {
-          def v0 = entries[i - 2].key.value
-          def v1 = entries[i - 1].key.value
-          def v2 = entries[i    ].key.value
+          def v0 = entries[i - 2].value
+          def v1 = entries[i - 1].value
+          def v2 = entries[i    ].value
           if (v1 != v2 && v1 != v0) {
             def ratio = (v1 - v0) / (v2 - v1)
             if (ratio < nmax) {
