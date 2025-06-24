@@ -383,7 +383,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   return Math.sqrt(jsd)
   }                             
     
-  /** Give Euclidian distance (metric) between two classifier {@link Map}s.
+  /** Give Euclidean distance (metric) between two classifier {@link Map}s.
     * @param p             The first classifier {@link Map} cls to weight.
     * @param q             The second classifier {@link Map} cls to weight.
     * @param keys          Unity of keys for m0, mx.
@@ -397,7 +397,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }   
    return Math.sqrt(sumSq) / Math.sqrt(2)
    }
- 
+    
   /** Give Cosine distance (metric) between two classifier {@link Map}s.
     * @param p             The first classifier {@link Map} cls to weight.
     * @param q             The second classifier {@link Map} cls to weight.
@@ -498,14 +498,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param dstClassifier The classifier to be used to interpret the classification.
     * @return              The recorded classification calculated
     *                      by number of classified <em>alert</em>s. */
-  def Map reclassification(String oid,
-                           String srcClassifier,
-                           String dstClassifier) {                        
+  def Map<String, Double> reclassification(String oid,
+                                           String srcClassifier,
+                                           String dstClassifier,
+                                           String kind = SourcesOfInterest) {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
     classified.each {it -> if (it.classifier == srcClassifier) {
-                             w = reclassify(it.class, "SourcesOfInterest", srcClassifier, dstClassifier);
+                             w = reclassify(it.class, type, srcClassifier, dstClassifier);
                              w.each {key, value -> if (reclassified[key] == null) {
                                                      reclassified[key] = 0;
                                                      }

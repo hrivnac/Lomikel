@@ -6,7 +6,7 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_dir = "2025/13-50-known"
+overlaps_dir = "2025/13-50"
 
 normalised = True          
 
@@ -40,7 +40,7 @@ elif overlaps_dir == "2024/13-20":
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
-limits_norm  = [80,                   0,                   0,                   50,                  0,                  0                 ]
+limits_norm  = [130,                   0,                   0,                   70,                  0,                  0                 ]
 limits_unorm = [0,                   0,                   0,                   0,                  0,                  0                 ]
 
 #-------------------------------------------------------------------------------
