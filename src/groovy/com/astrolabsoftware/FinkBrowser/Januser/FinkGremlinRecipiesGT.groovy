@@ -269,35 +269,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   }
     t = System.currentTimeMillis() - t
     log.info('distance of ' + n + ' sources evaluated in ' + t / 1000 + ' s')
-    if (nmax >= 1) {
-      return distances.entrySet().                        
-                       sort{a, b -> a.key.value <=> b.key.value}.  
-                       take((int)nmax).
-                       collectEntries(new LinkedHashMap<>()) {entry -> [(entry.key): entry.value]}
-      }
-    else {
-      def distances1 = [:];
-      def distanceEntries = distances.entrySet().sort{a, b -> a.key.value <=> b.key.value}
-      for (int i = 0; i < distanceEntries.size(); i++) {
-        if (i < 2) {
-          distances1[distanceEntries[i].key] = distanceEntries[i].value
-          }
-        else {
-          def v0 = distanceEntries[i - 2].key.value
-          def v1 = distanceEntries[i - 1].key.value
-          def v2 = distanceEntries[i    ].key.value
-          if (v1 != v2 && v1 != v0) {
-            def ratio = (v1 - v0) / (v2 - v1)
-            if (ratio < nmax) {
-              break
-              }
-            }
-          distances1[distanceEntries[i].key] = distanceEntries[i].value
-          }
-        }
-      return distances1
-      }
+    return limit(distances, nmax)
     }
+    
   /** Give distance (metric) between two classifier {@link Map}s.
     * @param m0            The first classifier {@link Map} cls to weight.
     * @param mx            The second classifier {@link Map} cls to weight.
@@ -501,6 +475,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<String, Double> reclassification(String oid,
                                            String srcClassifier,
                                            String dstClassifier,
+                                           int    nmax = 10,
                                            String kind = 'SourcesOfInterest') {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
@@ -514,9 +489,39 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                               }
                       }
       }
-    reclassified = reclassified.sort{-it.value};
-    return reclassified;
+    reclassified = reclassified.sort{-it.value}
     }
+    
+  def Map<String, Double> limit(Map<String, Double> map,
+            int                                     nmax) {
+    if (nmax >= 1) {
+      return map.entrySet().                        
+                 sort{a, b -> a.key.value <=> b.key.value}.  
+                 take((int)nmax).
+                 collectEntries(new LinkedHashMap<>()) {entry -> [(entry.key): entry.value]}
+      }
+    else {
+      def map1 = [:];
+      def entries = map.entrySet().sort{a, b -> a.key.value <=> b.key.value}
+      for (int i = 0; i < entries.size(); i++) {
+        if (i < 2) {
+          distances1[entries[i].key] = entries[i].value
+          }
+        else {
+          def v0 = entries[i - 2].key.value
+          def v1 = entries[i - 1].key.value
+          def v2 = entries[i    ].key.value
+          if (v1 != v2 && v1 != v0) {
+            def ratio = (v1 - v0) / (v2 - v1)
+            if (ratio < nmax) {
+              break
+              }
+            }
+          map1[entries[i].key] = entries[i].value
+          }
+        }
+      return map1
+      }
     
   /** Give all overlaps.
     * Using accumulated data in graph.
@@ -527,7 +532,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param outputCSV  The filename for CSV file with overlaps.
     *                   Optional named parameter.
     * @return           The overlaps. */
-  def Map overlaps(Map args) {
+  def Map<String, Double> overlaps(Map args) {
     def lbl        = args?.lbl;
     def classifier = args?.classifier;
     def outputCSV  = args?.outputCSV;
@@ -562,7 +567,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give classification from another {@link Classifier}.
     * Using accumulated data in graph.
     * @param cls           The class in the source classifier. 
-    * @param lbl           The label of {@link Vertex}es. 
+    * @param lbl           The label of collection {@link Vertex}es. 
     * @param srcClassifier The name of classifier of the source (known) class.
     * @param dstClassifier The name of classifier of the destination (required) class.
     * @return           The new classification. */
