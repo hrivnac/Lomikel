@@ -501,7 +501,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<String, Double> reclassification(String oid,
                                            String srcClassifier,
                                            String dstClassifier,
-                                           String kind = SourcesOfInterest) {                        
+                                           String kind = 'SourcesOfInterest') {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
