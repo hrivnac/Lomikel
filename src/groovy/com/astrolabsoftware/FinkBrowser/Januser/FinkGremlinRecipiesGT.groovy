@@ -490,6 +490,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                       }
       }
     reclassified = reclassified.sort{-it.value}
+    return limit(reclassified, nmax)
     }
     
   def Map<String, Double> limit(Map<String, Double> map,
@@ -522,6 +523,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         }
       return map1
       }
+    }
     
   /** Give all overlaps.
     * Using accumulated data in graph.
