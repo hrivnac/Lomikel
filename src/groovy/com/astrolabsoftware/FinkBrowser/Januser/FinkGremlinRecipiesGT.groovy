@@ -489,8 +489,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                               }
                       }
       }
-    reclassified = reclassified.sort{-it.value}
-    return limit(reclassified, nmax)
+    return limitx(reclassified, nmax)
     }
     
   def Map<Map.Entry<String, Double>, Map<String, Double>> limit(Map<Map.Entry<String, Double>, Map<String, Double>> map,
@@ -525,8 +524,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     }
      
-  def Map<String, Double> limit(Map<String, Double> map,
-                                double              nmax) {
+  def Map<String, Double> limitx(Map<String, Double> map,
+                                 double              nmax) {
     if (nmax >= 1) {
       return map.sort{-it.value}.  
                  take((int)nmax)
