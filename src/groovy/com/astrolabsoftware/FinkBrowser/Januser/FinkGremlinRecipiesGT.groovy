@@ -494,7 +494,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
     
   def Map<String, Double> limit(Map<String, Double> map,
-            int                                     nmax) {
+                               double               nmax) {
     if (nmax >= 1) {
       return map.entrySet().                        
                  sort{a, b -> a.key.value <=> b.key.value}.  
