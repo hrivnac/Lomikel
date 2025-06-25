@@ -44,18 +44,18 @@ import glob
 # Parameters -------------------------------------------------------------------
 
 dataFn = "/user/julien.peloton/archive/science/year=2025"
-skipNaN = False
-replaceNaNbyMean = True
+skipNaN = True
+replaceNaNbyMean = False
 replaceNaNbyZero = False
 n_sample = 0
-n_pca = 13
+n_pca = 25
 n_clusters_start = 5
-n_clusters = 50
+n_clusters = 15
 silhouette = False
 cluster_features = "pca_features"
 known = True
-tag = "-known"
-clean = False
+tag = ""
+clean = True
 
 # Clean ------------------------------------------------------------------------
 

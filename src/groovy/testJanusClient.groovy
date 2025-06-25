@@ -21,7 +21,7 @@ gr.classification(oid);
 gr.classification(oid, "FINK_PORTAL");
 gr.classification(oid, "FEATURES");
 
-gr.reclassification(oid, "FEATURES", "FINK_PORTAL");
+gr.reclassification(oid, "FEATURES", "FINK_PORTAL", 10, 'AlertsOfInterest');
 
 gr.sourceNeighborhood(oid, "FINK_PORTAL", 10, 'JensenShannon'); // Euclidean, Cosine
 gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon');
