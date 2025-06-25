@@ -43,7 +43,7 @@ import glob
 
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2025/month=05"
+dataFn = "/user/julien.peloton/archive/science/year=2025"
 skipNaN = False
 replaceNaNbyMean = False
 replaceNaNbyZero = True
@@ -54,8 +54,8 @@ n_clusters = 15
 silhouette = False
 cluster_features = "pca_features"
 known = True
-tag = "-test"
-clean = False
+tag = "-known-zero"
+clean = True
 
 # Clean ------------------------------------------------------------------------
 
