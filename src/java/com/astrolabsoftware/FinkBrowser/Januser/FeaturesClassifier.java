@@ -112,7 +112,7 @@ public class FeaturesClassifier implements Classifier {
   private ClusterFinder finder() throws LomikelException {
     if (_finder == null || _reset) {
       if (_resourceName == null && _dirName == null) {
-        _resourceName = "Clusters/2025/13-50-known";
+        _resourceName = DEFAULT_RESOURCE_NAME;
         }
       try {
         if (_resourceName != null) {
@@ -158,6 +158,8 @@ public class FeaturesClassifier implements Classifier {
   private static String _dirName;
   
   private static String _resourceName;
+  
+  private static String DEFAULT_RESOURCE_NAME = "Clusters/2025/13-50-known";
   
   private static boolean _reset;
 
