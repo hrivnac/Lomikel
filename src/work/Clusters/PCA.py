@@ -43,7 +43,7 @@ import glob
 
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2025"
+dataFn = "/user/julien.peloton/archive/science/year=2025/month=05"
 skipNaN = True
 replaceNaNbyMean = False
 replaceNaNbyZero = False
