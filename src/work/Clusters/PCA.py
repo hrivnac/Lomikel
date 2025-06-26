@@ -50,12 +50,12 @@ replaceNaNbyZero = True
 n_sample = 0
 n_pca = 13
 n_clusters_start = 5
-n_clusters = 30
+n_clusters = 100
 silhouette = False
 cluster_features = "pca_features"
-known = True
-tag = "-known-zero"
-clean = True
+known = False
+tag = "-zero"
+clean = False
 
 # Clean ------------------------------------------------------------------------
 
