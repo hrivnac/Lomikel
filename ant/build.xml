@@ -508,6 +508,20 @@
       </jar> 
     </target>
     
+  <target name="exe-py4j"
+          depends="jar"
+          description="Create exe JARs for Py4J">
+    <jar jarfile="../lib/Lomikel-py4j-${version}.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelwPy4J"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Py4J.LomikelGatewayServer"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar"/>
+        </manifest>
+      </jar> 
+    </target>
+    
   <!-- WAR ==================================================================-->
 
   <target name="war"
