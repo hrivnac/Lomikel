@@ -1,0 +1,6 @@
+: 1750974748:0;ls
+: 1750974760:0;mv cluster_centers-known-zero.json cluster_centers.json
+: 1750974770:0;mv pca_params-known-zero.json pca_params.json
+: 1750974770:0;ls
+: 1750974778:0;mv scaler_params-known-zero.json scaler_params.json
+: 1750974779:0;cd ..
