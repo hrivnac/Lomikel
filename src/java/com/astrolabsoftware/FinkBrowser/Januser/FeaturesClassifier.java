@@ -67,6 +67,7 @@ public class FeaturesClassifier implements Classifier {
           value.containsKey("d:lc_features_r")) {
         fg = value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "");
         fr = value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "");
+        // BUG: some models replace by mean
         featuresS = (fg + "," + fr).replaceAll("null", "0.0").
                                     replaceAll("NaN", "0.0").
                                     split(",");
