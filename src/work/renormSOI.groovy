@@ -7,7 +7,7 @@ jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties")
 gr = new FinkGremlinRecipiesG(jc)
 
 gr.fhclient('vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
-FeaturesClassifier.setModelResource("Clusters/2025/13-50")
+FeaturesClassifier.setModelResource("Clusters/2025/13-30-zero")
 jc.g().V().has('lbl', 'source').values('objectId').toList().each{oid -> gr.classifySource(Classifiers.FEATURES, oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)}
 
 gr.generateCorrelations(Classifiers.valueOf("FEATURES"), Classifiers.valueOf("FINK_PORTAL"))

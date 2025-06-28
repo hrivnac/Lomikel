@@ -256,7 +256,6 @@ cluster_features = "pca_features"
 # @home
 scp julius.hrivnac@157.136.254.149:/tmp/'*.png' ./
 scp julius.hrivnac@157.136.254.149:/tmp/'*.json' ./
-scp *json centos@157.136.253.253:/tmp
 
 # testing results ##############################################################
 
