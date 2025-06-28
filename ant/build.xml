@@ -491,6 +491,15 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar> 
+    <jar jarfile="../lib/Lomikel-py4j-${version}.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelwPy4J"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Py4J.LomikelGatewayServer"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar"/>
+        </manifest>
+      </jar> 
     </target>
     
   <target name="exe-dl4j"
@@ -504,20 +513,6 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-data-${version}.jar dl4j-all.jar"/>
-        </manifest>
-      </jar> 
-    </target>
-    
-  <target name="exe-py4j"
-          depends="jar"
-          description="Create exe JARs for Py4J">
-    <jar jarfile="../lib/Lomikel-py4j-${version}.exe.jar" index="no">
-      <manifest>
-        <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="LomikelwPy4J"/>
-        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
-        <attribute name="Main-Class" value="com.Lomikel.Py4J.LomikelGatewayServer"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar"/>
         </manifest>
       </jar> 
     </target>
@@ -1087,7 +1082,7 @@
   <target name="start-py4j"
           description="Start Py4J Gateway Server">
     <echo>Starting Py4J Gateway Server</echo>
-    <java classname="com.Lomikel.Py4J.LomikelGatewayServer"
+    <java jar="../lib/Lomikel-py4j-${version}.exe.jar"
           fork="true">
       <classpath>
         <path refid="classpath.janusgraph"/>
