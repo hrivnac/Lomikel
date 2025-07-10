@@ -491,14 +491,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                              w.each {key, value -> if (reclassified[key] == null) {
                                                      reclassified[key] = 0;
                                                      }
-                                                   reclassified[key] += value;
+                                                   reclassified[key] += value * it.weight;
                               }
                       }
       }
-    //double total = reclassified.values().sum()
-    //if (total != 0) {
-    //  reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
-    //  }  
+    double total = reclassified.values().sum()
+    if (total != 0) {
+      reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
+      }  
     return limitMap(reclassified, nmax)
     }
     
