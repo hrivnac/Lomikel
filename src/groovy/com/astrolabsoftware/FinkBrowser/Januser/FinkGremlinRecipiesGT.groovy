@@ -495,10 +495,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                               }
                       }
       }
-    double total = reclassified.values().sum()
-    if (total != 0) {
-      reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
-      }  
+    //double total = reclassified.values().sum()
+    //if (total != 0) {
+    //  reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
+    //  }  
     return limitMap(reclassified, nmax)
     }
     
