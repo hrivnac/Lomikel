@@ -160,7 +160,7 @@ public class FeaturesClassifier implements Classifier {
   
   private static String _resourceName;
   
-  private static String DEFAULT_RESOURCE_NAME = "Clusters/2025/13-50-known";
+  private static String DEFAULT_RESOURCE_NAME = "Clusters/2025/13-30-zero";
   
   private static boolean _reset;
 

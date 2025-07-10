@@ -6,12 +6,23 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_dir = "2025/13-50"
+overlaps_dir = "2025/13-30-zero"
 
-normalised = True          
+normalised = False          
 
 merges = {}
 no_values = []
+if overlaps_dir == "2025/13-30-zero":    
+  merges = {"LPV":  ["LP*_Candidate",
+                     "LPV*",
+                     "LongPeriodV*",
+                     "LongPeriodV*_Candidate"],
+            "FC-LPV":     ["FC-0",
+                           "FC-3",
+                           "FC-15"],
+            "FC-QSO":     ["FC-14",
+                           "FC-27",
+                           "FC-1"]}
 if overlaps_dir == "2025/13-50-known":    
   merges = {"FC-A":   ["FC-11",
                        "FC-12"]}
@@ -41,7 +52,7 @@ classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       '
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
 types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
 limits_norm  = [130,                   0,                   0,                   70,                  0,                  0                 ]
-limits_unorm = [0,                   0,                   0,                   0,                  0,                  0                 ]
+limits_unorm = [10000,                   0,                   0,                   10000,                  0,                  0                 ]
 
 #-------------------------------------------------------------------------------
 

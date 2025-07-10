@@ -116,7 +116,7 @@ def labelsDirTrain   = new File(trainLabelDir);
 def featuresDirTest  = new File(testFeatureDir);
 def labelsDirTest    = new File(testLabelDir);
 
-numLabelClasses=numClasses
+numLabelClasses = numClasses
 
 trainFeatures = new CSVSequenceRecordReader();
 trainFeatures.initialize(new NumberedFileInputSplit(featuresDirTrain.getAbsolutePath() + "/seq_%d.csv", 0, trainSize - 1));

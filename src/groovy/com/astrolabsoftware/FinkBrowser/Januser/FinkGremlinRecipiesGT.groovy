@@ -477,7 +477,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param kind          The kind of collective vertex.
     *                      <em>SourcesOfInterest</em> (default) or <em>AlertsOfInterest</em>.
     * @return              The recorded classification calculated
-    *                      by number of classified <em>alert</em>s. */
+    *                      by number of classified <em>alert</em>s. Normalized to 1. */
   def Map<String, Double> reclassification(String oid,
                                            String srcClassifier,
                                            String dstClassifier,
@@ -495,6 +495,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                               }
                       }
       }
+    double total = reclassified.values().sum()
+    if (total != 0) {
+      reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
+      }  
     return limitMap(reclassified, nmax)
     }
     

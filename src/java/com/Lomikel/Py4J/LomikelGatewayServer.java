@@ -17,6 +17,10 @@ import org.apache.logging.log4j.LogManager;
   * gateway = JavaGateway()
   * gateway.jvm.java.lang.System.out.println("pokus")
   * </pre>
+  * To access it from the remote client, you may need to setup a tunnel first:
+  * <pre>
+  * ssh -L 25333:localhost:25333 remote_id@server_ip
+  * </pre>
   * @opt attributes
   * @opt operations
   * @opt types
