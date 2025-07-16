@@ -208,7 +208,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    by(select('e').outV().values('cls')).
                    by(select('e').values('weight')).
                    each {it -> m0[it['cls']] = it['w']}
-    log.info('calculating source distances from ' + oid0 + m0 + " using " + args + " " + allClasses);
+    log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
     if (climit > 0.0) {
       m0.entrySet().removeIf(entry -> entry.getValue() < climit)
       }
@@ -232,17 +232,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     else {
       // BUG: Janus-all.jar doesn't allow complex operations
-      if (client() == null) {
+      //if (client() == null) {
         sources = g().V().has('lbl', 'SourcesOfInterest').
                           has('classifier', classifier).
                           has('cls', within(classes)).
                           out().
                           has('lbl', 'source').
                           dedup()  
-        }
-      else {
-        sources = g().V().has('lbl', 'source')
-        }
+      //  }
+      //else {
+      //  sources = g().V().has('lbl', 'source')
+      //  }
       }
     def distance
     def n = 0
