@@ -208,7 +208,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    by(select('e').outV().values('cls')).
                    by(select('e').values('weight')).
                    each {it -> m0[it['cls']] = it['w']}
-    log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
+    log.info('calculating source distances from ' + oid0 + m0 + " using " + args + " " + allClasses);
     if (climit > 0.0) {
       m0.entrySet().removeIf(entry -> entry.getValue() < climit)
       }

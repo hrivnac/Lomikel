@@ -32,7 +32,7 @@ public class LomikelGatewayServer {
   public static void main(String[] args) {
     GatewayServer gatewayServer = new GatewayServer(new LomikelGatewayServer());
     gatewayServer.start();
-    log.info("Gateway Server Started");
+    log.info("Gateway Server Started at port 25333");
     try {
       NotifierURL.notify("", "Lomikel-GatewayServer", Info.release());
       }
