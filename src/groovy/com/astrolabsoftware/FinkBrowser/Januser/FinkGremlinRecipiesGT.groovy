@@ -231,18 +231,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                         has('objectId', within(oidS));
       }
     else {
-      // BUG: Janus-all.jar doesn't allow complex operations
-      //if (client() == null) {
-        sources = g().V().has('lbl', 'SourcesOfInterest').
-                          has('classifier', classifier).
-                          has('cls', within(classes)).
-                          out().
-                          has('lbl', 'source').
-                          dedup()  
-      //  }
-      //else {
-      //  sources = g().V().has('lbl', 'source')
-      //  }
+      // NOTE: Janus-all.jar doesn't allow some complex operations
+      sources = g().V().has('lbl', 'SourcesOfInterest').
+                        has('classifier', classifier).
+                        has('cls', within(classes)).
+                        out().
+                        has('lbl', 'source').
+                        dedup()  
       }
     def distance
     def n = 0

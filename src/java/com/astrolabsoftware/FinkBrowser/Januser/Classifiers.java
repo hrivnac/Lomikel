@@ -13,6 +13,12 @@ public enum Classifiers {
       return new FinkPortalClassifier();
       }
     },
+  FINK {
+    @Override
+    public Classifier instance() {
+      return new FinkClassifier();
+      }
+    },
   FEATURES {
     @Override
     public Classifier instance() {

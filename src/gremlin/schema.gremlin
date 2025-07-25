@@ -16,7 +16,7 @@ props        = mgmt.makeEdgeLabel('props'       ).multiplicity(SIMPLE  ).make()
 has          = mgmt.makeEdgeLabel('has'         ).multiplicity(ONE2MANY).make()
 holds        = mgmt.makeEdgeLabel('holds'       ).multiplicity(ONE2MANY).make()
 sends        = mgmt.makeEdgeLabel('sends'       ).multiplicity(ONE2MANY).make()
-contains     = mgmt.makeEdgeLabel('contains'    ).multiplicity(ONE2MANY).make()
+contains     = mgmt.makeEdgeLabel('contains'    ).multiplicity(MULTI   ).make()
 deepcontains = mgmt.makeEdgeLabel('deepcontains').multiplicity(MULTI   ).make()
 collects     = mgmt.makeEdgeLabel('collects'    ).multiplicity(MULTI   ).make()
 overlaps     = mgmt.makeEdgeLabel('overlaps'    ).multiplicity(SIMPLE).make()
@@ -34,6 +34,7 @@ timestamp     = mgmt.makePropertyKey('timestamp'   ).dataType(String.class  ).ca
 importDate    = mgmt.makePropertyKey('importDate'  ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
 importSource  = mgmt.makePropertyKey('importSource').dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
 weight        = mgmt.makePropertyKey('weight'      ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
+weights       = mgmt.makePropertyKey('weights'     ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make()
 instances     = mgmt.makePropertyKey('instances'   ).dataType(String.class  ).cardinality(Cardinality.SINGLE).make()
 direction     = mgmt.makePropertyKey('direction'   ).dataType(Geoshape.class).cardinality(Cardinality.SINGLE).make()
 dec           = mgmt.makePropertyKey('dec'         ).dataType(Double.class  ).cardinality(Cardinality.SINGLE).make() 
@@ -59,6 +60,7 @@ mgmt.addProperties(contains,
 mgmt.addProperties(deepcontains,
                    weight,
                    instances,
+                   weights,
                    lbl)
 
 // Connections   

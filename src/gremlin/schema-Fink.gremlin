@@ -5,11 +5,10 @@ mgmt = graph.openManagement()
 
 // Vertexes
 datalink          = mgmt.getVertexLabel('datalink')
-AlertsOfInterest  = mgmt.makeVertexLabel('AlertsOfInterest' ).make()
-SourcesOfInterest = mgmt.makeVertexLabel('SourcesOfInterest').make()
-AlertsCollection  = mgmt.makeVertexLabel('AlertsCollection' ).make()
-source            = mgmt.makeVertexLabel('source'           ).make()
-alert             = mgmt.makeVertexLabel('alert'            ).make()
+AoI               = mgmt.makeVertexLabel('AoI'    ).make()
+SoI               = mgmt.makeVertexLabel('SoI'    ).make()
+source            = mgmt.makeVertexLabel('source' ).make()
+alert             = mgmt.makeVertexLabel('alert'  ).make()
 
 // Edges
 props        = mgmt.getEdgeLabel('props'       )
@@ -36,27 +35,27 @@ importSource = mgmt.getPropertyKey('importSource' )
 objectId     = mgmt.makePropertyKey('objectId'    ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 jd           = mgmt.makePropertyKey('jd'          ).dataType(Double.class).cardinality(Cardinality.SINGLE).make() 
 classifier   = mgmt.makePropertyKey('classifier'  ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
+flavor       = mgmt.makePropertyKey('flavor'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 cls          = mgmt.makePropertyKey('cls'         ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 intersection = mgmt.makePropertyKey('intersection').dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 sizeIn       = mgmt.makePropertyKey('sizeIn'      ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 
 // Vertex properties
-mgmt.addProperties(AlertsOfInterest,
+mgmt.addProperties(AoI,
                    lbl,
                    classifier,
+                   flavor,
                    cls,
                    technology,
                    url)   
-mgmt.addProperties(SourcesOfInterest,
+mgmt.addProperties(SoI,
                    lbl,
                    classifier,
+                   flavor,
                    cls,
                    technology,
                    url)   
-mgmt.addProperties(AlertsCollection,
-                   lbl,
-                   title)   
 mgmt.addProperties(alert,
                    lbl,
                    objectId,
@@ -75,13 +74,12 @@ mgmt.addProperties(overlaps,
                    sizeOut)
 
 // Connections   
-mgmt.addConnection(sends,        source,            alert)
-mgmt.addConnection(contains,     AlertsOfInterest,  alert)
-mgmt.addConnection(deepcontains, SourcesOfInterest, source)
-mgmt.addConnection(overlaps,     SourcesOfInterest, SourcesOfInterest)
-mgmt.addConnection(overlaps,     AlertsOfInterest,  SourcesOfInterest)
-mgmt.addConnection(overlaps,     AlertsOfInterest,  AlertsOfInterest)
-mgmt.addConnection(collects,     AlertsCollection,  alert)
+mgmt.addConnection(sends,        source, alert)
+mgmt.addConnection(contains,     AoI,    alert)
+mgmt.addConnection(deepcontains, SoI,    source)
+mgmt.addConnection(overlaps,     SoI,    SoI)
+mgmt.addConnection(overlaps,     AoI,    SoI)
+mgmt.addConnection(overlaps,     AoI,    AoI)
 
 // Info
 mgmt.printSchema()
