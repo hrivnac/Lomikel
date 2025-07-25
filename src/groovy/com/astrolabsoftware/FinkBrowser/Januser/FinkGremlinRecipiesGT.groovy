@@ -196,7 +196,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       return [:];
       }
     if (classes0 == null || classes0.isEmpty()) {
-      classes0 = g().V().has('lbl', 'SourcesOfInterest').has('classifier', classifier).values('cls').toSet();
+      classes0 = g().V().has('lbl', 'SoI').has('classifier', classifier).values('cls').toSet();
       }
     def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
     def m0 = [:];
@@ -232,7 +232,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     else {
       // NOTE: Janus-all.jar doesn't allow some complex operations
-      sources = g().V().has('lbl', 'SourcesOfInterest').
+      sources = g().V().has('lbl', 'SoI').
                         has('classifier', classifier).
                         has('cls', within(classes)).
                         out().
@@ -470,14 +470,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      <tt>10</tt>, if missing.
     * @param kind          The kind of collective vertex.
-    *                      <em>SourcesOfInterest</em> (default) or <em>AlertsOfInterest</em>.
+    *                      <em>SoI</em> (default) or <em>AoI</em>.
     * @return              The recorded classification calculated
     *                      by number of classified <em>alert</em>s. Normalized to 1. */
   def Map<String, Double> reclassification(String oid,
                                            String srcClassifier,
                                            String dstClassifier,
                                            double nmax = 10,
-                                           String kind = 'SourcesOfInterest') {                        
+                                           String kind = 'SoI') {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
@@ -649,17 +649,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return classification;
     }
     
-  /** Export all <em>AlertsOfInterest</em> and <em?SourcesOfInterest</em>
+  /** Export all <em>AoI</em> and <em/>SoI</em>
     * {@link Vertex}es with connecting <em>overlaps</em> {@link Edge}s
     * into <em>GraphML</em> file.
     * @param fn          The full filename of the output <em>GraphML</em> file.
     * @param collections The {@link List} of collective {@link Vetex}es names.
     *                    If missing, empty or <tt>tt</tt> null,
-    *                    is used <em>AlertsOfInterest,SourcesOfInterest</em>. */
+    *                    is used <em>AoI,SoI</em>. */
   def exportAoISoI(String       fn,
                    List<String> collections = null) {  
     if (collections == null || collections.isEmpty()) {
-      collections = ['AlertsOfInterest', 'SourcesOfInterest'];
+      collections = ['AoI', 'SoI'];
       }
     g().V().has('lbl', within(collections)).
             outE().

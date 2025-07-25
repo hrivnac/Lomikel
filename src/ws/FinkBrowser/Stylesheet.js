@@ -204,26 +204,7 @@ stylesheet.nodes.cutout = {
     {name:"Table",      url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
     ]
   }
-stylesheet.nodes.AlertsCollection = {
-  properties:{},
-  graphics: {
-    label:"title", 
-    title:"title",        
-    subtitle:" ",     
-    group:" ",        
-    shape:"image",      
-    image:"Alerts.png",        
-    borderRadius:"0", 
-    borderWidth:"1",  
-    borderDashes:[1,0],
-    value:{gremlin:"both().count().join().toString()"}        
-    },
-  actions:[
-    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"},
-    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"}
-    ]
-  }
-stylesheet.nodes.AlertsOfInterest = {
+stylesheet.nodes.AoI = {
   properties:{},
   graphics: {
     label:"cls", 
@@ -242,7 +223,7 @@ stylesheet.nodes.AlertsOfInterest = {
     {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"}
     ]
   }
-stylesheet.nodes.SourcesOfInterest = {
+stylesheet.nodes.SoI = {
   properties:{},
   graphics: {
     label:"cls", 

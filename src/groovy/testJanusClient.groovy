@@ -15,13 +15,13 @@ gr.fhclient('vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
 gr.classifySource(Classifiers.FEATURES, oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
 gr.classifySource(Classifiers.FEATURES, oid, null, false, null)
 
-gr.registerSourcesOfInterest(Classifiers.TAG, 'MyTag_1', oid, 1.0, '', false, null)
+gr.registerSoI(Classifiers.TAG, 'MyTag_1', oid, 1.0, '', false, null)
 
 gr.classification(oid);
 gr.classification(oid, "FINK_PORTAL");
 gr.classification(oid, "FEATURES");
 
-gr.reclassification(oid, "FEATURES", "FINK_PORTAL", 10, 'AlertsOfInterest');
+gr.reclassification(oid, "FEATURES", "FINK_PORTAL", 10, 'AoI');
 
 gr.sourceNeighborhood(oid, "FINK_PORTAL", 10, 'JensenShannon'); // Euclidean, Cosine
 gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon');

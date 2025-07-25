@@ -84,9 +84,9 @@
         }
       lblFrom = callGremlinValues(gr + ".E('" + id1 + "').outV().values('lbl').next().toString()" )[0];
       lblTo   = callGremlinValues(gr + ".E('" + id1 + "').inV( ).values('lbl').next().toString()" )[0];
-      if (lblFrom == "AlertsOfInterest" || lblFrom == "SourcesOfInterest") { // TBD: move into Fink
+      if (lblFrom == "AoI" || lblFrom == "SoI") { // TBD: move into Fink
         vFrom  = callGremlinValues(gr + ".E('" + id1 + "').outV().values('cls').toSet().toArray().join('')")[0];
-        if (lblFrom == "AlertsOfInterest") {
+        if (lblFrom == "AoI") {
           vFrom = "AoI(" + vFrom + ")";
           }
         else {
@@ -96,9 +96,9 @@
       else {
         vFrom  = callGremlinValues(gr + ".E('" + id1 + "').outV().elementMap().next().toString()" )[0];
         }
-      if (lblTo == "AlertsOfInterest" || lblTo == "SourcesOfInterest") {
+      if (lblTo == "AoI" || lblTo == "SoI") {
         vTo    = callGremlinValues(gr + ".E('" + id1 + "').inV().values('cls').toSet().toArray().join('')")[0];
-        if (lblTo == "AlertsOfInterest") {
+        if (lblTo == "AoI") {
           vTo = "AoI(" + vTo + ")";
           }
         else {

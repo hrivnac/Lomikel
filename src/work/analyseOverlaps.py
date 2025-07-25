@@ -50,9 +50,9 @@ elif overlaps_dir == "2024/13-20":
                                   
 classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
 classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
-types        = ['SourcesOfInterest', 'SourcesOfInterest', 'SourcesOfInterest', 'AlertsOfInterest', 'AlertsOfInterest', 'AlertsOfInterest']
-limits_norm  = [130,                   0,                   0,                   70,                  0,                  0                 ]
-limits_unorm = [10000,                   0,                   0,                   10000,                  0,                  0                 ]
+types        = ['SoI',               'SoI',               'SoI',               'AoI',              'AoI',              'AoI'             ]
+limits_norm  = [130,                 0,                   0,                   70,                  0,                  0                ]
+limits_unorm = [10000,               0,                   0,                   10000,               0,                  0                ]
 
 #-------------------------------------------------------------------------------
 

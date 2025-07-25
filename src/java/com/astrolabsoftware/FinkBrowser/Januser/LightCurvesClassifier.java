@@ -93,7 +93,7 @@ public class LightCurvesClassifier implements Classifier {
       key = "FC-" + cls.getKey();
       val = cls.getValue();
       weight = val.size() / totalWeight;
-      recipies.registerSourcesOfInterest(Classifiers.FEATURES, key, oid, weight, val, enhance, columns);
+      recipies.registerSoI(Classifiers.FEATURES, key, oid, weight, val, enhance, columns);
       }
     }
     

@@ -40,7 +40,7 @@ public class TagClassifier implements Classifier {
   public void tag(String oid,
                   String tags) {
     if (!tags.contains(",")) {
-      _recipies.registerSourcesOfInterest(Classifiers.TAG, tags, oid, 1.0, "", false, null);
+      _recipies.registerSoI(Classifiers.TAG, tags, oid, 1.0, "", false, null);
       return;
       }
     Map<String, Double> tagMap = new TreeMap<>();
@@ -59,7 +59,7 @@ public class TagClassifier implements Classifier {
       }
     // renormalize
     for (Map.Entry<String, Double> entry : tagMap.entrySet()) {
-      _recipies.registerSourcesOfInterest(Classifiers.TAG, entry.getKey(), oid, entry.getValue(), "", false, null);
+      _recipies.registerSoI(Classifiers.TAG, entry.getKey(), oid, entry.getValue(), "", false, null);
       }
     }
   

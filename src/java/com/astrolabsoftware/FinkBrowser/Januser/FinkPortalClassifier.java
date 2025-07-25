@@ -69,7 +69,7 @@ public class FinkPortalClassifier implements Classifier {
       key = cls.getKey();
       val = cls.getValue();
       weight = val.size() / totalWeight;
-      recipies.registerSourcesOfInterest(Classifiers.FINK_PORTAL, key, oid, weight, val, enhance, columns);
+      recipies.registerSoI(Classifiers.FINK_PORTAL, key, oid, weight, val, enhance, columns);
       }
     }
 

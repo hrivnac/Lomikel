@@ -102,7 +102,7 @@ g.V().hasLabel('dataset').coin(0.01)
 // =======================
 
 // filter
-g.V().has('lbl', 'SourcesOfInterest').filter(outE().has('lbl', 'deepcontains').inV().has('objectId', startingWith('ZTF17')))
+g.V().has('lbl', 'SoI').filter(outE().has('lbl', 'deepcontains').inV().has('objectId', startingWith('ZTF17')))
 
 // show duplicated verteces
 g.V().has('lbl', 'alert').group().by('rowkey').unfold().filter(select(values).count(local).is(gt(1))).select(keys)

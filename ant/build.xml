@@ -222,19 +222,6 @@
         </classpath>
       </groovyc>
     </target>
-    
-  <target name="compile-python"
-          depends="init"
-          description="Compile python sources">
-    <exec executable="${jython_dir}/bin/jython">
-      <arg value="../src/python/compile.py"/>
-      </exec>
-    <move todir="../build">
-			<fileset dir="../src/python">
-			  <include name="*.class"/>
-			  </fileset>
-		  </move>
-    </target>
         
   <!-- Compile Native =======================================================-->
     
@@ -254,7 +241,7 @@
   <!-- Create JAR ===========================================================-->
   
   <target name="jar"
-          depends="compile,compile-groovy,compile-python"
+          depends="compile,compile-groovy"
           description="Create JAR">
     <path id="libs">
       <fileset dir="../extlib">
