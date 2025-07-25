@@ -14,7 +14,7 @@ import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties");
 gr = new FinkGremlinRecipiesG(jc);
-gr.processSourcesOfInterest('FINK_PORTAL', 'vdhbase1.lal.in2p3.fr:2183:ztf:', 100, 1000, null, false, null)
+gr.processSourcesOfInterest('FINK', 'vdhbase1.lal.in2p3.fr:2183:ztf:', 100, 1000, null, false, null)
 
 # Using
 # src/groovy/testJanusClient.groovy
@@ -24,9 +24,9 @@ import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties");
 gr = new FinkGremlinRecipiesG(g);
-gr.sourceNeighborhood('ZTF18actbfgh', 'FINK_PORTAL', 10);
+gr.sourceNeighborhood('ZTF18actbfgh', 'FINK', 10);
 gr.classification("ZTF18actbfgh");
 gr.overlaps();
 gr.overlaps("AlertsOfInterest");
-gr.overlaps("AlertsOfInterest", "FINK_PORTAL");
+gr.overlaps("AlertsOfInterest", "FINK");
 ---

@@ -27,13 +27,13 @@ gr.overlaps(classifier:"FEATURES");
 gr.overlaps(outputCSV:"/tmp/overlaps.csv");
 gr.overlaps(lbl:"SourcesOfInterest");
 
-gr.sourceNeighborhood("ZTF18aakpydc", "FINK_PORTAL")
+gr.sourceNeighborhood("ZTF18aakpydc", "FINK")
 
 gr.classification("ZTF18aakpydc")
-gr.classification("ZTF18aakpydc", "FINK_PORTAL")
-gr.reclassification('ZTF18aakpydc', 'FEATURES', 'FINK_PORTAL')
+gr.classification("ZTF18aakpydc", "FINK")
+gr.reclassification('ZTF18aakpydc', 'FEATURES', 'FINK')
 
-gr.reclassify("FC-3", "SourcesOfInterest", "FEATURES", "FINK_PORTAL")
+gr.reclassify("FC-3", "SourcesOfInterest", "FEATURES", "FINK")
 
 gr.classifySource(Classifiers.FEATURES, 'ZTF25aaksfzy', 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
 
@@ -42,7 +42,7 @@ gr.exportAoISoI('/tmp/Overlaps.graphml');
 --------------------------------------------------------------------------------
 
 
-gremlin> gr.reclassification('ZTF25aaksfzy', 'FEATURES', 'FINK_PORTAL')
+gremlin> gr.reclassification('ZTF25aaksfzy', 'FEATURES', 'FINK')
 ==>Solar System candidate=555.0
 ==>Tracklet=511.0
 ==>SN candidate=318.0
@@ -53,5 +53,5 @@ gremlin> gr.reclassification('ZTF25aaksfzy', 'FEATURES', 'FINK_PORTAL')
 ==>Microlensing candidate=1.0
 ==>BLLac=1.0
 gremlin> gr.classification('ZTF25aaksfzy')
-==>[weight:1.0,classifier:FINK_PORTAL,class:Solar System candidate]
+==>[weight:1.0,classifier:FINK,class:Solar System candidate]
 ==>[weight:1.0,classifier:FEATURES,class:FC-3]
