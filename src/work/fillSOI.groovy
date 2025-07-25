@@ -23,5 +23,5 @@ gr.processSoI(new String[]{'FINK', 'FEATURES'}, formula, 'vdhbase1.lal.in2p3.fr:
 //                       "Anomaly"}
 //gr.processSoI(new String[]{'FINK', 'FEATURES'}, null, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 0, 1500, classes, false, null)
 
-gr.generateCorrelations(Classifiers.valueOf("FEATURES"), Classifiers.valueOf("FINK_PORTAL"))
+gr.generateCorrelations(Classifiers.valueOf("FEATURES"), Classifiers.valueOf("FINK"))
 gr.overlaps("outputCSV":"/tmp/overlaps.csv")

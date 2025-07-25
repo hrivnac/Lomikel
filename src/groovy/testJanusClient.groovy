@@ -18,12 +18,12 @@ gr.classifySource(Classifiers.FEATURES, oid, null, false, null)
 gr.registerSoI(Classifiers.TAG, 'MyTag_1', oid, 1.0, '', false, null)
 
 gr.classification(oid);
-gr.classification(oid, "FINK_PORTAL");
+gr.classification(oid, "FINK");
 gr.classification(oid, "FEATURES");
 
-gr.reclassification(oid, "FEATURES", "FINK_PORTAL", 10, 'AoI');
+gr.reclassification(oid, "FEATURES", "FINK", 10, 'AoI');
 
-gr.sourceNeighborhood(oid, "FINK_PORTAL", 10, 'JensenShannon'); // Euclidean, Cosine
+gr.sourceNeighborhood(oid, "FINK", 10, 'JensenShannon'); // Euclidean, Cosine
 gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon');
 gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon', 0.2, True);
 
@@ -40,16 +40,16 @@ import com.Lomikel.Januser.JanusClient;
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 jc = new JanusClient('/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties');
 gr = new FinkGremlinRecipiesG(jc);
-gr.sourceNeighborhood('ZTF18actbfgh', 'FINK_PORTAL', 10);
+gr.sourceNeighborhood('ZTF18actbfgh', 'FINK', 10);
 
 import com.Lomikel.Januser.StringGremlinClient;
 client = new StringGremlinClient('134.158.74.85', 24444);
-print(client.interpret("gr=new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG(g);gr.sourceNeighborhood('ZTF18actbfgh', 'FINK_PORTAL', 10)"));
+print(client.interpret("gr=new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG(g);gr.sourceNeighborhood('ZTF18actbfgh', 'FINK', 10)"));
 
 import com.Lomikel.Januser.DirectGremlinClient;
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 client = new DirectGremlinClient('134.158.74.85', 24444);
 g = client.g();
 gr = new FinkGremlinRecipiesG(g);
-gr.sourceNeighborhood('ZTF18abctqum', 'FINK_PORTAL', 10);
+gr.sourceNeighborhood('ZTF18abctqum', 'FINK', 10);
 

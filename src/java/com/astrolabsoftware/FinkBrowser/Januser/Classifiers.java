@@ -19,6 +19,12 @@ public enum Classifiers {
       return new FinkClassifier();
       }
     },
+  XMATCH {
+    @Override
+    public Classifier instance() {
+      return new XMatchClassifier();
+      }
+    },
   FEATURES {
     @Override
     public Classifier instance() {

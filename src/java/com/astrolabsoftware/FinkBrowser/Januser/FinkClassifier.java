@@ -49,7 +49,7 @@ public class FinkClassifier implements Classifier {
       jo = ja.getJSONObject(i);
       cl = jo.getString("v:classification");
       jd = jo.getDouble("i:jd");
-      if (!cl.equals("Unknown")) {
+      if (CLASSES.contains(cl)) {
         if (classes.containsKey(cl)) {
           jds = classes.get(cl);
           jds.add(jd);
@@ -69,10 +69,25 @@ public class FinkClassifier implements Classifier {
       key = cls.getKey();
       val = cls.getValue();
       weight = val.size() / totalWeight;
-      recipies.registerSoI(Classifiers.FINK_PORTAL, key, oid, weight, val, enhance, columns);
+      recipies.registerSoI(Classifiers.FINK, key, oid, weight, val, enhance, columns);
       }
     }
-
+  
+  /** Give classes assigned by Fink.
+    * @return The classes assigned by Fink. */
+  public static Set<String> finkClasses() {
+    return CLASSES;
+    }
+    
+  private static Set<String> CLASSES = Set.of("(CTA) Blazar",
+                                              "Early SN Ia candidate",
+                                              "Kilonova candidate",
+                                              "Microlensing candidate",
+                                              "SN candidate",
+                                              "Solar System candidate",
+                                              "Solar System MPC",
+                                              "Tracklet",
+                                              "Anomaly"); // not treated: "Ambiguous"
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkClassifier.class);
   
