@@ -34,7 +34,7 @@ public abstract class Classifier {
  
   public static Classifier instance(String name,
                                     String flavor) throws LomikelException {
-    return instance(Type.valueOf(name));
+    return instance(Type.valueOf(name), flavor);
     }
     
   /** Give singleton {@link Classifier} for each type and flavor.
@@ -105,6 +105,10 @@ public abstract class Classifier {
   
   public String name() {
     return _type.name();
+    }
+    
+  public String toString() {
+    return name() + "[" + flavor() + "]";
     }
     
   private Type _type;  

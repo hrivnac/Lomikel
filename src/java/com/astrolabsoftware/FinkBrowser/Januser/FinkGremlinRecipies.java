@@ -331,7 +331,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                           Set<Double> instances,
                           boolean     enhance,
                           String      columns) {   
-    log.info("\tregistering " + objectId + " as " + cls + " with weight " + weight);
+    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight " + weight);
     Vertex soi = g().V().has("lbl",        "SoI"              ).
                          has("classifier", classifier.name()  ).
                          has("flavor",     classifier.flavor()).
