@@ -32,14 +32,6 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class TagClassifier extends Classifier {
   
-  public TagClassifier(String flavor) {
-    super(flavor);
-    }
-  
-  public TagClassifier() {
-    super();
-    }
-  
   /** Tag <em>source</em>.
     * @param oid  The <em>source</em> <tt>objectId</tt>.
     * @param tags The comma-separated tags to be attributed.

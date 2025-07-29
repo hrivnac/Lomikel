@@ -26,14 +26,6 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class FinkClassifier extends Classifier {
   
-  public FinkClassifier(String flavor) {
-    super(flavor);
-    }
-  
-  public FinkClassifier() {
-    super();
-    }
-  
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid,

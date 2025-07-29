@@ -99,6 +99,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Execute full chain of new sources correlations analyses.
     * @param classifierNames The names of the {@link Classifier} to be used.
+    *                        They can contain the {@link Classifier} flavor after <em>=</em> symbol.
     * @param filter          The HBase evaluation formula to be applied.
     *                        Ignored if <tt>clss</tt> are specified.
     * @param hbaseUrl        The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
@@ -113,25 +114,25 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param columns         HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
   public void processSoI(String[] classifierNames,
-                                       String   filter,
-                                       String   hbaseUrl,
-                                       int      nLimit,
-                                       int      timeLimit,
-                                       String[] clss,
-                                       boolean  enhance,
-                                       String   columns) throws LomikelException {
-    Classifiers[] classifiers = new Classifiers[classifierNames.length];
+                         String   filter,
+                         String   hbaseUrl,
+                         int      nLimit,
+                         int      timeLimit,
+                         String[] clss,
+                         boolean  enhance,
+                         String   columns) throws LomikelException {
+    Classifier[] classifiers = new Classifier[classifierNames.length];
     for (int i = 0; i < classifierNames.length; i++) {
-      classifiers[i] = Classifiers.valueOf(classifierNames[i]);
+      classifiers[i] = Classifier.instance(classifierNames[i]);
       }
     fillSoI(classifiers, filter, hbaseUrl, nLimit, timeLimit, clss, enhance, columns);
     generateCorrelations(classifiers);
     }
         
   /** Fill graph with <em>SoI</em> and expand them to alerts (if requested).
-    * @param classifiers The {@link Classifiers}s to be used.
-    * @param filter          The HBase evaluation formula to be applied.
-    *                        Ignored if <tt>clss</tt> are specified.
+    * @param classifiers The {@link Classifier}s to be used.
+    * @param filter      The HBase evaluation formula to be applied.
+    *                    Ignored if <tt>clss</tt> are specified.
     * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param nLimit      The maximal number of alerts getting from HBase or Fink Portal.
     *                    <tt>0</tt> means no limit.
@@ -143,14 +144,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                    possibly filled with requested HBase columns.
     * @param columns     The HBase columns to be copied into graph alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything fails. */
-  public void fillSoI(Classifiers[] classifiers,
-                                    String        filter,
-                                    String        hbaseUrl,
-                                    int           nLimit,
-                                    int           timeLimit,
-                                    String[]      clss,
-                                    boolean       enhance,
-                                    String        columns) throws LomikelException {
+  public void fillSoI(Classifier[] classifiers,
+                      String        filter,
+                      String        hbaseUrl,
+                      int           nLimit,
+                      int           timeLimit,
+                      String[]      clss,
+                      boolean       enhance,
+                      String        columns) throws LomikelException {
     String clssDesc = "";
     if (clss != null) {
       clssDesc = "of " + Arrays.toString(clss);
@@ -208,18 +209,18 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Classify <em>source</em> and expand them to alerts (if requested).
-    * @param classifiers The {@link Classifiers}s to be used.
+    * @param classifiers The {@link Classifier}s to be used.
     * @param oids        The {@link Set} of <tt>objectId</tt>s of source to be added.
     * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
     * @param enhance     Whether expand tree under all <em>SoI</em> with alerts
     *                    possibly filled with requested HBase columns.
     * @param columns     The HBase columns to be copied into graph alerts. May be <tt>null</tt>. 
     * @throws LomikelException If anything fails. */
-  public void classifySources(Classifiers[] classifiers,
-                              Set<String>   oids,
-                              String        hbaseUrl,
-                              boolean       enhance,
-                              String        columns) throws LomikelException {
+  public void classifySources(Classifier[] classifiers,
+                              Set<String>  oids,
+                              String       hbaseUrl,
+                              boolean      enhance,
+                              String       columns) throws LomikelException {
     int size = oids.size();
     int n = 0;
     long dt;
@@ -228,7 +229,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // loop over all sources
     for (String oid : oids) {
       log.info(oid + " (" + n + " of " + size + "):");
-      for (Classifiers classifier : classifiers) {
+      for (Classifier classifier : classifiers) {
         try {
           classifySource(classifier, oid, hbaseUrl, enhance, columns);
           }
@@ -251,11 +252,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be copied into graph alerts. May be <tt>null</tt>. 
     * @throws LomikelException If anything fails. */
-  public void classifySource(Classifiers classifier,
-                             String      objectId,
-                             String      hbaseUrl,
-                             boolean     enhance,
-                             String      columns) throws LomikelException {  
+  public void classifySource(Classifier classifier,
+                             String     objectId,
+                             String     hbaseUrl,
+                             boolean    enhance,
+                             String     columns) throws LomikelException {  
     if (g().V().has("lbl", "source").has("objectId", objectId).hasNext()) {
       Vertex v1 = g().V().has("lbl", "source").has("objectId", objectId).next();
       List<Vertex> v2s = g().V(v1).in().
@@ -276,7 +277,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }        
       // will be commited in registration
       }
-    classifier.instance().classify(this, objectId, enhance, columns);
+    classifier.classify(this, objectId, enhance, columns);
     }
        
   /** Register  <em>source</em> in <em>SoI</em>.
@@ -294,13 +295,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   possibly filled with requested HBase columns.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     *                   Ignored if enhancement not requested. */
-  public void registerSoI(Classifiers classifier,
-                                        String      cls,
-                                        String      objectId,
-                                        double      weight,
-                                        String      instancesS,
-                                        boolean     enhance,
-                                        String      columns) {   
+  public void registerSoI(Classifier classifier,
+                          String     cls,
+                          String     objectId,
+                          double     weight,
+                          String     instancesS,
+                          boolean    enhance,
+                          String     columns) {   
     Set<Double> instances = new HashSet<>();
     if (instancesS != null && !instancesS.trim().equals("")) {
       for (String instance : instancesS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
@@ -323,22 +324,24 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   filled with requested HBase columns.
     * @param columns The HBase columns to be filled into alerts. May be <tt>null</tt>.
     *                   Ignored if enhancement not requested. */
-  public void registerSoI(Classifiers classifier,
-                                        String      cls,
-                                        String      objectId,
-                                        double      weight,
-                                        Set<Double> instances,
-                                        boolean     enhance,
-                                        String      columns) {   
+  public void registerSoI(Classifier  classifier,
+                          String      cls,
+                          String      objectId,
+                          double      weight,
+                          Set<Double> instances,
+                          boolean     enhance,
+                          String      columns) {   
     log.info("\tregistering " + objectId + " as " + cls + " with weight " + weight);
-    Vertex soi = g().V().has("lbl",        "SoI").
-                         has("classifier", classifier.name()).
-                         has("cls",        cls).
+    Vertex soi = g().V().has("lbl",        "SoI"              ).
+                         has("classifier", classifier.name()  ).
+                         has("flavor",     classifier.flavor()).
+                         has("cls",        cls                ).
                          fold().
                          coalesce(unfold(), 
                                   addV("SoI").
                                   property("lbl",        "SoI").
                                   property("classifier", classifier.name()  ).
+                                  property("flavor",     classifier.flavor()).
                                   property("cls",        cls                ).
                                   property("technology", "HBase"            ).
                                   property("url",        hbaseUrl()         )).
@@ -374,11 +377,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param classifier The {@link Classifier} to be used.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
-  public void enhanceSoI(Classifiers classifier,
-                                       String      columns) throws LomikelException {
+  public void enhanceSoI(Classifier classifier,
+                         String     columns) throws LomikelException {
     log.info("Expanding all SoI and enhancing them with " + columns);
     for (Object soi : g().V().has("lbl",        "SoI").
                               has("classifier", classifier.name()  ).
+                              has("flavor",     classifier.flavor()).
                               values("cls"                         ).
                               toSet()) {
       enhanceSoI(classifier, soi.toString().trim(), columns);
@@ -391,12 +395,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param cls        The type (class) of <em>SoI</em>.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
-  public void enhanceSoI(Classifiers classifier,
-                                       String      cls,
-                                       String      columns) throws LomikelException {
+  public void enhanceSoI(Classifier classifier,
+                         String     cls,
+                         String     columns) throws LomikelException {
     log.info("Expanding " + cls + " SoI and enhancing them with " + columns);
     Vertex soi = g().V().has("lbl",        "SoI").
                          has("classifier", classifier.name()  ).
+                         has("flavor",     classifier.flavor()).
                          has("cls",        cls                ).
                          next();
     fhclient(soi.property("url").value().toString());
@@ -422,10 +427,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param jds        The <em>jd</em> of related <em>Alerts</em>.
     * @param columns    The HBase columns to be filled into alerts. May be <tt>null</tt>.
     * @throws LomikelException If anything goes wrong. */
-  public void enhanceSource(Classifiers classifier,
-                            Vertex      source,
-                            String[]    jds,
-                            String      columns) throws LomikelException {
+  public void enhanceSource(Classifier classifier,
+                            Vertex     source,
+                            String[]   jds,
+                            String     columns) throws LomikelException {
     String objectId = source.property("objectId").value().toString();
     int n = 0;
     String key;    
@@ -478,11 +483,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param classifier The {@link Classifier} to be used.
     * @param cls        The type (class) of <em>SoI</em>.
     * @throws LomikelException If anything goes wrong. */
-  public void cleanSoI(Classifiers classifier,
-                       String      cls) throws LomikelException {
+  public void cleanSoI(Classifier classifier,
+                       String     cls) throws LomikelException {
     log.info("Cleaning " + cls + " SoI");
     g().V().has("lbl",        "SoI").
             has("classifier", classifier.name()  ).
+            has("flavor",     classifier.flavor()).
             has("cls",        cls                ).
             out().
             out().
@@ -493,7 +499,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         
   /** Assemble AoI from all existing alerts. 
     * @param classifier The {@link Classifier} to be used. */ 
-  public void assembleAoI(Classifiers classifier) {
+  public void assembleAoI(Classifier classifier) {
     log.info("Assembling AoI");
     GraphTraversal<Vertex, Vertex> alertT = g().V().has("lbl", "alert");
     Vertex alert;
@@ -506,8 +512,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Assemble AoI from an alert.
     * @param classifier The {@link Classifier} to be used. 
     * @param alert      The existing alert. */
-  public void assembleAoI(Classifiers classifier,
-                          Vertex      alert) {
+  public void assembleAoI(Classifier classifier,
+                          Vertex     alert) {
     String jd = alert.property("jd").value().toString();
     Vertex source = alert.edges(Direction.IN).next().outVertex(); // BUG: should check lbl == source
     String objectId = source.property("objectId").value().toString();
@@ -528,17 +534,19 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         cls      = contains.outVertex().property("cls").value().toString();
         hbaseUrl = contains.outVertex().property("url").value().toString();
         key = objectId + "_" + jd;
-        aoi = g().V().has("lbl",        "AoI").
-                      has("classifier", classifier.name() ).
-                      has("cls",        cls               ).
+        aoi = g().V().has("lbl",        "AoI"              ).
+                      has("classifier", classifier.name()  ).
+                      has("flavor",     classifier.flavor()).
+                      has("cls",        cls                ).
                       fold().
                       coalesce(unfold(), 
                                addV("AoI").
-                               property("lbl",        "AoI").
-                               property("classifier", classifier.name() ).
-                               property("cls",        cls               ).
-                               property("technology", "HBase"           ).
-                               property("url",        hbaseUrl          )).
+                               property("lbl",        "AoI"              ).
+                               property("classifier", classifier.name()  ).
+                               property("flavor",     classifier.flavor()).
+                               property("cls",        cls                ).
+                               property("technology", "HBase"            ).
+                               property("url",        hbaseUrl           )).
                       next();
         addEdge(g().V(aoi).next(),
                 g().V(alert).next(),
@@ -553,16 +561,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         
   /** Generate <em>overlaps</em> Edges between <em>AoI</em> and <em>SoI</em>.
     * Possibly between two {@link Classifier}s.
-    * @param classifiers The {@link Classifier}s to be used. */
-  public void generateCorrelations(Classifiers... classifiers) {
+    * @param classifier The {@link Classifier}s to be used. */
+  public void generateCorrelations(Classifier... classifiers) {
     String[] classifierNames = Arrays.stream(classifiers).map(c -> c.name()).toArray(String[]::new);
     log.info("Generating correlations for Sources and Alerts of Interest for " + Arrays.toString(classifierNames));
     for (String classifierName : classifierNames) {
       // Clean all correlations 
-      g().V().has("lbl", "AoI" ).has("classifier", classifierName).bothE().has("lbl", "overlaps").drop().iterate();
+      g().V().has("lbl", "AoI").has("classifier", classifierName).bothE().has("lbl", "overlaps").drop().iterate();
       g().V().has("lbl", "SoI").has("classifier", classifierName).bothE().has("lbl", "overlaps").drop().iterate();
       // Remove wrong SoI, AoI
-      g().V().has("lbl", "AoI" ).has("classifier", classifierName).not(has("cls")).drop().iterate();
+      g().V().has("lbl", "AoI").has("classifier", classifierName).not(has("cls")).drop().iterate();
       g().V().has("lbl", "SoI").has("classifier", classifierName).not(has("cls")).drop().iterate();
       }
     commit();
@@ -649,23 +657,27 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Loop over SoI and create AoI
     String hbaseUrl;
     String classifierName;
+    String classifierFlavor;
     GraphTraversal<Vertex, Vertex> soiT = g().V().has("lbl", "SoI");
     while (soiT.hasNext()) {
       soi = soiT.next();
       hbaseUrl = soi.property("url").value().toString();
-      classifierName = soi.property("classifier").value().toString();
+      classifierName   = soi.property("classifier").value().toString();
+      classifierFlavor = soi.property("flavor"    ).value().toString();
       cls = soi.property("cls").value().toString();
-      g().V().has("lbl",        "AoI").
-              has("classifier", classifierName    ).
-              has("cls",        cls               ).
+      g().V().has("lbl",        "AoI"           ).
+              has("classifier", classifierName  ).
+              has("flavor",     classifierFlavor).
+              has("cls",        cls             ).
               fold().
               coalesce(unfold(), 
                        addV("AoI").
-                       property("lbl",        "AoI").
-                       property("classifier", classifierName    ).
-                       property("cls",        cls               ).
-                       property("technology", "HBase"           ).
-                       property("url",        hbaseUrl          )).
+                       property("lbl",        "AoI"           ).
+                       property("classifier", classifierName  ).
+                       property("flavor",     classifierFlavor).
+                       property("cls",        cls             ).
+                       property("technology", "HBase"         ).
+                       property("url",        hbaseUrl        )).
               iterate();
       }
     // Double-loop over SoI and create overlaps Edge SoI-SoI if non empty 

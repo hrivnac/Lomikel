@@ -31,14 +31,6 @@ import org.apache.logging.log4j.LogManager;
 // BUG: jd should be String or long
 public class LightCurvesClassifier extends Classifier {
   
-  public LightCurvesClassifier(String flavor) {
-    super(flavor);
-    }
-  
-  public LightCurvesClassifier() {
-    super();
-    }
-  
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid,
