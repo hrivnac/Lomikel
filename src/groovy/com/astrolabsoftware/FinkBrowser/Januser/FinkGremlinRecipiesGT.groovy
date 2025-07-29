@@ -156,7 +156,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                              Map         args) {
     return sourceNeighborhood(args, oid0, classifier, oidS, classes);
     }
-        
+    
   /** Give {@link Map} of other <em>source</em>s ordered
     * by distance to the specified <em>source</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
@@ -191,19 +191,27 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def metric     = args.metric     ?: 1;
     def climit     = args.climit     ?: 0.0;
     def allClasses = args.allClasses ?: false;
+    def cf = classierWithFlavor(classifier);
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
       }
     if (classes0 == null || classes0.isEmpty()) {
-      classes0 = g().V().has('lbl', 'SoI').has('classifier', classifier).values('cls').toSet();
+      classes0 = g().V().has('lbl', 'SoI'       ).
+                         has('classifier', cf[0]).
+                         has('flavor',     cf[1]).
+                         values('cls'           ).
+                         toSet();
       }
-    def source0 = g().V().has('lbl', 'source').has('objectId', oid0).next();
+    def source0 = g().V().has('lbl',      'source').
+                          has('objectId', oid0    ).
+                          next();
     def m0 = [:];
     g().V(source0).inE().
                    as('e').
-                   filter(and(outV().values('classifier').is(eq(classifier)),
-                              outV().values('cls').is(within(classes0)))).                   
+                   filter(and(outV().values('classifier').is(eq(cf[0])),
+                              outV().values('flavor'    ).is(eq(cf[1]))
+                              outV().values('cls'       ).is(within(classes0)))).                   
                    project('cls', 'w').
                    by(select('e').outV().values('cls')).
                    by(select('e').values('weight')).
@@ -233,8 +241,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     else {
       // NOTE: Janus-all.jar doesn't allow some complex operations
       sources = g().V().has('lbl', 'SoI').
-                        has('classifier', classifier).
-                        has('cls', within(classes)).
+                        has('classifier', cf[0]).
+                        has('flavor',     cf[1]).
+                        has('cls',        within(classes)).
                         out().
                         has('lbl', 'source').
                         dedup()  
@@ -247,9 +256,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   def m = [:];
                   g().V(s).inE().
                            as('e').
-                           filter(and(inV().values('objectId').is(neq(oid0)),
-                                      outV().values('classifier').is(eq(classifier)),
-                                      outV().values('cls').is(within(classes)))).
+                           filter(and(inV().values('objectId'   ).is(neq(oid0)),
+                                      outV().values('classifier').is(eq(cf[0])),
+                                      outV().values('flavor'    ).is(eq(cf[1])),
+                                      outV().values('cls'       ).is(within(classes)))).
                            project('cls', 'w').
                            by(select('e').outV().values('cls')).
                            by(select('e').values('weight')).
@@ -446,14 +456,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *            by number of classified <em>alert</em>s. */
   def List<Map<String, String>> classification(String oid,
                                                String classifier = null) {
+    def cf;
+    if (classifier != null) {
+      cf = classierWithFlavor(classifier);
+      }
     def classified = [];
     g().V().has('lbl', 'source').
             has('objectId', oid).
             inE().
-            project('weight', 'classifier', 'class').
+            project('weight', 'classifier', 'flavor', 'class').
             by(values('weight')).
             by(outV().values('classifier')).
-            by(outV().values('cls')).each {it -> if (classifier == null || classifier == it.classifier) {
+            by(outV().values('flavor')).
+            by(outV().values('cls')).each {it -> if (classifier == null || (cf[0] == it.classifier && cf[1] == it.flavor)) {
                                                    classified += it;
                                                    }
             }
@@ -586,26 +601,32 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classifier = args?.classifier;
     def outputCSV  = args?.outputCSV;
     def overlaps = [:];
+    def cf = classierWithFlavor(classifier);
     g().E().has('lbl', 'overlaps').
             order().
             by('intersection', asc).
-            project('xlbl', 'xclassifier', 'xcls', 'ylbl', 'yclassifier', 'ycls', 'intersection').
+            project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
             by(inV().values('lbl')).
             by(inV().values('classifier')).
+            by(inV().values('flavor')).
             by(inV().values('cls')).
             by(outV().values('lbl')).
             by(outV().values('classifier')).
+            by(outV().values('flavor')).
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
-                  if ((lbl        == null ||  v['xlbl'       ].equals(lbl       ) || v['ylbl'       ].equals(lbl       )) &&
-                      (classifier == null || (v['xclassifier'].equals(classifier) && v['yclassifier'].equals(classifier)))) {
-                    overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['ycls']] = v['intersection'];
+                  if ((lbl        == null ||  v['xlbl'].equals(lbl) || v['ylbl'].equals(lbl)) &&
+                      (classifier == null || (v['xclassifier'].equals(cf[0]) &&
+                                              v['yclassifier'].equals(cf[0]) &&
+                                              v['xflavor'    ].equals(cf[1]) && 
+                                              v['yflavor'    ].equals(cf[1])))) {
+                    overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xflavor'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['yflavor'] + ':' + v['ycls']] = v['intersection'];
                     }
                   };
     overlaps = overlaps.sort{-it.value};
     if (outputCSV != null) {
-      def csv = "type1,classifier1,class1,type2,classifier2,class2,overlap\n";
+      def csv = "type1,classifier1,flavor1,class1,type2,classifier2,flavor2,class2,overlap\n";
       overlaps.each{o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"};
       new File(outputCSV).text = csv;
       return null;
@@ -625,23 +646,29 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                      String srcClassifier,
                      String dstClassifier) {
     def classification = [:];
+    def srcCf = classierWithFlavor(srcClassifier);
+    def dstCf = classierWithFlavor(dstClassifier);
     g().E().has('lbl', 'overlaps').
             order().
             by('intersection', asc).
-            project('xlbl', 'xclassifier', 'xcls', 'ylbl', 'yclassifier', 'ycls', 'intersection').
+            project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
             by(inV().values('lbl')).
             by(inV().values('classifier')).
+            by(inV().values('flavor')).
             by(inV().values('cls')).
             by(outV().values('lbl')).
             by(outV().values('classifier')).
+            by(outV().values('flavor')).
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
-                  if (v['xlbl'       ].equals(lbl          ) &&
-                      v['ylbl'       ].equals(lbl          ) &&
-                      v['xcls'       ].equals(cls          ) &&
-                      v['xclassifier'].equals(srcClassifier) &&
-                      v['yclassifier'].equals(dstClassifier)) {
+                  if (v['xlbl'       ].equals(lbl     ) &&
+                      v['ylbl'       ].equals(lbl     ) &&
+                      v['xcls'       ].equals(cls     ) &&
+                      v['xclassifier'].equals(srcCf[0]) &&
+                      v['yclassifier'].equals(dstCf[0]) &&
+                      v['xflavor'    ].equals(srcCf[1]) &&
+                      v['yflavor'    ].equals(dstCf[1])) {
                     classification[v['ycls']] = v['intersection'];
                     }
                   };
@@ -669,6 +696,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             next().
             io(IoCore.graphml()).
             writeGraph(fn);
+    }
+    
+  /** Give classifier as an array of classifiar name and flavor.
+    * @param classifier The classifier. Can contain flavor after <em>=</em> sign.
+    * @return           The array of classifier and flavor (empty string if not specified). */
+  def String[] classifierWithFlavor(String classifier) {
+    if (!classifier.contains('=')) {
+      classifier += classifier + '=';
+      }
+    return classifier.split('=');
     }
     
   def Random _random = new Random()
