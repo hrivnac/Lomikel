@@ -24,7 +24,14 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class FinkPortalClassifier implements Classifier {
+public class FinkPortalClassifier extends Classifier {
+  
+  public FinkPortalClassifier(String flavor) {
+    super(flavor);
+    }
+  
+  public FinkPortalClassifier() {
+    }
   
   @Override
   public void classify(FinkGremlinRecipies recipies,

@@ -29,8 +29,16 @@ import org.apache.logging.log4j.LogManager;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // BUG: jd should be String or long
-public class FeaturesClassifier implements Classifier {
+public class FeaturesClassifier extends Classifier {
+    
+  public FeaturesClassifier(String flavor) {
+    super(flavor);
+    }
   
+  public FeaturesClassifier() {
+    super();
+    }
+
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid,

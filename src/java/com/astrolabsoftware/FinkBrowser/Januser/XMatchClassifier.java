@@ -24,7 +24,15 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class XMatchClassifier implements Classifier {
+public class XMatchClassifier extends Classifier {
+  
+  public XMatchClassifier(String flavor) {
+    super(flavor);
+    }
+  
+  public XMatchClassifier() {
+    super();
+    }
   
   @Override
   public void classify(FinkGremlinRecipies recipies,

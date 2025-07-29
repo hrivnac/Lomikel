@@ -8,8 +8,15 @@ import com.Lomikel.Utils.LomikelException;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public interface Classifier {
+public abstract class Classifier {
   
+  public Classifier(String flavor) {
+    _flavor = flavor;
+    }
+    
+  public Classifier() {
+    }
+    
   /** Classify <em>source</em> and expand them to alerts (if requested).
     * It should register classes corresponding to specified <tt>objectId</tt>
     * using {@link FinkGremlinRecipies#registerSoI(Classifiers, String, String, double, String, String, boolean, String)}.
@@ -24,4 +31,7 @@ public interface Classifier {
                                 boolean             enhance,
                                 String              columns) throws LomikelException;
   
+    
+  private String _flavor = "";
+
   }

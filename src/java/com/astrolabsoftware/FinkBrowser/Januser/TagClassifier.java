@@ -30,7 +30,15 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class TagClassifier implements Classifier {
+public class TagClassifier extends Classifier {
+  
+  public TagClassifier(String flavor) {
+    super(flavor);
+    }
+  
+  public TagClassifier() {
+    super();
+    }
   
   /** Tag <em>source</em>.
     * @param oid  The <em>source</em> <tt>objectId</tt>.

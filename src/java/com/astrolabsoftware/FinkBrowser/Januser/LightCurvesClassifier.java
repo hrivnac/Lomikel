@@ -29,7 +29,15 @@ import org.apache.logging.log4j.LogManager;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // BUG: jd should be String or long
-public class LightCurvesClassifier implements Classifier {
+public class LightCurvesClassifier extends Classifier {
+  
+  public LightCurvesClassifier(String flavor) {
+    super(flavor);
+    }
+  
+  public LightCurvesClassifier() {
+    super();
+    }
   
   @Override
   public void classify(FinkGremlinRecipies recipies,
