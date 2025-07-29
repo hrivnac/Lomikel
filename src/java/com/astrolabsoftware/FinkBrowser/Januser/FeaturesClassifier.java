@@ -30,14 +30,6 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // BUG: jd should be String or long
 public class FeaturesClassifier extends Classifier {
-    
-  public FeaturesClassifier(String flavor) {
-    super(flavor);
-    }
-  
-  public FeaturesClassifier() {
-    super();
-    }
 
   @Override
   public void classify(FinkGremlinRecipies recipies,
@@ -108,7 +100,7 @@ public class FeaturesClassifier extends Classifier {
       key = "FC-" + cls.getKey();
       val = cls.getValue();
       weight = val.size() / totalWeight;
-      recipies.registerSoI(Classifiers.FEATURES, key, oid, weight, val, enhance, columns);
+      recipies.registerSoI(this, key, oid, weight, val, enhance, columns);
       }
     if (!isClassified) {
       log.warn("Source " + oid + " cannot be classified because his alerts have no LC features");

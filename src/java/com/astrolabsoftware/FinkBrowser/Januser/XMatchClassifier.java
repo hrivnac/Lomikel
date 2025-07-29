@@ -26,14 +26,6 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class XMatchClassifier extends Classifier {
   
-  public XMatchClassifier(String flavor) {
-    super(flavor);
-    }
-  
-  public XMatchClassifier() {
-    super();
-    }
-  
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid,
@@ -77,7 +69,7 @@ public class XMatchClassifier extends Classifier {
       key = cls.getKey();
       val = cls.getValue();
       weight = val.size() / totalWeight;
-      recipies.registerSoI(Classifiers.XMATCH, key, oid, weight, val, enhance, columns);
+      recipies.registerSoI(this, key, oid, weight, val, enhance, columns);
       }
     }
 
