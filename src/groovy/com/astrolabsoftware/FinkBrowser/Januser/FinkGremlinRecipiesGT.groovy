@@ -191,7 +191,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def metric     = args.metric     ?: 1;
     def climit     = args.climit     ?: 0.0;
     def allClasses = args.allClasses ?: false;
-    def cf = classierWithFlavor(classifier);
+    def cf = classifierWithFlavor(classifier);
     if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
@@ -458,7 +458,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                String classifier = null) {
     def cf;
     if (classifier != null) {
-      cf = classierWithFlavor(classifier);
+      cf = classifierWithFlavor(classifier);
       }
     def classified = [];
     g().V().has('lbl', 'source').
@@ -601,7 +601,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classifier = args?.classifier;
     def outputCSV  = args?.outputCSV;
     def overlaps = [:];
-    def cf = classierWithFlavor(classifier);
+    def cf = classifierWithFlavor(classifier);
     g().E().has('lbl', 'overlaps').
             order().
             by('intersection', asc).
@@ -646,8 +646,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                      String srcClassifier,
                      String dstClassifier) {
     def classification = [:];
-    def srcCf = classierWithFlavor(srcClassifier);
-    def dstCf = classierWithFlavor(dstClassifier);
+    def srcCf = classifierWithFlavor(srcClassifier);
+    def dstCf = classifierWithFlavor(dstClassifier);
     g().E().has('lbl', 'overlaps').
             order().
             by('intersection', asc).
