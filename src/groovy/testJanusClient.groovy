@@ -19,6 +19,7 @@ gr.registerSoI(Classifier.instance("TAG"), 'MyTag_1', oid, 1.0, '', false, null)
 
 gr.classification(oid);
 gr.classification(oid, "FINK");
+gr.classification(oid, "FINK=aflavor");
 gr.classification(oid, "FEATURES");
 
 gr.reclassification(oid, "FEATURES", "FINK", 10, 'AoI');

@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 
 // Log4J
@@ -23,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 
 /** <code>FeaturesClassifier</code> classifies sources according to
   * HBase <tt>lc_features_*</tt> field.
+  * <em>flavor</em> points to resource carrying model. 
   * @opt attributes
   * @opt operations
   * @opt types
@@ -33,23 +36,18 @@ public class FeaturesClassifier extends Classifier {
 
   @Override
   public void classify(FinkGremlinRecipies recipies,
-                       String              oid,
-                       boolean             enhance,
-                       String              columns) throws LomikelException {
-    log.info(oid);
-    double jd;
+                       String              oid) throws LomikelException {
+    String jd;
     String cl;
     Map<String, String> value;
     String[] featuresS;
     double[] featuresD;
     String fg;
     String fr;
-    Map<String, Set<Double>> classes; // cl -> [jd]
-    Set<Double> jds;
+    Map<String, Set<String>> allInstances; // cl -> [jd]
+    Map<String, Double>      allWeights;   // jd -> w
+    Set<String> jds;
     String key;
-    Set<Double> val;
-    double weight;
-    double totalWeight;
     Map<String, Map<String, String>> alerts = recipies.fhclient().scan(null,
                                                                        "key:key:" + oid + ":prefix",
                                                                        "i:jd,d:lc_features_g,d:lc_features_r",
@@ -57,34 +55,36 @@ public class FeaturesClassifier extends Classifier {
                                                                        0,
                                                                        false,
                                                                        false);
-    classes = new TreeMap<>();
+    allInstances = new TreeMap<>();
+    allWeights   = new TreeMap<>();
     // get all alerts (jd) and their classses
     boolean isClassified = false;
     for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
       value = entry.getValue();
-      jd = Double.parseDouble(value.get("i:jd"));
+      jd = value.get("i:jd");
       if (value.containsKey("d:lc_features_g") &&
           value.containsKey("d:lc_features_r")) {
         fg = value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "");
         fr = value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "");
         // BUG: some models replace by mean
         featuresS = (fg + "," + fr).replaceAll("null", "0.0").
-                                    replaceAll("NaN", "0.0").
+                                    replaceAll("NaN",  "0.0").
                                     split(",");
         featuresD = Arrays.stream(featuresS).
                            mapToDouble(Double::parseDouble).
                            toArray();
         cl = String.valueOf(finder().transformAndPredict(featuresD));                  
         if (!cl.equals("-1")) {
-          if (classes.containsKey(cl)) {
-            jds = classes.get(cl);
+          if (allInstances.containsKey(cl)) {
+            jds = allInstances.get(cl);
             jds.add(jd);
             }
           else {
-            jds = new TreeSet<Double>();
+            jds = new TreeSet<String>();
             jds.add(jd);
-            classes.put(cl, jds);
+            allInstances.put(cl, jds);
             }
+          allWeights.put(cl, 1.0);
           }
         isClassified = true;
         }
@@ -92,15 +92,29 @@ public class FeaturesClassifier extends Classifier {
         //log.warn("Alert " + entry.getKey() + " has no features");
         }
       }
+    // rearrange instances and weights and register
+    double weight;
+    double totalWeight;
+    double w;
     totalWeight = 0;
-    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
-      totalWeight += cls.getValue().size();
+    List<String> instancesL;
+    List<Double> weightsL;
+    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
+      for (String instance : cls.getValue()) {
+        totalWeight += allWeights.get(instance);
+        }
       }
-    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
+    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
       key = "FC-" + cls.getKey();
-      val = cls.getValue();
-      weight = val.size() / totalWeight;
-      recipies.registerSoI(this, key, oid, weight, val, enhance, columns);
+      instancesL = new ArrayList<String>(cls.getValue());
+      weightsL   = new ArrayList<Double>();
+      w = 0;
+      for (String instance : instancesL) {
+        weightsL.add(allWeights.get(instance));
+        w += allWeights.get(instance);
+        }
+      weight = w / totalWeight;
+      recipies.registerSoI(this, key, oid, weight, instancesL, weightsL);
       }
     if (!isClassified) {
       log.warn("Source " + oid + " cannot be classified because his alerts have no LC features");
@@ -111,23 +125,12 @@ public class FeaturesClassifier extends Classifier {
     * @return The corresponding {@link ClusterFinder}. 
     * @throws LomikelExceltion If {@link ClusterFinder} cannot be created. */
   private ClusterFinder finder() throws LomikelException {
-    if (_finder == null || _reset) {
-      if (_resourceName == null && _dirName == null) {
-        _resourceName = DEFAULT_RESOURCE_NAME;
-        }
+    if (_finder == null) {
       try {
-        if (_resourceName != null) {
-          ClassLoader classLoader = getClass().getClassLoader();
-          _finder = new ClusterFinder(classLoader.getResource(_resourceName + "/scaler_params.json"),
-                                      classLoader.getResource(_resourceName + "/pca_params.json"),
-                                      classLoader.getResource(_resourceName + "/cluster_centers.json"));
-          }
-        else {
-          _finder = new ClusterFinder(_dirName + "/scaler_params.json",
-                                      _dirName + "/pca_params.json",
-                                      _dirName + "/cluster_centers.json");
-          }
-        _reset = false;
+         ClassLoader classLoader = getClass().getClassLoader();
+        _finder = new ClusterFinder(classLoader.getResource(flavor() + "/scaler_params.json"),
+                                    classLoader.getResource(flavor() + "/pca_params.json"),
+                                    classLoader.getResource(flavor() + "/cluster_centers.json"));
         }
       catch (IOException e) {
         throw new LomikelException("Cannot create Cluster Finder", e);
@@ -135,34 +138,8 @@ public class FeaturesClassifier extends Classifier {
       }
     return _finder;
     }
-    
-  /** Set the directory for model json files
-    * <tt>scaler_params.json, pca_params.json, cluster_centers.json</tt>.
-    * If not set, <tt>/tmp</tt> will be used.
-    * @param dirName The directory for model json files. */
-  public static void setModelDirectory(String dirName) {
-    _dirName = dirName;
-    _reset = true;
-    }
-    
-  /** Set the resource directory for model json files
-    * <tt>scaler_params.json, pca_params.json, cluster_centers.json</tt>.
-    * If not set, {@link #setModelDirectory} will be used.
-    * @param resourceName The resource directory for model json files. */
-  public static void setModelResource(String resourceName) {
-    _resourceName = resourceName;
-    _reset = true;
-    }
   
   private static ClusterFinder _finder;
-  
-  private static String _dirName;
-  
-  private static String _resourceName;
-  
-  private static String DEFAULT_RESOURCE_NAME = "Clusters/2024/13-60";
-  
-  private static boolean _reset;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(FeaturesClassifier.class);

@@ -40,7 +40,7 @@ public class TagClassifier extends Classifier {
   public void tag(String oid,
                   String tags) {
     if (!tags.contains(",")) {
-      _recipies.registerSoI(this, tags, oid, 1.0, "", false, null);
+      _recipies.registerSoI(this, tags, oid, 1.0, "", "");
       return;
       }
     Map<String, Double> tagMap = new TreeMap<>();
@@ -59,15 +59,13 @@ public class TagClassifier extends Classifier {
       }
     // renormalize
     for (Map.Entry<String, Double> entry : tagMap.entrySet()) {
-      _recipies.registerSoI(this, entry.getKey(), oid, entry.getValue(), "", false, null);
+      _recipies.registerSoI(this, entry.getKey(), oid, entry.getValue(), "", "");
       }
     }
   
   @Override
   public void classify(FinkGremlinRecipies recipies,
-                       String              oid,
-                       boolean             enhance,
-                       String              columns) throws LomikelException {
+                       String              oid) throws LomikelException {
     log.warn("Cannot classify automatically, use tag method to classify.");
     }
     

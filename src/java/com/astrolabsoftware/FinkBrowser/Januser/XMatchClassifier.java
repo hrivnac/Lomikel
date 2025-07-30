@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.List;
+import java.util.ArrayList;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -28,48 +30,60 @@ public class XMatchClassifier extends Classifier {
   
   @Override
   public void classify(FinkGremlinRecipies recipies,
-                       String              oid,
-                       boolean             enhance,
-                       String              columns) throws LomikelException {
+                       String              oid) throws LomikelException {
     JSONArray ja;
     JSONObject jo;
-    Map<String, Set<Double>> classes; // cl -> [jd]
+    Map<String, Set<String>> allInstances; // cl -> [jd]
+    Map<String, Double>      allWeights;   // jd -> w
     String cl;
-    double jd;
-    Set<Double> jds;
+    String jd;
+    Set<String> jds;
     String key;
-    Set<Double> val;
-    double weight;
-    double totalWeight;
     ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
                                       put("output-format", "json"));
-    classes =  new TreeMap<>();
+    allInstances = new TreeMap<>();
+    allWeights   = new TreeMap<>();
     // get all alerts (jd) and their classes
     for (int i = 0; i < ja.length(); i++) {
       jo = ja.getJSONObject(i);
       cl = jo.getString("v:classification");
-      jd = jo.getDouble("i:jd");
-      if (!FinkClassifier.finkClasses().contains(cl)) {
-        if (classes.containsKey(cl)) {
-          jds = classes.get(cl);
+      jd = jo.getString("i:jd");
+      if (!cl.equals("Unknown") && FinkClassifier.finkClasses().contains(cl)) {
+        if (allInstances.containsKey(cl)) {
+          jds = allInstances.get(cl);
           jds.add(jd);
           }
         else {
-          jds = new TreeSet<Double>();
+          jds = new TreeSet<String>();
           jds.add(jd);
-          classes.put(cl, jds);
+          allInstances.put(cl, jds);
           }
+        allWeights.put(jd, 1.0);
         }
       }
+    // rearrange instances and weights and register
+    double weight;
+    double totalWeight;
+    double w;
     totalWeight = 0;
-    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
-      totalWeight += cls.getValue().size();
+    List<String> instancesL;
+    List<Double> weightsL;
+    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
+      for (String instance : cls.getValue()) {
+        totalWeight += allWeights.get(instance);
+        }
       }
-    for (Map.Entry<String, Set<Double>> cls : classes.entrySet()) {
+    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
       key = cls.getKey();
-      val = cls.getValue();
-      weight = val.size() / totalWeight;
-      recipies.registerSoI(this, key, oid, weight, val, enhance, columns);
+      instancesL = new ArrayList<String>(cls.getValue());
+      weightsL   = new ArrayList<Double>();
+      w = 0;
+      for (String instance : instancesL) {
+        weightsL.add(allWeights.get(instance));
+        w += allWeights.get(instance);
+        }
+      weight = w / totalWeight;
+      recipies.registerSoI(this, key, oid, weight, instancesL, weightsL);
       }
     }
 

@@ -80,14 +80,9 @@ public abstract class Classifier {
     * using {@link FinkGremlinRecipies#registerSoI(Classifiers, String, String, double, String, String, boolean, String)}.
     * @param recipies   The {@link FinkGremlinRecipies} caller.
     * @param oid        The <tt>objectId</tt> of source to be added.
-    * @param enhance    Whether expand tree under all <em>SoI</em> with alerts
-    *                   possibly filled with requested HBase columns.
-    * @param columns    The HBase columns to be copied into graph alerts. May be <tt>null</tt>. 
     * @throws LomikelException If anything fails. */
   public abstract void classify(FinkGremlinRecipies recipies,
-                                String              oid,
-                                boolean             enhance,
-                                String              columns) throws LomikelException;
+                                String              oid) throws LomikelException;
   
   /** Set {@link Classifier} flavor.
     * @param flavor The {@link Classifier} flavor. */

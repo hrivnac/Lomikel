@@ -5,7 +5,6 @@ mgmt = graph.openManagement()
 
 // Vertexes
 datalink          = mgmt.getVertexLabel('datalink')
-AoI               = mgmt.makeVertexLabel('AoI'    ).make()
 SoI               = mgmt.makeVertexLabel('SoI'    ).make()
 source            = mgmt.makeVertexLabel('source' ).make()
 alert             = mgmt.makeVertexLabel('alert'  ).make()
@@ -42,20 +41,11 @@ sizeIn       = mgmt.makePropertyKey('sizeIn'      ).dataType(Double.class).cardi
 sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 
 // Vertex properties
-mgmt.addProperties(AoI,
-                   lbl,
-                   classifier,
-                   flavor,
-                   cls,
-                   technology,
-                   url)   
 mgmt.addProperties(SoI,
                    lbl,
                    classifier,
                    flavor,
-                   cls,
-                   technology,
-                   url)   
+                   cls)   
 mgmt.addProperties(alert,
                    lbl,
                    objectId,
@@ -75,11 +65,8 @@ mgmt.addProperties(overlaps,
 
 // Connections   
 mgmt.addConnection(sends,        source, alert)
-mgmt.addConnection(contains,     AoI,    alert)
 mgmt.addConnection(deepcontains, SoI,    source)
 mgmt.addConnection(overlaps,     SoI,    SoI)
-mgmt.addConnection(overlaps,     AoI,    SoI)
-mgmt.addConnection(overlaps,     AoI,    AoI)
 
 // Info
 mgmt.printSchema()
