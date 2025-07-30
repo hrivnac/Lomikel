@@ -47,7 +47,7 @@ public class XMatchClassifier extends Classifier {
     for (int i = 0; i < ja.length(); i++) {
       jo = ja.getJSONObject(i);
       cl = jo.getString("v:classification");
-      jd = jo.getString("i:jd");
+      jd = String.valueOf(jo.getDouble("i:jd"));
       if (!cl.equals("Unknown") && FinkClassifier.finkClasses().contains(cl)) {
         if (allInstances.containsKey(cl)) {
           jds = allInstances.get(cl);
