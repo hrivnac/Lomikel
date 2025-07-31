@@ -102,7 +102,7 @@ public class FeaturesClassifier extends Classifier {
     log.info(allWeights);
     for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
       for (String instance : cls.getValue()) {
-        log.info("" + allWeights + " " + instance);
+        log.info("" + allWeights + " " + instance + " " + allWeights.containsKey(instance));
         if (allWeights.containsKey(instance)) {
           totalWeight += allWeights.get(instance);
           }
