@@ -102,10 +102,7 @@ public class FeaturesClassifier extends Classifier {
     log.info(allWeights);
     for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
       for (String instance : cls.getValue()) {
-        log.info("" + allWeights + " " + instance + " " + allWeights.containsKey(instance));
-        if (allWeights.containsKey(instance)) {
-          totalWeight += allWeights.get(instance);
-          }
+        totalWeight += allWeights.get(instance);
         }
       }
     for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
@@ -114,13 +111,8 @@ public class FeaturesClassifier extends Classifier {
       weightsL   = new ArrayList<Double>();
       w = 0;
       for (String instance : instancesL) {
-        if (allWeights.containsKey(instance)) {
-          weightsL.add(allWeights.get(instance));
-          w += allWeights.get(instance);
-          }
-        else {
-          weightsL.add(0.0);
-          }
+        weightsL.add(allWeights.get(instance));
+        w += allWeights.get(instance);
         }
       weight = w / totalWeight;
       recipies.registerSoI(this, key, oid, weight, instancesL, weightsL);
