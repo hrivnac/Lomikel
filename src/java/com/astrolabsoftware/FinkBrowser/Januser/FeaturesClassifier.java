@@ -148,7 +148,7 @@ public class FeaturesClassifier extends Classifier {
     return _finder;
     }
   
-  private static ClusterFinder _finder;
+  private ClusterFinder _finder;
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(FeaturesClassifier.class);
