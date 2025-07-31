@@ -133,8 +133,8 @@ public class FeaturesClassifier extends Classifier {
                                     classLoader.getResource(flavor() + "/pca_params.json"),
                                     classLoader.getResource(flavor() + "/cluster_centers.json"));
         }
-      catch (IOException | IllegalArgumentExceptione e) {
-        throw new LomikelException("Cannot create Cluster Finder for " + flavor, e);
+      catch (IOException | IllegalArgumentException e) {
+        throw new LomikelException("Cannot create Cluster Finder for " + flavor(), e);
         }
       }
     return _finder;
