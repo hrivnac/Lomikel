@@ -98,7 +98,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Execute full chain of new sources correlations analyses.
-    * @param classifierNames The names of the {@link Classifier} to be used.
+    * @param classifiers The {@link Classifier}s to be used.
     *                        They can contain the {@link Classifier} flavor after <em>=</em> symbol.
     * @param filter          The HBase evaluation formula to be applied.
     *                        Ignored if <tt>clss</tt> are specified.
@@ -110,16 +110,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                        if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
     *                        if <tt>null</tt>, analyse <em>sources</em> from HBase database.
     * @throws LomikelException If anything fails. */
-  public void processSoI(String[] classifierNames,
-                         String   filter,
-                         String   hbaseUrl,
-                         int      nLimit,
-                         int      timeLimit,
-                         String[] clss) throws LomikelException {
-    Classifier[] classifiers = new Classifier[classifierNames.length];
-    for (int i = 0; i < classifierNames.length; i++) {
-      classifiers[i] = Classifier.instance(classifierNames[i]);
-      }
+  public void processSoI(Classifier[] classifiers,
+                         String       filter,
+                         String       hbaseUrl,
+                         int          nLimit,
+                         int          timeLimit,
+                         String[]     clss) throws LomikelException {
     fillSoI(classifiers, filter, hbaseUrl, nLimit, timeLimit, clss);
     generateCorrelations(classifiers);
     }
@@ -138,11 +134,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
 
     * @throws LomikelException If anything fails. */
   public void fillSoI(Classifier[] classifiers,
-                      String        filter,
-                      String        hbaseUrl,
-                      int           nLimit,
-                      int           timeLimit,
-                      String[]      clss) throws LomikelException {
+                      String       filter,
+                      String       hbaseUrl,
+                      int          nLimit,
+                      int          timeLimit,
+                      String[]     clss) throws LomikelException {
     String clssDesc = "";
     if (clss != null) {
       clssDesc = "of " + Arrays.toString(clss);
@@ -227,7 +223,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     }
     
-  /** Classify <em>source</em>.
+   /** Classify <em>source</em>.
     * @param classifier The {@link Classifier} to be used.
     * @param objectId   The <tt>objectId</tt> of source to be added.
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
@@ -235,6 +231,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void classifySource(Classifier classifier,
                              String     objectId,
                              String     hbaseUrl) throws LomikelException {  
+    fhclient(hbaseUrl);
+    classifySource(classifier, objectId);
+    }
+   
+  /** Classify <em>source</em>.
+    * @param classifier The {@link Classifier} to be used.
+    * @param objectId   The <tt>objectId</tt> of source to be added.
+    * @throws LomikelException If anything fails. */
+  public void classifySource(Classifier classifier,
+                             String     objectId) throws LomikelException {  
     if (g().V().has("lbl", "source").has("objectId", objectId).hasNext()) {
       Vertex v1 = g().V().has("lbl", "source").has("objectId", objectId).next();
       List<Vertex> v2s = g().V(v1).in().
@@ -366,14 +372,30 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * Possibly between two {@link Classifier}s.
     * @param classifier The {@link Classifier}s to be used. */
   public void generateCorrelations(Classifier... classifiers) {
-    String[] classifierNames = Arrays.stream(classifiers).map(c -> c.name()).toArray(String[]::new);
-    log.info("Generating correlations for Sources and Alerts of Interest for " + Arrays.toString(classifierNames));
-    for (String classifierName : classifierNames) {
+    log.info("Generating correlations for SoI for " + classifiers);
+    List<String> namesL   = new ArrayList<>();
+    List<String> flavorsL = new ArrayList<>();
+    for (Classifier classifier : classifiers) {
+      namesL.add(  classifier.name()  );
+      flavorsL.add(classifier.flavor());
       // Clean all correlations 
-      g().V().has("lbl", "SoI").has("classifier", classifierName).bothE().has("lbl", "overlaps").drop().iterate();
+      g().V().has("lbl",        "SoI"              ).
+              has("classifier", classifier.name()  ).
+              has("flavor",     classifier.flavor()).
+              bothE().
+              has("lbl", "overlaps").
+              drop().
+              iterate();
       // Remove wrong SoI
-      g().V().has("lbl", "SoI").has("classifier", classifierName).not(has("cls")).drop().iterate();
+      g().V().has("lbl",        "SoI"              ).
+              has("classifier", classifier.name()  ).
+              has("flavor",     classifier.flavor()).
+              not(has("cls")).
+              drop().
+              iterate();
       }
+    String[] names   = namesL.toArray(  String[]::new);
+    String[] flavors = flavorsL.toArray(String[]::new);
     commit();
     // Accumulate correlations and sizes
     Map<String, Double>               weights0 = new HashMap<>(); // cls -> weight (for one source)
@@ -440,18 +462,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     int ns = 0;
     int na = 0;
     // Double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
+    // NOTE: it takes all SoI names and all SoI flavors (even if they are not requested in all combinations)
     for (String cls1 : types) {
       try {
-        soi1 = g().V().has("lbl",        "SoI"    ).
-                       has("classifier", within(classifierNames)).
-                       has("cls",        cls1                   ).
+        soi1 = g().V().has("lbl",        "SoI"          ).
+                       has("classifier", within(names)  ).
+                       has("flavor",     within(flavors)).
+                       has("cls",        cls1           ).
                        next();
         for (String cls2 : types) {
           if (corrS.containsKey(Pair.of(cls1, cls2))) {
             try {
-              soi2 = g().V().has("lbl",        "SoI"    ).
-                             has("classifier", within(classifierNames)).
-                             has("cls",        cls2                   ).
+              soi2 = g().V().has("lbl",        "SoI"          ).
+                             has("classifier", within(names)  ).
+                             has("flavor",     within(flavors)).
+                             has("cls",         cls2          ).
                              next();
               addEdge(g().V(soi1).next(),
                       g().V(soi2).next(),
