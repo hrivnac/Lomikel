@@ -300,10 +300,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   Usualy the number of <em>Alerts</em> of this type. 
     * @param instances  The <em>jd</em> of related <em>Alerts</em>.
     * @param weights    The weights of related <em>Alerts</em>. */
-  public void registerSoI(Classifier  classifier,
-                          String      cls,
-                          String      objectId,
-                          double      weight,
+  public void registerSoI(Classifier   classifier,
+                          String       cls,
+                          String       objectId,
+                          double       weight,
                           List<String> instances,
                           List<Double> weights) {   
     log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight " + weight);
@@ -328,6 +328,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                 property("objectId", objectId)).
                        property("importDate", _now).
                        next();
+    log.info(soi + " " + s);
     addEdge(g().V(soi).next(),
             g().V(s).next(),
             "deepcontains",
@@ -337,7 +338,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             new String[]{"" + weight,
                          instances.toString().replaceFirst("\\[", "").replaceAll("]", ""),
                          weights.toString().replaceFirst("\\[", "").replaceAll("]", "")},
-            false);
+            true);
     commit();
     }
    
