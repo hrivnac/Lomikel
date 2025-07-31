@@ -264,7 +264,6 @@ public GraphTraversal<Vertex, Vertex> allV() {
     boolean create = !checkEdge(v1, v2, relation);
     if (create) {
       Edge e = v1.addEdge(relation, v2);
-      log.info(v1 + " " + v2 + " " + e);
       e.property("lbl", relation);
       for (int i = 0; i < names.length; i++) {
         e.property(names[i], values[i]);

@@ -124,7 +124,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     generateCorrelations(classifiers);
     }
         
-  /** Fill graph with <em>SoI</em> and expand them to alerts (if requested).
+  /** Fill graph with <em>SoI</em>.
     * @param classifiers The {@link Classifier}s to be used.
     * @param filter      The HBase evaluation formula to be applied.
     *                    Ignored if <tt>clss</tt> are specified.
@@ -196,7 +196,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     classifySources(classifiers, oids, hbaseUrl);
     }
     
-  /** Classify <em>source</em> and expand them to alerts (if requested).
+  /** Classify <em>source</em> .
     * @param classifiers The {@link Classifier}s to be used.
     * @param oids        The {@link Set} of <tt>objectId</tt>s of source to be added.
     * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
@@ -227,7 +227,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     }
     
-  /** Classify <em>source</em> and expand them to alerts (if requested).
+  /** Classify <em>source</em>.
     * @param classifier The {@link Classifier} to be used.
     * @param objectId   The <tt>objectId</tt> of source to be added.
     * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
@@ -238,8 +238,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     if (g().V().has("lbl", "source").has("objectId", objectId).hasNext()) {
       Vertex v1 = g().V().has("lbl", "source").has("objectId", objectId).next();
       List<Vertex> v2s = g().V(v1).in().
-                                   has("lbl", "SoI").
-                                   has("classifier", classifier.name()).
+                                   has("lbl",        "SoI").
+                                   has("classifier", classifier.name().
+                                   has("flavor",     classifier.flavor()).
                                    toList();
       Iterator<Edge> edges;
       for (Vertex v2 : v2s) {
@@ -328,7 +329,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                 property("objectId", objectId)).
                        property("importDate", _now).
                        next();
-    log.info(soi + " " + s);
     addEdge(g().V(soi).next(),
             g().V(s).next(),
             "deepcontains",
