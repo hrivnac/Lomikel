@@ -239,8 +239,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       Vertex v1 = g().V().has("lbl", "source").has("objectId", objectId).next();
       List<Vertex> v2s = g().V(v1).in().
                                    has("lbl",        "SoI").
-                                   has("classifier", classifier.name().
-                                   has("flavor",     classifier.flavor()).
+                                   has("classifier", classifier.name()).
+                                   has("flavor",     classifier.flavor().
                                    toList();
       Iterator<Edge> edges;
       for (Vertex v2 : v2s) {
