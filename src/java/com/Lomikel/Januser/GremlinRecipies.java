@@ -262,9 +262,9 @@ public GraphTraversal<Vertex, Vertex> allV() {
                       String[] values,
                       boolean  reset) {
     boolean create = !checkEdge(v1, v2, relation);
-    log.info(v1 + " " + v2 + " " + create);
     if (create) {
       Edge e = v1.addEdge(relation, v2);
+      log.info(v1 + " " + v2 + " " + e);
       e.property("lbl", relation);
       for (int i = 0; i < names.length; i++) {
         e.property(names[i], values[i]);
