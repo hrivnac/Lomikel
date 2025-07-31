@@ -702,6 +702,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier The classifier. Can contain flavor after <em>=</em> sign.
     * @return           The array of classifier and flavor (empty string if not specified). */
   def String[] classifierWithFlavor(String classifier) {
+    if (classifier == null) {
+      return new String[] {null, null};
+      }
     if (!classifier.contains('=')) {
       classifier += classifier + '=';
       }

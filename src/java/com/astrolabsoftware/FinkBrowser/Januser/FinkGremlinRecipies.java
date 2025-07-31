@@ -460,7 +460,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     // Create overlaps
     int ns = 0;
-    int na = 0;
     // Double-loop over SoI and create overlaps Edge SoI-SoI if non empty 
     // NOTE: it takes all SoI names and all SoI flavors (even if they are not requested in all combinations)
     for (String cls1 : types) {
@@ -501,7 +500,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }          
       }
     commit();
-    log.info("" + ns + ", " + na + " source-source correlations generated");
+    log.info("" + ns + " source-source correlations generated");
     }
         
   /** Create a new {@link FinkHBaseClient}. Singleton when url unchanged.
