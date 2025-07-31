@@ -84,7 +84,7 @@ public class FeaturesClassifier extends Classifier {
             jds.add(jd);
             allInstances.put(cl, jds);
             }
-          allWeights.put(cl, 1.0);
+          allWeights.put(jd, 1.0);
           }
         isClassified = true;
         }
