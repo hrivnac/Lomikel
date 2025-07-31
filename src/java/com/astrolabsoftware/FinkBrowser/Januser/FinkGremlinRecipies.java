@@ -319,7 +319,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                   property("flavor",     classifier.flavor()).
                                   property("cls",        cls                )).
                          next();
-    Vertex s = g().V().has("lbl", "source").
+    Vertex s = g().V().has("lbl",      "source").
                        has("objectId", objectId).
                        fold().
                        coalesce(unfold(), 
@@ -337,7 +337,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             new String[]{"" + weight,
                          instances.toString().replaceFirst("\\[", "").replaceAll("]", ""),
                          weights.toString().replaceFirst("\\[", "").replaceAll("]", "")},
-            true);
+            false);
     commit();
     }
    
