@@ -208,8 +208,8 @@ stylesheet.nodes.SoI = {
   properties:{},
   graphics: {
     label:"cls", 
-    title:"cls",        
-    subtitle:"classifier",     
+    title:"classifier",        
+    subtitle:"flavor",     
     group:" ",        
     shape:"image",      
     image:"StarsSources.png",        
