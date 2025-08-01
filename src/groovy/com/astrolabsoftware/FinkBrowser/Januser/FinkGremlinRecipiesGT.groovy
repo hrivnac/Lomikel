@@ -461,6 +461,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       cf = classifierWithFlavor(classifier);
       }
     def classified = [];
+    log.info(cf[0] + " " + ccf[1]);
     g().V().has('lbl', 'source').
             has('objectId', oid).
             inE().
@@ -703,7 +704,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return           The array of classifier and flavor (empty string if not specified). */
   def String[] classifierWithFlavor(String classifier) {
     if (classifier == null) {
-      return new String[] {null, null};
+      return new String[] {null, };
       }
     if (!classifier.contains('=')) {
       classifier += classifier + '=';
