@@ -461,7 +461,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       cf = classifierWithFlavor(classifier);
       }
     def classified = [];
-    log.info(cf[0] + " " + ccf[1]);
+    log.info(cf[0] + " " + cf[1]);
     g().V().has('lbl', 'source').
             has('objectId', oid).
             inE().
