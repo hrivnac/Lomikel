@@ -704,10 +704,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return           The array of classifier and flavor (empty string if not specified). */
   def String[] classifierWithFlavor(String classifier) {
     if (classifier == null) {
-      return new String[] {null, };
+      return new String[] {null, ''};
       }
     if (!classifier.contains('=')) {
-      classifier += classifier + '=';
+      return new String[]{classifier, ''};
       }
     return classifier.split('=');
     }
