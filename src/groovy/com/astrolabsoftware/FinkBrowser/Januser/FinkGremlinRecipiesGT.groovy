@@ -210,7 +210,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     g().V(source0).inE().
                    as('e').
                    filter(and(outV().values('classifier').is(eq(cf[0])),
-                              outV().values('flavor'    ).is(eq(cf[1]))
+                              outV().values('flavor'    ).is(eq(cf[1])),
                               outV().values('cls'       ).is(within(classes0)))).                   
                    project('cls', 'w').
                    by(select('e').outV().values('cls')).
@@ -461,7 +461,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       cf = classifierWithFlavor(classifier);
       }
     def classified = [];
-    log.info(cf[0] + " " + cf[1]);
     g().V().has('lbl', 'source').
             has('objectId', oid).
             inE().
