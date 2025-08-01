@@ -204,31 +204,12 @@ stylesheet.nodes.cutout = {
     {name:"Table",      url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
     ]
   }
-stylesheet.nodes.AoI = {
-  properties:{},
-  graphics: {
-    label:"cls", 
-    title:"cls",        
-    subtitle:"classifier",     
-    group:" ",        
-    shape:"image",      
-    image:"StarsAlerts.png",        
-    borderRadius:"0", 
-    borderWidth:"1",  
-    borderDashes:[1,0],
-    value:{gremlin:"both().count().join().toString()"}        
-    },
-  actions:[
-    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"},
-    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"}
-    ]
-  }
 stylesheet.nodes.SoI = {
   properties:{},
   graphics: {
     label:"cls", 
     title:"cls",        
-    subtitle:"classifier",     
+    subtitle:{gremlin:"valueMap('classifier', 'flavor').toList()[0]"},     
     group:" ",        
     shape:"image",      
     image:"StarsSources.png",        
