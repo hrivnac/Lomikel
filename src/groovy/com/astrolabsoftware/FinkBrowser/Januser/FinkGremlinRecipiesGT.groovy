@@ -493,8 +493,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
-    log.info(classified);
-    classified.each {it -> if (it.classifier == srcClassifier) {
+    def cf = classifierWithFlavor(srcClassifier);
+    classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
                              w = reclassify(it.class, 'SoI', srcClassifier, dstClassifier);
                              w.each {key, value -> if (reclassified[key] == null) {
                                                      reclassified[key] = 0;
@@ -643,7 +643,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                      String lbl,
                      String srcClassifier,
                      String dstClassifier) {
-    log.info(cls + ' ' + lbl + ' ' + srcClassifier + ' ' + dstClassifier);
     def classification = [:];
     def srcCf = classifierWithFlavor(srcClassifier);
     def dstCf = classifierWithFlavor(dstClassifier);
