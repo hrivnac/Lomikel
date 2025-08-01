@@ -26,6 +26,7 @@ gr.reclassification(oid, "FEATURES", "FINK", 10, 'AoI');
 
 gr.sourceNeighborhood(oid, "FINK", 10, 'JensenShannon'); // Euclidean, Cosine
 gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon');
+gr.sourceNeighborhood(oid, "FEATURES", 0.5, 'JensenShannon');
 gr.sourceNeighborhood(oid, "FEATURES", 10, 'JensenShannon', 0.2, True);
 
 gr.standardDeviationE('deepcontains', ['weight']);

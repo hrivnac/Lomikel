@@ -484,20 +484,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      If less then 1, the relative weight cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      <tt>10</tt>, if missing.
-    * @param kind          The kind of collective vertex.
-    *                      <em>SoI</em> (default) or <em>AoI</em>.
     * @return              The recorded classification calculated
     *                      by number of classified <em>alert</em>s. Normalized to 1. */
   def Map<String, Double> reclassification(String oid,
                                            String srcClassifier,
                                            String dstClassifier,
-                                           double nmax = 10,
-                                           String kind = 'SoI') {                        
+                                           double nmax = 10) {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
     classified.each {it -> if (it.classifier == srcClassifier) {
-                             w = reclassify(it.class, kind, srcClassifier, dstClassifier);
+                             w = reclassify(it.class, 'SoI', srcClassifier, dstClassifier);
                              w.each {key, value -> if (reclassified[key] == null) {
                                                      reclassified[key] = 0;
                                                      }
@@ -645,6 +642,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                      String lbl,
                      String srcClassifier,
                      String dstClassifier) {
+    log.info(cls + ' ' + lbl + ' ' + srcClassifier + ' ' + dstClassifier);
     def classification = [:];
     def srcCf = classifierWithFlavor(srcClassifier);
     def dstCf = classifierWithFlavor(dstClassifier);
