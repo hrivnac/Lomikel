@@ -205,7 +205,7 @@ stylesheet.nodes.cutout = {
     ]
   }
 stylesheet.nodes.SoI = {
-  properties:{},
+  properties:{gremlin:"valueMap('cls', 'classifier', 'flavor').toList()[0]"},
   graphics: {
     label:"cls", 
     title:"classifier",        
