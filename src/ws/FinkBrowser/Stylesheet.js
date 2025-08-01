@@ -209,7 +209,7 @@ stylesheet.nodes.SoI = {
   graphics: {
     label:"cls", 
     title:"cls",        
-    subtitle:{gremlin:"valueMap('classifier', 'flavor').toList()[0]"},     
+    subtitle:"classifier",     
     group:" ",        
     shape:"image",      
     image:"StarsSources.png",        
