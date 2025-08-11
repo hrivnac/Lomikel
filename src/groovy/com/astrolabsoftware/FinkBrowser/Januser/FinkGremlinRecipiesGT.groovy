@@ -524,8 +524,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         def q = [:]
         classifiedDst.each{p[it.class] = it.weight}
         reclassified.each{ q[it.key]   = it.value }
-        def quality = sourceDistance(p, q, false, 'JensenShannon')
-        log.info('quality: ' + quality)
+        //def quality = sourceDistance(p, q, false, 'JensenShannon')
+        log.info(sourceDistance(p, q, false, 'JensenShannon'))
+        log.info(sourceDistance(p, q, true, 'JensenShannon'))
+        log.info(sourceDistance(p, q, false, 'Euclidean'))
+        log.info(sourceDistance(p, q, true, 'Euclidean'))
+        log.info(sourceDistance(p, q, false, 'Cosine'))
+        log.info(sourceDistance(p, q, true, 'Cosine'))
+        //log.info('quality: ' + quality)
         }
       }
     return limitMap(reclassified, nmax)
