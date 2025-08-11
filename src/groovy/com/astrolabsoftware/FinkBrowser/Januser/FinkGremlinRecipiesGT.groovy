@@ -514,7 +514,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (total != 0) {
       reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
       }
-    reclassified = limitMap(reclassified, nmax)
     if (check) {
       def classifiedDst = classification(oid, dstClassifier);
       if (classifiedDst.isEmpty()) {
@@ -526,6 +525,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         def k = [].toSet()
         classifiedDst.each{k += [it.class]; p[it.class] = it.weight}
         reclassified.each{ k += [it.key];   q[it.key]   = it.value }
+        log.info(p)
+        log.info(q)
+        
         def quality = sourceDistanceJensenShannon(p, q, k)
         log.info('quality: ' + quality)
         }
