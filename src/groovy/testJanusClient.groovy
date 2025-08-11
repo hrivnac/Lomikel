@@ -12,8 +12,8 @@ oid = "ZTF19abasthk";
 oid = "ZTF25aakbssn";
 
 gr.fhclient('vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
-gr.classifySource(Classifier.instance("FEATURES=Clusters/2025/13-50"), oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', false, null)
-gr.classifySource(Classifier.instance("FEATURES=Clusters/2025/13-50"), oid, null, false, null)
+gr.classifySource(Classifier.instance("FEATURES=Clusters/2025/13-50"), oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
+gr.classifySource(Classifier.instance("FEATURES=Clusters/2025/13-50"), oid, null)
 
 gr.registerSoI(Classifier.instance("TAG"), 'MyTag_1', oid, 1.0, '', false, null)
 
@@ -22,7 +22,7 @@ gr.classification(oid, "FINK");
 gr.classification(oid, "FINK=aflavor");
 gr.classification(oid, "FEATURES=Clusters/2025/13-50");
 
-gr.reclassification(oid, "FEATURES=Clusters/2025/13-50", "FINK", 10, 'AoI');
+gr.reclassification(oid, "FEATURES=Clusters/2025/13-50", "FINK", 10, true);
 
 gr.sourceNeighborhood(oid, "FINK", 10, 'JensenShannon'); // Euclidean, Cosine
 gr.sourceNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 10, 'JensenShannon');
