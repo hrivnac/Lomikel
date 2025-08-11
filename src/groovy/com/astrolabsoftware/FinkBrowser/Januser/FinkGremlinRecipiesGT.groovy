@@ -522,11 +522,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       else {
         def p = [:]
         def q = [:]
-        def k = [].toSet()
-        classifiedDst.each{k += [it.class]; p[it.class] = it.weight}
-        reclassified.each{ k += [it.key];   q[it.key]   = it.value }
-        //def quality = sourceDistanceJensenShannon(p, q, k)
-        def quality = sourceDistanceCosine(p, q, k)
+        classifiedDst.each{p[it.class] = it.weight}
+        reclassified.each{ q[it.key]   = it.value }
+        def quality = sourceDistance(p, q, true, 'JensenShannon')
         log.info('quality: ' + quality)
         }
       }
