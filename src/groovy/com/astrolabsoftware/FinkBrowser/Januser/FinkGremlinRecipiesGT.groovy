@@ -349,7 +349,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                          Set<String>         keys) {
     Map<String, Double> m = [:]
     keys.each {if (!p.containsKey(it)) {p[it] = 0.0}
-               if (!q.containsKey(it)) {q[it] = 0.0}
+               if (!q.containsKey(it)) {q[it] = 0.0}}
     keys.each {k -> m[k] = 0.5 * (p[k] + q[k])}
     def kl = {Map<String, Double> a, Map<String, Double> b ->
                double klDiv = 0.0
