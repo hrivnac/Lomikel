@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // Java
-import java.text.SimpleDateFormat;
 
 // Log4J
 import org.apache.logging.log4j.Logger;

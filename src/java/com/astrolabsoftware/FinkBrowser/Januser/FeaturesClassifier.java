@@ -1,13 +1,9 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
-import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Utils.LomikelException;
-import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 import com.astrolabsoftware.FinkBrowser.HBaser.Clusteriser.ClusterFinder;
 
 // org.json
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 // Java
 import java.util.Arrays;

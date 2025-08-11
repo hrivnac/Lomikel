@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python3
 # coding: utf-8
 
 """This script reads all .java files from a directory tree and removes unused
@@ -62,8 +62,8 @@ if __name__ == "__main__":
                     not re.search(r'(?<!\w)%s(?!\w)' % import_lines[n],
                                   other_code)):
                     # import not found in code... continue (not writing)
-                    print "unused: %s at %s:%d" % (line, filename, n)
+                    print ("unused: %s at %s:%d" % (line, filename, n))
                     continue
                 f.write(line)
 
-    print "Please compile your project to make sure I haven't break anything."
+    print ("Please compile your project to make sure I haven't break anything.")

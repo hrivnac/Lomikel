@@ -19,7 +19,6 @@ import org.apache.avro.generic.GenericDatumReader;
 // Tinker Pop
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 
 // Janus Graph
 import org.janusgraph.core.JanusGraph;

@@ -3,8 +3,6 @@ package com.astrolabsoftware.FinkBrowser.HBaser.Clusteriser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.math3.linear.*;
 
-import java.util.List;
-import java.util.Arrays;
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;

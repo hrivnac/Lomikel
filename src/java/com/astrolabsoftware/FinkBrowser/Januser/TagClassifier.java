@@ -1,23 +1,12 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
-import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Utils.LomikelException;
-import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
-import com.astrolabsoftware.FinkBrowser.HBaser.Clusteriser.ClusterFinder;
 
 // org.json
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 // Java
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.io.IOException;
 
 // Log4J
 import org.apache.logging.log4j.Logger;

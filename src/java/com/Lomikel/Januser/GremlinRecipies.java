@@ -1,8 +1,5 @@
 package com.Lomikel.Januser;
 
-import com.Lomikel.Utils.MapUtil;
-import com.Lomikel.Utils.LomikelException;
-
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
@@ -20,7 +17,6 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
 // Janus Graph
 import org.janusgraph.graphdb.vertices.StandardVertex;
-import org.janusgraph.graphdb.database.StandardJanusGraph;
 
 // HBase
 import org.apache.hadoop.hbase.client.Get;
@@ -29,7 +25,6 @@ import org.apache.hadoop.hbase.client.Get;
 // Java
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -37,7 +32,6 @@ import java.util.TreeMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Optional;
 
 // Log4J
 import org.apache.logging.log4j.Logger;

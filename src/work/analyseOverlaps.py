@@ -81,7 +81,7 @@ for i, ax in enumerate(axes.flat):
                   alpha   = 0.6,        
                   palette = 'viridis',
                   ax      = ax)
-  ax.set_title(classifier1 + '[' + flavor1 + '] * ' + classifier2 + '[' + flavor2 + ']')
+  ax.set_title(classifier1 + '=' + flavor1 + ' * ' + classifier2 + '=' + flavor2)
   ax.set_xlabel(classifiers1[i])
   ax.set_ylabel(classifiers2[i])
   ax.grid(True)

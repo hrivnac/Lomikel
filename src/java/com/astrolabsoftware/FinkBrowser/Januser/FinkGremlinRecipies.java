@@ -1,11 +1,7 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
-import com.Lomikel.Utils.SmallHttpClient;
-import com.Lomikel.Utils.NotifierURL;
-import com.Lomikel.Utils.MapUtil;
 import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
-import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.ModifyingGremlinClient;
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
@@ -14,7 +10,6 @@ import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.otherV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
@@ -29,15 +24,10 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.structure.Property;
-import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 
 // Janus Graph
-import org.janusgraph.core.SchemaViolationException;
-import org.janusgraph.graphdb.vertices.StandardVertex;
-import org.janusgraph.graphdb.database.StandardJanusGraph;
 
 // HBase
 import org.apache.hadoop.hbase.client.Get;
@@ -48,24 +38,19 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // Java Mail
-import javax.mail.MessagingException;
 
 // Java
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.TreeMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
