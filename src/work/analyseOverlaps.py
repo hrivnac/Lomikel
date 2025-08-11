@@ -6,53 +6,20 @@ import math
 
 #-------------------------------------------------------------------------------
 
-overlaps_dir = "2025/13-30-zero"
-
 normalised = False          
 
 merges = {}
-no_values = []
-if overlaps_dir == "2025/13-30-zero":    
-  merges = {"LPV":  ["LP*_Candidate",
-                     "LPV*",
-                     "LongPeriodV*",
-                     "LongPeriodV*_Candidate"],
-            "FC-LPV":     ["FC-0",
-                           "FC-3",
-                           "FC-15"],
-            "FC-QSO":     ["FC-14",
-                           "FC-27",
-                           "FC-1"]}
-if overlaps_dir == "2025/13-50-known":    
-  merges = {"FC-A":   ["FC-11",
-                       "FC-12"]}
-if overlaps_dir == "2024/13-60":    
-  merges = {"FC-A":   ["FC-6",
-                       "FC-59"],
-            "FC-B":   ["FC-7",
-                       "FC-23",
-                       "FC-36"]}
-if overlaps_dir == "2024/13-45":    
-  merges = {"FC-A":   ["FC-38",
-                       "FC-10"],
-            "FC-B":   ["FC-3",
-                       "FC-11"]}
-elif overlaps_dir == "2024/13-20":                       
-  merges = {"FC-A":   ["FC-6",
-                       "FC-13",
-                       "FC-15",
-                       "FC-17"],
-            "FC-B":   ["FC-3",
-                       "FC-11"]}
-                     
+no_values = []                     
    
 #no_values = ["FC--1"]
-                                  
-classifiers1 = ['FEATURES',          'FEATURES',          'FINK_PORTAL',       'FEATURES',         'FEATURES',         'FINK_PORTAL'     ]
-classifiers2 = ['FINK_PORTAL',       'FEATURES',          'FINK_PORTAL',       'FINK_PORTAL',      'FEATURES',         'FINK_PORTAL'     ]
-types        = ['SoI',               'SoI',               'SoI',               'AoI',              'AoI',              'AoI'             ]
-limits_norm  = [130,                 0,                   0,                   70,                  0,                  0                ]
-limits_unorm = [10000,               0,                   0,                   10000,               0,                  0                ]
+        
+features_flavor = 'Clusters/2025/13-50'                                
+classifiers1 = ['FEATURES',      'FEATURES',      'FINK', 'FEATURES',      'FEATURES',      'XMATCH']
+classifiers2 = ['FINK',          'FEATURES',      'FINK', 'XMATCH',        'FEATURES',      'XMATCH']
+flavors1     = [features_flavor, features_flavor, '',     features_flavor, features_flavor, ''      ]
+flavors2     = ['',              features_flavor, '',     '',              features_flavor, ''      ]
+limits_norm  = [0,               0,               0,      10000,           10000,           10000     ]
+limits_unorm = [0,               0,               0,      10000,           10000,           10000     ]
 
 #-------------------------------------------------------------------------------
 
@@ -80,11 +47,11 @@ else:
   limits  = limits_unorm
   overlap = 'overlap'
 
-overlaps_csv = "../data/Clusters/" + overlaps_dir + "/overlaps.csv"
-df = pd.read_csv(overlaps_csv)
+overlaps_csv = "overlaps.csv"
+df = pd.read_csv(overlaps_csv, keep_default_na=False, na_values=[])
 
-df = df[((df['classifier1'] != 'FINK_PORTAL') | (~df['class1'].isin(no_values))) &
-        ((df['classifier2'] != 'FINK_PORTAL') | (~df['class2'].isin(no_values)))] 
+df = df[((df['classifier1'] != 'FINK') | (~df['class1'].isin(no_values))) &
+        ((df['classifier2'] != 'FINK') | (~df['class2'].isin(no_values)))] 
 
 for mrg in merges:
   df = merge(df, mrg, merges[mrg])
@@ -94,10 +61,11 @@ fig, axes = plt.subplots(2, 3, figsize = (20, 15))
 for i, ax in enumerate(axes.flat): 
   classifier1 = classifiers1[i] 
   classifier2 = classifiers2[i]
-  type = types[i]
+  flavor1 = flavors1[i]
+  flavor2 = flavors2[i]
   limit = limits[i] 
-  dfx = df.query('type1 == @type').\
-           query('type2 == @type').\
+  dfx = df.query('flavor1 == @flavor1').\
+           query('flavor2 == @flavor2').\
            query('classifier1 == @classifier1').\
            query('classifier2 == @classifier2')
   dfx['normalized_overlap'] = dfx.groupby(['class1', 'class2'])['overlap'].\
@@ -113,7 +81,7 @@ for i, ax in enumerate(axes.flat):
                   alpha   = 0.6,        
                   palette = 'viridis',
                   ax      = ax)
-  ax.set_title(type + ' of ' + classifier1 + ' * ' + classifier2)
+  ax.set_title(classifier1 + '[' + flavor1 + '] * ' + classifier2 + '[' + flavor2 + ']')
   ax.set_xlabel(classifiers1[i])
   ax.set_ylabel(classifiers2[i])
   ax.grid(True)
@@ -124,7 +92,7 @@ for i, ax in enumerate(axes.flat):
     
     
 plt.tight_layout()
-plt.savefig('Overlaps-' + overlaps_dir.replace('/', '_') + "-" + name + '.png')
+plt.savefig('Overlaps-' + name + '.png')
 plt.show()
                                           
 #print(tabulate(dfx, headers = 'keys', tablefmt = 'psql'))

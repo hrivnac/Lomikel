@@ -348,6 +348,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                          Map<String, Double> q,
                                          Set<String>         keys) {
     Map<String, Double> m = [:]
+    keys.each {if (!p.containsKey(it)) {p[it] = 0.0}
+               if (!q.containsKey(it)) {q[it] = 0.0}
     keys.each {k -> m[k] = 0.5 * (p[k] + q[k])}
     def kl = {Map<String, Double> a, Map<String, Double> b ->
                double klDiv = 0.0
@@ -507,8 +509,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (total != 0) {
       reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
       }  
+    def p = [:]
+    def q = [:]
+    def k = [].toSet()
+    classified.each{  k += [it.class]; p[it.class] = it.weight}
+    reclassified.each{k += [it.key];   q[it.key]   = it.value }
+    def quality = sourceDistanceJensenShannon(p, q, k)
+    log.info('quality: ' + quality) 
     return limitMap(reclassified, nmax)
-    }
+    }                            
     
   /** Limit {@link Map} based on its <tt>key.value</tt>.
     * @param map  The fill {@link Map}>
@@ -674,19 +683,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return classification;
     }
     
-  /** Export all <em>AoI</em> and <em/>SoI</em>
+  /** Export all <em/>SoI</em>
     * {@link Vertex}es with connecting <em>overlaps</em> {@link Edge}s
     * into <em>GraphML</em> file.
-    * @param fn          The full filename of the output <em>GraphML</em> file.
-    * @param collections The {@link List} of collective {@link Vetex}es names.
-    *                    If missing, empty or <tt>tt</tt> null,
-    *                    is used <em>AoI,SoI</em>. */
-  def exportAoISoI(String       fn,
-                   List<String> collections = null) {  
-    if (collections == null || collections.isEmpty()) {
-      collections = ['AoI', 'SoI'];
-      }
-    g().V().has('lbl', within(collections)).
+    * @param fn The full filename of the output <em>GraphML</em> file. */
+  def exportSoI(String       fn) {  
+    g().V().has('lbl', 'SoI').
             outE().
             has('lbl', 'overlaps').
             subgraph('x').
