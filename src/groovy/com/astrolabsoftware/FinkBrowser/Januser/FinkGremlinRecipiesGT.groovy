@@ -486,12 +486,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      If less then 1, the relative weight cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      <tt>10</tt>, if missing.
+    * @param check         Whether to check quality of ther reclassification.
+    *                      It slows down the calculation and may not be available if
+    *                      objectId is not classified in destination classification.
+    *                      The deafult is <tt>true</tt>.
     * @return              The recorded classification calculated
     *                      by number of classified <em>alert</em>s. Normalized to 1. */
-  def Map<String, Double> reclassification(String oid,
-                                           String srcClassifier,
-                                           String dstClassifier,
-                                           double nmax = 10) {                        
+  def Map<String, Double> reclassification(String  oid,
+                                           String  srcClassifier,
+                                           String  dstClassifier,
+                                           double  nmax = 10,
+                                           boolean check) {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
@@ -508,14 +513,22 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     double total = reclassified.values().sum()
     if (total != 0) {
       reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
-      }  
-    def p = [:]
-    def q = [:]
-    def k = [].toSet()
-    classified.each{  k += [it.class]; p[it.class] = it.weight}
-    reclassified.each{k += [it.key];   q[it.key]   = it.value }
-    def quality = sourceDistanceJensenShannon(p, q, k)
-    log.info('quality: ' + quality) 
+      }
+    if (check) {
+      def classifiedDst = classification(oid, dstClassifier);
+      if (classifiedDst.isEmpty()) {
+        log.warn('Cannot check quality')
+        }
+      else {
+        def p = [:]
+        def q = [:]
+        def k = [].toSet()
+        classifiedDst.each{k += [it.class]; p[it.class] = it.weight}
+        reclassified.each{ k += [it.key];   q[it.key]   = it.value }
+        def quality = sourceDistanceJensenShannon(p, q, k)
+        log.info('quality: ' + quality)
+        }
+      }
     return limitMap(reclassified, nmax)
     }                            
     
