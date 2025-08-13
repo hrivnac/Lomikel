@@ -60,7 +60,7 @@ public class TagClassifier extends Classifier {
                                property("cls",    tag).
                                iterate();
       recipies.commit();
-      log.error("Tag SoI " + tag + " of " + name + " = " + flavor() + " created");
+      log.error("Tag SoI " + tag + " of " + name() + " = " + flavor() + " created");
       }
     }
     
