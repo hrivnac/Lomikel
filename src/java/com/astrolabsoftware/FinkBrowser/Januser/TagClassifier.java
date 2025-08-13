@@ -36,29 +36,31 @@ public class TagClassifier extends Classifier {
     if (!recipies.g().V().has("lbl",    "SoI").
                           has("name",   name()).
                           has("flavor", flavor()).
+                          has("cls",    tag).
                           hasNext()) {
-      log.error("Tag SoI " + name() + " = " + flavor() + " does not exist, create it first");
+      log.error("Tag SoI " + tag + " of " + name() + " = " + flavor() + " does not exist, create it first");
       return;
       }
     recipies.registerSoI(this, tag, oid, value, "", "");
     }
     
   public void createTag(FinkGremlinRecipies recipies,
-                        String              name,
-                        String              flavor) {
+                        String              tag) {
     if (recipies.g().V().has("lbl",    "SoI").
                          has("name",   name()).
                          has("flavor", flavor()).
+                         has("cls",    tag).
                          hasNext()) {
-      log.error("Tag SoI " + name() + " = " + flavor() + " already exists");
+      log.error("Tag SoI " + tag + " of " + name() + " = " + flavor() + " already exists");
       }
     else {
       recipies.g().addV("SoI").property("lbl",    "SoI").
                                property("name",   name()).
                                property("flavor", flavor()).
+                               property("cls",    tag).
                                iterate();
       recipies.commit();
-      log.error("Tag SoI " + name + " = " + flavor() + " created");
+      log.error("Tag SoI " + tag + " of " + name + " = " + flavor() + " created");
       }
     }
     
