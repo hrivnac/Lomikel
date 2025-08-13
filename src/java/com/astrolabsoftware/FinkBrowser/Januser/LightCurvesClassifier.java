@@ -3,8 +3,6 @@ package com.astrolabsoftware.FinkBrowser.Januser;
 import com.Lomikel.Utils.LomikelException;
 import com.astrolabsoftware.FinkBrowser.HBaser.Clusteriser.ClusterFinder;
 
-// org.json
-
 // Java
 import java.util.Arrays;
 import java.util.Set;

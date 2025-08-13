@@ -27,8 +27,6 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 
-// Janus Graph
-
 // HBase
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Get;
@@ -36,8 +34,6 @@ import org.apache.hadoop.hbase.client.Get;
 // org.json
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-// Java Mail
 
 // Java
 import java.util.Arrays;

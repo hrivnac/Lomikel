@@ -7,8 +7,6 @@ import com.Lomikel.Utils.LomikelException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-// Java
-
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
