@@ -353,7 +353,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * Possibly between two {@link Classifier}s.
     * @param classifier The {@link Classifier}s to be used. */
   public void generateCorrelations(Classifier... classifiers) {
-    log.info("Generating correlations for SoI for " + classifiers);
+    log.info("Generating correlations for SoI for " + Arrays.asList(classifiers));
     List<String> namesL   = new ArrayList<>();
     List<String> flavorsL = new ArrayList<>();
     for (Classifier classifier : classifiers) {

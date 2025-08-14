@@ -38,7 +38,7 @@ public class TagClassifier extends Classifier {
                           has("flavor", flavor()).
                           has("cls",    tag).
                           hasNext()) {
-      log.error("Tag SoI " + tag + " of " + name() + " = " + flavor() + " does not exist, create it first");
+      log.error("SoI " + tag + " of " + name() + "[" + flavor() + "] does not exist, create it first");
       return;
       }
     recipies.registerSoI(this, tag, oid, value, "", "");
@@ -51,7 +51,7 @@ public class TagClassifier extends Classifier {
                          has("flavor", flavor()).
                          has("cls",    tag).
                          hasNext()) {
-      log.error("Tag SoI " + tag + " of " + name() + " = " + flavor() + " already exists");
+      log.error("SoI " + tag + " of " + name() + "[" + flavor() + "] already exists");
       }
     else {
       recipies.g().addV("SoI").property("lbl",    "SoI").
@@ -60,7 +60,7 @@ public class TagClassifier extends Classifier {
                                property("cls",    tag).
                                iterate();
       recipies.commit();
-      log.error("Tag SoI " + tag + " of " + name() + " = " + flavor() + " created");
+      log.info("SoI " + tag + " of " + name() + "[" + flavor() + "] created");
       }
     }
     
