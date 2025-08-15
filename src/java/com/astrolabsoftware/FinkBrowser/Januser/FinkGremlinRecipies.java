@@ -346,6 +346,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     else {
       Edge e = soi.addEdge("deepcontains", s);
+      e.property("lbl", "deepcontains");
       for (Map.Entry<String, String> attribute : attributes.entrySet()) {
         e.property(attribute.getKey(), attribute.getValue());
         }
