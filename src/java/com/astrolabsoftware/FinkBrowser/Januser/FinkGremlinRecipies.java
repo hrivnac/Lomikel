@@ -293,8 +293,26 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                           String       objectId,
                           double       weight,
                           List<String> instances,
-                          List<Double> weights) {   
-    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight " + weight);
+                          List<Double> weights) { 
+    Map<String, String> attributes = new HashMap<>();
+    attributes.put("weight",    "" + weight);
+    attributes.put("instances", instances.toString().replaceFirst("\\[", "").replaceAll("]", ""));
+    attributes.put("weights",   weights.toString().replaceFirst("\\[", "").replaceAll("]", ""));
+    registerSoI(classifier, cls, objectId, attributes);
+    }
+    
+  /** Register <em>source</em> in <em>SoI</em>.
+    * @param classifier The {@link Classifier} to be used.
+    * @param cls        The type (class) of <em>SoI</em> {@link Vertex}.
+    *                   It will be created if not yet exists.
+    * @param objectId   The objectId of the new <em>Source</em> {@link Vertex}.
+    *                   It will be created if not yet exists.
+    * @param attributes The additional {@link Edge} attributes. */
+  public void registerSoI(Classifier          classifier,
+                          String              cls,
+                          String              objectId,
+                          Map<String, String> attributes) {   
+    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes);
     Vertex soi = g().V().has("lbl",        "SoI"              ).
                          has("classifier", classifier.name()  ).
                          has("flavor",     classifier.flavor()).
@@ -319,12 +337,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     addEdge(g().V(soi).next(),
             g().V(s).next(),
             "deepcontains",
-            new String[]{"weight",
-                         "instances",
-                         "weights"},
-            new String[]{"" + weight,
-                         instances.toString().replaceFirst("\\[", "").replaceAll("]", ""),
-                         weights.toString().replaceFirst("\\[", "").replaceAll("]", "")},
+            attributes.keySet().toArray(new String[0]),
+            attributes.values().toArray(new String[0]),
             true);
     commit();
     }

@@ -5,6 +5,7 @@ import com.Lomikel.Utils.LomikelException;
 // Java
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.HashMap;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -24,15 +25,32 @@ public class TagClassifier extends Classifier {
                        String              oid) throws LomikelException {
     log.warn("Cannot classify automatically, use tag method to classify.");
     }
-
+    
   /** Tag <em>source</em>.
-    * @param oid   The <em>source</em> <tt>objectId</tt>.
-    * @param tag   The tag to be assigned. It should be already registered as a valid tag.
-    * @param value The tag value. */
+    * @param oid        The <em>source</em> <tt>objectId</tt>.
+    * @param tag        The tag to be assigned. It should be already registered as a valid tag.
+    * @param value      The tag value. */
   public void classify(FinkGremlinRecipies recipies,
                        String              oid,
                        String              tag,
                        double              value) throws LomikelException {
+    classify(recipies, oid, tag, value, null, null, null);
+    }
+
+  /** Tag <em>source</em>.
+    * @param oid        The <em>source</em> <tt>objectId</tt>.
+    * @param tag        The tag to be assigned. It should be already registered as a valid tag.
+    * @param value      The tag value.
+    * @param author     The tag author. May be <tt>null</tt>.
+    * @param annotation The tag annotation. May be <tt>null</tt>.
+    * @param ref        The tag reference (URL). May be <tt>null</tt>.*/
+  public void classify(FinkGremlinRecipies recipies,
+                       String              oid,
+                       String              tag,
+                       double              value,
+                       String              author,
+                       String              annotation,
+                       String              ref) throws LomikelException {
     if (!recipies.g().V().has("lbl",    "SoI").
                           has("name",   name()).
                           has("flavor", flavor()).
@@ -41,7 +59,18 @@ public class TagClassifier extends Classifier {
       log.error("SoI " + tag + " of " + name() + "[" + flavor() + "] does not exist, create it first");
       return;
       }
-    recipies.registerSoI(this, tag, oid, value, "", "");
+    Map<String, String> attributes = new HashMap<>();
+    attributes.put("weight", "" + value);
+    if (author != null) {
+      attributes.put("author", author);
+      }
+    if (annotation != null) {
+      attributes.put("annotation", annotation);
+      }
+    if (ref != null) {
+      attributes.put("ref", ref);
+      }
+    recipies.registerSoI(this, tag, oid, attributes);
     }
     
   public void createTag(FinkGremlinRecipies recipies,
