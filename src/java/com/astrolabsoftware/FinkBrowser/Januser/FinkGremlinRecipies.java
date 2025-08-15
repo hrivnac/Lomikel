@@ -278,7 +278,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     registerSoI(classifier, cls, objectId, weight, instances, weights);
     }
     
-  /** Register <em>source</em> in <em>SoI</em>. Reset possible existing registration.
+  /** Register <em>source</em> in <em>SoI</em>. Replace possible existing registration.
     * @param classifier The {@link Classifier} to be used.
     * @param cls        The type (class) of <em>SoI</em> {@link Vertex}.
     *                   It will be created if not yet exists.
@@ -308,13 +308,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param objectId   The objectId of the new <em>Source</em> {@link Vertex}.
     *                   It will be created if not yet exists.
     * @param attributes The additional {@link Edge} attributes.    
-    * @param reset      Whether to reset existing registration. */
+    * @param replace    Whether to replace existing resistration. */
   public void registerSoI(Classifier          classifier,
                           String              cls,
                           String              objectId,
                           Map<String, String> attributes,
-                          boolean             reset) {   
-    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", reset = " + reset);
+                          boolean             replace) {   
+    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
     Vertex soi = g().V().has("lbl",        "SoI"              ).
                          has("classifier", classifier.name()  ).
                          has("flavor",     classifier.flavor()).
@@ -336,12 +336,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                 property("objectId", objectId)).
                        property("importDate", _now).
                        next();
-    addEdge(g().V(soi).next(),
-            g().V(s).next(),
-            "deepcontains",
-            attributes.keySet().toArray(new String[0]),
-            attributes.values().toArray(new String[0]),
-            reset);
+    if (replace) {
+      addEdge(g().V(soi).next(),
+              g().V(s).next(),
+              "deepcontains",
+              attributes.keySet().toArray(new String[0]),
+              attributes.values().toArray(new String[0]),
+              true);
+      }
+    else {
+      Edge e = soi.addEdge("deepcontains", s);
+      for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+        e.property(attribute.getKey(), attribute.getValue());
+        }
+      }
     commit();
     }
    
