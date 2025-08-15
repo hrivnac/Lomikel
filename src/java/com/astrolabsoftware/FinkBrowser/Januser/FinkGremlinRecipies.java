@@ -278,7 +278,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     registerSoI(classifier, cls, objectId, weight, instances, weights);
     }
     
-  /** Register <em>source</em> in <em>SoI</em>.
+  /** Register <em>source</em> in <em>SoI</em>. Reset possible existing registration.
     * @param classifier The {@link Classifier} to be used.
     * @param cls        The type (class) of <em>SoI</em> {@link Vertex}.
     *                   It will be created if not yet exists.
@@ -298,7 +298,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     attributes.put("weight",    "" + weight);
     attributes.put("instances", instances.toString().replaceFirst("\\[", "").replaceAll("]", ""));
     attributes.put("weights",   weights.toString().replaceFirst("\\[", "").replaceAll("]", ""));
-    registerSoI(classifier, cls, objectId, attributes);
+    registerSoI(classifier, cls, objectId, attributes, true);
     }
     
   /** Register <em>source</em> in <em>SoI</em>.
@@ -307,12 +307,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   It will be created if not yet exists.
     * @param objectId   The objectId of the new <em>Source</em> {@link Vertex}.
     *                   It will be created if not yet exists.
-    * @param attributes The additional {@link Edge} attributes. */
+    * @param attributes The additional {@link Edge} attributes.    
+    * @param reset      Whether to reset existing registration. */
   public void registerSoI(Classifier          classifier,
                           String              cls,
                           String              objectId,
-                          Map<String, String> attributes) {   
-    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes);
+                          Map<String, String> attributes,
+                          boolean             reset) {   
+    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", reset = " + reset);
     Vertex soi = g().V().has("lbl",        "SoI"              ).
                          has("classifier", classifier.name()  ).
                          has("flavor",     classifier.flavor()).
@@ -339,7 +341,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             "deepcontains",
             attributes.keySet().toArray(new String[0]),
             attributes.values().toArray(new String[0]),
-            true);
+            reset);
     commit();
     }
    

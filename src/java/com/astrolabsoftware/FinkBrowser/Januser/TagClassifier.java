@@ -70,7 +70,7 @@ public class TagClassifier extends Classifier {
     if (ref != null) {
       attributes.put("ref", ref);
       }
-    recipies.registerSoI(this, tag, oid, attributes);
+    recipies.registerSoI(this, tag, oid, attributes, false);
     }
     
   public void createTag(FinkGremlinRecipies recipies,
