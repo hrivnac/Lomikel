@@ -8,25 +8,17 @@
 
 # Filling
 src/sh/cron/fillSOI.sh
----
-import com.Lomikel.Januser.JanusClient;
-import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 
-jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties");
-gr = new FinkGremlinRecipiesG(jc);
-gr.processSourcesOfInterest('FINK', 'vdhbase1.lal.in2p3.fr:2183:ztf:', 100, 1000, null, false, null)
+# Testing TAGs
+g.V().has('lbl', 'SoI').has('classifier', 'FINK').group().by(values('cls')).by(out().count()).unfold()
+g.V().has('lbl', 'SoI').has('classifier', 'FINK').values('cls').toList().each {cls ->
+  Classifier.instance('TAG').createTag(gr, cls)
+  g.V().has('lbl', 'SoI').has('classifier', 'FINK').has('cls', cls).outE().has('lbl', 'deepcontains').limit(100).inV().values('objectId').toList().
+  each {oid -> Classifier.instance('TAG').classify(gr, oid, cls, 1.0, null, null, null)}
+  }
+gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
+                            Classifier.instance('XMATCH'),
+                            Classifier.instance('FEATURES=Clusters/2024/13-60'),
+                            Classifier.instance('FEATURES=Clusters/2025/13-50'),
+                            Classifier.instance('TAG')})
 
-# Using
-# src/groovy/testJanusClient.groovy
-
-import com.Lomikel.Januser.JanusClient;
-import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
-
-jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties");
-gr = new FinkGremlinRecipiesG(g);
-gr.sourceNeighborhood('ZTF18actbfgh', 'FINK', 10);
-gr.classification("ZTF18actbfgh");
-gr.overlaps();
-gr.overlaps("AlertsOfInterest");
-gr.overlaps("AlertsOfInterest", "FINK");
----

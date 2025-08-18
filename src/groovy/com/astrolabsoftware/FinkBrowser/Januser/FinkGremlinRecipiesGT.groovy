@@ -507,7 +507,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                              w.each {cls, intersection -> if (reclassified[cls] == null) {
                                                             reclassified[cls] = 0;
                                                             }
-                                                          reclassified[key] += intersection * it.weight;
+                                                          reclassified[cls] += intersection * it.weight;
                                }
                       }
       }
