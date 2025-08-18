@@ -10,6 +10,7 @@
 src/sh/cron/fillSOI.sh
 
 # Testing TAGs
+
 g.V().has('lbl', 'SoI').has('classifier', 'FINK').group().by(values('cls')).by(out().count()).unfold()
 g.V().has('lbl', 'SoI').has('classifier', 'FINK').values('cls').toList().each {cls ->
   Classifier.instance('TAG').createTag(gr, cls)
@@ -17,8 +18,16 @@ g.V().has('lbl', 'SoI').has('classifier', 'FINK').values('cls').toList().each {c
   each {oid -> Classifier.instance('TAG').classify(gr, oid, cls, 1.0, null, null, null)}
   }
 gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
-                            Classifier.instance('XMATCH'),
-                            Classifier.instance('FEATURES=Clusters/2024/13-60'),
-                            Classifier.instance('FEATURES=Clusters/2025/13-50'),
-                            Classifier.instance('TAG')})
+                                         Classifier.instance('XMATCH'),
+                                         Classifier.instance('FEATURES=Clusters/2024/13-60'),
+                                         Classifier.instance('FEATURES=Clusters/2025/13-50'),
+                                         Classifier.instance('TAG')})
+                                         
+g.V().has('lbl', 'SoI').has('classifier', 'TAG').has('cls', 'Microlensing candidate').out().has('lbl', 'source').limit(5).valueMap()
+oid = 'ZTF20aapdnek'
+gr.classification(oid, 'FINK')
+gr.reclassification(oid, 'TAG', 'FINK')
+oid = 'ZTF18acjigrh'
 
+gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
+                                         Classifier.instance('TAG')})

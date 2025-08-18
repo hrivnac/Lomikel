@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // Java
+import java.lang.Math;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -449,7 +450,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             corrS.put(rel, 0.0);
             }
           cor = corrS.get(rel);
-          corrS.put(rel, cor + 1.0);
+          corrS.put(rel, cor + Math.sqrt(weight1 * weight2));
           }
         }
       }
