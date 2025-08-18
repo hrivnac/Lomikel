@@ -479,6 +479,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
    
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt>.
+    * The truthfulness of the result depends on quality and overlap of used classifications.
     * @param oid The <em>source objectId</em>.
     * @param srcClassifier The classifier to be used for primary classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
@@ -532,9 +533,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }   
     
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
-    * to <tt>dstClassifier</tt>.
+    * to <tt>dstClassifier</tt> passing by <tt>midClassifier</tt>.
+    * The truthfulness of the result depends on quality and overlap of used classifications.
     * @param oid The <em>source objectId</em>.
     * @param srcClassifier The classifier to be used for primary classification.
+    * @param midClassifier The classifier to be used for intermediate classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
     * @param nmax          The number of classes to give.
     *                      If less then 1, the relative weight cutoff
