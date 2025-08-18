@@ -454,8 +454,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param classifier The {@link Classifier} to be used.
     *                   Optional. If missing or <tt>null</tt>,
     *                   {@link Classifier}s will be used.
-    * @return    The recorded classification calculated
-    *            by number of classified <em>alert</em>s. */
+    * @return           The recorded classification calculated
+    *                   by number of classified <em>alert</em>s. */
   def List<Map<String, String>> classification(String oid,
                                                String classifier = null) {
     def cf;
@@ -476,7 +476,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             }
     return classified;
     }
-    
+   
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt>.
     * @param oid The <em>source objectId</em>.
@@ -503,11 +503,70 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def cf = classifierWithFlavor(srcClassifier);
     classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
                              w = reclassify(it.class, 'SoI', srcClassifier, dstClassifier);
-                             w.each {key, value -> if (reclassified[key] == null) {
-                                                     reclassified[key] = 0;
-                                                     }
-                                                   reclassified[key] += value * it.weight;
-                              }
+                             w.each {cls, intersection -> if (reclassified[cls] == null) {
+                                                            reclassified[cls] = 0;
+                                                            }
+                                                          reclassified[key] += intersection * it.weight;
+                               }
+                      }
+      }
+    double total = reclassified.values().sum()
+    if (total != 0) {
+      reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
+      }
+    if (check) {
+      def classifiedDst = classification(oid, dstClassifier);
+      if (classifiedDst.isEmpty()) {
+        log.warn('Cannot check quality')
+        }
+      else {
+        def p = [:]
+        def q = [:]
+        classifiedDst.each{p[it.class] = it.weight}
+        reclassified.each{ q[it.key]   = it.value }
+        def quality = 1.0 - sourceDistance(p, q, true, 'JensenShannon')
+        log.info('quality: ' + quality)
+        }
+      }
+    return limitMap(reclassified, nmax)
+    }   
+    
+  /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
+    * to <tt>dstClassifier</tt>.
+    * @param oid The <em>source objectId</em>.
+    * @param srcClassifier The classifier to be used for primary classification.
+    * @param dstClassifier The classifier to be used to interpret the classification.
+    * @param nmax          The number of classes to give.
+    *                      If less then 1, the relative weight cutoff
+    *                      (the larger cutoff means more selective, 0 means no selection). 
+    *                      <tt>10</tt>, if missing.
+    * @param check         Whether to check quality of ther reclassification.
+    *                      It slows down the calculation and may not be available if
+    *                      objectId is not classified in destination classification.
+    *                      The deafult is <tt>false</tt>.
+    * @return              The recorded classification calculated
+    *                      by number of classified <em>alert</em>s. Normalized to 1. */
+  def Map<String, Double> reclassification(String  oid,
+                                           String  srcClassifier,
+                                           String  midClassifier,
+                                           String  dstClassifier,
+                                           double  nmax  = 10,
+                                           boolean check = false) {                        
+    def classified = classification(oid, srcClassifier);
+    def reclassified = [:];      
+    def w;
+    def wMid;
+    def cf = classifierWithFlavor(srcClassifier);
+    def cg = classifierWithFlavor(midClassifier);
+    classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
+                             wMid = reclassify(it.class, 'SoI', srcClassifier, midClassifier);
+                             wMid.each {clsMid, intersectionMid -> w = reclassify(clsMid, 'SoI', midClassifier, dstClassifier);
+                                            w.each {cls, intersection -> if (reclassified[cls] == null) {
+                                                                           reclassified[cls] = 0;
+                                                                           }
+                                                                         reclassified[key] += intersectionMid * intersection * it.weight;
+                                              }
+                               }
                       }
       }
     double total = reclassified.values().sum()
@@ -530,7 +589,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     return limitMap(reclassified, nmax)
     }                            
-    
+
   /** Limit {@link Map} based on its <tt>key.value</tt>.
     * @param map  The fill {@link Map}>
     * @param nmax  The number of closest <em>source</em>s to give.
@@ -659,11 +718,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param lbl           The label of collection {@link Vertex}es. 
     * @param srcClassifier The name of classifier of the source (known) class.
     * @param dstClassifier The name of classifier of the destination (required) class.
-    * @return           The new classification. */
-  def Map reclassify(String cls,
-                     String lbl,
-                     String srcClassifier,
-                     String dstClassifier) {
+    * @return              The new classification. */
+  def Map<String, Double> reclassify(String cls,
+                                     String lbl,
+                                     String srcClassifier,
+                                     String dstClassifier) {
     def classification = [:];
     def srcCf = classifierWithFlavor(srcClassifier);
     def dstCf = classifierWithFlavor(dstClassifier);
