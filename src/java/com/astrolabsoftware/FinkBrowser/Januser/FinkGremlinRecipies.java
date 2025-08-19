@@ -1,6 +1,7 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Utils.Pair;
+import com.Lomikel.Utils.Metrics;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.ModifyingGremlinClient;
@@ -450,8 +451,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             corrS.put(rel, 0.0);
             }
           cor = corrS.get(rel);
-          corrS.put(rel, cor + 1.0);
-          //corrS.put(rel, cor + Math.sqrt(weight1 * weight2));
+          //corrS.put(rel, cor + 1.0);
+          corrS.put(rel, cor + Math.sqrt(weight1 * weight2));
           }
         }
       }
