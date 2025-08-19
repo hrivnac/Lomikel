@@ -205,8 +205,26 @@
         </classpath>
       </javac>
     </target>
-
-  <target name="compile-groovy"
+    
+   <target name="compile-groovy-0"
+          depends="init"
+          description="Compile groovy sources (before java sources)">
+    <groovyc srcdir="../src/groovy"
+             destdir="../build"
+             classpathref="classpath.groovy"
+             fork="true"
+             includeantruntime="false"
+             configscript="../src/groovy/config.groovy"
+             targetBytecode="${env.java_version}"> 
+      <include name="com/Lomikel/Utils/Metrics.groovy"/>
+      <classpath>
+        <path refid="classpath.build"/>
+        <pathelement path="../build"/>
+        </classpath>
+      </groovyc>
+    </target>
+    
+   <target name="compile-groovy"
           depends="init"
           description="Compile groovy sources">
     <groovyc srcdir="../src/groovy"
@@ -216,13 +234,14 @@
              includeantruntime="false"
              configscript="../src/groovy/config.groovy"
              targetBytecode="${env.java_version}"> 
+      <exclude name="com/Lomikel/Utils/Metrics.groovy"/>
       <classpath>
         <path refid="classpath.build"/>
         <pathelement path="../build"/>
         </classpath>
       </groovyc>
     </target>
-        
+       
   <!-- Compile Native =======================================================-->
     
   <target name="compile-native"
@@ -241,7 +260,7 @@
   <!-- Create JAR ===========================================================-->
   
   <target name="jar"
-          depends="compile,compile-groovy"
+          depends="compile-groovy-0,compile,compile-groovy"
           description="Create JAR">
     <path id="libs">
       <fileset dir="../extlib">

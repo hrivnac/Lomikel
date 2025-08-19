@@ -639,7 +639,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * {@link Vertex}es with connecting <em>overlaps</em> {@link Edge}s
     * into <em>GraphML</em> file.
     * @param fn The full filename of the output <em>GraphML</em> file. */
-  def exportSoI(String       fn) {  
+  def exportSoI(String fn) {  
     g().V().has('lbl', 'SoI').
             outE().
             has('lbl', 'overlaps').
@@ -663,7 +663,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return classifier.split('=');
     }
     
-  def Random _random = new Random()
+  def Random _random = new Random();
     
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkGremlinRecipiesGT.class);
