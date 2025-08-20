@@ -268,7 +268,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   if (climit > 0.0) {
                     m.entrySet().removeIf(entry -> entry.getValue() < climit)
                     }
-                  def dist = Metrics.sourceDistance(m0, m, allClasses, metric)
+                  def dist = Metrics.distance(m0, m, allClasses, metric)
                   n++
                   distance = Map.entry(oid, dist)
                   distances[distance] = m
@@ -368,14 +368,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param check         Whether to check quality of ther reclassification.
     *                      It slows down the calculation and may not be available if
     *                      objectId is not classified in destination classification.
-    *                      The deafult is <tt>false</tt>.
+    *                      The deafult is <tt>true</tt>.
     * @return              The recorded classification calculated
     *                      by number of classified <em>alert</em>s. Normalized to 1. */
   def Map<String, Double> reclassification(String  oid,
                                            String  srcClassifier,
                                            String  dstClassifier,
                                            double  nmax  = 10,
-                                           boolean check = false) {                        
+                                           boolean check = true) {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
@@ -403,7 +403,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         def q = [:]
         classifiedDst.each{p[it.class] = it.weight}
         reclassified.each{ q[it.key]   = it.value }
-        def quality = 1.0 - Metrics.sourceDistance(p, q, true, 'JensenShannon')
+        def quality = 1.0 - Metrics.distance(p, q, true, 'JensenShannon')
         log.info('quality: ' + quality)
         }
       }
@@ -424,7 +424,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param check         Whether to check quality of ther reclassification.
     *                      It slows down the calculation and may not be available if
     *                      objectId is not classified in destination classification.
-    *                      The deafult is <tt>false</tt>.
+    *                      The deafult is <tt>true</tt>.
     * @return              The recorded classification calculated
     *                      by number of classified <em>alert</em>s. Normalized to 1. */
   def Map<String, Double> reclassification(String  oid,
@@ -432,7 +432,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                            String  midClassifier,
                                            String  dstClassifier,
                                            double  nmax  = 10,
-                                           boolean check = false) {                        
+                                           boolean check = true) {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
@@ -464,7 +464,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         def q = [:]
         classifiedDst.each{p[it.class] = it.weight}
         reclassified.each{ q[it.key]   = it.value }
-        def quality = 1.0 - Metrics.sourceDistance(p, q, true, 'JensenShannon')
+        def quality = 1.0 - Metrics.distance(p, q, true, 'JensenShannon')
         log.info('quality: ' + quality)
         }
       }
