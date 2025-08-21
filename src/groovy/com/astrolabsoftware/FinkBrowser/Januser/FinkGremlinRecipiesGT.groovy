@@ -404,17 +404,47 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         classifiedDst.each{p[it.class] = it.weight}
         reclassified.each{ q[it.key]   = it.value }
         _lastQuality = 1.0 - Metrics.distance(p, q, true, 'JensenShannon')
-        log.info('quality: ' + _lastQuality)
+        log.info('quality: ' + _lastQuality + " for " + oid)
         }
       }
     return limitMap(reclassified, nmax)
     } 
     
-  def lastQuality() {
+  /** Test reclassification.
+    * @param srcClassifier The classifier to be used for primary classification.
+    * @param dstClassifier The classifier to be used to interpret the classification.
+    * @param sample        The number of objectIds to test.
+    * @param cls           The destination class to test.
+    * @return              The mean quality of tested reclassifications. */
+   def double testReclassification(String  srcClassifier,
+                                   String  dstClassifier,
+                                   String  cls,
+                                   int     sample) {
+    qualities = []                                         
+    g.V().has('lbl',       'SoI').
+          has('classifier', dstClassifier).
+          has('cls', cls).
+          out().
+          has('lbl', 'source').
+          limit(sample).
+          values('objectId').
+          toList().
+          each {oid -> gr.reclassification(oid, srcClassifier, dstClassifier)
+                       quality = gr.lastQuality()     
+                       if (quality != 0) {
+                         qualities += quality
+                         }
+            }
+    return qualities.sum() /  qualities.size();
+    }
+     
+  /** Give ther quality of the latest reclassification call.
+    * @return The quality of the latest reclassification call. */
+  def double lastQuality() {
     return _lastQuality
     }
     
-  def _lastQuality;
+  def double _lastQuality;
     
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt> passing by <tt>midClassifier</tt>.
