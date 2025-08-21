@@ -420,7 +420,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                    String  dstClassifier,
                                    String  cls,
                                    int     sample) {
-    def qualities = []                                         
+    def qualities = []   
+    def quality
     g().V().has('lbl',       'SoI').
             has('classifier', dstClassifier).
             has('cls', cls).
