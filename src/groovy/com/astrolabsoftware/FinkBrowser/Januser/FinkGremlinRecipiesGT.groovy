@@ -400,17 +400,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         }
       else {
         def p = [:]
-        def q = [:]g.V().has('lbl', 'SoI').has('classifier', 'FINK').has('cls', cls).outE().has('lbl', 'deepcontains').limit(100).inV().values('objectId').toList().
-  each {oid -> Classifier.instance('TAG').classify(gr, oid, cls, 1.0, null, null, null)}
-  }
-gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
-                                         Classifier.instance('XMATCH'),
-                                         Classifier.instance('FEATURES=Clusters/2024/13-60'),
-                                         Classifier.instance('FEATURES=Clusters/2025/13-50'),
-                                         Classifier.instance('TAG')})
-                                         
-src = 'FEATURES=Clusters/2024/13-60'   
-dst = 'FINK'
+        def q = [:]
+        classifiedDst.each{p[it.class] = it.weight}
+        reclassified.each{ q[it.key]   = it.value }
+        _lastQuality = 1.0 - Metrics.distance(p, q, true, 'JensenShannon')
+        log.info('quality: ' + _lastQuality + " for " + oid)
+        }
+      }
+    return limitMap(reclassified, nmax)
+    } 
+    
+  /** Test reclassification.
     * @param srcClassifier The classifier to be used for primary classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
     * @param sample        The number of objectIds to test.
