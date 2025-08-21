@@ -23,14 +23,4 @@ gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
                                          Classifier.instance('FEATURES=Clusters/2025/13-50'),
                                          Classifier.instance('TAG')})
                                          
-src = 'FEATURES=Clusters/2024/13-60'   
-dst = 'FINK'
-cls = 'Microlensing candidate'
-n = 10
-qualities = []                                         
-g.V().has('lbl', 'SoI').has('classifier', dst).has('cls', cls).out().has('lbl', 'source').limit(n).values('objectId').toList().
-  each {oid -> gr.reclassification(oid, src, dst)
-  quality = gr.lastQuality()
-  if (quality != 0) {
-    qualities += quality}}
-println(qualities.sum() /  qualities.size())
+gr.testReclassification('FEATURES=Clusters/2024/13-60', 'FINK', 'Microlensing candidate', 10)
