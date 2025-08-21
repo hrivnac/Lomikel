@@ -421,20 +421,20 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                    String  cls,
                                    int     sample) {
     def qualities = []                                         
-    g.V().has('lbl',       'SoI').
-          has('classifier', dstClassifier).
-          has('cls', cls).
-          out().
-          has('lbl', 'source').
-          limit(sample).
-          values('objectId').
-          toList().
-          each {oid -> gr.reclassification(oid, srcClassifier, dstClassifier)
-                       quality = gr.lastQuality()     
-                       if (quality != 0) {
-                         qualities += quality
-                         }
-            }
+    g().V().has('lbl',       'SoI').
+            has('classifier', dstClassifier).
+            has('cls', cls).
+            out().
+            has('lbl', 'source').
+            limit(sample).
+            values('objectId').
+            toList().
+            each {oid -> reclassification(oid, srcClassifier, dstClassifier)
+                         quality = gr.lastQuality()     
+                         if (quality != 0) {
+                           qualities += quality
+                           }
+              }
     return qualities.sum() /  qualities.size();
     }
      
