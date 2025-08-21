@@ -430,7 +430,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             values('objectId').
             toList().
             each {oid -> reclassification(oid, srcClassifier, dstClassifier)
-                         quality = gr.lastQuality()     
+                         quality = lastQuality()     
                          if (quality != 0) {
                            qualities += quality
                            }
