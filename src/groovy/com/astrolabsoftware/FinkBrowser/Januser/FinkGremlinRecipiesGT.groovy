@@ -403,12 +403,18 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         def q = [:]
         classifiedDst.each{p[it.class] = it.weight}
         reclassified.each{ q[it.key]   = it.value }
-        def quality = 1.0 - Metrics.distance(p, q, true, 'JensenShannon')
-        log.info('quality: ' + quality)
+        _lastQuality = 1.0 - Metrics.distance(p, q, true, 'JensenShannon')
+        log.info('quality: ' + _lastQuality)
         }
       }
     return limitMap(reclassified, nmax)
-    }   
+    } 
+    
+  def lastQuality() {
+    return _lastQuality
+    }
+    
+  def _lastQuality;
     
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt> passing by <tt>midClassifier</tt>.
