@@ -404,8 +404,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
         classifiedDst.each{p[it.class] = it.weight}
         reclassified.each{ q[it.key]   = it.value }
         _lastQuality = 1.0 - Metrics.distance(p, q, true, 'JensenShannon')
-        log.info('quality: ' + _lastQuality + " for " + oid)
         }
+      }
+    else {
+      _lastQuality = 0.0
       }
     return limitMap(reclassified, nmax)
     } 
@@ -436,7 +438,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            qualities += quality
                            }
               }
-    return qualities.sum() /  qualities.size();
+    return qualities.sum() / qualities.size()
     }
      
   /** Give ther quality of the latest reclassification call.

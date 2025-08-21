@@ -22,5 +22,16 @@ gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
                                          Classifier.instance('FEATURES=Clusters/2024/13-60'),
                                          Classifier.instance('FEATURES=Clusters/2025/13-50'),
                                          Classifier.instance('TAG')})
-                                         
-gr.testReclassification('FEATURES=Clusters/2024/13-60', 'FINK', 'Microlensing candidate', 10)
+   
+src = 'FEATURES=Clusters/2024/13-60'
+dst = 'XMATCH'
+clsMap = [:]  
+qualities = [:]
+g.V().has('lbl', 'SoI').has('classifier', dst).group().by(values('cls')).by(out().count()).unfold().each{clsMap[it.key] = it.value}                                  
+clsMap = clsMap.sort{-it.value}
+clsMap.each {
+  cls = it.key
+  q = gr.testReclassification(src, dst, cls, 10)
+  qualities[cls] = q + '[' + clsMap[cls] + ']'
+  }
+println(qualities)
