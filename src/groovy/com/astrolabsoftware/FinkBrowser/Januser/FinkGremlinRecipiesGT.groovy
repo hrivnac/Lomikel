@@ -465,7 +465,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     clsMap.take(nclasses).each {
       cls = it.key
       println('testing ' + cls)
-      q = gr.testReclassification(srcClassifier, dstClassifier, cls, sample)
+      q = testReclassification(srcClassifier, dstClassifier, cls, sample)
       qualities[cls] = q + '[' + clsMap[cls] + ']'
       }
     return qualities
