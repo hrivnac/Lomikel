@@ -415,8 +415,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Test reclassification.
     * @param srcClassifier The classifier to be used for primary classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
-    * @param sample        The number of objectIds to test.
     * @param cls           The destination class to test.
+    * @param sample        The number of objectIds to test.
     * @return              The mean quality of tested reclassifications. */
    def double testReclassification(String  srcClassifier,
                                    String  dstClassifier,
@@ -441,23 +441,30 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return qualities.sum() / qualities.size()
     }
     
-  def Map<String, String> testClassifications(String  srcClassifier,
-                                              String  dstClassifier,
-                                              int     nclasses,
-                                              int     sample) {
+  /** Test reclassification.
+    * @param srcClassifier The classifier to be used for primary classification.
+    * @param dstClassifier The classifier to be used to interpret the classification.
+    * @param nclasses      The number of destination classes (with highest statistics) to test.
+    * @param sample        The number of objectIds to test.
+    * @return              The mean quality of tested reclassifications. */
+  def Map<String, String> testReclassifications(String  srcClassifier,
+                                                String  dstClassifier,
+                                                int     nclasses,
+                                                int     sample) {
+    log.info('Evaluating reclassification of ' + srcClassifier + ' as ' + dstClassifier + ' for ' + nclasses + ' classes using ' + sample + ' objectIds for each') 
     def clsMap = [:]  
     def qualities = [:]
-    g.V().has('lbl',        'SoI').
-          has('classifier', dstClassifier).
-          group().
-          by(values('cls')).
-          by(out().count()).
-          unfold().each {clsMap[it.key] = it.value}                                  
+    g().V().has('lbl',        'SoI').
+           has('classifier', dstClassifier).
+           group().
+           by(values('cls')).
+           by(out().count()).
+           unfold().each {clsMap[it.key] = it.value}                                  
     clsMap = clsMap.sort{-it.value}
     clsMap.take(nclasses).each {
       cls = it.key
       println('testing ' + cls)
-      q = gr.testReclassification(srcClassifier, dsClassifiert, cls, sample)
+      q = gr.testReclassification(srcClassifier, dstClassifier, cls, sample)
       qualities[cls] = q + '[' + clsMap[cls] + ']'
       }
     return qualities
