@@ -426,7 +426,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def quality
     g().V().has('lbl',       'SoI').
             has('classifier', dstClassifier).
-            has('cls', cls).
+            has('cls',        cls).
             out().
             has('lbl', 'source').
             limit(sample).
@@ -439,6 +439,28 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            }
               }
     return qualities.sum() / qualities.size()
+    }
+    
+  def Map<String, String> testClassifications(String  srcClassifier,
+                                              String  dstClassifier,
+                                              int     nclasses,
+                                              int     sample) {
+    def clsMap = [:]  
+    def qualities = [:]
+    g.V().has('lbl',        'SoI').
+          has('classifier', dstClassifier).
+          group().
+          by(values('cls')).
+          by(out().count()).
+          unfold().each {clsMap[it.key] = it.value}                                  
+    clsMap = clsMap.sort{-it.value}
+    clsMap.take(nclasses).each {
+      cls = it.key
+      println('testing ' + cls)
+      q = gr.testReclassification(srcClassifier, dsClassifiert, cls, sample)
+      qualities[cls] = q + '[' + clsMap[cls] + ']'
+      }
+    return qualities
     }
      
   /** Give ther quality of the latest reclassification call.

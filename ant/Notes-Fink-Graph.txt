@@ -31,6 +31,7 @@ g.V().has('lbl', 'SoI').has('classifier', dst).group().by(values('cls')).by(out(
 clsMap = clsMap.sort{-it.value}
 clsMap.each {
   cls = it.key
+  println(cls)
   q = gr.testReclassification(src, dst, cls, 10)
   qualities[cls] = q + '[' + clsMap[cls] + ']'
   }
