@@ -454,6 +454,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     log.info('Evaluating reclassification of ' + srcClassifier + ' as ' + dstClassifier + ' for ' + nclasses + ' classes using ' + sample + ' objectIds for each') 
     def clsMap = [:]  
     def cls
+    def q
     def qualities = [:]
     g().V().has('lbl',        'SoI').
            has('classifier', dstClassifier).
