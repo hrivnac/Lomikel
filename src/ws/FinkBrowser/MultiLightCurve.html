@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LSST Light Curve Phase-Space Visualizer</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { display: flex; height: 100vh; margin: 0; font-family: sans-serif; }
+    #plot { flex: 3; }
+    #controls { flex: 1; overflow-y: auto; padding: 1em; background: #f7f7f7; display: flex; flex-direction: column; }
+    #formula { margin-bottom: 10px; font-weight: bold; font-size: 14px; }
+    .slider-group { margin-bottom: 1em; width: 100%; display: flex; flex-direction: column; }
+    label { display: block; font-size: 0.9em; }
+    input[type=range] { width: 100%; }
+    button { padding: 6px 12px; margin-bottom: 10px; cursor: pointer; border-radius: 6px; border: 1px solid #ccc; background: #eee; font-weight: bold; }
+    button:hover { background: #ddd; }
+  </style>
+</head>
+<body>
+  <div id="plot"></div>
+  <div id="controls">
+    <div id="formula">x = 0·Y + 0·z + 0·g + 0·i + 0·u + 0·r<br>y = 0·Y + 0·z + 0·g + 0·i + 0·u + 0·r</div>
+    <button id="resetButton">Reset</button>
+  </div>
+
+  <script>
+    const filters = ["Y", "z", "g", "i", "u", "r"];
+    let demoData = {};
+
+    function generateDemoData(n = 60) {
+      demoData = {};
+      const baseJD = 2460000;
+      filters.forEach(f => {
+        let times = [];
+        let values = [];
+        let t = 0;
+        for (let k = 0; k < n; k++) {
+          t += Math.random() * 5 + 1;
+          if (Math.random() < 0.15) continue;
+          times.push(baseJD + t);
+          let v;
+          switch(f){
+            case "Y": v = Math.exp(-Math.pow((t-80)/15,2))*2 + 0.2*Math.random(); break;
+            case "z": v = Math.sin(t/10) + 0.1*Math.random(); break;
+            case "g": v = Math.exp(-Math.pow((t-50)/10,2)) - Math.exp(-Math.pow((t-100)/10,2)); break;
+            case "i": v = ((t%30)<15? (t%30)/15 : (30-(t%30))/15) + 0.1*Math.random(); break;
+            case "u": v = 0.0005*t*t - 0.05*t + 2 + 0.2*Math.random(); break;
+            case "r": v = Math.cos(t/7) + 0.01*t + 0.1*Math.random(); break;
+          }
+          values.push(v);
+        }
+        demoData[f] = {times, values};
+      });
+    }
+
+    function interp1D(xs, ys, x) {
+      if (xs.length === 0) return {val:null, mode:"none"};
+      if (x < xs[0]) { let slope=(ys[1]-ys[0])/(xs[1]-xs[0]); return {val: ys[0]+slope*(x-xs[0]), mode:"extrapLeft"};}
+      if (x > xs[xs.length-1]) { let n=xs.length; let slope=(ys[n-1]-ys[n-2])/(xs[n-1]-xs[n-2]); return {val: ys[n-1]+slope*(x-xs[n-1]), mode:"extrapRight"};}
+      for (let i=0;i<xs.length-1;i++){ if(x>=xs[i] && x<=xs[i+1]){ let t=(x-xs[i])/(xs[i+1]-xs[i]); return {val: ys[i]*(1-t)+ys[i+1]*t, mode:"interp"};}}
+      return {val:null, mode:"none"};
+    }
+
+    function interpolateAll(){
+      let allTimes = new Set();
+      filters.forEach(f=>demoData[f].times.forEach(t=>allTimes.add(t)));
+      const minJD = Math.min(...Array.from(allTimes));
+      const maxJD = Math.max(...Array.from(allTimes));
+      const grid = [];
+      let step = (maxJD-minJD)/200;
+      for (let t=minJD;t<=maxJD;t+=step) grid.push(t);
+      let interp={};
+      filters.forEach(f=>interp[f]=grid.map(t=>interp1D(demoData[f].times,demoData[f].values,t)));
+      return {grid,interp};
+    }
+
+    let coeffs = {x:{},y:{}};
+    filters.forEach(f=>{coeffs.x[f]=Math.random()*2-1; coeffs.y[f]=Math.random()*2-1;});
+
+    function updateFormula(){
+      const formula = document.getElementById("formula");
+      let xStr = "x = ";
+      let yStr = "y = ";
+      filters.forEach((f,i)=>{xStr += `${coeffs.x[f].toFixed(2)}·${f}` + (i<filters.length-1?" + ":"");});
+      filters.forEach((f,i)=>{yStr += `${coeffs.y[f].toFixed(2)}·${f}` + (i<filters.length-1?" + ":"");});
+      formula.innerHTML = xStr+"<br>"+yStr;
+    }
+
+    function updatePlot(){
+      let {grid,interp}=interpolateAll();
+      let xs=[],ys=[],colors=[],modes=[];
+      for(let i=0;i<grid.length;i++){
+        let xVal=0,yVal=0,mode="interp";
+        for(let f of filters){
+          if(interp[f][i].val===null){mode="none"; break;}
+          xVal+=coeffs.x[f]*interp[f][i].val;
+          yVal+=coeffs.y[f]*interp[f][i].val;
+          if(interp[f][i].mode.startsWith("extrap")) mode=interp[f][i].mode;
+        }
+        if(mode!=="none"){xs.push(xVal); ys.push(yVal); colors.push(grid[i]); modes.push(mode);}
+      }
+      let xsInterp=[],ysInterp=[],cInterp=[];
+      let xsExtrapLeft=[],ysExtrapLeft=[],cExtrapLeft=[];
+      let xsExtrapRight=[],ysExtrapRight=[],cExtrapRight=[];
+      for(let i=0;i<xs.length;i++){
+        if(modes[i]==="interp"){xsInterp.push(xs[i]); ysInterp.push(ys[i]); cInterp.push(colors[i]);}
+        else if(modes[i]==="extrapLeft"){xsExtrapLeft.push(xs[i]); ysExtrapLeft.push(ys[i]); cExtrapLeft.push(colors[i]);}
+        else if(modes[i]==="extrapRight"){xsExtrapRight.push(xs[i]); ysExtrapRight.push(ys[i]); cExtrapRight.push(colors[i]);}
+      }
+      let traces=[];
+      if(xsInterp.length>0){
+        traces.push({x:xsInterp,y:ysInterp,mode:"lines+markers",line:{color:"blue"},
+          marker:{color:cInterp,colorscale:"Viridis",size:6,colorbar:{title:"JD",len:0.5}},name:"Interpolated"});
+      }
+      if(xsExtrapLeft.length>0){
+        traces.push({x:xsExtrapLeft,y:ysExtrapLeft,mode:"lines+markers",line:{color:"blue",dash:"dot"},
+          marker:{color:cExtrapLeft,colorscale:"Viridis",size:6},name:"Extrapolated Left"});
+      }
+      if(xsExtrapRight.length>0){
+        traces.push({x:xsExtrapRight,y:ysExtrapRight,mode:"lines+markers",line:{color:"blue",dash:"dot"},
+          marker:{color:cExtrapRight,colorscale:"Viridis",size:6},name:"Extrapolated Right"});
+      }
+      if(xs.length>0){
+        traces.push({x:[xs[0]],y:[ys[0]],mode:"markers",marker:{color:"green",size:10},name:"First"});
+        traces.push({x:[xs[xs.length-1]],y:[ys[ys.length-1]],mode:"markers",marker:{color:"red",size:10},name:"Last"});
+      }
+      Plotly.newPlot("plot",traces,{margin:{t:30},xaxis:{title:"X"},yaxis:{title:"Y"}});
+      updateFormula();
+    }
+
+    function buildControls(){
+      const div = document.getElementById("controls");
+      filters.forEach(f=>{
+        let group=document.createElement("div"); group.className="slider-group";
+        group.innerHTML=`<label>${f} (X)</label><input type="range" min="-2" max="2" step="0.1" value="${coeffs.x[f]}">
+                         <label>${f} (Y)</label><input type="range" min="-2" max="2" step="0.1" value="${coeffs.y[f]}">`;
+        div.appendChild(group);
+        let xInput = group.querySelector('input[type=range]:nth-child(2)');
+        let yInput = group.querySelector('input[type=range]:nth-child(4)');
+        xInput.addEventListener("input",e=>{coeffs.x[f]=parseFloat(e.target.value); updatePlot();});
+        yInput.addEventListener("input",e=>{coeffs.y[f]=parseFloat(e.target.value); updatePlot();});
+      });
+      document.getElementById("resetButton").addEventListener("click",()=>{
+        filters.forEach(f=>{
+          coeffs.x[f]=Math.random()*2-1;
+          coeffs.y[f]=Math.random()*2-1;
+        });
+        coeffs.x["Y"] = 1;
+        updatePlot();
+        buildControls(); // rebuild sliders with new random values
+      });
+    }
+
+    generateDemoData();
+    buildControls();
+    updatePlot();
+  </script>
+</body>
+</html>

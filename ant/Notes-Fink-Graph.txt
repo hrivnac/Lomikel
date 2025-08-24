@@ -13,26 +13,22 @@ src/sh/cron/fillSOI.sh
 
 g.V().has('lbl', 'SoI').has('classifier', 'FINK').group().by(values('cls')).by(out().count()).unfold()
 g.V().has('lbl', 'SoI').has('classifier', 'FINK').values('cls').toList().each {cls ->
-  Classifier.instance('TAG').createTag(gr, cls)
-  g.V().has('lbl', 'SoI').has('classifier', 'FINK').has('cls', cls).outE().has('lbl', 'deepcontains').limit(100).inV().values('objectId').toList().
-  each {oid -> Classifier.instance('TAG').classify(gr, oid, cls, 1.0, null, null, null)}
-  }
+  tag = 'Tag of ' + cls
+  Classifier.instance('TAG').createTag(gr, tag)
+  g.V().has('lbl', 'SoI').
+        has('classifier', 'FINK').
+        has('cls', cls).
+        outE().
+        has('lbl', 'deepcontains').
+        inV().
+        values('objectId').
+        toList().
+        each {oid -> Classifier.instance('TAG').classify(gr, oid, tag, 1.0, null, null, null)}
+     }
 gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
                                          Classifier.instance('XMATCH'),
                                          Classifier.instance('FEATURES=Clusters/2024/13-60'),
                                          Classifier.instance('FEATURES=Clusters/2025/13-50'),
                                          Classifier.instance('TAG')})
    
-src = 'FEATURES=Clusters/2024/13-60'
-dst = 'XMATCH'
-clsMap = [:]  
-qualities = [:]
-g.V().has('lbl', 'SoI').has('classifier', dst).group().by(values('cls')).by(out().count()).unfold().each{clsMap[it.key] = it.value}                                  
-clsMap = clsMap.sort{-it.value}
-clsMap.each {
-  cls = it.key
-  println(cls)
-  q = gr.testReclassification(src, dst, cls, 10)
-  qualities[cls] = q + '[' + clsMap[cls] + ']'
-  }
-println(qualities)
+gr.testReclassifications('TAG', 'FINK', 10, 5)

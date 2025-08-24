@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LSST Alert Demo</title>
+<style>
+  body { margin: 0; overflow: hidden; background: black; font-family: sans-serif; }
+  canvas { display: block; }
+  #tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    display: none;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div id="tooltip"></div>
+<script>
+const canvas = document.getElementById('sky');
+const ctx = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Procedural starfield
+const stars = [];
+for(let i=0;i<1000;i++){
+    stars.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        r: Math.random()*1.5,
+        alpha: 0.5 + Math.random()*0.5,
+        twinkleSpeed: 0.002 + Math.random()*0.003
+    });
+}
+
+const classes = {
+    "Microlensing candidate": "255,255,0",
+    "Early SN Ia candidate": "0,255,255",
+    "SN candidate": "255,0,0",
+    "Solar System candidate": "0,255,0",
+    "Solar System MPC": "255,0,255"
+};
+
+function raDecToXY(ra, dec) {
+    return {x: (ra/360)*canvas.width, y: ((90-dec)/180)*canvas.height};
+}
+
+// Draw star with optional sparkle
+function drawStar(x, y, radius, color, alpha, sparklePhase=0){
+    const spikes=5;
+    let rot = Math.PI/2*3;
+    const step = Math.PI/spikes;
+    ctx.beginPath();
+    for(let i=0;i<spikes;i++){
+        const sparkle = 0.1*Math.sin(Date.now()*0.02 + sparklePhase + i);
+        const outerRadius = radius*(1+sparkle);
+        const innerRadius = radius/2;
+        const sx1 = x + Math.cos(rot)*outerRadius;
+        const sy1 = y + Math.sin(rot)*outerRadius;
+        ctx.lineTo(sx1, sy1);
+        rot += step;
+        const sx2 = x + Math.cos(rot)*innerRadius;
+        const sy2 = y + Math.sin(rot)*innerRadius;
+        ctx.lineTo(sx2, sy2);
+        rot += step;
+    }
+    ctx.closePath();
+    ctx.fillStyle = `rgba(${color},${alpha})`;
+    ctx.fill();
+}
+
+class Flash {
+    constructor(alert){
+        this.pos = raDecToXY(alert.ra, alert.dec);
+        this.color = classes[alert.class] || '255,255,255';
+        this.startTime = Date.now();
+        this.alert = alert;
+        this.alpha = 0;
+        this.radius = 0;
+        this.trail = [];
+        this.sparklePhase = Math.random()*Math.PI*2;
+    }
+    draw(){
+        const elapsed = (Date.now()-this.startTime)/1000;
+
+        // Grow in first 1s
+        if(elapsed < 1){
+            this.radius = 5 + 15*(elapsed/1);
+            this.alpha = elapsed/1;
+        } else {
+            const shrinkElapsed = elapsed-1;
+            this.radius = 20 * Math.max(0,1 - shrinkElapsed/9);
+            this.alpha = Math.max(0,1 - shrinkElapsed/9);
+        }
+
+        if(this.alpha<=0) return false;
+
+        // Store trail
+        this.trail.push({x:this.pos.x, y:this.pos.y, radius:this.radius, alpha:this.alpha, sparklePhase:this.sparklePhase});
+        if(this.trail.length>15) this.trail.shift();
+
+        // Draw trail stars with faint alpha
+        for(let i=0;i<this.trail.length;i++){
+            const t = this.trail[i];
+            drawStar(t.x, t.y, t.radius, this.color, t.alpha*0.2, t.sparklePhase);
+        }
+
+        // Draw current star
+        drawStar(this.pos.x, this.pos.y, this.radius, this.color, this.alpha, this.sparklePhase);
+
+        // Class name
+        ctx.font="bold 14px sans-serif";
+        ctx.fillStyle=`rgba(${this.color},${this.alpha})`;
+        ctx.fillText(this.alert.class, this.pos.x + this.radius + 5, this.pos.y - this.radius - 5);
+
+        return true;
+    }
+}
+
+let flashes=[];
+function generateAlert(){
+    const ra=Math.random()*360;
+    const dec=(Math.random()-0.5)*180;
+    const cls=Object.keys(classes)[Math.floor(Math.random()*5)];
+    const objectId="ZTF"+Math.floor(Math.random()*10000000).toString().padStart(7,'0');
+    const jd=2460000+Math.random()*1000;
+    flashes.push(new Flash({ra, dec, class: cls, objectId, jd}));
+
+    setTimeout(generateAlert, 1000+Math.random()*9000);
+}
+
+function drawStars(){
+    for(const s of stars){
+        s.alpha += s.twinkleSpeed*(Math.random()<0.5?1:-1);
+        s.alpha = Math.max(0.3, Math.min(1,s.alpha));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,255,255,${s.alpha})`;
+        ctx.fill();
+    }
+}
+
+function animate(){
+    ctx.fillStyle='black';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    drawStars();
+    flashes = flashes.filter(f=>f.draw());
+    requestAnimationFrame(animate);
+}
+
+// Tooltip
+canvas.addEventListener('mousemove', e=>{
+    const mouseX=e.clientX, mouseY=e.clientY;
+    let found=false;
+    for(const f of flashes){
+        const dx=f.pos.x-mouseX, dy=f.pos.y-mouseY;
+        const r=f.radius;
+        if(dx*dx+dy*dy<=r*r){
+            tooltip.style.display='block';
+            tooltip.style.left=(mouseX+10)+'px';
+            tooltip.style.top=(mouseY+10)+'px';
+            tooltip.innerHTML=`<b>${f.alert.objectId}</b><br>JD: ${f.alert.jd.toFixed(2)}`;
+            found=true; break;
+        }
+    }
+    if(!found) tooltip.style.display='none';
+});
+canvas.addEventListener('mouseleave',()=>{tooltip.style.display='none';});
+
+generateAlert();
+animate();
+
+window.addEventListener('resize',()=>{
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+});
+</script>
+</body>
+</html>
