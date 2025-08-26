@@ -1,4 +1,4 @@
- //  === CONFIGURATION ===
+//  === CONFIGURATION ===
 
 // Color mapping by alert class
 const classes = {
