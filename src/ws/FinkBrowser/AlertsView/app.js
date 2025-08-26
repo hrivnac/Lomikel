@@ -9,6 +9,15 @@ const classes = {
   "Solar System MPC": "255,0,255"
 };
 
+// === EMBEDDED ALERTS ===
+const alertsPool = [
+    { "i:objectId": "ZTF25abixmgq", "i:ra": 317.3594119, "i:dec": -2.1304045, "i:jd": 2460913.7532639, "v:classification": "SN candidate" },
+    { "i:objectId": "ZTF25abjbadu", "i:ra": 24.5693835, "i:dec": 34.6136593, "i:jd": 2460911.884919, "v:classification": "Microlensing candidate" },
+    { "i:objectId": "ZTF25abioriw", "i:ra": 353.9771969, "i:dec": 47.0764717, "i:jd": 2460911.8657176, "v:classification": "Solar System candidate" },
+    { "i:objectId": "ZTF25abiqcie", "i:ra": 326.78721, "i:dec": 33.5252544, "i:jd": 2460910.8378241, "v:classification": "Early SN Ia candidate" },
+    { "i:objectId": "ZTF25abjzzzz", "i:ra": 150.12345, "i:dec": -20.9876, "i:jd": 2460912.5, "v:classification": "Solar System MPC" }
+    // Add more embedded alerts here
+];
 // === CANVAS SETUP ===
 const canvas = document.getElementById('sky');
 const ctx = canvas.getContext('2d');
@@ -88,17 +97,32 @@ class Flash {
 }
 
 // === FLASH MANAGEMENT ===
+//let flashes = [];
+//function generateAlert() {
+//  const ra = Math.random() * 360;
+//  const dec = (Math.random() - 0.5) * 180;
+//  const cls = Object.keys(classes)[Math.floor(Math.random() * 5)];
+//  const objectId = "ZTF" + Math.floor(Math.random() * 1e7).toString().padStart(7, '0');
+//  const jd = 2460000 + Math.random() * 1000;
+//
+//  flashes.push(new Flash({ ra, dec, class: cls, objectId, jd }));
+//  setTimeout(generateAlert, 1000 + Math.random() * 9000);
+//}
+const randInt = (a,b) => Math.floor(a + Math.random()*(b-a+1));
+
 let flashes = [];
 function generateAlert() {
-  const ra = Math.random() * 360;
-  const dec = (Math.random() - 0.5) * 180;
-  const cls = Object.keys(classes)[Math.floor(Math.random() * 5)];
-  const objectId = "ZTF" + Math.floor(Math.random() * 1e7).toString().padStart(7, '0');
-  const jd = 2460000 + Math.random() * 1000;
-
+  const pick = alertsPool[randInt(0, alertsPool.length-1)];
+  const ra = pick['i:ra'];
+  const dec = pick['i:dec'];
+  const cls = pick['v:classification'];
+  const objectId = pick['i:objectId'];
+  const jd = pick['i:jd'];
   flashes.push(new Flash({ ra, dec, class: cls, objectId, jd }));
   setTimeout(generateAlert, 1000 + Math.random() * 9000);
 }
+
+
 
 // === DRAW HELPERS ===
 function drawStar(x, y, radius, color, alpha, sparklePhase = 0) {
