@@ -2,158 +2,215 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>LSST Light Curve Phase-Space Visualizer</title>
+  <title>LSST Light Curve Phase‑Space Visualizer</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
-    body { display: flex; height: 100vh; margin: 0; font-family: sans-serif; }
+    body { margin: 0; display: flex; height: 100vh; font-family: system-ui, sans-serif; }
     #plot { flex: 3; }
-    #controls { flex: 1; overflow-y: auto; padding: 1em; background: #f7f7f7; display: flex; flex-direction: column; }
-    #formula { margin-bottom: 10px; font-weight: bold; font-size: 14px; }
-    .slider-group { margin-bottom: 1em; width: 100%; display: flex; flex-direction: column; }
-    label { display: block; font-size: 0.9em; }
-    input[type=range] { width: 100%; }
-    button { padding: 6px 12px; margin-bottom: 10px; cursor: pointer; border-radius: 6px; border: 1px solid #ccc; background: #eee; font-weight: bold; }
-    button:hover { background: #ddd; }
+    #controls { flex: 1; display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; background:#f7f7f7; overflow-y:auto; }
+    .formula { font-size: 0.7em;font-weight: 700; margin: 4px 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .buttons { display:flex; gap:8px; margin: 10px 0; }
+    button { flex:1; padding:8px 10px; border-radius:8px; border:1px solid #ccc; background:#eee; cursor:pointer; }
+    button:hover { background:#e2e2e2; }
+    .slider-row { margin: 8px 0; }
+    .slider-row label { display:block; font-size: 12px; margin-bottom: 4px; }
+    .slider-row input[type=range] { width: 100%; }
   </style>
 </head>
 <body>
   <div id="plot"></div>
   <div id="controls">
-    <div id="formula">x = 0·Y + 0·z + 0·g + 0·i + 0·u + 0·r<br>y = 0·Y + 0·z + 0·g + 0·i + 0·u + 0·r</div>
-    <button id="resetButton">Reset</button>
+    <div id="formulaX" class="formula"></div>
+    <div id="formulaY" class="formula"></div>
+    <div class="buttons">
+      <button id="resetRandom">Reset (Random)</button>
+      <button id="resetZero">Reset (Zero)</button>
+    </div>
+    <div id="sliders"></div>
   </div>
 
-  <script>
-    const filters = ["Y", "z", "g", "i", "u", "r"];
-    let demoData = {};
+<script>
+// ======= Synthetic, irregular, per-filter data with gaps =======
+const filters = ["Y","z","g","i","u","r"];
 
-    function generateDemoData(n = 60) {
-      demoData = {};
-      const baseJD = 2460000;
-      filters.forEach(f => {
-        let times = [];
-        let values = [];
-        let t = 0;
-        for (let k = 0; k < n; k++) {
-          t += Math.random() * 5 + 1;
-          if (Math.random() < 0.15) continue;
-          times.push(baseJD + t);
-          let v;
-          switch(f){
-            case "Y": v = Math.exp(-Math.pow((t-80)/15,2))*2 + 0.2*Math.random(); break;
-            case "z": v = Math.sin(t/10) + 0.1*Math.random(); break;
-            case "g": v = Math.exp(-Math.pow((t-50)/10,2)) - Math.exp(-Math.pow((t-100)/10,2)); break;
-            case "i": v = ((t%30)<15? (t%30)/15 : (30-(t%30))/15) + 0.1*Math.random(); break;
-            case "u": v = 0.0005*t*t - 0.05*t + 2 + 0.2*Math.random(); break;
-            case "r": v = Math.cos(t/7) + 0.01*t + 0.1*Math.random(); break;
-          }
-          values.push(v);
-        }
-        demoData[f] = {times, values};
-      });
+function generateDemoData(n = 70) {
+  const baseJD = 2460000;
+  // base irregular timeline
+  const baseTimes = []; let t = 0;
+  for (let k=0;k<n;k++){ t += 1 + Math.random()*5; baseTimes.push(baseJD + t); }
+
+  const data = {};
+  filters.forEach(f=>{ data[f] = { times: [], values: [] }; });
+
+  // different shapes per filter; drop points independently (gaps per filter)
+  baseTimes.forEach((jd, idx)=>{
+    const tt = idx; // shape parameter
+    // per-filter missingness
+    const keep = {
+      Y: Math.random()>0.12,
+      z: Math.random()>0.18,
+      g: Math.random()>0.15,
+      i: Math.random()>0.20,
+      u: Math.random()>0.22,
+      r: Math.random()>0.14,
+    };
+    const shapes = {
+      Y: 18 - 1.8*Math.exp(-Math.pow((tt-40)/12,2)) + 0.05*Math.random(), // Gaussian dip (magnitudes)
+      z: 18 + 0.5*Math.sin(tt/5) + 0.05*Math.random(),
+      g: 18 - 0.9*Math.exp(-Math.pow((tt-25)/9,2)) + 0.6*Math.exp(-Math.pow((tt-60)/10,2)) + 0.05*Math.random(),
+      i: 18 + ((tt%30)<15? (tt%30)/15 : (30-(tt%30))/15) - 0.5 + 0.04*Math.random(), // triangle-ish
+      u: 18 + 0.0008*tt*tt - 0.06*tt + 0.1*Math.random(),
+      r: 18 + 0.4*Math.cos(tt/6) + 0.004*tt + 0.05*Math.random(),
+    };
+    filters.forEach(f=>{
+      if (keep[f]) { data[f].times.push(jd); data[f].values.push(shapes[f]); }
+    });
+  });
+  return data;
+}
+
+// Linear interpolation with linear extrapolation (edge slopes)
+function interp1D(times, values, t){
+  const n = times.length;
+  if (n===0) return {val:null, mode:"none"};
+  if (n===1) return {val: values[0], mode: (t<times[0]?"extrapLeft": (t>times[0]?"extrapRight":"interp"))};
+  if (t < times[0]){
+    const m = (values[1]-values[0])/(times[1]-times[0]);
+    return {val: values[0] + m*(t - times[0]), mode:"extrapLeft"};
+  }
+  if (t > times[n-1]){
+    const m = (values[n-1]-values[n-2])/(times[n-1]-times[n-2]);
+    return {val: values[n-1] + m*(t - times[n-1]), mode:"extrapRight"};
+  }
+  // binary search for interval
+  let lo=0, hi=n-1;
+  while (hi-lo>1){ const mid=(lo+hi)>>1; if (times[mid] >= t) hi=mid; else lo=mid; }
+  const frac = (t - times[lo])/(times[hi]-times[lo]);
+  return {val: values[lo]*(1-frac) + values[hi]*frac, mode:"interp"};
+}
+
+// Build grid and compute combined X,Y with segmentation (left/interp/right)
+function projectXY(data, coeffs){
+  // intersection domain where all filters are within their observed ranges
+  const firsts = filters.map(f=>data[f].times[0]).filter(v=>v!=null);
+  const lasts  = filters.map(f=>data[f].times[data[f].times.length-1]).filter(v=>v!=null);
+  const startJD = Math.max.apply(null, firsts);
+  const endJD   = Math.min.apply(null, lasts);
+  const span = Math.max(1, endJD - startJD);
+  const leftTail  = 0.15*span;
+  const rightTail = 0.15*span;
+
+  // grids
+  const gridLeft = [];
+  for (let t=startJD-leftTail; t<startJD; t += span/200) gridLeft.push(t);
+  const gridMid = [];
+  for (let t=startJD; t<=endJD; t += span/200) gridMid.push(t);
+  const gridRight = [];
+  for (let t=endJD; t<=endJD+rightTail; t += span/200) gridRight.push(t);
+
+  function combineAt(t){
+    let x=0, y=0; let mode="interp";
+    for (const f of filters){
+      const it = interp1D(data[f].times, data[f].values, t);
+      if (it.val==null) return null; // give up if any is undefined
+      x += coeffs.x[f]*it.val; y += coeffs.y[f]*it.val;
     }
+    if (t < startJD) mode="extrapLeft"; else if (t > endJD) mode="extrapRight"; else mode="interp";
+    return {x,y,mode,t};
+  }
 
-    function interp1D(xs, ys, x) {
-      if (xs.length === 0) return {val:null, mode:"none"};
-      if (x < xs[0]) { let slope=(ys[1]-ys[0])/(xs[1]-xs[0]); return {val: ys[0]+slope*(x-xs[0]), mode:"extrapLeft"};}
-      if (x > xs[xs.length-1]) { let n=xs.length; let slope=(ys[n-1]-ys[n-2])/(xs[n-1]-xs[n-2]); return {val: ys[n-1]+slope*(x-xs[n-1]), mode:"extrapRight"};}
-      for (let i=0;i<xs.length-1;i++){ if(x>=xs[i] && x<=xs[i+1]){ let t=(x-xs[i])/(xs[i+1]-xs[i]); return {val: ys[i]*(1-t)+ys[i+1]*t, mode:"interp"};}}
-      return {val:null, mode:"none"};
-    }
+  const L = gridLeft.map(combineAt).filter(Boolean);
+  const M = gridMid.map(combineAt).filter(Boolean);
+  const R = gridRight.map(combineAt).filter(Boolean);
+  return {L,M,R,startJD,endJD};
+}
 
-    function interpolateAll(){
-      let allTimes = new Set();
-      filters.forEach(f=>demoData[f].times.forEach(t=>allTimes.add(t)));
-      const minJD = Math.min(...Array.from(allTimes));
-      const maxJD = Math.max(...Array.from(allTimes));
-      const grid = [];
-      let step = (maxJD-minJD)/200;
-      for (let t=minJD;t<=maxJD;t+=step) grid.push(t);
-      let interp={};
-      filters.forEach(f=>interp[f]=grid.map(t=>interp1D(demoData[f].times,demoData[f].values,t)));
-      return {grid,interp};
-    }
+// ======= UI state =======
+let coeffs = {x:{}, y:{}};
+let demo = generateDemoData();
 
-    let coeffs = {x:{},y:{}};
-    filters.forEach(f=>{coeffs.x[f]=Math.random()*2-1; coeffs.y[f]=Math.random()*2-1;});
+function initSliders(){
+  const panel = document.getElementById('sliders');
+  panel.innerHTML = '';
+  filters.forEach(f=>{
+    // random initial values for more interesting start
+    coeffs.x[f] = +(Math.random()*2 - 1).toFixed(2);
+    coeffs.y[f] = +(Math.random()*2 - 1).toFixed(2);
 
-    function updateFormula(){
-      const formula = document.getElementById("formula");
-      let xStr = "x = ";
-      let yStr = "y = ";
-      filters.forEach((f,i)=>{xStr += `${coeffs.x[f].toFixed(2)}·${f}` + (i<filters.length-1?" + ":"");});
-      filters.forEach((f,i)=>{yStr += `${coeffs.y[f].toFixed(2)}·${f}` + (i<filters.length-1?" + ":"");});
-      formula.innerHTML = xStr+"<br>"+yStr;
-    }
+    // X slider
+    const rowX = document.createElement('div'); rowX.className='slider-row';
+    const labX = document.createElement('label'); labX.textContent = `${f} (X)`;
+    const sX = document.createElement('input'); sX.type='range'; sX.min=-2; sX.max=2; sX.step=0.01; sX.value=coeffs.x[f]; sX.id=`x_${f}`;
+    sX.addEventListener('input', ()=>{ coeffs.x[f]=+sX.value; update(); });
+    rowX.appendChild(labX); rowX.appendChild(sX); panel.appendChild(rowX);
 
-    function updatePlot(){
-      let {grid,interp}=interpolateAll();
-      let xs=[],ys=[],colors=[],modes=[];
-      for(let i=0;i<grid.length;i++){
-        let xVal=0,yVal=0,mode="interp";
-        for(let f of filters){
-          if(interp[f][i].val===null){mode="none"; break;}
-          xVal+=coeffs.x[f]*interp[f][i].val;
-          yVal+=coeffs.y[f]*interp[f][i].val;
-          if(interp[f][i].mode.startsWith("extrap")) mode=interp[f][i].mode;
-        }
-        if(mode!=="none"){xs.push(xVal); ys.push(yVal); colors.push(grid[i]); modes.push(mode);}
-      }
-      let xsInterp=[],ysInterp=[],cInterp=[];
-      let xsExtrapLeft=[],ysExtrapLeft=[],cExtrapLeft=[];
-      let xsExtrapRight=[],ysExtrapRight=[],cExtrapRight=[];
-      for(let i=0;i<xs.length;i++){
-        if(modes[i]==="interp"){xsInterp.push(xs[i]); ysInterp.push(ys[i]); cInterp.push(colors[i]);}
-        else if(modes[i]==="extrapLeft"){xsExtrapLeft.push(xs[i]); ysExtrapLeft.push(ys[i]); cExtrapLeft.push(colors[i]);}
-        else if(modes[i]==="extrapRight"){xsExtrapRight.push(xs[i]); ysExtrapRight.push(ys[i]); cExtrapRight.push(colors[i]);}
-      }
-      let traces=[];
-      if(xsInterp.length>0){
-        traces.push({x:xsInterp,y:ysInterp,mode:"lines+markers",line:{color:"blue"},
-          marker:{color:cInterp,colorscale:"Viridis",size:6,colorbar:{title:"JD",len:0.5}},name:"Interpolated"});
-      }
-      if(xsExtrapLeft.length>0){
-        traces.push({x:xsExtrapLeft,y:ysExtrapLeft,mode:"lines+markers",line:{color:"blue",dash:"dot"},
-          marker:{color:cExtrapLeft,colorscale:"Viridis",size:6},name:"Extrapolated Left"});
-      }
-      if(xsExtrapRight.length>0){
-        traces.push({x:xsExtrapRight,y:ysExtrapRight,mode:"lines+markers",line:{color:"blue",dash:"dot"},
-          marker:{color:cExtrapRight,colorscale:"Viridis",size:6},name:"Extrapolated Right"});
-      }
-      if(xs.length>0){
-        traces.push({x:[xs[0]],y:[ys[0]],mode:"markers",marker:{color:"green",size:10},name:"First"});
-        traces.push({x:[xs[xs.length-1]],y:[ys[ys.length-1]],mode:"markers",marker:{color:"red",size:10},name:"Last"});
-      }
-      Plotly.newPlot("plot",traces,{margin:{t:30},xaxis:{title:"X"},yaxis:{title:"Y"}});
-      updateFormula();
-    }
+    // Y slider
+    const rowY = document.createElement('div'); rowY.className='slider-row';
+    const labY = document.createElement('label'); labY.textContent = `${f} (Y)`;
+    const sY = document.createElement('input'); sY.type='range'; sY.min=-2; sY.max=2; sY.step=0.01; sY.value=coeffs.y[f]; sY.id=`y_${f}`;
+    sY.addEventListener('input', ()=>{ coeffs.y[f]=+sY.value; update(); });
+    rowY.appendChild(labY); rowY.appendChild(sY); panel.appendChild(rowY);
+  });
+}
 
-    function buildControls(){
-      const div = document.getElementById("controls");
-      filters.forEach(f=>{
-        let group=document.createElement("div"); group.className="slider-group";
-        group.innerHTML=`<label>${f} (X)</label><input type="range" min="-2" max="2" step="0.1" value="${coeffs.x[f]}">
-                         <label>${f} (Y)</label><input type="range" min="-2" max="2" step="0.1" value="${coeffs.y[f]}">`;
-        div.appendChild(group);
-        let xInput = group.querySelector('input[type=range]:nth-child(2)');
-        let yInput = group.querySelector('input[type=range]:nth-child(4)');
-        xInput.addEventListener("input",e=>{coeffs.x[f]=parseFloat(e.target.value); updatePlot();});
-        yInput.addEventListener("input",e=>{coeffs.y[f]=parseFloat(e.target.value); updatePlot();});
-      });
-      document.getElementById("resetButton").addEventListener("click",()=>{
-        filters.forEach(f=>{
-          coeffs.x[f]=Math.random()*2-1;
-          coeffs.y[f]=Math.random()*2-1;
-        });
-        coeffs.x["Y"] = 1;
-        updatePlot();
-        buildControls(); // rebuild sliders with new random values
-      });
-    }
+function updateFormulas(){
+  const fx = 'x = ' + filters.map(f=>`${coeffs.x[f].toFixed(2)}·${f}`).join(' + ');
+  const fy = 'y = ' + filters.map(f=>`${coeffs.y[f].toFixed(2)}·${f}`).join(' + ');
+  document.getElementById('formulaX').textContent = fx;
+  document.getElementById('formulaY').textContent = fy;
+}
 
-    generateDemoData();
-    buildControls();
-    updatePlot();
-  </script>
+function updatePlot(){
+  const {L,M,R,startJD,endJD} = projectXY(demo, coeffs);
+  const traces = [];
+
+  if (L.length){
+    traces.push({ x: L.map(p=>p.x), y: L.map(p=>p.y), mode:'lines', line:{dash:'dot'}, name:'Extrapolated (left)'});
+  }
+  if (M.length){
+    traces.push({ x: M.map(p=>p.x), y: M.map(p=>p.y), mode:'lines+markers', line:{color:'grey'},
+      marker:{ color: M.map(p=>p.t), colorscale:'Viridis', size:6, colorbar:{ title:'JD', len:0.5 } }, name:'Interpolated' });
+    // endpoints (first/last of mid)
+    traces.push({ x:[M[0].x], y:[M[0].y], mode:'markers', marker:{color:'green', size:10}, name:'First'});
+    traces.push({ x:[M[M.length-1].x], y:[M[M.length-1].y], mode:'markers', marker:{color:'red', size:10}, name:'Last'});
+  }
+  if (R.length){
+    traces.push({ x: R.map(p=>p.x), y: R.map(p=>p.y), mode:'lines', line:{dash:'dot'}, name:'Extrapolated (right)'});
+  }
+
+  Plotly.newPlot('plot', traces, {
+    margin:{t:24}, xaxis:{title:'X'}, yaxis:{title:'Y'}, legend:{orientation:'h'}
+  });
+}
+
+function update(){ updateFormulas(); updatePlot(); }
+
+// Reset handlers update existing sliders (no duplication)
+function resetRandom(){
+  filters.forEach(f=>{
+    coeffs.x[f] = +(Math.random()*2 - 1).toFixed(2);
+    coeffs.y[f] = +(Math.random()*2 - 1).toFixed(2);
+    document.getElementById(`x_${f}`).value = coeffs.x[f];
+    document.getElementById(`y_${f}`).value = coeffs.y[f];
+  });
+  update();
+}
+function resetZero(){
+  filters.forEach(f=>{
+    coeffs.x[f] = 0; coeffs.y[f] = 0;
+    document.getElementById(`x_${f}`).value = 0;
+    document.getElementById(`y_${f}`).value = 0;
+  });
+  update();
+}
+
+// Wire buttons
+window.addEventListener('DOMContentLoaded', ()=>{
+  initSliders();
+  document.getElementById('resetRandom').addEventListener('click', resetRandom);
+  document.getElementById('resetZero').addEventListener('click', resetZero);
+  update();
+});
+</script>
 </body>
 </html>

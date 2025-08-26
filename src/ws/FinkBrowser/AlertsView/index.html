@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LSST Alert Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="frame">
+    <canvas id="sky"></canvas>
+
+    <!-- Controls (top-right) -->
+    <div id="controls">
+      <button id="btnDynamic">Dynamic Sky</button>
+      <button id="btnWhole">Whole Sky</button>
+    </div>
+
+    <!-- Legend (below controls) -->
+    <div id="legend"></div>
+
+    <!-- RA/Dec info (bottom-left) -->
+    <div id="viewInfo"></div>
+
+    <!-- Overview mini map (bottom-right) -->
+    <div id="overview-container">
+      <canvas id="overview"></canvas>
+    </div>
+  </div>
+
+  <!-- Tooltip for alerts -->
+  <div id="tooltip"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

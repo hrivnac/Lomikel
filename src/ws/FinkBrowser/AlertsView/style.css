@@ -1,0 +1,115 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background: black;
+  font-family: sans-serif;
+}
+
+#frame {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  border: 8px solid #333;
+  box-sizing: border-box;
+  background: black;
+}
+
+canvas {
+  display: block;
+}
+
+/* Controls in top-right */
+#controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.6);
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  gap: 10px;
+}
+
+#controls button {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#controls button:hover {
+  background: #666;
+}
+
+/* Legend below controls */
+#legend {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background: rgba(0,0,0,0.6);
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  line-height: 1.4em;
+}
+#legend div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#legend span {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+/* RA/Dec info in bottom-left */
+#viewInfo {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: white;
+  font-size: 14px;
+  background: rgba(0,0,0,0.6);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+/* Overview map in bottom-right */
+#overview-container {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  border: 2px solid #555;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.6);
+}
+#overview {
+  width: 200px;
+  height: 100px;
+  display: block;
+}
+
+/* Tooltip */
+#tooltip {
+  position: absolute;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  pointer-events: auto;
+  display: none;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 10;
+}
+#tooltip a {
+  color: #4af;
+  text-decoration: none;
+}
+#tooltip a:hover {
+  text-decoration: underline;
+}
