@@ -12,7 +12,7 @@ const classes = {
 // === EMBEDDED ALERTS ===
 
  alertsPool = [];
-fetch("alerts.json")
+fetch("ztf_example.json")
   .then(response => response.json())
   .then(x => {alertsPool = x;});
   
