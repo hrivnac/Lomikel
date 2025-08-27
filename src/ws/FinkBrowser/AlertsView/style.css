@@ -9,9 +9,11 @@ body {
   position: relative;
   width: 100vw;
   height: 100vh;
-  border: 8px solid #333;
+  border: 8px solid #444;
   box-sizing: border-box;
   background: black;
+  display: flex;
+  flex-direction: column;
 }
 
 canvas {

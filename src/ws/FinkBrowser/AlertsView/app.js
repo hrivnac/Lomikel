@@ -10,14 +10,16 @@ const classes = {
 };
 
 // === EMBEDDED ALERTS ===
-const alertsPool = [
-    { "i:objectId": "ZTF25abixmgq", "i:ra": 317.3594119, "i:dec": -2.1304045, "i:jd": 2460913.7532639, "v:classification": "SN candidate" },
-    { "i:objectId": "ZTF25abjbadu", "i:ra": 24.5693835, "i:dec": 34.6136593, "i:jd": 2460911.884919, "v:classification": "Microlensing candidate" },
-    { "i:objectId": "ZTF25abioriw", "i:ra": 353.9771969, "i:dec": 47.0764717, "i:jd": 2460911.8657176, "v:classification": "Solar System candidate" },
-    { "i:objectId": "ZTF25abiqcie", "i:ra": 326.78721, "i:dec": 33.5252544, "i:jd": 2460910.8378241, "v:classification": "Early SN Ia candidate" },
-    { "i:objectId": "ZTF25abjzzzz", "i:ra": 150.12345, "i:dec": -20.9876, "i:jd": 2460912.5, "v:classification": "Solar System MPC" }
-    // Add more embedded alerts here
-];
+
+ alertsPool = [];
+fetch("alerts.json")
+  .then(response => response.json())
+  .then(x => {alertsPool = x;});
+  
+  
+console.log(alertsPool);
+
+
 // === CANVAS SETUP ===
 const canvas = document.getElementById('sky');
 const ctx = canvas.getContext('2d');
@@ -38,15 +40,80 @@ let camera = {
 
 // === STARFIELD BACKGROUND ===
 const stars = [];
-for (let i = 0; i < 1000; i++) {
+
+const d = fetch('hyg_v38.csv')
+    .then( res => res.text() )
+    .then( csv => {
+        Papa.parse( csv, {
+    header: true,
+    skipEmptyLines: true,
+            //download: true,
+            complete: function(results, file) {
+                //console.log("Parsing complete:", results, file);
+                //console.log(results.data);
+for (let i = 0; i < results.data.length; i++) {
+    ra = results.data[i].ra * 15;
+    dec = results.data[i].dec;
+    mag = magnitudeToInterval(results.data[i].mag);
+    if (mag < 0.5) {
+      r = magnitudeToInterval(mag);
   stars.push({
-    ra: Math.random() * 360,
-    dec: (Math.random() - 0.5) * 180,
-    r: Math.random() * 1.5,
-    alpha: 0.5 + Math.random() * 0.5,
-    twinkleSpeed: 0.002 + Math.random() * 0.003
+      ra: ra * 15,
+      dec: dec,
+      r: r,
+      alpha:  r,
+      twinkleSpeed:  0.002 + Math.random() * 0.003
   });
+    }
 }
+            }
+        });
+    });
+
+    
+function magnitudeToInterval(mag, options = {}) {
+    const minMag = options.minMag ?? -1.44;
+    const maxMag = options.maxMag ?? 6;
+    const logScale = options.logScale ?? true;
+
+    let normalized;
+
+    if (logScale) {
+        // Convert magnitude to relative brightness
+        const brightness = Math.pow(10, -4 * mag);
+        const minBrightness = Math.pow(10, -0.4 * maxMag);
+        const maxBrightness = Math.pow(10, -0.4 * minMag);
+        normalized = (brightness - minBrightness) / (maxBrightness - minBrightness);
+    } else {
+        // Linear scaling
+        normalized = (maxMag - mag) / (maxMag - minMag);
+    }
+
+    // Scale to 0-1.5
+    return Math.min(Math.max(normalized * 5.5, 0), 5.5);
+}
+
+//console.log(parsedData.data);
+//const parsedData = parseCSV(hyg_v38_csv);   
+//for (let i = 1; i < parsedData.length; i++) {
+//  ra = parsedData[i][7] * 15
+//  dec = parsedData[i][8]
+//  mag = parsedData[i][13]
+//  stars.push({
+//      ra: ra * 15,
+//      dec: dec,
+//      r: magnitudeToInterval(mag),
+//      alpha:  0.5 + Math.random() * 0.5,
+//      twinkleSpeed:  0.002 + Math.random() * 0.003
+//  });
+
+
+//console.log(stars);
+//console.log(parsedData[2][7]); 
+//console.log(parsedData[2][8]); 
+//console.log(parsedData[2][13]); 
+
+
 
 // === ALERT FLASH CLASS ===
 class Flash {
@@ -89,7 +156,7 @@ class Flash {
     // Class label
     ctx.font = "bold 14px sans-serif";
     ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
-    ctx.fillText(this.alert.class, pos.x + this.radius + 5, pos.y - this.radius - 5);
+    ctx.fillText(this.alert.objectId, pos.x + this.radius + 5, pos.y - this.radius - 5);
 
     this.pos = pos;
     return true;
@@ -112,14 +179,19 @@ const randInt = (a,b) => Math.floor(a + Math.random()*(b-a+1));
 
 let flashes = [];
 function generateAlert() {
+  try {
   const pick = alertsPool[randInt(0, alertsPool.length-1)];
+ console.log(alertsPool.length);
   const ra = pick['i:ra'];
   const dec = pick['i:dec'];
   const cls = pick['v:classification'];
   const objectId = pick['i:objectId'];
   const jd = pick['i:jd'];
   flashes.push(new Flash({ ra, dec, class: cls, objectId, jd }));
-  setTimeout(generateAlert, 1000 + Math.random() * 9000);
+  }
+  catch (e) {
+  }
+  setTimeout(generateAlert, 1000 + Math.random() * 900);
 }
 
 
@@ -242,7 +314,7 @@ canvas.addEventListener('mousemove', e => {
       tooltip.style.left = (mouseX + 10) + 'px';
       tooltip.style.top = (mouseY + 10) + 'px';
       tooltip.innerHTML =
-        `<b>${f.alert.objectId}</b><br>JD: ${f.alert.jd.toFixed(2)}<br>` +
+        `<b>${f.alert.objectId}</b><br>${f.alert.jd}<br>${f.alert.class}<br>` +
         `<a href="https://fink-portal.org/${f.alert.objectId}" target="_blank">View on Fink</a>`;
       found = true;
       clearTimeout(tooltipTimeout);
