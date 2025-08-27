@@ -1,0 +1,4 @@
+- put back interactive view window
+- put on logo (LSST, FINK)
+- dynamical class list
+  - classes on/off
