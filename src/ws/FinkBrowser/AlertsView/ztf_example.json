@@ -1,0 +1,352 @@
+[
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -1.1399348,
+    "i:jd": 2460911.8209028,
+    "i:objectId": "ZTF25abgahjn",
+    "i:ra": 337.6909891
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -19.18661,
+    "i:jd": 2460911.7942245,
+    "i:objectId": "ZTF25abbpjct",
+    "i:ra": 332.3756632
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -19.1866973,
+    "i:jd": 2460911.7705093,
+    "i:objectId": "ZTF25abbpjct",
+    "i:ra": 332.3756375
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -10.4896049,
+    "i:jd": 2460910.7761921,
+    "i:objectId": "ZTF25abemtnr",
+    "i:ra": 331.2639018
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -24.7332502,
+    "i:jd": 2460910.7568287,
+    "i:objectId": "ZTF21abcabox",
+    "i:ra": 282.0930178
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -23.5786749,
+    "i:jd": 2460910.7568287,
+    "i:objectId": "ZTF25abcwzci",
+    "i:ra": 281.6415671
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -22.0372551,
+    "i:jd": 2460910.6568171,
+    "i:objectId": "ZTF23aaopkgx",
+    "i:ra": 261.2091943
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -1.1399752,
+    "i:jd": 2460909.8373958,
+    "i:objectId": "ZTF25abgahjn",
+    "i:ra": 337.6909615
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -19.1867171,
+    "i:jd": 2460909.7937037,
+    "i:objectId": "ZTF25abbpjct",
+    "i:ra": 332.3757072
+  },
+  {
+    "v:classification": "Microlensing candidate",
+    "i:dec": -23.5787009,
+    "i:jd": 2460908.7774769,
+    "i:objectId": "ZTF25abcwzci",
+    "i:ra": 281.6415527
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": -2.1304045,
+    "i:jd": 2460913.7532639,
+    "i:objectId": "ZTF25abixmgq",
+    "i:ra": 317.3594119
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": 34.6136593,
+    "i:jd": 2460911.884919,
+    "i:objectId": "ZTF25abjbadu",
+    "i:ra": 24.5693835
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": 47.0764717,
+    "i:jd": 2460911.8657176,
+    "i:objectId": "ZTF25abioriw",
+    "i:ra": 353.9771969
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": 47.0764876,
+    "i:jd": 2460911.8276157,
+    "i:objectId": "ZTF25abioriw",
+    "i:ra": 353.9772349
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": 33.5252544,
+    "i:jd": 2460910.8378241,
+    "i:objectId": "ZTF25abiqcie",
+    "i:ra": 326.78721
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": 72.3369956,
+    "i:jd": 2460910.7674653,
+    "i:objectId": "ZTF25abipumk",
+    "i:ra": 240.6326289
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": 72.33699,
+    "i:jd": 2460910.7664583,
+    "i:objectId": "ZTF25abipumk",
+    "i:ra": 240.6326284
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": -6.2132846,
+    "i:jd": 2460910.7591782,
+    "i:objectId": "ZTF25abidcdj",
+    "i:ra": 294.6417965
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": -19.5244586,
+    "i:jd": 2460910.7521181,
+    "i:objectId": "ZTF25abimrij",
+    "i:ra": 292.5482794
+  },
+  {
+    "v:classification": "Early SN Ia candidate",
+    "i:dec": -6.2132601,
+    "i:jd": 2460910.7363542,
+    "i:objectId": "ZTF25abidcdj",
+    "i:ra": 294.6417873
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 18.8292583,
+    "i:jd": 2460913.7575231,
+    "i:objectId": "ZTF25aayiimj",
+    "i:ra": 339.9399391
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 12.2835279,
+    "i:jd": 2460913.7570602,
+    "i:objectId": "ZTF25abiolbr",
+    "i:ra": 340.1380028
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 12.3357707,
+    "i:jd": 2460913.7570602,
+    "i:objectId": "ZTF25abjbqvp",
+    "i:ra": 340.0778486
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 9.0892351,
+    "i:jd": 2460913.7570602,
+    "i:objectId": "ZTF25ablioyb",
+    "i:ra": 343.990512
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 8.9193086,
+    "i:jd": 2460913.7570602,
+    "i:objectId": "ZTF25abjamjh",
+    "i:ra": 344.1992777
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 13.931992,
+    "i:jd": 2460913.7570602,
+    "i:objectId": "ZTF25abeldua",
+    "i:ra": 342.1531059
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 6.2091004,
+    "i:jd": 2460913.7565856,
+    "i:objectId": "ZTF25ablinmi",
+    "i:ra": 344.4864352
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 1.1080315,
+    "i:jd": 2460913.7561227,
+    "i:objectId": "ZTF25aauhbec",
+    "i:ra": 338.4898658
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 1.1844729,
+    "i:jd": 2460913.7561227,
+    "i:objectId": "ZTF25abhodvi",
+    "i:ra": 337.8721322
+  },
+  {
+    "v:classification": "SN candidate",
+    "i:dec": 20.5040506,
+    "i:jd": 2460913.7556366,
+    "i:objectId": "ZTF25aaylqqq",
+    "i:ra": 321.377219
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": 21.534831,
+    "i:jd": 2460913.7575231,
+    "i:objectId": "ZTF25ablwyvi",
+    "i:ra": 340.5462883
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": 6.65794,
+    "i:jd": 2460913.7565856,
+    "i:objectId": "ZTF25ablwwrz",
+    "i:ra": 346.3191439
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": 18.0297608,
+    "i:jd": 2460913.7556366,
+    "i:objectId": "ZTF25ablwysx",
+    "i:ra": 327.2191921
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": 11.3586242,
+    "i:jd": 2460913.755162,
+    "i:objectId": "ZTF25ablwydu",
+    "i:ra": 327.336644
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": 4.7029514,
+    "i:jd": 2460913.7537384,
+    "i:objectId": "ZTF25ablwytz",
+    "i:ra": 318.200641
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": 5.5806094,
+    "i:jd": 2460913.7537384,
+    "i:objectId": "ZTF25ablwwkx",
+    "i:ra": 314.1725635
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": 4.3393298,
+    "i:jd": 2460913.7537384,
+    "i:objectId": "ZTF25ablwvii",
+    "i:ra": 315.5383632
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": 7.0857655,
+    "i:jd": 2460913.7537384,
+    "i:objectId": "ZTF25ablwvhp",
+    "i:ra": 315.7560823
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": -10.8484846,
+    "i:jd": 2460913.7528009,
+    "i:objectId": "ZTF25ablwwvy",
+    "i:ra": 326.4519411
+  },
+  {
+    "v:classification": "Solar System candidate",
+    "i:dec": -14.7027322,
+    "i:jd": 2460913.7523264,
+    "i:objectId": "ZTF25ablwuhv",
+    "i:ra": 328.2428482
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 18.0419905,
+    "i:jd": 2460913.7579977,
+    "i:objectId": "ZTF25ablwzbm",
+    "i:ra": 329.8615774
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 18.3226463,
+    "i:jd": 2460913.7579977,
+    "i:objectId": "ZTF25ablwysq",
+    "i:ra": 331.1203297
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 17.6271665,
+    "i:jd": 2460913.7579977,
+    "i:objectId": "ZTF25ablwzda",
+    "i:ra": 329.6796663
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 18.548391,
+    "i:jd": 2460913.7579977,
+    "i:objectId": "ZTF25ablwysr",
+    "i:ra": 330.7371631
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 20.4929928,
+    "i:jd": 2460913.7579977,
+    "i:objectId": "ZTF25ablwyyl",
+    "i:ra": 332.7301359
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 16.4150928,
+    "i:jd": 2460913.7575231,
+    "i:objectId": "ZTF25ablwzbr",
+    "i:ra": 342.3441638
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 16.4247702,
+    "i:jd": 2460913.7575231,
+    "i:objectId": "ZTF25ablwzbs",
+    "i:ra": 342.1828172
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 18.1934683,
+    "i:jd": 2460913.7575231,
+    "i:objectId": "ZTF25ablwzdh",
+    "i:ra": 340.8677982
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 16.4687549,
+    "i:jd": 2460913.7575231,
+    "i:objectId": "ZTF25ablwzbz",
+    "i:ra": 341.3104051
+  },
+  {
+    "v:classification": "Solar System MPC",
+    "i:dec": 16.8018145,
+    "i:jd": 2460913.7575231,
+    "i:objectId": "ZTF25ablwzcb",
+    "i:ra": 340.7994132
+  }
+]
