@@ -27,7 +27,7 @@ function galacticToEquatorial(lDeg, bDeg) {
   // ensure 0–360°
   ra = (ra*180/Math.PI + 360) % 360;
   const decDeg = dec*180/Math.PI;
-  return { ra, dec: decDeg };
+  return {ra, dec: decDeg};
   }
 
 // λ in degrees along ecliptic, β = 0 for the Sun's path

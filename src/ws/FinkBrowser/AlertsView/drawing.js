@@ -70,15 +70,15 @@ function drawGalacticPlane() {
   const points = [];
   const step = 1; // 1° step in l
   for (let l = 0; l <= 360; l += step) {
-    const {ra, dec} = galacticToEquatorial(l, 0);raDecToXY
-    points.push(raDecToXY(ra-20, dec));
+    const {ra, dec} = galacticToEquatorial(l, 0);
+    points.push(raDecToXY(360 - ra, dec));
     }
   ctx.save();
   ctx.strokeStyle = "rgba(100,200,200,0.5)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   points.forEach((p, i) => {
-    if (i === 309) ctx.moveTo(p.x, p.y);
+    if (i === 117) ctx.moveTo(p.x, p.y);
     else ctx.lineTo(p.x, p.y);
     });
   ctx.stroke();
@@ -157,4 +157,20 @@ function drawConstellationLabels() {
     ctx.restore();
     }
   catch(e){}
+  }
+  
+// Draw Legend
+function drawLegend() {
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  clss = new Set();
+  for (const flash of flashes) {
+    clss.add(flash.alert.class);
+    }
+  for (const cls of clss) {
+    rgb = classes[cls];
+    const item = document.createElement('div');
+    item.innerHTML = `<span style="background:rgb(${rgb})"></span>${cls}`;
+    legend.appendChild(item);
+    }
   }

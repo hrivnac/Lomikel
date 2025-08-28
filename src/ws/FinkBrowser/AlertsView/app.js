@@ -55,6 +55,7 @@ class Flash {
     ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
     ctx.fillText(this.alert.objectId, pos.x + this.radius + 5, pos.y - this.radius - 5);
     this.pos = pos;
+    drawLegend();
     return true;
     }
   }
@@ -167,19 +168,6 @@ canvas.addEventListener('mousemove', e => {
 // Controls
 document.getElementById('btnDynamic').onclick = () => {camera.mode = "dynamic";};
 document.getElementById('btnWhole').onclick = () => {camera.mode = "whole";};
-
-
-// Legend
-function initLegend() {
-  const legend = document.getElementById('legend');
-  legend.innerHTML = '';
-  for (const [cls, rgb] of Object.entries(classes)) {
-    const item = document.createElement('div');
-    item.innerHTML = `<span style="background:rgb(${rgb})"></span>${cls}`;
-    legend.appendChild(item);
-    }
-  }
-initLegend();
 
 // Logo
 function initLogo() {
