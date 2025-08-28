@@ -1,37 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>LSST Alert Demo</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div id="frame">
-     <!--object id="skySVG" type="image/svg+xml" data="constellations_map_equ1110112.svg"></object-->
-     <canvas id="sky"></canvas>
-
-    <!-- Controls (top-right) -->
-    <div id="controls">
-      <button id="btnDynamic">Dynamic Sky</button>
-      <button id="btnWhole">Whole Sky</button>
-    </div>
-
-    <!-- Legend (below controls) -->
-    <div id="legend"></div>
-
-    <!-- RA/Dec info (bottom-left) -->
-    <div id="viewInfo"></div>
-
-    <!-- Overview mini map (bottom-right) -->
-    <div id="overview-container">
-      <canvas id="overview"></canvas>
-    </div>
-  </div>
-
-  <!-- Tooltip for alerts -->
-  <div id="tooltip"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+  <head>
+    <meta charset="UTF-8">
+    <title>LSST Alert Demo</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
+  <body>
+    <div id="frame">
+      <canvas id="sky"></canvas>  
+      <!-- Controls (top-right) -->
+      <div id="controls">
+        <button id="btnDynamic">Dynamic Sky</button>
+        <button id="btnWhole">Whole Sky</button>
+        </div>  
+      <!-- Legend (below controls) -->
+      <div id="legend"></div>  
+      <!-- Logo (top-left) -->
+      <div id="logo"></div>  
+      <!-- RA/Dec info (bottom-left) -->
+      <div id="viewInfo"></div>  
+      <!-- Overview mini map (bottom-right) -->
+      <div id="overview-container">
+        <canvas id="overview"></canvas>
+        </div>
+      </div>  
+    <!-- Tooltip for alerts -->
+    <div id="tooltip"></div>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="app.js"></script>
+    </body>
+  </html>

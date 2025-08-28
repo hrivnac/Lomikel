@@ -2,3 +2,6 @@
 - put on logo (LSST, FINK)
 - dynamical class list
   - classes on/off
+  
+  
+ https://github.com/ofrohn/d3-celestial/blob/master/data/constellations.lines.json
