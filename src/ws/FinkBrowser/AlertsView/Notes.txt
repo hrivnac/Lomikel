@@ -4,4 +4,6 @@
   - classes on/off
   
   
- https://github.com/ofrohn/d3-celestial/blob/master/data/constellations.lines.json
+https://github.com/ofrohn/d3-celestial/blob/master/data/constellations.lines.json
+
+python3 -m http.server 8000 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/AlertsView
