@@ -172,7 +172,7 @@ document.getElementById('btnWhole').onclick = () => {camera.mode = "whole";};
 // Logo
 function initLogo() {
   const logo = document.getElementById('logo');
-  logo.innerHTML = `<img src='Fink_PrimaryLogo_WEB.png' width='` + (window.innerWidth / 16) + `'>`;
+  logo.innerHTML = `<a href="https://fink-portal.org" target="_blank"><img src='Fink_PrimaryLogo_WEB.png' width='` + (window.innerWidth / 16) + `'></a>`;
   }
 initLogo();
 
