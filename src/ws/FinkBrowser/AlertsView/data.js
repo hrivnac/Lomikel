@@ -1,44 +1,34 @@
-function generateDemoData(n = 70) {
-  const baseJD = 2460000;
-  // base irregular timeline
-  const baseTimes = []; let t = 0;
-  for (let k = 0; k < n; k++){
-    t += 1 + Math.random() * 5;
-    baseTimes.push(baseJD + t);
-    }
-  const data = {};
-  filters.forEach(f => {
-    data[f] = {
-      times: [],
-      values: []
-      };
-    });
-  // different shapes per filter; drop points independently (gaps per filter)
-  baseTimes.forEach((jd, idx) => {
-    const tt = idx; // shape parameter
-    // per-filter missingness
-    const keep = {
-      Y: Math.random() > 0.12,
-      z: Math.random() > 0.18,
-      g: Math.random() > 0.15,
-      i: Math.random() > 0.20,
-      u: Math.random() > 0.22,
-      r: Math.random() > 0.14,
-      };
-    const shapes = {
-      Y: 18 - 1.8 * Math.exp(-Math.pow((tt - 40) / 12, 2)) + 0.05 * Math.random(), // Gaussian dip (magnitudes)
-      z: 18 + 0.5 * Math.sin(tt / 5) + 0.05 * Math.random(),
-      g: 18 - 0.9 * Math.exp(-Math.pow((tt - 25) / 9, 2)) +  0.6 * Math.exp(-Math.pow((tt - 60) / 10, 2)) + 0.05 * Math.random(),
-      i: 18 + ((tt % 30) < 15 ? (tt % 30) / 15 : (30 - (tt % 30)) / 15) - 0.5 + 0.04 * Math.random(), // triangle-ish
-      u: 18 + 0.0008 * tt * tt - 0.06 * tt + 0.1 * Math.random(),
-      r: 18 + 0.4 * Math.cos(tt / 6) + 0.004 * tt + 0.05 * Math.random(),
-      };
-    filters.forEach(f => {
-      if (keep[f]) {
-        data[f].times.push(jd);
-        data[f].values.push(shapes[f]);
-        }
-      });
-    });
-  return data;
-  }
+// Alerts
+alertsPool = [];
+fetch("ztf_example.json").then(response => response.json()).
+                          then(x => {alertsPool = x});
+    
+// Constellations      
+constellations = [];
+fetch("constellations.lines.json").then(response => response.json()).
+                                   then(x => {constellations = x});
+
+// Stars
+const stars = [];
+const d = fetch('hyg_v38.csv').then(res => res.text()).
+                               then(csv => {Papa.parse(csv, {header: true,
+                                                             skipEmptyLines: true,
+                                                             complete: function(results, file) {
+                                                                         for (let i = 0; i < results.data.length; i++) {
+                                                                            ra = results.data[i].ra * 15;
+                                                                            dec = results.data[i].dec;
+                                                                            mag = results.data[i].mag;
+                                                                            proper = results.data[i].proper;
+                                                                            r = Math.max(0.5, 2.5 - mag * 0.2);
+                                                                            if (ra != 0 && r > 1.5) {
+                                                                              stars.push({ra: ra,
+                                                                                          dec: dec,
+                                                                                          r: r,
+                                                                                          proper: proper,
+                                                                                          alpha:  Math.max(0, 1 - mag * 0.05),
+                                                                                          twinkleSpeed:  Math.max(0, 0.1*(1 - mag * 0.05))});                                                                            
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        });
+                                                              });
