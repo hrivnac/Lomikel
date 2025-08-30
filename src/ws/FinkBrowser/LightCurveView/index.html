@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>LSST Light Curve Visualizer</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.0.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="style.css">
     </head>
   <body>
@@ -15,12 +16,17 @@
         <button id="resetRandom">Reset (Random)</button>
         <button id="resetZero">Reset (Zero)</button>
         </div>
+      <div>
+        <div id="snid-buttons"></div>
+        </div>
       <div id="sliders"></div>
       </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="consts.js"></script>
     <script src="data.js"></script>
     <script src="reset.js"></script>
     <script src="sliders.js"></script>
+    <script src="buttons.js"></script>
     <script src="update.js"></script>
     <script src="utils.js"></script>
     <script src="app.js"></script>

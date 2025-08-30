@@ -1,4 +1,5 @@
-// Reset handlers update existing sliders (no duplication)
+// Reset handlers update existing sliders 
+
 function resetRandom(){
   filters.forEach(f => {
     coeffs.x[f] = +(Math.random() * 2 - 1).toFixed(2);

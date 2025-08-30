@@ -59,4 +59,19 @@ button:hover {
   width: 100%;
   }
 
+#snid-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+  }
+  
+.snid-btn {
+  padding:6px 10px; border:1px solid #ccc; border-radius:8px;
+  background:#3b82f6; color:#fff; cursor:pointer;
+  }
+  
+.snid-btn.active {
+  background:#16a34a; border-color:#0ea34a;
+  }
 

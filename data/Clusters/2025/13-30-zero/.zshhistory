@@ -1,6 +1,0 @@
-: 1751119578:0;ll
-: 1751119581:0;ls ../*
-: 1751119600:0;mv cluster_centers-zero.json cluster_centers.json
-: 1751119607:0;mv pca_params-zero.json pca_params.json
-: 1751119621:0;mv scaler_params-zero.json scaler_params.json
-: 1751119624:0;cd ../..

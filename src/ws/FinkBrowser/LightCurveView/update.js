@@ -5,19 +5,22 @@ function updateFormulas(){
   document.getElementById('formulaX').textContent = fx;
   document.getElementById('formulaY').textContent = fy;
   }
-
-function updatePlot(){
+  
+function updatePlot() {
+  if (lightcurve != "") {
+    demo = lightcurve;
+    }
   const {L, M ,R , startJD, endJD} = projectXY(demo, coeffs);
   const traces = [];
-  if (L.length){
-    traces.push({
-      x: L.map(p => p.x),
-      y: L.map(p => p.y),
-      mode:'lines',
-      line:{dash:'dot'},
-      name:'Extrapolated (left)'
-      });
-    }
+  //if (L.length){
+  //  traces.push({
+  //    x: L.map(p => p.x),
+  //    y: L.map(p => p.y),
+  //    mode:'lines',
+  //    line:{dash:'dot'},
+  //    name:'Extrapolated (left)'
+  //    });
+  //  }
   if (M.length){
     traces.push({
       x: M.map(p => p.x),
@@ -56,17 +59,17 @@ function updatePlot(){
       name:'Last'
       });
     }
-  if (R.length){
-    traces.push({
-      x: R.map(p => p.x),
-      y: R.map(p => p.y),
-      mode:'lines',
-      line:{
-        dash:'dot'
-        },
-      name:'Extrapolated (right)'
-      });
-    }
+  //if (R.length){
+  //  traces.push({
+  //    x: R.map(p => p.x),
+  //    y: R.map(p => p.y),
+  //    mode:'lines',
+  //    line:{
+  //      dash:'dot'
+  //      },
+  //    name:'Extrapolated (right)'
+  //    });
+  //  }
   Plotly.newPlot('plot', traces, {
     margin:{t:24},
     xaxis:{title:'X'},

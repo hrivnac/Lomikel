@@ -1,0 +1,5 @@
+- allow saving names configuration
+- provide some pre-defined configurations
+- get real lightcurves
+
+python3 -m http.server 8001 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/LightCurveView

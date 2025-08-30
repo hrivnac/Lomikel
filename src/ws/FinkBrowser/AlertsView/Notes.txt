@@ -1,8 +1,5 @@
-- put back interactive view window
-- put on logo (LSST, FINK)
-- dynamical class list
-  - classes on/off
-  
+- get alerts from Fink (with classes)
+- use specific classes icons
   
 https://github.com/ofrohn/d3-celestial/blob/master/data/constellations.lines.json
 
