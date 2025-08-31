@@ -47,7 +47,7 @@ function generateDemoData(n = 70) {
 lightcurve = "";
 function loadSNID(snid) {
   lightcurve = "";
-  fetch(`sn_lightcurves/${snid}.json`).then(resp => resp.json()).
+  fetch(`${snid}.json`).then(resp => resp.json()).
                                        then(data => {
                                          lightcurve = data;
                                          resetRandom();     
