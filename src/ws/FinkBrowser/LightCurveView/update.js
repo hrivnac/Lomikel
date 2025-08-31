@@ -77,6 +77,49 @@ function updatePlot() {
     legend:{orientation:'h'}
     });
   }
+  
+function plotLightCurves(data) {
+  let traces = [];
+  for (let band of filters) {
+    if (data[band] && data[band].times.length > 0) {
+      // Filter out zero magnitudes
+      let times = [];
+      let mags  = [];
+      for (let i = 0; i < data[band].times.length; i++) {
+        if (data[band].values[i] !== 0) {
+          times.push(data[band].times[i]);
+          mags.push(data[band].values[i]);
+          }
+        }
+      if (times.length > 0) {
+        traces.push({
+          x: times,
+          y: mags,
+          mode: 'lines+markers',
+          name: band,
+          line: {color: bandColors[band]},
+          marker: {size: 6,
+                   color: bandColors[band]}
+          });
+        }
+      }
+  }  
+  
+  Plotly.newPlot("lightcurvePlot", 
+                 traces, 
+                 {margin: {t: 20},
+                  xaxis: {title: "MJD"},
+                  yaxis: {title: "Magnitude"},  // mag axis inverted
+                  height: 300,
+                  legend: {
+                    orientation: "h",        // horizontal legend
+                    x: 0, y: -0.2,           // place it below the plot
+                    bgcolor: "rgba(0,0,0,0)" // transparent background
+                    }
+                  },
+                 {displayModeBar: false      // hide Plotly toolbar
+                });
+  }
 
 function update(){
   updateFormulas();

@@ -834,7 +834,7 @@
       </exec>
     <echo>Restart JanusGraph !</echo>
     </target>
-  
+    
   <!-- Start/Stop JanusGraph ================================================-->
   
   <target name="janus-start"

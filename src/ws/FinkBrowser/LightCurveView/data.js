@@ -40,6 +40,7 @@ function generateDemoData(n = 70) {
         }
       });
     });
+  plotLightCurves(data);
   return data;
   }
  
@@ -48,10 +49,11 @@ function loadSNID(snid) {
   lightcurve = "";
   fetch(`sn_lightcurves/${snid}.json`).then(resp => resp.json()).
                                        then(data => {
-                                         lightcurve = data; 
+                                         lightcurve = data;
                                          resetRandom();     
                                          activeSNID = String(snid);
                                          updateSNIDHighlight();
+                                         plotLightCurves(data);
                                          }).
                                        catch(err => console.error("Failed to load SNID", snid, err));
   }

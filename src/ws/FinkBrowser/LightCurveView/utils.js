@@ -53,6 +53,7 @@ function projectXY(data, coeffs){
     else mode = "interp";
     return {x, y, mode, t};
     }
+    
   const L = gridLeft.map(combineAt).filter(Boolean);
   const M = gridMid.map(combineAt).filter(Boolean);
   const R = gridRight.map(combineAt).filter(Boolean);
