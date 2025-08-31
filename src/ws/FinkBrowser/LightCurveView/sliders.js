@@ -9,7 +9,8 @@ function initSliders(){
     const rowX = document.createElement('div');
     rowX.className = 'slider-row';
     const labX = document.createElement('label');
-    labX.textContent = `${f} (X)`;
+    labX.textContent = `${f} (x)`;
+    labX.style.color = bandColors[f];
     const sX = document.createElement('input');
     sX.type = 'range';
     sX.min = -2;
@@ -17,6 +18,7 @@ function initSliders(){
     sX.step = 0.01;
     sX.value = coeffs.x[f];
     sX.id = `x_${f}`;
+    sX.style.accentColor = bandColors[f]; // works in modern browsers
     sX.addEventListener('input', () => {
       coeffs.x[f] = + sX.value;
       update();
@@ -28,7 +30,8 @@ function initSliders(){
     const rowY = document.createElement('div');
     rowY.className = 'slider-row';
     const labY = document.createElement('label');
-    labY.textContent = `${f} (Y)`;
+    labY.textContent = `${f} (y)`;
+    labY.style.color = bandColors[f];
     const sY = document.createElement('input');
     sY.type = 'range'; 
     sY.min = -2;
@@ -36,6 +39,7 @@ function initSliders(){
     sY.step = 0.01;
     sY.value = coeffs.y[f];
     sY.id = `y_${f}`;
+    sY.style.accentColor = bandColors[f]; // works in modern browsers
     sY.addEventListener('input', () => {
       coeffs.y[f] = +sY.value;
       update();
