@@ -59,3 +59,5 @@ function projectXY(data, coeffs){
   const R = gridRight.map(combineAt).filter(Boolean);
   return {L, M, R, startJD, endJD};
   }
+  
+  

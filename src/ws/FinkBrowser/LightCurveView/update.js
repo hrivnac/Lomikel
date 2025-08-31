@@ -5,12 +5,15 @@ function updateFormulas(){
   document.getElementById('formulaX').textContent = fx;
   document.getElementById('formulaY').textContent = fy;
   }
+
   
 function updatePlot() {
   if (lightcurve != "") {
     demo = lightcurve;
     }
   const {L, M ,R , startJD, endJD} = projectXY(demo, coeffs);
+  activeX = M.map(p => p.x);
+  activeY = M.map(p => p.y);
   const traces = [];
   //if (L.length){
   //  traces.push({
@@ -103,8 +106,7 @@ function plotLightCurves(data) {
           });
         }
       }
-  }  
-  
+    }  
   Plotly.newPlot("lightcurvePlot", 
                  traces, 
                  {margin: {t: 20},
@@ -125,3 +127,4 @@ function update(){
   updateFormulas();
   updatePlot();
   }
+  
