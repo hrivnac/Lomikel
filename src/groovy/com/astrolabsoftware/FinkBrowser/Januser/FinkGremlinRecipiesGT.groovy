@@ -551,14 +551,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def Map<Map.Entry<String, Double>, Map<String, Double>> limitMapMap(Map<Map.Entry<String, Double>, Map<String, Double>> map,
                                                                       double                                              nmax) {
     if (nmax >= 1) {
-      return map.entrySet().                        
-                 sort{a, b -> a.key.value <=> b.key.value}.  
-                 take((int)nmax).
-                 collectEntries(new LinkedHashMap<>()) {entry -> [(entry.key): entry.value]}
+      def map1 = [:];
+      def entries = map.entrySet().
+                        sort{a, b -> a.key.value <=> b.key.value}
+      return entries.take((int)nmax).
+                     collectEntries(new LinkedHashMap<>()) {entry -> [(entry.key): entry.value]}
       }
     else {
       def map1 = [:];
-      def entries = map.entrySet().sort{a, b -> a.key.value <=> b.key.value}
+      def entries = map.entrySet().
+                        sort{a, b -> a.key.value <=> b.key.value}
       for (int i = 0; i < entries.size(); i++) {
         if (i < 2) {
           map1[entries[i].key] = entries[i].value
