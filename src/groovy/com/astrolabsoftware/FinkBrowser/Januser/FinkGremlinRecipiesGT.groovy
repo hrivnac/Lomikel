@@ -550,21 +550,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   // TBD: rafactor with limitMap
   def Map<Map.Entry<String, Double>, Map<String, Double>> limitMapMap(Map<Map.Entry<String, Double>, Map<String, Double>> map,
                                                                       double                                              nmax) {
+    def map1 = [:];
+    def entries = map.entrySet().
+                      sort{a, b -> a.key.value <=> b.key.value}
     if (nmax >= 1) {
-      def map1 = [:];
-      def entries = map.entrySet().
-                        sort{a, b -> a.key.value <=> b.key.value}
-      //return entries.take((int)nmax).
-      //               collectEntries(new LinkedHashMap<>()) {entry -> [(entry.key): entry.value]}
       for (int i = 0; i < 10; i++) {
         map1[entries[i].key] = entries[i].value
         }
       return map1
       }
     else {
-      def map1 = [:];
-      def entries = map.entrySet().
-                        sort{a, b -> a.key.value <=> b.key.value}
       for (int i = 0; i < entries.size(); i++) {
         if (i < 2) {
           map1[entries[i].key] = entries[i].value
