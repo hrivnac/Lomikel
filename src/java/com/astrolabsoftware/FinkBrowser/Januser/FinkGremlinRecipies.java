@@ -316,7 +316,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                           String              objectId,
                           Map<String, String> attributes,
                           boolean             replace) {   
-    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
+    //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
+    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + attributes.get("weight") + ", replace = " + replace);
     Vertex soi = g().V().has("lbl",        "SoI"              ).
                          has("classifier", classifier.name()  ).
                          has("flavor",     classifier.flavor()).
