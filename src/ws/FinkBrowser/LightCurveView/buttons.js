@@ -8,6 +8,14 @@ function createSNIDButtons() {
     btn.onclick = () => loadSNID(snid);
     container.appendChild(btn);
   });
+  demo_selection.forEach(snid => {
+    const btn = document.createElement("button");
+    btn.textContent = snid;
+    btn.className = "snid-btn";
+    btn.dataset.snid = String(snid);
+    btn.onclick = () => loadDemo(snid);
+    container.appendChild(btn);
+  });
 }
 
 function updateSNIDHighlight() {

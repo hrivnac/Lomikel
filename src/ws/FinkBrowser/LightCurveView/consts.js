@@ -8,4 +8,7 @@ const bandColors = {
   "u": "purple",
   "r": "orange"
 };
+
 const snid_selection = [99141878, 98988375, 39702066, 98837255];
+
+const demo_selection = ["random", "peak", "periodic"];

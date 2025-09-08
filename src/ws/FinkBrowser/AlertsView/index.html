@@ -2,36 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>LSST Alert Monitor</title>
+    <title>LSST Alerts Monitor</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=AlertsView"></script>                                                       |
     <link rel="stylesheet" href="style.css">
     </head>
   <body>
     <div id="frame">
       <canvas id="sky"></canvas>  
-      <!-- Controls (top-right) -->
       <div id="controls">
         <button id="btnDynamic">Dynamic Sky</button>
         <button id="btnWhole">Whole Sky</button>
-        </div>  
-      <!-- Legend (below controls) -->
+        </div> 
       <div id="legend"></div>  
-      <!-- Logo (top-left) -->
       <div id="logo"></div>  
-      <!-- RA/Dec info (bottom-left) -->
-      <div id="viewInfo"></div>  
-      <!-- Overview mini map (bottom-right) -->
+      <div id="infoContainer">
+        <div id="statusPanel"></div>
+        <div id="viewInfo"></div>
+        </div>
       <div id="overview-container">
         <canvas id="overview"></canvas>
         </div>
       </div>  
-    <!-- Tooltip for alerts -->
     <div id="tooltip"></div>
-    <!-- scripts -->
     <script src="consts.js"></script>
     <script src="data.js"></script>
     <script src="utils.js"></script>
     <script src="drawing.js"></script>
+    <script src="update.js"></script>
     <script src="app.js"></script>
     </body>
   </html>

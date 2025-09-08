@@ -1,8 +1,36 @@
 // Alerts
-alertsPool = [];
-fetch("ztf_example.json").then(response => response.json()).
-                          then(x => {alertsPool = x});
-    
+let alertsPool = [];
+//fetch("ztf_example.json").then(response => response.json()).
+//                          then(x => {alertsPool = x});
+async function fetchAlerts() {
+  const allAlerts = [];
+  for (const cls of Object.keys(classes)) {
+    const url = `https://api.fink-portal.org/api/v1/latests?class=${encodeURIComponent(cls)}&n=${encodeURIComponent(nAlerts)}&columns=i%3AobjectId%2Ci%3Ajd%2Ci%3Ara%2Ci%3Adec&output-format=json`;
+    try {
+      const response = await fetch(url, {headers: {"accept": "application/json"}});
+      if (!response.ok) {
+        console.error(`Failed to fetch ${cls}: ${response.status}`);
+        continue;
+        }
+      const data = await response.json();
+      data.forEach(alert => {
+        alert["v:classification"] = cls;
+        });
+      allAlerts.push(...data);
+      }
+    catch (err) {
+      console.error("Error fetching alerts for", cls, err);
+      }
+    }
+  alertsPool = allAlerts;
+  console.log(`Fetched ${alertsPool.length} alerts from Fink Portal`);;
+  updateStatusPanel(alertsPool.length);
+  }
+// Initial fetch
+fetchAlerts();
+// Refresh every 10 minutes
+setInterval(fetchAlerts, fetchPeriod * 60 * 1000);
+
 // Constellations      
 constellations = [];
 fetch("constellations.lines.json").then(response => response.json()).
