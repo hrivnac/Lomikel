@@ -4,8 +4,9 @@ let alertsPool = [];
 //                          then(x => {alertsPool = x});
 async function fetchAlerts() {
   const allAlerts = [];
+  const startdate = getStartDateParam();
   for (const cls of Object.keys(classes)) {
-    const url = `https://api.fink-portal.org/api/v1/latests?class=${encodeURIComponent(cls)}&n=${encodeURIComponent(nAlerts)}&columns=i%3AobjectId%2Ci%3Ajd%2Ci%3Ara%2Ci%3Adec&output-format=json`;
+    const url = `https://api.fink-portal.org/api/v1/latests?class=${encodeURIComponent(cls)}&n=${encodeURIComponent(nAlerts)}&columns=i%3AobjectId%2Ci%3Ajd%2Ci%3Ara%2Ci%3Adec&startdate=${encodeURIComponent(startdate)}&output-format=json`;
     try {
       const response = await fetch(url, {headers: {"accept": "application/json"}});
       if (!response.ok) {

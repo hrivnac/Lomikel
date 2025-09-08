@@ -13,6 +13,7 @@ const deltaGP = 27.12825 * Math.PI/180;
 const lOmega  = 32.93192 * Math.PI/180;
 const epsilon = 23.4393 * Math.PI/180; // obliquity in radians
 
-const fetchPeriod = 1;
+const fetchPeriod = 1; // every x minutes
+const fetchStart = 48; // hours before now
 const nAlerts = 10;
   

@@ -44,3 +44,19 @@ function eclipticToEquatorial(lambdaDeg) {
     dec: dec*180/Math.PI
     };
   }
+
+function getStartDateParam() {
+  const now = new Date();
+  const past = new Date(now.getTime() - fetchStart * 60 * 60 * 1000); // 12 hours ago
+  const yyyy = past.getFullYear();
+  const mm = String(past.getMonth() + 1).padStart(2, '0');
+  const dd = String(past.getDate()).padStart(2, '0');
+  const HH = String(past.getHours()).padStart(2, '0');
+  const MM = String(past.getMinutes()).padStart(2, '0');
+  const SS = String(past.getSeconds()).padStart(2, '0');
+  // format: YYYY-MM-DD HH:MM:SS
+  const formatted = `${yyyy}-${mm}-${dd} ${HH}:${MM}:${SS}`;
+  return formatted;
+  }
+  
+  
