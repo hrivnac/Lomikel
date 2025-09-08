@@ -25,7 +25,7 @@ async function fetchAlerts() {
     }
   alertsPool = allAlerts;
   console.log(`Fetched ${alertsPool.length} alerts from Fink Portal`);;
-  updateStatusPanel(alertsPool.length);
+  updateStatusPanel();
   }
 // Initial fetch
 fetchAlerts();

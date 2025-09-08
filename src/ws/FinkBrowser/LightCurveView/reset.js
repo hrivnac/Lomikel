@@ -1,6 +1,6 @@
 // Reset handlers update existing sliders 
 
-function resetRandom(){
+function resetRandom() {
   filters.forEach(f => {
     coeffs.x[f] = +(Math.random() * 2 - 1).toFixed(2);
     coeffs.y[f] = +(Math.random() * 2 - 1).toFixed(2);
@@ -10,7 +10,7 @@ function resetRandom(){
   update();
   }
   
-function resetZero(){
+function resetZero() {
   filters.forEach(f => {
     coeffs.x[f] = 0;
     coeffs.y[f] = 0;

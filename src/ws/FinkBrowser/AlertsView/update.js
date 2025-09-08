@@ -1,6 +1,14 @@
-function updateStatusPanel(count) {
-  const el = document.getElementById("statusPanel");
-  const now = new Date();
-  const timestamp = now.toLocaleTimeString();
-  el.textContent = `Last update: ${timestamp} | Alerts: ${count}`;
+function updateStatusPanel() {
+  const statusPanel = document.getElementById("statusPanel");
+  const now = new Date().toLocaleTimeString();
+  const configInfo = `<span style="color:lightblue">
+    fetchPeriod=${fetchPeriod}m, 
+    fetchStart=${fetchStart}h, 
+    nAlerts=${nAlerts}
+  </span>`;
+  const updateInfo = `<span style="color:green">
+    Last update: ${now}, Alerts loaded: ${alertsPool.length}
+  </span>`;
+  statusPanel.innerHTML = `${configInfo} &nbsp;&nbsp; ${updateInfo}`;
   }
+  

@@ -7,7 +7,7 @@ body {
   
 #plot {
   flex: 3;
-  0}
+  }
   
 #controls {
   flex: 1;
@@ -18,7 +18,7 @@ body {
   background:#f7f7f7;
   overflow-y:auto;
   }
-  
+ 
 .formula {
   font-size: 0.7em;
   font-weight: 700;

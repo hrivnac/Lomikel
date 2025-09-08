@@ -1,4 +1,3 @@
-- get alerts from Fink (with classes)
 - use specific classes icons
   
 https://github.com/ofrohn/d3-celestial/blob/master/data/constellations.lines.json

@@ -1,5 +1,5 @@
-- allow saving names configuration
+- x-axis: mj - mjmin
 - provide some pre-defined configurations
-- get real lightcurves
+  - rainbow
 
 python3 -m http.server 8001 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/LightCurveView

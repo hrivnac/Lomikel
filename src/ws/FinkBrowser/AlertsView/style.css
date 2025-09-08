@@ -74,17 +74,54 @@ canvas {
 
 /* Logo in top-left */ 
 
+#logoWrap {
+  position:absolute;
+  top:10px;
+  left:10px;
+  z-index:3000;
+  }
+  
 #logo {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  color: white;
-  font-size: 14px;
+  display:block;
+  cursor:help;
+  }
+
+#logoWrap {
   background: rgba(0,0,0,0.6);
   padding: 6px 10px;
   border-radius: 6px;
- }
- 
+  }
+
+#logo-help {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 260px;
+  margin-top: 6px;
+  padding: 10px;
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity .15s ease, transform .15s ease, visibility 0s linear .15s;
+  font-size: 14px;
+  }
+  
+#logoWrap:hover #logo-help {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition-delay: 0s;
+  }
+
+/* keep canvases below UI */
+#skyCanvas, #overlayCanvas {
+  position:absolute;
+  z-index:100;
+  }
  
 /* Overview map in bottom-right */
 
@@ -95,7 +132,7 @@ canvas {
   border: 2px solid #555;
   border-radius: 4px;
   background: rgba(0,0,0,0.6);
- }
+  }
  
 #overview {
   width: 200px;

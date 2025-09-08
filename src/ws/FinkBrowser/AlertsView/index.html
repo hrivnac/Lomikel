@@ -15,7 +15,18 @@
         <button id="btnWhole">Whole Sky</button>
         </div> 
       <div id="legend"></div>  
-      <div id="logo"></div>  
+      <div id="logoWrap">
+        <img id="logo" src="Fink_PrimaryLogo_WEB.png" width="200" alt="LSST Alerts">
+        <div id="logo-help" role="tooltip">
+        <p>This application displays ZTF/LSST alerts projected on the night sky.</p>
+        <ul>
+          <li><b>Dynamic Sky:</b> zooms to current alerts region.</li>
+          <li><b>Global Sky:</b> shows the entire sphere.</li>
+          <li>Hover alerts for alert details, click for portal link.</li>
+          <li>Service parameters:<br/><small><tt>fetchPeriod=10&amp;fetchStart=24&amp;nAlerts=10</tt></small></li>
+          </ul>        
+          </div>
+        </div>
       <div id="infoContainer">
         <div id="statusPanel"></div>
         <div id="viewInfo"></div>
@@ -26,6 +37,7 @@
       </div>  
     <div id="tooltip"></div>
     <script src="consts.js"></script>
+    <script src="params.js"></script>
     <script src="utils.js"></script>
     <script src="data.js"></script>
     <script src="drawing.js"></script>
