@@ -41,18 +41,22 @@ function projectXY(data, coeffs){
   for (let t = endJD; t <= endJD + rightTail; t += span / 200) gridRight.push(t);
   function combineAt(t) {
     let x = 0, y = 0;
-    let mode = "interp";
     for (const f of filters){
       const it = interp1D(data[f].times, data[f].values, t);
       if (it.val == null) return null; // give up if any is undefined
-      x += coeffs.x[f] * it.val;
+      if (xTime) {
+        x = t - startJD;
+        }
+      else {
+        x += coeffs.x[f] * it.val;
+        }
       y += coeffs.y[f] * it.val;
       }
     if (t < startJD) mode = "extrapLeft";
     else if (t > endJD) mode = "extrapRight";
     else mode = "interp";
-    return {x, y, mode, t};
-    }
+    return {x, y, mode, t: t - startJD};
+    } 
     
   const L = gridLeft.map(combineAt).filter(Boolean);
   const M = gridMid.map(combineAt).filter(Boolean);
@@ -60,4 +64,15 @@ function projectXY(data, coeffs){
   return {L, M, R, startJD, endJD};
   }
   
-  
+function rainbowCoefficients() {
+  const inv = {};
+  for (const f of filters) {
+    inv[f] = 1 / effLambda[f];
+    }
+  const maxVal = Math.max(...Object.values(inv));
+  const coeffsNorm = {};
+  for (const f of filters) {
+    coeffsNorm[f] = inv[f] / maxVal; // normalize to 1
+    }
+  return coeffsNorm;
+  } 

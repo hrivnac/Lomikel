@@ -63,8 +63,7 @@ function getQueryParams() {
   const params = new URLSearchParams(window.location.search);
   fetchPeriod = parseInt(params.get("fetchPeriod")) || fetchPeriod;
   fetchStart  = parseInt(params.get("fetchStart"))  || fetchStart;
-  nAlerts     = parseInt(params.get("nAlerts"))     || nAlerts;
-  console.log("Config:", { fetchPeriod, fetchStart, nAlerts });
+  magMax      = parseInt(params.get("magMax"))      || magMax;
   }
   
   

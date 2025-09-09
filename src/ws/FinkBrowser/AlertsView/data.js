@@ -46,7 +46,7 @@ d3.csv('hyg_v38.csv').
        const dec    = row.dec;
        const mag    = row.mag;
        const proper = row.proper;
-       if (ra != 0 && mag < 6) {
+       if (ra != 0 && mag < magMax) {
          stars.push({ra: ra,
                      dec: dec,
                      r: Math.max(0.5, 2.5 - mag * 0.2),

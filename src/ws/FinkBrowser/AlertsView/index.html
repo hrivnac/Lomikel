@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>LSST Alerts Monitor</title>
+    <title>ZTF/LSST Alerts View</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=AlertsView"></script>                                                       |
     <link rel="stylesheet" href="style.css">
@@ -16,14 +16,14 @@
         </div> 
       <div id="legend"></div>  
       <div id="logoWrap">
-        <img id="logo" src="Fink_PrimaryLogo_WEB.png" width="200" alt="LSST Alerts">
+        <img id="logo" src="Fink_PrimaryLogo_WEB.png" width="100">
         <div id="logo-help" role="tooltip">
         <p>This application displays ZTF/LSST alerts projected on the night sky.</p>
         <ul>
           <li><b>Dynamic Sky:</b> zooms to current alerts region.</li>
           <li><b>Global Sky:</b> shows the entire sphere.</li>
           <li>Hover alerts for alert details, click for portal link.</li>
-          <li>Service parameters:<br/><small><tt>fetchPeriod=10&amp;fetchStart=24&amp;nAlerts=10</tt></small></li>
+          <li>Service parameters:<br/><small><tt>fetchPeriod=10&amp;fetchStart=24&amp;nAlerts=10&amp;magMax=6</tt></small></li>
           </ul>        
           </div>
         </div>

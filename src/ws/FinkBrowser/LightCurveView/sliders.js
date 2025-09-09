@@ -49,3 +49,15 @@ function initSliders(){
     panel.appendChild(rowY);
     });
   }
+  
+function hideXSliders() {
+  for (const f of filters) {
+    document.getElementById(`x_${f}`).style.display = "none";
+    }
+  }
+
+function showXSliders() {
+  for (const f of filters) {
+    document.getElementById(`x_${f}`).style.display = "block";
+    }
+  }

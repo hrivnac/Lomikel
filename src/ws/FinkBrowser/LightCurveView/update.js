@@ -1,12 +1,16 @@
-
-function updateFormulas(){
-  const fx = 'x = ' + filters.map(f => `${coeffs.x[f].toFixed(2)}·${f}`).join(' + ');
-  const fy = 'y = ' + filters.map(f => `${coeffs.y[f].toFixed(2)}·${f}`).join(' + ');
+function updateFormulas() {
+  let fx, fy;
+  if (xTime) {
+    fx = "x = ΔMJD";
+    }
+  else {
+    fx = 'x = ' + filters.map(f => `${coeffs.x[f].toFixed(2)}·${f}`).join(' + ');
+    }
+  fy = 'y = ' + filters.map(f => `${coeffs.y[f].toFixed(2)}·${f}`).join(' + ');
   document.getElementById('formulaX').textContent = fx;
   document.getElementById('formulaY').textContent = fy;
   }
 
-  
 function updatePlot() {
   if (lightcurve != "") {
     demo = lightcurve;
@@ -82,6 +86,7 @@ function updatePlot() {
   }
   
 function plotLightCurves(data) {
+  const minMJD = Math.min(...filters.flatMap(f => data[f].times.length ? [data[f].times[0]] : []));
   let traces = [];
   for (let band of filters) {
     if (data[band] && data[band].times.length > 0) {
@@ -96,7 +101,7 @@ function plotLightCurves(data) {
         }
       if (times.length > 0) {
         traces.push({
-          x: times,
+          x: times.map(t => t - minMJD),
           y: mags,
           mode: 'lines+markers',
           name: band,
@@ -110,7 +115,7 @@ function plotLightCurves(data) {
   Plotly.newPlot("lightcurvePlot", 
                  traces, 
                  {margin: {t: 20},
-                  xaxis: {title: "MJD"},
+                  xaxis: {title: "ΔMJD (days)"},
                   yaxis: {title: "Magnitude"},  // mag axis inverted
                   height: 300,
                   legend: {
@@ -126,5 +131,11 @@ function plotLightCurves(data) {
 function update(){
   updateFormulas();
   updatePlot();
+  if (xTime) {
+    hideXSliders();
+    }
+  else {
+    showXSliders();
+    }
   }
   

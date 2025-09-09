@@ -96,7 +96,7 @@ canvas {
   position: absolute;
   top: 100%;
   left: 0;
-  width: 260px;
+  width: 520px;
   margin-top: 6px;
   padding: 10px;
   background: rgba(0,0,0,0.85);
@@ -175,7 +175,6 @@ canvas {
   font-family: monospace;
   }
     
-  
 /* RA/Dec info in bottom-left */
 
 #viewInfo {

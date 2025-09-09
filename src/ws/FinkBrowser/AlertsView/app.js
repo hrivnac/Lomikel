@@ -140,7 +140,7 @@ function drawOverview() {
   octx.lineWidth = 2;
   octx.strokeRect(x1, y2, x2 - x1, y1 - y2);
   // update info
-  document.getElementById('viewInfo').textContent = `RA: ${minRa.toFixed(1)}–${maxRa.toFixed(1)}, Dec: ${minDec.toFixed(1)}–${maxDec.toFixed(1)}`;
+  document.getElementById('viewInfo').textContent = `ra: ${minRa.toFixed(1)}–${maxRa.toFixed(1)}, dec: ${minDec.toFixed(1)}–${maxDec.toFixed(1)}`;
    }
 
 // Tooltip
@@ -170,13 +170,6 @@ canvas.addEventListener('mousemove', e => {
 // Controls
 document.getElementById('btnDynamic').onclick = () => {camera.mode = "dynamic";};
 document.getElementById('btnWhole').onclick = () => {camera.mode = "whole";};
-
-// Logo
-function initLogo() {
-  const logo = document.getElementById('logo');
-  logo.innerHTML = `<a href="https://fink-portal.org" target="_blank"><img src='Fink_PrimaryLogo_WEB.png' width='` + (window.innerWidth / 16) + `'></a>`;
-  }
-initLogo();
 
 // Main Loop
 function animate() {

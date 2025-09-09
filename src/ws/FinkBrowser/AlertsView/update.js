@@ -4,7 +4,8 @@ function updateStatusPanel() {
   const configInfo = `<span style="color:lightblue">
     fetchPeriod=${fetchPeriod}m, 
     fetchStart=${fetchStart}h, 
-    nAlerts=${nAlerts}
+    nAlerts=${nAlerts},
+    magMax=${magMax}
   </span>`;
   const updateInfo = `<span style="color:green">
     Last update: ${now}, Alerts loaded: ${alertsPool.length}
