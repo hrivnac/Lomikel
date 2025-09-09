@@ -1,24 +1,42 @@
-body {
-  margin: 0;
-  overflow: hidden;
-  background: black;
-  font-family: sans-serif;
- }
-
-#frame {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  border: 8px solid #444;
+* { 
   box-sizing: border-box;
-  background: black;
-  display: flex;
-  flex-direction: column;
- }
-
+  }
+  
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  }
+ 
 canvas {
   display: block;
- }
+  }
+  
+#frame {
+  position: fixed;        /* anchor to viewport */
+  inset: 0;               /* top:0; right:0; bottom:0; left:0; */
+  border: 8px solid #444;
+  background: black;
+  z-index: 9999;          /* on top of canvases and other content */
+  overflow: hidden;       /* keep inner content inside frame */
+  display: flex;
+  flex-direction: column;
+  /* ensure iOS safe-area doesn't hide borders */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  }
+
+#skyCanvas, #overlayCanvas {
+  position: absolute;
+  z-index: 100;
+  }
+
+#logoWrap, #controls, #infoContainer {
+  position: absolute;
+  z-index: 2000;
+  }
 
 /* Controls in top-right */
 
@@ -31,7 +49,7 @@ canvas {
   border-radius: 6px;
   display: flex;
   gap: 10px;
- }
+  }
 
 #controls button {
   background: #444;
@@ -43,7 +61,7 @@ canvas {
   }
 #controls button:hover {
   background: #666;
- }
+  }
 
 /* Legend below controls */
 
@@ -57,20 +75,20 @@ canvas {
   color: white;
   font-size: 14px;
   line-height: 1.4em;
- }
+  }
  
 #legend div {
   display: flex;
   align-items: center;
   gap: 6px;
- }
+  }
  
 #legend span {
   display: inline-block;
   width: 14px;
   height: 14px;
   border-radius: 3px;
- }
+  }
 
 /* Logo in top-left */ 
 

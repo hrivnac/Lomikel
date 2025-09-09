@@ -8,7 +8,7 @@ const classes = {
   };
 
 let fetchPeriod = 10; // every x minutes
-let fetchStart = 24; // hours before now
+let fetchStart = 48; // hours before now
 let nAlerts = 10;
 let magMax = 6;
   

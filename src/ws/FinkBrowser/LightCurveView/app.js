@@ -1,6 +1,8 @@
-let coeffs = {x:{}, y:{}};
 let demo = generateDemoData();
 let activeSNID = null;
+let coeffs = {x:{}, y:{}};
+resetRandom();
+
 
 window.addEventListener('DOMContentLoaded', () => {
   initSliders();

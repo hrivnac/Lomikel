@@ -1,5 +1,1 @@
-- x-axis: mj - mjmin
-- provide some pre-defined configurations
-  - rainbow
-
 python3 -m http.server 8001 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/LightCurveView

@@ -4,9 +4,9 @@ function updateFormulas() {
     fx = "x = ΔMJD";
     }
   else {
-    fx = 'x = ' + filters.map(f => `${coeffs.x[f].toFixed(2)}·${f}`).join(' + ');
+    fx = 'x = ' + filters.map(f => `${(coeffs.x[f] ?? 0).toFixed(2)}·${f}`).join(" + ");
     }
-  fy = 'y = ' + filters.map(f => `${coeffs.y[f].toFixed(2)}·${f}`).join(' + ');
+  fy = 'y = ' + filters.map(f => `${(coeffs.y[f] ?? 0).toFixed(2)}·${f}`).join(" + ");
   document.getElementById('formulaX').textContent = fx;
   document.getElementById('formulaY').textContent = fy;
   }
@@ -127,15 +127,19 @@ function plotLightCurves(data) {
                  {displayModeBar: false      // hide Plotly toolbar
                 });
   }
+  
+function updateSlidersFromCoeffs() {
+  if (!window.sliderHandles) return;
+  const { handles, scale } = window.sliderHandles;
+
+  handles
+    .attr("cx", d => scale(coeffs.x[d.band]))
+    .attr("cy", d => scale(-coeffs.y[d.band]));
+}
 
 function update(){
   updateFormulas();
   updatePlot();
-  if (xTime) {
-    hideXSliders();
-    }
-  else {
-    showXSliders();
-    }
+  updateSlidersFromCoeffs();
   }
   

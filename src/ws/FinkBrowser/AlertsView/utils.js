@@ -46,8 +46,9 @@ function eclipticToEquatorial(lambdaDeg) {
   }
 
 function getStartDateParam() {
+  getQueryParams();
   const now = new Date();
-  const past = new Date(now.getTime() - fetchStart * 60 * 60 * 1000); // 12 hours ago
+  const past = new Date(now.getTime() - fetchStart * 60 * 60 * 1000);
   const yyyy = past.getFullYear();
   const mm = String(past.getMonth() + 1).padStart(2, '0');
   const dd = String(past.getDate()).padStart(2, '0');
@@ -63,6 +64,7 @@ function getQueryParams() {
   const params = new URLSearchParams(window.location.search);
   fetchPeriod = parseInt(params.get("fetchPeriod")) || fetchPeriod;
   fetchStart  = parseInt(params.get("fetchStart"))  || fetchStart;
+  nAlerts     = parseInt(params.get("nAlerts"))     || nAlerts;
   magMax      = parseInt(params.get("magMax"))      || magMax;
   }
   
