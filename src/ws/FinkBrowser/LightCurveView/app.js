@@ -1,8 +1,11 @@
 let demo = generateDemoData();
 let activeSNID = null;
+let savedPresets = {};
 let coeffs = {x:{}, y:{}};
+let rainbowMode = false;
 resetRandom();
-
+initSaveButton();
+loadPresets();
 
 window.addEventListener('DOMContentLoaded', () => {
   initSliders();

@@ -130,12 +130,10 @@ function plotLightCurves(data) {
   
 function updateSlidersFromCoeffs() {
   if (!window.sliderHandles) return;
-  const { handles, scale } = window.sliderHandles;
-
-  handles
-    .attr("cx", d => scale(coeffs.x[d.band]))
-    .attr("cy", d => scale(-coeffs.y[d.band]));
-}
+  const {handles, scale} = window.sliderHandles;
+  handles.attr("cx", d => scale(coeffs.x[d.band]))
+         .attr("cy", d => scale(-coeffs.y[d.band]));
+  }
 
 function update(){
   updateFormulas();

@@ -66,6 +66,13 @@ button:hover {
   margin-top:10px;
   }
   
+ #save-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+  }
+ 
 .snid-btn {
   padding:6px 10px; border:1px solid #ccc; border-radius:8px;
   background:#3b82f6; color:#fff; cursor:pointer;
@@ -74,4 +81,33 @@ button:hover {
 .snid-btn.active {
   background:#16a34a; border-color:#0ea34a;
   }
+  
+.save-btn {
+  padding:6px 10px; border:1px solid #ccc; border-radius:8px;
+  background:red; color:#fff; cursor:pointer;
+  }
+  
+.save-btn.active {
+  background:#16a34a; border-color:#0ea34a;
+  }
+  
+.preset-btn {
+  padding:6px 10px; border:1px solid #ccc; border-radius:8px;
+  background:green; color:#fff; cursor:pointer;
+  }
+  
+.preset-btn.active {
+  background:#16a34a; border-color:#0ea34a;
+  }
+  
+.del-btn {
+  padding:6px 10px; border:1px solid #ccc; border-radius:8px;
+  background:grey; color:#fff; cursor:pointer;
+  }
+  
+.del-btn.active {
+  background:#16a34a; border-color:#0ea34a;
+  }
+
+
 
