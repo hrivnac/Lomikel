@@ -43,7 +43,10 @@ import glob
 
 # Parameters -------------------------------------------------------------------
 
-dataFn = "/user/julien.peloton/archive/science/year=2025"
+#source = ZTF
+source = LSST
+#dataFn = "/user/julien.peloton/archive/science/year=2025"
+dataFn = "/user/julien.peloton/rubin_alert_commissioning/raw/20250906"
 skipNaN = False
 replaceNaNbyMean = False
 replaceNaNbyZero = True

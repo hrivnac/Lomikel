@@ -21,7 +21,6 @@ python ../src/work/analyseOverlaps.py
 
 --------------------------------------------------------------------------------
 
-
 gr.overlaps();
 gr.overlaps(classifier:"FEATURES");
 gr.overlaps(outputCSV:"/tmp/overlaps.csv");
