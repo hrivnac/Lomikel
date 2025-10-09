@@ -43,10 +43,8 @@ import glob
 
 # Parameters -------------------------------------------------------------------
 
-#source = ZTF
-source = LSST
-#dataFn = "/user/julien.peloton/archive/science/year=2025"
-dataFn = "/user/julien.peloton/rubin_alert_commissioning/raw/20250906"
+#source = "ZTF"
+source = "LSST"
 skipNaN = False
 replaceNaNbyMean = False
 replaceNaNbyZero = True
@@ -59,6 +57,14 @@ cluster_features = "pca_features"
 known = False
 tag = "-zero"
 clean = True
+
+if (source == "ZTF"):
+  dataFn = "/user/julien.peloton/archive/science/year=2025"
+else if (source == "LSST"):
+  dataFn = "/user/julien.peloton/rubin_alert_commissioning/raw/20250906"
+else:
+  log.fatal("No source")
+  return
 
 # Clean ------------------------------------------------------------------------
 

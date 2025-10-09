@@ -1,9 +1,11 @@
 # training #####################################################################
 
 # @livy
-git pull;hadoop fs -put -f ../src/work/Clusters/PCA.py
+git pull
+hadoop fs -put -f ../src/work/Clusters/PCA.py
 
 # @janusgraph
+git pull
 lomikel_hbase -s ../src/work/Clusters/PCA.groovy -b
 
 # @home
