@@ -89,6 +89,8 @@ log.info("Starting...")
 df = spark.read\
           .format("parquet")\
           .load(dataFn)
+          
+df.show(n=2)
 
 df = df.filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())
