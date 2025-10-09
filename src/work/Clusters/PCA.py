@@ -64,7 +64,7 @@ elif (source == "LSST"):
   dataFn = "/user/julien.peloton/rubin_alert_commissioning/raw/20250906"
 else:
   log.fatal("No source")
-  return
+  sys.exit()
 
 # Clean ------------------------------------------------------------------------
 
