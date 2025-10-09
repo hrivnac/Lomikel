@@ -91,7 +91,8 @@ df = spark.read\
           .load(dataFn)
           
 #df.show(n = 2)
-df.describe().show()
+#df.describe().show()
+df.printSchema()
 
 df = df.filter(df.lc_features_g.isNotNull())\
        .filter(df.lc_features_r.isNotNull())
