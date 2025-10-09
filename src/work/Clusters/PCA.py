@@ -60,7 +60,7 @@ clean = True
 
 if (source == "ZTF"):
   dataFn = "/user/julien.peloton/archive/science/year=2025"
-else if (source == "LSST"):
+elif (source == "LSST"):
   dataFn = "/user/julien.peloton/rubin_alert_commissioning/raw/20250906"
 else:
   log.fatal("No source")
