@@ -43,8 +43,8 @@ import glob
 
 # Parameters -------------------------------------------------------------------
 
-#source = "ZTF"
-source = "LSST"
+source = "ZTF"
+#source = "LSST"
 skipNaN = False
 replaceNaNbyMean = False
 replaceNaNbyZero = True
