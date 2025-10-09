@@ -1,0 +1,8 @@
+#!/usr/bin/expect
+set P [exec grep ssh /home/hrivnac/include/hesla | awk {{print $2}}]
+spawn ssh -L 25333:localhost:25333 centos@157.136.253.253
+expect "Enter passphrase for key '/home/hrivnac/.ssh/id_rsa':"
+send "${P}\r"
+expect "centos@vdjanusgraph1"
+send "java -jar /tmp/Lomikel-py4j-03.07.00x.exe.jar\r"
+interact
