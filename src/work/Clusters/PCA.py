@@ -234,7 +234,7 @@ if replaceNaNbyZero:
   df = df.na.fill(0)  
     
 log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
-log.info(columns)
+log.info(cols)
 sys.exit()
 
 # Standardisation --------------------------------------------------------------
