@@ -45,8 +45,8 @@ import glob
 
 # Parameters -------------------------------------------------------------------
 
-source = "ZTF"
-#source = "LSST"
+#source = "ZTF"
+source = "LSST"
 skipNaN = False
 replaceNaNbyMean = False
 replaceNaNbyZero = True
@@ -153,6 +153,8 @@ if n_sample > 0:
 
 # Classification ---------------------------------------------------------------
 
+cols = None
+
 if (source == "ZTF"):
 
   args = ["cdsxmatch",
@@ -215,8 +217,6 @@ if (source == "ZTF"):
          .drop("lc_features_g", "lc_features_r")  
          
   cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
-  log.info(cols)
-  sys.exit()
   
   if skipNaN: # cuts number of alerts to 1/4
     df = df.na.drop(subset = cols)
@@ -232,7 +232,12 @@ if (source == "ZTF"):
   if replaceNaNbyZero:
     df = df.na.fill(0)  
     
-  log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
+elif (source == "LSST"):   
+  cols = ["ixx", "ixy", "iyy"]
+  
+log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
+log.info(cols)
+sys.exit()
 
 # Standardisation --------------------------------------------------------------
 
