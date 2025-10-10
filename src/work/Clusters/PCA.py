@@ -68,52 +68,52 @@ else:
   
   
 from pyspark.sql.functions import col, size
-    from pyspark.sql.types import ArrayType
+from pyspark.sql.types import ArrayType
 
-    class NestedDF:
-    """A class for flattening nested dataframes in PySpark."""
+class NestedDF:
+"""A class for flattening nested dataframes in PySpark."""
 
-    def __init__(self, nested_df):
-        """
-        Args:
-            nested_df (pyspark.sql.dataframe.DataFrame): Nested dataframe.
-        """
-
-        self.nested_df = nested_df
-        self.flattened_struct_df = self.flatten_struct_df()
-        self.flattened_df = self.flatten_array_df()
-
-    def flatten_array_df(self):
-        """Flatten a nested array dataframe into a single level dataframe.
-
-        Returns:
-            pyspark.sql.dataframe.DataFrame: Flattened dataframe.
-
-        """
-        cols = self.flattened_struct_df.columns
-        for col_name in cols:
-            if isinstance(self.flattened_struct_df.schema[col_name].dataType, ArrayType):
-                array_len = self.flattened_struct_df.select(size(col(col_name)).alias("array_len")).collect()[0]["array_len"]
-                for i in range(array_len):
-                    self.flattened_struct_df = self.flattened_struct_df.withColumn(col_name + "_" + str(i), self.flattened_struct_df[col_name].getItem(i))
-                self.flattened_struct_df = self.flattened_struct_df.drop(col_name)
-        return self.flattened_struct_df
-
-    def flatten_struct_df(self):
-        """Flatten a nested dataframe into a single level dataframe.
-        Returns:
-            pyspark.sql.dataframe.DataFrame: Flattened dataframe.
-        """
-        stack=[((), self.nested_df)]
-        columns=[]
-        while len(stack)>0:
-            parents, df=stack.pop()
-            for col_name, col_type in df.dtypes:
-                if col_type.startswith('struct'):
-                    stack.append((parents+(col_name,), df.select(col_name+".*")))
-                else:
-                    columns.append(col(".".join(parents+(col_name,))).alias("_".join(parents+(col_name,))))
-        return self.nested_df.select(columns)
+  def __init__(self, nested_df):
+      """
+      Args:
+          nested_df (pyspark.sql.dataframe.DataFrame): Nested dataframe.
+      """
+  
+      self.nested_df = nested_df
+      self.flattened_struct_df = self.flatten_struct_df()
+      self.flattened_df = self.flatten_array_df()
+  
+  def flatten_array_df(self):
+      """Flatten a nested array dataframe into a single level dataframe.
+  
+      Returns:
+          pyspark.sql.dataframe.DataFrame: Flattened dataframe.
+  
+      """
+      cols = self.flattened_struct_df.columns
+      for col_name in cols:
+          if isinstance(self.flattened_struct_df.schema[col_name].dataType, ArrayType):
+              array_len = self.flattened_struct_df.select(size(col(col_name)).alias("array_len")).collect()[0]["array_len"]
+              for i in range(array_len):
+                  self.flattened_struct_df = self.flattened_struct_df.withColumn(col_name + "_" + str(i), self.flattened_struct_df[col_name].getItem(i))
+              self.flattened_struct_df = self.flattened_struct_df.drop(col_name)
+      return self.flattened_struct_df
+  
+  def flatten_struct_df(self):
+      """Flatten a nested dataframe into a single level dataframe.
+      Returns:
+          pyspark.sql.dataframe.DataFrame: Flattened dataframe.
+      """
+      stack=[((), self.nested_df)]
+      columns=[]
+      while len(stack)>0:
+          parents, df=stack.pop()
+          for col_name, col_type in df.dtypes:
+              if col_type.startswith('struct'):
+                  stack.append((parents+(col_name,), df.select(col_name+".*")))
+              else:
+                  columns.append(col(".".join(parents+(col_name,))).alias("_".join(parents+(col_name,))))
+      return self.nested_df.select(columns)
 
 
 # Clean ------------------------------------------------------------------------
