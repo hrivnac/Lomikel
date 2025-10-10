@@ -216,6 +216,7 @@ if (source == "ZTF"):
          
   cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
   log.info(cols)
+  sys.exit()
   
   if skipNaN: # cuts number of alerts to 1/4
     df = df.na.drop(subset = cols)
