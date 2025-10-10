@@ -11,6 +11,7 @@ from pyspark.sql.functions import isnan
 from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import StringType
 from pyspark.sql.types import DoubleType
+from pyspark.sql.types import ArrayType
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import PCA
 from pyspark.ml.feature import VectorAssembler
