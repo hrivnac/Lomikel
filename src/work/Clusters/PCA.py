@@ -71,7 +71,7 @@ from pyspark.sql.functions import col, size
 from pyspark.sql.types import ArrayType
 
 class NestedDF:
-"""A class for flattening nested dataframes in PySpark."""
+  """A class for flattening nested dataframes in PySpark."""
 
   def __init__(self, nested_df):
       """
