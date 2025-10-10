@@ -158,7 +158,7 @@ df = spark.read\
           .load(dataFn)
    
 if (source == "LSST"):
-  df = flatten_array_struct_df(df)
+  df = flatten_structs(df)
   
 #df.show(n = 2)
 #df.describe().show()
