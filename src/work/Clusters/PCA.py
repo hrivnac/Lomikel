@@ -70,69 +70,32 @@ else:
   
 # NestedDF ---------------------------------------------------------------------
 
-from pyspark.sql.types import *
-from pyspark.sql import functions as f
+def flatten_df(nested_df, layers):
+    flat_cols = []
+    nested_cols = []
+    flat_df = []
 
-def flatten_structs(nested_df):
-    stack = [((), nested_df)]
-    columns = []
+    flat_cols.append([c[0] for c in nested_df.dtypes if c[1][:6] != 'struct'])
+    nested_cols.append([c[0] for c in nested_df.dtypes if c[1][:6] == 'struct'])
 
-    while len(stack) > 0:
-        
-        parents, df = stack.pop()
-        
-        array_cols = [
-            c[0]
-            for c in df.dtypes
-            if c[1][:5] == "array"
-        ]
-        
-        flat_cols = [
-            f.col(".".join(parents + (c[0],))).alias("_".join(parents + (c[0],)))
-            for c in df.dtypes
-            if c[1][:6] != "struct"
-        ]
+    flat_df.append(nested_df.select(flat_cols[0] +
+                               [col(nc+'.'+c).alias(nc+'_'+c)
+                                for nc in nested_cols[0]
+                                for c in nested_df.select(nc+'.*').columns])
+                  )
+    for i in range(1, layers):
+        print (flat_cols[i-1])
+        flat_cols.append([c[0] for c in flat_df[i-1].dtypes if c[1][:6] != 'struct'])
+        nested_cols.append([c[0] for c in flat_df[i-1].dtypes if c[1][:6] == 'struct'])
 
-        nested_cols = [
-            c[0]
-            for c in df.dtypes
-            if c[1][:6] == "struct"
-        ]
-        
-        columns.extend(flat_cols)
+        flat_df.append(flat_df[i-1].select(flat_cols[i] +
+                                [col(nc+'.'+c).alias(nc+'_'+c)
+                                    for nc in nested_cols[i]
+                                    for c in flat_df[i-1].select(nc+'.*').columns])
+        )
 
-        for nested_col in nested_cols:
-            projected_df = df.select(nested_col + ".*")
-            stack.append((parents + (nested_col,), projected_df))
-        
-    return nested_df.select(columns)
-
-def flatten_array_struct_df(df):
+    return flat_df[-1]
     
-    array_cols = [
-            c[0]
-            for c in df.dtypes
-            if c[1][:5] == "array"
-        ]
-    
-    while len(array_cols) > 0:
-        
-        for array_col in array_cols:
-            
-            cols_to_select = [x for x in df.columns if x != array_col ]
-            
-            df = df.withColumn(array_col, f.explode(f.col(array_col)))
-            
-        df = flatten_structs(df)
-        
-        array_cols = [
-            c[0]
-            for c in df.dtypes
-            if c[1][:5] == "array"
-        ]
-    return df
-
-
 # Clean ------------------------------------------------------------------------
 
 if clean:
@@ -156,9 +119,9 @@ log.info("Starting...")
 df = spark.read\
           .format("parquet")\
           .load(dataFn)
-   
-#if (source == "LSST"):
-#  df = flatten_structs(df)
+ 
+if (source == "LSST"):
+  df = flatten_df(df)
   
 df.show(n = 2)
 #df.describe().show()
