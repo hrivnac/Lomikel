@@ -179,7 +179,6 @@ if (source == "ZTF"):
 # Converting lc_features arrays into columns -----------------------------------
       
 if (source == "ZTF"):
-
   feature_names = ["mean",
                    "weighted_mean",
                    "standard_deviation",
@@ -205,38 +204,37 @@ if (source == "ZTF"):
                    "anderson_darling_normal", 
                    "chi2",
                    "skew",
-                   "stetson_K"]
-  
+                   "stetson_K"]  
   columns = [col("class")]\
           + [col("objectId")]\
           + [col("candidate.jd").alias("jd")]\
           + [col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names]\
-          + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]
-  
+          + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]  
   df = df.select(*columns)\
-         .drop("lc_features_g", "lc_features_r")  
-         
+         .drop("lc_features_g", "lc_features_r")           
   cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
-  
-  if skipNaN: # cuts number of alerts to 1/4
-    df = df.na.drop(subset = cols)
-    df = df.filter(reduce(lambda x, y: x & ~isnan(col(y)), cols, lit(True)))
-  
-  if replaceNaNbyMean:
-    mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
-                    .collect()[0]\
-                    .asDict()
-    mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}  
-    df = df.na.fill(mean_values)
-    
-  if replaceNaNbyZero:
-    df = df.na.fill(0)  
-    
 elif (source == "LSST"):   
-  cols = ["ixx", "ixy", "iyy"]
+  cols = ["ixx",
+          "ixy",
+          "iyy"]
+  columns = [col(c) for x in cols]]
+
+if skipNaN: # cuts number of alerts to 1/4
+  df = df.na.drop(subset = cols)
+  df = df.filter(reduce(lambda x, y: x & ~isnan(col(y)), cols, lit(True)))
+
+if replaceNaNbyMean:
+  mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
+                  .collect()[0]\
+                  .asDict()
+  mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}  
+  df = df.na.fill(mean_values)
   
+if replaceNaNbyZero:
+  df = df.na.fill(0)  
+    
 log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
-log.info(cols)
+log.info(columns)
 sys.exit()
 
 # Standardisation --------------------------------------------------------------
