@@ -123,9 +123,9 @@ df = spark.read\
 if (source == "LSST"):
   df = flatten_df(df, 1)
   
-df.show(n = 2)
+#df.show(n = 2)
 #df.describe().show()
-#df.printSchema()
+df.printSchema()
 sys.exit()
 
 if (source == "ZTF"):
