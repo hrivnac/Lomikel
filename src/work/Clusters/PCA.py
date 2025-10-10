@@ -157,8 +157,8 @@ df = spark.read\
           .format("parquet")\
           .load(dataFn)
    
-if (source == "LSST"):
-  df = flatten_structs(df)
+#if (source == "LSST"):
+#  df = flatten_structs(df)
   
 #df.show(n = 2)
 #df.describe().show()
