@@ -160,8 +160,8 @@ df = spark.read\
 #if (source == "LSST"):
 #  df = flatten_structs(df)
   
-#df.show(n = 2)
-df.describe().show()
+df.show(n = 2)
+#df.describe().show()
 #df.printSchema()
 sys.exit()
 
