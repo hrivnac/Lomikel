@@ -45,8 +45,8 @@ import glob
 
 # Parameters -------------------------------------------------------------------
 
-#source = "ZTF"
-source = "LSST"
+source = "ZTF"
+#source = "LSST"
 skipNaN = False
 replaceNaNbyMean = False
 replaceNaNbyZero = True
@@ -69,7 +69,6 @@ else:
   sys.exit()
   
 # NestedDF ---------------------------------------------------------------------
-  
 
 class NestedDF:
   """A class for flattening nested dataframes in PySpark."""
@@ -136,94 +135,103 @@ log.info("Starting...")
 df = spark.read\
           .format("parquet")\
           .load(dataFn)
-          
-df = NestedDF(df).flattened_df  
+   
+if (source == "LSST"):
+  df = NestedDF(df).flattened_df  
+  
 #df.show(n = 2)
 #df.describe().show()
-df.printSchema()
+#df.printSchema()
 
-df = df.filter(df.lc_features_g.isNotNull())\
-       .filter(df.lc_features_r.isNotNull())
-       
+if (source == "ZTF"):
+  df = df.filter(df.lc_features_g.isNotNull())\
+         .filter(df.lc_features_r.isNotNull())
+#elif (source == "LSST"):
+ 
 if n_sample > 0:
   df = df.limit(n_sample)        
 
 # Classification ---------------------------------------------------------------
 
-args = ["cdsxmatch",
-        "roid",
-        "mulens",
-        "snn_snia_vs_nonia",
-        "snn_sn_vs_all",
-        "rf_snia_vs_nonia",
-        "candidate.ndethist",
-        "candidate.drb",
-        "candidate.classtar",
-        "candidate.jd",
-        "candidate.jdstarthist",
-        "rf_kn_vs_nonkn",
-        "tracklet"]
+if (source == "ZTF"):
 
-df = df.withColumn("class", extract_fink_classification(*args))
-       
-if known:
-  df = df.filter(df.cdsxmatch != "Unknown")
-
+  args = ["cdsxmatch",
+          "roid",
+          "mulens",
+          "snn_snia_vs_nonia",
+          "snn_sn_vs_all",
+          "rf_snia_vs_nonia",
+          "candidate.ndethist",
+          "candidate.drb",
+          "candidate.classtar",
+          "candidate.jd",
+          "candidate.jdstarthist",
+          "rf_kn_vs_nonkn",
+          "tracklet"]
+  
+  df = df.withColumn("class", extract_fink_classification(*args))
+         
+  if known:
+    df = df.filter(df.cdsxmatch != "Unknown")
+  
 # Converting lc_features arrays into columns -----------------------------------
       
-feature_names = ["mean",
-                 "weighted_mean",
-                 "standard_deviation",
-                 "median",
-                 "amplitude", 
-                 "beyond_1_std",
-                 "cusum",
-                 "inter_percentile_range_10",
-                 "kurtosis", 
-                 "linear_trend",
-                 "linear_trend_sigma",
-                 "linear_trend_noise", 
-                 "linear_fit_slope",
-                 "linear_fit_slope_sigma",
-                 "linear_fit_reduced_chi2", 
-                 "magnitude_percentage_ratio_40_5",
-                 "magnitude_percentage_ratio_20_10", 
-                 "maximum_slope",
-                 "median_absolute_deviation",
-                 "median_buffer_range_percentage_10", 
-                 "percent_amplitude",
-                 "mean_variance",
-                 "anderson_darling_normal", 
-                 "chi2",
-                 "skew",
-                 "stetson_K"]
+if (source == "ZTF"):
 
-columns = [col("class")]\
-        + [col("objectId")]\
-        + [col("candidate.jd").alias("jd")]\
-        + [col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names]\
-        + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]
-
-df = df.select(*columns)\
-       .drop("lc_features_g", "lc_features_r")  
-       
-cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
-
-if skipNaN: # cuts number of alerts to 1/4
-  df = df.na.drop(subset = cols)
-  df = df.filter(reduce(lambda x, y: x & ~isnan(col(y)), cols, lit(True)))
-
-if replaceNaNbyMean:
-  mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
-                  .collect()[0]\
-                  .asDict()
-  mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}  
-  df = df.na.fill(mean_values)
+  feature_names = ["mean",
+                   "weighted_mean",
+                   "standard_deviation",
+                   "median",
+                   "amplitude", 
+                   "beyond_1_std",
+                   "cusum",
+                   "inter_percentile_range_10",
+                   "kurtosis", 
+                   "linear_trend",
+                   "linear_trend_sigma",
+                   "linear_trend_noise", 
+                   "linear_fit_slope",
+                   "linear_fit_slope_sigma",
+                   "linear_fit_reduced_chi2", 
+                   "magnitude_percentage_ratio_40_5",
+                   "magnitude_percentage_ratio_20_10", 
+                   "maximum_slope",
+                   "median_absolute_deviation",
+                   "median_buffer_range_percentage_10", 
+                   "percent_amplitude",
+                   "mean_variance",
+                   "anderson_darling_normal", 
+                   "chi2",
+                   "skew",
+                   "stetson_K"]
   
-if replaceNaNbyZero:
-  df = df.na.fill(0)  
+  columns = [col("class")]\
+          + [col("objectId")]\
+          + [col("candidate.jd").alias("jd")]\
+          + [col(f"lc_features_g.{feat}").alias(f"g_{feat}") for feat in feature_names]\
+          + [col(f"lc_features_r.{feat}").alias(f"r_{feat}") for feat in feature_names]
   
-log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
+  df = df.select(*columns)\
+         .drop("lc_features_g", "lc_features_r")  
+         
+  cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
+  log.info(cols)
+  
+  if skipNaN: # cuts number of alerts to 1/4
+    df = df.na.drop(subset = cols)
+    df = df.filter(reduce(lambda x, y: x & ~isnan(col(y)), cols, lit(True)))
+  
+  if replaceNaNbyMean:
+    mean_values = df.select([mean(col(c)).alias(c) for c in df.columns if c != "class"])\
+                    .collect()[0]\
+                    .asDict()
+    mean_values = {k: (v if v is not None and not math.isnan(v) else 0) for k, v in mean_values.items()}  
+    df = df.na.fill(mean_values)
+    
+  if replaceNaNbyZero:
+    df = df.na.fill(0)  
+    
+  log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
 
 # Standardisation --------------------------------------------------------------
 
