@@ -121,7 +121,7 @@ df = spark.read\
           .load(dataFn)
  
 if (source == "LSST"):
-  df = flatten_df(df)
+  df = flatten_df(df, 1)
   
 df.show(n = 2)
 #df.describe().show()
