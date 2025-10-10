@@ -217,7 +217,7 @@ elif (source == "LSST"):
   cols = ["ixx",
           "ixy",
           "iyy"]
-  columns = [col(c) for x in cols]]
+  columns = [col(c) for c in cols]
 
 if skipNaN: # cuts number of alerts to 1/4
   df = df.na.drop(subset = cols)
