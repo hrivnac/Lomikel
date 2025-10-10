@@ -214,9 +214,16 @@ if (source == "ZTF"):
          .drop("lc_features_g", "lc_features_r")           
   cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
 elif (source == "LSST"):   
-  cols = ["ixx",
+  cols = ["dipoleLength",
+          "dipoleAngle",
+          "dipoleChi2",
+          "scienceFlux",
+          "ixx",
+          "iyy",
           "ixy",
-          "iyy"]
+          "ixxPSF",
+          "iyyPSF",
+          "ixyPSF"]
   columns = [col(c) for c in cols]
 
 if skipNaN: # cuts number of alerts to 1/4
@@ -235,7 +242,6 @@ if replaceNaNbyZero:
     
 log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
 log.info(cols)
-sys.exit()
 
 # Standardisation --------------------------------------------------------------
 
@@ -261,6 +267,10 @@ scaler_params = {
   }
 with open("/tmp/scaler_params" + tag + ".json", "w") as f:
   json.dump(scaler_params, f)
+
+df_standardized.show()
+sys.exit()
+
 
 # PCA --------------------------------------------------------------------------
 
