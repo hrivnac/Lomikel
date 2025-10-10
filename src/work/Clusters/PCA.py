@@ -137,11 +137,12 @@ df = spark.read\
           .load(dataFn)
    
 if (source == "LSST"):
-  df = NestedDF(df).flattened_df  
+  df = NestedDF(df).flattened_struct_df  
   
 #df.show(n = 2)
 #df.describe().show()
-#df.printSchema()
+df.printSchema()
+sys.exit()
 
 if (source == "ZTF"):
   df = df.filter(df.lc_features_g.isNotNull())\
@@ -153,10 +154,7 @@ if n_sample > 0:
 
 # Classification ---------------------------------------------------------------
 
-cols = None
-
 if (source == "ZTF"):
-
   args = ["cdsxmatch",
           "roid",
           "mulens",
@@ -169,14 +167,18 @@ if (source == "ZTF"):
           "candidate.jd",
           "candidate.jdstarthist",
           "rf_kn_vs_nonkn",
-          "tracklet"]
-  
-  df = df.withColumn("class", extract_fink_classification(*args))
-         
+          "tracklet"] 
+  df = df.withColumn("class", extract_fink_classification(*args))         
   if known:
     df = df.filter(df.cdsxmatch != "Unknown")
   
 # Converting lc_features arrays into columns -----------------------------------
+
+cols = None
+columns = None
+
+df.show()
+sys.exit()
       
 if (source == "ZTF"):
   feature_names = ["mean",
