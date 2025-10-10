@@ -161,8 +161,8 @@ df = spark.read\
 #  df = flatten_structs(df)
   
 #df.show(n = 2)
-#df.describe().show()
-df.printSchema()
+df.describe().show()
+#df.printSchema()
 sys.exit()
 
 if (source == "ZTF"):
