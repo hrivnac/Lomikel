@@ -1,4 +1,6 @@
 from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame
+from pyspark.sql import types as T
 from pyspark.sql import functions as F
 from pyspark.sql.functions import size
 from pyspark.sql.functions import col
@@ -68,6 +70,31 @@ else:
   log.fatal("No source")
   sys.exit()
     
+# Flatten Structs --------------------------------------------------------------    
+    
+def flatten_structs(df: DataFrame, sep: str = "_") -> DataFrame:
+    """Recursively flattens all struct fields in a Spark DataFrame."""
+    flat_cols = []
+    for field in df.schema.fields:
+        field_name = field.name
+        field_type = field.dataType
+
+        if isinstance(field_type, T.StructType):
+            # Flatten nested struct
+            for subfield in field_type.fields:
+                sub_name = subfield.name
+                new_name = f"{field_name}{sep}{sub_name}"
+                flat_cols.append(F.col(f"{field_name}.{sub_name}").alias(new_name))
+        else:
+            flat_cols.append(F.col(field_name))
+    flat_df = df.select(flat_cols)
+
+    # Recursively flatten until no structs remain
+    if any(isinstance(f.dataType, T.StructType) for f in flat_df.schema.fields):
+        return flatten_structs(flat_df, sep)
+    else:
+        return flat_df
+    
 # Clean ------------------------------------------------------------------------
 
 if clean:
@@ -91,17 +118,20 @@ log.info("Starting...")
 df = spark.read\
           .format("parquet")\
           .load(dataFn)  
-df.show(n = 2)
-df.describe().show()
-df.printSchema()
 
 if (source == "ZTF"):
   df = df.filter(df.lc_features_g.isNotNull())\
          .filter(df.lc_features_r.isNotNull())
-#elif (source == "LSST"):
- 
+elif (source == "LSST"):
+  flatten_structs(df)
+  
 if n_sample > 0:
   df = df.limit(n_sample)        
+
+df.show(n = 2)
+#df.describe().show()
+#df.printSchema()
+
 
 # Classification ---------------------------------------------------------------
 
