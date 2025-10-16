@@ -128,9 +128,9 @@ elif (source == "LSST"):
 if n_sample > 0:
   df = df.limit(n_sample)        
 
-df.show(n = 2)
+#df.show(truncate = False)
 #df.describe().show()
-#df.printSchema()
+df.printSchema()
 
 
 # Classification ---------------------------------------------------------------
