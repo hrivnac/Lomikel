@@ -122,8 +122,8 @@ df = spark.read\
 if (source == "ZTF"):
   df = df.filter(df.lc_features_g.isNotNull())\
          .filter(df.lc_features_r.isNotNull())
-elif (source == "LSST"):
-  df = flatten_structs(df)
+#elif (source == "LSST"):
+#  df = flatten_structs(df)
   
 if n_sample > 0:
   df = df.limit(n_sample)        
