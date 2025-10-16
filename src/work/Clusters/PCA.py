@@ -196,7 +196,7 @@ elif (source == "LSST"):
                    "diaSource_ixy",
                    "diaSource_iyy"]
   columns = [col("diaSource_diaObjectId").alias("objectId")]\
-          + [col("brokerInjestMjd").alias("jd")]\
+          + [col("brokerIngestMjd"      ).alias("jd")]\
           + [col(feature) for feature in feature_names]
   df = df.select(*columns)
   cols = [c for c in df.columns if (c != "objectId" and c != "jd")]
