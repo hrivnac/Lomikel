@@ -130,7 +130,6 @@ df.show(truncate = False)
 #df.describe().show()
 #df.printSchema()
 
-
 # Classification ---------------------------------------------------------------
 
 if (source == "ZTF"):
@@ -156,9 +155,6 @@ if (source == "ZTF"):
 
 cols = None
 columns = None
-
-#df.show()
-sys.exit()
       
 if (source == "ZTF"):
   feature_names = ["mean",
@@ -195,7 +191,15 @@ if (source == "ZTF"):
   df = df.select(*columns)\
          .drop("lc_features_g", "lc_features_r")           
   cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
-#elif (source == "LSST"):   
+elif (source == "LSST"):   
+  feature_names = ["diaObject_diaObjectId",
+                   "diaSource_ixx",
+                   "diaSource_ixy",
+                   "diaSource_iyy"]
+  columns = [col("diaSource_diaObjectId")]\
+          + [col(feature) for feature in feature_names]
+  df = df.select(*columns)
+  cols = [c for c in df.columns if (c != "diaSource_diaObjectId")]
 
 if skipNaN: # cuts number of alerts to 1/4
   df = df.na.drop(subset = cols)
