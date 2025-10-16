@@ -91,9 +91,9 @@ log.info("Starting...")
 df = spark.read\
           .format("parquet")\
           .load(dataFn)  
-#df.show(n = 2)
-#df.describe().show()
-#df.printSchema()
+df.show(n = 2)
+df.describe().show()
+df.printSchema()
 
 if (source == "ZTF"):
   df = df.filter(df.lc_features_g.isNotNull())\
@@ -129,7 +129,7 @@ if (source == "ZTF"):
 cols = None
 columns = None
 
-df.show()
+#df.show()
 sys.exit()
       
 if (source == "ZTF"):
