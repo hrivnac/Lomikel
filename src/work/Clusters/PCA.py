@@ -126,7 +126,7 @@ elif (source == "LSST"):
 if n_sample > 0:
   df = df.limit(n_sample)        
 
-df.show(truncate = False)
+#df.show(truncate = False)
 #df.describe().show()
 #df.printSchema()
 
@@ -192,14 +192,14 @@ if (source == "ZTF"):
          .drop("lc_features_g", "lc_features_r")           
   cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
 elif (source == "LSST"):   
-  feature_names = ["diaObject_diaObjectId",
-                   "diaSource_ixx",
+  feature_names = ["diaSource_ixx",
                    "diaSource_ixy",
                    "diaSource_iyy"]
-  columns = [col("diaSource_diaObjectId")]\
+  columns = [col("diaSource_diaObjectId").alias("objectId")]\
+          + [col("brokerInjestMjd").alias("jd")]\
           + [col(feature) for feature in feature_names]
   df = df.select(*columns)
-  cols = [c for c in df.columns if (c != "diaSource_diaObjectId")]
+  cols = [c for c in df.columns if (c != "objectId" and c != "jd")]
 
 if skipNaN: # cuts number of alerts to 1/4
   df = df.na.drop(subset = cols)
