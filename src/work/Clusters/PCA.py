@@ -67,34 +67,6 @@ elif (source == "LSST"):
 else:
   log.fatal("No source")
   sys.exit()
-  
-# NestedDF ---------------------------------------------------------------------
-
-def flatten_df(nested_df, layers):
-    flat_cols = []
-    nested_cols = []
-    flat_df = []
-
-    flat_cols.append([c[0] for c in nested_df.dtypes if c[1][:6] != 'struct'])
-    nested_cols.append([c[0] for c in nested_df.dtypes if c[1][:6] == 'struct'])
-
-    flat_df.append(nested_df.select(flat_cols[0] +
-                               [col(nc+'.'+c).alias(nc+'_'+c)
-                                for nc in nested_cols[0]
-                                for c in nested_df.select(nc+'.*').columns])
-                  )
-    for i in range(1, layers):
-        print (flat_cols[i-1])
-        flat_cols.append([c[0] for c in flat_df[i-1].dtypes if c[1][:6] != 'struct'])
-        nested_cols.append([c[0] for c in flat_df[i-1].dtypes if c[1][:6] == 'struct'])
-
-        flat_df.append(flat_df[i-1].select(flat_cols[i] +
-                                [col(nc+'.'+c).alias(nc+'_'+c)
-                                    for nc in nested_cols[i]
-                                    for c in flat_df[i-1].select(nc+'.*').columns])
-        )
-
-    return flat_df[-1]
     
 # Clean ------------------------------------------------------------------------
 
@@ -118,15 +90,10 @@ log.info("Starting...")
 
 df = spark.read\
           .format("parquet")\
-          .load(dataFn)
- 
-if (source == "LSST"):
-  df = flatten_df(df, 1)
-  
+          .load(dataFn)  
 #df.show(n = 2)
 #df.describe().show()
-df.printSchema()
-sys.exit()
+#df.printSchema()
 
 if (source == "ZTF"):
   df = df.filter(df.lc_features_g.isNotNull())\
@@ -155,6 +122,7 @@ if (source == "ZTF"):
   df = df.withColumn("class", extract_fink_classification(*args))         
   if known:
     df = df.filter(df.cdsxmatch != "Unknown")
+#elif (source == "LSST"):
   
 # Converting lc_features arrays into columns -----------------------------------
 
@@ -199,18 +167,7 @@ if (source == "ZTF"):
   df = df.select(*columns)\
          .drop("lc_features_g", "lc_features_r")           
   cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
-elif (source == "LSST"):   
-  cols = ["dipoleLength",
-          "dipoleAngle",
-          "dipoleChi2",
-          "scienceFlux",
-          "ixx",
-          "iyy",
-          "ixy",
-          "ixxPSF",
-          "iyyPSF",
-          "ixyPSF"]
-  columns = [col(c) for c in cols]
+#elif (source == "LSST"):   
 
 if skipNaN: # cuts number of alerts to 1/4
   df = df.na.drop(subset = cols)
