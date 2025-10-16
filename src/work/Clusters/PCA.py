@@ -128,8 +128,8 @@ elif (source == "LSST"):
 if n_sample > 0:
   df = df.limit(n_sample)        
 
-#df.show(truncate = False)
-df.describe().show()
+df.show(truncate = False)
+#df.describe().show()
 #df.printSchema()
 
 
