@@ -44,6 +44,7 @@ import json
 import csv
 import os
 import glob
+import sys
 
 # Parameters -------------------------------------------------------------------
 
@@ -130,6 +131,7 @@ if n_sample > 0:
 df.show(truncate = True)
 #df.describe().show()
 #df.printSchema()
+sys.exit()
 
 # Classification ---------------------------------------------------------------
 
