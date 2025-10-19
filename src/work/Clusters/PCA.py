@@ -122,7 +122,7 @@ if (source == "ZTF"):
          .filter(df.lc_features_r.isNotNull())
 elif (source == "LSST"):
   df = df.drop("cutoutDifference", "cutoutScience", "cutoutTemplate")
-#  df = flatten_structs(df)
+  df = flatten_structs(df)
   
 if n_sample > 0:
   df = df.limit(n_sample)        
@@ -196,7 +196,7 @@ elif (source == "LSST"):
   feature_names = ["diaSource_ixx",
                    "diaSource_ixy",
                    "diaSource_iyy"]
-  columns = [col("diaSource_diaObjectId").alias("objectId")]\
+  columns = [col("diaObject_diaObjectId").alias("objectId")]\
           + [col("brokerIngestMjd"      ).alias("jd")]\
           + [col(feature) for feature in feature_names]
   df = df.select(*columns)
