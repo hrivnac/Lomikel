@@ -120,13 +120,13 @@ df = spark.read\
 if (source == "ZTF"):
   df = df.filter(df.lc_features_g.isNotNull())\
          .filter(df.lc_features_r.isNotNull())
-elif (source == "LSST"):
-  df = flatten_structs(df)
+#elif (source == "LSST"):
+#  df = flatten_structs(df)
   
 if n_sample > 0:
   df = df.limit(n_sample)        
 
-#df.show(truncate = False)
+df.show(truncate = False)
 #df.describe().show()
 #df.printSchema()
 
@@ -216,7 +216,6 @@ if replaceNaNbyZero:
   df = df.na.fill(0)  
     
 log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
-log.info(cols)
 
 # Standardisation --------------------------------------------------------------
 
@@ -243,9 +242,7 @@ scaler_params = {
 with open("/tmp/scaler_params" + tag + ".json", "w") as f:
   json.dump(scaler_params, f)
 
-df_standardized.show()
-sys.exit()
-
+#df_standardized.show()
 
 # PCA --------------------------------------------------------------------------
 
@@ -342,7 +339,7 @@ pdf["cluster"] = pdf["cluster"].astype(str)
 grouped = pdf.groupby(["class", "cluster"])\
              .size()\
              .reset_index(name="count")
-plt.figure(figsize=(12, 6))
+plt.figure(figsize = (12, 6))
 sns.scatterplot(data=grouped,
                 x         = "cluster",
                 y         = "class",
