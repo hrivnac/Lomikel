@@ -120,7 +120,8 @@ df = spark.read\
 if (source == "ZTF"):
   df = df.filter(df.lc_features_g.isNotNull())\
          .filter(df.lc_features_r.isNotNull())
-#elif (source == "LSST"):
+elif (source == "LSST"):
+  df = df.drop("cutoutDifference", "cutoutScience", "cutoutTemplate")
 #  df = flatten_structs(df)
   
 if n_sample > 0:
