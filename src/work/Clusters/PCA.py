@@ -126,7 +126,7 @@ if (source == "ZTF"):
 if n_sample > 0:
   df = df.limit(n_sample)        
 
-df.show(truncate = False)
+df.show(truncate = True)
 #df.describe().show()
 #df.printSchema()
 
