@@ -196,12 +196,12 @@ if (source == "ZTF"):
 elif (source == "LSST"):   
   feature_names = ["diaSource_ixx",
                    "diaSource_ixy",
-                   "diaSource_iyy"
+                   "diaSource_iyy",
                    "diaSource_ixxPSF",
                    "diaSource_ixyPSF",
                    "diaSource_iyyPSF",
-                   "psfFlux",
-                   "scienceFlux"]
+                   "diaSource_psfFlux",
+                   "diaSource_scienceFlux"]
   columns = [col("diaObject_diaObjectId").alias("objectId")]\
           + [col("brokerIngestMjd"      ).alias("jd")]\
           + [col(feature) for feature in feature_names]
