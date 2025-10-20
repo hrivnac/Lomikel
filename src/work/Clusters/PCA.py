@@ -152,7 +152,7 @@ if (source == "ZTF"):
   if known:
     df = df.filter(df.cdsxmatch != "Unknown")
 elif (source == "LSST"):
-  df = df.withColumn("class", "tbd")
+  df = df.withColumn("class", lit("tbd"))
   
   
 # Converting lc_features arrays into columns -----------------------------------
