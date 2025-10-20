@@ -50,14 +50,14 @@ import sys
 
 #source = "ZTF"
 source = "LSST"
-skipNaN = False
-replaceNaNbyMean = False
-replaceNaNbyZero = True
+skipNaN = True
+replaceNaNbyMean = True
+replaceNaNbyZero = False
 n_sample = 0
-n_pca = 13
+n_pca = 7
 n_clusters_start = 5
-n_clusters = 30
-silhouette = False
+n_clusters = 10
+silhouette = True
 cluster_features = "pca_features"
 known = False
 tag = "-zero"
@@ -223,9 +223,6 @@ if replaceNaNbyZero:
   df = df.na.fill(0)  
     
 log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
-
-df.show(truncate = True)
-sys.exit()
 
 # Standardisation --------------------------------------------------------------
 
