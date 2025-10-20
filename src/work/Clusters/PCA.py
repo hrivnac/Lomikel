@@ -204,9 +204,9 @@ elif (source == "LSST"):
                    "diaSource_iyyPSF",
                    "diaSource_psfFlux",
                    "diaSource_scienceFlux"]
-  columns = [col("class"                )]\
-            [col("diaObject_diaObjectId").alias("objectId")]\
-          + [col("brokerIngestMjd"      ).alias("jd")]\
+  columns = [col("class")]\
+          + [col("diaObject_diaObjectId").alias("objectId")]\
+          + [col("brokerIngestMjd").alias("jd")]\
           + [col(feature) for feature in feature_names]
   df = df.select(*columns)
   cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
