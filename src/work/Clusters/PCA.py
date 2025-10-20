@@ -151,7 +151,9 @@ if (source == "ZTF"):
   df = df.withColumn("class", extract_fink_classification(*args))         
   if known:
     df = df.filter(df.cdsxmatch != "Unknown")
-#elif (source == "LSST"):
+elif (source == "LSST"):
+  df = df.withColumn("class", "tbd")
+  
   
 # Converting lc_features arrays into columns -----------------------------------
 
@@ -202,11 +204,12 @@ elif (source == "LSST"):
                    "diaSource_iyyPSF",
                    "diaSource_psfFlux",
                    "diaSource_scienceFlux"]
-  columns = [col("diaObject_diaObjectId").alias("objectId")]\
+  columns = [col("class"                )]\
+            [col("diaObject_diaObjectId").alias("objectId")]\
           + [col("brokerIngestMjd"      ).alias("jd")]\
           + [col(feature) for feature in feature_names]
   df = df.select(*columns)
-  cols = [c for c in df.columns if (c != "objectId" and c != "jd")]
+  cols = [c for c in df.columns if (c != "class" and c != "objectId" and c != "jd")]
 
 if skipNaN: # cuts number of alerts to 1/4
   df = df.na.drop(subset = cols)
