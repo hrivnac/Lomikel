@@ -128,10 +128,9 @@ elif (source == "LSST"):
 if n_sample > 0:
   df = df.limit(n_sample)        
 
-df.show(truncate = True)
+#df.show(truncate = True)
 #df.describe().show()
 #df.printSchema()
-sys.exit()
 
 # Classification ---------------------------------------------------------------
 
@@ -197,7 +196,12 @@ if (source == "ZTF"):
 elif (source == "LSST"):   
   feature_names = ["diaSource_ixx",
                    "diaSource_ixy",
-                   "diaSource_iyy"]
+                   "diaSource_iyy"
+                   "diaSource_ixxPSF",
+                   "diaSource_ixyPSF",
+                   "diaSource_iyyPSF",
+                   "psfFlux",
+                   "scienceFlux"]
   columns = [col("diaObject_diaObjectId").alias("objectId")]\
           + [col("brokerIngestMjd"      ).alias("jd")]\
           + [col(feature) for feature in feature_names]
@@ -219,6 +223,9 @@ if replaceNaNbyZero:
   df = df.na.fill(0)  
     
 log.info("Initial shape: " + str(df.count()) + " * " + str(len(df.columns)))
+
+df.show(truncate = True)
+sys.exit()
 
 # Standardisation --------------------------------------------------------------
 
