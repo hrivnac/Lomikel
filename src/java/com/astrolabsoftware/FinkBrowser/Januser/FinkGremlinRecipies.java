@@ -568,9 +568,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
    
   private String _now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()).toString();
  
-  private static String FINK_OBJECTS_WS = "https://api.fink-portal.org/api/v1/objects";
-  private static String FINK_LATESTS_WS = "https://api.fink-portal.org/api/v1/latests";
-  private static String FINK_ANOMALY_WS = "https://api.fink-portal.org/api/v1/anomaly";
+  private static String FINK_OBJECTS_WS = "https://api.ztf.fink-portal.org/api/v1/objects";
+  private static String FINK_LATESTS_WS = "https://api.ztf.fink-portal.org/api/v1/latests";
+  private static String FINK_ANOMALY_WS = "https://api.ztf.fink-portal.org/api/v1/anomaly";
 
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkGremlinRecipies.class);

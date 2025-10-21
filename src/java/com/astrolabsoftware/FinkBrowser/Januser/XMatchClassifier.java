@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkClassifier</code> classifies sources using XMatch according to
-  * <a href="https://api.fink-portal.org/api">Fink Portal</a> REST service.
+  * <a href="https://api.ztf.fink-portal.org/api">Fink Portal</a> REST service.
   * @opt attributes
   * @opt operations
   * @opt types
