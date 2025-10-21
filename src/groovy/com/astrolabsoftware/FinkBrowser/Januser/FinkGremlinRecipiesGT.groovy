@@ -65,6 +65,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: use classifier.system
 public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
   /** TBD */
@@ -457,11 +458,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def q
     def qualities = [:]
     g().V().has('lbl',       'OCol').
-           has('classifier', dstClassifier).
-           group().
-           by(values('cls')).
-           by(out().count()).
-           unfold().each {clsMap[it.key] = it.value}                                  
+            has('classifier', dstClassifier).
+            group().
+            by(values('cls')).
+            by(out().count()).
+            unfold().each {clsMap[it.key] = it.value}                                  
     clsMap = clsMap.sort{-it.value}
     clsMap.take(nclasses).each {
       cls = it.key
