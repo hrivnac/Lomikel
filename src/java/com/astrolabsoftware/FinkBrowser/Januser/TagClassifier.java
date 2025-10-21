@@ -92,6 +92,11 @@ public class TagClassifier extends Classifier {
       log.info("OCol " + tag + " of " + name() + "[" + flavor() + "] created");
       }
     }
+  
+  @Override
+  public String system() {
+    return "ANY";
+    }
     
   /** Logging . */
   private static Logger log = LogManager.getLogger(TagClassifier.class);
