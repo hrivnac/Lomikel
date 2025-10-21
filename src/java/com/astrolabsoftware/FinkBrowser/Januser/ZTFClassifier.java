@@ -17,7 +17,7 @@ public abstract class ZTFClassifier extends Classifier {
          
   @Override
   public String system() {
-    return "LSST";
+    return "ZTF";
     }
 
   }
