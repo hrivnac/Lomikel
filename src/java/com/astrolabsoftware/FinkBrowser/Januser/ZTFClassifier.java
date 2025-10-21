@@ -14,5 +14,10 @@ import java.util.HashMap;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public abstract class ZTFClassifier extends Classifier {
-   
+         
+  @Override
+  public String system() {
+    return "LSST";
+    }
+
   }

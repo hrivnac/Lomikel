@@ -102,6 +102,8 @@ public abstract class Classifier {
     return _type.name();
     }
     
+  public abstract String system();
+    
   public String toString() {
     return name() + "[" + flavor() + "]";
     }
