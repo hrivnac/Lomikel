@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class FinkClassifier extends Classifier {
+public class FinkClassifier extends ZTFClassifier {
   
   @Override
   public void classify(FinkGremlinRecipies recipies,
@@ -83,7 +83,7 @@ public class FinkClassifier extends Classifier {
         w += allWeights.get(instance);
         }
       weight = w / totalWeight;
-      recipies.registerSoI(this, key, oid, weight, instancesL, weightsL);
+      recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
       }
     }
   

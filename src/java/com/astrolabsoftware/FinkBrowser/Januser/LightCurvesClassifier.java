@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 // BUG: jd should be String or long
-public class LightCurvesClassifier extends Classifier {
+public class LightCurvesClassifier extends ZTFClassifier {
   
   @Override
   public void classify(FinkGremlinRecipies recipies,
@@ -107,7 +107,7 @@ public class LightCurvesClassifier extends Classifier {
         w += allWeights.get(instance);
         }
       weight = w / totalWeight;
-      recipies.registerSoI(this, key, oid, weight, instancesL, weightsL);
+      recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
       }
     if (!isClassified) {
       log.warn("Source " + oid + " cannot be classified because his alerts have no LC features");

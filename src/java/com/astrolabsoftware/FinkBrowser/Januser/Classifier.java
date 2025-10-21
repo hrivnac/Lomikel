@@ -7,7 +7,7 @@ import com.Lomikel.Utils.LomikelException;
 import java.util.Map;
 import java.util.HashMap;
 
-/** <code>Classifier</code> classifies sources.
+/** <code>Classifier</code> classifies <em>objects</em>.
   * @opt attributes
   * @opt operations
   * @opt types
@@ -70,16 +70,16 @@ public abstract class Classifier {
         }
       cl.setType(type);
       cl.setFlavor(flavor);
-      _classifiers.put(signature, cl);
+      classifiers().put(signature, cl);
       }
-    return _classifiers.get(signature);
+    return classifiers().get(signature);
     }
     
-  /** Classify <em>source</em> and expand them to alerts (if requested).
+  /** Classify <em>object</em> and expand them to <em>source</em>s (if requested).
     * It should register classes corresponding to specified <tt>objectId</tt>
-    * using {@link FinkGremlinRecipies#registerSoI(Classifiers, String, String, double, String, String, boolean, String)}.
+    * using {@link FinkGremlinRecipies#registerOCol(Classifiers, String, String, double, String, String, boolean, String)}.
     * @param recipies   The {@link FinkGremlinRecipies} caller.
-    * @param oid        The <tt>objectId</tt> of source to be added.
+    * @param oid        The <tt>objectId</tt> of <em>object</em> to be added.
     * @throws LomikelException If anything fails. */
   public abstract void classify(FinkGremlinRecipies recipies,
                                 String              oid) throws LomikelException;
@@ -109,6 +109,10 @@ public abstract class Classifier {
   private Type _type;  
     
   private String _flavor;
+    
+  protected static Map<Pair<Type, String>, Classifier> classifiers() {
+    return _classifiers;
+    }
   
   private static Map<Pair<Type, String>, Classifier> _classifiers = new HashMap<>();
   

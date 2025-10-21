@@ -18,7 +18,7 @@ def reduceCls(String cls) {
   }
 
 classes = []
-g.V().has('lbl', 'SoI').
+g.V().has('lbl', 'OCol').
       has('classifier', 'FINK_PORTAL').
       project('cls', 'size').
       by(values('cls')).
@@ -30,7 +30,7 @@ g.V().has('lbl', 'SoI').
       each {x -> classes += (x['cls'])}
 
 outputFile.write("cls,objectId,jd_list\n")
-classes.each {cls -> def results = g.V().has('lbl', 'SoI').
+classes.each {cls -> def results = g.V().has('lbl', 'OCol').
                                          has('classifier', 'FINK_PORTAL').
                                          has('cls', cls).
                                          outE().

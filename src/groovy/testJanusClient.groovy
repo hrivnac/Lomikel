@@ -15,7 +15,7 @@ gr.fhclient('vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
 gr.classifySource(Classifier.instance("FEATURES=Clusters/2025/13-50"), oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
 gr.classifySource(Classifier.instance("FEATURES=Clusters/2025/13-50"), oid, null)
 
-gr.registerSoI(Classifier.instance("TAG"), 'MyTag_1', oid, 1.0, '', false, null)
+gr.registerOCol(Classifier.instance("TAG"), 'MyTag_1', oid, 1.0, '', false, null)
 
 gr.classification(oid);
 gr.classification(oid, "FINK");
@@ -30,7 +30,7 @@ gr.sourceNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 0.5, 'JensenShannon')
 gr.sourceNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 10, 'JensenShannon', 0.2, True);
 
 gr.standardDeviationE('deepcontains', ['weight']);
-gr.exportAoISoI('/tmp/Overlaps.graphml');
+gr.exportOCol('/tmp/Overlaps.graphml');
 // sum of weights (= number od alerts) per source
 jc.g().V().has('lbl', 'source').order().by('objectId', asc).project('objectId', 'weight').by(values('objectId')).by(inE().values('weight').sum());
 // numbers of source lastly updated per update (date)

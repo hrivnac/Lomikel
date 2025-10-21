@@ -5,9 +5,9 @@ mgmt = graph.openManagement()
 
 // Vertexes
 datalink          = mgmt.getVertexLabel('datalink')
-SoI               = mgmt.makeVertexLabel('SoI'    ).make()
+OCol              = mgmt.makeVertexLabel('OCol'   ).make()
 source            = mgmt.makeVertexLabel('source' ).make()
-alert             = mgmt.makeVertexLabel('alert'  ).make()
+object            = mgmt.makeVertexLabel('object' ).make()
 
 // Edges
 props        = mgmt.getEdgeLabel('props'       )
@@ -35,24 +35,27 @@ objectId     = mgmt.makePropertyKey('objectId'    ).dataType(String.class).cardi
 jd           = mgmt.makePropertyKey('jd'          ).dataType(Double.class).cardinality(Cardinality.SINGLE).make() 
 classifier   = mgmt.makePropertyKey('classifier'  ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 flavor       = mgmt.makePropertyKey('flavor'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
+system       = mgmt.makePropertyKey('system'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 cls          = mgmt.makePropertyKey('cls'         ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 intersection = mgmt.makePropertyKey('intersection').dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 sizeIn       = mgmt.makePropertyKey('sizeIn'      ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 
 // Vertex properties
-mgmt.addProperties(SoI,
+mgmt.addProperties(OCol,
                    lbl,
+                   system,
                    classifier,
                    flavor,
                    cls)   
-mgmt.addProperties(alert,
+mgmt.addProperties(source,
                    lbl,
                    objectId,
                    jd,
                    importDate)
-mgmt.addProperties(source,
+mgmt.addProperties(object,
                    lbl,
+                   system,
                    objectId,
                    importDate)
                                     
@@ -64,9 +67,9 @@ mgmt.addProperties(overlaps,
                    sizeOut)
 
 // Connections   
-mgmt.addConnection(sends,        source, alert)
-mgmt.addConnection(deepcontains, SoI,    source)
-mgmt.addConnection(overlaps,     SoI,    SoI)
+mgmt.addConnection(sends,        object, source)
+mgmt.addConnection(deepcontains, OCol,   object)
+mgmt.addConnection(overlaps,     OCol,   OCol)
 
 // Info
 mgmt.printSchema()

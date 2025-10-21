@@ -51,12 +51,12 @@ public class TagClassifier extends Classifier {
                        String              author,
                        String              annotation,
                        String              ref) throws LomikelException {
-    if (!recipies.g().V().has("lbl",        "SoI").
+    if (!recipies.g().V().has("lbl",        "OCol").
                           has("classifier", name()).
                           has("flavor",     flavor()).
                           has("cls",        tag).
                           hasNext()) {
-      log.error("SoI " + tag + " of " + name() + "[" + flavor() + "] does not exist, create it first");
+      log.error("OCol " + tag + " of " + name() + "[" + flavor() + "] does not exist, create it first");
       return;
       }
     Map<String, String> attributes = new HashMap<>();
@@ -70,26 +70,26 @@ public class TagClassifier extends Classifier {
     if (ref != null) {
       attributes.put("ref", ref);
       }
-    recipies.registerSoI(this, tag, oid, attributes, false);
+    recipies.registerOCol(this, tag, oid, attributes, false);
     }
     
   public void createTag(FinkGremlinRecipies recipies,
                         String              tag) {
-    if (recipies.g().V().has("lbl",          "SoI").
+    if (recipies.g().V().has("lbl",          "OCol").
                          has("classifier",   name()).
                          has("flavor",       flavor()).
                          has("cls",          tag).
                          hasNext()) {
-      log.error("SoI " + tag + " of " + name() + "[" + flavor() + "] already exists");
+      log.error("OCol " + tag + " of " + name() + "[" + flavor() + "] already exists");
       }
     else {
-      recipies.g().addV("SoI").property("lbl",        "SoI").
-                               property("classifier", name()).
-                               property("flavor",     flavor()).
-                               property("cls",        tag).
-                               iterate();
+      recipies.g().addV("OCol").property("lbl",        "OCol").
+                                property("classifier", name()).
+                                property("flavor",     flavor()).
+                                property("cls",        tag).
+                                iterate();
       recipies.commit();
-      log.info("SoI " + tag + " of " + name() + "[" + flavor() + "] created");
+      log.info("OCol " + tag + " of " + name() + "[" + flavor() + "] created");
       }
     }
     

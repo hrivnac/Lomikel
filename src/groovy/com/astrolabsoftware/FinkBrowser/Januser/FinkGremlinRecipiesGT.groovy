@@ -85,28 +85,28 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
     }
 
-  /** Give {@link Map} of other <em>source</em>s ordered
-    * by distance to the specified <em>source</em> with respect
+  /** Give {@link Map} of other <em>object</em>s ordered
+    * by distance to the specified <em>object</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
     * Include classification for each neighbour.
-    * @param oid0          The <em>objectOd</em> of the <em>source</em>.
+    * @param oid0          The <em>objectOd</em> of the <em>object</em>.
     * @param classifier    The classifier name to be used.
-    * @param nmax          The number of closest <em>source</em>s to give.
+    * @param nmax          The number of closest <em>object</em>s to give.
     *                      All are given, if missing.
     * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
-    * @param climit        The low limit fir the classification ration of the evaluated source.
+    * @param climit        The low limit fir the classification ration of the evaluated <em>object</em>.
     *                      Default: <tt>0.0</tt>.
-    * @param allClasses    Whether to consider also classes not available in original source.
+    * @param allClasses    Whether to consider also classes not available in original <em>object</em>.
     *                      Default: <tt>false</tt>.
     * @return              The full neigbouthood information. */
-  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String  oid0,
+  def Map<Map.Entry<String, Double>, Map<String, Double>> objectNeighborhood(String  oid0,
                                                                              String  classifier,
                                                                              double  nmax,
                                                                              String  metric = 'JensenShannon',
                                                                              double  climit = 0.0,
                                                                              boolean allClasses = false) {
-     return sourceNeighborhood('nmax':nmax,
+     return objectNeighborhood('nmax':nmax,
                        'metric':metric,
                        'climit':climit,
                        'allClasses':allClasses,
@@ -114,20 +114,20 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                        classifier)
     }
 
-  /** The same method as {@link #sourceNeighborhood(Map, String, String},
+  /** The same method as {@link #objectNeighborhood(Map, String, String},
     * appropriate for direct call from Java (instead of Groovy). */
-  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String oid0,
-                                                                             String classifier,
-                                                                             Map    args) {
-    return sourceNeighborhood(args, oid0, classifier);
+  def Map<Map.Entry<String, Double>, Map<String, Double>> objecteNeighborhood(String oid0,
+                                                                              String classifier,
+                                                                              Map    args) {
+    return objectNeighborhood(args, oid0, classifier);
     }
         
-  /** Give {@link Map} of other <em>source</em>s ordered
-    * by distance to the specified <em>source</em> with respect
-    * to weights to all (or selected) <em>SourceOfInterest</em> classes.
-    * @param oid0          The <em>objectOd</em> of the <em>source</em>.
+  /** Give {@link Map} of other <em>object</em>s ordered
+    * by distance to the specified <em>object</em> with respect
+    * to weights to all (or selected) <em>OCol</em> classes.
+    * @param oid0          The <em>objectId</em> of the <em>object</em>.
     * @param classifier    The classifier name to be used.
-    * @param nmax          The number of closest <em>source</em>s to give.
+    * @param nmax          The number of closest <em>object</em>s to give.
     *                      If less then 1, the relative distance cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
@@ -135,41 +135,41 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      Optional named parameter.
-    * @param climit        The low limit fir the classification ration of the evaluated source.
+    * @param climit        The low limit fir the classification ration of the evaluated <em>object</em>.
     *                      Default: <tt>0.0</tt>.
     *                      Optional named parameter.
-    * @param allClasses    Whether to consider also classes not available in original source.
+    * @param allClasses    Whether to consider also classes not available in original <em>object</em>.
     *                      Default: <tt>false</tt>.
     *                      Optional named parameter.
-    * @return              The distances to other sources, order by the distance. */
-  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map    args = [:],
+    * @return              The distances to other <em>object</em>s, order by the distance. */
+  def Map<Map.Entry<String, Double>, Map<String, Double>> objectNeighborhood(Map    args = [:],
                                                                              String oid0,
                                                                              String classifier) {
-    return sourceNeighborhood(args, oid0, classifier, null, null);
+    return objectNeighborhood(args, oid0, classifier, null, null);
     }
 
-  /** The same method as {@link #sourceNeighborhood(Map, String, String, ListMString>, List<String>},
+  /** The same method as {@link #objectNeighborhood(Map, String, String, ListMString>, List<String>},
     * appropriate for direct call from Java (instead of Groovy). */
-  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(String      oid0,
+  def Map<Map.Entry<String, Double>, Map<String, Double>> objectNeighborhood(String      oid0,
                                                                              String      classifier,
                                                                              Set<String> oidS,
                                                                              Set<String> classes0,
                                                                              Map         args) {
-    return sourceNeighborhood(args, oid0, classifier, oidS, classes);
+    return objectNeighborhood(args, oid0, classifier, oidS, classes);
     }
     
-  /** Give {@link Map} of other <em>source</em>s ordered
-    * by distance to the specified <em>source</em> with respect
-    * to weights to all (or selected) <em>SourceOfInterest</em> classes.
-    * @param oid0          The <em>objectOd</em> of the <em>source</em>.
+  /** Give {@link Map} of other <em>object</em>s ordered
+    * by distance to the specified <em>object</em> with respect
+    * to weights to all (or selected) <em>OCol</em> classes.
+    * @param oid0          The <em>objectId</em> of the <em>object</em>.
     * @param classifier    The classifier name to be used.
-    * @param oidS          A {@link List} of <em>source</em> objectIds to only avaluated.
-    *                      If <tt>null</tt>, all <em>source</em>s will be evaluated.
-    * @param classes0      A {@link List} of <em>SourceOfInterest</em> classes to be
+    * @param oidS          A {@link List} of <em>object</em> objectIds to only avaluated.
+    *                      If <tt>null</tt>, all <em>object</em>s will be evaluated.
+    * @param classes0      A {@link List} of <em>OCol</em> classes to be
     *                      used in comparison.
-    *                      All <em>SourceOfInterest</em> classes of the specified
-    *                      <em>source</em> will be used if <tt>null</tt>.
-    * @param nmax          The number of closest <em>source</em>s to give.
+    *                      All <em>OCol</em> classes of the specified
+    *                      <em>object</em> will be used if <tt>null</tt>.
+    * @param nmax          The number of closest <em>object</em>s to give.
     *                      If less then 1, the relative distance cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      All are given, if missing.
@@ -177,13 +177,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
     *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
     *                      Optional named parameter.
-    * @param climit        The low limit for the classification ration of the evaluated source.
+    * @param climit        The low limit for the classification ration of the evaluated <em>object</em>.
     *                      Default: <tt>0.0</tt>.
     *                      Optional named parameter.
-    * @param allClasses    Whether to consider also classes not available in original source.
+    * @param allClasses    Whether to consider also classes not available in original <em>object</em>.
     *                      Default: <tt>false</tt>.
-    * @return              The distances to other sources, order by the distance. */
-  def Map<Map.Entry<String, Double>, Map<String, Double>> sourceNeighborhood(Map         args = [:],
+    * @return              The distances to other <em>objects</em>s, order by the distance. */
+  def Map<Map.Entry<String, Double>, Map<String, Double>> objectNeighborhood(Map         args = [:],
                                                                              String      oid0,
                                                                              String      classifier,
                                                                              Set<String> oidS,
@@ -193,22 +193,22 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def climit     = args.climit     ?: 0.0;
     def allClasses = args.allClasses ?: false;
     def cf = classifierWithFlavor(classifier);
-    if (g().V().has('lbl', 'source').has('objectId', oid0).count().next() == 0) {
+    if (g().V().has('lbl', 'object').has('objectId', oid0).count().next() == 0) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
       }
     if (classes0 == null || classes0.isEmpty()) {
-      classes0 = g().V().has('lbl', 'SoI'       ).
+      classes0 = g().V().has('lbl', 'OCol'      ).
                          has('classifier', cf[0]).
                          has('flavor',     cf[1]).
                          values('cls'           ).
                          toSet();
       }
-    def source0 = g().V().has('lbl',      'source').
+    def object0 = g().V().has('lbl',      'object').
                           has('objectId', oid0    ).
                           next();
     def m0 = [:];
-    g().V(source0).inE().
+    g().V(object0).inE().
                    as('e').
                    filter(and(outV().values('classifier').is(eq(cf[0])),
                               outV().values('flavor'    ).is(eq(cf[1])),
@@ -217,7 +217,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                    by(select('e').outV().values('cls')).
                    by(select('e').values('weight')).
                    each {it -> m0[it['cls']] = it['w']}
-    log.info('calculating source distances from ' + oid0 + m0 + " using " + args);
+    log.info('calculating object distances from ' + oid0 + m0 + " using " + args);
     if (climit > 0.0) {
       m0.entrySet().removeIf(entry -> entry.getValue() < climit)
       }
@@ -233,26 +233,26 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       log.info("\tsearching only in " + classes);
       }
     def distances = [:]
-    def sources;
+    def objects;
     if (oidS) {
       log.info("\tsearching only " + oidS);
-      sources = g().V().has('lbl', 'source').
+      objects = g().V().has('lbl',      'object').
                         has('objectId', within(oidS));
       }
     else {
       // NOTE: Janus-all.jar doesn't allow some complex operations
-      sources = g().V().has('lbl', 'SoI').
+      objects = g().V().has('lbl',        'OCol').
                         has('classifier', cf[0]).
                         has('flavor',     cf[1]).
                         has('cls',        within(classes)).
                         out().
-                        has('lbl', 'source').
+                        has('lbl', 'object').
                         dedup()  
       }
     def distance
     def n = 0
     def t = System.currentTimeMillis()
-    sources.each {s -> 
+    objects.each {s -> 
                   def oid = g().V(s).values('objectId').next();
                   def m = [:];
                   g().V(s).inE().
@@ -274,7 +274,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   distances[distance] = m
                   }
     t = System.currentTimeMillis() - t
-    log.info('distance of ' + n + ' sources evaluated in ' + t / 1000 + ' s')
+    log.info('distance of ' + n + ' objects evaluated in ' + t / 1000 + ' s')
     return limitMapMap(distances, nmax)
     }
   
@@ -328,12 +328,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
 
   /** Give recorded classification for all {@link Classifiers}.
-    * @param oid        The <em>source objectId</em>.
+    * @param oid        The <em>objectId</em>.
     * @param classifier The {@link Classifier} to be used.
     *                   Optional. If missing or <tt>null</tt>,
     *                   {@link Classifier}s will be used.
     * @return           The recorded classification calculated
-    *                   by number of classified <em>alert</em>s. */
+    *                   by number of classified <em>sources</em>s. */
   def List<Map<String, String>> classification(String oid,
                                                String classifier = null) {
     def cf;
@@ -341,7 +341,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       cf = classifierWithFlavor(classifier);
       }
     def classified = [];
-    g().V().has('lbl', 'source').
+    g().V().has('lbl',      'object').
             has('objectId', oid).
             inE().
             project('weight', 'classifier', 'flavor', 'class').
@@ -358,7 +358,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt>.
     * The truthfulness of the result depends on quality and overlap of used classifications.
-    * @param oid The <em>source objectId</em>.
+    * @param oid The <em>objectId</em>.
     * @param srcClassifier The classifier to be used for primary classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
     * @param nmax          The number of classes to give.
@@ -370,7 +370,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      objectId is not classified in destination classification.
     *                      The deafult is <tt>true</tt>.
     * @return              The recorded classification calculated
-    *                      by number of classified <em>alert</em>s. Normalized to 1. */
+    *                      by number of classified <em>source</em>s. Normalized to 1. */
   def Map<String, Double> reclassification(String  oid,
                                            String  srcClassifier,
                                            String  dstClassifier,
@@ -381,7 +381,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def w;
     def cf = classifierWithFlavor(srcClassifier);
     classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
-                             w = reclassify(it.class, 'SoI', srcClassifier, dstClassifier);
+                             w = reclassify(it.class, 'OCol', srcClassifier, dstClassifier);
                              w.each {cls, intersection -> if (reclassified[cls] == null) {
                                                             reclassified[cls] = 0;
                                                             }
@@ -424,11 +424,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                    int     sample) {
     def qualities = []   
     def quality
-    g().V().has('lbl',       'SoI').
+    g().V().has('lbl',       'OCol').
             has('classifier', dstClassifier).
             has('cls',        cls).
             out().
-            has('lbl', 'source').
+            has('lbl', 'object').
             limit(sample).
             values('objectId').
             toList().
@@ -456,7 +456,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def cls
     def q
     def qualities = [:]
-    g().V().has('lbl',        'SoI').
+    g().V().has('lbl',       'OCol').
            has('classifier', dstClassifier).
            group().
            by(values('cls')).
@@ -483,7 +483,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** Give recorded classification. Recalculate classes from <tt>srcClassifier</tt>
     * to <tt>dstClassifier</tt> passing by <tt>midClassifier</tt>.
     * The truthfulness of the result depends on quality and overlap of used classifications.
-    * @param oid The <em>source objectId</em>.
+    * @param oid The <em>objectId</em>.
     * @param srcClassifier The classifier to be used for primary classification.
     * @param midClassifier The classifier to be used for intermediate classification.
     * @param dstClassifier The classifier to be used to interpret the classification.
@@ -496,7 +496,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      objectId is not classified in destination classification.
     *                      The deafult is <tt>true</tt>.
     * @return              The recorded classification calculated
-    *                      by number of classified <em>alert</em>s. Normalized to 1. */
+    *                      by number of classified <em>source</em>s. Normalized to 1. */
   def Map<String, Double> reclassification(String  oid,
                                            String  srcClassifier,
                                            String  midClassifier,
@@ -510,8 +510,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def cf = classifierWithFlavor(srcClassifier);
     def cg = classifierWithFlavor(midClassifier);
     classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
-                             wMid = reclassify(it.class, 'SoI', srcClassifier, midClassifier);
-                             wMid.each {clsMid, intersectionMid -> w = reclassify(clsMid, 'SoI', midClassifier, dstClassifier);
+                             wMid = reclassify(it.class, 'OCol', srcClassifier, midClassifier);
+                             wMid.each {clsMid, intersectionMid -> w = reclassify(clsMid, 'OCol', midClassifier, dstClassifier);
                                             w.each {cls, intersection -> if (reclassified[cls] == null) {
                                                                            reclassified[cls] = 0;
                                                                            }
@@ -543,7 +543,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
   /** Limit {@link Map} based on its <tt>key.value</tt>.
     * @param map  The fill {@link Map}>
-    * @param nmax  The number of closest <em>source</em>s to give.
+    * @param nmax  The number of closest <em>object</em>s to give.
     *              If less then 1, the relative distance cutoff
     *              (the larger cutoff means more selective, 0 means no selection). 
     * @return     The limited {@link Map}. */
@@ -582,7 +582,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
      
   /** Limit {@link Map} based on its <tt>value</tt>.
     * @param map  The fill {@link Map}>
-    * @param nmax  The number of closest <em>source</em>s to give.
+    * @param nmax  The number of closest <em>object</em>s to give.
     *              If less then 1, the relative distance cutoff
     *              (the larger cutoff means more selective, 0 means no selection). 
     * @return     The limited {@link Map}. */
@@ -666,9 +666,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     
   /** Give classification from another {@link Classifier}.
     * Using accumulated data in graph.
-    * @param cls           The class in the source classifier. 
+    * @param cls           The class in the object classifier. 
     * @param lbl           The label of collection {@link Vertex}es. 
-    * @param srcClassifier The name of classifier of the source (known) class.
+    * @param srcClassifier The name of classifier of the object (known) class.
     * @param dstClassifier The name of classifier of the destination (required) class.
     * @return              The new classification. */
   def Map<String, Double> reclassify(String cls,
@@ -706,12 +706,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return classification;
     }
     
-  /** Export all <em/>SoI</em>
+  /** Export all <em/>OCol</em>
     * {@link Vertex}es with connecting <em>overlaps</em> {@link Edge}s
     * into <em>GraphML</em> file.
     * @param fn The full filename of the output <em>GraphML</em> file. */
-  def exportSoI(String fn) {  
-    g().V().has('lbl', 'SoI').
+  def exportOCol(String fn) {  
+    g().V().has('lbl', 'OCol').
             outE().
             has('lbl', 'overlaps').
             subgraph('x').
