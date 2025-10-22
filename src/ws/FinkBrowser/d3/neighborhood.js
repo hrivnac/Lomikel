@@ -1,7 +1,7 @@
 // ToDo:
 // - classes distributed according to their overlaps
 
-function showNeighbors(data, sourceId, sourceClassification) {
+function showNeighbors(data, objectId, objectClassification) {
 
 /*
   data = {ZTF19actbknb: {distance: 0.0022675736961451087,
@@ -18,8 +18,8 @@ function showNeighbors(data, sourceId, sourceClassification) {
                          classes: {"YSO_Candidate": 0.939,
                                    "SN candidate": 0.061}}};
 
-    sourceId = "ZTF23abdlxeb";
-    sourceClassification = {"YSO_Candidate": 0.8333,
+    objectId = "ZTF23abdlxeb";
+    objectClassification = {"YSO_Candidate": 0.8333,
                             "SN candidate": 0.1667};
 
 */
@@ -45,7 +45,7 @@ function showNeighbors(data, sourceId, sourceClassification) {
   let hideTimeout = null;
   
   const allClasses = new Set();
-  Object.keys(sourceClassification).forEach(c => allClasses.add(c));
+  Object.keys(objectClassification).forEach(c => allClasses.add(c));
   Object.values(data).forEach(obj => {Object.keys(obj.classes).forEach(c => allClasses.add(c));});
   const classList = Array.from(allClasses);
   const angleScale = d3.scaleLinear()
@@ -90,18 +90,18 @@ function showNeighbors(data, sourceId, sourceClassification) {
       }
     return { x: sumX / total, y: sumY / total };
     } 
-  const sourcePos = weightedPosition(sourceClassification);
+  const objectPos = weightedPosition(objectClassification);
   container.append("path")
            .attr("d", d3.symbol().type(d3.symbolStar).size(200))
-           .attr("transform", `translate(${sourcePos.x},${sourcePos.y})`)
+           .attr("transform", `translate(${objectPos.x},${objectPos.y})`)
            .attr("fill", "red")
            .on("mouseover", function(event) {clearTimeout(hideTimeout);           
-                                             const classEntries = Object.entries(sourceClassification)
+                                             const classEntries = Object.entries(objectClassification)
                                                                         .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
                                                                         .join("");
            
-                                             tooltip.html(`<strong>${sourceId}</strong><br>
-                                                           <a href="https://fink-portal.org/${sourceId}" target="_blank">View on Fink Portal</a><br>
+                                             tooltip.html(`<strong>${objectId}</strong><br>
+                                                           <a href="https://fink-portal.org/${objectId}" target="_blank">View on Fink Portal</a><br>
                                                            <ul style="margin:4px 0; padding-left: 16px;">${classEntries}</ul>`)
                                                     .style("display", "block")
                                                     .style("left", (event.pageX + 10) + "px")
@@ -129,14 +129,14 @@ function showNeighbors(data, sourceId, sourceClassification) {
             .on("mousemove", function(event) {tooltip.style("left", (event.pageX + 10) + "px")
                                                      .style("top", (event.pageY - 20) + "px");})
            .on("mouseout", function() {hideTimeout = setTimeout(() => {tooltip.style("display", "none");}, 300);});
-    container.append("line").attr("x1", sourcePos.x)
-                            .attr("y1", sourcePos.y)
+    container.append("line").attr("x1", objectPos.x)
+                            .attr("y1", objectPos.y)
                             .attr("x2", pos.x)
                             .attr("y2", pos.y)
                             .attr("stroke", "blue")
                             .attr("stroke-dasharray", "2 2"); 
-    const labelX = (sourcePos.x + pos.x) / 2;
-    const labelY = (sourcePos.y + pos.y) / 2;
+    const labelX = (objectPos.x + pos.x) / 2;
+    const labelY = (objectPos.y + pos.y) / 2;
     container.append("text")
              .attr("x", labelX)
              .attr("y", labelY)

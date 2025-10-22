@@ -30,7 +30,7 @@
 <button onclick="resetZoom()">Reset Zoom</button>
 
 <%
-  String sourceId   = request.getParameter("sourceId");
+  String objectId   = request.getParameter("objectId");
   String classifier = request.getParameter("classifier");
   String alg        = request.getParameter("alg");
   String nmax       = request.getParameter("nmax");
@@ -39,8 +39,11 @@
   %>
 <%@include file="../PropertiesProcessor.jsp"%>
 <%
+  if (objectId == null || objectId.isEmpty()) {
+    objectId = "ZTF20aachcvz"; // demo
+    }
   if (classifier == null || classifier.isEmpty()) {
-    classifier = "FINK_PORTAL";
+    classifier = "FINK";
     }
   if (alg == null || alg.isEmpty()) {
     alg = "JensenShannon";
@@ -55,16 +58,16 @@
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
 
-  JSONObject sourceClassification = new JSONObject();
-  for (Map<String, String> m : gr.classification(sourceId, classifier)) {
-    sourceClassification.put(m.get("class"), m.get("weight"));
+  JSONObject objectClassification = new JSONObject();
+  for (Map<String, String> m : gr.classification(objectId, classifier)) {
+    objectClassification.put(m.get("class"), m.get("weight"));
     }
     
   JSONObject data = new JSONObject();
   JSONObject neighbor;
   JSONObject classes;
   String noid;
-  for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : gr.sourceNeighborhood(sourceId,
+  for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : gr.objectNeighborhood(objectId,
                                                                                            classifier,
                                                                                            Double.parseDouble(nmax),
                                                                                            alg,
@@ -80,7 +83,7 @@
     data.put(noid, neighbor);
     }
 
-  request.setAttribute("sourceClassJson", sourceClassification.toString());
+  request.setAttribute("objectClassJson", objectClassification.toString());
   request.setAttribute("data", data.toString());
   %>
 
@@ -88,5 +91,5 @@
 <script src="neighborhood.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-  showNeighbors(<%=data%>, "<%=sourceId%>", <%=sourceClassification%>);
+  showNeighbors(<%=data%>, "<%=objectId%>", <%=objectClassification%>);
   </script>

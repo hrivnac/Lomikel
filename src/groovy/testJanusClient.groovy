@@ -24,10 +24,10 @@ gr.classification(oid, "FEATURES=Clusters/2025/13-50");
 
 gr.reclassification(oid, "FEATURES=Clusters/2025/13-50", "FINK", 10, true);
 
-gr.sourceNeighborhood(oid, "FINK", 10, 'JensenShannon'); // Euclidean, Cosine
-gr.sourceNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 10, 'JensenShannon');
-gr.sourceNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 0.5, 'JensenShannon');
-gr.sourceNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 10, 'JensenShannon', 0.2, True);
+gr.objectNeighborhood(oid, "FINK", 10, 'JensenShannon'); // Euclidean, Cosine
+gr.objectNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 10, 'JensenShannon');
+gr.objectNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 0.5, 'JensenShannon');
+gr.objectNeighborhood(oid, "FEATURES=Clusters/2025/13-50", 10, 'JensenShannon', 0.2, True);
 
 gr.standardDeviationE('deepcontains', ['weight']);
 gr.exportOCol('/tmp/Overlaps.graphml');
