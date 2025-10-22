@@ -15,7 +15,7 @@
 <%@ page import="org.apache.logging.log4j.Logger" %>
 <%@ page import="org.apache.logging.log4j.LogManager" %>
 
-<%@ page errorPage="../ExceptionHandler.jsp" %>
+<!--%@ page errorPage="../ExceptionHandler.jsp" %-->
 
 <%! static Logger log = LogManager.getLogger(org.apache.jsp.d3.neighborhood_jsp.class); %>
 
