@@ -122,9 +122,9 @@ public class FeaturesClassifier extends ZTFClassifier {
     if (_finder == null) {
       try {
          ClassLoader classLoader = getClass().getClassLoader();
-        _finder = new ClusterFinder(classLoader.getResource(flavor() + "/scaler_params.json"),
-                                    classLoader.getResource(flavor() + "/pca_params.json"),
-                                    classLoader.getResource(flavor() + "/cluster_centers.json"));
+        _finder = new ClusterFinder(classLoader.getResource(system() + "/" + flavor() + "/scaler_params.json"),
+                                    classLoader.getResource(system() + "/" + flavor() + "/pca_params.json"),
+                                    classLoader.getResource(system() + "/" + flavor() + "/cluster_centers.json"));
         }
       catch (IOException | IllegalArgumentException e) {
         throw new LomikelException("Cannot create Cluster Finder for " + flavor(), e);

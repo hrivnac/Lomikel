@@ -306,8 +306,9 @@
   <target name="data"
           description="Create JAR">
     <jar jarfile="../lib/Lomikel-data-${version}.jar" index="no">
-      <fileset dir="../data" includes="Clusters/2024/*/*.json"/>
-      <fileset dir="../data" includes="Clusters/2025/*/*.json"/>
+      <fileset dir="../data" includes="Clusters/ZTF/2024/*/*.json"/>
+      <fileset dir="../data" includes="Clusters/ZTF/2025/*/*.json"/>
+      <fileset dir="../data" includes="Clusters/LSST/2025/*/*.json"/>
      <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="LomikelData"/>
