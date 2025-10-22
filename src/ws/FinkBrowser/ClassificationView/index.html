@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>D3 Zoomable Neighbor Visualization</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <h2>Source Neighborhood Visualization</h2>
+  <div id="tooltip"></div>
+  <div id="viz"></div>
+  <button onclick="resetZoom()">Reset Zoom</button>
+
+  <script src="app.js"></script>
+
+  <script>
+    // Example data
+    const sampleData = {
+      "ZTF19actbknb": {
+        distance: 0.0023,
+        classes: {"YSO_Candidate": 0.8571, "SN candidate": 0.1429}
+      },
+      "ZTF19actfogx": {
+        distance: 0.0363,
+        classes: {"Radio": 0.4707, "YSO_Candidate": 0.0608, "CataclyV*_Candidate": 0.1943, "CV*_Candidate": 0.2623}
+      }
+    };
+    const sourceId = "ZTF23abdlxeb";
+    const sourceClassification = {"YSO_Candidate": 0.8333, "SN candidate": 0.1667};
+
+    // Draw
+    showNeighbors(sampleData, sourceId, sourceClassification);
+  </script>
+</body>
+</html>

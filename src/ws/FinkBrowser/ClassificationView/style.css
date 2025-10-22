@@ -1,0 +1,41 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #fafafa;
+}
+
+#viz {
+  width: 800px;
+  height: 800px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  background: white;
+}
+
+button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f7f7f7;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #eee;
+}
+
+#tooltip {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 4px;
+  pointer-events: auto;
+  font-size: 13px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+  display: none;
+  z-index: 100;
+  text-align: left;
+}
