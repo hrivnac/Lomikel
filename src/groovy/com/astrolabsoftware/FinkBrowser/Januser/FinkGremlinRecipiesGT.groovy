@@ -255,6 +255,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def t = System.currentTimeMillis()
     objects.each {s -> 
                   def oid = g().V(s).values('objectId').next();
+                  log.info(oid);
                   def m = [:];
                   g().V(s).inE().
                            as('e').
