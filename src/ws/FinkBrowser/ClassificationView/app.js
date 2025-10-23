@@ -217,4 +217,48 @@ window.onclick = (event) => {
 };
 
 // --- nmax slider display (LOGICALLY CORRECT) ---
-const nmaxSlide
+const nmaxSlider = document.getElementById("nmax");
+function sliderToNmax(t) {
+  // t in [0,1]
+  if (t <= 0.5) {
+    // left half maps linearly to 0..1
+    return t * 2.0;
+  } else {
+    // right half maps logarithmically to 1..10
+    const u = (t - 0.5) / 0.5; // 0..1
+    return Math.pow(10, u);   // 10^0..10^1 -> 1..10
+  }
+}
+nmaxSlider.oninput = () => {
+  const t = parseFloat(nmaxSlider.value);
+  let nmax = sliderToNmax(t);
+  if (nmax > 1) nmax = Math.round(nmax); // integers in 1..10
+  // format display
+  const disp = (nmax > 1) ? String(nmax) : nmax.toFixed(2).replace(/\.?0+$/, '');
+  document.getElementById("nmaxValue").textContent = disp;
+};
+// ensure initial correct display (we set slider value=0.25 in HTML so nmax=0.5)
+nmaxSlider.dispatchEvent(new Event('input'));
+
+// --- Load data ---
+async function loadNeighborhood(objectId = null) {
+  const nmaxText = document.getElementById("nmaxValue").textContent;
+  const nmaxVal = parseFloat(nmaxText);
+  const params = {
+    system: document.getElementById("system").value,
+    objectId: objectId || document.getElementById("objectId").value,
+    classifier: document.getElementById("classifier").value,
+    alg: document.getElementById("alg").value,
+    nmax: nmaxVal,
+    climit: document.getElementById("climit").value
+  };
+
+  const data = await fetchNeighborhood(params);
+  showObjectNeighborhood(data);
+}
+
+document.getElementById("showBtn").onclick = () => loadNeighborhood();
+document.getElementById("resetBtn").onclick = () => resetZoom();
+
+// Initial load
+loadNeighborhood();
