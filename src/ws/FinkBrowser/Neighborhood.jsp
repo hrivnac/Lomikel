@@ -78,6 +78,7 @@
     neighbor.put("classes", classes);
     objects.put(noid, neighbor);
     }
+  data.put("objectId",             objectId);
   data.put("objects",              objects);
   data.put("objectClassification", objectClassification);
   out.print(data);
