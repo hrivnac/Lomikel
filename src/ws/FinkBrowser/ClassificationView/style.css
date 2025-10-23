@@ -48,12 +48,23 @@ button:hover {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   border: 1px solid #ccc;
-  padding: 10px;
   border-radius: 8px;
-  width: 200px;
+  width: 220px;
+}
+
+#panel-header {
+  background: #e9e9e9;
+  padding: 6px;
   cursor: move;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 8px 8px 0 0;
+}
+
+#panel-body {
+  padding: 8px;
 }
 
 #controls label {
@@ -64,8 +75,8 @@ button:hover {
   background: linear-gradient(
     to right,
     red 0%,
-    red 10%,
-    blue 10%,
+    red 50%,
+    blue 50%,
     blue 100%
   );
   height: 6px;

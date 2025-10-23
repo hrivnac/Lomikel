@@ -4,12 +4,10 @@ async function fetchNeighborhood(params) {
 
   try {
     const response = await fetch(url);
-    console.log(response);
     if (!response.ok) throw new Error("Network error");
     return await response.json();
   } catch (err) {
     console.warn("Neighborhood.jsp failed, using demo data:", err);
-    // fallback demo data
     return {
       objectId: "ZTF23abdlxeb",
       objects: {
@@ -27,6 +25,7 @@ async function fetchNeighborhood(params) {
   }
 }
 
+// ----------- Visualization -----------
 function showObjectNeighborhood(data) {
   d3.select("#viz").selectAll("*").remove();
 
@@ -49,7 +48,6 @@ function showObjectNeighborhood(data) {
   const tooltip = d3.select("#tooltip");
   let hideTimeout = null;
 
-  // Collect all classes
   const allClasses = new Set();
   Object.keys(data.objectClassification).forEach(c => allClasses.add(c));
   Object.values(data.objects).forEach(obj =>
@@ -77,7 +75,6 @@ function showObjectNeighborhood(data) {
       .style("font-size", "12px");
   });
 
-  // Connect class positions
   const classLine = d3.line()
     .x(d => d.x)
     .y(d => d.y)
@@ -106,14 +103,11 @@ function showObjectNeighborhood(data) {
 
   const objectPos = weightedPosition(data.objectClassification);
 
-  // Main object (red)
   drawObject(container, data.objectId, objectPos, "red", data.objectClassification, tooltip, hideTimeout, true);
 
-  // Neighbors (blue)
   for (const [id, obj] of Object.entries(data.objects)) {
     const pos = weightedPosition(obj.classes);
 
-    // line to main object
     container.append("line")
       .attr("x1", objectPos.x)
       .attr("y1", objectPos.y)
@@ -122,7 +116,6 @@ function showObjectNeighborhood(data) {
       .attr("stroke", "#aaa")
       .attr("stroke-dasharray", "2 2");
 
-    // label distance
     const labelX = (objectPos.x + pos.x) / 2;
     const labelY = (objectPos.y + pos.y) / 2;
     container.append("text")
@@ -151,11 +144,9 @@ function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, is
     .attr("fill", color)
     .on("mouseover", function(event) {
       clearTimeout(hideTimeout);
-
       const classEntries = Object.entries(classes)
         .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
         .join("");
-
       tooltip.html(`
         <strong>${id}</strong><br>
         <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
@@ -185,50 +176,55 @@ function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, is
     });
 }
 
-// --- Control panel ---
-function makeDraggable(el) {
+// --- Movable panel via header only ---
+function makeDraggable(header, panel) {
   let offsetX, offsetY, isDown = false;
-  el.addEventListener('mousedown', e => {
+  header.addEventListener('mousedown', e => {
     isDown = true;
-    offsetX = e.clientX - el.offsetLeft;
-    offsetY = e.clientY - el.offsetTop;
+    offsetX = e.clientX - panel.offsetLeft;
+    offsetY = e.clientY - panel.offsetTop;
   });
   window.addEventListener('mouseup', () => isDown = false);
   window.addEventListener('mousemove', e => {
     if (!isDown) return;
-    el.style.left = (e.clientX - offsetX) + 'px';
-    el.style.top = (e.clientY - offsetY) + 'px';
+    panel.style.left = (e.clientX - offsetX) + 'px';
+    panel.style.top = (e.clientY - offsetY) + 'px';
   });
 }
 
-makeDraggable(document.getElementById("controls"));
+makeDraggable(document.getElementById("panel-header"), document.getElementById("controls"));
 
 // --- Help modal ---
-document.getElementById("help-btn").onclick = () => {
-  document.getElementById("help-modal").style.display = "block";
-};
-document.getElementById("close-help").onclick = () => {
-  document.getElementById("help-modal").style.display = "none";
-};
+document.getElementById("help-btn").onclick = () => document.getElementById("help-modal").style.display = "block";
+document.getElementById("close-help").onclick = () => document.getElementById("help-modal").style.display = "none";
 window.onclick = (event) => {
   if (event.target === document.getElementById("help-modal"))
     document.getElementById("help-modal").style.display = "none";
 };
 
-// --- nmax slider display ---
+// --- nmax slider display (logarithmic) ---
 const nmaxSlider = document.getElementById("nmax");
 nmaxSlider.oninput = () => {
-  document.getElementById("nmaxValue").textContent = parseFloat(nmaxSlider.value).toFixed(1);
+  let val = parseFloat(nmaxSlider.value);
+  // Convert to log domain where 0.0–0.5 => 0–1, 0.5–1.0 => 1–10
+  let nmax;
+  if (val <= 0.5) nmax = val * 2;        // 0–1 range
+  else nmax = Math.pow(10, (val - 0.5) * 2) / 10; // 1–10 range
+  if (nmax > 1) nmax = Math.round(nmax);
+  document.getElementById("nmaxValue").textContent = nmax.toFixed(1);
+  nmaxSlider.value = val;
 };
+nmaxSlider.oninput();
 
 // --- load function ---
 async function loadNeighborhood(objectId = null) {
+  const nmaxVal = parseFloat(document.getElementById("nmaxValue").textContent);
   const params = {
     system: document.getElementById("system").value,
     objectId: objectId || document.getElementById("objectId").value,
     classifier: document.getElementById("classifier").value,
     alg: document.getElementById("alg").value,
-    nmax: document.getElementById("nmax").value,
+    nmax: nmaxVal,
     climit: document.getElementById("climit").value
   };
 
