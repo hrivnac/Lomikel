@@ -17,7 +17,7 @@
 
 <!--%@ page errorPage="../ExceptionHandler.jsp" %-->
 
-<%! static Logger log = LogManager.getLogger(org.apache.jsp.d3.neighborhood_jsp.class); %>
+<%! static Logger log = LogManager.getLogger(org.apache.jsp.Neighborhood_jsp.class); %>
 
 <jsp:useBean id="repository" class="com.Lomikel.WebService.StringRepository" scope="session"/>
    
