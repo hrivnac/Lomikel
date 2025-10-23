@@ -1,8 +1,15 @@
+// --- Utility: show/hide spinner ---
+function showSpinner(show) {
+  document.getElementById("loading-spinner").style.display = show ? "flex" : "none";
+}
+
+// --- Fetch data ---
 async function fetchNeighborhood(params) {
   const query = new URLSearchParams(params).toString();
   const url = `/FinkBrowser/Neighborhood.jsp?${query}`;
 
   try {
+    showSpinner(true);
     const response = await fetch(url);
     if (!response.ok) throw new Error("Network error");
     return await response.json();
@@ -22,10 +29,12 @@ async function fetchNeighborhood(params) {
       },
       objectClassification: {"YSO_Candidate": 0.8333, "SN candidate": 0.1667}
     };
+  } finally {
+    showSpinner(false);
   }
 }
 
-// ----------- Visualization -----------
+// --- Visualization ---
 function showObjectNeighborhood(data) {
   d3.select("#viz").selectAll("*").remove();
 
@@ -133,47 +142,53 @@ function showObjectNeighborhood(data) {
   tooltip
     .on("mouseover", () => clearTimeout(hideTimeout))
     .on("mouseout", () => {
-      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 300);
+      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 700);
     });
 }
 
+// --- Draw star objects ---
 function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, isMain) {
-  container.append("path")
+  const symbol = container.append("path")
     .attr("d", d3.symbol().type(d3.symbolStar).size(isMain ? 200 : 100))
     .attr("transform", `translate(${pos.x},${pos.y})`)
-    .attr("fill", color)
-    .on("mouseover", function(event) {
-      clearTimeout(hideTimeout);
-      const classEntries = Object.entries(classes)
-        .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
-        .join("");
-      tooltip.html(`
-        <strong>${id}</strong><br>
-        <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
-        <a href="#" id="showObject-${id}">Show</a><br>
-        <strong>Classes:</strong>
-        <ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>
-      `)
+    .attr("fill", color);
+
+  const showDetails = (event) => {
+    clearTimeout(hideTimeout);
+    const classEntries = Object.entries(classes)
+      .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
+      .join("");
+    tooltip.html(`
+      <strong>${id}</strong><br>
+      <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
+      <a href="#" id="showObject-${id}">Show</a><br>
+      <strong>Classes:</strong>
+      <ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>
+    `)
       .style("display", "block")
       .style("left", (event.pageX + 10) + "px")
       .style("top", (event.pageY - 20) + "px");
 
-      setTimeout(() => {
-        const link = document.getElementById(`showObject-${id}`);
-        if (link) link.onclick = (e) => {
-          e.preventDefault();
-          tooltip.style("display", "none");
-          loadNeighborhood(id);
-        };
-      }, 100);
-    })
+    setTimeout(() => {
+      const link = document.getElementById(`showObject-${id}`);
+      if (link) link.onclick = (e) => {
+        e.preventDefault();
+        tooltip.style("display", "none");
+        loadNeighborhood(id);
+      };
+    }, 100);
+  };
+
+  symbol
+    .on("mouseover", showDetails)
     .on("mousemove", event => {
       tooltip.style("left", (event.pageX + 10) + "px")
              .style("top", (event.pageY - 20) + "px");
     })
     .on("mouseout", () => {
-      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 300);
-    });
+      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 700);
+    })
+    .on("dblclick", () => loadNeighborhood(id));
 }
 
 // --- Movable panel via header only ---
@@ -191,7 +206,6 @@ function makeDraggable(header, panel) {
     panel.style.top = (e.clientY - offsetY) + 'px';
   });
 }
-
 makeDraggable(document.getElementById("panel-header"), document.getElementById("controls"));
 
 // --- Help modal ---
@@ -206,17 +220,15 @@ window.onclick = (event) => {
 const nmaxSlider = document.getElementById("nmax");
 nmaxSlider.oninput = () => {
   let val = parseFloat(nmaxSlider.value);
-  // Convert to log domain where 0.0–0.5 => 0–1, 0.5–1.0 => 1–10
   let nmax;
-  if (val <= 0.5) nmax = val * 2;        // 0–1 range
+  if (val <= 0.5) nmax = val * 2; // 0–1 range
   else nmax = Math.pow(10, (val - 0.5) * 2) / 10; // 1–10 range
   if (nmax > 1) nmax = Math.round(nmax);
   document.getElementById("nmaxValue").textContent = nmax.toFixed(1);
-  nmaxSlider.value = val;
 };
 nmaxSlider.oninput();
 
-// --- load function ---
+// --- Load data ---
 async function loadNeighborhood(objectId = null) {
   const nmaxVal = parseFloat(document.getElementById("nmaxValue").textContent);
   const params = {

@@ -9,6 +9,7 @@
 <body>
   <button id="help-btn">?</button>
 
+  <!-- Help modal -->
   <div id="help-modal" class="modal">
     <div class="modal-content">
       <span id="close-help" class="close">&times;</span>
@@ -17,6 +18,7 @@
     </div>
   </div>
 
+  <!-- Movable controls panel -->
   <div id="controls" class="draggable">
     <div id="panel-header">Neighborhood Parameters</div>
     <div id="panel-body">
@@ -62,9 +64,15 @@
     </div>
   </div>
 
+  <!-- Tooltip and Viz -->
   <div id="tooltip"></div>
   <div id="viz"></div>
   <button id="resetBtn">Reset Zoom</button>
+
+  <!-- Loading spinner -->
+  <div id="loading-spinner" class="spinner-overlay">
+    <div class="spinner"></div>
+  </div>
 
   <script src="app.js"></script>
 </body>
