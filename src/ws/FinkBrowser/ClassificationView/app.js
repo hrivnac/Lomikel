@@ -4,6 +4,7 @@ async function fetchNeighborhood(params) {
 
   try {
     const response = await fetch(url);
+    console.log(response);
     if (!response.ok) throw new Error("Network error");
     return await response.json();
   } catch (err) {
@@ -22,7 +23,7 @@ async function fetchNeighborhood(params) {
         }
       },
       objectClassification: {"YSO_Candidate": 0.8333, "SN candidate": 0.1667}
-    };ZTF23aaaabot
+    };
   }
 }
 
