@@ -74,8 +74,8 @@
     neighbor.put("distance", m.getKey().getValue());
     neighbor.put("classes", classes);
     data.put(noid, neighbor);
-    out.println(data);
     }
+  out.println(data);
 
   request.setAttribute("objectClassJson", objectClassification.toString());
   request.setAttribute("data", data.toString());
