@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!-- Lomikel Neigborhood search -->
-<!-- @author Julius.Hrivnac@cern.ch -->
+<%@ page trimDirectiveWhitespaces="true"  %>
 
 <%@ page import="com.Lomikel.WebService.PropertiesProcessor" %>
 <%@ page import="com.Lomikel.Januser.JanusClient" %>
@@ -14,8 +13,6 @@
 
 <%@ page import="org.apache.logging.log4j.Logger" %>
 <%@ page import="org.apache.logging.log4j.LogManager" %>
-
-<!--%@ page errorPage="../ExceptionHandler.jsp" %-->
 
 <%! static Logger log = LogManager.getLogger(org.apache.jsp.Neighborhood_jsp.class); %>
 
@@ -75,15 +72,5 @@
     neighbor.put("classes", classes);
     data.put(noid, neighbor);
     }
-  out.println(data);
-
-  request.setAttribute("objectClassJson", objectClassification.toString());
-  request.setAttribute("data", data.toString());
+  out.print(data);
   %>
-
-<!--script src="actions.js"      type="text/javascript"></script>
-<script src="neighborhood.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-  showNeighbors(<%=data%>, "<%=objectId%>", <%=objectClassification%>);
-  </script-->
