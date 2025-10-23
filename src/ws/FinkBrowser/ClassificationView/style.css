@@ -1,41 +1,108 @@
 body {
   font-family: sans-serif;
-  text-align: center;
   background: #fafafa;
+  margin: 0;
+  overflow: hidden;
 }
 
 #viz {
-  width: 800px;
-  height: 800px;
-  margin: 0 auto;
+  width: 100%;
+  height: 90vh;
   border: 1px solid #ddd;
   background: white;
 }
 
-button {
-  margin-top: 10px;
-  padding: 6px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f7f7f7;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #eee;
-}
-
 #tooltip {
   position: absolute;
-  background-color: white;
+  background: white;
   border: 1px solid #ccc;
   padding: 8px 12px;
   border-radius: 4px;
-  pointer-events: auto;
   font-size: 13px;
+  pointer-events: auto;
   box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
   display: none;
   z-index: 100;
-  text-align: left;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f7f7f7;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #eee;
+}
+
+#resetBtn {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+#controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  width: 200px;
+  cursor: move;
+}
+
+#controls label {
+  font-size: 13px;
+}
+
+#nmax::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    red 0%,
+    red 10%,
+    blue 10%,
+    blue 100%
+  );
+  height: 6px;
+  border-radius: 3px;
+}
+
+#help-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 200;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 6px;
+  width: 50%;
+}
+
+.close {
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
 }

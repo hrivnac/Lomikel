@@ -2,35 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>D3 Zoomable Neighbor Visualization</title>
+  <title>Neighborhood Visualization</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-  <h2>Source Neighborhood Visualization</h2>
+  <button id="help-btn">?</button>
+  <div id="help-modal" class="modal">
+    <div class="modal-content">
+      <span id="close-help" class="close">&times;</span>
+      <h2>Help</h2>
+      <p>blabla help text here ...</p>
+    </div>
+  </div>
+
+  <div id="controls" class="draggable">
+    <h3>Neighborhood Parameters</h3>
+    <label>System:
+      <select id="system">
+        <option value="ZTF" selected>ZTF</option>
+        <option value="LSST">LSST</option>
+      </select>
+    </label><br>
+
+    <label>Object ID:
+      <input type="text" id="objectId" value="ZTF20aachcvz">
+    </label><br>
+
+    <label>Classifier:
+      <select id="classifier">
+        <option value="FINK" selected>FINK</option>
+        <option value="FEATURES">FEATURES</option>
+        <option value="XMACH">XMACH</option>
+        <option value="LIGHTCURVES">LIGHTCURVES</option>
+        <option value="TAG">TAG</option>
+      </select>
+    </label><br>
+
+    <label>Algorithm:
+      <select id="alg">
+        <option value="JensenShannon" selected>JensenShannon</option>
+        <option value="Euclidean">Euclidean</option>
+        <option value="Cosine">Cosine</option>
+      </select>
+    </label><br>
+
+    <label>nmax:
+      <input type="range" id="nmax" min="0" max="10" step="0.1" value="5">
+      <span id="nmaxValue">5.0</span>
+    </label><br>
+
+    <label>climit:
+      <input type="number" id="climit" step="0.01" value="0.0">
+    </label><br>
+
+    <button id="showBtn">Show</button>
+  </div>
+
   <div id="tooltip"></div>
   <div id="viz"></div>
-  <button onclick="resetZoom()">Reset Zoom</button>
+  <button id="resetBtn">Reset Zoom</button>
 
   <script src="app.js"></script>
-
-  <script>
-    // Example data
-    const sampleData = {
-      "ZTF19actbknb": {
-        distance: 0.0023,
-        classes: {"YSO_Candidate": 0.8571, "SN candidate": 0.1429}
-      },
-      "ZTF19actfogx": {
-        distance: 0.0363,
-        classes: {"Radio": 0.4707, "YSO_Candidate": 0.0608, "CataclyV*_Candidate": 0.1943, "CV*_Candidate": 0.2623}
-      }
-    };
-    const sourceId = "ZTF23abdlxeb";
-    const sourceClassification = {"YSO_Candidate": 0.8333, "SN candidate": 0.1667};
-
-    // Draw
-    showNeighbors(sampleData, sourceId, sourceClassification);
-  </script>
 </body>
 </html>

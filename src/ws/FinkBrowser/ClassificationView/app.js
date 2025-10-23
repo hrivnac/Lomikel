@@ -1,52 +1,72 @@
-function showNeighbors(data, sourceId, sourceClassification) {
-  const width = 800, height = 800, radius = 300;
+async function fetchNeighborhood(params) {
+  const query = new URLSearchParams(params).toString();
+  const url = `Neighborhood.jsp?${query}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Network error");
+    return await response.json();
+  } catch (err) {
+    console.warn("Neighborhood.jsp failed, using demo data:", err);
+    // fallback demo data
+    return {
+      objectId: "ZTF23abdlxeb",
+      objects: {
+        "ZTF19actbknb": {
+          distance: 0.0023,
+          classes: {"YSO_Candidate": 0.8571, "SN candidate": 0.1429}
+        },
+        "ZTF19actfogx": {
+          distance: 0.0363,
+          classes: {"Radio": 0.4707, "YSO_Candidate": 0.0608, "CataclyV*_Candidate": 0.1943, "CV*_Candidate": 0.2623}
+        }
+      },
+      objectClassification: {"YSO_Candidate": 0.8333, "SN candidate": 0.1667}
+    };
+  }
+}
+
+function showObjectNeighborhood(data) {
+  d3.select("#viz").selectAll("*").remove();
+
+  const width = document.getElementById("viz").clientWidth;
+  const height = document.getElementById("viz").clientHeight;
+  const radius = Math.min(width, height) / 3;
   const centerX = width / 2, centerY = height / 2;
 
-  const svg = d3.select("#viz")
-    .append("svg")
+  const svg = d3.select("#viz").append("svg")
     .attr("width", width)
     .attr("height", height);
-
   const container = svg.append("g");
 
   const zoom = d3.zoom()
     .scaleExtent([0.5, 10])
-    .on("zoom", event => {
-      container.attr("transform", event.transform);
-    });
-
+    .on("zoom", event => container.attr("transform", event.transform));
   svg.call(zoom);
-
-  window.resetZoom = function() {
-    svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
-  };
+  window.resetZoom = () => svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
 
   const tooltip = d3.select("#tooltip");
   let hideTimeout = null;
 
   // Collect all classes
   const allClasses = new Set();
-  Object.keys(sourceClassification).forEach(c => allClasses.add(c));
-  Object.values(data).forEach(obj => {
-    Object.keys(obj.classes).forEach(c => allClasses.add(c));
-  });
-
+  Object.keys(data.objectClassification).forEach(c => allClasses.add(c));
+  Object.values(data.objects).forEach(obj =>
+    Object.keys(obj.classes).forEach(c => allClasses.add(c))
+  );
   const classList = Array.from(allClasses);
 
-  // Use full circle distribution (rotated if 2 classes)
   const angleScale = d3.scaleLinear()
     .domain([0, classList.length])
     .range([0, 2 * Math.PI]);
 
   const classPositions = {};
   classList.forEach((cls, i) => {
-    // Rotate by 90° if only 2 classes (vertical layout)
     const angle = angleScale(i) + (classList.length === 2 ? Math.PI / 2 : 0);
     classPositions[cls] = {
       x: centerX + radius * Math.cos(angle),
       y: centerY + radius * Math.sin(angle)
     };
-
     container.append("text")
       .attr("x", classPositions[cls].x)
       .attr("y", classPositions[cls].y)
@@ -56,22 +76,19 @@ function showNeighbors(data, sourceId, sourceClassification) {
       .style("font-size", "12px");
   });
 
-  // Draw polygon connecting classes
+  // Connect class positions
   const classLine = d3.line()
     .x(d => d.x)
     .y(d => d.y)
     .curve(d3.curveLinearClosed);
 
-  const classPoints = classList.map(cls => classPositions[cls]);
   container.append("path")
-    .datum(classPoints)
+    .datum(classList.map(cls => classPositions[cls]))
     .attr("d", classLine)
     .attr("fill", "none")
     .attr("stroke", "#ccc")
-    .attr("stroke-width", 1)
     .attr("stroke-dasharray", "4 2");
 
-  // Weighted position of a source based on class weights
   function weightedPosition(classMap) {
     let sumX = 0, sumY = 0, total = 0;
     for (const cls in classMap) {
@@ -86,78 +103,27 @@ function showNeighbors(data, sourceId, sourceClassification) {
     return { x: sumX / total, y: sumY / total };
   }
 
-  // Main source (red star)
-  const sourcePos = weightedPosition(sourceClassification);
-  container.append("path")
-    .attr("d", d3.symbol().type(d3.symbolStar).size(200))
-    .attr("transform", `translate(${sourcePos.x},${sourcePos.y})`)
-    .attr("fill", "red")
-    .on("mouseover", function(event) {
-      clearTimeout(hideTimeout);
+  const objectPos = weightedPosition(data.objectClassification);
 
-      const classEntries = Object.entries(sourceClassification)
-        .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
-        .join("");
+  // Main object (red)
+  drawObject(container, data.objectId, objectPos, "red", data.objectClassification, tooltip, hideTimeout, true);
 
-      tooltip
-        .html(`<strong>${sourceId}</strong><br>
-               <a href="https://fink-portal.org/${sourceId}" target="_blank">View on Fink Portal</a><br>
-               <strong>Classes:</strong><ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>`)
-        .style("display", "block")
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY - 20) + "px");
-    })
-    .on("mousemove", event => {
-      tooltip.style("left", (event.pageX + 10) + "px")
-             .style("top", (event.pageY - 20) + "px");
-    })
-    .on("mouseout", () => {
-      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 300);
-    });
-
-  // Neighbor sources
-  for (const [id, obj] of Object.entries(data)) {
+  // Neighbors (blue)
+  for (const [id, obj] of Object.entries(data.objects)) {
     const pos = weightedPosition(obj.classes);
 
-    container.append("path")
-      .attr("d", d3.symbol().type(d3.symbolStar).size(100))
-      .attr("transform", `translate(${pos.x},${pos.y})`)
-      .attr("fill", "blue")
-      .on("mouseover", function(event) {
-        clearTimeout(hideTimeout);
-
-        const classEntries = Object.entries(obj.classes)
-          .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
-          .join("");
-
-        tooltip
-          .html(`<strong>${id}</strong><br>
-                 <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
-                 <strong>Classes:</strong><ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>`)
-          .style("display", "block")
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 20) + "px");
-      })
-      .on("mousemove", event => {
-        tooltip.style("left", (event.pageX + 10) + "px")
-               .style("top", (event.pageY - 20) + "px");
-      })
-      .on("mouseout", () => {
-        hideTimeout = setTimeout(() => tooltip.style("display", "none"), 300);
-      });
-
-    // Line from source to neighbor
+    // line to main object
     container.append("line")
-      .attr("x1", sourcePos.x)
-      .attr("y1", sourcePos.y)
+      .attr("x1", objectPos.x)
+      .attr("y1", objectPos.y)
       .attr("x2", pos.x)
       .attr("y2", pos.y)
       .attr("stroke", "#aaa")
       .attr("stroke-dasharray", "2 2");
 
-    // Distance label
-    const labelX = (sourcePos.x + pos.x) / 2;
-    const labelY = (sourcePos.y + pos.y) / 2;
+    // label distance
+    const labelX = (objectPos.x + pos.x) / 2;
+    const labelY = (objectPos.y + pos.y) / 2;
     container.append("text")
       .attr("x", labelX)
       .attr("y", labelY)
@@ -166,6 +132,8 @@ function showNeighbors(data, sourceId, sourceClassification) {
       .text(obj.distance.toFixed(4))
       .style("font-size", "10px")
       .style("fill", "#666");
+
+    drawObject(container, id, pos, "blue", obj.classes, tooltip, hideTimeout, false);
   }
 
   tooltip
@@ -174,3 +142,101 @@ function showNeighbors(data, sourceId, sourceClassification) {
       hideTimeout = setTimeout(() => tooltip.style("display", "none"), 300);
     });
 }
+
+function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, isMain) {
+  container.append("path")
+    .attr("d", d3.symbol().type(d3.symbolStar).size(isMain ? 200 : 100))
+    .attr("transform", `translate(${pos.x},${pos.y})`)
+    .attr("fill", color)
+    .on("mouseover", function(event) {
+      clearTimeout(hideTimeout);
+
+      const classEntries = Object.entries(classes)
+        .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
+        .join("");
+
+      tooltip.html(`
+        <strong>${id}</strong><br>
+        <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
+        <a href="#" id="showObject-${id}">Show</a><br>
+        <strong>Classes:</strong>
+        <ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>
+      `)
+      .style("display", "block")
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 20) + "px");
+
+      setTimeout(() => {
+        const link = document.getElementById(`showObject-${id}`);
+        if (link) link.onclick = (e) => {
+          e.preventDefault();
+          tooltip.style("display", "none");
+          loadNeighborhood(id);
+        };
+      }, 100);
+    })
+    .on("mousemove", event => {
+      tooltip.style("left", (event.pageX + 10) + "px")
+             .style("top", (event.pageY - 20) + "px");
+    })
+    .on("mouseout", () => {
+      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 300);
+    });
+}
+
+// --- Control panel ---
+function makeDraggable(el) {
+  let offsetX, offsetY, isDown = false;
+  el.addEventListener('mousedown', e => {
+    isDown = true;
+    offsetX = e.clientX - el.offsetLeft;
+    offsetY = e.clientY - el.offsetTop;
+  });
+  window.addEventListener('mouseup', () => isDown = false);
+  window.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    el.style.left = (e.clientX - offsetX) + 'px';
+    el.style.top = (e.clientY - offsetY) + 'px';
+  });
+}
+
+makeDraggable(document.getElementById("controls"));
+
+// --- Help modal ---
+document.getElementById("help-btn").onclick = () => {
+  document.getElementById("help-modal").style.display = "block";
+};
+document.getElementById("close-help").onclick = () => {
+  document.getElementById("help-modal").style.display = "none";
+};
+window.onclick = (event) => {
+  if (event.target === document.getElementById("help-modal"))
+    document.getElementById("help-modal").style.display = "none";
+};
+
+// --- nmax slider display ---
+const nmaxSlider = document.getElementById("nmax");
+nmaxSlider.oninput = () => {
+  document.getElementById("nmaxValue").textContent = parseFloat(nmaxSlider.value).toFixed(1);
+};
+
+// --- load function ---
+async function loadNeighborhood(objectId = null) {
+  const params = {
+    system: document.getElementById("system").value,
+    objectId: objectId || document.getElementById("objectId").value,
+    classifier: document.getElementById("classifier").value,
+    alg: document.getElementById("alg").value,
+    nmax: document.getElementById("nmax").value,
+    climit: document.getElementById("climit").value
+  };
+
+  const data = await fetchNeighborhood(params);
+  showObjectNeighborhood(data);
+}
+
+document.getElementById("showBtn").onclick = () => loadNeighborhood();
+document.getElementById("resetBtn").onclick = () => resetZoom();
+
+// Initial load
+loadNeighborhood();
