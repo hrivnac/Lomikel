@@ -5,7 +5,7 @@
   response.setHeader("Content-Disposition", "inline");
   %>
 
-<%@ page trimDirectiveWhitespaces="true"  %>
+<%@ page trimDirectiveWhitespaces="true" %>
 
 <%@ page import="com.Lomikel.WebService.PropertiesProcessor" %>
 <%@ page import="com.Lomikel.Januser.JanusClient" %>
