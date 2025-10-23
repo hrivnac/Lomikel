@@ -275,9 +275,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                   distances[distance] = m
                   }
     t = System.currentTimeMillis() - t
-    log.info(distances);
-    //return limitMapMap(distances, nmax)
-    return distances;
+    return limitMapMap(distances, nmax)
     }
   
   /** Drop all {@link Vertex} with specified <em>importDate</em>.
