@@ -59,6 +59,7 @@
     }
     
   JSONObject data = new JSONObject();
+  JSONObject objects = new JSONObject();
   JSONObject neighbor;
   JSONObject classes;
   String noid;
@@ -75,7 +76,9 @@
     noid = m.getKey().getKey();
     neighbor.put("distance", m.getKey().getValue());
     neighbor.put("classes", classes);
-    data.put(noid, neighbor);
+    objects.put(noid, neighbor);
     }
+  data.put("objects",              objects);
+  data.put("objectClassification", objectClassification);
   out.print(data);
   %>
