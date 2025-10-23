@@ -1,6 +1,6 @@
 async function fetchNeighborhood(params) {
   const query = new URLSearchParams(params).toString();
-  const url = `Neighborhood.jsp?${query}`;
+  const url = `/FinkBrowser/Neighborhood.jsp?${query}`;
 
   try {
     const response = await fetch(url);
@@ -22,7 +22,7 @@ async function fetchNeighborhood(params) {
         }
       },
       objectClassification: {"YSO_Candidate": 0.8333, "SN candidate": 0.1667}
-    };
+    };ZTF23aaaabot
   }
 }
 
