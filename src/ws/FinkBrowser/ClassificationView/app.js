@@ -3,7 +3,7 @@ function showSpinner(show) {
   document.getElementById("loading-spinner").style.display = show ? "flex" : "none";
 }
 
-// --- Fetch data ---
+// --- Fetch data (unchanged) ---
 async function fetchNeighborhood(params) {
   const query = new URLSearchParams(params).toString();
   const url = `/FinkBrowser/Neighborhood.jsp?${query}`;
@@ -34,7 +34,7 @@ async function fetchNeighborhood(params) {
   }
 }
 
-// --- Visualization ---
+// --- Visualization (unchanged except tooltip delay increased) ---
 function showObjectNeighborhood(data) {
   d3.select("#viz").selectAll("*").remove();
 
@@ -142,11 +142,11 @@ function showObjectNeighborhood(data) {
   tooltip
     .on("mouseover", () => clearTimeout(hideTimeout))
     .on("mouseout", () => {
-      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 700);
+      // increase wait so user can move into tooltip and click links
+      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 900);
     });
 }
 
-// --- Draw star objects ---
 function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, isMain) {
   const symbol = container.append("path")
     .attr("d", d3.symbol().type(d3.symbolStar).size(isMain ? 200 : 100))
@@ -186,7 +186,7 @@ function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, is
              .style("top", (event.pageY - 20) + "px");
     })
     .on("mouseout", () => {
-      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 700);
+      hideTimeout = setTimeout(() => tooltip.style("display", "none"), 900);
     })
     .on("dblclick", () => loadNeighborhood(id));
 }
@@ -216,36 +216,5 @@ window.onclick = (event) => {
     document.getElementById("help-modal").style.display = "none";
 };
 
-// --- nmax slider display (logarithmic) ---
-const nmaxSlider = document.getElementById("nmax");
-nmaxSlider.oninput = () => {
-  let val = parseFloat(nmaxSlider.value);
-  let nmax;
-  if (val <= 0.5) nmax = val * 2; // 0–1 range
-  else nmax = Math.pow(10, (val - 0.5) * 2) / 10; // 1–10 range
-  if (nmax > 1) nmax = Math.round(nmax);
-  document.getElementById("nmaxValue").textContent = nmax.toFixed(1);
-};
-nmaxSlider.oninput();
-
-// --- Load data ---
-async function loadNeighborhood(objectId = null) {
-  const nmaxVal = parseFloat(document.getElementById("nmaxValue").textContent);
-  const params = {
-    system: document.getElementById("system").value,
-    objectId: objectId || document.getElementById("objectId").value,
-    classifier: document.getElementById("classifier").value,
-    alg: document.getElementById("alg").value,
-    nmax: nmaxVal,
-    climit: document.getElementById("climit").value
-  };
-
-  const data = await fetchNeighborhood(params);
-  showObjectNeighborhood(data);
-}
-
-document.getElementById("showBtn").onclick = () => loadNeighborhood();
-document.getElementById("resetBtn").onclick = () => resetZoom();
-
-// Initial load
-loadNeighborhood();
+// --- nmax slider display (LOGICALLY CORRECT) ---
+const nmaxSlide
