@@ -270,13 +270,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     m.entrySet().removeIf(entry -> entry.getValue() < climit)
                     }
                   def dist = Metrics.distance(m0, m, allClasses, metric)
-                  log.info(" " + m0 + " " + m + " " + dist);
                   n++
                   distance = Map.entry(oid, dist)
                   distances[distance] = m
                   }
     t = System.currentTimeMillis() - t
     log.info('distance of ' + n + ' objects evaluated in ' + t / 1000 + ' s')
+    log.info(distances);
     return limitMapMap(distances, nmax)
     }
   
