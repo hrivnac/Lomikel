@@ -53,7 +53,7 @@ function showObjectNeighborhood(data) {
 //    .on("zoom", event => container.attr("transform", event.transform));
  
 const zoom = d3.zoom()
-  .scaleExtent([0.5, 10])
+  .scaleExtent([0.5, 20])
   .on("zoom", event => {
     const { k, x, y } = event.transform;
     container.attr("transform", `translate(${x},${y}) scale(${k})`);
