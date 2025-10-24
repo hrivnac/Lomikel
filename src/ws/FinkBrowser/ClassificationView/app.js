@@ -48,9 +48,27 @@ function showObjectNeighborhood(data) {
     .attr("height", height);
   const container = svg.append("g");
 
-  const zoom = d3.zoom()
-    .scaleExtent([0.5, 10])
-    .on("zoom", event => container.attr("transform", event.transform));
+//  const zoom = d3.zoom()
+//    .scaleExtent([0.5, 10])
+//    .on("zoom", event => container.attr("transform", event.transform));
+ 
+const zoom = d3.zoom()
+  .scaleExtent([0.5, 10])
+  .on("zoom", event => {
+    const { k, x, y } = event.transform;
+    container.attr("transform", `translate(${x},${y}) scale(${k})`);
+
+    // Resize objects and text inversely to zoom level
+    container.selectAll(".object-symbol")
+      .attr("transform", d => `translate(${d.x},${d.y}) scale(${1 / k})`);
+
+    container.selectAll(".distance-label")
+      .style("font-size", `${10 / k}px`);
+
+    container.selectAll(".class-label")
+      .style("font-size", `${12 / k}px`);
+  });
+    
   svg.call(zoom);
   window.resetZoom = () => svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
 
@@ -76,6 +94,7 @@ function showObjectNeighborhood(data) {
       y: centerY + radius * Math.sin(angle)
     };
     container.append("text")
+      .attr("class", "class-label")
       .attr("x", classPositions[cls].x)
       .attr("y", classPositions[cls].y)
       .attr("text-anchor", "middle")
@@ -128,6 +147,7 @@ function showObjectNeighborhood(data) {
     const labelX = (objectPos.x + pos.x) / 2;
     const labelY = (objectPos.y + pos.y) / 2;
     container.append("text")
+      .attr("class", "distance-label")
       .attr("x", labelX)
       .attr("y", labelY)
       .attr("text-anchor", "middle")
@@ -149,6 +169,8 @@ function showObjectNeighborhood(data) {
 
 function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, isMain) {
   const symbol = container.append("path")
+    .datum({x: pos.x, y: pos.y})
+    .attr("class", "object-symbol")
     .attr("d", d3.symbol().type(d3.symbolStar).size(isMain ? 200 : 100))
     .attr("transform", `translate(${pos.x},${pos.y})`)
     .attr("fill", color);
