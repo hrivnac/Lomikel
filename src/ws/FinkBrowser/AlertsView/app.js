@@ -13,7 +13,7 @@ let camera = {
   currentZoom: 1,
   targetCenter: {ra: 180, dec: 0},
   targetZoom: 1,
-  mode: "dynamic" or "whole"
+  mode: "dynamic" || "whole"
   };
 
 // Alerts Flash
