@@ -530,28 +530,25 @@
           depends="exe"
           description="Create WAR">
     <echo>Creating Lomikel.war</echo>
- 		<copy file="../src/ws/index.jsp"             tofile="../build/index.jsp"              overwrite="true"/>
- 		<copy file="../src/ws/Top.jsp"               tofile="../build/Top.jsp"                overwrite="true"/>
- 		<copy file="../src/ws/FinkBrowser/Apps.html" tofile="../build/FinkBrowser/Apps.html" overwrite="true"/>
- 		<copy file="../src/ws/TopMini.jsp"           tofile="../build/TopMini.jsp"            overwrite="true"/>
- 		<copy file="../src/ws/Servers-${target}.jsp" tofile="../build/Servers.jsp"            overwrite="true"/>
- 		<copy file="../src/ws/Graphs-${target}.jsp"  tofile="../build/Graphs.jsp"             overwrite="true"/>
-    <replace file="../build/index.jsp"             token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/index.jsp"             token="@ICON@"    value="${browsericon}"/>
-    <replace file="../build/FinkBrowser/Apps.html" token="@VERSION@" value="${version}"/>
-    <replace file="../build/FinkBrowser/Apps.html" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/Top.jsp"               token="@VERSION@" value="${version}"/>
-    <replace file="../build/Top.jsp"               token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/Top.jsp"               token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/Top.jsp"               token="@LOGO@"    value="${browserlogo}"/>
-    <replace file="../build/Top.jsp"               token="@HOME@"    value="${browserurl}"/>
-    <replace file="../build/Top.jsp"               token="@BOOT@"    value="${bootgremlin}"/>
-    <replace file="../build/TopMini.jsp"           token="@VERSION@" value="${version}"/>
-    <replace file="../build/TopMini.jsp"           token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/TopMini.jsp"           token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/TopMini.jsp"           token="@LOGO@"    value="${browserlogo}"/>
-    <replace file="../build/TopMini.jsp"           token="@HOME@"    value="${browserurl}"/>
-    <replace file="../build/TopMini.jsp"           token="@BOOT@"    value="${bootgremlin}"/>
+ 		<copy file="../src/ws/index.jsp"             tofile="../build/index.jsp"   overwrite="true"/>
+ 		<copy file="../src/ws/Top.jsp"               tofile="../build/Top.jsp"     overwrite="true"/>
+ 		<copy file="../src/ws/TopMini.jsp"           tofile="../build/TopMini.jsp" overwrite="true"/>
+ 		<copy file="../src/ws/Servers-${target}.jsp" tofile="../build/Servers.jsp" overwrite="true"/>
+ 		<copy file="../src/ws/Graphs-${target}.jsp"  tofile="../build/Graphs.jsp"  overwrite="true"/>
+    <replace file="../build/index.jsp"   token="@NAME@"    value="${browsername}"/>
+    <replace file="../build/index.jsp"   token="@ICON@"    value="${browsericon}"/>
+    <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
+    <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
+    <replace file="../build/Top.jsp"     token="@NAME@"    value="${browsername}"/>
+    <replace file="../build/Top.jsp"     token="@LOGO@"    value="${browserlogo}"/>
+    <replace file="../build/Top.jsp"     token="@HOME@"    value="${browserurl}"/>
+    <replace file="../build/Top.jsp"     token="@BOOT@"    value="${bootgremlin}"/>
+    <replace file="../build/TopMini.jsp" token="@VERSION@" value="${version}"/>
+    <replace file="../build/TopMini.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
+    <replace file="../build/TopMini.jsp" token="@NAME@"    value="${browsername}"/>
+    <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${browserlogo}"/>
+    <replace file="../build/TopMini.jsp" token="@HOME@"    value="${browserurl}"/>
+    <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${bootgremlin}"/>
     <war destfile="../lib/Lomikel.war" webxml="../src/ws/web.xml">
       <fileset dir="../src/ws">
 	    	<include name="**/*"/>
@@ -584,12 +581,15 @@
       </war>
     <echo>Creating FinkBrowser.war</echo>
  		<copy file="../src/ws/index.jsp"                         tofile="../build/index.jsp"   overwrite="true"/>
+ 		<copy file="../src/ws/FinkBrowser/Apps.html" tofile="../build/FinkBrowser/Apps.html" overwrite="true"/>
  		<copy file="../src/ws/Top.jsp"                           tofile="../build/Top.jsp"     overwrite="true"/>
  		<copy file="../src/ws/TopMini.jsp"                       tofile="../build/TopMini.jsp" overwrite="true"/>
  		<copy file="../src/ws/FinkBrowser/Servers-${target}.jsp" tofile="../build/Servers.jsp" overwrite="true"/>
  		<copy file="../src/ws/FinkBrowser/Graphs-${target}.jsp"  tofile="../build/Graphs.jsp"  overwrite="true"/>
     <replace file="../build/index.jsp"   token="@NAME@"    value="${Finkbrowsername}"/>
     <replace file="../build/index.jsp"   token="@ICON@"    value="${Finkbrowsericon}"/>
+    <replace file="../build/FinkBrowser/Apps.html" token="@VERSION@" value="${version}"/>
+    <replace file="../build/FinkBrowser/Apps.html" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
     <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
     <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
     <replace file="../build/Top.jsp"     token="@NAME@"    value="${Finkbrowsername}"/>
