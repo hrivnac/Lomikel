@@ -576,8 +576,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           map1[entries[i].key] = entries[i].value
           }
         }
-      return map1
       }
+    return map1
     }
      
   /** Limit {@link Map} based on its <tt>value</tt>.
