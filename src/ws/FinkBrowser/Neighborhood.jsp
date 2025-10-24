@@ -7,6 +7,7 @@
 
 <%@ page trimDirectiveWhitespaces="true" %>
 
+<%@ page import="com.Lomikel.Utils.Init" %>
 <%@ page import="com.Lomikel.WebService.PropertiesProcessor" %>
 <%@ page import="com.Lomikel.Januser.JanusClient" %>
 <%@ page import="com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG" %>
@@ -48,7 +49,10 @@
    if (climit == null || climit.isEmpty()) {
     climit = "0.0";
     }
-   
+    
+    
+  Init.initWS("Neighborhood");
+
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
 
