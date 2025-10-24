@@ -113,7 +113,7 @@ const zoom = d3.zoom()
 
   container.append("path")
     .datum(classList.map(cls => classPositions[cls]))
-    .attr("class", "object-symbol")
+    .attr("class", "link-line")
     .attr("d", classLine)
     .attr("fill", "none")
     .attr("stroke", "#ccc")
