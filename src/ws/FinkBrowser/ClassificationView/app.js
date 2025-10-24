@@ -67,6 +67,9 @@ const zoom = d3.zoom()
 
     container.selectAll(".class-label")
       .style("font-size", `${12 / k}px`);
+      
+    container.selectAll(".link-line")
+      .style("stroke-width", `${1.5 / k}px`);
   });
     
   svg.call(zoom);
@@ -137,6 +140,7 @@ const zoom = d3.zoom()
     const pos = weightedPosition(obj.classes);
 
     container.append("line")
+      .attr("class", "link-line")
       .attr("x1", objectPos.x)
       .attr("y1", objectPos.y)
       .attr("x2", pos.x)
