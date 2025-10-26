@@ -122,9 +122,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     String noid;
     for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : objectNeighborhood(objectId,
                                                                                           classifier,
-                                                                                          Double.parseDouble(nmax),
+                                                                                          nmax,
                                                                                           alg,
-                                                                                          Double.parseDouble(climit)).entrySet()) {
+                                                                                          climit).entrySet()) {
       classes = new JSONObject();
       for (Map.Entry<String, Double> e : m.getValue().entrySet()) {
         classes.put(e.getKey(), e.getValue());
