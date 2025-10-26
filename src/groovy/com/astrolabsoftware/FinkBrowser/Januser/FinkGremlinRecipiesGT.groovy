@@ -93,14 +93,26 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
     }
 
-  /** TBD */
+  /** Give JSON of other <em>object</em>s ordered
+    * by distance to the specified <em>object</em> with respect
+    * to weights to all (or selected) <em>SourceOfInterest</em> classes.
+    * Include classification for each neighbour.
+    * @param oid0          The <em>objectOd</em> of the <em>object</em>.
+    * @param classifier    The classifier name to be used.
+    * @param nmax          The number of closest <em>object</em>s to give.
+    *                      All are given, if missing.
+    * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
+    *                      Default: <tt>JensenShannon</tt>. Anyhing else gives random metric - for testing.
+    * @param climit        The low limit fir the classification ration of the evaluated <em>object</em>.
+    *                      Default: <tt>0.0</tt>.
+    * @return              The full neigbouthood information. */
   public String objectNeighborhood2JSON(String objectId,
                                         String classifier,
                                         String alg,
                                         double nmax,
                                         double climit) {                                         
     JSONObject objectClassification = new JSONObject();
-    for (Map<String, String> m : gr.classification(objectId, classifier)) {
+    for (Map<String, String> m : classification(objectId, classifier)) {
       objectClassification.put(m.get("class"), m.get("weight"));
       }      
     JSONObject data = new JSONObject();
@@ -108,11 +120,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     JSONObject neighbor;
     JSONObject classes;
     String noid;
-    for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : gr.objectNeighborhood(objectId,
-                                                                                             classifier,
-                                                                                             Double.parseDouble(nmax),
-                                                                                             alg,
-                                                                                             Double.parseDouble(climit)).entrySet()) {
+    for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : objectNeighborhood(objectId,
+                                                                                          classifier,
+                                                                                          Double.parseDouble(nmax),
+                                                                                          alg,
+                                                                                          Double.parseDouble(climit)).entrySet()) {
       classes = new JSONObject();
       for (Map.Entry<String, Double> e : m.getValue().entrySet()) {
         classes.put(e.getKey(), e.getValue());
