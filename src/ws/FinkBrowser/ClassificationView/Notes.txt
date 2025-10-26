@@ -1,5 +1,8 @@
 - failure: stay in the existing (except first call)
            popup warning
+- JSON inside gr
+- nicer
+- overlap distances
 
 
 python3 -m http.server 8002 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/ClassificationView

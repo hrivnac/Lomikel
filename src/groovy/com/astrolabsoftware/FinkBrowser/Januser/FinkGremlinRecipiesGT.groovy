@@ -54,6 +54,13 @@ import static org.janusgraph.core.attribute.Geo.geoWithin;
 // Groovy SQL
 import groovy.sql.Sql;
 
+// JSON
+import org.json.JSONObject;
+import org.json.JSONArray;
+
+// Java
+import java.util.Map;
+
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -86,6 +93,42 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
     }
 
+  /** TBD */
+  public String objectNeighborhood2JSON(String objectId,
+                                        String classifier,
+                                        String alg,
+                                        double nmax,
+                                        double climit) {                                         
+    JSONObject objectClassification = new JSONObject();
+    for (Map<String, String> m : gr.classification(objectId, classifier)) {
+      objectClassification.put(m.get("class"), m.get("weight"));
+      }      
+    JSONObject data = new JSONObject();
+    JSONObject objects = new JSONObject();
+    JSONObject neighbor;
+    JSONObject classes;
+    String noid;
+    for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : gr.objectNeighborhood(objectId,
+                                                                                             classifier,
+                                                                                             Double.parseDouble(nmax),
+                                                                                             alg,
+                                                                                             Double.parseDouble(climit)).entrySet()) {
+      classes = new JSONObject();
+      for (Map.Entry<String, Double> e : m.getValue().entrySet()) {
+        classes.put(e.getKey(), e.getValue());
+        }
+      neighbor = new JSONObject();
+      noid = m.getKey().getKey();
+      neighbor.put("distance", m.getKey().getValue());
+      neighbor.put("classes", classes);
+      objects.put(noid, neighbor);
+      }
+    data.put("objectId",             objectId);
+    data.put("objects",              objects);
+    data.put("objectClassification", objectClassification);
+    return data;
+    }
+    
   /** Give {@link Map} of other <em>object</em>s ordered
     * by distance to the specified <em>object</em> with respect
     * to weights to all (or selected) <em>SourceOfInterest</em> classes.
