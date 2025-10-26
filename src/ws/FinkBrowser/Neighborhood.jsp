@@ -40,6 +40,6 @@
 
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
-  String data = gr.objectNeighborhood2JSON(objectId, classifier, alg, nmax, climit);
+  String data = gr.objectNeighborhood2JSON(objectId, classifier, alg, Double.parseDouble(nmax), Double.parseDouble(climit));
   out.print(data);
   %>
