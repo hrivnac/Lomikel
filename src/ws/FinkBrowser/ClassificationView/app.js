@@ -58,7 +58,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       c2 = c2.replace(/^OCol:[^:]+::/, "").trim();
 
       // Keep only classes we know
-      if (!classList.includes(c1) || !classList.includes(c2)) continue;
+      //if (!classList.includes(c1) || !classList.includes(c2)) continue;
 
       overlapMap[c1] = overlapMap[c1] || {};
       overlapMap[c1][c2] = val;
