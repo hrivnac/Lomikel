@@ -54,6 +54,9 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       const c1 = item.first.class?.trim();
       const c2 = item.second.class?.trim();
       const val = parseFloat(item.overlap);
+      console.log(c1);
+      console.log(c2);
+      console.log(val);
 
       if (!c1 || !c2 || c1 === c2 || isNaN(val)) continue; // ignore invalid or self
       if (!classList.includes(c1) || !classList.includes(c2)) continue; // keep only relevant classes
