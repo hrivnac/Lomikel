@@ -185,7 +185,7 @@ const zoom = d3.zoom()
  
   const classList = Array.from(allClasses);
   
-  const classPositions = await getOverlapPositions(classifier, classList, radius, centerX, centerY);  
+  const classPositions = await getOverlapPositions(document.getElementById("classifier").value, classList, radius, centerX, centerY);  
   
   
   //
