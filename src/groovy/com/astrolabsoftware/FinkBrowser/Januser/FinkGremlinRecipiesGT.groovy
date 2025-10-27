@@ -684,7 +684,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   /** TBD
     * @param outputCSV  The filename for CSV file with overlaps. */
   // TBD: replace all 2JSON with direct json
-  def JSONArray overlaps2JSON(String classifier) {
+  def String overlaps2JSON(String classifier) {
     JSONArray result = new JSONArray();
     JSONObject entry;
     JSONObject first;
