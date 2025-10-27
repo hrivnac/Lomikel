@@ -53,7 +53,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       overlaps.push({ source: c1, target: c2, value: v });
     }
 
-    console.log(overlapMap);
+    console.log(overlaps);
     
     const nodes = classList.map(c => ({ id: c }));
     const maxOverlap = d3.max(overlaps, d => d.value) || 1;
