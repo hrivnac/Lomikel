@@ -1,6 +1,5 @@
 - failure: stay in the existing (except first call)
            popup warning
-- JSON inside gr
 - nicer
 - overlap distances
 

@@ -672,6 +672,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     }
    
+  /** TBD */
+  def Map<String, Double> overlaps(String classifier) {
+    if (classifier == null) {
+      return overlaps();
+      }
+    else {
+      return overlaps('classifier':classifier);
+      }
+    }
+  
+    
   /** Give all overlaps.
     * Using accumulated data in graph.
     * @param lbl        The label of {@link Vertex}es to use for overlap search.
