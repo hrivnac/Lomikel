@@ -672,13 +672,41 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     }
    
-  /** TBD */
-  def String overlaps2String(String classifier) {  
-    String o = "";
-    for (Map.Entry<String, Double> e : overlaps(classifier)) {
-      o += e.getKey() + " = " + e.getValue() + "\n";
-      }
-    return o;
+  /** TBD
+    * @param outputCSV  The filename for CSV file with overlaps. */
+  def String overlaps2CVS(Map<String, Double> overlaps,
+                          String              outputCSV) {
+    def csv = "type1,classifier1,flavor1,class1,type2,classifier2,flavor2,class2,overlap\n";
+    overlaps.each {o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"};
+    new File(outputCSV).text = csv;
+    }
+    
+  /** TBD
+    * @param outputCSV  The filename for CSV file with overlaps. */
+  def JSONArray overlaps2JSON(Map<String, Double> overlaps) {
+    JSONArray result = new JSONArray();
+    JSONObject entry;
+    String firstS;
+    String secondS;
+    String[] firstA;
+    String[] secondA;
+    String[] parts;
+    overlaps.each {o -> parts = o.getKey().split(' * ');
+                        firstA  = parts[0].split(':');
+                        secondA = parts[1].split(':');
+                        entry = new JSONObject();
+                        first  = new JSONObject();
+                        second = new JSONObject();
+                        first.put( 'class', firstA[ 3]);
+                        second.put('class', secondA[3]);
+                        entry.put('first',  first);
+                        entry.put('second', second);
+                        entry.put('overlap', o.getValue());
+                        result.put(entry);
+    }  
+                        
+    
+    
     }
    
   /** TBD */
@@ -698,13 +726,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                   Optional named parameter.
     * @param classifier The name of classifier to use for overlap search.
     *                   Optional named parameter. 
-    * @param outputCSV  The filename for CSV file with overlaps.
-    *                   Optional named parameter.
     * @return           The overlaps. */
   def Map<String, Double> overlaps(Map args) {
     def lbl        = args?.lbl;
     def classifier = args?.classifier;
-    def outputCSV  = args?.outputCSV;
     def overlaps = [:];
     def cf = classifierWithFlavor(classifier);
     g().E().has('lbl', 'overlaps').
@@ -732,7 +757,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     overlaps = overlaps.sort{-it.value};
     if (outputCSV != null) {
       def csv = "type1,classifier1,flavor1,class1,type2,classifier2,flavor2,class2,overlap\n";
-      overlaps.each{o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"};
+      overlaps.each {o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"};
       new File(outputCSV).text = csv;
       return null;
       }
