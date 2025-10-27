@@ -42,7 +42,8 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
     const text = await response.text();
 
     // Parse overlaps
-    const regex = /OCol:[^:]+::(.+?)\s*\*\s*OCol:[^:]+::(.+?)\s*=\s*([0-9.eE+-]+)/g;
+    //const regex = /OCol:[^:]+::(.+?)\s*\*\s*OCol:[^:]+::(.+?)\s*=\s*([0-9.eE+-]+)/g;
+    const regex = /OCol:[^:]+::(.+?) \* OCol:[^:]+::(.+?) = ([\d.]+)/g;
     const overlapMap = {};
     let match;
     const parsed = [];
