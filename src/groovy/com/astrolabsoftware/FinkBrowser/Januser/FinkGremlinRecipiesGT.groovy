@@ -673,6 +673,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     }
    
   /** TBD */
+  def String overlaps2String(String classifier) {  
+    String o = "";
+    for (Map.Entry<String, Double> e : overlaps(classifier)) {
+      o += e.getKey() + " = " + e.getValue() + "\n";
+      }
+    return o;
+    }
+   
+  /** TBD */
   def Map<String, Double> overlaps(String classifier) {
     if (classifier == null) {
       return overlaps();
