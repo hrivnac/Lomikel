@@ -108,12 +108,38 @@ async function showObjectNeighborhood(data) {
   const svg = d3.select("#viz").append("svg")
     .attr("width", width)
     .attr("height", height);
-  const container = svg.append("g");
-
+  //const container = svg.append("g");
+  const container = svg.append("g");  // handles zoom + pan
+  const rotationGroup = container.append("g"); // handles rotation
+  
 //  const zoom = d3.zoom()
 //    .scaleExtent([0.5, 10])
 //    .on("zoom", event => container.attr("transform", event.transform));
  
+let rotationAngle = 0;
+let isRotating = false;
+let lastX = 0;
+
+svg.on("mousedown", (event) => {
+  if (event.shiftKey) { // Hold Shift to rotate
+    isRotating = true;
+    lastX = event.clientX;
+  }
+});
+
+svg.on("mousemove", (event) => {
+  if (isRotating) {
+    const dx = event.clientX - lastX;
+    lastX = event.clientX;
+    rotationAngle += dx * 0.5; // rotation sensitivity
+    rotationGroup.attr("transform", `rotate(${rotationAngle}, ${centerX}, ${centerY})`);
+  }
+});
+
+svg.on("mouseup", () => { isRotating = false; });
+svg.on("mouseleave", () => { isRotating = false; });
+
+
 const zoom = d3.zoom()
   .scaleExtent([0.5, 20])
   .on("zoom", event => {
@@ -121,21 +147,23 @@ const zoom = d3.zoom()
     container.attr("transform", `translate(${x},${y}) scale(${k})`);
 
     // Resize objects and text inversely to zoom level
-    container.selectAll(".object-symbol")
+    rotationGroup.selectAll(".object-symbol")
       .attr("transform", d => `translate(${d.x},${d.y}) scale(${1 / k})`);
 
-    container.selectAll(".distance-label")
+    rotationGroup.selectAll(".distance-label")
       .style("font-size", `${10 / k}px`);
 
-    container.selectAll(".class-label")
+    rotationGroup.selectAll(".class-label")
       .style("font-size", `${12 / k}px`);
       
-    container.selectAll(".link-line")
+    rotationGroup.selectAll(".link-line")
       .style("stroke-width", `${1.5 / k}px`);
   });
     
   svg.call(zoom);
   window.resetZoom = () => svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+  
+  
 
   const tooltip = d3.select("#tooltip");
   let hideTimeout = null;
