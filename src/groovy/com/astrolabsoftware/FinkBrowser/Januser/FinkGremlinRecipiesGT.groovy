@@ -686,8 +686,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def JSONArray overlaps2JSON(Map<String, Double> overlaps) {
     JSONArray result = new JSONArray();
     JSONObject entry;
-    String firstS;
-    String secondS;
+    JSONObject first;
+    JSONObject second;
     String[] firstA;
     String[] secondA;
     String[] parts;
