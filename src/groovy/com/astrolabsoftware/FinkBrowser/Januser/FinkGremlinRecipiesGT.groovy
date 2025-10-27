@@ -705,7 +705,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                         entry.put('overlap', o.getValue());
                         result.put(entry);
                         }  
-    return results;
+    return result;
     }
    
   /** TBD */
