@@ -55,8 +55,8 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       if (c1 === c2 || isNaN(val)) continue; // ignore self and invalid
 
       // Normalize to plain class names (strip any prefix)
-      c1 = c1.replace(/^OCol:[^:]+::/, "").trim();
-      c2 = c2.replace(/^OCol:[^:]+::/, "").trim();
+      //c1 = c1.replace(/^OCol:[^:]+::/, "").trim();
+      //c2 = c2.replace(/^OCol:[^:]+::/, "").trim();
       
       console.log(c1);
       console.log(c2);
