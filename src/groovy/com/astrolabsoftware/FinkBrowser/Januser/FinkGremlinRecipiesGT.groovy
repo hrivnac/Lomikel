@@ -683,6 +683,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     
   /** TBD
     * @param outputCSV  The filename for CSV file with overlaps. */
+  // TBD: replace all 2JSON with direct json
   def JSONArray overlaps2JSON(Map<String, Double> overlaps) {
     JSONArray result = new JSONArray();
     JSONObject entry;
@@ -694,6 +695,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     overlaps.each {o -> parts = o.getKey().split(' * ');
                         firstA  = parts[0].split(':');
                         secondA = parts[1].split(':');
+                        log.info(firstA);
                         entry = new JSONObject();
                         first  = new JSONObject();
                         second = new JSONObject();
