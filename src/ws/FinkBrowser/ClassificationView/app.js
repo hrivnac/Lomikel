@@ -51,6 +51,8 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       overlapMap[c1][c2] = v;
       overlaps.push({ source: c1, target: c2, value: v });
     }
+    
+    console.log(overlapMap);
 
     // Build symmetric links
     const links = [];
@@ -63,6 +65,8 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
         console.log(b);
         const v1 = (overlapMap[a] && overlapMap[a][b]) || 0;
         const v2 = (overlapMap[b] && overlapMap[b][a]) || 0;
+        console.log(v1);
+        console.log(v2);
         const value = (v1 + v2) / 2;
         if (value > 0) {
           links.push({ source: a, target: b, value });
