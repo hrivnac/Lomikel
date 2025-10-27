@@ -695,7 +695,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     overlaps.each {o -> parts = o.getKey().split(' \\* ');
                         firstA  = parts[0].split(':');
                         secondA = parts[1].split(':');
-                        log.info(firstA[0]);
                         entry = new JSONObject();
                         first  = new JSONObject();
                         second = new JSONObject();
@@ -705,10 +704,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                         entry.put('second', second);
                         entry.put('overlap', o.getValue());
                         result.put(entry);
-    }  
-                        
-    
-    
+                        }  
+    return results;
     }
    
   /** TBD */
