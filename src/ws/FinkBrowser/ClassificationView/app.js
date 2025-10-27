@@ -77,6 +77,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
 
     const positions = {};
     nodes.forEach(n => positions[n.id] = { x: n.x, y: n.y });
+    console.log(positions);
     return positions;
 
   } catch (err) {
