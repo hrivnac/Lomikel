@@ -755,12 +755,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                     }
                   };
     overlaps = overlaps.sort{-it.value};
-    if (outputCSV != null) {
-      def csv = "type1,classifier1,flavor1,class1,type2,classifier2,flavor2,class2,overlap\n";
-      overlaps.each {o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"};
-      new File(outputCSV).text = csv;
-      return null;
-      }
     return overlaps;
     }
     
