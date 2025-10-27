@@ -83,7 +83,8 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
     for (let i = 0; i < 300; i++) simulation.tick();
     // Normalize final positions onto a circular boundary
     const positions = {};
-    nodes.forEach(n => {const angle = Math.atan2(n.y - centerY, n.x - centerX);
+    nodes.forEach(n => {const angle = Math.atan2(n.y - centerY, n.x - centerX);           
+                        console.log(angle);
                         positions[n.id] = {x: centerX + radius * Math.cos(angle),
                                            y: centerY + radius * Math.sin(angle)
                                            };
