@@ -56,6 +56,9 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       // Normalize to plain class names (strip any prefix)
       c1 = c1.replace(/^OCol:[^:]+::/, "").trim();
       c2 = c2.replace(/^OCol:[^:]+::/, "").trim();
+      
+      console.log(c1);
+      console.log(c2);
 
       // Keep only classes we know
       //if (!classList.includes(c1) || !classList.includes(c2)) continue;
