@@ -1,7 +1,6 @@
 - failure: stay in the existing (except first call)
            popup warning
 - nicer
-- overlap distances
-
+- keep overlaps data
 
 python3 -m http.server 8002 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/ClassificationView
