@@ -529,6 +529,7 @@
   <target name="war"
           depends="exe"
           description="Create WAR">
+          <!--
     <echo>Creating Lomikel.war</echo>
  		<copy file="../src/ws/index.jsp"             tofile="../build/index.jsp"   overwrite="true"/>
  		<copy file="../src/ws/Top.jsp"               tofile="../build/Top.jsp"     overwrite="true"/>
@@ -579,6 +580,7 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </war>
+      -->
     <echo>Creating FinkBrowser.war</echo>
  		<copy file="../src/ws/index.jsp"                         tofile="../build/index.jsp"             overwrite="true"/>
  		<copy file="../src/ws/FinkBrowser/Apps.html"             tofile="../build/FinkBrowser/Apps.html" overwrite="true"/>

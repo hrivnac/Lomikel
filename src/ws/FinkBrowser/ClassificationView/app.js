@@ -44,7 +44,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
     const overlapMap = {};
     
     text.forEach(line =>  {
-      console.log(line.split('*');
+      console.log(line.split('*'));
       });
     
     const regex = /OCol:[^:]+::(.+?) \* OCol:[^:]+::(.+?) = ([\d.]+)/g;
