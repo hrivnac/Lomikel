@@ -97,7 +97,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
 
 
 // --- Visualization (unchanged except tooltip delay increased) ---
-function showObjectNeighborhood(data) {
+async function showObjectNeighborhood(data) {
   d3.select("#viz").selectAll("*").remove();
 
   const width = document.getElementById("viz").clientWidth;
