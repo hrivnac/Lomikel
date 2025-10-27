@@ -72,7 +72,7 @@ while ((match = regex.exec(text)) !== null) {
       //overlapMap[c1] = overlapMap[c1] || {};
       //overlapMap[c1][c2] = val;
       //parsed.push({ c1, c2, val });
-    }
+    //}
 
     if (parsed.length === 0) {
       console.warn("⚠️ No matching overlaps found for classes:", classList);
