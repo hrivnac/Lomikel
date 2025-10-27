@@ -34,6 +34,67 @@ async function fetchNeighborhood(params) {
   }
 }
 
+async function getOverlapPositions(classifier, classList, radius, centerX, centerY) {
+  try {
+    const response = await fetch(`/FinkBrowser/Overlaps.jsp?${classifier}`);
+    if (!response.ok) throw new Error("Failed to fetch overlaps");
+    const text = await response.text();
+
+    const overlaps = [];
+    const overlapMap = {};
+    const regex = /OCol:[^:]+::(.+?) \* OCol:[^:]+::(.+?) = ([\d.]+)/g;
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+      const [_, c1, c2, value] = match;
+      const v = parseFloat(value);
+      if (!overlapMap[c1]) overlapMap[c1] = {};
+      overlapMap[c1][c2] = v;
+      overlaps.push({ source: c1, target: c2, value: v });
+    }
+
+    const nodes = classList.map(c => ({ id: c }));
+    const maxOverlap = d3.max(overlaps, d => d.value) || 1;
+
+    // Create simulation where stronger overlaps = shorter links
+    const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(overlaps)
+        .id(d => d.id)
+        .distance(d => radius * (1 - d.value / maxOverlap))) // smaller distance for big overlap
+      .force("charge", d3.forceManyBody().strength(-radius * 0.8))
+      .force("radial", d3.forceRadial(radius, centerX, centerY))
+      .stop();
+
+    // Run simulation manually for stability
+    for (let i = 0; i < 200; i++) simulation.tick();
+
+    // Normalize to circle boundary
+    const maxR = d3.max(nodes, n => Math.hypot(n.x - centerX, n.y - centerY));
+    nodes.forEach(n => {
+      const angle = Math.atan2(n.y - centerY, n.x - centerX);
+      n.x = centerX + radius * Math.cos(angle);
+      n.y = centerY + radius * Math.sin(angle);
+    });
+
+    const positions = {};
+    nodes.forEach(n => positions[n.id] = { x: n.x, y: n.y });
+    return positions;
+
+  } catch (err) {
+    console.warn("Overlap fetch failed, using equidistant layout", err);
+    // fallback: equidistant positions
+    const angleScale = d3.scaleLinear()
+      .domain([0, classList.length])
+      .range([0, 2 * Math.PI]);
+    const pos = {};
+    classList.forEach((c, i) => {
+      const a = angleScale(i);
+      pos[c] = { x: centerX + radius * Math.cos(a), y: centerY + radius * Math.sin(a) };
+    });
+    return pos;
+  }
+}
+
+
 // --- Visualization (unchanged except tooltip delay increased) ---
 function showObjectNeighborhood(data) {
   d3.select("#viz").selectAll("*").remove();
@@ -83,19 +144,26 @@ const zoom = d3.zoom()
   Object.values(data.objects).forEach(obj =>
     Object.keys(obj.classes).forEach(c => allClasses.add(c))
   );
-  const classList = Array.from(allClasses);
-
-  const angleScale = d3.scaleLinear()
-    .domain([0, classList.length])
-    .range([0, 2 * Math.PI]);
-
-  const classPositions = {};
-  classList.forEach((cls, i) => {
-    const angle = angleScale(i) + (classList.length === 2 ? Math.PI / 2 : 0);
-    classPositions[cls] = {
-      x: centerX + radius * Math.cos(angle),
-      y: centerY + radius * Math.sin(angle)
-    };
+  
+  const classList = [...new Set(Object.keys(objectClassification)
+    .concat(...Object.values(data).map(d => Object.keys(d.classes))))];
+  
+  const classPositions = await getOverlapPositions(classifier, classList, radius, centerX, centerY);  
+  
+  
+  //const classList = Array.from(allClasses);
+  //
+  //const angleScale = d3.scaleLinear()
+  //  .domain([0, classList.length])
+  //  .range([0, 2 * Math.PI]);
+  //
+  //const classPositions = {};
+  //classList.forEach((cls, i) => {
+  //  const angle = angleScale(i) + (classList.length === 2 ? Math.PI / 2 : 0);
+  //  classPositions[cls] = {
+  //    x: centerX + radius * Math.cos(angle),
+  //    y: centerY + radius * Math.sin(angle)
+  //  };
     container.append("text")
       .attr("class", "class-label")
       .attr("x", classPositions[cls].x)
