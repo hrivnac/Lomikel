@@ -37,7 +37,7 @@ async function fetchNeighborhood(params) {
 async function getOverlapPositions(classifier, classList, radius, centerX, centerY) {
   try {
     console.log(classifier);
-    const url = `/FinkBrowser/Overlaps.jsp?${classifier}`;
+    const url = `/FinkBrowser/Overlaps.jsp?classifier=${classifier}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch overlaps");
 
