@@ -59,6 +59,8 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       for (let j = i + 1; j < classList.length; j++) {
         const a = classList[i];
         const b = classList[j];
+        console.log(a);
+        console.log(b);
         const v1 = (overlapMap[a] && overlapMap[a][b]) || 0;
         const v2 = (overlapMap[b] && overlapMap[b][a]) || 0;
         const value = (v1 + v2) / 2;
