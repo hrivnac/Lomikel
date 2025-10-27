@@ -674,17 +674,17 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
    
   /** TBD
     * @param outputCSV  The filename for CSV file with overlaps. */
-  def String overlaps2CVS(Map<String, Double> overlaps,
-                          String              outputCSV) {
+  def String overlaps2CVS(String classifier,
+                          String outputCSV) {
     def csv = "type1,classifier1,flavor1,class1,type2,classifier2,flavor2,class2,overlap\n";
-    overlaps.each {o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"};
+    overlaps(classifier).each {o -> csv += o.getKey().replaceAll(" \\* ", ",").replaceAll(":", ",") + "," + o.getValue() + "\n"};
     new File(outputCSV).text = csv;
     }
     
   /** TBD
     * @param outputCSV  The filename for CSV file with overlaps. */
   // TBD: replace all 2JSON with direct json
-  def JSONArray overlaps2JSON(Map<String, Double> overlaps) {
+  def JSONArray overlaps2JSON(String classifier) {
     JSONArray result = new JSONArray();
     JSONObject entry;
     JSONObject first;
@@ -692,25 +692,25 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     String[] firstA;
     String[] secondA;
     String[] parts;
-    overlaps.each {o -> parts = o.getKey().split(' \\* ');
-                        firstA  = parts[0].split(':');
-                        secondA = parts[1].split(':');
-                        entry = new JSONObject();
-                        first  = new JSONObject();
-                        second = new JSONObject();
-                        first.put( 'lbl',        firstA[ 0]);
-                        first.put( 'classifier', firstA[ 1]);
-                        first.put( 'flavor',     firstA[ 2]);
-                        first.put( 'class',      firstA[ 3]);
-                        second.put('lbl',        secondA[0]);
-                        second.put('classifier', secondA[1]);
-                        second.put('flavor',     secondA[2]);
-                        second.put('class',      secondA[3]);
-                        entry.put('first',  first);
-                        entry.put('second', second);
-                        entry.put('overlap', o.getValue());
-                        result.put(entry);
-                        }  
+    overlaps(classifier).each {o -> parts = o.getKey().split(' \\* ');
+                                    firstA  = parts[0].split(':');
+                                    secondA = parts[1].split(':');
+                                    entry = new JSONObject();
+                                    first  = new JSONObject();
+                                    second = new JSONObject();
+                                    first.put( 'lbl',        firstA[ 0]);
+                                    first.put( 'classifier', firstA[ 1]);
+                                    first.put( 'flavor',     firstA[ 2]);
+                                    first.put( 'class',      firstA[ 3]);
+                                    second.put('lbl',        secondA[0]);
+                                    second.put('classifier', secondA[1]);
+                                    second.put('flavor',     secondA[2]);
+                                    second.put('class',      secondA[3]);
+                                    entry.put('first',  first);
+                                    entry.put('second', second);
+                                    entry.put('overlap', o.getValue());
+                                    result.put(entry);
+                                    }  
     return result;
     }
    

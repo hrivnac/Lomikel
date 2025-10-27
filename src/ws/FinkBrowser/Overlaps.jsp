@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/plain"%>
+<%@ page language="java" contentType="application/json"%>
 
 <%
   response.setContentType("application/json");
@@ -24,6 +24,6 @@
 
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
-  String data = gr.overlaps2String(classifier);
+  String data = gr.overlaps2JSON(classifier);
   out.print(data);
   %>
