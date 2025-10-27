@@ -43,7 +43,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
     const overlaps = [];
     const overlapMap = {};
     
-    text.forEach(line =>  {
+    text.split("\n").forEach(line =>  {
       console.log(line.split('*'));
       });
     
