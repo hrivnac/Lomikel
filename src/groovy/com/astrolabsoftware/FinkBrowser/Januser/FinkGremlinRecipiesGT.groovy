@@ -698,8 +698,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                         entry = new JSONObject();
                         first  = new JSONObject();
                         second = new JSONObject();
-                        first.put( 'class', firstA[ 3]);
-                        second.put('class', secondA[3]);
+                        first.put( 'lbl',        firstA[ 0]);
+                        first.put( 'classifier', firstA[ 1]);
+                        first.put( 'flavor',     firstA[ 2]);
+                        first.put( 'class',      firstA[ 3]);
+                        second.put('lbl',        secondA[0]);
+                        second.put('classifier', secondA[1]);
+                        second.put('flavor',     secondA[2]);
+                        second.put('class',      secondA[3]);
                         entry.put('first',  first);
                         entry.put('second', second);
                         entry.put('overlap', o.getValue());
