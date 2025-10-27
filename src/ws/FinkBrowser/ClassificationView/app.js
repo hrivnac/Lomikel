@@ -162,11 +162,11 @@ const zoom = d3.zoom()
   //const classPositions = {};
   
   classList.forEach((cls, i) => {
-    const angle = angleScale(i) + (classList.length === 2 ? Math.PI / 2 : 0);
-    classPositions[cls] = {
-      x: centerX + radius * Math.cos(angle),
-      y: centerY + radius * Math.sin(angle)
-    };
+    //const angle = angleScale(i) + (classList.length === 2 ? Math.PI / 2 : 0);
+    //classPositions[cls] = {
+    //  x: centerX + radius * Math.cos(angle),
+    //  y: centerY + radius * Math.sin(angle)
+    //};
     container.append("text")
       .attr("class", "class-label")
       .attr("x", classPositions[cls].x)
