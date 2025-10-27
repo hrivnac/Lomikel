@@ -146,7 +146,7 @@ const zoom = d3.zoom()
     Object.keys(obj.classes).forEach(c => allClasses.add(c))
   );
   
-  const classList = [...new Set(Object.keys(objectClassification)
+  const classList = [...new Set(Object.keys(data.objectClassification)
     .concat(...Object.values(data).map(d => Object.keys(d.classes))))];
   
   const classPositions = getOverlapPositions(classifier, classList, radius, centerX, centerY);  
