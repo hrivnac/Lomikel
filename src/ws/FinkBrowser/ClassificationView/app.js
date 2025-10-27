@@ -42,11 +42,6 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
 
     const overlaps = [];
     const overlapMap = {};
-    
-    text.split("\n").forEach(line =>  {
-      console.log(line.split('*'));
-      });
-    
     const regex = /OCol:[^:]+::(.+?) \* OCol:[^:]+::(.+?) = ([\d.]+)/g;
     let match;
     while ((match = regex.exec(text)) !== null) {
@@ -56,137 +51,52 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       overlapMap[c1][c2] = v;
       overlaps.push({ source: c1, target: c2, value: v });
     }
-    
-    console.log(overlapMap);
 
-    // Build symmetric links
-    const links = [];
-    let maxOverlap = 0;
-    for (let i = 0; i < classList.length; i++) {
-      for (let j = i + 1; j < classList.length; j++) {
-        const a = classList[i];
-        const b = classList[j];
-        console.log(a);
-        console.log(b);
-        const v1 = (overlapMap[a] && overlapMap[a][b]) || 0;
-        const v2 = (overlapMap[b] && overlapMap[b][a]) || 0;
-        console.log(v1);
-        console.log(v2);
-        const value = (v1 + v2) / 2;
-        if (value > 0) {
-          links.push({ source: a, target: b, value });
-          if (value > maxOverlap) maxOverlap = value;
-        }
-      }
-    }
-
-    if (links.length === 0 || maxOverlap === 0) throw new Error("No usable overlap links");
-
-    
-    
-    // Create layout forces
     const nodes = classList.map(c => ({ id: c }));
-    const minDist = radius * 0.15;
-    const maxDist = radius * 1.2;
+    const maxOverlap = d3.max(overlaps, d => d.value) || 1;
 
-    const simLinks = links.map(l => ({
-      source: l.source,
-      target: l.target,
-      distance: minDist + (1 - l.value / maxOverlap) * (maxDist - minDist),
-      strength: 0.3 + 0.7 * (l.value / maxOverlap)
-    }));
-
+    // Create simulation where stronger overlaps = shorter links
     const simulation = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(simLinks)
+      .force("link", d3.forceLink(overlaps)
         .id(d => d.id)
-        .distance(d => d.distance)
-        .strength(d => d.strength))
-      .force("charge", d3.forceManyBody().strength(-radius * 0.6))
-      .force("center", d3.forceCenter(centerX, centerY))
+        .distance(d => radius * (1 - d.value / maxOverlap))) // smaller distance for big overlap
+      .force("charge", d3.forceManyBody().strength(-radius * 0.8))
+      .force("radial", d3.forceRadial(radius, centerX, centerY))
       .stop();
 
-    for (let i = 0; i < 300; i++) simulation.tick();
+    // Run simulation manually for stability
+    for (let i = 0; i < 200; i++) simulation.tick();
 
-    // Normalize to circle
-    const positions = {};
+    // Normalize to circle boundary
+    const maxR = d3.max(nodes, n => Math.hypot(n.x - centerX, n.y - centerY));
     nodes.forEach(n => {
       const angle = Math.atan2(n.y - centerY, n.x - centerX);
-      positions[n.id] = {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle)
-      };
+      n.x = centerX + radius * Math.cos(angle);
+      n.y = centerY + radius * Math.sin(angle);
     });
 
-    console.log(`✅ Overlaps loaded: ${parsed.length} entries, ${links.length} links`);
+    const positions = {};
+    nodes.forEach(n => positions[n.id] = { x: n.x, y: n.y });
+    console.log(positions);
     return positions;
 
   } catch (err) {
-    console.warn("⚠️ Overlap layout failed, using equidistant fallback:", err.message);
+    console.warn("Overlap fetch failed, using equidistant layout", err);
+    // fallback: equidistant positions
     const angleScale = d3.scaleLinear()
       .domain([0, classList.length])
       .range([0, 2 * Math.PI]);
     const pos = {};
     classList.forEach((c, i) => {
       const a = angleScale(i);
-      pos[c] = {
-        x: centerX + radius * Math.cos(a),
-        y: centerY + radius * Math.sin(a)
-      };
+      pos[c] = { x: centerX + radius * Math.cos(a), y: centerY + radius * Math.sin(a) };
     });
     return pos;
   }
 }
-   
-    
-    
-    
-//    const nodes = classList.map(c => ({ id: c }));
-//    const maxOverlap = d3.max(overlaps, d => d.value) || 1;
-//
-//    // Create simulation where stronger overlaps = shorter links
-//    const simulation = d3.forceSimulation(nodes)
-//      .force("link", d3.forceLink(overlaps)
-//        .id(d => d.id)
-//        .distance(d => radius * (1 - d.value / maxOverlap))) // smaller distance for big overlap
-//      .force("charge", d3.forceManyBody().strength(-radius * 0.8))
-//      .force("radial", d3.forceRadial(radius, centerX, centerY))
-//      .stop();
-//
-//    // Run simulation manually for stability
-//    for (let i = 0; i < 200; i++) simulation.tick();
-//
-//    // Normalize to circle boundary
-//    const maxR = d3.max(nodes, n => Math.hypot(n.x - centerX, n.y - centerY));
-//    nodes.forEach(n => {
-//      const angle = Math.atan2(n.y - centerY, n.x - centerX);
-//      n.x = centerX + radius * Math.cos(angle);
-//      n.y = centerY + radius * Math.sin(angle);
-//    });
-//
-//    const positions = {};
-//    nodes.forEach(n => positions[n.id] = { x: n.x, y: n.y });
-//    console.log(positions);
-//    return positions;
-//
-//  } catch (err) {
-//    console.warn("Overlap fetch failed, using equidistant layout", err);
-//    // fallback: equidistant positions
-//    const angleScale = d3.scaleLinear()
-//      .domain([0, classList.length])
-//      .range([0, 2 * Math.PI]);
-//    const pos = {};
-//    classList.forEach((c, i) => {
-//      const a = angleScale(i);
-//      pos[c] = { x: centerX + radius * Math.cos(a), y: centerY + radius * Math.sin(a) };
-//    });
-//    
-//    
-//    return pos;
-//  }
-//}
 
 
-// --- Visualization (unchanged
+
 
 // --- Visualization (unchanged except tooltip delay increased) ---
 async function showObjectNeighborhood(data) {
