@@ -692,7 +692,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     String[] firstA;
     String[] secondA;
     String[] parts;
-    overlaps.each {o -> parts = o.getKey().split(' * ');
+    overlaps.each {o -> parts = o.getKey().split(' \\* ');
                         firstA  = parts[0].split(':');
                         secondA = parts[1].split(':');
                         log.info(firstA[0]);
