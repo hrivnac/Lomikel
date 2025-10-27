@@ -81,15 +81,42 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
                          .stop();
     // Run layout simulation
     for (let i = 0; i < 300; i++) simulation.tick();
-    // Normalize final positions onto a circular boundary
+    
+    
+    
+    // --- NEW: Sort classes by final angle ---
+    const nodesWithAngles = nodes.map(n => {
+      const angle = Math.atan2(n.y - centerY, n.x - centerX);
+      return { ...n, angle };
+    });
+
+    // sort clockwise by angle
+    nodesWithAngles.sort((a, b) => a.angle - b.angle);
+    
+    // reposition on perfect circle in sorted order
     const positions = {};
-    nodes.forEach(n => {const angle = Math.atan2(n.y - centerY, n.x - centerX);           
-                        positions[n.id] = {x: centerX + radius * Math.cos(angle),
-                                           y: centerY + radius * Math.sin(angle)
-                                           };
-                        });
+    const angleScale = d3.scaleLinear()
+      .domain([0, nodesWithAngles.length])
+      .range([0, 2 * Math.PI]);
+
+    nodesWithAngles.forEach((n, i) => {
+      const a = angleScale(i);
+      positions[n.id] = {
+        x: centerX + radius * Math.cos(a),
+        y: centerY + radius * Math.sin(a)
+      };
+    });
+    
+    
+    // Normalize final positions onto a circular boundary
+    //const positions = {};
+    //nodes.forEach(n => {const angle = Math.atan2(n.y - centerY, n.x - centerX);           
+    //                    positions[n.id] = {angle: angle,
+    //                                       x: centerX + radius * Math.cos(angle),
+    //                                       y: centerY + radius * Math.sin(angle)
+    //                                       };
+    //                    });
     console.log(`✅ Overlaps loaded: ${links.length} links from JSON`);
-    console.log(positions);
     return positions;
     }
   catch (err) {
