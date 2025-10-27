@@ -146,13 +146,14 @@ const zoom = d3.zoom()
     Object.keys(obj.classes).forEach(c => allClasses.add(c))
   );
   
-  const classList = [...new Set(Object.keys(data.objectClassification)
-    .concat(...Object.values(data).map(d => Object.keys(d.classes))))];
+  //const classList = [...new Set(Object.keys(data.objectClassification)
+  //  .concat(...Object.values(data).map(d => Object.keys(d.classes))))];
+ 
+  const classList = Array.from(allClasses);
   
   const classPositions = getOverlapPositions(classifier, classList, radius, centerX, centerY);  
   
   
-  //const classList = Array.from(allClasses);
   //
   //const angleScale = d3.scaleLinear()
   //  .domain([0, classList.length])
