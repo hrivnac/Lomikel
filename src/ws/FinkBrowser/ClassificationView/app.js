@@ -47,26 +47,31 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
     const overlapMap = {};
     let match;
     const parsed = [];
-
-    while ((match = regex.exec(text)) !== null) {
-      let c1 = match[1].trim();
-      let c2 = match[2].trim();
-      const val = parseFloat(match[3]);
-      if (c1 === c2 || isNaN(val)) continue; // ignore self and invalid
+    
+while ((match = regex.exec(text)) !== null) {
+      const [_, c1, c2, value] = match;
+      const v = parseFloat(value);
+      if (!overlapMap[c1]) overlapMap[c1] = {};
+      overlapMap[c1][c2] = v;
+      parsed.push({ source: c1, target: c2, value: v });
+    }
+    //while ((match = regex.exec(text)) !== null) {
+    //  let c1 = match[1].trim();
+    //  let c2 = match[2].trim();
+    //  const val = parseFloat(match[3]);
+    //  if (c1 === c2 || isNaN(val)) continue; // ignore self and invalid
 
       // Normalize to plain class names (strip any prefix)
       //c1 = c1.replace(/^OCol:[^:]+::/, "").trim();
       //c2 = c2.replace(/^OCol:[^:]+::/, "").trim();
       
-      console.log(c1);
-      console.log(c2);
 
       // Keep only classes we know
       //if (!classList.includes(c1) || !classList.includes(c2)) continue;
 
-      overlapMap[c1] = overlapMap[c1] || {};
-      overlapMap[c1][c2] = val;
-      parsed.push({ c1, c2, val });
+      //overlapMap[c1] = overlapMap[c1] || {};
+      //overlapMap[c1][c2] = val;
+      //parsed.push({ c1, c2, val });
     }
 
     if (parsed.length === 0) {
