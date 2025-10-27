@@ -48,9 +48,9 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       const [_, c1, c2, value] = match;
       const v = parseFloat(value);
       if (!overlapMap[c1]) overlapMap[c1] = {};
-      overlapMap[c1][c2] = v;
-      overlaps.push({ source: c1, target: c2, value: v });
-    }
+      overlapMap[c1][c2] = 1 / v;
+      overlaps.push({ source: c1, target: c2, value: (1 / v) });
+    } 
 
     const nodes = classList.map(c => ({ id: c }));
     const maxOverlap = d3.max(overlaps, d => d.value) || 1;
@@ -77,7 +77,6 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
 
     const positions = {};
     nodes.forEach(n => positions[n.id] = { x: n.x, y: n.y });
-    console.log(positions);
     return positions;
 
   } catch (err) {
@@ -97,7 +96,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
 
 
 // --- Visualization (unchanged except tooltip delay increased) ---
-async function showObjectNeighborhood(data) {
+function showObjectNeighborhood(data) {
   d3.select("#viz").selectAll("*").remove();
 
   const width = document.getElementById("viz").clientWidth;
