@@ -89,7 +89,7 @@ stylesheet.nodes.alert = {
     {name:"Table",   url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
     ]
   }
-stylesheet.nodes.source = {
+stylesheet.nodes.object = {
   properties:{gremlin:"valueMap('lbl').toList()[0]"},
   graphics: {
     label:"objectId",
@@ -204,7 +204,7 @@ stylesheet.nodes.cutout = {
     {name:"Table",      url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
     ]
   }
-stylesheet.nodes.SoI = {
+stylesheet.nodes.OCol = {
   properties:{gremlin:"valueMap('cls', 'classifier', 'flavor').toList()[0]"},
   graphics: {
     label:"cls", 

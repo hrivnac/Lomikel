@@ -110,7 +110,7 @@ function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, is
                                                              .join("");
                                   tooltip.html(`<strong>${id}</strong><br>
                                                <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
-                                               <a href="#" id="showObject-${id}">Show</a><br>
+                                               <a href="#" id="showObject-${id}">Expand here</a><br>
                                                <strong>Classes:</strong>
                                                <ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>
                                   `            )

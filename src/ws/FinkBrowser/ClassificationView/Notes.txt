@@ -1,5 +1,6 @@
 - failure: stay in the existing (except first call)
 - nicer
 - keep overlaps data
+- add re-classification
 
 python3 -m http.server 8002 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/ClassificationView
