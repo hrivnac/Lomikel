@@ -15,7 +15,7 @@ scp julius.hrivnac@157.136.254.149:/tmp/'*.json' ./
 # testing results ##############################################################
 
 # @janusgraph (gremlin)
-../src/work/fillSIO.groovy
+../src/work/fillOCol.groovy
 
 # @home
 scp centos@157.136.253.253:/tmp/overlaps.csv ./
