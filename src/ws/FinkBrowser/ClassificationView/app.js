@@ -297,8 +297,7 @@ nmaxSlider.dispatchEvent(new Event('input'));
 async function loadNeighborhood(objectId = null) {
   const nmaxText = document.getElementById("nmaxValue").textContent;
   const nmaxVal = parseFloat(nmaxText);
-  const params = {system: document.getElementById("system").value,
-                  objectId: objectId || document.getElementById("objectId").value,
+  const params = {objectId: objectId || document.getElementById("objectId").value,
                   classifier: document.getElementById("classifier").value,
                   alg: document.getElementById("alg").value,
                   nmax: nmaxVal
