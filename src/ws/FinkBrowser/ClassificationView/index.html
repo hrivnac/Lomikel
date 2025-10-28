@@ -13,7 +13,19 @@
       <div class="modal-content">
         <span id="close-help" class="close">&times;</span>
         <h2>Help</h2>
-        <p>blabla help text here ...</p>
+        <p>Application shows classification-based neigborhood (i.e. other objects with similar classification)
+           for any object of ZTF or LSST. User can choose:
+           <ul>
+             <li><b>Object ID</b> of requested object from either XTF orv LSST.</li>
+             <li><b>Classifier</b> used to classify objects.</li>
+             <li><b>Algorithm</b> (measure) to calculate distances between objects in the space of classifications.</li>
+             <li><b>nmax</b> - the maximal number of closest objects to show. If less than 1, the number of objects
+                               to show is calculated via differences in distances between subsequnt objects.</li>
+             </ul>
+           Double-click on an object (represented by blue star) triggers the search centered on that object.
+           Objects pop-up shows classification details and allows to navigate to Fink Portal of concerned object.
+           If data loading fails, the demo data are shown.
+           </p>
         </div>
       </div> 
     <!-- Movable controls panel -->
