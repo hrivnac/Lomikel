@@ -16,11 +16,19 @@
         <p>Application shows classification-based neigborhood (i.e. other objects with similar classification)
            for any object of ZTF or LSST. User can choose:
            <ul>
-             <li><b>Object ID</b> of requested object from either XTF orv LSST.</li>
-             <li><b>Classifier</b> used to classify objects.</li>
+             <li><b>Object ID</b> of requested object from either ZTF or LSST.</li>
+             <li><b>Classifier</b> used to classify objects.
+                 <ul>
+                   <li><b>FINK</b> is based on the FINK classiofication.</li>
+                   <li><b>XMATCH</b> is based on other classifications aquired via FINK.</li>
+                   <li><b>FEATURES</b> uses classification based on PCA and clusterring of alerts physical properties.</li>
+                   <li><b>LIGHTCURVES</b> uses learned properties of objects light curves.</li>
+                   <li><b>TAG</b> is using user-supplied selections.</li>
+                   </ul>
+               </li>
              <li><b>Algorithm</b> (measure) to calculate distances between objects in the space of classifications.</li>
              <li><b>nmax</b> - the maximal number of closest objects to show. If less than 1, the number of objects
-                               to show is calculated via differences in distances between subsequnt objects.</li>
+                               to show is calculated via differences in distances between subsequent objects.</li>
              </ul>
            Double-click on an object (represented by blue star) triggers the search centered on that object.
            Objects pop-up shows classification details and allows to navigate to Fink Portal of concerned object.
@@ -39,8 +47,8 @@
         <label>Classifier:
           <select id="classifier">
             <option value="FINK">FINK</option>
-            <option value="FEATURES">FEATURES</option>
             <option value="XMATCH" selected>XMATCH</option>
+            <option value="FEATURES">FEATURES</option>
             <option value="LIGHTCURVES">LIGHTCURVES</option>
             <option value="TAG">TAG</option>
             </select>
