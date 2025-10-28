@@ -11,7 +11,6 @@ if [[ -e ${LOCK} ]]; then
   echo "  not killed ${LOCK}"
   exit
   fi
-echo "  killed"
 /bin/rm -f ${PID}
 PID=$$
 echo ${PID} > ${LOCK}

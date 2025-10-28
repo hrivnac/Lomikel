@@ -12,22 +12,22 @@ oid = "ZTF19abasthk";
 oid = "ZTF25aakbssn";
 
 gr.fhclient('vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
-gr.classifySource(Classifier.instance("FEATURES=Clusters/ZTF/2025/13-50"), oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
-gr.classifySource(Classifier.instance("FEATURES=Clusters/ZTF/2025/13-50"), oid, null)
+gr.classifySource(Classifier.instance("FEATURES=2025/13-50"), oid, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1')
+gr.classifySource(Classifier.instance("FEATURES=2025/13-50"), oid, null)
 
 gr.registerOCol(Classifier.instance("TAG"), 'MyTag_1', oid, 1.0, '', false, null)
 
 gr.classification(oid);
 gr.classification(oid, "FINK");
 gr.classification(oid, "FINK=aflavor");
-gr.classification(oid, "FEATURES=Clusters/2025/13-50");
+gr.classification(oid, "FEATURES=2025/13-50");
 
-gr.reclassification(oid, "FEATURES=Clusters/2025/13-50", "FINK", 10, true);
+gr.reclassification(oid, "FEATURES=2025/13-50", "FINK", 10, true);
 
 gr.objectNeighborhood(oid, "FINK", 10, 'JensenShannon'); // Euclidean, Cosine
-gr.objectNeighborhood(oid, "FEATURES=Clusters/ZTF/2025/13-50", 10, 'JensenShannon');
-gr.objectNeighborhood(oid, "FEATURES=Clusters/ZTF/2025/13-50", 0.5, 'JensenShannon');
-gr.objectNeighborhood(oid, "FEATURES=Clusters/ZTF/2025/13-50", 10, 'JensenShannon', 0.2, True);
+gr.objectNeighborhood(oid, "FEATURES=2025/13-50", 10, 'JensenShannon');
+gr.objectNeighborhood(oid, "FEATURES=2025/13-50", 0.5, 'JensenShannon');
+gr.objectNeighborhood(oid, "FEATURES=2025/13-50", 10, 'JensenShannon', 0.2, True);
 
 gr.standardDeviationE('deepcontains', ['weight']);
 gr.exportOCol('/tmp/Overlaps.graphml');

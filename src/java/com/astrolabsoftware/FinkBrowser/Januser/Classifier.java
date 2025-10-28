@@ -105,7 +105,12 @@ public abstract class Classifier {
   public abstract String survey();
     
   public String toString() {
-    return name() + "[" + survey() + "]";
+    String ts = name();
+    if (_flavor != null && !_flavor.equals("")) {
+      ts += "=" + _flavor;
+      }
+    ts += "[" + survey() + "]";
+    return ts;
     }
     
   private Type _type;  
