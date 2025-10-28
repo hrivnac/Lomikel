@@ -157,7 +157,8 @@ async function showObjectNeighborhood(data) {
              .attr("text-anchor", "middle")
              .attr("alignment-baseline", "middle")
              .text(cls)
-             .style("font-size", "12px");
+             .style("font-size", "12px")
+             .style("font-weight", "bold");
     });
   const classLine = d3.line()
                       .x(d => d.x)
@@ -193,8 +194,8 @@ async function showObjectNeighborhood(data) {
              .attr("y1", objectPos.y)
              .attr("x2", pos.x)
              .attr("y2", pos.y)
-             .attr("stroke", "#aaa")
-             .attr("stroke-dasharray", "2 2");
+             .attr("stroke", "#aaa");
+             //.attr("stroke-dasharray", "2 2");
     const labelX = (objectPos.x + pos.x) / 2;
     const labelY = (objectPos.y + pos.y) / 2;
     container.append("text")
