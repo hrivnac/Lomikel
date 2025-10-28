@@ -16,7 +16,7 @@ import java.util.HashMap;
 public abstract class ZTFClassifier extends Classifier {
          
   @Override
-  public String system() {
+  public String survey() {
     return "ZTF";
     }
 

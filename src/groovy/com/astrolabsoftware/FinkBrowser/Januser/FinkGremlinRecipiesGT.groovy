@@ -72,7 +72,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-// TBD: use classifier.system
+// TBD: use classifier.survey
 public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
   /** TBD */

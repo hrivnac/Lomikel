@@ -102,10 +102,10 @@ public abstract class Classifier {
     return _type.name();
     }
     
-  public abstract String system();
+  public abstract String survey();
     
   public String toString() {
-    return name() + "[" + flavor() + "]";
+    return name() + "[" + survey() + "]";
     }
     
   private Type _type;  

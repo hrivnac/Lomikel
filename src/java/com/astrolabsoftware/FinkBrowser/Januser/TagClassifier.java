@@ -94,7 +94,7 @@ public class TagClassifier extends Classifier {
     }
   
   @Override
-  public String system() {
+  public String survey() {
     return "ANY";
     }
     

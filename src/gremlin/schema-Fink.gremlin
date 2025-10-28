@@ -35,7 +35,7 @@ objectId     = mgmt.makePropertyKey('objectId'    ).dataType(String.class).cardi
 jd           = mgmt.makePropertyKey('jd'          ).dataType(Double.class).cardinality(Cardinality.SINGLE).make() 
 classifier   = mgmt.makePropertyKey('classifier'  ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 flavor       = mgmt.makePropertyKey('flavor'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-system       = mgmt.makePropertyKey('system'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
+survey       = mgmt.makePropertyKey('survey'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 cls          = mgmt.makePropertyKey('cls'         ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 intersection = mgmt.makePropertyKey('intersection').dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 sizeIn       = mgmt.makePropertyKey('sizeIn'      ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
@@ -44,7 +44,7 @@ sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class).cardi
 // Vertex properties
 mgmt.addProperties(OCol,
                    lbl,
-                   system,
+                   survey,
                    classifier,
                    flavor,
                    cls)   
@@ -55,7 +55,7 @@ mgmt.addProperties(source,
                    importDate)
 mgmt.addProperties(object,
                    lbl,
-                   system,
+                   survey,
                    objectId,
                    importDate)
                                     

@@ -228,7 +228,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       Vertex v1 = g().V().has("lbl", "object").has("objectId", objectId).next();
       List<Vertex> v2s = g().V(v1).in().
                                    has("lbl",        "OCol").
-                                   has("system",     classifier.system()).
+                                   has("survey",     classifier.survey()).
                                    has("classifier", classifier.name()  ).
                                    has("flavor",     classifier.flavor()).
                                    toList();
@@ -320,7 +320,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
     log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + attributes.get("weight") + ", replace = " + replace);
     Vertex ocol = g().V().has("lbl",        "OCol"             ).
-                          has("system",     classifier.system()).
+                          has("survey",     classifier.survey()).
                           has("classifier", classifier.name()  ).
                           has("flavor",     classifier.flavor()).
                           has("cls",        cls                ).
@@ -328,7 +328,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                           coalesce(unfold(), 
                                   addV("OCol").
                                   property("lbl",        "OCol").
-                                  property("system",     classifier.system()).
+                                  property("survey",     classifier.survey()).
                                   property("classifier", classifier.name()  ).
                                   property("flavor",     classifier.flavor()).
                                   property("cls",        cls                )).
@@ -370,7 +370,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                         String     cls) throws LomikelException {
     log.info("Cleaning " + cls + " OCol");
     g().V().has("lbl",        "OCol").
-            has("system",     classifier.system()).
+            has("survey",     classifier.survey()).
             has("classifier", classifier.name()  ).
             has("flavor",     classifier.flavor()).
             has("cls",        cls                ).
@@ -386,16 +386,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param classifier The {@link Classifier}s to be used. */
   public void generateCorrelations(Classifier... classifiers) {
     log.info("Generating correlations for OCol for " + Arrays.asList(classifiers));
-    List<String> systemsL = new ArrayList<>();
+    List<String> surveysL = new ArrayList<>();
     List<String> namesL   = new ArrayList<>();
     List<String> flavorsL = new ArrayList<>();
     for (Classifier classifier : classifiers) {
-      systemsL.add(classifier.system());
+      surveysL.add(classifier.survey());
       namesL.add(  classifier.name()  );
       flavorsL.add(classifier.flavor());
       // Clean all correlations 
       g().V().has("lbl",        "OCol"             ).
-              has("classifier", classifier.system()).
+              has("survey",     classifier.survey()).
               has("classifier", classifier.name()  ).
               has("flavor",     classifier.flavor()).
               bothE().
@@ -404,14 +404,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               iterate();
       // Remove wrong OCol
       g().V().has("lbl",        "OCol"             ).
-              has("classifier", classifier.system()).
+              has("survey",     classifier.survey()).
               has("classifier", classifier.name()  ).
               has("flavor",     classifier.flavor()).
               not(has("cls")).
               drop().
               iterate();
       }
-    String[] systems = systemsL.toArray(String[]::new);
+    String[] surveys = surveysL.toArray(String[]::new);
     String[] names   = namesL.toArray(  String[]::new);
     String[] flavors = flavorsL.toArray(String[]::new);
     commit();
@@ -480,11 +480,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Create overlaps
     int ns = 0;
     // Double-loop over OCol and create overlaps Edge OCol-OCol if non empty 
-    // NOTE: it takes all OCol names, systems and flavors (even if they are not requested in all combinations)
+    // NOTE: it takes all OCol names, surveys and flavors (even if they are not requested in all combinations)
     for (String cls1 : types) {
       try {
         ocol1 = g().V().has("lbl",        "OCol"          ).
-                        has("system",     within(systems) ).
+                        has("survey",     within(surveys) ).
                         has("classifier", within(names)  ).
                         has("flavor",     within(flavors)).
                         has("cls",        cls1           ).
@@ -493,7 +493,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           if (corrS.containsKey(Pair.of(cls1, cls2))) {
             try {
               ocol2 = g().V().has("lbl",        "OCol"         ).
-                              has("system",     within(systems)).
+                              has("survey",     within(surveys)).
                               has("classifier", within(names)  ).
                               has("flavor",     within(flavors)).
                               has("cls",        cls2           ).
