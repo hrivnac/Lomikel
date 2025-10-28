@@ -14,6 +14,7 @@ async function fetchNeighborhood(params) {
     return await response.json();
     }
   catch (err) {
+    window.alert("Neighborhood search failed, using demo data");
     console.warn("Neighborhood.jsp failed, using demo data:", err);
     return {
       objectId: "ZTF23abdlxeb",
@@ -81,8 +82,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
                          .force("center", d3.forceCenter(centerX, centerY))
                          .stop();
     // Run layout simulation
-    for (let i = 0; i < 300; i++) simulation.tick();
-    
+    for (let i = 0; i < 300; i++) simulation.tick();    
     // Normalize final positions onto a circular boundary
     const positions = {};
     nodes.forEach(n => {const angle = Math.atan2(n.y - centerY, n.x - centerX);           
@@ -91,11 +91,11 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
                                            y: centerY + radius * Math.sin(angle)
                                            };
                         });
-    console.log(`✅ Overlaps loaded: ${links.length} links from JSON`);
     return positions;
     }
   catch (err) {
-    console.warn("⚠️ Overlap layout failed, using equidistant fallback:", err.message);
+    window.alert("Overlap layout failed, using equidistant fallback");
+    console.warn("Overlap layout failed, using equidistant fallback:", err.message);
     // fallback layout
     const angleScale = d3.scaleLinear()
                          .domain([0, classList.length])
@@ -301,8 +301,7 @@ async function loadNeighborhood(objectId = null) {
                   objectId: objectId || document.getElementById("objectId").value,
                   classifier: document.getElementById("classifier").value,
                   alg: document.getElementById("alg").value,
-                  nmax: nmaxVal,
-                  climit: document.getElementById("climit").value
+                  nmax: nmaxVal
                   };
   const data = await fetchNeighborhood(params);
   showObjectNeighborhood(data);
