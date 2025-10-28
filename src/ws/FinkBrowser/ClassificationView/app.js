@@ -37,6 +37,7 @@ async function fetchNeighborhood(params) {
 
 async function getOverlapPositions(classifier, classList, radius, centerX, centerY) {
   try {
+    showSpinner(true);
     const url = `/FinkBrowser/Overlaps.jsp?classifier=${classifier}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch overlaps");
@@ -82,38 +83,12 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
     // Run layout simulation
     for (let i = 0; i < 300; i++) simulation.tick();
     
-    
-    
-    // --- NEW: Sort classes by final angle ---
-    const nodesWithAngles = nodes.map(n => {
-      const angle = Math.atan2(n.y - centerY, n.x - centerX);
-      return { ...n, angle };
-    });
-
-    // sort clockwise by angle
-    nodesWithAngles.sort((a, b) => a.angle - b.angle);
-    
-    // reposition on perfect circle in sorted order
-    //const positions = {};
-    //const angleScale = d3.scaleLinear()
-    //  .domain([0, nodesWithAngles.length])
-    //  .range([0, 2 * Math.PI]);
-    //
-    //nodesWithAngles.forEach((n, i) => {
-    //  const a = angleScale(i);
-    //  positions[n.id] = {
-    //    x: centerX + radius * Math.cos(a),
-    //    y: centerY + radius * Math.sin(a)
-    //  };
-    //});
-    
-    
     // Normalize final positions onto a circular boundary
     const positions = {};
-    nodesWithAngles.forEach(n => {//const angle = Math.atan2(n.y - centerY, n.x - centerX);
-        console.log(n.angle);
-                        positions[n.id] = {x: centerX + radius * Math.cos(n.angle),
-                                           y: centerY + radius * Math.sin(n.angle)
+    nodes.forEach(n => {const angle = Math.atan2(n.y - centerY, n.x - centerX);           
+                        positions[n.id] = {angle: angle,
+                                           x: centerX + radius * Math.cos(angle),
+                                           y: centerY + radius * Math.sin(angle)
                                            };
                         });
     console.log(`✅ Overlaps loaded: ${links.length} links from JSON`);
@@ -132,6 +107,9 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
                                            };
                                  });
     return pos;
+    }
+  finally {
+    showSpinner(false);
     }
   }
 
@@ -203,7 +181,7 @@ async function showObjectNeighborhood(data) {
         total += weight;
         }
       }
-    return { x: sumX / total, y: sumY / total };
+    return {x: sumX / total, y: sumY / total};
     }
   const objectPos = weightedPosition(data.objectClassification);
   drawObject(container, data.objectId, objectPos, "red", data.objectClassification, tooltip, hideTimeout, true);
