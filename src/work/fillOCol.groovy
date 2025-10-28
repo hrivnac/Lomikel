@@ -11,7 +11,7 @@ classifiers = new Classifier[]{Classifier.instance('FINK'),
                                Classifier.instance('FEATURES=Clusters/ZTF/2025/13-50'),
                                Classifier.instance('TAG')}
 //formula = "cdsxmatch != 'Unknown' && roid != 3 && ndethist >= 3";
-gr.processOCol(classifiers, true, 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 20000, 1500, null);
+gr.processOCol(classifiers, 'true', 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 20000, 1500, null);
 
 //gr.processOCol(classifiers, 'true', 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 2000000, 1500000, new String[]{"Microlensing candidate"})
 //gr.processOCol(classifiers, 'true', 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1', 2000000, 1500000, new String[]{"Solar System candidate"})
