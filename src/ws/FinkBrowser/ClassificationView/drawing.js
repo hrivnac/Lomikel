@@ -32,8 +32,11 @@ async function showObjectNeighborhood(data) {
   Object.keys(data.objectClassification).forEach(c => allClasses.add(c));
   Object.values(data.objects).forEach(obj => Object.keys(obj.classes).forEach(c => allClasses.add(c)));
   const classList = Array.from(allClasses);
-  console.log(document.getElementById("reclassifier"));
-  const classPositions = await getOverlapPositions(document.getElementById("classifier").value, classList, radius, centerX, centerY);  
+  let overlapClassifier = document.getElementById("reclassifier").value;
+  if (overlapClassifier == none) {
+    overlapClassifier = document.getElementById("classifier").value;
+    }
+  const classPositions = await getOverlapPositions(overlapClassifier, classList, radius, centerX, centerY);  
   classList.forEach((cls, i) => {
     container.append("text")
              .attr("class", "class-label")
