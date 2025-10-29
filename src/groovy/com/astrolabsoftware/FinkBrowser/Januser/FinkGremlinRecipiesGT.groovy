@@ -121,6 +121,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     else {
       classifications = reclassification(objectId, classifier, reclassifier);
+      classifier = reclassifier;
       }
     for (Map<String, String> m : classifications) {
       objectClassification.put(m.get("class"), m.get("weight"));
