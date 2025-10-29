@@ -35,6 +35,7 @@ async function loadNeighborhood(objectId = null) {
   const nmaxVal = parseFloat(nmaxText);
   const params = {objectId: objectId || document.getElementById("objectId").value,
                   classifier: document.getElementById("classifier").value,
+                  reclassifier: document.getElementById("reclassifier").value,
                   alg: document.getElementById("alg").value,
                   nmax: nmaxVal
                   };
