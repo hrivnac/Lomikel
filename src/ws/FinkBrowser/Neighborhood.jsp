@@ -15,16 +15,20 @@
 <%@ page import="org.apache.logging.log4j.LogManager" %>
    
 <%
-  String objectId   = request.getParameter("objectId");
-  String classifier = request.getParameter("classifier");
-  String alg        = request.getParameter("alg");
-  String nmax       = request.getParameter("nmax");
-  String climit     = request.getParameter("climit");
+  String objectId     = request.getParameter("objectId");
+  String classifier   = request.getParameter("classifier");
+  String reclassifier = request.getParameter("reclassifier");
+  String alg          = request.getParameter("alg");
+  String nmax         = request.getParameter("nmax");
+  String climit       = request.getParameter("climit");
   if (objectId == null || objectId.isEmpty()) {
     objectId = "ZTF20aachcvz"; // demo
     }
   if (classifier == null || classifier.isEmpty()) {
     classifier = "FINK";
+    }
+  if (reclassifier == null || reclassifier.isEmpty() || reclassifier.equals("none")) {
+    reclassifier = null;
     }
   if (alg == null || alg.isEmpty()) {
     alg = "JensenShannon";
@@ -40,6 +44,6 @@
 
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
-  String data = gr.objectNeighborhood2JSON(objectId, classifier, alg, Double.parseDouble(nmax), Double.parseDouble(climit));
+  String data = gr.objectNeighborhood2JSON(objectId, classifier, reclassifier, alg, Double.parseDouble(nmax), Double.parseDouble(climit));
   out.print(data);
   %>

@@ -99,6 +99,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * Include classification for each neighbour.
     * @param oid0          The <em>objectOd</em> of the <em>object</em>.
     * @param classifier    The classifier name to be used.
+    * @param reclassifier  The classifier name to re-interpret results.
+    *                      May be <tt>null</tt>.
     * @param nmax          The number of closest <em>object</em>s to give.
     *                      All are given, if missing.
     * @param metric        The metric to use <tt>JensenShannon, Euclidean or Cosine</tt>.
@@ -108,11 +110,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @return              The full neigbouthood information. */
   public String objectNeighborhood2JSON(String objectId,
                                         String classifier,
+                                        String reclassifier,
                                         String alg,
                                         double nmax,
                                         double climit) {                                         
     JSONObject objectClassification = new JSONObject();
-    for (Map<String, String> m : classification(objectId, classifier)) {
+    List<Map<String, String>> classification;
+    if (reclassifier == null) {
+      classification = classification(objectId, classifier);
+      }
+    else {
+      classification = reclassification(objectId, classifier, reclassifier);
+      }
+    for (Map<String, String> m : classification) {
       objectClassification.put(m.get("class"), m.get("weight"));
       }      
     JSONObject data = new JSONObject();
@@ -426,7 +436,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      The deafult is <tt>true</tt>.
     * @return              The recorded classification calculated
     *                      by number of classified <em>source</em>s. Normalized to 1. */
-  def List<Map<String, Double>> reclassification(String  oid,
+  def List<Map<String, String>> reclassification(String  oid,
                                                  String  srcClassifier,
                                                  String  dstClassifier,
                                                  double  nmax  = 10,
@@ -464,7 +474,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     else {
       _lastQuality = 0.0
       }
-    reclassified = limitMap(reclassified, nmax);
+    // BUG: reclassified = limitMap(reclassified, nmax);
     def reclassifiedA = [];
     reclassified.each {it -> cf = classifierWithFlavor(dstClassifier);
                              reclassifiedA += ['classifier':cf[0],
