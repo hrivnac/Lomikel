@@ -2,7 +2,7 @@ async function fetchNeighborhood(params) {
   const query = new URLSearchParams(params).toString();
   const url = `/FinkBrowser/Neighborhood.jsp?${query}`;
   try {
-    showSpinner(true);
+    showSpinner(true, "green");
     const response = await fetch(url);
     if (!response.ok) throw new Error("Network error");
     return await response.json();
