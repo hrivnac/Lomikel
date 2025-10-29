@@ -426,11 +426,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      The deafult is <tt>true</tt>.
     * @return              The recorded classification calculated
     *                      by number of classified <em>source</em>s. Normalized to 1. */
-  def Map<String, Double> reclassification(String  oid,
-                                           String  srcClassifier,
-                                           String  dstClassifier,
-                                           double  nmax  = 10,
-                                           boolean check = true) {                        
+  def List<Map<String, Double>> reclassification(String  oid,
+                                                 String  srcClassifier,
+                                                 String  dstClassifier,
+                                                 double  nmax  = 10,
+                                                 boolean check = true) {                        
     def classified = classification(oid, srcClassifier);
     def reclassified = [:];      
     def w;
@@ -445,7 +445,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                       }
       }
     double total = reclassified.values().sum();
-    log.info(reclassified);
     if (total != 0) {
       reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
       }
@@ -465,7 +464,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     else {
       _lastQuality = 0.0
       }
-    return limitMap(reclassified, nmax)
+    def reclassifiedLimited = limitMap(reclassified, nmax);
+    reclassifiedA = [];
+    reclassifiedLimited.each {it -> log.info(it);}
+    return reclassifiedA;
     } 
     
   /** Test reclassification.
