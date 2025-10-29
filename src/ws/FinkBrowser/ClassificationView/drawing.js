@@ -48,6 +48,7 @@ async function showObjectNeighborhood(data) {
                       .x(d => d.x)
                       .y(d => d.y)
                       .curve(d3.curveLinearClosed);
+  console.log(classLine);
   container.append("path")
            .datum(classList.map(cls => classPositions[cls]))
            .attr("class", "link-line")

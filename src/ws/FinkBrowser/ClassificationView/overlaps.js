@@ -53,7 +53,6 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
                                            y: centerY + radius * Math.sin(angle)
                                            };
                         });
-    console.log(positions);
     return positions;
     }
   catch (err) {
