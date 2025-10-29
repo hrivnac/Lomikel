@@ -420,7 +420,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     *                      If less then 1, the relative weight cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
     *                      <tt>10</tt>, if missing.
-    * @param check         Whether to check quality of ther reclassification.
+    * @param check         Whether to check quality of the reclassification.
     *                      It slows down the calculation and may not be available if
     *                      objectId is not classified in destination classification.
     *                      The deafult is <tt>true</tt>.
@@ -444,7 +444,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                }
                       }
       }
-    double total = reclassified.values().sum()
+    double total = reclassified.values().sum();
+    log.info(reclassified);
     if (total != 0) {
       reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
       }
