@@ -115,16 +115,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                         double nmax,
                                         double climit) {                                         
     JSONObject objectClassification = new JSONObject();
-    List<Map<String, String>> classification;
+    List<Map<String, String>> classifications;
     if (reclassifier == null) {
-      log.info(objectId);
-      log.info(classifier);
-      classification = classification(objectId, classifier);
+      classifications = classification(objectId, classifier);
       }
     else {
-      classification = reclassification(objectId, classifier, reclassifier);
+      classifications = reclassification(objectId, classifier, reclassifier);
       }
-    for (Map<String, String> m : classification) {
+    for (Map<String, String> m : classifications) {
       objectClassification.put(m.get("class"), m.get("weight"));
       }      
     JSONObject data = new JSONObject();
