@@ -1,4 +1,10 @@
 function showSpinner(show) {
   document.getElementById("loading-spinner").style.display = show ? "flex" : "none";
-  document.getElementById("loading-spinner").style.stroke = "green";
   }
+  
+function setSpinnerColor(color) {
+  const spinner = document.getElementById("spinner");
+  if (spinner) spinner.style.borderTopColor = color;
+}
+
+setSpinnerColor("#00ff00"); 
