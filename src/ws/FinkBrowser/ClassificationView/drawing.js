@@ -61,7 +61,7 @@ async function showObjectNeighborhood(data) {
       const weight = classMap[cls];
       const pos = classPositions[cls];
       if (pos) {
-        comsole.log(pos.angle);
+        console.log(pos.angle);
         sumX += pos.x * weight;
         sumY += pos.y * weight;
         total += weight;
