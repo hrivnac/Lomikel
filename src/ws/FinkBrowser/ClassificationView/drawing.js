@@ -48,7 +48,6 @@ async function showObjectNeighborhood(data) {
                       .x(d => d.x)
                       .y(d => d.y)
                       .curve(d3.curveLinearClosed);
-  console.log(classLine);
   container.append("path")
            .datum(classList.map(cls => classPositions[cls]))
            .attr("class", "link-line")
@@ -62,6 +61,7 @@ async function showObjectNeighborhood(data) {
       const weight = classMap[cls];
       const pos = classPositions[cls];
       if (pos) {
+        comsole.log(pos.angle);
         sumX += pos.x * weight;
         sumY += pos.y * weight;
         total += weight;
