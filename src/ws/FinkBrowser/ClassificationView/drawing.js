@@ -48,6 +48,7 @@ async function showObjectNeighborhood(data) {
                       .x(d => d.x)
                       .y(d => d.y)
                       .curve(d3.curveLinearClosed);
+  console.log(classList.map(cls => classPositions[cls]));
   container.append("path")
            .datum(classList.map(cls => classPositions[cls]))
            .attr("class", "link-line")
@@ -61,7 +62,6 @@ async function showObjectNeighborhood(data) {
       const weight = classMap[cls];
       const pos = classPositions[cls];
       if (pos) {
-        console.log(pos.angle);
         sumX += pos.x * weight;
         sumY += pos.y * weight;
         total += weight;
@@ -72,8 +72,7 @@ async function showObjectNeighborhood(data) {
   const objectPos = weightedPosition(data.objectClassification);
   drawObject(container, data.objectId, objectPos, "red", data.objectClassification, tooltip, hideTimeout, true);
   for (const [id, obj] of Object.entries(data.objects)) {
-    //const pos = weightedPosition(obj.classes);
-    const pos = objectPos;
+    const pos = weightedPosition(obj.classes);
     container.append("line")
              .attr("class", "link-line")
              .attr("x1", objectPos.x)
