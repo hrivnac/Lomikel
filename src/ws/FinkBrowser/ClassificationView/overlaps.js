@@ -1,6 +1,6 @@
 async function getOverlapPositions(classifier, classList, radius, centerX, centerY) {
   try {
-    showSpinner(true, "green");
+    showSpinner(true, "blue");
     const url = `/FinkBrowser/Overlaps.jsp?classifier=${classifier}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch overlaps");
