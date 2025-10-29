@@ -72,7 +72,8 @@ async function showObjectNeighborhood(data) {
   const objectPos = weightedPosition(data.objectClassification);
   drawObject(container, data.objectId, objectPos, "red", data.objectClassification, tooltip, hideTimeout, true);
   for (const [id, obj] of Object.entries(data.objects)) {
-    const pos = weightedPosition(obj.classes);
+    //const pos = weightedPosition(obj.classes);
+    const pos = objectPos;
     container.append("line")
              .attr("class", "link-line")
              .attr("x1", objectPos.x)
