@@ -3,7 +3,7 @@ function showSpinner(show) {
   }
   
 function setSpinnerColor(color) {
-  const spinner = document.getElementById("spinner");
+  const spinner = document.getElementByClass("spinner");
   if (spinner) spinner.style.borderTopColor = color;
 }
 
