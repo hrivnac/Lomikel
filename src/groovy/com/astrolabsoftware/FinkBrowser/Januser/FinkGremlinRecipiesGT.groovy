@@ -117,6 +117,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     JSONObject objectClassification = new JSONObject();
     List<Map<String, String>> classification;
     if (reclassifier == null) {
+      log.info(objectId);
+      log.info(classifier);
       classification = classification(objectId, classifier);
       }
     else {
