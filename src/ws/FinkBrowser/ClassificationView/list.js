@@ -9,16 +9,14 @@ function updateDetailsPanel(data) {
   }
   */
 
-  const mainObj = data.objectId;
-
   const rows = [];
 
   // Add main object
   if (mainObj) {
     rows.push(`
       <div class="objLine mainObj">
-        <div>⭐ <b>${mainObj.name || mainObj.id}</b> (origin)</div>
-        <div>Classes: ${formatClasses(mainObj.classes)}</div>
+        <div>⭐ <b>${data.objectId}</b></div>
+        <div>Classes: ${data.objectClassification}</div>
       </div>
     `);
   }
