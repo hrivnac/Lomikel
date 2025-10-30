@@ -11,7 +11,7 @@ function makeDraggable(header, panel) {
                                              });
   }
 makeDraggable(document.getElementById("controls-header"), document.getElementById("controls"));
-makeDraggable(document.getElementById("list-header"),     document.getElementById("colistntrols"));
+makeDraggable(document.getElementById("list-header"),     document.getElementById("list"));
 
 const nmaxSlider = document.getElementById("nmax");
 
