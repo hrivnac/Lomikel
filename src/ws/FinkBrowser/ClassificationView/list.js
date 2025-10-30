@@ -4,14 +4,12 @@ function updateDetailsPanel(data) {
   
   const rows = [];
 
-  rows.push(`<div class="objLine mainObj">
-               <div><b><u>${data.objectId}</u></b></div>
-               <div>${JSON.stringify(data.objectClassification)
-                          .replaceAll("{", "")
-                          .replaceAll("}", "")
-                          .replaceAll('"', '')
-                          .replaceAll(",", "<br/>")}</div>
-               </div>`);
+  let row = `<div class="objLine mainObj"><div><b><u>${data.objectId}</u></b></div><div>`;
+  for (var [k, v] of iterate_object(data.objectClassification)) {
+    row += `${k} ${v.toFixed(4)} <br/>`;
+    }
+  row += `</div>`;
+  rows.push(row);
   
   for (var [key, val] of iterate_object(data.objects)) {
     rows.push(`<div class="objLine">
