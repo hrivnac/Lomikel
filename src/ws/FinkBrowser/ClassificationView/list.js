@@ -12,7 +12,11 @@ function updateDetailsPanel(data) {
   for (object of data.objects) {
     console.log(object);
   }
-  /*
+for (var [key, val] of iterate_object(data.objects) {
+    console.log(key, val);
+}
+
+/*
 
   // Add all other visible objects
   for (const obj of objects) {
@@ -33,6 +37,12 @@ function updateDetailsPanel(data) {
   
 }
 
+function* iterate_object(o) {
+    var keys = Object.keys(o);
+    for (var i=0; i<keys.length; i++) {
+        yield [keys[i], o[keys[i]]];
+    }
+}
 
 function formatClasses(classData) {
   if (!classData) return "—";
