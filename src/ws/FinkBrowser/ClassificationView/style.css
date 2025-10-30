@@ -78,7 +78,7 @@ button:hover {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid #ccc;
   border-radius: 8px;
-  width: 400px;
+  width: 200px;
   }
   
 #list-header {
@@ -95,8 +95,6 @@ button:hover {
   }
 
 #objectList {
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
   padding: 10px;
   border-radius: 10px;
   font-size: 0.8em;
