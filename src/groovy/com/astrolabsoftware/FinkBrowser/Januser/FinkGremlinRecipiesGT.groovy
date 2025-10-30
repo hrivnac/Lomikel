@@ -618,7 +618,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param map  The fill {@link Map}>
     * @param nmax  The number of closest <em>object</em>s to give.
     *              If less then 1, the relative distance cutoff
-    *              (the larger cutoff means more selective, 0 means no selection). 
+    *              (the smaller cutoff means more selective, 0 means no selection). 
     * @return     The limited {@link Map}. */
   // TBD: refactor with limitMap
   def Map<Map.Entry<String, Double>, Map<String, Double>> limitMapMap(Map<Map.Entry<String, Double>, Map<String, Double>> map,
@@ -666,6 +666,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                    double              nmax) {
     def map1 = [:];
     def entries = map.entrySet().sort{-it.value}
+    if (nmax == 0) {
+      nmax = Integer.MAX_VALUE;
+      }
     if (nmax >= 1) {
       for (int i = 0; i < (int)nmax; i++) {
         map1[entries[i].key] = entries[i].value
