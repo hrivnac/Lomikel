@@ -14,6 +14,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch overlaps");
       overlaps = await response.json();
+      overlapCache[classifier] = overlaps;
       if (!Array.isArray(overlaps) || overlaps.length === 0) {
         throw new Error("No overlap data");
         }
