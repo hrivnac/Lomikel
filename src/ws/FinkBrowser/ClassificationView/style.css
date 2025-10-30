@@ -78,7 +78,7 @@ button:hover {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid #ccc;
   border-radius: 8px;
-  width: 220px;
+  width: 400px;
   }
   
 #list-header {
@@ -99,7 +99,7 @@ button:hover {
   color: white;
   padding: 10px;
   border-radius: 10px;
-  font-size: 0.9em;
+  font-size: 0.3em;
   max-height: 80vh;
   overflow-y: auto;
   }

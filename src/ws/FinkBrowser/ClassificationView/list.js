@@ -5,7 +5,8 @@ function updateDetailsPanel(data) {
   const rows = [];
 
   rows.push(`<div class="objLine mainObj">
-               <div><b>${data.objectId}</b>: ${JSON.stringify(data.objectClassification)}</div>
+               <div>${data.objectId}</div>
+               <div>${JSON.stringify(data.objectClassification)}</div>
                </div>`);
   
   for (var [key, val] of iterate_object(data.objects)) {
