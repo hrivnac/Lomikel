@@ -1,6 +1,7 @@
 const overlapCache = {};
 
 async function getOverlapPositions(classifier, classList, radius, centerX, centerY) {
+  let overlaps;
   try {
     showSpinner(true, "blue");
     if (overlapCache[classifier]) {
@@ -12,7 +13,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       const url = `/FinkBrowser/Overlaps.jsp?classifier=${classifier}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch overlaps");
-      const overlaps = await response.json();
+      overlaps = await response.json();
       if (!Array.isArray(overlaps) || overlaps.length === 0) {
         throw new Error("No overlap data");
         }
