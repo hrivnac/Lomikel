@@ -10,6 +10,7 @@ function makeDraggable(header, panel) {
                                              panel.style.top = (e.clientY - offsetY) + 'px';
                                              });
   }
+  
 makeDraggable(document.getElementById("controls-header"), document.getElementById("controls"));
 makeDraggable(document.getElementById("list-header"),     document.getElementById("list"));
 
