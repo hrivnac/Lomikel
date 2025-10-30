@@ -12,11 +12,9 @@ function updateDetailsPanel(data) {
     rows.push(`<div class="objLine">
                  <div>${key}</div>
                  <div>Distance: ${val.distance}</div>
-                 <div>Classes: ${val.classes)}</div>
-                 </div>
-    `);
-    
-}
+                 <div>Classes: ${val.classes}</div>
+                 </div>`);
+    }
 
 /*
 
