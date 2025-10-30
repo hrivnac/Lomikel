@@ -54,7 +54,7 @@ button:hover {
   width: 220px;
   }
 
-#panel-header {
+#controls-header {
   background: #e9e9e9;
   padding: 6px;
   cursor: move;
@@ -63,7 +63,7 @@ button:hover {
   border-radius: 8px 8px 0 0;
   }
 
-#panel-body {
+#controls-body {
   padding: 8px;
   }
 
@@ -74,11 +74,24 @@ button:hover {
 #list {
   position: absolute;
   top: 10px;
-  right: 10px;
+  left: 10px;
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid #ccc;
   border-radius: 8px;
   width: 220px;
+  }
+  
+#list-header {
+  background: #e9e9e9;
+  padding: 6px;
+  cursor: move;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 8px 8px 0 0;
+  }
+
+#list-body {
+  padding: 8px;
   }
 
 #objectList {
