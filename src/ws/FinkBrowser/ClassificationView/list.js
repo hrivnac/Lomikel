@@ -1,7 +1,7 @@
 function updateDetailsPanel(data) {
   const panel = document.getElementById("objectList");
   if (!panel) return;
-  console.log(objects.objectId);
+  console.log(data.objectId);
 /*
   if (!objects || objects.length === 0) {
     panel.innerHTML = "No objects loaded";
