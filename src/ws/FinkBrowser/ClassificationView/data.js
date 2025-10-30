@@ -41,7 +41,7 @@ async function loadNeighborhood(objectId = null) {
                   };
   const data = await fetchNeighborhood(params);
   console.log(data);
-  updateDetailsPanel(data, objectId);
+  updateDetailsPanel(data);
   showObjectNeighborhood(data);
   }
 

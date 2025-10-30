@@ -1,7 +1,8 @@
-function updateDetailsPanel(objects, mainObjectId) {
+function updateDetailsPanel(data) {
   const panel = document.getElementById("objectList");
   if (!panel) return;
-
+  console.log(objects.objectId);
+/*
   if (!objects || objects.length === 0) {
     panel.innerHTML = "No objects loaded";
     return;
@@ -41,10 +42,12 @@ function updateDetailsPanel(objects, mainObjectId) {
   panel.innerHTML = rows.join("");
 }
 
+*/
+
 function formatClasses(classData) {
   if (!classData) return "—";
   return Object.entries(classData)
-    .map(([cls, weight]) => `${cls} (${weight.toFixed(2)})`)
-    .join(", ");
-}
+               .map(([cls, weight]) => `${cls} (${weight.toFixed(2)})`)
+               .join(", ");
+  }
 
