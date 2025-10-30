@@ -39,9 +39,9 @@ function updateDetailsPanel(data) {
   }
 
   panel.innerHTML = rows.join("");
+  */
 }
 
-*/
 
 function formatClasses(classData) {
   if (!classData) return "—";
