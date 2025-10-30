@@ -10,9 +10,8 @@ function updateDetailsPanel(data) {
   
   for (var [key, val] of iterate_object(data.objects)) {
     rows.push(`<div class="objLine">
-                 <div>${key}</div>
-                 <div>Distance: ${val.distance}</div>
-                 <div>Classes: ${val.classes}</div>
+                 <div>${key} ${val.distance}</div>
+                 <div>${JSON.stringify(val.classes)}</div>
                  </div>`);
     }
 
