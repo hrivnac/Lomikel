@@ -12,14 +12,9 @@ function updateDetailsPanel(data) {
   const rows = [];
 
   // Add main object
-  if (mainObj) {
-    rows.push(`
-      <div class="objLine mainObj">
-        <div>⭐ <b>${data.objectId}</b></div>
-        <div>Classes: ${data.objectClassification}</div>
-      </div>
-    `);
-  }
+  rows.push(`<div class="objLine mainObj">
+               <div><b>${data.objectId}</b>: ${data.objectClassification}</div>
+               </div>`);
   /*
 
   // Add all other visible objects
