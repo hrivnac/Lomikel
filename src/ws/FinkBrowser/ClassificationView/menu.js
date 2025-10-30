@@ -20,14 +20,14 @@ function sliderToNmax(t) {
     return t * 2.0;
     }
   else {
-    // right half maps logarithmically to 1..10
+    // right half maps logarithmically to 1..20
     const u = (t - 0.5) / 0.5; // 0..1
-    return Math.pow(10, u);   // 10^0..10^1 -> 1..10
+    return Math.pow(20, u);   // 20^0..20^1 -> 1..20
     }
   }
 nmaxSlider.oninput = () => {const t = parseFloat(nmaxSlider.value);
                             let nmax = sliderToNmax(t);
-                            if (nmax > 1) nmax = Math.round(nmax); // integers in 1..10
+                            if (nmax > 1) nmax = Math.round(nmax); // integers in 1..20
                             // format display
                             const disp = (nmax > 1) ? String(nmax) : nmax.toFixed(2).replace(/\.?0+$/, '');
                             document.getElementById("nmaxValue").textContent = disp;
