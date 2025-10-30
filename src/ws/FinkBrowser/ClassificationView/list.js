@@ -2,19 +2,16 @@ function updateDetailsPanel(data) {
   const panel = document.getElementById("objectList");
   if (!panel) return;
   
-/*
-  if (!objects || objects.length === 0) {
-    panel.innerHTML = "No objects loaded";
-    return;
-  }
-  */
-
   const rows = [];
 
   // Add main object
   rows.push(`<div class="objLine mainObj">
                <div><b>${data.objectId}</b>: ${JSON.stringify(data.objectClassification)}</div>
                </div>`);
+  
+  for (object of data.objects) {
+    console.log(object);
+  }
   /*
 
   // Add all other visible objects
