@@ -9,8 +9,7 @@ function updateDetailsPanel(data) {
   }
 
   // Find main object
-  const mainObj = objects.find(o => o.id === mainObjectId);
-  const mainPos = mainObj ? { x: mainObj.x, y: mainObj.y } : { x: 0, y: 0 };
+  const mainObj = objects.objectId);
 
   const rows = [];
 

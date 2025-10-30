@@ -10,9 +10,11 @@ function makeDraggable(header, panel) {
                                              panel.style.top = (e.clientY - offsetY) + 'px';
                                              });
   }
-makeDraggable(document.getElementById("panel-header"), document.getElementById("controls"));
+makeDraggable(document.getElementById("controls-header"), document.getElementById("controls"));
+makeDraggable(document.getElementById("list-header"),     document.getElementById("colistntrols"));
 
 const nmaxSlider = document.getElementById("nmax");
+
 function sliderToNmax(t) {
   // t in [0,1]
   if (t <= 0.5) {
@@ -25,6 +27,7 @@ function sliderToNmax(t) {
     return Math.pow(20, u);   // 20^0..20^1 -> 1..20
     }
   }
+  
 nmaxSlider.oninput = () => {const t = parseFloat(nmaxSlider.value);
                             let nmax = sliderToNmax(t);
                             if (nmax > 1) nmax = Math.round(nmax); // integers in 1..20
