@@ -641,7 +641,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
           def v1 = entries[i - 1].key.value
           def v2 = entries[i    ].key.value
           if (v1 != v2 && v1 != v0) {
-            def ratio = (v1 - v0) / (v2 - v1)
+            def ratio = (v2 - v1) / (v1 - v0)
             if (ratio < nmax) {
               break
               }
