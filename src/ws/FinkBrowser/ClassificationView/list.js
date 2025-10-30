@@ -12,7 +12,7 @@ function updateDetailsPanel(data) {
   for (object of data.objects) {
     console.log(object);
   }
-for (var [key, val] of iterate_object(data.objects) {
+for (var [key, val] of iterate_object(data.objects)) {
     console.log(key, val);
 }
 
