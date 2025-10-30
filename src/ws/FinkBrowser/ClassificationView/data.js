@@ -40,6 +40,8 @@ async function loadNeighborhood(objectId = null) {
                   nmax: nmaxVal
                   };
   const data = await fetchNeighborhood(params);
+  console.log(data);
+  updateDetailsPanel(data, objectId);
   showObjectNeighborhood(data);
   }
 
