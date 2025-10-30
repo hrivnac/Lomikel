@@ -9,6 +9,7 @@ function updateDetailsPanel(data) {
                <div>${JSON.stringify(data.objectClassification)
                           .replaceAll("{", "")
                           .replaceAll("}", "")
+                          .replaceAll('"', '')
                           .replaceAll(",", "<br/>")}</div>
                </div>`);
   
@@ -18,6 +19,7 @@ function updateDetailsPanel(data) {
                  <div>${JSON.stringify(val.classes)
                             .replaceAll("{", "")
                             .replaceAll("}", "")
+                            .replaceAll('"', '')
                             .replaceAll(",", "<br/>")}</div>
                  </div>`);
     }
