@@ -4,13 +4,18 @@ function updateDetailsPanel(data) {
   
   const rows = [];
 
-  // Add main object
   rows.push(`<div class="objLine mainObj">
                <div><b>${data.objectId}</b>: ${JSON.stringify(data.objectClassification)}</div>
                </div>`);
   
-for (var [key, val] of iterate_object(data.objects)) {
-    console.log(key, val);
+  for (var [key, val] of iterate_object(data.objects)) {
+    rows.push(`<div class="objLine">
+                 <div>${key}</div>
+                 <div>Distance: ${val.distance}</div>
+                 <div>Classes: ${val.classes)}</div>
+                 </div>
+    `);
+    
 }
 
 /*
