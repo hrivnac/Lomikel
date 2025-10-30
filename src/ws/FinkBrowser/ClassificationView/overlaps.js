@@ -1,12 +1,21 @@
+const overlapCache = {};
+
 async function getOverlapPositions(classifier, classList, radius, centerX, centerY) {
   try {
     showSpinner(true, "blue");
-    const url = `/FinkBrowser/Overlaps.jsp?classifier=${classifier}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch overlaps");
-    const overlaps = await response.json();
-    if (!Array.isArray(overlaps) || overlaps.length === 0) {
-      throw new Error("No overlap data");
+    if (overlapCache[classifier]) {
+      console.log(`Using cached overlaps for ${classifier}`);
+      overlaps = overlapCache[classifier]
+      }
+    else {
+      console.log(`Fetching overlaps for ${classifier}...`);
+      const url = `/FinkBrowser/Overlaps.jsp?classifier=${classifier}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch overlaps");
+      const overlaps = await response.json();
+      if (!Array.isArray(overlaps) || overlaps.length === 0) {
+        throw new Error("No overlap data");
+        }
       }
     // Filter and normalize overlaps
     const links = [];
@@ -26,7 +35,7 @@ async function getOverlapPositions(classifier, classList, radius, centerX, cente
       }
     if (links.length === 0) throw new Error("No valid overlap links");
     // Create nodes
-    const nodes = classList.map(c => ({ id: c }));
+    const nodes = classList.map(c => ({id: c}));
     // Define force simulation
     const minDist = radius * 0.15;
     const maxDist = radius * 1.2;
