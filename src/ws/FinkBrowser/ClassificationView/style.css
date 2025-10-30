@@ -78,7 +78,7 @@ button:hover {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid #ccc;
   border-radius: 8px;
-  width: 200px;
+  width: 300px;
   }
   
 #list-header {
@@ -103,7 +103,7 @@ button:hover {
   }
 
 #objectList .objLine {
-  border-bottom: 1px solid rgba(255,255,255,0.2);
+  border-bottom: 1px solid rgba(100, 100, 100, 0.2);
   padding: 5px 0;
   }
   
