@@ -1,15 +1,15 @@
 function updateDetailsPanel(data) {
   const panel = document.getElementById("objectList");
   if (!panel) return;
-  console.log(data.objectId);
+  
 /*
   if (!objects || objects.length === 0) {
     panel.innerHTML = "No objects loaded";
     return;
   }
+  */
 
-  // Find main object
-  const mainObj = objects.objectId);
+  const mainObj = data.objectId;
 
   const rows = [];
 
@@ -22,6 +22,7 @@ function updateDetailsPanel(data) {
       </div>
     `);
   }
+  /*
 
   // Add all other visible objects
   for (const obj of objects) {
@@ -37,9 +38,9 @@ function updateDetailsPanel(data) {
       </div>
     `);
   }
-
+*/
   panel.innerHTML = rows.join("");
-  */
+  
 }
 
 
