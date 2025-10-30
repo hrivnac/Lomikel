@@ -4,13 +4,23 @@ function updateDetailsPanel(data) {
   
   const rows = [];
 
-  let row = `<div class="objLine mainObj"><b><u>${data.objectId}</u></b><div>`;
+  let row = `<div class="objLine mainObj"><div><b><u>${data.objectId}</u></b></div><div>`;
   for (var [k, v] of iterate_object(data.objectClassification)) {
-    row += `${k}: ${v.toFixed(4)} <br/>`;
+    row += `${k}: ${v.toFixed(4)}<br/>`;
     }
   row += `</div></div>`;
   rows.push(row);
   
+  for (var [key, val] of iterate_object(data.objects)) {
+    row = `<div class="objLine"><div><b><u>${key}</b>: ${val.distance.toFixed(4)}</u></div><div>`;
+    for (var [k, v] of iterate_object(val.classes)) {
+      row += `${k}: ${v.toFixed(4)}<br/>`;
+      }
+    row += `</div></div>`;
+    rows.push(row);
+    }
+ 
+    /*
   for (var [key, val] of iterate_object(data.objects)) {
     rows.push(`<div class="objLine">
                  <div><b><u>${key}</b> ${val.distance.toFixed(4)}</u></div>
@@ -21,7 +31,8 @@ function updateDetailsPanel(data) {
                             .replaceAll(",", "<br/>")}</div>
                  </div>`);
     }
-    
+*/
+
   panel.innerHTML = rows.join("");
   }
 
