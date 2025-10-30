@@ -13,7 +13,7 @@ function updateDetailsPanel(data) {
 
   // Add main object
   rows.push(`<div class="objLine mainObj">
-               <div><b>${data.objectId}</b>: ${data.objectClassification}</div>
+               <div><b>${data.objectId}</b>: ${JSON.stringify(data.objectClassification)}</div>
                </div>`);
   /*
 
