@@ -4,11 +4,11 @@ function updateDetailsPanel(data) {
   
   const rows = [];
 
-  let row = `<div class="objLine mainObj"><div><b><u>${data.objectId}</u></b></div><div>`;
+  let row = `<div class="objLine mainObj"><b><u>${data.objectId}</u></b><div>`;
   for (var [k, v] of iterate_object(data.objectClassification)) {
-    row += `${k} ${v.toFixed(4)} <br/>`;
+    row += `${k}: ${v.toFixed(4)} <br/>`;
     }
-  row += `</div>`;
+  row += `</div></div>`;
   rows.push(row);
   
   for (var [key, val] of iterate_object(data.objects)) {
