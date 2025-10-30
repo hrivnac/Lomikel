@@ -5,7 +5,7 @@ function updateDetailsPanel(data) {
   const rows = [];
 
   rows.push(`<div class="objLine mainObj">
-               <div><b>${data.objectId}</b></div>
+               <div><b><u>${data.objectId}</u></b></div>
                <div>${JSON.stringify(data.objectClassification)
                           .replaceAll("{", "")
                           .replaceAll("}", "")
@@ -15,7 +15,7 @@ function updateDetailsPanel(data) {
   
   for (var [key, val] of iterate_object(data.objects)) {
     rows.push(`<div class="objLine">
-                 <div><b>${key}</b> ${val.distance}</div>
+                 <div><b><u>${key}</b> ${val.distance.toFixed(4)}</u></div>
                  <div>${JSON.stringify(val.classes)
                             .replaceAll("{", "")
                             .replaceAll("}", "")
