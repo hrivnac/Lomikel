@@ -12,7 +12,7 @@ function updateDetailsPanel(data) {
   rows.push(row);
     
   for (var o of objects(data.objects)) {
-    row = `<div class="objLine"><div><b><u>${o.objectId}</b>: ${o.v.distance.toFixed(4)}</u> (<a href="https://fink-portal.org/${key}" target="_blank">Fink</a>)</div><div>`;
+    row = `<div class="objLine"><div><b><u>${o.objectId}</b>: ${o.v.distance.toFixed(4)}</u> (<a href="https://fink-portal.org/${o.objectId}" target="_blank">Fink</a>)</div><div>`;
     for (var [k, v] of iterate_object(o.v.classes)) {
       row += `${k}: ${v.toFixed(4)}<br/>`;
       }
