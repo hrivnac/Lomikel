@@ -32,7 +32,6 @@ function* iterate_object(o) {
     }
   }
 
-
 function objects(o) {
   let os = [];
   var keys = Object.keys(o);
@@ -40,7 +39,7 @@ function objects(o) {
     os.push({objectId:keys[i], properties:o[keys[i]]});
     }
   console.log(os);
-  //let oss = os.sort((a, b) => a.propeties.distance - b.properties.distance);
-  return os;
+  let oss = os.sort((a, b) => a.propeties.distance - b.properties.distance);
+  return oss;
   }
  
