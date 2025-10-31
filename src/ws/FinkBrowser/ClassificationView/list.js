@@ -40,6 +40,6 @@ function objects(o) {
     }
   console.log(os);
   let oss = os.sort((a, b) => a.v.distance - b.v.distance);
-  return os;
+  return oss;
   }
  
