@@ -13,7 +13,7 @@ function updateDetailsPanel(data) {
   
   let objects = {};
   for (var [key, val] of iterate_object(data.objects)) {
-    objects[key] = value;
+    objects[key] = val;
     }
   console.log(objects);
   
