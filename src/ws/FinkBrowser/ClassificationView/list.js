@@ -36,10 +36,10 @@ function objects(o) {
   let os = [];
   var keys = Object.keys(o);
   for (var i = 0; i  < keys.length; i++) {
-    os.push({objectId:keys[i], properties:o[keys[i]]});
+    os.push({objectId:keys[i], o[keys[i]]});
     }
-  console.log(os);
-  let oss = os.sort((a, b) => a.propeties.distance - b.properties.distance);
-  return oss;
+  console.log(oss);
+  //let oss = os.sort((a, b) => a.v.distance - b.v.distance);
+  return os;
   }
  
