@@ -34,12 +34,12 @@ function* iterate_object(o) {
 
 
 function objects(o) {
-  let os = {};
+  let os = [];
   var keys = Object.keys(o);
   for (var i = 0; i  < keys.length; i++) {
-    os[keys[i]] = o[keys[i]];
+    os.push[{objectId:keys[i], properties:o[keys[i]];
     }
-  let oss = os.sort((a, b) => a.value.distance - b.value.distance);
+  let oss = os.sort((a, b) => a.propeties.distance - b.peoperties.distance);
   return oss;
   }
  
