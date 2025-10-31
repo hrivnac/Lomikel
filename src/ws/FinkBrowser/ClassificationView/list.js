@@ -39,7 +39,8 @@ function objects(o) {
   for (var i = 0; i  < keys.length; i++) {
     os.push({objectId:keys[i], properties:o[keys[i]]});
     }
-  let oss = os.sort((a, b) => a.propeties.distance - b.properties.distance);
-  return oss;
+  console.log(os);
+  //let oss = os.sort((a, b) => a.propeties.distance - b.properties.distance);
+  return os;
   }
  
