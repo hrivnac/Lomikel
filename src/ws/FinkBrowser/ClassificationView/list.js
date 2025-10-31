@@ -11,7 +11,7 @@ function updateDetailsPanel(data) {
   row += `</div></div>`;
   rows.push(row);
   
-  let objects = [:];
+  let objects = {};
   for (var [key, val] of iterate_object(data.objects)) {
     objects[key] = value;
     }
