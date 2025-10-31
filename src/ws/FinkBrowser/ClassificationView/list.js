@@ -37,7 +37,7 @@ function objects(o) {
   let os = {};
   var keys = Object.keys(o);
   for (var i = 0; i  < keys.length; i++) {
-    os[keys[i]) = o[keys[i]];
+    os[keys[i]] = o[keys[i]];
     }
   //let oss = os.sort((a, b) => a.angle - b.angle);
   return os;
