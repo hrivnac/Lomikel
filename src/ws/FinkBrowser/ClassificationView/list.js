@@ -2,7 +2,7 @@ function updateDetailsPanel(data) {
   const panel = document.getElementById("objectList");
   if (!panel) return;
   
-  const rows = [];
+  const rows = {};
 
   let row = `<div class="objLine mainObj"><div><b><u>${data.objectId}</u></b> (<a href="https://fink-portal.org/${data.objectId}" target="_blank">Fink</a>)</div><div>`;
   for (var [k, v] of iterate_object(data.objectClassification)) {
@@ -13,7 +13,7 @@ function updateDetailsPanel(data) {
   
   let objects = [:];
   for (var [key, val] of iterate_object(data.objects)) {
-    objects += [key:value];
+    objects[key] = value;
     }
   console.log(objects);
   
