@@ -10,13 +10,8 @@ function updateDetailsPanel(data) {
     }
   row += `</div></div>`;
   rows.push(row);
-  
-  let objects = {};
-  for (var [key, val] of iterate_object(data.objects)) {
-    objects[key] = val;
-    }
-  const objectsSorted = new Map([...objects.entries()].sort((a, b) => b[1]['distance'] - a[1]['distance']));
-  console.log(objectsSorted);
+    
+  console.log(objects(data.objects); 
   
   for (var [key, val] of iterate_object(data.objects)) {
     row = `<div class="objLine"><div><b><u>${key}</b>: ${val.distance.toFixed(4)}</u> (<a href="https://fink-portal.org/${key}" target="_blank">Fink</a>)</div><div>`;
@@ -35,5 +30,16 @@ function* iterate_object(o) {
   for (var i = 0; i  < keys.length; i++) {
     yield [keys[i], o[keys[i]]];
     }
+  }
+
+
+function objects(o) {
+  let os = {};
+  var keys = Object.keys(o);
+  for (var i = 0; i  < keys.length; i++) {
+    os[keys[i]) = o[keys[i]];
+    }
+  //let oss = os.sort((a, b) => a.angle - b.angle);
+  return os;
   }
  
