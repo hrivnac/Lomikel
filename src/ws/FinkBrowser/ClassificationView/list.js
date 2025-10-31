@@ -15,6 +15,7 @@ function updateDetailsPanel(data) {
   for (var [key, val] of iterate_object(data.objects)) {
     objects[key] = val;
     }
+  const objectsSorted = new Map([...objects.entries()].sort((a, b) => b[1]['distance'] - a[1]['distance']));
   console.log(objects);
   
   for (var [key, val] of iterate_object(data.objects)) {
