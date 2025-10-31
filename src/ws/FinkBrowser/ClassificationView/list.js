@@ -39,7 +39,7 @@ function objects(o) {
     os.push({objectId:keys[i], v:o[keys[i]]});
     }
   console.log(os);
-  //let oss = os.sort((a, b) => a.v.distance - b.v.distance);
+  let oss = os.sort((a, b) => a.v.distance - b.v.distance);
   return os;
   }
  
