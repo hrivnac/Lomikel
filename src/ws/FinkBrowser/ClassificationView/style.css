@@ -103,12 +103,13 @@ button:hover {
   }
 
 #objectList .objLine {
+  color: blue;
   border-bottom: 1px solid rgba(100, 100, 100, 0.2);
   padding: 5px 0;
   }
   
 #objectList .mainObj {
-  color: #ff5555;
+  color: red;
   }
   
 #nmax::-webkit-slider-runnable-track {

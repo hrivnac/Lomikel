@@ -629,6 +629,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (nmax == 0) {
       nmax = Integer.MAX_VALUE;
       }
+    if (nmax > map.size()) {
+      nmax = map.size();
+      }
     if (nmax >= 1) {
       for (int i = 0; i < (int)nmax; i++) {
         map1[entries[i].key] = entries[i].value
@@ -668,6 +671,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def entries = map.entrySet().sort{-it.value}
     if (nmax == 0) {
       nmax = Integer.MAX_VALUE;
+      }
+    if (nmax > map.size()) {
+      nmax = map.size();
       }
     if (nmax >= 1) {
       for (int i = 0; i < (int)nmax; i++) {
