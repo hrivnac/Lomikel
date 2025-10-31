@@ -20,15 +20,6 @@ function updateDetailsPanel(data) {
     rows.push(row);
     }
 
-  //for (var [key, val] of iterate_object(data.objects)) {
-  //  row = `<div class="objLine"><div><b><u>${key}</b>: ${val.distance.toFixed(4)}</u> (<a href="https://fink-portal.org/${key}" target="_blank">Fink</a>)</div><div>`;
-  //  for (var [k, v] of iterate_object(val.classes)) {
-  //    row += `${k}: ${v.toFixed(4)}<br/>`;
-  //    }
-  //  row += `</div></div>`;
-  //  rows.push(row);
-  //  }
-
   panel.innerHTML = rows.join("");
   }
 
