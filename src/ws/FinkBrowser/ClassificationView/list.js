@@ -39,7 +39,7 @@ function objects(o) {
   for (var i = 0; i  < keys.length; i++) {
     os[keys[i]] = o[keys[i]];
     }
-  //let oss = os.sort((a, b) => a.angle - b.angle);
-  return os;
+  let oss = os.sort((a, b) => a.value.distance - b.value.distance);
+  return oss;
   }
  
