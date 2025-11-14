@@ -487,7 +487,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         ocol1 = g().V().has("lbl",        "OCol"          ).
                         has("survey",     within(surveys) ).
                         has("classifier", within(names)  ).
-                        has("flavor",     within(flavors)).
+                        //has("flavor",     within(flavors)).
                         has("cls",        cls1           ).
                         next();
         for (String cls2 : types) {
@@ -496,7 +496,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               ocol2 = g().V().has("lbl",        "OCol"         ).
                               has("survey",     within(surveys)).
                               has("classifier", within(names)  ).
-                              has("flavor",     within(flavors)).
+                              //has("flavor",     within(flavors)).
                               has("cls",        cls2           ).
                               next();
               addEdge(g().V(ocol1).next(),
