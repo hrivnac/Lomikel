@@ -108,19 +108,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param climit        The low limit fir the classification ration of the evaluated <em>object</em>.
     *                      Default: <tt>0.0</tt>.
     * @return              The full neigbouthood information. */
-  public String objectNeighborhood2JSON(String objectId,
+  public String objectNeighborhood2JSON(String oid0,
                                         String classifier,
                                         String reclassifier,
-                                        String alg,
                                         double nmax,
+                                        String metric,
                                         double climit) {                                         
     JSONObject objectClassification = new JSONObject();
     List<Map<String, String>> classifications;
     if (reclassifier == null || reclassifier.equals(classifier)) {
-      classifications = classification(objectId, classifier);
+      classifications = classification(oid0, classifier);
       }
     else {
-      classifications = reclassification(objectId, classifier, reclassifier);
+      classifications = reclassification(oid0, classifier, reclassifier);
       classifier = reclassifier;
       }
     for (Map<String, String> m : classifications) {
@@ -131,10 +131,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     JSONObject neighbor;
     JSONObject classes;
     String noid;
-    for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : objectNeighborhood(objectId,
+    for (Map.Entry<Map.Entry<String, Double>, Map<String, Double>> m : objectNeighborhood(oid0,
                                                                                           classifier,
                                                                                           nmax,
-                                                                                          alg,
+                                                                                          metric,
                                                                                           climit).entrySet()) {
       classes = new JSONObject();
       for (Map.Entry<String, Double> e : m.getValue().entrySet()) {
@@ -146,7 +146,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       neighbor.put("classes", classes);
       objects.put(noid, neighbor);
       }
-    data.put("objectId",             objectId);
+    data.put("objectId",             oid0);
     data.put("objects",              objects);
     data.put("objectClassification", objectClassification);
     return data;
@@ -174,11 +174,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                                              double  climit = 0.0,
                                                                              boolean allClasses = false) {
      return objectNeighborhood('nmax':nmax,
-                       'metric':metric,
-                       'climit':climit,
-                       'allClasses':allClasses,
-                       oid0,
-                       classifier)
+                               'metric':metric,
+                               'climit':climit,
+                               'allClasses':allClasses,
+                               oid0,
+                               classifier)
     }
 
   /** The same method as {@link #objectNeighborhood(Map, String, String},
@@ -753,8 +753,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       return overlaps('classifier':classifier);
       }
     }
-  
-    
+   
   /** Give all overlaps.
     * Using accumulated data in graph.
     * @param lbl        The label of {@link Vertex}es to use for overlap search.

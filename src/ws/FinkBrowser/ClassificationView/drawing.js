@@ -108,7 +108,6 @@ function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, is
                           .attr("d", d3.symbol().type(d3.symbolStar).size(isMain ? 200 : 100))
                           .attr("transform", `translate(${pos.x},${pos.y})`)
                           .attr("fill", color);
-                          console.log(classes);
   const showDetails = (event) => {clearTimeout(hideTimeout);
                                   const classEntries = Object.entries(classes)
                                                              .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
@@ -116,7 +115,6 @@ function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, is
                                   tooltip.html(`<strong>${id}</strong><br>
                                                <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
                                                <a href="#" id="showObject-${id}">Expand here</a><br>
-                                               distance = <br>
                                                <strong>Classes:</strong>
                                                <ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>
                                   `            )

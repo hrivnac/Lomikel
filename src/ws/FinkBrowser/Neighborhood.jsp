@@ -18,7 +18,7 @@
   String objectId     = request.getParameter("objectId");
   String classifier   = request.getParameter("classifier");
   String reclassifier = request.getParameter("reclassifier");
-  String alg          = request.getParameter("alg");
+  String metric       = request.getParameter("metric");
   String nmax         = request.getParameter("nmax");
   String climit       = request.getParameter("climit");
   if (objectId == null || objectId.isEmpty()) {
@@ -30,8 +30,8 @@
   if (reclassifier == null || reclassifier.isEmpty() || reclassifier.equals("none")) {
     reclassifier = null;
     }
-  if (alg == null || alg.isEmpty()) {
-    alg = "JensenShannon";
+  if (metric == null || metric.isEmpty()) {
+    metric = "JensenShannon";
     }
   if (nmax == null || nmax.isEmpty()) {
     nmax = "5";
@@ -44,6 +44,6 @@
 
   JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
-  String data = gr.objectNeighborhood2JSON(objectId, classifier, reclassifier, alg, Double.parseDouble(nmax), Double.parseDouble(climit));
+  String data = gr.objectNeighborhood2JSON(objectId, classifier, reclassifier, Double.parseDouble(nmax), metric, Double.parseDouble(climit));
   out.print(data);
   %>

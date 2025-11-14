@@ -397,7 +397,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       g().V().has("lbl",        "OCol"             ).
               has("survey",     classifier.survey()).
               has("classifier", classifier.name()  ).
-              has("flavor",     classifier.flavor()).
+              //has("flavor",     classifier.flavor()).
               bothE().
               has("lbl", "overlaps").
               drop().
@@ -406,7 +406,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       g().V().has("lbl",        "OCol"             ).
               has("survey",     classifier.survey()).
               has("classifier", classifier.name()  ).
-              has("flavor",     classifier.flavor()).
+              //has("flavor",     classifier.flavor()).
               not(has("cls")).
               drop().
               iterate();

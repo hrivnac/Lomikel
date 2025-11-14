@@ -36,7 +36,7 @@ async function loadNeighborhood(objectId = null) {
   const params = {objectId: objectId || document.getElementById("objectId").value,
                   classifier: document.getElementById("classifier").value,
                   reclassifier: document.getElementById("reclassifier").value,
-                  alg: document.getElementById("alg").value,
+                  metric: document.getElementById("metric").value,
                   nmax: nmaxVal
                   };
   const data = await fetchNeighborhood(params);

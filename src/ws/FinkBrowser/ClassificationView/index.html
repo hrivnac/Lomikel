@@ -31,7 +31,7 @@
                    <li><b>none</b> doesn't re-interpret.</li>
                    </ul>
                </li>
-             <li><b>Algorithm</b> (measure) to calculate distances between objects in the space of classifications.</li>
+             <li><b>Metric</b> to calculate distances between objects in the space of classifications.</li>
              <li><b>nmax</b> - the maximal number of closest objects to show. If less than 1, the number of objects
                                to show is calculated via differences in distances between subsequent objects
                                (smaller numbers is less selective). 0 gives all close objects.</li>
@@ -81,8 +81,8 @@
             </select>
           </label>
         <br>  
-        <label>Algorithm:
-          <select id="alg">
+        <label>Metric:
+          <select id="metric">
             <option value="JensenShannon" selected>JensenShannon</option>
             <option value="Euclidean">Euclidean</option>
             <option value="Cosine">Cosine</option>
