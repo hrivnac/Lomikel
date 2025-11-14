@@ -532,8 +532,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def cls
     def q
     def qualities = [:]
+    def cf = classifierWithFlavor(dstClassifier);
     g().V().has('lbl',       'OCol').
-            has('classifier', dstClassifier).
+            has('classifier', cf[0]).
+            has('flavor',     cf[1]).
             group().
             by(values('cls')).
             by(out().count()).

@@ -30,11 +30,16 @@ gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
                                          Classifier.instance('XMATCH'),
                                          Classifier.instance('FEATURES=Clusters/2024/13-60'),
                                          Classifier.instance('FEATURES=Clusters/2025/13-50'),
-                                         Classifier.instance('TAG=ALL')})
+                                         Classifier.instance('TAG')})
    
 gr.testReclassifications('TAG', 'FINK', 10, 5)
+gr.testReclassifications('FEATURES=2024/13-60', 'TAG', 10, 5)
 
 oid = 'ZTF20aalmymq'
 gr.objectNeighborhood(oid, "TAG", 10, 'JensenShannon')
 gr.reclassification(oid, "TAG", "FINK", 10, true)
+
+g.V().has('lbl','object').has('objectId', oid).inE().where(outV().has('classifier','TAG')).drop()
+gr.reclassification(oid, "FEATURES=2024/13-60", "TAG", 10, true)
+
 
