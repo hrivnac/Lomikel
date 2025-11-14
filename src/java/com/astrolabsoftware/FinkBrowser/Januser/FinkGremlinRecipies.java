@@ -385,7 +385,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * Possibly between two {@link Classifier}s.
     * @param classifier The {@link Classifier}s to be used. */
   public void generateCorrelations(Classifier... classifiers) {
-    log.info("Generating correlations for OCol for " + Arrays.asList(classifiers));
+    log.info("Generating correlations for OCol of " + Arrays.asList(classifiers));
     List<String> surveysL = new ArrayList<>();
     List<String> namesL   = new ArrayList<>();
     List<String> flavorsL = new ArrayList<>();
@@ -397,7 +397,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       g().V().has("lbl",        "OCol"             ).
               has("survey",     classifier.survey()).
               has("classifier", classifier.name()  ).
-              //has("flavor",     classifier.flavor()).
+              has("flavor",     classifier.flavor()).
               bothE().
               has("lbl", "overlaps").
               drop().
@@ -406,7 +406,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       g().V().has("lbl",        "OCol"             ).
               has("survey",     classifier.survey()).
               has("classifier", classifier.name()  ).
-              //has("flavor",     classifier.flavor()).
+              has("flavor",     classifier.flavor()).
               not(has("cls")).
               drop().
               iterate();
@@ -479,7 +479,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     // Create overlaps
     int ns = 0;
-    log.info(flavors);
+    log.info(Arrays.toString(flavors));
     // Double-loop over OCol and create overlaps Edge OCol-OCol if non empty 
     // NOTE: it takes all OCol names, surveys and flavors (even if they are not requested in all combinations)
     for (String cls1 : types) {
