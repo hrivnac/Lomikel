@@ -364,6 +364,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * Drop alerts. Alerts are dropped even if they have other
     * {@link Edge}s.
     * @param classifier The {@link Classifier} to be used.
+    *                   All its <em>flavors</em> are handled.
     * @param cls        The type (class) of <em>OCol</em>.
     * @throws LomikelException If anything goes wrong. */
   public void cleanOCol(Classifier classifier,
@@ -479,7 +480,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     // Create overlaps
     int ns = 0;
-    log.info(Arrays.toString(flavors));
     // Double-loop over OCol and create overlaps Edge OCol-OCol if non empty 
     // NOTE: it takes all OCol names, surveys and flavors (even if they are not requested in all combinations)
     for (String cls1 : types) {

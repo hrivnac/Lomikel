@@ -511,6 +511,9 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                            qualities += quality
                            }
               }
+    if (qualities.size() == 0) {
+      return 0
+      }
     return qualities.sum() / qualities.size()
     }
     
