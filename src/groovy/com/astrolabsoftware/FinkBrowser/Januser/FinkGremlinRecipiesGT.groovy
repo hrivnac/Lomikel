@@ -500,7 +500,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def cf = classifierWithFlavor(dstClassifier);
     g().V().has('lbl',       'OCol').
             has('classifier', cf[0]).
-            has('flavor',     cf[1].
+            has('flavor',     cf[1]).
             has('cls',        cls).
             out().
             has('lbl', 'object').
