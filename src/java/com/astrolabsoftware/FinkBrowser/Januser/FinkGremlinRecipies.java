@@ -479,6 +479,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     // Create overlaps
     int ns = 0;
+    log.info(flavors);
     // Double-loop over OCol and create overlaps Edge OCol-OCol if non empty 
     // NOTE: it takes all OCol names, surveys and flavors (even if they are not requested in all combinations)
     for (String cls1 : types) {
