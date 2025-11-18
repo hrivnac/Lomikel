@@ -396,7 +396,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       flavorsL.add(classifier.flavor());
       // Clean all correlations 
       g().V().has("lbl",        "OCol"             ).
-              has("survey",     classifier.survey()).
               has("classifier", classifier.name()  ).
               has("flavor",     classifier.flavor()).
               bothE().
@@ -405,7 +404,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               iterate();
       // Remove wrong OCol
       g().V().has("lbl",        "OCol"             ).
-              has("survey",     classifier.survey()).
               has("classifier", classifier.name()  ).
               has("flavor",     classifier.flavor()).
               not(has("cls")).
