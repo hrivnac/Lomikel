@@ -812,6 +812,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                      String lbl,
                                      String srcClassifier,
                                      String dstClassifier) {
+    log.info(cls);
+    log.info(lbl);
+    log.info(srcClassifier);
+    log.info(dstClassifier);
     def classification = [:];
     def srcCf = classifierWithFlavor(srcClassifier);
     def dstCf = classifierWithFlavor(dstClassifier);
@@ -829,6 +833,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
+                  log.info(v);
                   if (v['xlbl'       ].equals(lbl     ) &&
                       v['ylbl'       ].equals(lbl     ) &&
                       v['xcls'       ].equals(cls     ) &&
