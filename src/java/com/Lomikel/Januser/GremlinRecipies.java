@@ -230,7 +230,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
     if (!create && reset) {
       List<Edge> edges = getEdge(v1, v2, relation);
       if (edges.size() != 1) {
-        log.error("" + edges.size() + " edges exists, none modified");
+        log.error("" + edges.size() + " " + relation + " edges exists, none modified");
         }
       else {
         Edge e = edges.get(0);

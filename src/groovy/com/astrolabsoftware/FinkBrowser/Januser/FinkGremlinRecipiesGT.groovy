@@ -448,7 +448,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def cf = classifierWithFlavor(srcClassifier);
     classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
                              w = reclassify(it.class, 'OCol', srcClassifier, dstClassifier);
-                     log.info(w)
                              w.each {cls, intersection -> if (reclassified[cls] == null) {
                                                             reclassified[cls] = 0;
                                                             }
@@ -456,8 +455,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                }
                       }
       }
-    log.info(classified);
-    log.info(reclassified);
     double total = reclassified.values().sum();
     if (total != 0) {
       reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
@@ -813,10 +810,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                      String lbl,
                                      String srcClassifier,
                                      String dstClassifier) {
-    log.info(cls);
-    log.info(lbl);
-    log.info(srcClassifier);
-    log.info(dstClassifier);
     def classification = [:];
     def srcCf = classifierWithFlavor(srcClassifier);
     def dstCf = classifierWithFlavor(dstClassifier);
@@ -834,7 +827,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
-                  log.info(v);
                   if (v['xlbl'       ].equals(lbl     ) &&
                       v['ylbl'       ].equals(lbl     ) &&
                       v['xcls'       ].equals(cls     ) &&
