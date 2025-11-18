@@ -475,6 +475,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     else {
       _lastQuality = 0.0
       }
+    log.info(reclassified);
     reclassified = limitMap(reclassified, nmax);
     def reclassifiedA = [];
     reclassified.each {it -> cf = classifierWithFlavor(dstClassifier);
