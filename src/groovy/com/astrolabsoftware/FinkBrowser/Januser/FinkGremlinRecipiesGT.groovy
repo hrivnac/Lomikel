@@ -455,6 +455,8 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                }
                       }
       }
+    log.info(classified);
+    log.info(reclassified);
     double total = reclassified.values().sum();
     if (total != 0) {
       reclassified = reclassified.collectEntries {k, v -> [k, v / total]}
@@ -475,7 +477,6 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     else {
       _lastQuality = 0.0
       }
-    log.info(reclassified);
     reclassified = limitMap(reclassified, nmax);
     def reclassifiedA = [];
     reclassified.each {it -> cf = classifierWithFlavor(dstClassifier);
