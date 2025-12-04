@@ -34,12 +34,72 @@ gr.generateCorrelations(new Classifier[]{Classifier.instance('FINK'),
    
 gr.testReclassifications('TAG', 'FINK', 10, 5)
 gr.testReclassifications('FEATURES=2024/13-60', 'TAG', 10, 5)
+-------------------------------------------------------------
+gremlin> gr.testReclassifications('TAG', 'FINK', 10, 5)
+13:41:52 INFO  org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache - Evaluating reclassification of TAG as FINK for 10 classes using 5 objectIds for each
+testing Solar System MPC
+testing SN candidate
+testing Tracklet
+testing Solar System candidate
+testing Microlensing candidate
+testing Early SN Ia candidate
+==>Solar System MPC=1.0[22500]
+==>SN candidate=0.9658239736261709[1866]
+==>Tracklet=1.0[330]
+==>Solar System candidate=1.0[251]
+==>Microlensing candidate=0.8342701196069925[177]
+==>Early SN Ia candidate=0.7239371501129915[25]
+gremlin> gr.testReclassifications('FEATURES=2024/13-60', 'TAG', 10, 5)
+13:43:13 INFO  org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache - Evaluating reclassification of FEATURES=2024/13-60 as TAG for 10 classes using 5 objectIds for each
+testing Tag of Solar System MPC
+testing Tag of SN candidate
+testing Tag of Microlensing candidate
+testing Tag of Solar System candidate
+testing Tag of Tracklet
+testing Tag of Early SN Ia candidate
+==>Tag of Solar System MPC=0.0[18514]
+==>Tag of SN candidate=0.6700934280281293[1739]
+==>Tag of Microlensing candidate=0.2502428279117747[166]
+==>Tag of Solar System candidate=0.0[106]
+==>Tag of Tracklet=0.17639395831596938[96]
+==>Tag of Early SN Ia candidate=0.4942084809172602[25]
+
 
 oid = 'ZTF20aalmymq'
 gr.objectNeighborhood(oid, "TAG", 10, 'JensenShannon')
 gr.reclassification(oid, "TAG", "FINK", 10, true)
+-------------------------------------------------
+gremlin> oid = 'ZTF20aalmymq'
+==>ZTF20aalmymq
+gremlin> gr.objectNeighborhood(oid, "TAG", 10, 'JensenShannon')
+13:49:41 INFO  org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache - calculating object distances from ZTF20aalmymq[Tag of SN candidate:1.0] using [nmax:10.0, metric:JensenShannon, climit:0.0, allClasses:false]
+13:49:41 INFO  org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache -        searching only in [Tag of SN candidate]
+==>ZTF19aavninf=0.0={Tag of SN candidate=1.0}
+==>ZTF19abftwqt=0.0={Tag of SN candidate=1.0}
+==>ZTF19ablkohp=0.0={Tag of SN candidate=1.0}
+==>ZTF19ablkohn=0.0={Tag of SN candidate=1.0}
+==>ZTF19abmyncu=0.0={Tag of SN candidate=1.0}
+==>ZTF19abptcbr=0.0={Tag of SN candidate=1.0}
+==>ZTF19abqkmas=0.0={Tag of SN candidate=1.0}
+==>ZTF19abptcbw=0.0={Tag of SN candidate=1.0}
+==>ZTF19abpugun=0.0={Tag of SN candidate=1.0}
+==>ZTF19abqgspv=0.0={Tag of SN candidate=1.0}
+gremlin> gr.reclassification(oid, "TAG", "FINK", 10, true)
+==>[classifier:FINK,flavor:,weight:0.9966339555546144,class:SN candidate]
+==>[classifier:FINK,flavor:,weight:0.0022364420545836297,class:Microlensing candidate]
+==>[classifier:FINK,flavor:,weight:0.0011296023908019322,class:Early SN Ia candidate]
+
 
 g.V().has('lbl','object').has('objectId', oid).inE().where(outV().has('classifier','TAG')).drop()
 gr.reclassification(oid, "FEATURES=2024/13-60", "TAG", 10, true)
+----------------------------------------------------------------
+gremlin> g.V().has('lbl','object').has('objectId', oid).inE().where(outV().has('classifier','TAG')).drop()
+gremlin> gr.reclassification(oid, "FEATURES=2024/13-60", "TAG", 10, true)
+13:51:05 WARN  org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache - Cannot check quality
+==>[classifier:TAG,flavor:,weight:0.6648214409491939,class:Tag of SN candidate]
+==>[classifier:TAG,flavor:,weight:0.30970056553142444,class:Tag of Solar System MPC]
+==>[classifier:TAG,flavor:,weight:0.023564105499098115,class:Tag of Microlensing candidate]
+==>[classifier:TAG,flavor:,weight:0.0013365518766274413,class:Tag of Early SN Ia candidate]
+==>[classifier:TAG,flavor:,weight:5.773361436559822E-4,class:Tag of Solar System candidate]
 
 
