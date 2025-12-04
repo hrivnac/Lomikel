@@ -1,10 +1,3 @@
-/ant/build-local.properties
-/ant/Notes.txt
-/ant/.jython_cache/*
-/ant/.build.xml.marks
-/ant/blank.txt
-/ant/db
-/ant/log
 /bin/*
 /data/*
 /lib/*
