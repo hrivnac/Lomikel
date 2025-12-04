@@ -1,0 +1,8 @@
+*.dot
+build-local.properties
+Notes.txt
+.jython_cache/*
+.build.xml.marks
+blank.txt
+db
+log
