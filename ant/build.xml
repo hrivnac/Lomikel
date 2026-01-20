@@ -1203,6 +1203,7 @@
       <group title="Fink Januser"       packages="com.astrolabsoftware.FinkBrowser.Januser*"/>
       <group title="Fink Portal Client" packages="com.astrolabsoftware.FinkBrowser.FinkPOrtalClient*"/>
       <group title="Fink WebService"    packages="com.astrolabsoftware.FinkBrowser.WebService*"/>
+      <group title="Fink LightCurves"   packages="com.astrolabsoftware.FinkBrowser.LightCurces*"/>
       <group title="LehmanUtils"        packages="de.lehmannet.om.util*"/>
       <link href="http://docs.oracle.com/javase/11/docs/api"/>
       <link href="http://docs.groovy-lang.org/latest/html/api"/>
