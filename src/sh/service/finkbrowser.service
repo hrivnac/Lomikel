@@ -4,15 +4,14 @@ After=network.target
 
 [Service]
 Type=simple
-User=jetty
-Group=jetty
+User=janusgraph
+Group=janusgraph
 WorkingDirectory=/localhome/janusgraph/Lomikel/run
 ExecStart=/localhome/janusgraph/Lomikel/src/sh/service/finkbrowser.sh
+KillSignal=SIGTERM
+TimeoutStopSec=60
+SuccessExitStatus=143
 Restart=always
 RestartSec=5
 SuccessExitStatus=143
-
-[Install]
-WantedBy=multi-user.target
-
 
