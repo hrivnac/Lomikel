@@ -29,18 +29,17 @@ async function loadPane(pane, url, iframe, height) {
   }        
 
 function postUrlToIframe(fullUrl, iframeName) {
-    // Parse URL
-    const url = new URL(fullUrl, window.location.origin);
-    const action = url.origin + url.pathname;
+    // Resolve relative URLs safely
+    const url = new URL(fullUrl, document.baseURI);
 
-    // Create form
+    const action = url.pathname; // keeps it relative
     const form = document.createElement("form");
     form.method = "POST";
     form.action = action;
     form.target = iframeName;
     form.style.display = "none";
 
-    // Convert query params to hidden inputs
+    // Add query params as hidden inputs
     url.searchParams.forEach((value, key) => {
         const input = document.createElement("input");
         input.type = "hidden";
@@ -49,9 +48,7 @@ function postUrlToIframe(fullUrl, iframeName) {
         form.appendChild(input);
     });
 
-    // Add form to DOM, submit, then clean up
     document.body.appendChild(form);
     form.submit();
     document.body.removeChild(form);
 }
-
