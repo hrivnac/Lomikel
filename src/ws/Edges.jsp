@@ -338,7 +338,7 @@
       else {
         first = false;
         }
-        console.log(tdata[i][x]);
+        console.log(tdata[i][x]['cls']);
         params += "{\"x\":\"" + tdata[i][x] + "\",\"y\":\"" + tdata[i][y] + "\"";
         params += ",\"value\":\"" + tdata[i]['intersection'] + "\"";
         params += ",\"info\":\"" + tdata[i][sumx] + "/" + tdata[i][sumy] + "\"";
