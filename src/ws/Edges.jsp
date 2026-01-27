@@ -329,7 +329,6 @@
     showCorrelogram("to", "from", "sizeOut", "sizeIn");
     }
   function showCorrelogram(x, y, sumx, sumy) {
-    console.log(x);
     var params = "tdata=[";
     first = true;
     for (i = 0; i < tdata.length; i++) {
@@ -339,6 +338,7 @@
       else {
         first = false;
         }
+        console.log(tdata[i][x]);
         params += "{\"x\":\"" + tdata[i][x] + "\",\"y\":\"" + tdata[i][y] + "\"";
         params += ",\"value\":\"" + tdata[i]['intersection'] + "\"";
         params += ",\"info\":\"" + tdata[i][sumx] + "/" + tdata[i][sumy] + "\"";
