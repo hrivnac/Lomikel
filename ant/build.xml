@@ -645,6 +645,7 @@
         <include name="Servers.jsp"/>
         </fileset>
       <classes dir="../src/ws/FinkBrowser">
+        <include name="d3/actions.js"/>
         <include name="log4j.xml"/>
         </classes>
       <lib file="../lib/Lomikel-Janus-${version}.exe.jar"/>

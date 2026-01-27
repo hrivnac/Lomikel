@@ -329,6 +329,7 @@
     showCorrelogram("to", "from", "sizeOut", "sizeIn");
     }
   function showCorrelogram(x, y, sumx, sumy) {
+    console.log(x);
     var params = "tdata=[";
     first = true;
     for (i = 0; i < tdata.length; i++) {
