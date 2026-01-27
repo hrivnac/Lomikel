@@ -84,26 +84,16 @@
         }
       lblFrom = callGremlinValues(gr + ".E('" + id1 + "').outV().values('lbl').next().toString()" )[0];
       lblTo   = callGremlinValues(gr + ".E('" + id1 + "').inV( ).values('lbl').next().toString()" )[0];
-      if (lblFrom == "AoI" || lblFrom == "SoI") { // TBD: move into Fink
+      if (lblFrom == "OCol") { // TBD: move into Fink
         vFrom  = callGremlinValues(gr + ".E('" + id1 + "').outV().values('cls').toSet().toArray().join('')")[0];
-        if (lblFrom == "AoI") {
-          vFrom = "AoI(" + vFrom + ")";
-          }
-        else {
-          vFrom = "SoI(" + vFrom + ")";
-          }
+        vFrom = "OCol(" + vFrom + ")";
         }
       else {
         vFrom  = callGremlinValues(gr + ".E('" + id1 + "').outV().elementMap().next().toString()" )[0];
         }
-      if (lblTo == "AoI" || lblTo == "SoI") {
+      if (lblTo == "OCol") {
         vTo    = callGremlinValues(gr + ".E('" + id1 + "').inV().values('cls').toSet().toArray().join('')")[0];
-        if (lblTo == "AoI") {
-          vTo = "AoI(" + vTo + ")";
-          }
-        else {
-          vTo = "SoI(" + vTo + ")";
-          }
+        vTo = "OCol(" + vTo + ")";
         }
       else {
         vTo    = callGremlinValues(gr + ".E('" + id1 + "').inV().elementMap().next().toString()")[0];
@@ -338,7 +328,7 @@
       else {
         first = false;
         }
-        params += "{\"x\":\"" + tdata[i][x]['cls'] + "\",\"y\":\"" + tdata[i][y] + "\"";
+        params += "{\"x\":\"" + tdata[i][x] + "\",\"y\":\"" + tdata[i][y] + "\"";
         params += ",\"value\":\"" + tdata[i]['intersection'] + "\"";
         params += ",\"info\":\"" + tdata[i][sumx] + "/" + tdata[i][sumy] + "\"";
         params += "}";        
