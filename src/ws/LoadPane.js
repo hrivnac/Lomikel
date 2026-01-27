@@ -10,9 +10,11 @@ async function loadPane(pane, url, iframe, height) {
     height = "100%";
     }
   if (iframe) {
+    console.log("iframe");
     document.getElementById(pane).innerHTML='<iframe height="' + height + '" width="100%" src="' + url + '">';
     }
   else {
+    console.log("load");
     $("#" + pane).load(url);
     }
   if (pane == 'result' || pane == 'table' || pane == 'image' || pane == 'plot' || pane == 'skyview') {
