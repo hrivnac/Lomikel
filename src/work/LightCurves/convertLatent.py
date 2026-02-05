@@ -42,3 +42,11 @@ with open('../data/LightCurves/Latent/all.csv', 'w', newline='') as out_file:
       jds += str(jd) + ';' + str(jd)
       jd += 1
     writer.writerow((oid, fids, magpsfs, jds, clsses, maxclass))
+    
+with open('../data/LightCurves/Latent/summary.csv', 'w', newline='') as out_file:
+  writer = csv.writer(out_file)
+  writer.writerow(('oid', 'cls'))
+  for n in range(0, 3606):
+    oid = objectIds[n]
+    cls = classes[n]
+    writer.writerow((oid, cls))
