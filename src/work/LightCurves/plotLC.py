@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 doPlot = False
 dirRun = '../run/LightCurves/lstm_data'
-dirData = '../data/LightCurves/2025'
+dirData = '../data/LightCurves/Latent'
 set = 'train'
 
 with open(dirData + '/iterator_config.json', 'r') as file:

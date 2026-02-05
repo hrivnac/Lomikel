@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 doPlot = False
 nout = 10
 dirRun = '../run/LightCurves/lstm_data'
-dirData = '../data/LightCurves/2024'
+dirData = '../data/LightCurves/Latent'
 
 with open(dirData + '/iterator_config.json', 'r') as file:
   data = json.load(file)
