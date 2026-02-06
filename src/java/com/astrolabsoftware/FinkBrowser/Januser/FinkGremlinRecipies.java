@@ -645,7 +645,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                       new Double[]{corrS.get(Pair.of(cls1, cls2)),
                                    sizeS.get(cls1),
                                    sizeS.get(cls2)},
-                      true);
+                      false);
               ns++;
               }
             catch (NoSuchElementException e) {
