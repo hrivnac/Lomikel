@@ -480,21 +480,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // NOTE: it takes all OCol names, surveys and flavors (even if they are not requested in all combinations)
     for (FullClass cls1 : types) {
       try {
-        ocol1 = g().V().has("lbl",        "OCol"          ).
-                        has("survey",     within(surveys) ).
-                        has("classifier", within(names)   ).
-                        //has("flavor",     within(flavors)).
-                        has("cls",        cls1.cls()      ).
+        ocol1 = g().V().has("lbl",        "OCol"           ).
+                        has("survey",     cls1.survey()    ).
+                        has("classifier", cls1.classifier()).
+                        has("flavor",     cls1.flavor()    ).
+                        has("cls",        cls1.cls()       ).
                         next();
         for (FullClass cls2 : types) {
           if (corrS.containsKey(Pair.of(cls1, cls2))) {
             log.info("" + cls1 + " --- " + cls2);
             try {
-              ocol2 = g().V().has("lbl",        "OCol"         ).
-                              has("survey",     within(surveys)).
-                              has("classifier", within(names)  ).
-                              //has("flavor",     within(flavors)).
-                              has("cls",        cls2.cls()     ).
+              ocol2 = g().V().has("lbl",        "OCol"           ).
+                              has("survey",     cls2.survey()    ).
+                              has("classifier", cls2.classifier()).
+                              has("flavor",     cls2.flavor()    ).
+                              has("cls",        cls2.cls()       ).
                               next();
               //ddEdge(g().V(ocol1).next(),
               //       g().V(ocol2).next(),

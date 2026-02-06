@@ -104,6 +104,7 @@ public abstract class Classifier {
     
   public abstract String survey();
     
+  @Override
   public String toString() {
     String ts = name();
     if (_flavor != null && !_flavor.equals("")) {

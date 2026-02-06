@@ -16,9 +16,9 @@ public class FullClass implements Comparable<FullClass> {
   /** Create with class and {@link Classifier}.
     * @param ocol The <em>OCol</em> {@link Vertex}. */
   public FullClass(Vertex ocol) {
-    _classifier = ocol.property("survey"    ).value().toString() + "-"
-                + ocol.property("classifier").value().toString() + "-"
-                + ocol.property("flavor"    ).value().toString();
+    _survey     = ocol.property("survey"    ).value().toString();
+    _classifier = ocol.property("classifier").value().toString();
+    _flavor     = ocol.property("flavor"    ).value().toString();
     _cls        = ocol.property("cls"       ).value().toString();
     }
 
@@ -41,23 +41,51 @@ public class FullClass implements Comparable<FullClass> {
   @Override
   public int hashCode() {
     if (_hash == 0) {
-      _hash = (_cls + _classifier).hashCode();
+      _hash = (_survey + _classifier + _flavor + _cls).hashCode();
       }
     return _hash;
     }
     
-  /** Give contained alarm class.
-    * @return The contained alarm class. */
+  /** Give contained classifier survey.
+    * @return The contained classifier survey. */
+  public String survey() {
+    return _survey;
+    }
+    
+  /** Give contained classifier name.
+    * @return The contained classifier name. */
+  public String classifier() {
+    return _classifier;
+    }
+    
+  /** Give contained classifier flavor.
+    * @return The contained classifier flavor. */
+  public String flavor() {
+    return _flavor;
+    }
+    
+  /** Give contained classifier class.
+    * @return The contained classifier class. */
   public String cls() {
     return _cls;
     }
     
   @Override
+  // as in Classifier
   public String toString() {
-    return _cls + " of " + _classifier;
+    String ts = _classifier;
+    if (_flavor != null && !_flavor.equals("")) {
+      ts += "=" + _flavor;
+      }
+    ts += "[" + _survey + "]";
+    return ts;
     }
+  
+  private String _survey;
     
   private String _classifier;
+  
+  private String _flavor;
   
   private String _cls;
   
