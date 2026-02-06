@@ -420,7 +420,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex object;
     Iterator<Edge> deepcontainsIt;
     Edge deepcontains;
-    Edge overlaps;
     double weight;
     double weight1;
     double weight2;
@@ -477,8 +476,29 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Create overlaps
     int ns = 0;
     // Double-loop over OCol and create overlaps Edge OCol-OCol if non empty 
-    // NOTE: it takes all OCol names, surveys and flavors (even if they are not requested in all combinations)
-    for (FullClass cls1 : types) {
+    corrS.forEach((pair, w) -> {
+        FullClass fc1 = pair.first();
+        FullClass fc2 = pair.second();
+        Vertex o1 = g().V().has("lbl",        "OCol"           ).
+                            has("survey",     fc1.survey()    ).
+                            has("classifier", fc1.classifier()).
+                            has("flavor",     fc1.flavor()    ).
+                            has("cls",        fc1.cls()       ).
+                            next();
+        Vertex o2 = g().V().has("lbl",        "OCol"           ).
+                            has("survey",     fc2.survey()    ).
+                            has("classifier", fc2.classifier()).
+                            has("flavor",     fc2.flavor()    ).
+                            has("cls",        fc2.cls()       ).
+                            next();
+      Edge overlaps = o1.addEdge("overlaps", o2);
+      overlaps.property("lbl",          "overlaps");
+      overlaps.property("intersection", w);
+      overlaps.property("sizeIn",       sizeS.get(fc1));
+      overlaps.property("sizeOut",      sizeS.get(fc2));
+    }
+       );
+    /*for (FullClass cls1 : types) {
       try {
         ocol1 = g().V().has("lbl",        "OCol"           ).
                         has("survey",     cls1.survey()    ).
@@ -512,7 +532,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               overlaps.property("sizeIn",       sizeS.get(cls1));
               overlaps.property("sizeOut",      sizeS.get(cls2));
               ns++;
-              }
+              }        
             catch (NoSuchElementException e) {
               log.debug("OCol for " + cls2 + " doesn't exist");
               }          
@@ -522,7 +542,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       catch (NoSuchElementException e) {
         log.debug("OCol for " + cls1 + " doesn't exist");
         }          
-      }
+      }*/
     commit();
     log.info("" + ns + " object-object correlations generated");
     }
