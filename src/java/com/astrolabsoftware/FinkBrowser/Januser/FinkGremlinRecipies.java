@@ -420,6 +420,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex object;
     Iterator<Edge> deepcontainsIt;
     Edge deepcontains;
+    Edge overlaps;
     double weight;
     double weight1;
     double weight2;
@@ -495,16 +496,21 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                               //has("flavor",     within(flavors)).
                               has("cls",        cls2.cls()     ).
                               next();
-              addEdge(g().V(ocol1).next(),
-                      g().V(ocol2).next(),
-                      "overlaps",
-                      new String[]{"intersection",                
-                                   "sizeIn",            
-                                   "sizeOut"},
-                      new Double[]{corrS.get(Pair.of(cls1, cls2)),
-                                   sizeS.get(cls1),
-                                   sizeS.get(cls2)},
-                      false);
+              //ddEdge(g().V(ocol1).next(),
+              //       g().V(ocol2).next(),
+              //       "overlaps",
+              //       new String[]{"intersection",                
+              //                    "sizeIn",            
+              //                    "sizeOut"},
+              //       new Double[]{corrS.get(Pair.of(cls1, cls2)),
+              //                    sizeS.get(cls1),
+              //                    sizeS.get(cls2)},
+              //       false);
+              overlaps = ocol1.addEdge("overlaps", ocol2);
+              overlaps.property("lbl",          "overlaps");
+              overlaps.property("intersection", corrS.get(Pair.of(cls1, cls2)));
+              overlaps.property("sizeIn",       sizeS.get(cls1));
+              overlaps.property("sizeOut",      sizeS.get(cls2));
               ns++;
               }
             catch (NoSuchElementException e) {
