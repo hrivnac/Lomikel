@@ -395,11 +395,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       namesL.add(  classifier.name()  );
       flavorsL.add(classifier.flavor());
       // Clean all correlations 
-      g().V().has("lbl",        "OCol"             ).
-              has("classifier", classifier.name()  ).
-              has("flavor",     classifier.flavor()).
-              bothE().
-              has("lbl", "overlaps").
+      g().E().has("lbl", "overlaps").
               drop().
               iterate();
       // Remove wrong OCol
@@ -491,7 +487,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                         next();
         for (FullClass cls2 : types) {
           if (corrS.containsKey(Pair.of(cls1, cls2))) {
-            log.info("" + cls1 + " --- " + cls2);
             try {
               ocol2 = g().V().has("lbl",        "OCol"         ).
                               has("survey",     within(surveys)).
@@ -508,7 +503,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                       new Double[]{corrS.get(Pair.of(cls1, cls2)),
                                    sizeS.get(cls1),
                                    sizeS.get(cls2)},
-                      true);
+                      false);
               ns++;
               }
             catch (NoSuchElementException e) {
