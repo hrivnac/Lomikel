@@ -487,7 +487,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                         has("cls",        cls1.cls()       ).
                         next();
         for (FullClass cls2 : types) {
-          if (cls2.compareTo(cls1) >= 0 && corrS.containsKey(Pair.of(cls1, cls2))) {
+          if (cls2.compareTo(cls1) > 0 && corrS.containsKey(Pair.of(cls1, cls2))) {
             log.info("" + cls1 + " --- " + cls2);
             try {
               ocol2 = g().V().has("lbl",        "OCol"           ).
