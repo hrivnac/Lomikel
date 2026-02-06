@@ -415,6 +415,148 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     String[] flavors = flavorsL.toArray(String[]::new);
     commit();
     // Accumulate correlations and sizes
+    // (cls = FullClass)
+    Map<FullClass, Double>                  weights0 = new HashMap<>(); // cls -> weight (for one objext)
+    Map<Pair<FullClass, FullClass>, Double> corrS    = new HashMap<>(); // [cls1, cls2] -> weight (for all object between OCol-OCol)
+    Map<FullClass, Double>                  sizeS    = new HashMap<>(); // cls -> total (for all objects of OCol)
+    SortedSet<FullClass>                    types0   = new TreeSet<>(); // [cls] (for one object)
+    SortedSet<FullClass>                    types    = new TreeSet<>(); // [cls] (for all objects)
+    Vertex object;
+    Iterator<Edge> deepcontainsIt;
+    Edge deepcontains;
+    double weight;
+    double weight1;
+    double weight2;
+    double cor;
+    Vertex ocol;
+    Vertex ocol1;
+    Vertex ocol2;
+    FullClass cls;
+    Pair<FullClass, FullClass> rel;
+    // Loop over objets and accumulated weights to each object
+    GraphTraversal<Vertex, Vertex> objectT = g().V().has("lbl", "object");
+    while (objectT.hasNext()) {
+      weights0.clear();
+      types0.clear();
+      object = objectT.next();
+      deepcontainsIt = object.edges(Direction.IN);
+      // Get all weights to this object
+      while (deepcontainsIt.hasNext()) {
+        deepcontains = deepcontainsIt.next();
+        weight = Double.parseDouble(deepcontains.property("weight").value().toString());
+        ocol1 = deepcontains.outVertex();
+        cls = new FullClass(ocol1);
+        types0.add(cls);
+        types.add(cls);
+        weights0.put(cls, weight);
+        }
+      // Double loop over accumulated weights and fill weights between OCols
+      for (FullClass cls1 : types0) {
+        weight1 = weights0.get(cls1);
+        for (FullClass cls2 : types0) {
+          weight2 = weights0.get(cls2);
+          rel = Pair.of(cls1, cls2);
+          // OCol-OCol
+          if (!corrS.containsKey(rel)) {
+            corrS.put(rel, 0.0);
+            }
+          cor = corrS.get(rel);
+          //corrS.put(rel, cor + 1.0);
+          corrS.put(rel, cor + Math.sqrt(weight1 * weight2));
+          }
+        }
+      }
+    // Fill total sizes
+    double sizeS0;
+    for (FullClass cls1 : types) {
+      sizeS0 = 0.0;
+      for (FullClass cls2 : types) {
+        if (corrS.containsKey(Pair.of(cls1, cls2))) {
+          sizeS0 += corrS.get(Pair.of(cls1, cls2));
+          }
+        }
+      sizeS.put(cls1, sizeS0);
+      }
+    // Create overlaps
+    int ns = 0;
+    // Double-loop over OCol and create overlaps Edge OCol-OCol if non empty 
+    // NOTE: it takes all OCol names, surveys and flavors (even if they are not requested in all combinations)
+    for (FullClass cls1 : types) {
+      try {
+        ocol1 = g().V().has("lbl",        "OCol"          ).
+                        has("survey",     within(surveys) ).
+                        has("classifier", within(names)   ).
+                        //has("flavor",     within(flavors)).
+                        has("cls",        cls1.cls()      ).
+                        next();
+        for (FullClass cls2 : types) {
+          if (corrS.containsKey(Pair.of(cls1, cls2))) {
+            try {
+              ocol2 = g().V().has("lbl",        "OCol"         ).
+                              has("survey",     within(surveys)).
+                              has("classifier", within(names)  ).
+                              //has("flavor",     within(flavors)).
+                              has("cls",        cls2.cls()     ).
+                              next();
+              addEdge(g().V(ocol1).next(),
+                      g().V(ocol2).next(),
+                      "overlaps",
+                      new String[]{"intersection",                
+                                   "sizeIn",            
+                                   "sizeOut"},
+                      new Double[]{corrS.get(Pair.of(cls1, cls2)),
+                                   sizeS.get(cls1),
+                                   sizeS.get(cls2)},
+                      true);
+              ns++;
+              }
+            catch (NoSuchElementException e) {
+              log.debug("OCol for " + cls2 + " doesn't exist");
+              }          
+            }  
+          }
+        }
+      catch (NoSuchElementException e) {
+        log.debug("OCol for " + cls1 + " doesn't exist");
+        }          
+      }
+    commit();
+    log.info("" + ns + " object-object correlations generated");
+    }
+    
+  /** Generate <em>overlaps</em> Edges between <em>OCol</em>.
+    * Possibly between two {@link Classifier}s.
+    * @param classifier The {@link Classifier}s to be used. */
+  public void generateCorrelationsOrig(Classifier... classifiers) {
+    log.info("Generating correlations for OCol of " + Arrays.asList(classifiers));
+    List<String> surveysL = new ArrayList<>();
+    List<String> namesL   = new ArrayList<>();
+    List<String> flavorsL = new ArrayList<>();
+    for (Classifier classifier : classifiers) {
+      surveysL.add(classifier.survey());
+      namesL.add(  classifier.name()  );
+      flavorsL.add(classifier.flavor());
+      // Clean all correlations 
+      g().V().has("lbl",        "OCol"             ).
+              has("classifier", classifier.name()  ).
+              has("flavor",     classifier.flavor()).
+              bothE().
+              has("lbl", "overlaps").
+              drop().
+              iterate();
+      // Remove wrong OCol
+      g().V().has("lbl",        "OCol"             ).
+              has("classifier", classifier.name()  ).
+              has("flavor",     classifier.flavor()).
+              not(has("cls")).
+              drop().
+              iterate();
+      }
+    String[] surveys = surveysL.toArray(String[]::new);
+    String[] names   = namesL.toArray(  String[]::new);
+    String[] flavors = flavorsL.toArray(String[]::new);
+    commit();
+    // Accumulate correlations and sizes
     Map<String, Double>               weights0 = new HashMap<>(); // cls -> weight (for one objext)
     Map<Pair<String, String>, Double> corrS    = new HashMap<>(); // [cls1, cls2] -> weight (for all object between OCol-OCol)
     Map<String, Double>               sizeS    = new HashMap<>(); // cls -> total (for all objects of OCol)
@@ -522,7 +664,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     commit();
     log.info("" + ns + " object-object correlations generated");
     }
-        
+ 
   /** Create a new {@link FinkHBaseClient}. Singleton when url unchanged.
     * @param hbaseUrl The HBase url as <tt>ip:port:table[:schema]</tt>.
     * @return          The corresponding {@link FinkHBaseClient}, created and initialised if needed.
