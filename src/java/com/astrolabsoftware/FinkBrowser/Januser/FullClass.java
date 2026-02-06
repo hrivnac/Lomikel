@@ -73,7 +73,7 @@ public class FullClass implements Comparable<FullClass> {
   @Override
   // as in Classifier
   public String toString() {
-    String ts = _classifier;
+    String ts = _cls + " of " + _classifier;
     if (_flavor != null && !_flavor.equals("")) {
       ts += "=" + _flavor;
       }
