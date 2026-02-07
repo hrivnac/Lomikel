@@ -420,6 +420,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex object;
     Iterator<Edge> deepcontainsIt;
     Edge deepcontains;
+    Edge overlaps;
     double weight;
     double weight1;
     double weight2;
@@ -476,28 +477,31 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     // Create overlaps
     int ns = 0;
     // Double-loop over OCol and create overlaps Edge OCol-OCol if non empty 
-    corrS.forEach((pair, w) -> {
-        FullClass fc1 = pair.first();
-        FullClass fc2 = pair.second();
-        Vertex o1 = g().V().has("lbl",        "OCol"           ).
-                            has("survey",     fc1.survey()    ).
-                            has("classifier", fc1.classifier()).
-                            has("flavor",     fc1.flavor()    ).
-                            has("cls",        fc1.cls()       ).
-                            next();
-        Vertex o2 = g().V().has("lbl",        "OCol"           ).
-                            has("survey",     fc2.survey()    ).
-                            has("classifier", fc2.classifier()).
-                            has("flavor",     fc2.flavor()    ).
-                            has("cls",        fc2.cls()       ).
-                            next();
-      Edge overlaps = o1.addEdge("overlaps", o2);
+    FullClass cls1;
+    FullClass cls2;
+    for (Map.Entry<Pair<FullClass, FullClass>, Double> entry : corrS.entrySet()) {
+      rel = entry.getKey();
+      cls1 = rel.first();
+      cls2 = rel.second();
+      weight = entry.getValue();
+      ocol1 = g().V().has("lbl",        "OCol"          ).
+                      has("survey",     cls1.survey()    ).
+                      has("classifier", cls1.classifier()).
+                      has("flavor",     cls1.flavor()    ).
+                      has("cls",        cls1.cls()       ).
+                      next();
+      ocol2 = g().V().has("lbl",        "OCol"          ).
+                      has("survey",     cls2.survey()    ).
+                      has("classifier", cls2.classifier()).
+                      has("flavor",     cls2.flavor()    ).
+                      has("cls",        cls2.cls()       ).
+                      next();
+      overlaps = ocol1.addEdge("overlaps", ocol2);
       overlaps.property("lbl",          "overlaps");
-      overlaps.property("intersection", w);
-      overlaps.property("sizeIn",       sizeS.get(fc1));
-      overlaps.property("sizeOut",      sizeS.get(fc2));
-    }
-       );
+      overlaps.property("intersection", weight);
+      overlaps.property("sizeIn",       sizeS.get(cls1));
+      overlaps.property("sizeOut",      sizeS.get(cls2));
+      }
     /*for (FullClass cls1 : types) {
       try {
         ocol1 = g().V().has("lbl",        "OCol"           ).
