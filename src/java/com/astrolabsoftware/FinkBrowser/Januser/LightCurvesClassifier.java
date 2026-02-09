@@ -30,6 +30,7 @@ public class LightCurvesClassifier extends ZTFClassifier {
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid) throws LomikelException {
+    /*
     String jd;
     String cl;
     Map<String, String> value;
@@ -112,6 +113,7 @@ public class LightCurvesClassifier extends ZTFClassifier {
     if (!isClassified) {
       log.warn("Source " + oid + " cannot be classified because his alerts have no LC features");
       }
+    */
     }
     
   /** Give {@link ClusterFinder} to current database. Singleton.

@@ -475,7 +475,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     // Create overlaps
     int ns = 0;
-    // Double-loop over OCol and create overlaps Edge OCol-OCol if non empty 
+    // Loop over OCol-OCol and create overlaps Edge OCol-OCol if non empty 
     OCol cls1;
     OCol cls2;
     for (Map.Entry<Pair<OCol, OCol>, Double> entry : corrS.entrySet()) {
