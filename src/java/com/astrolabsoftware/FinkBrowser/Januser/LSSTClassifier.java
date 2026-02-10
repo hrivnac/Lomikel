@@ -1,12 +1,5 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
-import com.Lomikel.Utils.Pair;
-import com.Lomikel.Utils.LomikelException;
-
-// Java
-import java.util.Map;
-import java.util.HashMap;
-
 /** <code>ZTFClassifier</code> classifies <em>LSST</em> <em>objects</em>.
   * @opt attributes
   * @opt operations

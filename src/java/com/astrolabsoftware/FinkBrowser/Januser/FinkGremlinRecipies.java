@@ -1,7 +1,6 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Utils.Pair;
-import com.Lomikel.Utils.Metrics;
 import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.ModifyingGremlinClient;
@@ -26,7 +25,6 @@ import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.Direction;
-import org.apache.tinkerpop.gremlin.structure.Graph;
 
 // HBase
 import org.apache.hadoop.hbase.client.Get;
@@ -52,7 +50,6 @@ import java.util.Iterator;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.NoSuchElementException;
 
 // Log4J
 import org.apache.logging.log4j.Logger;

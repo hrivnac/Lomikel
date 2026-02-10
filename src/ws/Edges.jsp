@@ -85,18 +85,22 @@
       lblFrom = callGremlinValues(gr + ".E('" + id1 + "').outV().values('lbl').next().toString()" )[0];
       lblTo   = callGremlinValues(gr + ".E('" + id1 + "').inV( ).values('lbl').next().toString()" )[0];
       if (lblFrom == "OCol") { // TBD: move into Fink
-        vFrom  = callGremlinValues(gr + ".E('" + id1 + "').outV().values('cls').toSet().toArray().join('')")[0];
+        vFrom = callGremlinValues(gr + ".E('" + id1 + "').outV().values('classifier').toSet().toArray().join('')")[0] + "/"
+              + callGremlinValues(gr + ".E('" + id1 + "').outV().values('flavor').toSet().toArray().join('')")[0] + "/"
+              + callGremlinValues(gr + ".E('" + id1 + "').outV().values('cls').toSet().toArray().join('')")[0]
         vFrom = "OCol(" + vFrom + ")";
         }
       else {
-        vFrom  = callGremlinValues(gr + ".E('" + id1 + "').outV().elementMap().next().toString()" )[0];
+        vFrom = callGremlinValues(gr + ".E('" + id1 + "').outV().elementMap().next().toString()" )[0];
         }
       if (lblTo == "OCol") {
-        vTo    = callGremlinValues(gr + ".E('" + id1 + "').inV().values('cls').toSet().toArray().join('')")[0];
+        vTo = callGremlinValues(gr + ".E('" + id1 + "').inV().values('classifier').toSet().toArray().join('')")[0] + "/"
+            + callGremlinValues(gr + ".E('" + id1 + "').inV().values('flavor').toSet().toArray().join('')")[0] + "/"
+            + callGremlinValues(gr + ".E('" + id1 + "').inV().values('cls').toSet().toArray().join('')")[0];
         vTo = "OCol(" + vTo + ")";
         }
       else {
-        vTo    = callGremlinValues(gr + ".E('" + id1 + "').inV().elementMap().next().toString()")[0];
+        vTo = callGremlinValues(gr + ".E('" + id1 + "').inV().elementMap().next().toString()")[0];
         }
       tdata += ",\"from\":\""  + vFrom  + "\"";
       tdata += ",\"to\":\""    + vTo    + "\"";

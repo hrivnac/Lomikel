@@ -1,17 +1,6 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Utils.LomikelException;
-import com.astrolabsoftware.FinkBrowser.HBaser.Clusteriser.ClusterFinder;
-
-// Java
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.io.IOException;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -30,124 +19,9 @@ public class LightCurvesClassifier extends ZTFClassifier {
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid) throws LomikelException {
-    /*
-    String jd;
-    String cl;
-    Map<String, String> value;
-    String[] featuresS;
-    double[] featuresD;
-    String fg;
-    String fr;
-    Map<String, Set<String>> allInstances; // cl -> [jd]
-    Map<String, Double>      allWeights;   // jd -> w
-    Set<String> jds;
-    String key;
-    Map<String, Map<String, String>> alerts = recipies.fhclient().scan(null,
-                                                                       "key:key:" + oid + ":prefix",
-                                                                       "i:jd,d:lc_features_g,d:lc_features_r",
-                                                                       0,
-                                                                       0,
-                                                                       false,
-                                                                       false);
-    allInstances = new TreeMap<>();
-    allWeights   = new TreeMap<>();
-    // get all alerts (jd) and their classses
-    boolean isClassified = false;
-    for (Map.Entry<String, Map<String, String>> entry : alerts.entrySet()) {
-      value = entry.getValue();
-      jd = value.get("i:jd");
-      if (value.containsKey("d:lc_features_g") &&
-          value.containsKey("d:lc_features_r")) {
-        fg = value.get("d:lc_features_g").replaceFirst("\\[", "").replaceAll("]$", "");
-        fr = value.get("d:lc_features_r").replaceFirst("\\[", "").replaceAll("]$", "");
-        // BUG: some models replace by mean
-        featuresS = (fg + "," + fr).replaceAll("null", "0.0").
-                                    replaceAll("NaN",  "0.0").
-                                    split(",");
-        featuresD = Arrays.stream(featuresS).
-                           mapToDouble(Double::parseDouble).
-                           toArray();
-        cl = String.valueOf(finder().transformAndPredict(featuresD));                  
-        if (!cl.equals("-1")) {
-          if (allInstances.containsKey(cl)) {
-            jds = allInstances.get(cl);
-            jds.add(jd);
-            }
-          else {
-            jds = new TreeSet<String>();
-            jds.add(jd);
-            allInstances.put(cl, jds);
-            }
-          allWeights.put(cl, 1.0);
-          }
-        isClassified = true;
-        }
-      else {
-        //log.warn("Alert " + entry.getKey() + " has no features");
-        }
-      }
-    // rearrange instances and weights and register
-    double weight;
-    double totalWeight;
-    double w;
-    totalWeight = 0;
-    List<String> instancesL;
-    List<Double> weightsL;
-    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
-      for (String instance : cls.getValue()) {
-        totalWeight += allWeights.get(instance);
-        }
-      }
-    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
-      key = "FC-" + cls.getKey();
-      instancesL = new ArrayList<String>(cls.getValue());
-      weightsL   = new ArrayList<Double>();
-      w = 0;
-      for (String instance : instancesL) {
-        weightsL.add(allWeights.get(instance));
-        w += allWeights.get(instance);
-        }
-      weight = w / totalWeight;
-      recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
-      }
-    if (!isClassified) {
-      log.warn("Source " + oid + " cannot be classified because his alerts have no LC features");
-      }
-    */
+    // TBD
     }
     
-  /** Give {@link ClusterFinder} to current database. Singleton.
-    * @return The corresponding {@link ClusterFinder}. 
-    * @throws LomikelExceltion If {@link ClusterFinder} cannot be created. */
-  private ClusterFinder finder() throws LomikelException {
-    if (_finder == null) {
-      if (_dirName == null) {
-        _dirName = "/tmp";
-        }
-      try {
-        _finder = new ClusterFinder(_dirName + "/scaler_params.json",
-                                    _dirName + "/pca_params.json",
-                                    _dirName + "/cluster_centers.json");
-        }
-      catch (IOException e) {
-        throw new LomikelException("Cannot create Cluster Finder", e);
-        }
-      }
-    return _finder;
-    }
-    
-  /** Set the directory for model json files
-    * <tt>scaler_params.json, pca_params.json, cluster_centers.json</tt>.
-    * If not set, <tt>/tmp</tt> will be used.
-    * @param dirName The directory for model json files. */
-  public void setModelDirectory(String dirName) {
-    _dirName = dirName;
-    }
-  
-  private static ClusterFinder _finder;
-  
-  private static String _dirName;
-
   /** Logging . */
   private static Logger log = LogManager.getLogger(LightCurvesClassifier.class);
   
