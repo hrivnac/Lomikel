@@ -113,7 +113,7 @@ function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, is
                                                              .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
                                                              .join("");
                                   tooltip.html(`<strong>${id}</strong><br>
-                                               <a href="https://fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
+                                               <a href="https://ztf.fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
                                                <a href="#" id="showObject-${id}">Expand here</a><br>
                                                <strong>Classes:</strong>
                                                <ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>

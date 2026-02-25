@@ -2,7 +2,7 @@ function initSliders() {
   const container = d3.select("#sliders");
   container.html(""); // clear previous
   const size = 300; // pixels
-  const axisRange = 5; // coeff range (-5 to +5)
+  const axisRange = 2; // coeff range (-2 to +2)
   const scale = d3.scaleLinear().domain([-axisRange, axisRange]).range([0, size]);
   // SVG canvas
   const svg = container.append("svg")

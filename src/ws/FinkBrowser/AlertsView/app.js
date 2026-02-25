@@ -66,12 +66,12 @@ let flashes = [];
 function generateAlert() {
   try {
     const pick = alertsPool[randInt(0, alertsPool.length - 1)];
-    const ra = pick['i:ra'];
-    const dec = pick['i:dec'];
-    const cls = pick['v:classification'];
-    const objectId = pick['i:objectId'];
-    const jd = pick['i:jd'];
-    flashes.push(new Flash({ ra, dec, class: cls, objectId, jd }));
+    const ra       = (survey == "LSST") ? pick['r:ra']             : pick['i:ra'];
+    const dec      = (survey == "LSST") ? pick['r:dec']            : pick['i:dec'];
+    const cls      = (survey == "LSST") ? pick['v:classification'] : pick['v:classification'];
+    const objectId = (survey == "LSST") ? pick['r:diaObjectId']    : pick['i:objectId'];
+    const jd       = (survey == "LSST") ? pick['r:midpointMjdTai'] : pick['i:jd'];
+    flashes.push(new Flash({ra, dec, class: cls, objectId, jd}));
     }
   catch (e) {}
   setTimeout(generateAlert, 1000 + Math.random() * 900);
@@ -155,7 +155,7 @@ canvas.addEventListener('mousemove', e => {
       tooltip.style.left = (mouseX + 10) + 'px';
       tooltip.style.top = (mouseY + 10) + 'px';
       tooltip.innerHTML = `<b>${f.alert.objectId}</b><br>${f.alert.jd}<br>${f.alert.class}<br>` +
-                          `<a href="https://fink-portal.org/${f.alert.objectId}" target="_blank">View on Fink</a>`;
+                          `<a href="https://ztf.fink-portal.org/${f.alert.objectId}" target="_blank">View on Fink</a>`;
       found = true;
       clearTimeout(tooltipTimeout);
       tooltipTimeout = setTimeout(() => tooltip.style.display = 'none', 3000);

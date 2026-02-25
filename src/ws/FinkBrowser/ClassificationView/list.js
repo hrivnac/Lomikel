@@ -4,7 +4,7 @@ function updateDetailsPanel(data) {
   
   const rows = [];
 
-  let row = `<div class="objLine mainObj"><div><b><u>${data.objectId}</u></b> (<a href="https://fink-portal.org/${data.objectId}" target="_blank">Fink</a>)</div><div>`;
+  let row = `<div class="objLine mainObj"><div><b><u>${data.objectId}</u></b> (<a href="https://ztf.fink-portal.org/${data.objectId}" target="_blank">Fink</a>)</div><div>`;
   for (var [k, v] of iterate_object(data.objectClassification)) {
     row += `${k}: ${v.toFixed(4)}<br/>`;
     }
@@ -12,7 +12,7 @@ function updateDetailsPanel(data) {
   rows.push(row);
     
   for (var o of objects(data.objects)) {
-    row = `<div class="objLine"><div><b><u>${o.objectId}</b>: ${o.v.distance.toFixed(4)}</u> (<a href="https://fink-portal.org/${o.objectId}" target="_blank">Fink</a>)</div><div>`;
+    row = `<div class="objLine"><div><b><u>${o.objectId}</b>: ${o.v.distance.toFixed(4)}</u> (<a href="https://ztf.fink-portal.org/${o.objectId}" target="_blank">Fink</a>)</div><div>`;
     for (var [k, v] of iterate_object(o.v.classes)) {
       row += `${k}: ${v.toFixed(4)}<br/>`;
       }
