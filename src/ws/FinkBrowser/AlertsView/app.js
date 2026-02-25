@@ -21,6 +21,7 @@ class Flash {
   constructor(alert) {
     this.alert = alert;
     this.color = classes[alert.class] || "255,255,255";
+    this.spikes = (alert.survey == "LSST") ? 10 : 5;
     this.startTime = Date.now();
     this.alpha = 0;
     this.radius = 0;
@@ -47,9 +48,9 @@ class Flash {
                      sparklePhase: this.sparklePhase});
     if (this.trail.length > 15) this.trail.shift();
     for (let t of this.trail) {
-      drawStar(t.x, t.y, t.radius, this.color, t.alpha * 0.2, t.sparklePhase);
+      drawStar(t.x, t.y, t.radius, this.color, t.alpha * 0.2, t.sparklePhase, this.spikes);
       }
-    drawStar(pos.x, pos.y, this.radius, this.color, this.alpha, this.sparklePhase);
+    drawStar(pos.x, pos.y, this.radius, this.color, this.alpha, this.sparklePhase, this.spikes);
     // Class label
     ctx.font = "bold 14px sans-serif";
     ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
@@ -66,12 +67,13 @@ let flashes = [];
 function generateAlert() {
   try {
     const pick = alertsPool[randInt(0, alertsPool.length - 1)];
+    const survey = pick['v:survey'];
     const ra       = (survey == "LSST") ? pick['r:ra']             : pick['i:ra'];
     const dec      = (survey == "LSST") ? pick['r:dec']            : pick['i:dec'];
     const cls      = (survey == "LSST") ? pick['v:classification'] : pick['v:classification'];
     const objectId = (survey == "LSST") ? pick['r:diaObjectId']    : pick['i:objectId'];
     const jd       = (survey == "LSST") ? pick['r:midpointMjdTai'] : pick['i:jd'];
-    flashes.push(new Flash({ra, dec, class: cls, objectId, jd}));
+    flashes.push(new Flash({ra, dec, class: cls, objectId, jd, survey: survey}));
     }
   catch (e) {}
   setTimeout(generateAlert, 1000 + Math.random() * 900);

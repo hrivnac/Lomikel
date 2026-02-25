@@ -62,7 +62,6 @@ function getStartDateParam() {
   
 function getQueryParams() {
   const params = new URLSearchParams(window.location.search);
-  survey      =          params.get("survey")       || survey;
   fetchPeriod = parseInt(params.get("fetchPeriod")) || fetchPeriod;
   fetchStart  = parseInt(params.get("fetchStart"))  || fetchStart;
   nAlerts     = parseInt(params.get("nAlerts"))     || nAlerts;

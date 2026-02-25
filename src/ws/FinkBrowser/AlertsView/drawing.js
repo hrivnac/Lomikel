@@ -1,6 +1,6 @@
 // Draw Star
-function drawStar(x, y, radius, color, alpha, sparklePhase = 0) {
-  const spikes = 10;
+function drawStar(x, y, radius, color, alpha, sparklePhase = 0, sp = 10) {
+  const spikes = sp;
   let rot = Math.PI / 2 * 3;
   const step = Math.PI / spikes;
   ctx.beginPath();

@@ -2,13 +2,13 @@
 let alertsPool = [];
 //fetch("ztf_example.json").then(response => response.json()).
 //                          then(x => {alertsPool = x});
-async function fetchAlerts() {
+async function fetchAlerts(survey) {
   const allAlerts = [];
   const startdate = getStartDateParam();
-  //const classes = (survey == "LSST") ? classesLSST : classesZTF;
+  const classes = (survey == "LSST") ? classesLSST : classesZTF;
   for (const cls of Object.keys(classes)) {
     const url = (survey == "LSST") ? `https://api.lsst.fink-portal.org/api/v1/tags?tag=${encodeURIComponent(cls)}&n=${encodeURIComponent(nAlerts)}&columns=r%3AdiaObjectId%2Cr%3AmidpointMjdTai%2Cr%3Ara%2Cr%3Adec&startdate=${encodeURIComponent(startdate)}&output-format=json`
-                                   : `https://api.ztf.fink-portal.org/api/v1/latests?class=${encodeURIComponent(cls)}&n=${encodeURIComponent(nAlerts)}&columns=%3AobjectId%2Ci%3Ajd%2Ci%3Ara%2Ci%3Adec&startdate=${encodeURIComponent(startdate)}&output-format=json`;
+                                   : `https://api.ztf.fink-portal.org/api/v1/latests?class=${encodeURIComponent(cls)}&n=${encodeURIComponent(nAlerts)}&columns=i%3AobjectId%2Ci%3Ajd%2Ci%3Ara%2Ci%3Adec&startdate=${encodeURIComponent(startdate)}&output-format=json`;
     try {
       const response = await fetch(url, {headers: {"accept": "application/json"}});
       if (!response.ok) {
@@ -17,6 +17,7 @@ async function fetchAlerts() {
         }
       const data = await response.json();
       data.forEach(alert => {
+        alert["v:survey"]         = survey;
         alert["v:classification"] = cls;
         });
       allAlerts.push(...data);
@@ -25,14 +26,16 @@ async function fetchAlerts() {
       console.error("Error fetching alerts for", cls, err);
       }
     }
-  alertsPool = allAlerts;
-  console.log(`Fetched ${alertsPool.length} alerts from Fink Portal`);
+  alertsPool = alertsPool.concat(allAlerts);
+  console.log(`Fetched ${alertsPool.length} ${survey} alerts from Fink Portal`);
   updateStatusPanel();
   }
 // Initial fetch
-fetchAlerts();
+fetchAlerts("ZTF");
+fetchAlerts("LSST");
 // Refresh every 10 minutes
-setInterval(fetchAlerts, fetchPeriod * 60 * 1000);
+setInterval(fetchAlerts("ZTF" ), fetchPeriod * 60 * 1000);
+setInterval(fetchAlerts("LSST"), fetchPeriod * 60 * 1000);
 
 // Constellations      
 constellations = [];
