@@ -1,0 +1,51 @@
+import com.Lomikel.HBaser.AsynchHBaseClient;
+import com.Lomikel.Januser.JanusClient;
+import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
+import com.astrolabsoftware.FinkBrowser.Januser.Classifier;
+import com.Lomikel.Utils.Timer;
+
+timer = new Timer("entries", 1000, 5);
+
+client = new AsynchHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
+client.connect("ztf", "schema_3.1_5.6.2");
+//client.setLimit(20000);
+
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties")
+gr = new FinkGremlinRecipiesG(jc)
+
+classifiers = new Classifier[]{Classifier.instance('FINK'),
+                               Classifier.instance('XMATCH'),
+                               Classifier.instance('FEATURES=2024/13-60'),
+                               Classifier.instance('FEATURES=2025/13-50'),
+                               Classifier.instance('LIGHTCURVES=Latent'),
+                               Classifier.instance('TAG')}
+formula = "cdsxmatch != 'Unknown' && roid != 3 && ndethist >= 3";
+hbaseUrl = 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1'
+now = System.currentTimeMillis();
+client.startScan(null,
+                 null,
+                 "i:jd",
+                 now - 90000000, // 1 day
+                 now,
+                 false,
+                 false);
+
+timer.start();
+while (client.scanning() || client.size() > 0) {
+  if (client.size() > 0) {
+    //println(client.size() + ":");
+    client.poll().each {k, v -> for (Classifier classifier : classifiers) {
+                                  gr.classifySource(classifier, k, hbaseUrl);
+                                  }
+                         }
+    if (timer.report()) {
+      esclient.commit();
+      }
+    }
+  }
+
+esclient.commit();
+
+client.stop();
+
+
