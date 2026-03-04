@@ -38,7 +38,7 @@ while (client.scanning() || client.size() > 0) {
                                   try {
                                     gr.classifySource(classifier, k, hbaseUrl);
                                     }
-                                  catch {Exception e) {
+                                  catch (Exception e) {
                                     log.error("Cannot classify " + k + " with " + classifier);
                                     }
                                   }
