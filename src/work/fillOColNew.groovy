@@ -41,13 +41,13 @@ client.startScan(null,
 timer.start();
 while (client.scanning() || client.size() > 0) {
   if (client.size() > 0) {
-    println(client.size() + ":");
+    //println(client.size() + ":");
     client.poll().each {k, v -> for (Classifier classifier : classifiers) {
                                   try {
                                     gr.classifySource(classifier, k, hbaseUrl);
                                     }
                                   catch (Exception e) {
-                                    log.error("Cannot classify " + k + " with " + classifier);
+                                    log.error("Cannot classify " + k + " with " + classifier, e);
                                     }
                                   }
                          }
