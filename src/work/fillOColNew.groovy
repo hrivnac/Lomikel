@@ -12,7 +12,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 Configurator.initialize(null, "../src/java/log4j2.xml")
 log = LogManager.getLogger(this.class)
 
-timer = new Timer("entries", 1000, 5);
+timer = new Timer("entries", 100, 5);
 
 client = new AsynchHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 client.connect("ztf", "schema_3.1_5.6.2");
