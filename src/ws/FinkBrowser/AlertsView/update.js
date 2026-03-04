@@ -2,7 +2,6 @@ function updateStatusPanel() {
   const statusPanel = document.getElementById("statusPanel");
   const now = new Date().toLocaleTimeString();
   const configInfo = `<span style="color:lightblue">
-    survey=${survey},
     fetchPeriod=${fetchPeriod}m, 
     fetchStart=${fetchStart}h, 
     nAlerts=${nAlerts},

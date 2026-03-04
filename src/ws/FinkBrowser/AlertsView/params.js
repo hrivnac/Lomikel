@@ -7,15 +7,14 @@ const classesZTF = {
   "Solar System MPC": "255,0,255"
   };
 const classesLSST = {
-  "extragalactic_lt20mag_candidate": "255,255,0",
-  "extragalactic_new_candidate": "0,255,255",
-  "hostless_candidate": "255,0,0",
-  "in_tns": "0,255,0",
-  "sn_near_galaxy_candidate": "255,0,255"
+  "extragalactic_lt20mag_candidate": "255,255,127",
+  "extragalactic_new_candidate": "127,255,255",
+  "hostless_candidate": "255,127,127",
+  "in_tns": "127,255,127",
+  "sn_near_galaxy_candidate": "255,127,255"
   };
  const classes = {...classesZTF, ...classesLSST};
  
-let survey = "LSST";
 let fetchPeriod = 10; // every x minutes
 let fetchStart = 48; // hours before now
 let nAlerts = 10;

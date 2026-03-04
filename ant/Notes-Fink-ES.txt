@@ -10,3 +10,6 @@ src/sh/cron/fillES.sh
 
 # Using
 src/groovy/testESClient.groovy
+
+# Testing
+curl -s 'http://127.0.0.1:20200/radec/_search?pretty=true&q=*:*'

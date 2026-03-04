@@ -145,7 +145,9 @@ function drawOverview() {
 
 // Tooltip
 let tooltipTimeout;
+let tooltipLocked = false;
 canvas.addEventListener('mousemove', e => {
+  if (tooltipLocked) return;
   const mouseX = e.clientX, mouseY = e.clientY;
   let found = false;
   for (const f of flashes) {
@@ -156,11 +158,21 @@ canvas.addEventListener('mousemove', e => {
       tooltip.style.display = 'block';
       tooltip.style.left = (mouseX + 10) + 'px';
       tooltip.style.top = (mouseY + 10) + 'px';
-      tooltip.innerHTML = `<b>${f.alert.objectId}</b><br>${f.alert.jd}<br>${f.alert.class}<br>` +
-                          `<a href="https://ztf.fink-portal.org/${f.alert.objectId}" target="_blank">View on Fink</a>`;
+      if (f.alert.survey == "LSST") {
+        tooltip.innerHTML = `<b>${f.alert.objectId}</b><br>${f.alert.jd}<br>${f.alert.class}<br>` +
+                            `<a href="https://lsst.fink-portal.org/${f.alert.objectId}" target="_blank">View on Fink</a>`;
+        }
+      else {
+        tooltip.innerHTML = `<b>${f.alert.objectId}</b><br>${f.alert.jd}<br>${f.alert.class}<br>` +
+                            `<a href="https://ztf.fink-portal.org/${f.alert.objectId}" target="_blank">View on Fink</a>`;
+        }
       found = true;
+      tooltipLocked = true;
       clearTimeout(tooltipTimeout);
-      tooltipTimeout = setTimeout(() => tooltip.style.display = 'none', 3000);
+      tooltipTimeout = setTimeout(() => {
+        tooltip.style.display = 'none';
+        tooltipLocked = false;
+        }, 3000);
       break;
       }
     }
