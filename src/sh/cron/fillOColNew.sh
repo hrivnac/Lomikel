@@ -1,7 +1,7 @@
 #!/usr/bin/bash -l
 NOW=`date +"%Y%m%d%H%M%s"`
-LOG=/tmp/fillES-${NOW}.log
-LOCK=/tmp/fillES.lock 
+LOG=/tmp/fillOCol-${NOW}.log
+LOCK=/tmp/fillOCol.lock 
 if [[ -e ${LOCK} ]]; then
   echo "Already filling OCol with ${LOCK}"
   exit

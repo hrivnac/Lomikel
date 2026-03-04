@@ -35,7 +35,12 @@ while (client.scanning() || client.size() > 0) {
   if (client.size() > 0) {
     //println(client.size() + ":");
     client.poll().each {k, v -> for (Classifier classifier : classifiers) {
-                                  gr.classifySource(classifier, k, hbaseUrl);
+                                  try {
+                                    gr.classifySource(classifier, k, hbaseUrl);
+                                    }
+                                  catch {Exception e) {
+                                    log.error("Cannot classify " + k + " with " + classifier);
+                                    }
                                   }
                          }
     timer.report();
