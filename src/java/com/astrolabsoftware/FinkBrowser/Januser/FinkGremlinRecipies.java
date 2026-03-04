@@ -90,6 +90,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                        if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
     *                        if <tt>null</tt>, analyse <em>object</em>s from HBase database.
     * @throws LomikelException If anything fails. */
+  @Deprecated
   public void processOCol(Classifier[] classifiers,
                           String       filter,
                           String       hbaseUrl,
@@ -113,6 +114,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                    if <tt>null</tt>, analyse <em>object</em>s from HBase database.
 
     * @throws LomikelException If anything fails. */
+  @Deprecated
   public void fillOCol(Classifier[] classifiers,
                        String       filter,
                        String       hbaseUrl,
