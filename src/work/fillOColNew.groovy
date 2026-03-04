@@ -4,6 +4,14 @@ import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 import com.astrolabsoftware.FinkBrowser.Januser.Classifier;
 import com.Lomikel.Utils.Timer;
 
+// Log
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.Configurator;
+
+Configurator.initialize(null, "../src/java/log4j2.xml")
+log = LogManager.getLogger(this.class)
+
 timer = new Timer("entries", 1000, 5);
 
 client = new AsynchHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
@@ -33,7 +41,7 @@ client.startScan(null,
 timer.start();
 while (client.scanning() || client.size() > 0) {
   if (client.size() > 0) {
-    //println(client.size() + ":");
+    println(client.size() + ":");
     client.poll().each {k, v -> for (Classifier classifier : classifiers) {
                                   try {
                                     gr.classifySource(classifier, k, hbaseUrl);
