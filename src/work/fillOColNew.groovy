@@ -17,8 +17,8 @@ classifiers = new Classifier[]{Classifier.instance('FINK'),
                                Classifier.instance('XMATCH'),
                                Classifier.instance('FEATURES=2024/13-60'),
                                Classifier.instance('FEATURES=2025/13-50'),
-                               Classifier.instance('LIGHTCURVES=Latent'),
-                               Classifier.instance('TAG')}
+                               Classifier.instance('LIGHTCURVES=Latent')
+                               }
 formula = "cdsxmatch != 'Unknown' && roid != 3 && ndethist >= 3";
 hbaseUrl = 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1'
 now = System.currentTimeMillis();
@@ -38,13 +38,11 @@ while (client.scanning() || client.size() > 0) {
                                   gr.classifySource(classifier, k, hbaseUrl);
                                   }
                          }
-    if (timer.report()) {
-      esclient.commit();
-      }
+    timer.report();
     }
   }
 
-esclient.commit();
+gr.generateCorrelations(classifiers);
 
 client.stop();
 
