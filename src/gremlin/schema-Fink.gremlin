@@ -5,7 +5,7 @@ mgmt = graph.openManagement()
 
 // Vertexes
 datalink          = mgmt.getVertexLabel('datalink')
-OCol              = mgmt.makeVertexLabel('OCol'   ).make()
+ocol              = mgmt.makeVertexLabel('OCol'   ).make()
 source            = mgmt.makeVertexLabel('source' ).make()
 object            = mgmt.makeVertexLabel('object' ).make()
 
@@ -42,7 +42,7 @@ sizeIn       = mgmt.makePropertyKey('sizeIn'      ).dataType(Double.class).cardi
 sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
 
 // Vertex properties
-mgmt.addProperties(OCol,
+mgmt.addProperties(ocol,
                    lbl,
                    survey,
                    classifier,
@@ -68,8 +68,8 @@ mgmt.addProperties(overlaps,
 
 // Connections   
 mgmt.addConnection(sends,        object, source)
-mgmt.addConnection(deepcontains, OCol,   object)
-mgmt.addConnection(overlaps,     OCol,   OCol)
+mgmt.addConnection(deepcontains, ocol,   object)
+mgmt.addConnection(overlaps,     ocol,   ocol)
 
 // Info
 mgmt.printSchema()
