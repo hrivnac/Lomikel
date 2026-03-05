@@ -40,7 +40,7 @@ public class AsynchHBaseProcessor implements HBaseProcessor {
       _queue.add(entry.getValue());
       try {
         while (_queue.size() > _maxsize) {
-          log.info("queue size = " + _queue.size() + " > " + _maxsize);
+          log.debug("queue size = " + _queue.size() + " > " + _maxsize);
           TimeUnit.SECONDS.sleep(_waitSeconds);
           }
         }

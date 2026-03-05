@@ -7,6 +7,7 @@ timer = new Timer("entries", 1000, 5);
 esclient = new ESClient("http://157.136.253.253:20200");
 
 client = new AsynchHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
+client.setMaxQueueSize(1000);
 client.connect("ztf", "schema_3.1_5.6.2");
 //client.setLimit(20000);
 now = System.currentTimeMillis();
