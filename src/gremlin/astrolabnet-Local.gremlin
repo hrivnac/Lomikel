@@ -34,7 +34,7 @@ loc = g.addV('site').
 ijclabGraph = g.addV().
                 property('lbl',        'datalink').
                 property('technology', 'Graph'  ).
-                property('url',        'hbase:188.184.87.217:8182:janusgraph').
+                property('url',        'hbase:188.184.87.217:8182:janusgraph1').
                 next()
 ijclabHBase = g.addV().
                 property('lbl',        'datalink').

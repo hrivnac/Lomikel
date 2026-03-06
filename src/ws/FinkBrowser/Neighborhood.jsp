@@ -42,7 +42,7 @@
         
   Init.initWS("NeighborhoodWS");
 
-  JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
+  JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph1");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
   String data = gr.objectNeighborhood2JSON(objectId, classifier, reclassifier, Double.parseDouble(nmax), metric, Double.parseDouble(climit));
   out.print(data);

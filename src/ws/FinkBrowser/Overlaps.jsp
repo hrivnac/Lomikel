@@ -22,7 +22,7 @@
         
   Init.initWS("OverlapsWS");
 
-  JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph");
+  JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph1");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
   String data = gr.overlaps2JSON(classifier);
   out.print(data);
