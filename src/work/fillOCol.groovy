@@ -15,7 +15,7 @@ log = LogManager.getLogger(this.class)
 timer = new Timer("entries", 100, 5);
 
 client = new AsynchHBaseClient("vdhbase1.lal.in2p3.fr", 2183);
-client.setMaxSize(100);
+client.setMaxQueueSize(100);
 client.connect("ztf", "schema_3.1_5.6.2");
 //client.setLimit(20000);
 
