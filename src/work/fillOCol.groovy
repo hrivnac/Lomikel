@@ -31,6 +31,7 @@ classifiers = new Classifier[]{Classifier.instance('FINK'),
 formula = "cdsxmatch != 'Unknown' && roid != 3 && ndethist >= 3";
 hbaseUrl = 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1'
 now = System.currentTimeMillis();
+client.setEvaluation(formula);
 client.startScan(null,
                  null,
                  "i:jd",
