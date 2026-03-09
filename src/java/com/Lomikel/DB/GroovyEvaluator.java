@@ -58,6 +58,7 @@ public class GroovyEvaluator {
   public boolean evalBoolean(Map<String, String> values,
                              String              formula) throws LomikelException {
     String r = eval(values, formula, "boolean");
+    log.info("Evaluating " + formula);
     return Boolean.parseBoolean(r);
     }    
 
