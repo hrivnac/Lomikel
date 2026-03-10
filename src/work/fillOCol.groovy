@@ -34,7 +34,7 @@ now = System.currentTimeMillis();
 client.setEvaluation(formula);
 client.startScan(null,
                  null,
-                 "i:jd",
+                 "i:objectId",
                  now - 90000000, // 1 day
                  now,
                  false,
@@ -46,10 +46,10 @@ while (client.scanning() || client.size() > 0) {
     //println(client.size() + ":");
     client.poll().each {k, v -> for (Classifier classifier : classifiers) {
                                   try {
-                                    gr.classifySource(classifier, k, hbaseUrl);
+                                    gr.classifySource(classifier, v.get("i:objectId", hbaseUrl);
                                     }
                                   catch (Exception e) {
-                                    log.error("Cannot classify " + k + " with " + classifier, e);
+                                    log.error("Cannot classify " + v.get("i:objectId") + " with " + classifier, e);
                                     }
                                   }
                          }
