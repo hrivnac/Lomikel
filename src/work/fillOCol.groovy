@@ -46,7 +46,7 @@ while (client.scanning() || client.size() > 0) {
     //println(client.size() + ":");
     client.poll().each {k, v -> for (Classifier classifier : classifiers) {
                                   try {
-                                    gr.classifySource(classifier, v.get("i:objectId", hbaseUrl);
+                                    gr.classifySource(classifier, v.get("i:objectId"), hbaseUrl);
                                     }
                                   catch (Exception e) {
                                     log.error("Cannot classify " + v.get("i:objectId") + " with " + classifier, e);
