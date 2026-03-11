@@ -12,12 +12,15 @@ import com.Lomikel.DB.SearchMap;
 // HBase
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName ;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.MasterNotRunningException;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Delete;
@@ -219,6 +222,21 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _table;
     }
 
+  public List<String> tables() {
+    List<String> tables = new ArrayList<>();
+    try {
+      Admin admin = _connection.getAdmin();
+      HTableDescriptor[] tableDescriptor = admin.listTables();
+      for (int i = 0; i < tableDescriptor.length; i++) {
+        tables.add(tableDescriptor[i].getNameAsString());
+        }
+      }
+    catch (IOException e) {
+      log.error("Cannot get tables", e);
+      }
+    return tables;
+    }
+    
   @Override
   public void close() {
     log.debug("Closing");
