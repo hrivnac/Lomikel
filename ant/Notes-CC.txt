@@ -1,0 +1,6 @@
+HBase master: 134.158.243.163 cchbase1.in2p3.fr cchbase1.novalocal cchbase1
+
+Elasticsearch:  almalinux@134.158.243.139
+
+Janusgraph:  almalinux@134.158.243.144
+
