@@ -36,12 +36,14 @@ export hbase_table
  
 alias gremlin_console_Local='CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local.properties ${home}"'
 alias gremlin_console_IJCLab='CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local-IJCLab.properties ${home}"'
+alias gremlin_console_CC='CLASSPATH="${GREMLIN_CLASSPATH}" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_console.gremlin ${janusgraph_dir}/conf/gremlin-server/Local-CC.properties ${home}"'
 alias gremlin_Local='CLASSPATH=""  ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_Local.gremlin"'
 alias gremlin_IJCLab='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_IJCLab.gremlin"'
+alias gremlin_CC='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/gremlin/start_CC.gremlin"'
 alias lomikel='CLASSPATH="${LOMIKEL_CLASSPATH}" java com.Lomikel.Apps.LUC'
 alias lomikel_pure='java -jar ../lib/Lomikel-${version}.exe.jar'
 alias lomikel_hbase='java -jar ../lib/Lomikel-HBase-${version}.exe.jar'
 alias lomikel_janus='java -jar ../lib/Lomikel-Janus-${version}.exe.jar'
 alias lomikel_dl4j='java --enable-preview -jar ../lib/Lomikel-dl4j-${version}.exe.jar'
 
-echo "commands: gremlin_console_Local, gremlin_console_IJCLab, gremlin_Local, gremlin_IJCLab, lomikel, lomikel_pure, lomikel_hbase, lomikel_janus, lomikel_dl4j"
+echo "commands: gremlin_console_Local, gremlin_console_IJCLab, gremlin_console_CC, gremlin_Local, gremlin_IJCLab, gremlin_CC, lomikel, lomikel_pure, lomikel_hbase, lomikel_janus, lomikel_dl4j"
