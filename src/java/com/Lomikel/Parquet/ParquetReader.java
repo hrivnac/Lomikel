@@ -216,7 +216,7 @@ public class ParquetReader {
     * @param value The value to add to the {@link List} of values.*/
   private void addToSet(String name,
                         String value) {
-    log.info(name + " " + type);
+    log.info(name + " " + value);
     Set<String> set;
     if (_props.containsKey(name)) {
       set = _props.get(name);
