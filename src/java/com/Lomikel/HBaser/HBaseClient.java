@@ -232,7 +232,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       Admin admin = _connection.getAdmin();
       HTableDescriptor[] tableDescriptor = admin.listTables();
       for (int i = 0; i < tableDescriptor.length; i++) {
-        if (description) {
+        if (descriptions) {
           tables.add(tableDescriptor[i].toStringCustomizedValues());
           }
         else {
