@@ -390,6 +390,7 @@
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/slf4j-api-1.7.33.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hadoop-hdfs-3.2.4.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hadoop-hdfs-client-3.2.4.jar"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/guava-27.0-jre.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-core-2.15.2.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-annotations-2.15.2.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-databind-2.15.2.jar"/>
