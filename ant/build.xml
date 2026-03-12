@@ -607,7 +607,7 @@
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/hdfs/hadoop-hdfs-3.2.1-tests.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/hdfs/hadoop-hdfs-nfs-3.2.1.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/mapreduce/lib/hamcrest-core-1.3.jar"/>
-      <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/mapreduce/lib/junit-4.11.jar"/>
+      <!--zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/mapreduce/lib/junit-4.11.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/mapreduce/hadoop-mapreduce-client-nativetask-3.2.1.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/mapreduce/hadoop-mapreduce-client-uploader-3.2.1.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/mapreduce/hadoop-mapreduce-client-shuffle-3.2.1.jar"/>
@@ -658,7 +658,7 @@
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/yarn/hadoop-yarn-server-timeline-pluginstorage-3.2.1.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/yarn/hadoop-yarn-server-sharedcachemanager-3.2.1.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/yarn/hadoop-yarn-submarine-3.2.1.jar"/>
-      <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/yarn/hadoop-yarn-server-nodemanager-3.2.1.jar"/>
+      <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/yarn/hadoop-yarn-server-nodemanager-3.2.1.jar"/-->
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Hadoop4Lomikel"/>
