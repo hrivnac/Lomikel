@@ -5,7 +5,7 @@ import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 client = new HBaseClient("vdhbase1.lal.in2p3.fr", 2183);
 
 // Get list of tables
-print(client.tables());
+print(client.tables(true));
 
 // Connect to table with defined schema
 client.connect("ztf", "schema_2.2_2.0.0");

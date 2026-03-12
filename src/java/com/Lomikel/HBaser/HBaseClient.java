@@ -223,15 +223,21 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     }
 
   /** Get {@link List} of available {@link Tables}s.
+    * @param descriptions Whether to get full table descriptions or just their names.
     * @return The list of available {@link Table}s. */
-  public List<String> tables() {
+  // TBD: move it to Client
+  public List<String> tables(boolean descriptions) {
     List<String> tables = new ArrayList<>();
     try {
       Admin admin = _connection.getAdmin();
       HTableDescriptor[] tableDescriptor = admin.listTables();
       for (int i = 0; i < tableDescriptor.length; i++) {
-        //tables.add(tableDescriptor[i].getNameAsString());
-        tables.add(tableDescriptor[i].toStringCustomizedValues());
+        if (description) {
+          tables.add(tableDescriptor[i].toStringCustomizedValues());
+          }
+        else {
+          tables.add(tableDescriptor[i].getNameAsString());
+          }
         }
       }
     catch (IOException e) {
