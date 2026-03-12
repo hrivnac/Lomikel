@@ -43,7 +43,7 @@ alias gremlin_CC='CLASSPATH="" ${janusgraph_dir}/bin/gremlin.sh -i "../src/greml
 alias lomikel='CLASSPATH="${LOMIKEL_CLASSPATH}" java com.Lomikel.Apps.LUC'
 alias lomikel_pure='java -jar ../lib/Lomikel-${version}.exe.jar'
 alias lomikel_hbase='java -jar ../lib/Lomikel-HBase-${version}.exe.jar'
-alias lomikel_hadoop='java -jar ../lib/Lomikel-Hadoop-${version}.exe.jar'
+alias lomikel_hadoop='java --add-opens java.base/java.lang=ALL-UNNAMED -jar ../lib/Lomikel-Hadoop-${version}.exe.jar'
 alias lomikel_janus='java -jar ../lib/Lomikel-Janus-${version}.exe.jar'
 alias lomikel_dl4j='java --enable-preview -jar ../lib/Lomikel-dl4j-${version}.exe.jar'
 
