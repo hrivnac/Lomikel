@@ -376,8 +376,8 @@
         <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-HBase-${version}.jar Lomikel-data-${version}.jar"/>
         </manifest>
       </jar> 
-    <!-- create from hbase classpath \-\-glob -->
     <jar jarfile="../lib/Lomikel-HBase-${version}.jar" index="no">
+      <!-- create from hbase classpath \-\-glob -->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/shaded-clients/hbase-shaded-client-2.5.8-hadoop3.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/audience-annotations-0.13.0.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/commons-logging-1.2.jar"/>
@@ -388,13 +388,15 @@
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/opentelemetry-context-1.15.0.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/opentelemetry-semconv-1.15.0-alpha.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/client-facing-thirdparty/slf4j-api-1.7.33.jar"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-core-2.15.2.jar"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-annotations-2.15.2.jar"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-databind-2.15.2.jar"/>
+      <!-- HDFS -->
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hadoop-hdfs-3.2.4.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/hadoop-hdfs-client-3.2.4.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/guava-27.0-jre.jar"/>
       <zipfileset includes="**/*" src="${hbase_dir}/lib/protobuf-java-2.5.0.jar"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-core-2.15.2.jar"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-annotations-2.15.2.jar"/>
-      <zipfileset includes="**/*" src="${hbase_dir}/lib/jackson-databind-2.15.2.jar"/>
+      <zipfileset includes="**/*" src="${hbase_dir}/lib/commons-collections-3.2.2.jar"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="HBase4Lomikel"/>
@@ -435,6 +437,8 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-util-3.7.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/guava-32.1.3-jre.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-common-3.3.5.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-hdfs-client-3.3.5.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/protobuf-java-3.24.3.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hbase-shaded-client-2.5.3-hadoop3.jar"/>      
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hppc-0.9.1.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/ivy-2.5.1.jar"/>
