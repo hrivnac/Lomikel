@@ -158,6 +158,9 @@ public class ParquetReader {
         for (int j = 0; j < g.getFieldRepetitionCount(i); j++) {
           jt = type.getType(i).toString().split(" "); // optionality, type, name, ...
           switch (jt[1]) {
+            case "boolean":
+              addToSet(jt[2], "" + g.getBoolean(i, j));
+              break;
             case "int32":
               addToSet(jt[2], "" + g.getInteger(i, j));
               break;
