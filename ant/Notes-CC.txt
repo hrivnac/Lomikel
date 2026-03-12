@@ -1,5 +1,12 @@
 HBase master: 134.158.243.163 cchbase1.in2p3.fr cchbase1.novalocal cchbase1
 
+134.158.243.163 cchbase1.in2p3.fr cchbase1.novalocal cchbase1
+134.158.243.171 cchbase2.in2p3.fr cchbase2.novalocal cchbase2
+134.158.243.134 cchbase3.in2p3.fr cchbase3.novalocal cchbase3
+134.158.243.159 cchbase4.in2p3.fr cchbase4.novalocal cchbase4
+134.158.243.149 cchbase5.in2p3.fr cchbase5.novalocal cchbase5
+
+
 Elasticsearch:  almalinux@134.158.243.139
 
 Janusgraph:  almalinux@134.158.243.144

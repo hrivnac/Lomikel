@@ -222,13 +222,16 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     return _table;
     }
 
+  /** Get {@link List} of available {@link Tables}s.
+    * @return The list of available {@link Table}s. */
   public List<String> tables() {
     List<String> tables = new ArrayList<>();
     try {
       Admin admin = _connection.getAdmin();
       HTableDescriptor[] tableDescriptor = admin.listTables();
       for (int i = 0; i < tableDescriptor.length; i++) {
-        tables.add(tableDescriptor[i].getNameAsString());
+        //tables.add(tableDescriptor[i].getNameAsString());
+        tables.add(tableDescriptor[i].toStringCustomizedValues());
         }
       }
     catch (IOException e) {

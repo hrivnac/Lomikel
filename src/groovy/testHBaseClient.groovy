@@ -3,6 +3,10 @@ import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 
 // Open HBase database (ip, port)
 client = new HBaseClient("vdhbase1.lal.in2p3.fr", 2183);
+
+// Get list of tables
+print(client.tables());
+
 // Connect to table with defined schema
 client.connect("ztf", "schema_2.2_2.0.0");
 // Set maximum number of results
