@@ -157,35 +157,48 @@ public class ParquetReader {
       for (int i = 0; i < n; i++) {
         for (int j = 0; j < g.getFieldRepetitionCount(i); j++) {
           jt = type.getType(i).toString().split(" "); // optionality, type, name, ...
-          switch (jt[1]) {
+          processValue(g, type, jt[1], jt[2], jt.length == 4 ? jt[3] : null, i, j);
+          }
+        }
+      }
+    }
+    
+  private void processValue(Group g,
+                            GroupType gtype,
+                            String type,
+                            String name,
+                            String btype,
+                            int i,
+                            int j) {
+          switch (type) {
             case "boolean":
-              addToSet(jt[2], "" + g.getBoolean(i, j));
+              addToSet(name, "" + g.getBoolean(i, j));
               break;
             case "int32":
-              addToSet(jt[2], "" + g.getInteger(i, j));
+              addToSet(name, "" + g.getInteger(i, j));
               break;
             case "int64":
-              addToSet(jt[2], "" + g.getLong(i, j));
+              addToSet(name, "" + g.getLong(i, j));
               break;
             case "int96":
-              addToSet(jt[2], "" + int96toTimestamp(g.getInt96(i, j).getBytes()));
+              addToSet(name, "" + int96toTimestamp(g.getInt96(i, j).getBytes()));
               break;
             case "float":
-              addToSet(jt[2], "" + g.getFloat(i, j));
+              addToSet(name, "" + g.getFloat(i, j));
               break;
             case "double":
-              addToSet(jt[2], "" + g.getDouble(i, j));
+              addToSet(name, "" + g.getDouble(i, j));
               break;
             case "binary":
-              if (jt.length == 4 && jt[3].equals("(STRING)")) {
-                addToSet(jt[2], g.getString(i, j));
+              if (btype != null && btype.equals("(STRING)")) {
+                addToSet(name, g.getString(i, j));
                 }
               else {
-                addToSet(jt[2], Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
+                addToSet(name, Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
                 }
               break;
             case "group":
-              name = type.getFieldName(i);
+              name = gtype.getFieldName(i);
               if (name.equals("list")) {
                 processGroup(g.getGroup(i, j).getGroup(0, 0));
                 }
@@ -194,18 +207,16 @@ public class ParquetReader {
                 }
               break;
             default:
-              log.error("Uncovered  type of " + type.getType(i).toString());
+              log.error("Uncovered  type of " + gtype.getType(i).toString());
             }
-          }
-        }
-      }
-    }
+  }
 
   /** Add value to {@link Map} of values.
     * @param name  The name of value to add to the {@link Set} of its values.
     * @param value The value to add to the {@link List} of values.*/
   private void addToSet(String name,
                         String value) {
+    log.info(name + " " + type);
     Set<String> set;
     if (_props.containsKey(name)) {
       set = _props.get(name);
