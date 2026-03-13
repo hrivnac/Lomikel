@@ -200,7 +200,7 @@ public class ParquetReader {
           addToSet(name, Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
           }
         break;
-      case "group
+      case "group":
         log.info(name + " " + gtype.getFieldName(i));
         if (gtype.getFieldName(i).equals("list")) {
           processGroup(g.getGroup(i, j).getGroup(0, 0));
