@@ -178,7 +178,7 @@ public class ParquetReader {
     String fullname = name;
     if (gname != null) {
       if (name.equals("list")) {
-        log.info("NEWLIST");
+        newList();
         fullname = gname;
         }
       else {
@@ -225,12 +225,15 @@ public class ParquetReader {
       }
     }
 
+  public void newList() {
+    log.info(_props.size());
+    }
+    
   /** Add value to {@link Map} of values.
     * @param name  The name of value to add to the {@link Set} of its values.
     * @param value The value to add to the {@link List} of values.*/
   private void addToSet(String name,
                         String value) {
-    log.info(name);
     Set<String> set;
     if (_props.containsKey(name)) {
       set = _props.get(name);
