@@ -176,8 +176,13 @@ public class ParquetReader {
                               int       j,
                               String    gname) {
     String fullname = name;
-    if (gname != null && !name.equals("list")) {
-      fullname = gname + "." + name;
+    if (gname != null) {
+      if (name.equals("list")) {
+        fullname = gname;
+        }
+      else {
+        fullname = gname + "." + name;
+        }
       }
     switch (type) {
       case "boolean":
