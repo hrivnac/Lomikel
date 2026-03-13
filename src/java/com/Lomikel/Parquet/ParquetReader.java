@@ -166,13 +166,13 @@ public class ParquetReader {
   /** Process value of {@link SimpleGroup}.
     * to be overriden.
     * TBD */
-  private void processValue(Group     g,
-                            GroupType gtype,
-                            String    type,
-                            String    name,
-                            String    btype,
-                            int       i,
-                            int       j) {
+  protected void processValue(Group     g,
+                              GroupType gtype,
+                              String    type,
+                              String    name,
+                              String    btype,
+                              int       i,
+                              int       j) {
     switch (type) {
       case "boolean":
         addToSet(name, "" + g.getBoolean(i, j));
