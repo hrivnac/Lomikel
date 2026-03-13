@@ -178,7 +178,6 @@ public class ParquetReader {
     String fullname = name;
     if (gname != null) {
       if (name.equals("list")) {
-        newList();
         fullname = gname;
         }
       else {
@@ -214,6 +213,7 @@ public class ParquetReader {
         break;
       case "group":
         if (name.equals("list")) {
+          newList();
           processGroup(g.getGroup(i, j).getGroup(0, 0), fullname);
           }
         else {
@@ -232,7 +232,7 @@ public class ParquetReader {
     * @param name  The name of value to add to the {@link Set} of its values.
     * @param value The value to add to the {@link List} of values.*/
   protected void addToSet(String name,
-                          String value) {
+                        String value) {
     Set<String> set;
     if (_props.containsKey(name)) {
       set = _props.get(name);
