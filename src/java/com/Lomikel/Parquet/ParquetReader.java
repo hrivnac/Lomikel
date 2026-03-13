@@ -137,7 +137,7 @@ public class ParquetReader {
       Group g;
       int i = 0;
       while ((g = recordReader.read()) != null && ++i < rows) {
-        processGroup(g, "");
+        processGroup(g, null);
         }
       }
     } 
@@ -175,7 +175,10 @@ public class ParquetReader {
                               int       i,
                               int       j,
                               String    gname) {
-    String fullname = gname + "." + name;
+    String fullname = name;
+    if (gname != null) 
+      fullname = gname + "." + name;
+      }
     switch (type) {
       case "boolean":
         addToSet(fullname, "" + g.getBoolean(i, j));
