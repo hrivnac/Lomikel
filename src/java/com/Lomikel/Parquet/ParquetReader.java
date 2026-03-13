@@ -228,19 +228,32 @@ public class ParquetReader {
       }
     }
 
+  /** Called at the beginning of a new list.
+    * Does nothing.
+    * May be overriden. */
   public void newList() {
     }
     
+  /** Called at the beginning of a new group.
+    * Does nothing.
+    * May be overriden. */
   public void newGroup() {
     }
 
+  /** Called at the end of a list.
+    * Does nothing.
+    * May be overriden. */
   public void endList() {
     }
     
+  /** Called at the end of a group.
+    * Does nothing.
+    * May be overriden. */
   public void endGroup() {
     }
     
   /** Add value to {@link Map} of values.
+    * May be overriden.
     * @param name  The name of value to add to the {@link Set} of its values.
     * @param value The value to add to the {@link List} of values.*/
   protected void addToSet(String name,
