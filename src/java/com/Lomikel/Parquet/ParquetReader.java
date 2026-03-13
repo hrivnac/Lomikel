@@ -201,7 +201,7 @@ public class ParquetReader {
           }
         break;
       case "group
-        log.info(name + " " + gtype.getFieldName(i))
+        log.info(name + " " + gtype.getFieldName(i));
         if (gtype.getFieldName(i).equals("list")) {
           processGroup(g.getGroup(i, j).getGroup(0, 0));
           }
