@@ -178,7 +178,6 @@ public class ParquetReader {
     String fullname = name;
     if (gname != null) {
       if (name.equals("list")) {
-        newList();
         fullname = gname;
         }
       else {
@@ -214,10 +213,11 @@ public class ParquetReader {
         break;
       case "group":
         if (name.equals("list")) {
+          newList();
           processGroup(g.getGroup(i, j).getGroup(0, 0), fullname);
           }
         else {
-          log.info("G");
+          newGroup();
           processGroup(g.getGroup(i, j), fullname);
           }
         break;
@@ -227,6 +227,9 @@ public class ParquetReader {
     }
 
   public void newList() {
+    }
+    
+  public void newGroup() {
     }
     
   /** Add value to {@link Map} of values.
