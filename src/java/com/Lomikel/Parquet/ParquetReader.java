@@ -215,10 +215,12 @@ public class ParquetReader {
         if (name.equals("list")) {
           newList();
           processGroup(g.getGroup(i, j).getGroup(0, 0), fullname);
+          endList();
           }
         else {
           newGroup();
           processGroup(g.getGroup(i, j), fullname);
+          endGroup();
           }
         break;
       default:
@@ -230,6 +232,12 @@ public class ParquetReader {
     }
     
   public void newGroup() {
+    }
+
+  public void endList() {
+    }
+    
+  public void endGroup() {
     }
     
   /** Add value to {@link Map} of values.
