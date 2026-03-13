@@ -150,7 +150,6 @@ public class ParquetReader {
     GroupType type;
     String[] jt;
     int n;
-    String name = null;
     if (g instanceof SimpleGroup) {
       sg = (SimpleGroup)g;
       type = sg.getType();
@@ -174,6 +173,7 @@ public class ParquetReader {
                               String    btype,
                               int       i,
                               int       j) {
+    log.info(name);
     switch (type) {
       case "boolean":
         addToSet(name, "" + g.getBoolean(i, j));
@@ -220,7 +220,6 @@ public class ParquetReader {
     * @param value The value to add to the {@link List} of values.*/
   private void addToSet(String name,
                         String value) {
-    log.info(name + " " + value);
     Set<String> set;
     if (_props.containsKey(name)) {
       set = _props.get(name);
