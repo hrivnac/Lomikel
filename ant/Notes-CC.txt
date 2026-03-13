@@ -1,13 +1,71 @@
-HBase master: 134.158.243.163 cchbase1.in2p3.fr cchbase1.novalocal cchbase1
-
-134.158.243.163 cchbase1.in2p3.fr cchbase1.novalocal cchbase1
+134.158.243.137 mesos1 mesos1.novalocal
+134.158.243.163 cchbase1.in2p3.fr cchbase1.novalocal cchbase1 # HBase master
 134.158.243.171 cchbase2.in2p3.fr cchbase2.novalocal cchbase2
 134.158.243.134 cchbase3.in2p3.fr cchbase3.novalocal cchbase3
 134.158.243.159 cchbase4.in2p3.fr cchbase4.novalocal cchbase4
 134.158.243.149 cchbase5.in2p3.fr cchbase5.novalocal cchbase5
+134.158.243.172 ccingestion1.in2p3.fr ccingestion1.novalocal ccingestion1
+134.158.243.146 cckafka1.in2p3.fr cckafka1.novalocal cckafka1
+134.158.243.187 cckafka2.in2p3.fr cckafka2.novalocal cckafka2
+134.158.243.184 cckafka3.in2p3.fr cckafka3.novalocal cckafka3
+134.158.243.165 ccmaster1.in2p3.fr ccmaster1.novalocal ccmaster1
+134.158.243.155 ccmaster2.in2p3.fr ccmaster2.novalocal ccmaster2
+134.158.243.142 ccmesos1.in2p3.fr ccmesos1.novalocal ccmesos1
+134.158.243.188 ccproxy1.in2p3.fr ccproxy1.novalocal ccproxy1
+134.158.243.164 ccslave1.in2p3.fr ccslave1.novalocal ccslave1
+134.158.243.157 ccslave2.in2p3.fr ccslave2.novalocal ccslave2
+134.158.243.183 ccslave3.in2p3.fr ccslave3.novalocal ccslave3
+134.158.243.186 ccslave4.in2p3.fr ccslave4.novalocal ccslave4
+134.158.243.169 ccslave5.in2p3.fr ccslave5.novalocal ccslave5
+134.158.243.140 ccslave6.in2p3.fr ccslave6.novalocal ccslave6
+134.158.243.185 ccslave7.in2p3.fr ccslave7.novalocal ccslave7
+134.158.243.135 ccslave8.in2p3.fr ccslave8.novalocal ccslave8
+134.158.243.182 ccslave9.in2p3.fr ccslave9.novalocal ccslave9
+134.158.243.153 ccslave10.in2p3.fr ccslave10.novalocal ccslave10
+134.158.243.166 ccslave11.in2p3.fr ccslave11.novalocal ccslave11
+134.158.243.179 ccslave12.in2p3.fr ccslave12.novalocal ccslave12
+134.158.243.148 ccslave13.in2p3.fr ccslave13.novalocal ccslave13
+
 
 
 Elasticsearch:  almalinux@134.158.243.139
 
 Janusgraph:  almalinux@134.158.243.144
 
+Reading parquet example:
+
+from pyspark.sql import SparkSession
+
+# put args
+YEAR = "2026"
+MONTH = "03"
+NIGHT = "10"
+
+spark = SparkSession.builder.appName("extract_index").getOrCreate()
+spark.sparkContext.setLogLevel("WARN")
+
+df = spark.read.format("parquet").load("hdfs://ccmaster1:8020///user/fink/archive/science/year={}/month={}/day={}".format(YEAR, MONTH, NIGHT))
+
+# static ID, moving ID, ra, dec, time
+fields = ["diaObject.diaObjectId", "ssSource.ssObjectId", "diaSource.ra", "diaSource.dec", "diaSource.midpointMjdTai"]
+df_sub = df.select(fields)
+
+df_sub.show()
+
+from pyspark.sql import SparkSession
+
+# put args
+YEAR = "2026"
+MONTH = "03"
+NIGHT = "10"
+
+spark = SparkSession.builder.appName("extract_index").getOrCreate()
+spark.sparkContext.setLogLevel("WARN")
+
+df = spark.read.format("parquet").load("hdfs://ccmaster1:8020///user/fink/archive/science/year={}/month={}/day={}".format(YEAR, MONTH, NIGHT))
+
+# static ID, moving ID, ra, dec, time
+fields = ["diaObject.diaObjectId", "ssSource.ssObjectId", "diaSource.ra", "diaSource.dec", "diaSource.midpointMjdTai"]
+df_sub = df.select(fields)
+
+df_sub.show()

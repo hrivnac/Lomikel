@@ -358,33 +358,6 @@
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         </manifest>
       </jar>    
-    <jar jarfile="../lib/Lomikel-${version}.exe.jar" index="no">
-      <manifest>
-        <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="Lomikel"/>
-        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
-        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-data-${version}.jar"/>
-        </manifest>
-      </jar>    
-    <jar jarfile="../lib/Lomikel-HBase-${version}.exe.jar" index="no">
-      <manifest>
-        <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="LomikelwHBase"/>
-        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
-        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-HBase-${version}.jar Lomikel-data-${version}.jar"/>
-        </manifest>
-      </jar> 
-    <jar jarfile="../lib/Lomikel-Hadoop-${version}.exe.jar" index="no">
-      <manifest>
-        <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="LomikelwHadoop"/>
-        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
-        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Hadoop-${version}.jar Lomikel-data-${version}.jar"/>
-        </manifest>
-      </jar> 
     <!-- create from hbase classpath \-\-glob -->
     <jar jarfile="../lib/Lomikel-HBase-${version}.jar" index="no">
       <zipfileset includes="**/*" src="${hbase_dir}/lib/shaded-clients/hbase-shaded-client-2.5.8-hadoop3.jar"/>
@@ -665,15 +638,6 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar>
-    <jar jarfile="../lib/Lomikel-Janus-${version}.exe.jar" index="no">
-      <manifest>
-        <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="LomikelwHBase"/>
-        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
-        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
-        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar Lomikel-data-${version}.jar"/>
-        </manifest>
-      </jar> 
     <!-- empirically assembled minimum -->
     <jar jarfile="../lib/Lomikel-Janus-${version}.jar" index="no" zip64Mode="always">
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/caffeine-2.9.3.jar"/>
@@ -765,6 +729,51 @@
         <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
         </manifest>
       </jar> 
+    <jar jarfile="../lib/Lomikel-${version}.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="Lomikel"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-data-${version}.jar"/>
+        </manifest>
+      </jar>    
+    <jar jarfile="../lib/Lomikel-HBase-${version}.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelwHBase"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-HBase-${version}.jar Lomikel-data-${version}.jar"/>
+        </manifest>
+      </jar> 
+    <jar jarfile="../lib/Lomikel-Janus-${version}.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelwHBase"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar Lomikel-data-${version}.jar"/>
+        </manifest>
+      </jar> 
+    <jar jarfile="../lib/Lomikel-Hadoop-${version}.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelwHadoop"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Hadoop-${version}.jar Lomikel-data-${version}.jar"/>
+        </manifest>
+      </jar> 
+    <jar jarfile="../lib/Lomikel-All-${version}.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelwJanusHadoop"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Hadoop-${version}.jar Lomikel-Janus-${version}.jar Lomikel-data-${version}.jar"/>
+        </manifest>
+      </jar> 
     <jar jarfile="../lib/Lomikel-py4j-${version}.exe.jar" index="no">
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
@@ -774,11 +783,6 @@
         <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar"/>
         </manifest>
       </jar> 
-    </target>
-    
-  <target name="exe-dl4j"
-          depends="jar"
-          description="Create exe JARs for dl4j">
     <copy file="${dl4j_jar}" tofile="../lib/dl4j-all.jar"/>
     <jar jarfile="../lib/Lomikel-dl4j-${version}.exe.jar" index="no">
       <manifest>
@@ -790,7 +794,7 @@
         </manifest>
       </jar> 
     </target>
-    
+        
   <!-- WAR ==================================================================-->
 
   <target name="war"
@@ -1294,7 +1298,7 @@
       </delete>
    </target>
    
-  <!-- Dist ==========================WWW=======================================-->
+  <!-- Dist =================================================================-->
 
   <target name="dist"
           depends="exe"
@@ -1306,7 +1310,7 @@
       </copy>
   </target>
 
-  <!-- Run =================================================================-->
+  <!-- Run ==================================================================-->
 
   <target name="start-Lomikel"
           depends="init"

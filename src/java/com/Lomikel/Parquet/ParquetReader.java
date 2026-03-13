@@ -163,53 +163,56 @@ public class ParquetReader {
       }
     }
     
-  private void processValue(Group g,
+  /** Process value of {@link SimpleGroup}.
+    * to be overriden.
+    * TBD */
+  private void processValue(Group     g,
                             GroupType gtype,
-                            String type,
-                            String name,
-                            String btype,
-                            int i,
-                            int j) {
-          switch (type) {
-            case "boolean":
-              addToSet(name, "" + g.getBoolean(i, j));
-              break;
-            case "int32":
-              addToSet(name, "" + g.getInteger(i, j));
-              break;
-            case "int64":
-              addToSet(name, "" + g.getLong(i, j));
-              break;
-            case "int96":
-              addToSet(name, "" + int96toTimestamp(g.getInt96(i, j).getBytes()));
-              break;
-            case "float":
-              addToSet(name, "" + g.getFloat(i, j));
-              break;
-            case "double":
-              addToSet(name, "" + g.getDouble(i, j));
-              break;
-            case "binary":
-              if (btype != null && btype.equals("(STRING)")) {
-                addToSet(name, g.getString(i, j));
-                }
-              else {
-                addToSet(name, Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
-                }
-              break;
-            case "group":
-              name = gtype.getFieldName(i);
-              if (name.equals("list")) {
-                processGroup(g.getGroup(i, j).getGroup(0, 0));
-                }
-              else {
-                processGroup(g.getGroup(i, j));
-                }
-              break;
-            default:
-              log.error("Uncovered  type of " + gtype.getType(i).toString());
-            }
-  }
+                            String    type,
+                            String    name,
+                            String    btype,
+                            int       i,
+                            int       j) {
+    switch (type) {
+      case "boolean":
+        addToSet(name, "" + g.getBoolean(i, j));
+        break;
+      case "int32":
+        addToSet(name, "" + g.getInteger(i, j));
+        break;
+      case "int64":
+        addToSet(name, "" + g.getLong(i, j));
+        break;
+      case "int96":
+        addToSet(name, "" + int96toTimestamp(g.getInt96(i, j).getBytes()));
+        break;
+      case "float":
+        addToSet(name, "" + g.getFloat(i, j));
+        break;
+      case "double":
+        addToSet(name, "" + g.getDouble(i, j));
+        break;
+      case "binary":
+        if (btype != null && btype.equals("(STRING)")) {
+          addToSet(name, g.getString(i, j));
+          }
+        else {
+          addToSet(name, Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
+          }
+        break;
+      case "group":
+        name = gtype.getFieldName(i);
+        if (name.equals("list")) {
+          processGroup(g.getGroup(i, j).getGroup(0, 0));
+          }
+        else {
+          processGroup(g.getGroup(i, j));
+          }
+        break;
+      default:
+        log.error("Uncovered  type of " + gtype.getType(i).toString());
+      }
+    }
 
   /** Add value to {@link Map} of values.
     * @param name  The name of value to add to the {@link Set} of its values.
