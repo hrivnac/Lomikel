@@ -143,8 +143,9 @@ public class ParquetReader {
     } 
     
   /** Process {@link Group}. Runs recursively.
+    * May be overriden.
     * @param g The {@link Group} to process. */
-  private void processGroup(Group g) {
+  protected void processGroup(Group g) {
     SimpleGroup sg;
     GroupType type;
     String[] jt;
@@ -164,7 +165,7 @@ public class ParquetReader {
     }
     
   /** Process value of {@link SimpleGroup}.
-    * to be overriden.
+    * May be overriden.
     * TBD */
   protected void processValue(Group     g,
                               GroupType gtype,

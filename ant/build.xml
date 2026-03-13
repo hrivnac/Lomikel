@@ -783,7 +783,7 @@
         <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar"/>
         </manifest>
       </jar> 
-    <copy file="${dl4j_jar}" tofile="../lib/dl4j-all.jar"/>
+    <!--copy file="${dl4j_jar}" tofile="../lib/dl4j-all.jar"/>
     <jar jarfile="../lib/Lomikel-dl4j-${version}.exe.jar" index="no">
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
@@ -792,7 +792,7 @@
         <attribute name="Main-Class" value="com.Lomikel.Apps.LUC"/>
         <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-data-${version}.jar dl4j-all.jar"/>
         </manifest>
-      </jar> 
+      </jar--> 
     </target>
         
   <!-- WAR ==================================================================-->
