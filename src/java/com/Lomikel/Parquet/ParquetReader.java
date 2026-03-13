@@ -137,7 +137,7 @@ public class ParquetReader {
       Group g;
       int i = 0;
       while ((g = recordReader.read()) != null && ++i < rows) {
-        processGroup(g);
+        processGroup(g, "");
         }
       }
     } 
@@ -145,7 +145,8 @@ public class ParquetReader {
   /** Process {@link Group}. Runs recursively.
     * May be overriden.
     * @param g The {@link Group} to process. */
-  protected void processGroup(Group g) {
+  protected void processGroup(Group g,
+                              String fullname) {
     SimpleGroup sg;
     GroupType type;
     String[] jt;
@@ -157,7 +158,7 @@ public class ParquetReader {
       for (int i = 0; i < n; i++) {
         for (int j = 0; j < g.getFieldRepetitionCount(i); j++) {
           jt = type.getType(i).toString().split(" "); // optionality, type, name, ...
-          processValue(g, type, jt[1], jt[2], jt.length == 4 ? jt[3] : null, i, j);
+          processValue(g, type, jt[1], jt[2], jt.length == 4 ? jt[3] : null, i, j, fullname);
           }
         }
       }
@@ -172,41 +173,42 @@ public class ParquetReader {
                               String    name,
                               String    btype,
                               int       i,
-                              int       j) {
+                              int       j,
+                              String    gname) {
+    String fullname = gname + "." + name;
     switch (type) {
       case "boolean":
-        addToSet(name, "" + g.getBoolean(i, j));
+        addToSet(fullname, "" + g.getBoolean(i, j));
         break;
       case "int32":
-        addToSet(name, "" + g.getInteger(i, j));
+        addToSet(fullname, "" + g.getInteger(i, j));
         break;
       case "int64":
-        addToSet(name, "" + g.getLong(i, j));
+        addToSet(fullname, "" + g.getLong(i, j));
         break;
       case "int96":
-        addToSet(name, "" + int96toTimestamp(g.getInt96(i, j).getBytes()));
+        addToSet(fullname, "" + int96toTimestamp(g.getInt96(i, j).getBytes()));
         break;
       case "float":
-        addToSet(name, "" + g.getFloat(i, j));
+        addToSet(fullname, "" + g.getFloat(i, j));
         break;
       case "double":
-        addToSet(name, "" + g.getDouble(i, j));
+        addToSet(fullname, "" + g.getDouble(i, j));
         break;
       case "binary":
         if (btype != null && btype.equals("(STRING)")) {
-          addToSet(name, g.getString(i, j));
+          addToSet(fullname, g.getString(i, j));
           }
         else {
-          addToSet(name, Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
+          addToSet(fullname, Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
           }
         break;
       case "group":
-        log.info(name + " " + gtype.getFieldName(i));
-        if (gtype.getFieldName(i).equals("list")) {
-          processGroup(g.getGroup(i, j).getGroup(0, 0));
+        if (name.equals("list")) {
+          processGroup(g.getGroup(i, j).getGroup(0, 0), fullname);
           }
         else {
-          processGroup(g.getGroup(i, j));
+          processGroup(g.getGroup(i, j), fullname);
           }
         break;
       default:
@@ -219,6 +221,7 @@ public class ParquetReader {
     * @param value The value to add to the {@link List} of values.*/
   private void addToSet(String name,
                         String value) {
+    log.info(name);
     Set<String> set;
     if (_props.containsKey(name)) {
       set = _props.get(name);
