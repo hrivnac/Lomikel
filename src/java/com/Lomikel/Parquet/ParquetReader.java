@@ -173,7 +173,6 @@ public class ParquetReader {
                               String    btype,
                               int       i,
                               int       j) {
-    log.info(name);
     switch (type) {
       case "boolean":
         addToSet(name, "" + g.getBoolean(i, j));
@@ -201,9 +200,9 @@ public class ParquetReader {
           addToSet(name, Base64.getEncoder().encodeToString(g.getBinary(i, j).getBytes()));
           }
         break;
-      case "group":
-        name = gtype.getFieldName(i);
-        if (name.equals("list")) {
+      case "group
+        log.info(name + " " + gtype.getFieldName(i))
+        if (gtype.getFieldName(i).equals("list")) {
           processGroup(g.getGroup(i, j).getGroup(0, 0));
           }
         else {
