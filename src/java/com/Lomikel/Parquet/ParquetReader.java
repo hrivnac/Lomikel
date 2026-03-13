@@ -137,7 +137,6 @@ public class ParquetReader {
       Group g;
       int i = 0;
       while ((g = recordReader.read()) != null && ++i < rows) {
-        log.info("NEW");
         processGroup(g, null);
         }
       }
@@ -179,6 +178,7 @@ public class ParquetReader {
     String fullname = name;
     if (gname != null) {
       if (name.equals("list")) {
+        log.info("NEWLIST");
         fullname = gname;
         }
       else {
