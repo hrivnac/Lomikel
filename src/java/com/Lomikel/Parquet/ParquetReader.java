@@ -137,6 +137,7 @@ public class ParquetReader {
       Group g;
       int i = 0;
       while ((g = recordReader.read()) != null && ++i < rows) {
+        log.info("NEW");
         processGroup(g, null);
         }
       }
