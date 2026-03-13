@@ -176,7 +176,7 @@ public class ParquetReader {
                               int       j,
                               String    gname) {
     String fullname = name;
-    if (gname != null) {
+    if (gname != null && !name.equals("list")) {
       fullname = gname + "." + name;
       }
     switch (type) {
