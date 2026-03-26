@@ -1,7 +1,7 @@
 import com.Lomikel.ElasticSearcher.ESClient;
+import com.Lomikel.Parquet.ParquetReader;
 
 // Parquet
-import com.Lomikel.Parquet.ParquetReader;
 import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.example.data.simple.SimpleGroup;
