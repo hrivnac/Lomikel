@@ -10,5 +10,5 @@ PID=$$
 echo ${PID} > ${LOCK}
 cd ~/Lomikel/ant
 source ./setup.sh
-java -jar ~/Lomikel/lib/Lomikel-All-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/fillES.groovy | tee -a ${LOG} 2>&1
+java --add-opens=java.base/java.lang=ALL-UNNAMED-jar ~/Lomikel/lib/Lomikel-All-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/fillES.groovy | tee -a ${LOG} 2>&1
 /bin/rm -f ${LOCK} 
