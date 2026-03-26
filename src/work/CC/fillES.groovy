@@ -9,6 +9,10 @@ import org.apache.parquet.example.data.simple.SimpleGroup;
 // Hadoop
 import org.apache.hadoop.fs.Path;
 
+// Java
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 // Log
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -77,4 +81,5 @@ public class PR extends ParquetReader {
 //esclient.createIndex("dia_mjd", "mjd", "double");
 
 reader = new PR("hdfs://ccmaster1:8020");
-reader.processDir("/user/fink/archive/science/year=2026/month=03/day=10", "parquet");
+yesterday = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
+reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");

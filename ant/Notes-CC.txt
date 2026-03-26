@@ -26,11 +26,24 @@
 134.158.243.179 ccslave12.in2p3.fr ccslave12.novalocal ccslave12
 134.158.243.148 ccslave13.in2p3.fr ccslave13.novalocal ccslave13
 
+---
+import com.Lomikel.ElasticSearcher.ESClient;
 
+esclient = new ESClient("http://157.136.253.253:20200");
+
+esclient.setSizeSearch(10000); // default is 10
+println(esclient.searchGeoPoint("dia_radec", "location", 149.868, 0.598, 0.1));
+println(esclient.searchRange("dia_mjd", "mjd", 61108.143, 61109.144));
+println(esclient.searchGeoPoint("ss_radec", "location", 149.868, 0.598, 0.1));
+println(esclient.searchRange("ss_mjd", "mjd", 61108.143, 61109.144));
+---
 
 Elasticsearch:  almalinux@134.158.243.139
 
 Janusgraph:  almalinux@134.158.243.144
+
+src/work/CC/fillES.groovy
+
 
 Reading parquet example:
 

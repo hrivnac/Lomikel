@@ -204,7 +204,7 @@ public class ESClient {
                                            .toString());
     }
     
-  /** Search value.
+  /** Search String value.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  value     The field value.
@@ -220,7 +220,7 @@ public class ESClient {
                                            .toString());
     }
     
-  /** Search value.
+  /** Search long value.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  value     The field value.
@@ -236,7 +236,7 @@ public class ESClient {
                                            .toString());
     }
     
-  /** Search value.
+  /** Search double value.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  value     The field value.
@@ -252,7 +252,7 @@ public class ESClient {
                                            .toString());
     }
     
-  /** Search value.
+  /** Search value in String range.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  minValue  The minimal value.
@@ -268,10 +268,11 @@ public class ESClient {
                                                                      new JSONObject().put(fieldName,
                                                                                           new JSONObject().put("gte", minValue)
                                                                                                           .put("lte", maxValue))))
+                                           .put("size", _size)
                                            .toString());
     }
     
-  /** Search value in range.
+  /** Search value in long range.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  minValue  The minimal value.
@@ -291,7 +292,7 @@ public class ESClient {
                                            .toString());
     }
     
-  /** Search value in range.
+  /** Search value in double range.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  minValue  The minimal value.
