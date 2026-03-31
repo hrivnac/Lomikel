@@ -663,6 +663,7 @@
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/gremlin-util-3.7.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/guava-32.1.3-jre.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hadoop-common-3.3.5.jar"/>
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hbase-shaded-client-2.5.3-hadoop3.jar"/>      
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/hppc-0.9.1.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/ivy-2.5.1.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/janusgraph-all-1.0.0.jar"/>
