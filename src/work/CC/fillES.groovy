@@ -20,7 +20,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml");
 
-delay = 20;
+delay = 25;
 
 public class PR extends ParquetReader {
 
