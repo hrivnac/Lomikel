@@ -51,7 +51,7 @@ public class PR extends ParquetReader {
     
   @Override
   public void endGroup() {
-    log.info(props);
+    log.info(props());
     //if (props().containsKey("diaObject.diaObjectId") || props().containsKey("ssSource.ssObjectId")) {
     //  double ra  = new Double(props().get("diaSource.ra"            ).iterator().next());
     //  double dec = new Double(props().get("diaSource.dec"           ).iterator().next());
