@@ -75,6 +75,7 @@ public class PR extends ParquetReader {
       esclient.commit();
       }
     }
+    
   }
   
 //esclient.createIndex("ss_radec", "location", "geo_point");
