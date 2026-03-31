@@ -14,34 +14,25 @@ import java.util.HashMap;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public abstract class Classifier {
-  
-  public static Classifier instance(Type type) throws LomikelException {
-    return instance(type, "");
-    }
-    
-  public static Classifier instance(String name) throws LomikelException {
-    String[] fullName = name.split("=");
-    if (fullName.length == 2) {
-      return instance(fullName[0], fullName[1]);
-      }
-    else if (fullName.length == 1) {
-      return instance(name, "");
-      }
-    else {
-      throw new LomikelException("Unknown Classifier name " + name);
-      }
-    }
- 
-  public static Classifier instance(String name,
+   
+  /** Give singleton {@link Classifier} for each type, survey and flavor.
+    * @param type   The {@link Classifier} type.
+    * @param survey The {@link Classifier} survey.
+    * @param flavor The {@link Classifier} flavor. May be empty.
+    * @throws LomikelException If {@link Classifier} cannot be created. */
+  public static Classifier instance(String type,
+                                    String survey, 
                                     String flavor) throws LomikelException {
-    return instance(Type.valueOf(name), flavor);
+    return instance(Type.valueOf(type), Survey.valueOf(survey), flavor);
     }
     
-  /** Give singleton {@link Classifier} for each type and flavor.
-    * @param type The {@link Classifier} {@link Type}.
-    * @param flavor The {@link Classifier} flavor.
+  /** Give singleton {@link Classifier} for each type, survey and flavor.
+    * @param type   The {@link Classifier} {@link Type}.
+    * @param survey The {@link Classifier} {@link Survey}.
+    * @param flavor The {@link Classifier} flavor. May ber empty.
     * @throws LomikelException If {@link Classifier} cannot be created. */
   public static Classifier instance(Type   type,
+                                    Survey survey,
                                     String flavor) throws LomikelException {
     Pair<Type, String> signature = Pair.of(type, flavor);
     if (!_classifiers.containsKey(signature)) {
@@ -51,7 +42,16 @@ public abstract class Classifier {
           cl = new FinkPortalClassifier();
           break;
         case FINK:
-          cl = new FinkClassifier();
+          switch (survey) {
+            case ZTF:
+              cl = new FinkZTFClassifier();
+              break;
+            case LSST:
+              cl = new FinkLSSTClassifier();
+              break;
+            default:
+              throw new LomikelException("Unknown Classifier Type " + type + " for survey " + survey);      
+            }
           break;
         case XMATCH:
           cl = new XMatchClassifier();
@@ -124,6 +124,12 @@ public abstract class Classifier {
   
   private static Map<Pair<Type, String>, Classifier> _classifiers = new HashMap<>();
   
+  /** The survey of {@link Classifier}. */
+  public static enum Survey {
+    ZTF,
+    LSST
+    }
+    
   /** The type of {@link Classifier}. Each {@link Type} can exist in many flavors. */
   public static enum Type {
     FINK_PORTAL,
