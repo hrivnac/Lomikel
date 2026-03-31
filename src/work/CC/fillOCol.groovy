@@ -73,7 +73,7 @@ public class PR extends ParquetReader {
     //  props().clear();
     //  esclient.commit();
     //  }
-    //}
+    }
     
   }
   
