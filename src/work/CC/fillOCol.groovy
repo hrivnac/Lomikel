@@ -22,13 +22,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml");
-//Logger log = LogManager.getLogger(this.class)
 
 delay = 25;
 
 public class PR extends ParquetReader {
 
   Logger log = LogManager.getLogger(this.class);
+
+  classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', '')}
 
   public PR(String url) {
     super(url);
@@ -53,7 +54,20 @@ public class PR extends ParquetReader {
     
   @Override
   public void endGroup() {
-    log.info(props());
+    if (props().containsKey("diaObject.diaObjectId") || props().containsKey("ssSource.ssObjectId")) {
+      String key;
+      if (props().containsKey("diaObject.diaObjectId")) {
+        key = props().get("diaObject.diaObjectId").iterator().next();
+        }
+      else if (props().containsKey("ssSource.ssObjectId")) {
+        key = props().get("ssSource.ssObjectId").next();
+        }
+      else {
+        log.warn("no objectid");
+        }
+      log.info(key);
+      props().clear();
+      }    
     }
     
   }
