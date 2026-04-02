@@ -23,13 +23,13 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml");
 
-delay = 25;
+int delay = 25;
 
 public class PR extends ParquetReader {
 
   Logger log = LogManager.getLogger(this.class);
 
-  classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', '')}
+  Classifier[] classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', '')}
 
   public PR(String url) {
     super(url);
@@ -72,8 +72,8 @@ public class PR extends ParquetReader {
     
   }
 
-timer = new Timer("entries", 100, 5); 
+Timer timer = new Timer("entries", 100, 5); 
   
-reader = new PR("hdfs://ccmaster1:8020");
+ParquetReader reader = new PR("hdfs://ccmaster1:8020");
 yesterday = LocalDate.now().minusDays(delay).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
 reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
