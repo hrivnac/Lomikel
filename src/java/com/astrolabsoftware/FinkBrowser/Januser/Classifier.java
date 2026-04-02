@@ -91,20 +91,30 @@ public abstract class Classifier {
     _flavor = flavor;
     }  
     
+  /** Set {@link Classifier} {@link Type}.
+    * @param flavor The {@link Classifier} {@link Type}. */
   protected void setType(Type type) {
     _type = type;
     }    
   
+  /** Give {@link Classifier} flavor.
+    * @return flavor The {@link Classifier} flavor. */
   public String flavor() {
     return _flavor;
     }
   
+  /** Give {@link Classifier} {@link Type} name.
+    * @param flavor The {@link Classifier} {@link Type} name. */
   public String name() {
     return _type.name();
     }
     
+  /** Give {@link Classifier} {@link Survey} name.
+    * @return flavor The {@link Classifier} {@link Survey} name. */
   public abstract String survey();
   
+  /** Give {@link Classifier} {@link FPC}
+    * @return flavor The {@link Classifier} {@link FPC} (<tt>null</tt> if doesn't apply). */
   public abstract FPC fpc() throws LomikelException;
     
   @Override

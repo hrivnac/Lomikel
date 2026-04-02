@@ -20,7 +20,8 @@ import org.apache.logging.log4j.LogManager;
 // BUG: make everything for ZTF/LSST
 public class FPC {
   
-  /** TBD */
+  /** Create for a survey.
+    * @param survey The survey: <em>ZTF</em> or <em>LSST</em>. */
   public FPC(String survey) throws LomikelException {
     switch (survey) {
       case "ZTF":
@@ -87,7 +88,6 @@ public class FPC {
   
   private String _restUrl;
 
-  
   /** Logging . */
   private static Logger log = LogManager.getLogger(FPC.class);
                                                 
