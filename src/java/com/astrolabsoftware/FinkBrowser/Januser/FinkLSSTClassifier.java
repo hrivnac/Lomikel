@@ -33,16 +33,63 @@ public class FinkLSSTClassifier extends LSSTClassifier {
   public void classify(FinkGremlinRecipies recipies,
                        String              oid) throws LomikelException {
     Map<String, Map<String, String>> results;
-    for (Map.Entry<String, HBaseClient> entry : CLIENTS.entrySet()) {
-      results = entry.getValue().scan(null,
-                                      "key:key:" + oid + ":substring",
-                                      "r:midpointMjdTai",
-                                      0,
-                                      false,
-                                      false);
+    Map<String, Set<String>> allInstances; // cl -> [mjd]
+    Map<String, Double>      allWeights;   // mjd -> w
+    String cl;
+    String mjd;
+    Set<String> jds;
+    allInstances = new TreeMap<>();
+    allWeights   = new TreeMap<>();
+    // get all alerts (jd) and their classes
+    for (Map.Entry<String, HBaseClient> client : CLIENTS.entrySet()) {
+      results = client.getValue().scan(null,
+                                       "key:key:" + oid + ":substring",
+                                       "r:midpointMjdTai",
+                                       0,
+                                       false,
+                                       false);
       if (results.size() > 0) {
-        log.info(results);
+        cl = client.getKey();
+        for (Map.Entry<String, Map<String, String>> result : results.entrySet()) {
+          mjd = result.getValue().get("r:midpointMjdTai");
+          if (allInstances.containsKey(cl)) {
+            jds = allInstances.get(cl);
+            jds.add(mjd);
+            }
+          else {
+            jds = new TreeSet<String>();
+            jds.add(mjd);
+            allInstances.put(cl, jds);
+            }
+          allWeights.put(mjd, 1.0);          
+          }
         }
+      }
+    // rearrange instances and weights and register
+    String key;
+    double weight;
+    double totalWeight;
+    double w;
+    totalWeight = 0;
+    List<String> instancesL;
+    List<Double> weightsL;
+    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
+      for (String instance : cls.getValue()) {
+        totalWeight += allWeights.get(instance);
+        }
+      }
+    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
+      key = cls.getKey();
+      instancesL = new ArrayList<String>(cls.getValue());
+      weightsL   = new ArrayList<Double>();
+      w = 0;
+      for (String instance : instancesL) {
+        weightsL.add(allWeights.get(instance));
+        w += allWeights.get(instance);
+        }
+      weight = w / totalWeight;
+      log.info(key + " " + oid + " " + weight + " " + instancesL + " " + weightsL);
+      //recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
       }
 
     /*
