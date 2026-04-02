@@ -29,7 +29,7 @@ public class PR extends ParquetReader {
 
   Logger log = LogManager.getLogger(this.class);
 
-  JanusClient jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties")
+  JanusClient jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties")
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc)
 
   Classifier[] classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', '')}
