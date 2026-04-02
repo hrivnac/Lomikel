@@ -17,7 +17,22 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// BUG: make everything for ZTF/LSST
 public class FPC {
+  
+  /** TBD */
+  public FPC(String survey) throws LomikelException {
+    switch (survey) {
+      case "ZTF":
+        _restUrl = "https://api.ztf.fink-portal.org/api/v1";
+        break;
+      case "LSST":
+        _restUrl = "https://api.lsst.fink-portal.org/api/v1";
+        break;
+      default:
+        throw new LomikelException("Unknown Classifier survey " + survey);
+      }  
+    }
     
   /** Call <em>Fink Science Portal <b>objects</b></em> Web Service.
     * <a href="https://api.ztf.fink-portal.org/api">https://api.ztf.fink-portal.org/api/v1</a>.
@@ -25,7 +40,7 @@ public class FPC {
     * @param endpoint The service endpoint.
     * @return         The answer formulated as {@link JSONArray}.
     * @throws LomikelException If call fails. */
-  public static JSONArray objects(JSONObject request) throws LomikelException {
+  public JSONArray objects(JSONObject request) throws LomikelException {
     return call(request, OBJECTS_WS);
     }
      
@@ -35,7 +50,7 @@ public class FPC {
     * @param endpoint The service endpoint.
     * @return         The answer formulated as {@link JSONArray}.
     * @throws LomikelException If call fails. */
-  public static JSONArray latests(JSONObject request) throws LomikelException {
+  public JSONArray latests(JSONObject request) throws LomikelException {
     return call(request, LATESTS_WS);
     }
     
@@ -45,7 +60,7 @@ public class FPC {
     * @param endpoint The service endpoint.
     * @return         The answer formulated as {@link JSONArray}.
     * @throws LomikelException If call fails. */
-  public static JSONArray anomaly(JSONObject request) throws LomikelException {
+  public JSONArray anomaly(JSONObject request) throws LomikelException {
     return call(request, ANOMALY_WS);
     }
    
@@ -54,9 +69,9 @@ public class FPC {
     * @param endpoint The service endpoint.
     * @return         The answer formulated as {@link JSONArray}.
     * @throws LomikelException If call fails. */
-  private static JSONArray call(JSONObject request,
-                                String     endpoint) throws LomikelException {
-     String answer = shc.postJSON(FINK_SCIENCE_PORTAL + "/" + endpoint,
+  private JSONArray call(JSONObject request,
+                         String     endpoint) throws LomikelException {
+     String answer = shc.postJSON(_restUrl + "/" + endpoint,
                                   request.toString(),
                                   null,
                                   null);
@@ -66,10 +81,12 @@ public class FPC {
 
   public static SmallHttpClient shc = new SmallHttpClient();
   
-  private static String FINK_SCIENCE_PORTAL = "https://api.ztf.fink-portal.org/api/v1";
   private static String OBJECTS_WS = "objects";
   private static String LATESTS_WS = "latests";
   private static String ANOMALY_WS = "anomaly";
+  
+  private String _restUrl;
+
   
   /** Logging . */
   private static Logger log = LogManager.getLogger(FPC.class);

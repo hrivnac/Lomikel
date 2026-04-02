@@ -2,6 +2,7 @@ package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Utils.Pair;
 import com.Lomikel.Utils.LomikelException;
+import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 
 // Java
 import java.util.Map;
@@ -103,6 +104,8 @@ public abstract class Classifier {
     }
     
   public abstract String survey();
+  
+  public abstract FPC fpc() throws LomikelException;
     
   @Override
   public String toString() {

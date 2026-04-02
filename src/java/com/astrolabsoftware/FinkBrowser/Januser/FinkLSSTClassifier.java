@@ -41,8 +41,8 @@ public class FinkLSSTClassifier extends LSSTClassifier {
     String jd;
     Set<String> jds;
     String key;
-    ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
-                                      put("output-format", "json"));
+    ja = _fpc.objects(new JSONObject().put("objectId",      oid   ).
+                                       put("output-format", "json"));
     allInstances = new TreeMap<>();
     allWeights   = new TreeMap<>();
     // get all alerts (jd) and their classes
@@ -105,6 +105,7 @@ public class FinkLSSTClassifier extends LSSTClassifier {
                                               "Solar System MPC",
                                               "Tracklet",
                                               "Anomaly"); // not treated: "Ambiguous"
+    
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkLSSTClassifier.class);
   

@@ -1,6 +1,7 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Utils.LomikelException;
+import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 
 // Java
 import java.util.Map;
@@ -95,6 +96,11 @@ public class TagClassifier extends Classifier {
   @Override
   public String survey() {
     return "ANY";
+    }
+    
+  @Override
+  public FPC fpc() throws LomikelException {
+    return null;
     }
     
   /** Logging . */

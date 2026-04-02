@@ -39,8 +39,8 @@ public class XMatchClassifier extends ZTFClassifier {
     String jd;
     Set<String> jds;
     String key;
-    ja = FPC.objects(new JSONObject().put("objectId",      oid   ).
-                                      put("output-format", "json"));
+    ja = fpc().objects(new JSONObject().put("objectId",      oid   ).
+                                        put("output-format", "json"));
     allInstances = new TreeMap<>();
     allWeights   = new TreeMap<>();
     // get all alerts (jd) and their classes
