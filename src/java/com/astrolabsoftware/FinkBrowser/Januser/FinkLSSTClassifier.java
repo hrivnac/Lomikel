@@ -91,63 +91,6 @@ public class FinkLSSTClassifier extends LSSTClassifier {
       //log.info(key + " " + oid + " " + weight + " " + instancesL + " " + weightsL);
       recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
       }
-
-    /*
-    JSONArray ja;
-    JSONObject jo;
-    Map<String, Set<String>> allInstances; // cl -> [jd]
-    Map<String, Double>      allWeights;   // jd -> w
-    String cl;
-    String jd;
-    Set<String> jds;
-    String key;
-    ja = _fpc.objects(new JSONObject().put("objectId",      oid   ).
-                                       put("output-format", "json"));
-    allInstances = new TreeMap<>();
-    allWeights   = new TreeMap<>();
-    // get all alerts (jd) and their classes
-    for (int i = 0; i < ja.length(); i++) {
-      jo = ja.getJSONObject(i);
-      cl = jo.getString("v:classification");
-      jd = String.valueOf(jo.getDouble("i:jd"));
-      if (!cl.equals("Unknown") && CLASSES.contains(cl)) {
-        if (allInstances.containsKey(cl)) {
-          jds = allInstances.get(cl);
-          jds.add(jd);
-          }
-        else {
-          jds = new TreeSet<String>();
-          jds.add(jd);
-          allInstances.put(cl, jds);
-          }
-        allWeights.put(jd, 1.0);
-        }
-      }
-    // rearrange instances and weights and register
-    double weight;
-    double totalWeight;
-    double w;
-    totalWeight = 0;
-    List<String> instancesL;
-    List<Double> weightsL;
-    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
-      for (String instance : cls.getValue()) {
-        totalWeight += allWeights.get(instance);
-        }
-      }
-    for (Map.Entry<String, Set<String>> cls : allInstances.entrySet()) {
-      key = cls.getKey();
-      instancesL = new ArrayList<String>(cls.getValue());
-      weightsL   = new ArrayList<Double>();
-      w = 0;
-      for (String instance : instancesL) {
-        weightsL.add(allWeights.get(instance));
-        w += allWeights.get(instance);
-        }
-      weight = w / totalWeight;
-      recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
-      }
-    */
     }
   
   private static Map<String, HBaseClient> CLIENTS;

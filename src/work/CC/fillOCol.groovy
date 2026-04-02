@@ -34,8 +34,11 @@ public class PR extends ParquetReader {
 
   Classifier[] classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', '')}
 
+  Timer timer = new Timer("entries", 100, 5);
+  
   public PR(String url) {
     super(url);
+    timer.start() 
     }
 
   @Override
@@ -77,13 +80,13 @@ public class PR extends ParquetReader {
           }
         }
       props().clear();
-      }    
+      }  
+    timer.report();
     }
     
   }
-
-Timer timer = new Timer("entries", 100, 5); 
   
 ParquetReader reader = new PR("hdfs://ccmaster1:8020");
 yesterday = LocalDate.now().minusDays(delay).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
 reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
+gr.generateCorrelations(classifiers);
