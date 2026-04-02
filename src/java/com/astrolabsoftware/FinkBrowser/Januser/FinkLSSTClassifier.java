@@ -1,5 +1,6 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
+import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Utils.LomikelException;
 import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 
@@ -32,6 +33,16 @@ public class FinkLSSTClassifier extends LSSTClassifier {
   public void classify(FinkGremlinRecipies recipies,
                        String              oid) throws LomikelException {
     log.info(oid);
+    HBaseClient client = new HBaseClient("cchbase1.in2p3.fr", 2183);
+    client.connect("rubin.tag_early_snia_candidate", "schema_4.1_8.39.0");
+    Map results = client.scan(null,
+                             "key:" + oid + ":substring",
+                             "r:diaObjectId,r:ssObjectId",
+                             0,
+                             false,
+                             false);
+    log.info(results);
+
     /*
     JSONArray ja;
     JSONObject jo;
