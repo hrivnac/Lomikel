@@ -37,11 +37,11 @@ public class FinkLSSTClassifier extends LSSTClassifier {
     for (Map.Entry<String, HBaseClient> entry : CLIENTS.entrySet()) {
       results = entry.getValue().scan(null,
                                       "key:" + oid + ":substring",
-                                      "r:diaObjectId,r:ssObjectId",
+                                      null,
                                       0,
                                       false,
                                       false);
-      log.info(results);
+      log.info(oid + " of " + entry.getKey() + " = " + results.size());
       }
 
     /*
