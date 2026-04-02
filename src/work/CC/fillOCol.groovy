@@ -65,7 +65,14 @@ public class PR extends ParquetReader {
       else {
         log.warn("no objectid");
         }
-      log.info(key);
+      for (Classifier classifier : classifiers) {
+        try {
+          gr.classifySource(classifier, key);
+          }
+        catch (Exception e) {
+          log.error("Cannot classify " + key + " with " + classifier, e);
+          }
+        }
       props().clear();
       }    
     }

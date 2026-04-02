@@ -20,7 +20,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml");
 
-delay = 20;
+int delay = 20;
 
 public class PR extends ParquetReader {
 
@@ -83,6 +83,6 @@ public class PR extends ParquetReader {
 //esclient.createIndex("ss_mjd", "mjd", "double");
 //esclient.createIndex("dia_mjd", "mjd", "double");
 
-reader = new PR("hdfs://ccmaster1:8020");
+ParquetReader reader = new PR("hdfs://ccmaster1:8020");
 yesterday = LocalDate.now().minusDays(delay).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
 reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
