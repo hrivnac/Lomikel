@@ -104,7 +104,13 @@ public class FinkLSSTClassifier extends LSSTClassifier {
   
   private static Map<String, HBaseClient> CLIENTS;
 
-  private static Set<String> CLASSES = Set.of("rubin.tag_early_snia_candidate");
+  private static Set<String> CLASSES = Set.of("rubin.tag_early_snia_candidate",
+                                              "rubin.tag_extragalactic_lt20mag_candidate",
+                                              "rubin.tag_extragalactic_new_candidate",
+                                              "rubin.tag_good_quality",
+                                              "rubin.tag_hostless_candidate",
+                                              "rubin.tag_in_tns",
+                                              "rubin.tag_sn_near_galaxy_candidate");
    
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkLSSTClassifier.class);
