@@ -32,6 +32,7 @@ public class FinkLSSTClassifier extends LSSTClassifier {
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid) throws LomikelException {
+    // get all alerts (mjd) and their classes (cl)
     Map<String, Map<String, String>> results;
     Map<String, Set<String>> allInstances; // cl -> [mjd]
     Map<String, Double>      allWeights;   // mjd -> w
@@ -40,7 +41,6 @@ public class FinkLSSTClassifier extends LSSTClassifier {
     Set<String> jds;
     allInstances = new TreeMap<>();
     allWeights   = new TreeMap<>();
-    // get all alerts (jd) and their classes
     for (Map.Entry<String, HBaseClient> client : CLIENTS.entrySet()) {
       results = client.getValue().scan(null,
                                        "key:key:" + oid + ":substring",
@@ -88,8 +88,8 @@ public class FinkLSSTClassifier extends LSSTClassifier {
         w += allWeights.get(instance);
         }
       weight = w / totalWeight;
-      log.info(key + " " + oid + " " + weight + " " + instancesL + " " + weightsL);
-      //recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
+      //log.info(key + " " + oid + " " + weight + " " + instancesL + " " + weightsL);
+      recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
       }
 
     /*
