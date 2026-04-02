@@ -31,6 +31,8 @@ public class FinkLSSTClassifier extends LSSTClassifier {
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid) throws LomikelException {
+    log.info(oid);
+    /*
     JSONArray ja;
     JSONObject jo;
     Map<String, Set<String>> allInstances; // cl -> [jd]
@@ -85,6 +87,7 @@ public class FinkLSSTClassifier extends LSSTClassifier {
       weight = w / totalWeight;
       recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
       }
+    */
     }
   
   /** Give classes assigned by Fink.
