@@ -32,11 +32,10 @@ public class FinkLSSTClassifier extends LSSTClassifier {
   @Override
   public void classify(FinkGremlinRecipies recipies,
                        String              oid) throws LomikelException {
-    log.info(oid);
     Map<String, Map<String, String>> results;
     for (Map.Entry<String, HBaseClient> entry : CLIENTS.entrySet()) {
       results = entry.getValue().scan(null,
-                                      "key:" + oid + ":substring",
+                                      "key:key:" + oid + ":substring",
                                       null,
                                       0,
                                       false,
