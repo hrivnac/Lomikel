@@ -22,13 +22,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml");
-Logger log = LogManager.getLogger(this.class)
+//Logger log = LogManager.getLogger(this.class)
 
 delay = 25;
 
 public class PR extends ParquetReader {
 
-  //Logger log = LogManager.getLogger(this.class);
+  Logger log = LogManager.getLogger(this.class);
 
   public PR(String url) {
     super(url);
