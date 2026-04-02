@@ -33,15 +33,16 @@ public class FinkLSSTClassifier extends LSSTClassifier {
   public void classify(FinkGremlinRecipies recipies,
                        String              oid) throws LomikelException {
     log.info(oid);
-    HBaseClient client = new HBaseClient("cchbase1.in2p3.fr", 2183);
-    client.connect("rubin.tag_early_snia_candidate", "schema_4.1_8.39.0");
-    Map results = client.scan(null,
-                             "key:" + oid + ":substring",
-                             "r:diaObjectId,r:ssObjectId",
-                             0,
-                             false,
-                             false);
-    log.info(results);
+    Map<String, Map<String, String>> results;
+    for (Map.Entry<String, HBaseClient> entry : CLIENTS.entrySet()) {
+      results = entry.getValue().scan(null,
+                                      "key:" + oid + ":substring",
+                                      "r:diaObjectId,r:ssObjectId",
+                                      0,
+                                      false,
+                                      false);
+      log.info(results);
+      }
 
     /*
     JSONArray ja;
@@ -101,25 +102,24 @@ public class FinkLSSTClassifier extends LSSTClassifier {
     */
     }
   
-  /** Give classes assigned by Fink.
-    * @return The classes assigned by Fink. */
-  public static Set<String> finkClasses() {
-    return CLASSES;
-    }
-    
-  private static Set<String> CLASSES = Set.of("(CTA) Blazar",
-                                              "Early SN Ia candidate",
-                                              "Kilonova candidate",
-                                              "Microlensing candidate",
-                                              "SN candidate",
-                                              "Solar System candidate",
-                                              "Solar System MPC",
-                                              "Tracklet",
-                                              "Anomaly"); // not treated: "Ambiguous"
-    
+  private static Map<String, HBaseClient> CLIENTS;
+  
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkLSSTClassifier.class);
   
+  static {
+    CLIENTS = new TreeMap<String, HBaseClient>();
+    HBaseClient client;
+    try {
+      client = new HBaseClient("cchbase1.in2p3.fr", 2183);
+      client.connect("rubin.tag_early_snia_candidate", "schema_4.1_8.39.0");
+      CLIENTS.put("rubin.tag_early_snia_candidate", client);
+      }
+    catch (LomikelException e) {
+      log.error("Cannot connect to rubin.tag_early_snia_candidate table");
+      }
+    }
+ 
   }
            
            
