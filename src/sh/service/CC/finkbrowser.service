@@ -1,0 +1,16 @@
+[Unit]
+Description=Fink Browser
+After=network.target
+
+[Service]
+Type=simple
+User=janusgraph
+Group=janusgraph
+WorkingDirectory=/home/almalinux/Lomikel/run
+ExecStart=/home/almalinux/Lomikel/src/sh/service/finkbrowser.sh
+KillSignal=SIGTERM
+TimeoutStopSec=60
+Restart=always
+RestartSec=5
+SuccessExitStatus=143
+
