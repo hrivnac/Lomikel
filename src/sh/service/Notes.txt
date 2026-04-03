@@ -1,8 +1,0 @@
-/etc/systemd/system/finkbrowser.service
-
-chcon -t bin_t /localhome/janusgraph/Lomikel/src/sh/service/finkbrowser.sh
-systemctl daemon-reload
-systemctl start finkbrowser
-systemctl enable finkbrowser
-journalctl -u finkbrowser -f
-
