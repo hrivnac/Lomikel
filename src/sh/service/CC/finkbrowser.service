@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=janusgraph
-Group=janusgraph
+User=almalinux
+Group=almalinux
 WorkingDirectory=/home/almalinux/Lomikel/run
 ExecStart=/home/almalinux/Lomikel/src/sh/service/finkbrowser.sh
 KillSignal=SIGTERM
