@@ -8,6 +8,7 @@ datalink          = mgmt.getVertexLabel('datalink')
 ocol              = mgmt.makeVertexLabel('OCol'   ).make()
 source            = mgmt.makeVertexLabel('source' ).make()
 object            = mgmt.makeVertexLabel('object' ).make()
+newtag            = mgmt.makeVertexLabel('NewTag' ).make()
 
 // Edges
 props        = mgmt.getEdgeLabel('props'       )
@@ -33,6 +34,7 @@ importDate   = mgmt.getPropertyKey('importDate'   )
 importSource = mgmt.getPropertyKey('importSource' )
 objectId     = mgmt.makePropertyKey('objectId'    ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 jd           = mgmt.makePropertyKey('jd'          ).dataType(Double.class).cardinality(Cardinality.SINGLE).make() 
+mjd          = mgmt.makePropertyKey('mjd'         ).dataType(Double.class).cardinality(Cardinality.SINGLE).make() 
 classifier   = mgmt.makePropertyKey('classifier'  ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 flavor       = mgmt.makePropertyKey('flavor'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
 survey       = mgmt.makePropertyKey('survey'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
@@ -58,7 +60,11 @@ mgmt.addProperties(object,
                    survey,
                    objectId,
                    importDate)
-                                    
+mgmt.addProperties(newtag,
+                   lbl,
+                   objectId,
+                   cls,
+                   mjd)              
 // Edge properties
 mgmt.addProperties(overlaps,
                    lbl,
