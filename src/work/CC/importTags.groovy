@@ -57,7 +57,7 @@ clss.each {
         }
       }
     }
+  client.stop(false, true);
   }
 
-client.stop();
 client.close();

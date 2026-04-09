@@ -305,15 +305,15 @@ public class AsynchHBaseClient extends    HBaseClient
   public void stop(boolean keep,
                    boolean reuse) {
     log.info("Stopping scan");
+    if (!keep) {
+      log.info("removing remaining results");
+      _queue.clear();
+      }
     if (!reuse) {
       log.info("\tending thread");
       _thread.stop();
       }
     _scanning = false;
-    if (!keep) {
-      log.info("removing remaining results");
-      _queue.clear();
-      }
     }
     
   protected ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
