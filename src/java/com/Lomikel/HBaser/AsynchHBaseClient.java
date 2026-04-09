@@ -293,20 +293,25 @@ public class AsynchHBaseClient extends    HBaseClient
     _loopWait = t;
     }
     
-  /** Stop the scanning and remove all remaining results. */
+  /** Stop the scanning, end thread and remove all remaining results. */
   public void stop() {
-    stop(false);
+    stop(false, false);
     }
     
   /** Stop the scanning.
-    * @param keep Whether to keep already accumulated results,
-    *             or to remove them. */
-  public void stop(boolean keep) {
+    * @param keep   Whether to keep already accumulated results,
+    *               or to remove them.
+    * @param reuse Whether to keep {@link Thread} for reuse. */
+  public void stop(boolean keep,
+                   boolean reuse) {
     log.info("Stopping scan");
-    _thread.stop();
+    if (!reuse) {
+      log.info("\tending thread");
+      _thread.stop();
+      }
     _scanning = false;
     if (!keep) {
-      log.info("\tand removing remaining results");
+      log.info("removing remaining results");
       _queue.clear();
       }
     }

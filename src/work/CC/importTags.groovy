@@ -22,7 +22,6 @@ clss = new String[]{'rubin.tag_early_snia_candidate',
                     'rubin.tag_in_tns',
                     'rubin.tag_sn_near_galaxy_candidate'};
 
-
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
 gr = new FinkGremlinRecipiesG(jc);
 
