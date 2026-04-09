@@ -36,12 +36,12 @@ clss.each {
   cls -> log.info('Importing ' + cls);
          client.connect(cls);
          client.restartScan(null,
-                          null,
-                          null,
-                          0,
-                          now,
-                          false,
-                          false);
+                            null,
+                            null,
+                            0,
+                            now,
+                            false,
+                            false);
   while (client.scanning() || client.size() > 0) {
     if (client.size() > 0) {
       client.poll().each {k, v -> (oid, mjd) = k.tokenize('_');

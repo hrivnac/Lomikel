@@ -151,12 +151,13 @@ public class AsynchHBaseClient extends    HBaseClient
       _scanIfkey  = true;
       _scanIftime = iftime;
       _doscan     = true;
-      log.info("Scheduling asynchronous scan");
+      log.info("Scheduling new asynchronous scan");
       }
-    if (_thread == null) {
-      _thread = new Thread(this);
-      _thread.start();
+    if (_thread != null) {
+      _thread.join();
       }
+    _thread = new Thread(this);
+    _thread.start();
     }
  
       
