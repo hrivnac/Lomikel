@@ -25,8 +25,6 @@ clss = new String[]{'rubin.tag_early_snia_candidate',
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
 gr = new FinkGremlinRecipiesG(jc);
 
-client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
-client.setMaxQueueSize(100);
 
 now = System.currentTimeMillis();
 
@@ -34,6 +32,8 @@ timer.start();
 
 clss.each {
   cls -> log.info('Importing ' + cls);
+         client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
+         client.setMaxQueueSize(100);
          client.connect(cls);
          client.startScan(null,
                           null,
@@ -57,7 +57,7 @@ clss.each {
         }
       }
     }
-  client.stop(false, true);
+  //client.stop();
   }
 
-client.close();
+//client.close();
