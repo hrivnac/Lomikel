@@ -38,7 +38,6 @@ public class AsynchHBaseClient extends    HBaseClient
   public AsynchHBaseClient(String zookeepers,
                            String clientPort) throws LomikelException {
     super(zookeepers, clientPort);
-    setProcessor(_processor);
     }
         
   /** Create and connect to HBase.
@@ -48,7 +47,6 @@ public class AsynchHBaseClient extends    HBaseClient
   public AsynchHBaseClient(String zookeepers,
                            int    clientPort) throws LomikelException {
     super(zookeepers, clientPort);
-    setProcessor(_processor);
     }
     
   /** Create and connect to HBase.
@@ -56,7 +54,6 @@ public class AsynchHBaseClient extends    HBaseClient
     * @throws LomikelException If anything goes wrong. */
   public AsynchHBaseClient(String url) throws LomikelException {
     super(url);
-    setProcessor(_processor);
     }
               
   @Override
@@ -67,6 +64,7 @@ public class AsynchHBaseClient extends    HBaseClient
         if (_doscan) {
           log.info("Starting asynchronous scan");
           _scanning = true;
+          setProcessor(new AsynchHBaseProcessor(_queue));
           scan(_scanKey,
                _scanSearch,
                _scanFilter,
