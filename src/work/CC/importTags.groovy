@@ -34,7 +34,7 @@ timer.start();
 
 clss.each {
   cls -> log.info('Importing ' + cls);
-         client.connect(cls, null);
+         client.connect(cls, null); 
          client.restartScan(null,
                             null,
                             null,
