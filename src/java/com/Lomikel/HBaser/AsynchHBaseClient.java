@@ -131,6 +131,34 @@ public class AsynchHBaseClient extends    HBaseClient
     _thread = new Thread(this);
     _thread.start();
     }
+    
+  public void restartScan(String  key,
+                          String  search,
+                          String  filter,
+                          long    start,
+                          long    stop,
+                          boolean ifkey,
+                          boolean iftime) {
+    if (_scanning == true || size() > 0) {
+      log.error("Scanning, restart ignored");
+      }
+    else {
+      _scanKey    = key;
+      _scanSearch = search;
+      _scanFilter = filter;
+      _scanStart  = start;
+      _scanStop   = stop;
+      _scanIfkey  = true;
+      _scanIftime = iftime;
+      _doscan     = true;
+      log.info("Scheduling asynchronous scan");
+      }
+    if (_thread == null) {
+      _thread = new Thread(this);
+      _thread.start();
+      }
+    }
+ 
       
   /** Start scan assynchronously. Present results as a <em>JSON</em> string.
     * @param key     The row key. Disables other search terms.
