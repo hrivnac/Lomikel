@@ -33,7 +33,7 @@ now = System.currentTimeMillis();
 timer.start();
 
 clss.each {
-  cls -> log.info('importing ' + cls);
+  cls -> log.info('Importing ' + cls);
          client.connect(cls, '');
          client.startScan(null,
                           null,
@@ -45,12 +45,12 @@ clss.each {
   while (client.scanning() || client.size() > 0) {
     if (client.size() > 0) {
       client.poll().each {k, v -> (oid, mjd) = k.tokenize('_');
-                                   gr.g().addV('NewTag') \
-                                     .property('lbl', 'NewTag') \
-                                     .property('objectId', oid) \
-                                     .property('cls', cls) \
-                                     .property('mjd', mjd)
-                                     .iterate();
+                                   gr.g().addV('NewTag')
+                                         .property('lbl',      'NewTag')
+                                         .property('objectId', oid)
+                                         .property('cls',      cls)
+                                         .property('mjd',      mjd)
+                                         .iterate();
                            }
       timer.report();
       }
