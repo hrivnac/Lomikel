@@ -14,7 +14,7 @@ log = LogManager.getLogger(this.class);
 
 timer = new Timer("entries", 100, 5);
 
-clss = new String[]{//'rubin.tag_early_snia_candidate',
+clss = new String[]{'rubin.tag_early_snia_candidate',
                     'rubin.tag_extragalactic_lt20mag_candidate',
                     'rubin.tag_extragalactic_new_candidate',
                     'rubin.tag_good_quality',
@@ -51,7 +51,9 @@ clss.each {
                                          .property('mjd',      mjd)
                                          .iterate();
                            }
-      timer.report();
+      if (timer.report() {
+        gr.commit();
+        }
       }
     }
   client.stop();
