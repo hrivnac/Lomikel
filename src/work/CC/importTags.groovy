@@ -51,7 +51,7 @@ clss.each {
                                          .property('mjd',      mjd)
                                          .iterate();
                            }
-      if (timer.report() {
+      if (timer.report()) {
         gr.commit();
         }
       }
