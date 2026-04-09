@@ -14,9 +14,6 @@ log = LogManager.getLogger(this.class);
 
 timer = new Timer("entries", 100, 5);
 
-client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
-client.setMaxQueueSize(100);
-
 clss = new String[]{'rubin.tag_early_snia_candidate',
                     'rubin.tag_extragalactic_lt20mag_candidate',
                     'rubin.tag_extragalactic_new_candidate',
@@ -34,6 +31,8 @@ timer.start();
 
 clss.each {
   cls -> log.info('Importing ' + cls);
+         client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
+         client.setMaxQueueSize(100);
          client.connect(cls, '');
          client.startScan(null,
                           null,
@@ -56,5 +55,6 @@ clss.each {
       }
     }
   client.stop();
+  client.close();
   }
 
