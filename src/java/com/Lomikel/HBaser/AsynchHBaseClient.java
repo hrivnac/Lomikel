@@ -156,6 +156,7 @@ public class AsynchHBaseClient extends    HBaseClient
     if (_thread != null) {
       try {
         _thread.join();
+        _scanning = false;
         }
       catch (InterruptedException e) {
         log.warn("Cannot join Thread", e);
