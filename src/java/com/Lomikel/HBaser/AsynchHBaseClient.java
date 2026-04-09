@@ -154,7 +154,12 @@ public class AsynchHBaseClient extends    HBaseClient
       log.info("Scheduling new asynchronous scan");
       }
     if (_thread != null) {
-      _thread.join();
+      try {
+        _thread.join();
+        }
+      catch (InterruptedException e) {
+        log.warn("Cannot join Thread", e);
+        }
       }
     _thread = new Thread(this);
     _thread.start();
