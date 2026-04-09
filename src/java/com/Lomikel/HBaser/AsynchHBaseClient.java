@@ -63,6 +63,7 @@ public class AsynchHBaseClient extends    HBaseClient
       while (true) {
         if (_doscan) {
           log.info("Starting asynchronous scan");
+          _doscan = false;
           _scanning = true;
           setProcessor(_processor);
           scan(_scanKey,
@@ -128,7 +129,9 @@ public class AsynchHBaseClient extends    HBaseClient
       _doscan     = true;
       log.info("Scheduling asynchronous scan");
       }
-    _thread = new Thread(this);
+    if (_thread == null) {
+      _thread = new Thread(this);
+      }
     _thread.start();
     }
       
@@ -312,9 +315,8 @@ public class AsynchHBaseClient extends    HBaseClient
     if (!reuse) {
       log.info("\tending thread");
       _thread.stop();
+      _scanning = false;
       }
-    _doscan   = false;
-    _scanning = false;
     }
     
   protected ConcurrentLinkedQueue<Map<String, String>> _queue = new ConcurrentLinkedQueue<>();
