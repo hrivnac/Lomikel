@@ -26,7 +26,7 @@ jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
 gr = new FinkGremlinRecipiesG(jc);
 
 client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
-client.setMaxQueueSize(100);
+client.setMaxQueueSize(1000);
 
 now = System.currentTimeMillis();
 
@@ -35,13 +35,13 @@ timer.start();
 clss.each {
   cls -> log.info('Importing ' + cls);
          client.connect(cls, null); 
-         client.restartScan(null,
-                            null,
-                            null,
-                            0,
-                            now,
-                            false,
-                            false);
+         client.startScan(null,
+                          null,
+                          null,
+                          0,
+                          now,
+                          false,
+                          false);
   while (client.scanning() || client.size() > 0) {
     if (client.size() > 0) {
       client.poll().each {k, v -> (oid, mjd) = k.tokenize('_');
@@ -53,11 +53,11 @@ clss.each {
                                          .iterate();
                            }
       if (timer.report()) {
-        gr.commit();
+        gr.commit(cls + ": ");
         }
       }
     }
-  //client.stop();
   }
 
-//client.close();
+client.stop();
+client.close();

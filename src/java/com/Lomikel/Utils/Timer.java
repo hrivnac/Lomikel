@@ -31,10 +31,17 @@ public class Timer {
     _i = 0;
     _j = 0;
     }
+    
+  /** Report snapshot.
+    * @param msg Additional message to be prepended.
+    * @return If commit should be executed. */
+  public boolean report() {
+    return report("");
+  }
 
   /** Report snapshot.
     * @return If commit should be executed. */
-  public boolean report() {
+  public boolean report(String msg) {
     _i++;
     if (_modulus > -1 && _i % _modulus != 0) {
       return false;
@@ -44,7 +51,7 @@ public class Timer {
     if (dt == 0) {
       dt = 1;
       }
-    log.info("" + _i + " " + _msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz");
+    log.info(msg + _i + " " + _msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz");
     if (_commitF > -1 && _j % _commitF == 0) {
 	    return true;
       }
