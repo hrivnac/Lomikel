@@ -313,6 +313,7 @@ public class AsynchHBaseClient extends    HBaseClient
       log.info("\tending thread");
       _thread.stop();
       }
+    _doscan   = false;
     _scanning = false;
     }
     
