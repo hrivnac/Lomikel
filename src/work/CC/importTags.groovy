@@ -12,6 +12,8 @@ import org.apache.logging.log4j.core.config.Configurator;
 Configurator.initialize(null, '../src/java/log4j2.xml');
 log = LogManager.getLogger(this.class);
 
+log.info("Importing " + cls);
+
 timer = new Timer("entries", 100, 5);
 
 clss = new String[]{'rubin.tag_early_snia_candidate',
@@ -22,43 +24,41 @@ clss = new String[]{'rubin.tag_early_snia_candidate',
                     'rubin.tag_in_tns',
                     'rubin.tag_sn_near_galaxy_candidate'};
 
+now = System.currentTimeMillis();
+                      
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
 gr = new FinkGremlinRecipiesG(jc);
 
-
-now = System.currentTimeMillis();
+client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
+client.setMaxQueueSize(1000);
+client.connect(cls, null);
+client.setLimit(100);
 
 timer.start();
 
-clss.each {
-  cls -> log.info('Importing ' + cls);
-client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
-client.setMaxQueueSize(1000);
-         client.connect(cls, null);
-         client.setLimit(100);
-         client.startScan(null,
-                          null,
-                          null,
-                          0,
-                          now,
-                          false,
-                          false);
-  while (client.scanning() || client.size() > 0) {
-    if (client.size() > 0) {
-      client.poll().each {k, v -> (mjd, oid) = k.tokenize('_');
-                                   gr.g().addV('NewTag')
-                                         .property('lbl',      'NewTag')
-                                         .property('objectId', oid)
-                                         .property('cls',      cls)
-                                         .property('mjd',      mjd)
-                                         .iterate();
-                           }
-      if (timer.report(cls + ": ")) {
-        gr.commit();
-        }
+client.startScan(null,
+                 null,
+                 null,
+                 0,
+                 now,
+                 false,
+                 false);
+                
+while (client.scanning() || client.size() > 0) {
+  if (client.size() > 0) {
+    client.poll().each {k, v -> (mjd, oid) = k.tokenize('_');
+                                 gr.g().addV('NewTag')
+                                       .property('lbl',      'NewTag')
+                                       .property('objectId', oid)
+                                       .property('cls',      cls)
+                                       .property('mjd',      mjd)
+                                       .iterate();
+                         }
+    if (timer.report(cls + ": ")) {
+      gr.commit();
       }
     }
+  }
 
 client.stop();
 client.close();
-  }

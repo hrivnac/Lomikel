@@ -13,6 +13,9 @@ import groovy.lang.Binding;
 import org.apache.groovy.groovysh.Groovysh;
 import org.codehaus.groovy.tools.shell.IO;
 
+// Java
+import java.util.Map;
+
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -66,6 +69,12 @@ public class GCLI extends CLI {
     log.info("cli set");
     StringFile     sf;
     StringResource sr;
+    // Set additional arguments
+    if (arguments() != null) {
+      for (Map.Entry<String, String> arg : arguments().entrySet()) {
+        shell().evaluate(arg.getKey() + "=" + arg.getValue());
+        }
+      }
     // Source init.groovy
     try {
       sf = new StringFile("init.groovy");

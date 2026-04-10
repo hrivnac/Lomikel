@@ -9,6 +9,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
+// Java
+import java.util.Map;
+import java.util.HashMap;
+
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -69,6 +73,11 @@ public abstract class CLI {
                                    .hasArg()
                                    .withArgName("file")
                                    .create("s"));
+    options.addOption(OptionBuilder.withLongOpt("args")
+                                   .withDescription("additional arguments et before scripts: name=value,name=value,...")
+                                   .hasArg()
+                                   .withArgName("arguments")
+                                   .create("o"));
     options.addOption(OptionBuilder.withLongOpt("api")
                                    .withDescription("cli language: [groovy|python] (othewise taken from source extension, defauld is groovy")
                                    .hasArg()
@@ -94,6 +103,13 @@ public abstract class CLI {
         }
       if (cline.hasOption("source")) {
         _source = cline.getOptionValue("source");
+        }
+      if (cline.hasOption("args")) {
+        String[] arg0;
+        for (String arg : cline.getOptionValue("args").split(",")) {
+          arg0 = arg.split("=");
+          _arguments.put(arg0[0], arg0[1]);
+          }
         }
       if (cline.hasOption("api")) {
         _api = cline.getOptionValue("api");
@@ -160,6 +176,19 @@ public abstract class CLI {
   public static String source() {
     return _source;
    }
+   
+  /** Give the arguments.
+    * @return The arguments. */
+  public static Map<String, String> arguments() {
+    return _arguments;
+   }
+   
+  /** Give one argument.
+    * @param name The arguments name (or <tt>null</tt>).
+    * @return The argument. */
+  public static String argument(String name) {
+    return _arguments.get(name);
+   }
        
   /** Give the script language.
     * @return The script language. */
@@ -203,30 +232,31 @@ public abstract class CLI {
     return _notebook;
    }
     
-  private static String  _scriptArgs = null;  
-                         
-  private static String  _scriptSrc  = null;
-                         
-  private static String  _profile    = null;
-                         
-  private static String  _source     = null;
-                         
-  private static String  _api        = "groovy";
-                                    
-  private static String  _help       = "";
-                                    
-  private static boolean _quiet      = false;
-                                     
-  private static boolean _gui        = false;
-                                     
-  private static boolean _batch      = false;
-                                     
-  private static boolean _web        = false;
-                                     
-  private static boolean _notebook   = false;
-
+  private static String              _scriptArgs = null;  
+                                                 
+  private static String              _scriptSrc  = null;
+                                                 
+  private static String              _profile    = null;
+                                                 
+  private static String              _source     = null;
+  
+  private static Map<String, String> _arguments  = new HashMap<>();
+                                                 
+  private static String              _api        = "groovy";
+                                                 
+  private static String              _help       = "";
+                                                 
+  private static boolean             _quiet      = false;
+                                                 
+  private static boolean             _gui        = false;
+                                                 
+  private static boolean             _batch      = false;
+                                                 
+  private static boolean             _web        = false;
+                                                 
+  private static boolean             _notebook   = false;
+                                  
   /** Logging . */
   private static Logger log = LogManager.getLogger(CLI.class);
    
- 
   }
