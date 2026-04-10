@@ -303,7 +303,7 @@ public class AsynchHBaseClient extends    HBaseClient
     *             or to remove them. */
   public void stop(boolean keep) {
     log.info("Stopping scan");
-    _thread.stop();
+    _thread.join();
     _scanning = false;
     if (!keep) {
       log.info("\tand removing remaining results");
