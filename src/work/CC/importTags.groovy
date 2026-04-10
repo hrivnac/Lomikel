@@ -13,16 +13,15 @@ Configurator.initialize(null, '../src/java/log4j2.xml');
 log = LogManager.getLogger(this.class);
 
 log.info("Importing " + cls);
+//'rubin.tag_early_snia_candidate'
+//'rubin.tag_extragalactic_lt20mag_candidate'
+//'rubin.tag_extragalactic_new_candidate'
+//'rubin.tag_good_quality'
+//'rubin.tag_hostless_candidate'
+//'rubin.tag_in_tns'
+//'rubin.tag_sn_near_galaxy_candidate'
 
 timer = new Timer("entries", 100, 5);
-
-clss = new String[]{'rubin.tag_early_snia_candidate',
-                    'rubin.tag_extragalactic_lt20mag_candidate',
-                    'rubin.tag_extragalactic_new_candidate',
-                    'rubin.tag_good_quality',
-                    'rubin.tag_hostless_candidate',
-                    'rubin.tag_in_tns',
-                    'rubin.tag_sn_near_galaxy_candidate'};
 
 now = System.currentTimeMillis();
                       
