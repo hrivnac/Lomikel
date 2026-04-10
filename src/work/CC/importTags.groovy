@@ -36,7 +36,7 @@ clss.each {
   cls -> log.info('Importing ' + cls);
          client.connect(cls, null);
          client.setLimit(100);
-         client.startScan(null,
+         client.updateScan(null,
                           null,
                           null,
                           0,
@@ -58,7 +58,7 @@ clss.each {
         }
       }
     }
-  client.stop();
   }
 
+client.stop();
 client.close();
