@@ -128,7 +128,9 @@ public class AsynchHBaseClient extends    HBaseClient
       _doscan     = true;
       log.info("Scheduling asynchronous scan");
       }
-    _thread = new Thread(this);
+    if (_thread == null) {
+      _thread = new Thread(this);
+      }
     _thread.start();
     }
     
@@ -303,7 +305,12 @@ public class AsynchHBaseClient extends    HBaseClient
     *             or to remove them. */
   public void stop(boolean keep) {
     log.info("Stopping scan");
-    _thread.join();
+    try {
+      _thread.join();
+      }
+    catch (InterruptedException e) {
+      log.error("cannot join thread", e);
+      }
     _scanning = false;
     if (!keep) {
       log.info("\tand removing remaining results");
