@@ -152,6 +152,7 @@ public class AsynchHBaseClient extends    HBaseClient
       _scanIftime = iftime;
       _doscan     = true;
       log.info("Updating asynchronous scan");
+      _thread.start();
    }
    }
    
