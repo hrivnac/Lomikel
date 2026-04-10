@@ -34,7 +34,8 @@ timer.start();
 
 clss.each {
   cls -> log.info('Importing ' + cls);
-         client.connect(cls, null); 
+         client.connect(cls, null);
+         client.setLimit(100);
          client.startScan(null,
                           null,
                           null,
@@ -44,7 +45,7 @@ clss.each {
                           false);
   while (client.scanning() || client.size() > 0) {
     if (client.size() > 0) {
-      client.poll().each {k, v -> (oid, mjd) = k.tokenize('_');
+      client.poll().each {k, v -> (mjd, oid) = k.tokenize('_');
                                    gr.g().addV('NewTag')
                                          .property('lbl',      'NewTag')
                                          .property('objectId', oid)
