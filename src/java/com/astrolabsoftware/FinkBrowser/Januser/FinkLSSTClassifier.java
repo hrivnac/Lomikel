@@ -94,7 +94,7 @@ public class FinkLSSTClassifier extends LSSTClassifier {
     }
     
   /** Initialise HBase connections. */
-  public static init() {
+  public static void init() {
     CLIENTS = new TreeMap<String, HBaseClient>();
     HBaseClient client;
     for (String cls : CLASSES) {
