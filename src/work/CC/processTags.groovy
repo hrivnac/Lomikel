@@ -1,6 +1,7 @@
 import com.Lomikel.Januser.JanusClient
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG
 import com.astrolabsoftware.FinkBrowser.Januser.Classifier
+import com.Lomikel.Utils.Timer;
 
 // TinkerPop
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.id
@@ -32,8 +33,7 @@ logg.info("Processing NewTags")
 
 jobImportDate = new Timestamp(System.currentTimeMillis())
 
-// commit counter
-counter = 0
+timer = new Timer("entries", 100, 5);
 
 // temporary defaults until they arrive on NewTag
 defaultSurvey     = 'LSST'
@@ -127,6 +127,7 @@ getOrCreateDeepcontains = { ocolV, objectV ->
 //    - rebuild edge.weights as 1.0 per instance
 //    - normalize edge.weight across all classes for this object
 // ------------------------------------------------------------
+timer.start()
 grouped.each { objectId, clsMap ->
 
     //logg.debug("processing ${objectId}")
@@ -213,11 +214,13 @@ grouped.each { objectId, clsMap ->
 
     // touch object importDate as part of this job
     g.V(objectV).property('importDate', jobImportDate).iterate()
-counter = counter + 1
-    if (counter % 500 == 0) {
-        graph.tx().commit()
-        logg.info("${counter} objects committed")
-    }
+    
+    
+    
+    if (timer.report()) {
+      gr.commit();
+      }
+    
 
 }
 
@@ -231,7 +234,7 @@ if (!processedTagIds.isEmpty()) {
       property('processed', true).
       iterate()
 }
-graph.tx().commit()
+gr.commit()
 logg.info("done at importDate=${jobImportDate}")
 
 classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', '')}

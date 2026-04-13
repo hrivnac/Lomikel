@@ -12,7 +12,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 Configurator.initialize(null, '../src/java/log4j2.xml');
 log = LogManager.getLogger(this.class);
 
-log.info("Importing " + cls);
+log.info("Importing NewTags for " + cls);
 
 timer = new Timer("entries", 100, 5);
 
@@ -51,6 +51,8 @@ while (client.scanning() || client.size() > 0) {
       }
     }
   }
+  
+gr.commit()
 
 client.stop();
 client.close();
