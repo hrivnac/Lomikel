@@ -83,7 +83,7 @@ getOrCreateObject = {objectId ->
        .has('objectId', objectId)
        .fold()
        .coalesce(unfold(),
-                 addV('object').property('lbl',        'object').
+                 addV('object').property('lbl',        'object')
                                .property('objectId',   objectId)
                                .property('importDate', jobImportDate))
        .next()
