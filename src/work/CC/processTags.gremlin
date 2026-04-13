@@ -1,5 +1,33 @@
-import java.sql.Timestamp
+//:set max-iteration 10
+//:set result.indicator.null "x"
+import com.Lomikel.Januser.JanusClient;
+import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.id
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.values
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.select
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.constant
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addE
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V
 
+
+import java.sql.Timestamp
+// Log
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.Configurator;
+
+Configurator.initialize(null, '../src/java/log4j2.xml');
+logg = LogManager.getLogger(this.class);
+
+logg.info("Importing ");
+
+
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
+gr = new FinkGremlinRecipiesG(jc);
+g=gr.g()
 // ------------------------------------------------------------
 // 0) one timestamp for the whole job
 // ------------------------------------------------------------
@@ -17,14 +45,15 @@ defaultClassifier = 'Fink'
 //    grouped as: objectId -> cls -> [tagVertexIds, mjds]
 // ------------------------------------------------------------
 newTags = g.V().
-    has('lbl', 'NewTag').
+    has('lbl', 'NewTag').limit(100).
     //not(has('imported', true)).
     project('tagId', 'objectId', 'cls', 'mjd').
       by(id()).
       by(values('objectId')).
       by(values('cls')).
       by(values('mjd')).
-    toList()
+    toList();[]
+    
 
 println "newTags count = ${newTags.size()}"
 
