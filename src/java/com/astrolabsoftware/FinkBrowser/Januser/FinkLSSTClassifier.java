@@ -92,6 +92,22 @@ public class FinkLSSTClassifier extends LSSTClassifier {
       recipies.registerOCol(this, key, oid, weight, instancesL, weightsL);
       }
     }
+    
+  /** Initialise HBase connections. */
+  public static init() {
+    CLIENTS = new TreeMap<String, HBaseClient>();
+    HBaseClient client;
+    for (String cls : CLASSES) {
+      try {
+        client = new HBaseClient("cchbase1.in2p3.fr", 2183);
+        client.connect(cls, "schema_4.1_8.39.0");
+        CLIENTS.put(cls, client);
+        }
+      catch (LomikelException e) {
+        log.error("Cannot connect to " + cls + " table");
+        }
+      }
+    }  
   
   private static Map<String, HBaseClient> CLIENTS;
 
@@ -106,21 +122,6 @@ public class FinkLSSTClassifier extends LSSTClassifier {
   /** Logging . */
   private static Logger log = LogManager.getLogger(FinkLSSTClassifier.class);
   
-  static {
-    CLIENTS = new TreeMap<String, HBaseClient>();
-    HBaseClient client;
-    for (String cls : CLASSES) {
-      try {
-        client = new HBaseClient("cchbase1.in2p3.fr", 2183);
-        client.connect(cls, "schema_4.1_8.39.0");
-        CLIENTS.put(cls, client);
-        }
-      catch (LomikelException e) {
-        log.error("Cannot connect to rubin.tag_early_snia_candidate table");
-        }
-      }
-    }  
- 
   }
            
            
