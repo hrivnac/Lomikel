@@ -1,5 +1,6 @@
 import com.Lomikel.Januser.JanusClient
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG
+import com.astrolabsoftware.FinkBrowser.Januser.Classifier
 
 // TinkerPop
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.id
@@ -231,3 +232,8 @@ if (!processedTagIds.isEmpty()) {
 }
 graph.tx().commit()
 logg.info("done at importDate=${jobImportDate}")
+
+classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', '')}
+gr.generateCorrelations(classifiers)
+
+

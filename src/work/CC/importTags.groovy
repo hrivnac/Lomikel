@@ -24,7 +24,7 @@ gr = new FinkGremlinRecipiesG(jc);
 client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
 client.setMaxQueueSize(1000);
 client.connect(cls, null);
-client.setLimit(10000);
+//client.setLimit(10000);
 
 timer.start();
 
