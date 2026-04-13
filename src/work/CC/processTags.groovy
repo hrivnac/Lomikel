@@ -1,3 +1,6 @@
+import com.Lomikel.Januser.JanusClient;
+import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
+
 // SQL
 import java.sql.Timestamp
 
@@ -6,6 +9,11 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
 
+Configurator.initialize(null, '../src/java/log4j2.xml');
+log = LogManager.getLogger(this.class);
+
+log.info("Importing " + cls);
+
 jobImportDate = new Timestamp(System.currentTimeMillis())
 
 counter = 0
@@ -13,6 +21,10 @@ counter = 0
 defaultSurvey     = 'LSST'
 defaultFlavor     = ''
 defaultClassifier = 'Fink'
+
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
+gr = new FinkGremlinRecipiesG(jc);
+g = gr.g()
 
 // ------------------------------------------------------------
 // 1) collect all not-yet-imported NewTag vertices
