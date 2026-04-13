@@ -10,9 +10,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, '../src/java/log4j2.xml');
-log = LogManager.getLogger(this.class);
+logg = LogManager.getLogger(this.class);
 
-log.info("Importing " + cls);
+lo.info("Importing " + cls);
 
 jobImportDate = new Timestamp(System.currentTimeMillis())
 
@@ -51,7 +51,7 @@ newTags.each {row ->
   grouped[objectId][cls].tagIds << tagId
   grouped[objectId][cls].mjds   << mjd
   }
-
+/*
 // ------------------------------------------------------------
 // 2) helpers: upsert object vertex, OCol vertex, edge
 // ------------------------------------------------------------
@@ -218,3 +218,4 @@ if (!processedTagIds.isEmpty()) {
 }
 
 log.info("done, importDate=${jobImportDate}")
+*/
