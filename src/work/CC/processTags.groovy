@@ -18,8 +18,8 @@ defaultClassifier = 'Fink'
 // 1) collect all not-yet-imported NewTag vertices
 //    grouped as: objectId -> cls -> [tagVertexIds, mjds]
 // ------------------------------------------------------------
-newTags = g.V().has('lbl', 'NewTag').
-                not(has('imported', true)).
+newTags = g.V().has('lbl', 'NewTag').limit(100).
+                //not(has('imported', true)).
                 project('tagId', 'objectId', 'cls', 'mjd').
                   by(id()).
                   by(values('objectId')).
