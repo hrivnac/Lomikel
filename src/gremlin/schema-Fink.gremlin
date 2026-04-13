@@ -32,16 +32,17 @@ technology   = mgmt.getPropertyKey('technology'   )
 timestamp    = mgmt.getPropertyKey('timestamp'    )
 importDate   = mgmt.getPropertyKey('importDate'   )
 importSource = mgmt.getPropertyKey('importSource' )
-objectId     = mgmt.makePropertyKey('objectId'    ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-jd           = mgmt.makePropertyKey('jd'          ).dataType(Double.class).cardinality(Cardinality.SINGLE).make() 
-mjd          = mgmt.makePropertyKey('mjd'         ).dataType(Double.class).cardinality(Cardinality.SINGLE).make() 
-classifier   = mgmt.makePropertyKey('classifier'  ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-flavor       = mgmt.makePropertyKey('flavor'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-survey       = mgmt.makePropertyKey('survey'      ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-cls          = mgmt.makePropertyKey('cls'         ).dataType(String.class).cardinality(Cardinality.SINGLE).make()
-intersection = mgmt.makePropertyKey('intersection').dataType(Double.class).cardinality(Cardinality.SINGLE).make()
-sizeIn       = mgmt.makePropertyKey('sizeIn'      ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
-sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class).cardinality(Cardinality.SINGLE).make()
+objectId     = mgmt.makePropertyKey('objectId'    ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+jd           = mgmt.makePropertyKey('jd'          ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+mjd          = mgmt.makePropertyKey('mjd'         ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make() 
+classifier   = mgmt.makePropertyKey('classifier'  ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+flavor       = mgmt.makePropertyKey('flavor'      ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+survey       = mgmt.makePropertyKey('survey'      ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+cls          = mgmt.makePropertyKey('cls'         ).dataType(String.class ).cardinality(Cardinality.SINGLE).make()
+intersection = mgmt.makePropertyKey('intersection').dataType(Double.class ).cardinality(Cardinality.SINGLE).make()
+sizeIn       = mgmt.makePropertyKey('sizeIn'      ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make()
+sizeOut      = mgmt.makePropertyKey('sizeOut'     ).dataType(Double.class ).cardinality(Cardinality.SINGLE).make()
+processed    = mgmt.makePropertyKey('processed'   ).dataType(Boolean.class).cardinality(Cardinality.SINGLE).make()
 
 // Vertex properties
 mgmt.addProperties(ocol,
@@ -64,7 +65,8 @@ mgmt.addProperties(newtag,
                    lbl,
                    objectId,
                    cls,
-                   mjd)              
+                   mjd,
+                   processed)              
 // Edge properties
 mgmt.addProperties(overlaps,
                    lbl,

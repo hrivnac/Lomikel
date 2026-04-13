@@ -50,7 +50,7 @@ graph = g.getGraph()
 newTags = g.V().
     has('lbl', 'NewTag').
     limit(100).
-    //not(has('imported', true)).
+    not(has('processed', true)).
     project('tagId', 'objectId', 'cls', 'mjd').
       by(id()).
       by(values('objectId')).
@@ -101,8 +101,7 @@ getOrCreateOCol = { cls, survey, flavor, classifier ->
           property('cls', cls).
           property('survey', survey).
           property('flavor', flavor).
-          property('classifier', classifier).
-          property('importDate', jobImportDate)
+          property('classifier', classifier)
       ).next()
 }
 
@@ -205,7 +204,6 @@ grouped.each { objectId, clsMap ->
           property('instances', data.instances).
           property('weights',   data.weights).
           property('weight',    normalizedWeight).
-          property('importDate', jobImportDate).
           iterate()
 
         logg.info("\tcls=${cls}, count=${data.instances.size()}, weight=${normalizedWeight}")
@@ -228,8 +226,7 @@ processedTagIds = newTags.collect { it.tagId }
 
 if (!processedTagIds.isEmpty()) {
     g.V(processedTagIds).
-      property('imported', true).
-      property('importDate', jobImportDate).
+      property('processed', true).
       iterate()
 }
 graph.tx().commit()
