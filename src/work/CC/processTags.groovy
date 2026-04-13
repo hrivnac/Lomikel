@@ -117,6 +117,7 @@ getOrCreateDeepcontains = {ocolV, objectV ->
                                           .property('weights',   [])
                                           .property('weight',    0.0d))
             .next()
+  }
   
 // ------------------------------------------------------------
 // 3) process each objectId
@@ -212,7 +213,7 @@ grouped.each {objectId, clsMap ->
               .iterate()
   
   if (timer.report()) {
-    gr.commit();
+    gr.commit()
     }
   
   }
