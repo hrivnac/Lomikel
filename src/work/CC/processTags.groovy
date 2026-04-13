@@ -227,12 +227,11 @@ if (!processedTagIds.isEmpty()) {
                       .iterate()
   }
 gr.commit()
-logg.info("done at ${jobImportDate}")
+logg.info('done at ${jobImportDate}')
 
 // ------------------------------------------------------------
 // 5) generate correlations
 // ------------------------------------------------------------
 classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', '')}
 gr.generateCorrelations(classifiers)
-
 
