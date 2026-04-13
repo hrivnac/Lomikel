@@ -39,7 +39,7 @@ newTags = g.V().has('lbl', 'NewTag').limit(100).
                   by(values('mjd')).
                 toList()
 
-log./info("Importing ${newTags.size()} NewTags"
+log..info("Importing ${newTags.size()} NewTags"
 
 grouped = [:].withDefault { [:].withDefault { [tagIds: [], mjds: []] } }
 
