@@ -129,7 +129,7 @@ getOrCreateDeepcontains = { ocolV, objectV ->
 // ------------------------------------------------------------
 grouped.each { objectId, clsMap ->
 
-    logg.info("processing objectId=${objectId}")
+    //logg.debug("processing ${objectId}")
 
     def objectV = getOrCreateObject(objectId)
 
@@ -208,7 +208,7 @@ grouped.each { objectId, clsMap ->
           property('weight',    normalizedWeight).
           iterate()
 
-        logg.info("\tcls=${cls}, count=${data.instances.size()}, weight=${normalizedWeight}")
+        //logg.debug("\tcls=${cls}, count=${data.instances.size()}, weight=${normalizedWeight}")
     }
 
     // touch object importDate as part of this job
