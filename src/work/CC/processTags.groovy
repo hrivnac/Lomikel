@@ -58,7 +58,7 @@ newTags = g.V().
     toList();[]
     
 
-logg.info("newTags count = ${newTags.size()}")
+logg.info("Processing ${newTags.size()} new tags")
 
 grouped = [:].withDefault { [:].withDefault { [tagIds: [], mjds: []] } }
 
@@ -127,7 +127,7 @@ getOrCreateDeepcontains = { ocolV, objectV ->
 // ------------------------------------------------------------
 grouped.each { objectId, clsMap ->
 
-    println "processing objectId=${objectId}"
+    logg.info("processing objectId=${objectId}")
 
     def objectV = getOrCreateObject(objectId)
 
@@ -207,7 +207,7 @@ grouped.each { objectId, clsMap ->
           property('importDate', jobImportDate).
           iterate()
 
-        println "  cls=${cls}, count=${data.instances.size()}, weight=${normalizedWeight}"
+        logg.info("\tcls=${cls}, count=${data.instances.size()}, weight=${normalizedWeight}")
     }
 
     // touch object importDate as part of this job
@@ -215,7 +215,7 @@ grouped.each { objectId, clsMap ->
 counter = counter + 1
     if (counter % 500 == 0) {
         graph.tx().commit()
-        println "committed ${counter} objects"
+        logg.info("${counter} objects committed")
     }
 
 }
@@ -231,5 +231,5 @@ if (!processedTagIds.isEmpty()) {
       property('importDate', jobImportDate).
       iterate()
 }
-
-println "done, importDate=${jobImportDate}"
+graph.tx().commit()
+logg.info("done at importDate=${jobImportDate}")
