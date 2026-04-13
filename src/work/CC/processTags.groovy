@@ -40,6 +40,8 @@ defaultSurvey     = 'LSST'
 defaultFlavor     = ''
 defaultClassifier = 'FINK'
 
+ntags = 100000
+
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties")
 gr = new FinkGremlinRecipiesG(jc)
 g = gr.g()
@@ -49,10 +51,11 @@ graph = g.getGraph()
 // 1) collect all not-yet-imported NewTag vertices
 //    grouped as: objectId -> cls -> [tagVertexIds, mjds]
 // ------------------------------------------------------------
+logg.info("Accumulating up to " + ntags + " NewTags");
 newTags = g.V().
     has('lbl', 'NewTag').
     not(has('processed', true)).
-    limit(100000).
+    limit(ntags).
     project('tagId', 'objectId', 'cls', 'mjd').
       by(id()).
       by(values('objectId')).
