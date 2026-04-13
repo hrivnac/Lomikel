@@ -41,6 +41,7 @@ defaultClassifier = 'Fink'
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties")
 gr = new FinkGremlinRecipiesG(jc)
 g = gr.g()
+graph = g.getGraph()
 
 // ------------------------------------------------------------
 // 1) collect all not-yet-imported NewTag vertices
