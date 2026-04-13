@@ -112,7 +112,7 @@ getOrCreateDeepcontains = {ocolV, objectV ->
             .coalesce(unfold(),
                       addE('deepcontains').from(V(ocolV))
                                           .to(V(objectV))
-                                          .property('lbl', 'deepcontains')
+                                          .property('lbl',       'deepcontains')
                                           .property('instances', [])
                                           .property('weights',   [])
                                           .property('weight',    0.0d))
@@ -145,7 +145,7 @@ grouped.each {objectId, clsMap ->
               .by(select('e'))
               .by(select('ocol').values('cls'))
               .by(select('e').coalesce(values('instances'), constant([])))
-              .by(select('e').coalesce(values('weights'), constant([])))
+              .by(select('e').coalesce(values('weights'),   constant([])))
               .toList()
               .each {rec -> existingByCls[rec.cls] = rec}
 
@@ -209,7 +209,7 @@ grouped.each {objectId, clsMap ->
     }
 
   // touch object importDate as part of this job
-  g.V(objectV).property('importDate', jobImportDate)
+  g.V(objectV).property("importDate", jobImportDate)
               .iterate()
   
   if (timer.report()) {
