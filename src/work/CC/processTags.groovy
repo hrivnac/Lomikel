@@ -1,13 +1,15 @@
+// SQL
 import java.sql.Timestamp
 
-// ------------------------------------------------------------
-// 0) one timestamp for the whole job
-// ------------------------------------------------------------
+// Log
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.Configurator;
+
 jobImportDate = new Timestamp(System.currentTimeMillis())
 
 counter = 0
 
-// temporary defaults until they arrive on NewTag
 defaultSurvey     = 'LSST'
 defaultFlavor     = ''
 defaultClassifier = 'Fink'
@@ -16,74 +18,75 @@ defaultClassifier = 'Fink'
 // 1) collect all not-yet-imported NewTag vertices
 //    grouped as: objectId -> cls -> [tagVertexIds, mjds]
 // ------------------------------------------------------------
-newTags = g.V().
-    has('lbl', 'NewTag').
-    not(has('imported', true)).
-    project('tagId', 'objectId', 'cls', 'mjd').
-      by(id()).
-      by(values('objectId')).
-      by(values('cls')).
-      by(values('mjd')).
-    toList()
+newTags = g.V().has('lbl', 'NewTag').
+                not(has('imported', true)).
+                project('tagId', 'objectId', 'cls', 'mjd').
+                  by(id()).
+                  by(values('objectId')).
+                  by(values('cls')).
+                  by(values('mjd')).
+                toList()
 
-println "newTags count = ${newTags.size()}"
+log./info("Importing ${newTags.size()} NewTags"
 
 grouped = [:].withDefault { [:].withDefault { [tagIds: [], mjds: []] } }
 
-newTags.each { row ->
-    def objectId = row.objectId
-    def cls      = row.cls
-    def mjd      = row.mjd
-    def tagId    = row.tagId
-
-    grouped[objectId][cls].tagIds << tagId
-    grouped[objectId][cls].mjds   << mjd
-}
+newTags.each {row ->
+  def objectId = row.objectId
+  def cls      = row.cls
+  def mjd      = row.mjd
+  def tagId    = row.tagId
+  grouped[objectId][cls].tagIds << tagId
+  grouped[objectId][cls].mjds   << mjd
+  }
 
 // ------------------------------------------------------------
 // 2) helpers: upsert object vertex, OCol vertex, edge
 // ------------------------------------------------------------
-getOrCreateObject = { objectId ->
-    g.V().has('lbl', 'object').has('objectId', objectId).fold().
-      coalesce(
-        unfold(),
-        addV('object').
-          property('lbl', 'object').
-          property('objectId', objectId).
-          property('importDate', jobImportDate)
-      ).next()
-}
+getOrCreateObject = {objectId ->
+  g.V().has('lbl', 'object').has('objectId', objectId).
+        fold().
+        coalesce(
+          unfold(),
+          addV('object').
+            property('lbl', 'object').
+            property('objectId', objectId).
+            property('importDate', jobImportDate)).
+         next()
+  }
 
-getOrCreateOCol = { cls, survey, flavor, classifier ->
-    g.V().has('lbl', 'OCol').
-      has('cls', cls).
-      has('survey', survey).
-      has('flavor', flavor).
-      has('classifier', classifier).
-      fold().
-      coalesce(
-        unfold(),
-        addV('OCol').
-          property('lbl', 'OCol').
-          property('cls', cls).
-          property('survey', survey).
-          property('flavor', flavor).
-          property('classifier', classifier).
-          property('importDate', jobImportDate)
-      ).next()
-}
+getOrCreateOCol = {cls, survey, flavor, classifier ->
+  g.V().has('lbl', 'OCol').
+        has('cls', cls).
+        has('survey', survey).
+        has('flavor', flavor).
+        has('classifier', classifier).
+        fold().
+        coalesce(
+          unfold(),
+          addV('OCol').
+            property('lbl', 'OCol').
+            property('cls', cls).
+            property('survey', survey).
+            property('flavor', flavor).
+            property('classifier', classifier).
+            property('importDate', jobImportDate)).
+        next()
+  }
 
-getOrCreateDeepcontains = { ocolV, objectV ->
-    g.V(ocolV).outE('deepcontains').where(inV().hasId(objectV.id())).fold().
-      coalesce(
-        unfold(),
-        addE('deepcontains').from(V(ocolV)).to(V(objectV)).
-          property('lbl', 'deepcontains').
-          property('instances', []).
-          property('weights', []).
-          property('weight', 0.0d)
-      ).next()
-}
+getOrCreateDeepcontains = {ocolV, objectV ->
+  g.V(ocolV).outE('deepcontains').
+             where(inV().hasId(objectV.id())).
+             fold().
+             coalesce(
+               unfold(),
+               addE('deepcontains').from(V(ocolV)).to(V(objectV)).
+                 property('lbl', 'deepcontains').
+                 property('instances', []).
+                 property('weights', []).
+                 property('weight', 0.0d)).
+             next()
+  }
 
 // ------------------------------------------------------------
 // 3) process each objectId
@@ -93,17 +96,19 @@ getOrCreateDeepcontains = { ocolV, objectV ->
 //    - rebuild edge.weights as 1.0 per instance
 //    - normalize edge.weight across all classes for this object
 // ------------------------------------------------------------
-grouped.each { objectId, clsMap ->
+grouped.each {objectId, clsMap ->
 
-    println "processing objectId=${objectId}"
+    log.info("processing objectId=${objectId}")
 
     def objectV = getOrCreateObject(objectId)
 
     // read all existing deepcontains edges into this object
     def existingByCls = [:]
-    g.V(objectV).
-      inE('deepcontains').as('e').
-      outV().has('lbl', 'OCol').as('ocol').
+    g.V(objectV).inE('deepcontains').
+                 as('e').
+                 outV().
+                 has('lbl', 'OCol').
+                 as('ocol').
       project('edge', 'cls', 'instances', 'weights').
         by(select('e')).
         by(select('ocol').values('cls')).
@@ -175,7 +180,7 @@ grouped.each { objectId, clsMap ->
           property('importDate', jobImportDate).
           iterate()
 
-        println "  cls=${cls}, count=${data.instances.size()}, weight=${normalizedWeight}"
+        log.info("cls=${cls}, count=${data.instances.size()}, weight=${normalizedWeight}")
     }
 
     // touch object importDate as part of this job
@@ -183,7 +188,7 @@ grouped.each { objectId, clsMap ->
 counter = counter + 1
     if (counter % 500 == 0) {
         graph.tx().commit()
-        println "committed ${counter} objects"
+        log.info("committed ${counter} objects")
     }
 
 }
@@ -200,4 +205,4 @@ if (!processedTagIds.isEmpty()) {
       iterate()
 }
 
-println "done, importDate=${jobImportDate}"
+log.info("done, importDate=${jobImportDate}")
