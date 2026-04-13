@@ -36,7 +36,7 @@ counter = 0
 // temporary defaults until they arrive on NewTag
 defaultSurvey     = 'LSST'
 defaultFlavor     = ''
-defaultClassifier = 'Fink'
+defaultClassifier = 'FINK'
 
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties")
 gr = new FinkGremlinRecipiesG(jc)
