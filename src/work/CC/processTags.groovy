@@ -11,6 +11,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.consta
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addE
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.has
 
 // SQL
 import java.sql.Timestamp
@@ -49,7 +50,6 @@ graph = g.getGraph()
 // ------------------------------------------------------------
 newTags = g.V().
     has('lbl', 'NewTag').
-    limit(100).
     not(has('processed', true)).
     project('tagId', 'objectId', 'cls', 'mjd').
       by(id()).
