@@ -52,7 +52,7 @@ graph = g.getGraph()
 newTags = g.V().
     has('lbl', 'NewTag').
     not(has('processed', true)).
-    limit(10000).
+    limit(100000).
     project('tagId', 'objectId', 'cls', 'mjd').
       by(id()).
       by(values('objectId')).
