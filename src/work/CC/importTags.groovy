@@ -52,7 +52,7 @@ while (client.scanning() || client.size() > 0) {
     }
   }
   
-gr.commit()
+gr.commit();
 
 client.stop();
 client.close();
