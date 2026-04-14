@@ -19,6 +19,10 @@ catch (MissingPropertyException e) {
   cls = 'rubin.tag_early_snia_candidate'
   }
 
+
+log.info("Cleaning already processed NewTags");
+gr.dropV("NewTag", 1000, "processed", "true");
+  
 log.info("Importing NewTags for " + cls);
 
 timer = new Timer("entries", 100, 5);

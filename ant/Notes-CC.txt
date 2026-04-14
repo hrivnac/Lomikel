@@ -82,3 +82,47 @@ fields = ["diaObject.diaObjectId", "ssSource.ssObjectId", "diaSource.ra", "diaSo
 df_sub = df.select(fields)
 
 df_sub.show()
+
+// just take one object
+oid='313985349745377418'
+==>313985349745377418
+// how it is classified
+gr.classification(oid)
+==>[weight:0.5588235294117647,classifier:FINK,flavor:,class:rubin.tag_early_snia_candidate]
+==>[weight:0.4411764705882353,classifier:FINK,flavor:,class:rubin.tag_sn_near_galaxy_candidate]
+
+// what are the most similar objects
+gr.objectNeighborhood(oid, 'FINK', 10, 'JensenShannon')
+==>170028486134595648=8.378261061303295E-4={rubin.tag_early_snia_candidate=0.56, rubin.tag_sn_near_galaxy_candidate=0.44}
+==>313893022963597411=0.0023260742822557756={rubin.tag_early_snia_candidate=0.5555555555555556, rubin.tag_sn_near_galaxy_candidate=0.4444444444444444}
+==>313862203231436976=0.0023260742822557756={rubin.tag_early_snia_candidate=0.5555555555555556, rubin.tag_sn_near_galaxy_candidate=0.4444444444444444}
+==>313862204866167023=0.004556347927356521={rubin.tag_early_snia_candidate=0.5652173913043478, rubin.tag_sn_near_galaxy_candidate=0.43478260869565216}
+==>313664312954060801=0.004556347927356521={rubin.tag_early_snia_candidate=0.5652173913043478, rubin.tag_sn_near_galaxy_candidate=0.43478260869565216}
+==>313998539302633572=0.00505100878644497={rubin.tag_early_snia_candidate=0.5517241379310345, rubin.tag_sn_near_galaxy_candidate=0.4482758620689655}
+==>313976545466646529=0.00505100878644497={rubin.tag_early_snia_candidate=0.5517241379310345, rubin.tag_sn_near_galaxy_candidate=0.4482758620689655}
+==>313871014596444283=0.007422524178710033={rubin.tag_early_snia_candidate=0.5483870967741935, rubin.tag_sn_near_galaxy_candidate=0.45161290322580644}
+==>313972155319058524=0.007422524178710033={rubin.tag_early_snia_candidate=0.5483870967741935, rubin.tag_sn_near_galaxy_candidate=0.45161290322580644}
+==>170028487714275396=0.008989824177311827={rubin.tag_early_snia_candidate=0.5714285714285714, rubin.tag_sn_near_galaxy_candidate=0.42857142857142855}
+
+// the classification of the first one (the closest one)
+gr.classification('170028486134595648')
+==>[weight:0.56,classifier:FINK,flavor:,class:rubin.tag_early_snia_candidate]
+==>[weight:0.44,classifier:FINK,flavor:,class:rubin.tag_sn_near_galaxy_candidate]
+
+// tag oid as 'TestTag' with weight=1.0 in TAG classification schema
+gr.registerOCol(Classifier.instance('TAG', 'LSST', ''), 'TestTag', oid, 1.0, '', '')
+
+// get full classification of oid (in all available schemas)
+gr.classification(oid)
+==>[weight:0.5588235294117647,classifier:FINK,flavor:,class:rubin.tag_early_snia_candidate]
+==>[weight:0.4411764705882353,classifier:FINK,flavor:,class:rubin.tag_sn_near_galaxy_candidate]
+==>[weight:1.0,classifier:TAG,flavor:,class:TestTag]
+
+// how would be that oid classified in FINK
+// (it uses information about its classification in TAG
+//  and the correlations between classification in FINK and TAG schemas,
+//  it doesn't use information how oid is actually classified in FINK)
+gr.reclassification(oid, "TAG", "FINK", 10, true);
+==>[classifier:FINK,flavor:,weight:0.529514245966467,class:rubin.tag_early_snia_candidate]
+==>[classifier:FINK,flavor:,weight:0.47048575403353304,class:rubin.tag_sn_near_galaxy_candidate]
+
