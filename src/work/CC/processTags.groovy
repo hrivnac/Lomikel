@@ -40,7 +40,12 @@ defaultSurvey     = 'LSST'
 defaultFlavor     = ''
 defaultClassifier = 'FINK'
 
-ntags = 100000
+try {
+  ntags
+  }  
+catch (MissingPropertyException e) {
+  ntags = 100000
+  }
 
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties")
 gr = new FinkGremlinRecipiesG(jc)

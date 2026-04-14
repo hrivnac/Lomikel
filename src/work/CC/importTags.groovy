@@ -12,6 +12,13 @@ import org.apache.logging.log4j.core.config.Configurator;
 Configurator.initialize(null, '../src/java/log4j2.xml');
 log = LogManager.getLogger(this.class);
 
+try {
+  cls
+  }  
+catch (MissingPropertyException e) {
+  cls = 'rubin.tag_early_snia_candidate'
+  }
+
 log.info("Importing NewTags for " + cls);
 
 timer = new Timer("entries", 100, 5);
@@ -24,7 +31,6 @@ gr = new FinkGremlinRecipiesG(jc);
 client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
 client.setMaxQueueSize(1000);
 client.connect(cls, null);
-//client.setLimit(10000);
 
 timer.start();
 

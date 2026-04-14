@@ -40,6 +40,5 @@
     <Logger name="org.apache.zookeeper.ClientCnxn"                                          level="WARN"/>
     <Logger name="org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient" level="WARN"/>
     <Logger name="org.apache.hadoop.io.compress.CodecPool"                                  level="WARN"/>
-    <Logger name="org.apache.hadoop.hbase.unsafe.HBasePlatformDependent.checkUnaligned"     level="ERROR"/>
     </Loggers>
   </Configuration>
