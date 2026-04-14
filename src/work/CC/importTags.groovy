@@ -40,7 +40,7 @@ timer.start();
 client.startScan(null,
                  null,
                  null,
-                 0,
+                 now - 180000000, // 2 days
                  now,
                  false,
                  false);
