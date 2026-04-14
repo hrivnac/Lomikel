@@ -18,8 +18,10 @@ try {
 catch (MissingPropertyException e) {
   cls = 'rubin.tag_early_snia_candidate'
   }
-
-
+                    
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
+gr = new FinkGremlinRecipiesG(jc);
+    
 log.info("Cleaning already processed NewTags");
 gr.dropV("NewTag", 1000, "processed", "true");
   
@@ -28,9 +30,6 @@ log.info("Importing NewTags for " + cls);
 timer = new Timer("entries", 100, 5);
 
 now = System.currentTimeMillis();
-                      
-jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
-gr = new FinkGremlinRecipiesG(jc);
 
 client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
 client.setMaxQueueSize(1000);
