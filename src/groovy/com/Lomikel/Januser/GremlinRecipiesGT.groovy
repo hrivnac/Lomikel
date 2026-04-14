@@ -87,28 +87,82 @@ trait GremlinRecipiesGT {
     }
                     
   /** Drop {@link Vertex}es by groups.
-    * @param label The label of {@link Vertex}es to drop.
-    * @param n     The number of {@link Vertex}es to drop for each commit. */
+    * @param label    The label of {@link Vertex}es to drop.
+    * @param n        The number of {@link Vertex}es to drop for each commit.
+    * @param attName  The name of an attribute to check. Optional. 
+    * @param attValue The value of an attribute to check. Optional. */
   def dropV(String label,
-            int    n) {
-    def m = g().V().has('lbl', label).count().next();
+            int    n,
+            String attName  = null,
+            String attValue = null) {
+    def m;
+    if (attName == null) {
+      m = g().V().has('lbl', label)
+                 .count()
+                 .next();
+      }      
+    else {
+      m = g().V().has('lbl', label)
+                 .has(attName, attValue)
+                 .count()
+                 .next();
+      }
     while (m > 0) {
       println('' + m + ' ' + label + 's to drop');
-      g().V().has('lbl', label).limit(n).drop().iterate();
+      if (attName == null) {
+        g().V().has('lbl', label)
+               .limit(n)
+               .drop()
+               .iterate();  
+        }
+      else {
+        g().V().has('lbl', label)
+               .has(attName, attValue)
+               .limit(n)
+               .drop()
+               .iterate();  
+        }
       graph().traversal().tx().commit();
       m -= n;
       }
     }
     
   /** Drop {@link Edge}s by groups.
-    * @param label The label of {@link Edge}s to drop.
-    * @param n     The number of {@link Edge}s to drop for each commit. */
+    * @param label    The label of {@link Edge}s to drop.
+    * @param n        The number of {@link Edge}s to drop for each commit.
+    * @param attName  The name of an attribute to check. Optional. 
+    * @param attValue The value of an attribute to check. Optional. */
   def dropE(String label,
-            int    n) {
-    def m = g().E().has('lbl', label).count().next();
+            int    n,
+            String attName  = null,
+            String attValue = null) {
+    def m;
+    if (attName == null) {
+      m = g().E().has('lbl', label)
+                 .count()
+                 .next();
+      }
+    else {
+      m = g().E().has('lbl', label)
+                 .has(attName, attValue)
+                 .count()
+                 .next();
+      }
     while (m > 0) {
       println('' + m + ' ' + label + 's to drop');
-      g().E().has('lbl', label).limit(n).drop().iterate();
+      if (attName == null) {
+        g().E().has('lbl', label)
+               .limit(n)
+               .drop()
+               .iterate();
+        }
+      else {
+        g().E().has('lbl', label)
+               .has(attName, attValue)
+               .limit(n)
+               .drop()
+               .iterate();
+        }
       graph().traversal().tx().commit();
       m -= n;
       }
