@@ -10,6 +10,7 @@ PID=$$
 echo ${PID} > ${LOCK}
 cd ~/Lomikel/ant
 source ./setup.sh
+java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/cleanTags.groovy | tee -a ${LOG} 2>&1
 for T in rubin.tag_early_snia_candidate \
          rubin.tag_extragalactic_lt20mag_candidate \
          rubin.tag_extragalactic_new_candidate \

@@ -21,9 +21,6 @@ catch (MissingPropertyException e) {
                     
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
 gr = new FinkGremlinRecipiesG(jc);
-    
-log.info("Cleaning already processed NewTags");
-gr.dropV("NewTag", 1000, "processed", "true");
   
 log.info("Importing NewTags for " + cls);
 

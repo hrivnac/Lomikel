@@ -124,41 +124,35 @@ getOrCreateDeepcontains = {ocolV, objectV ->
             .next()
   }
   
-toMjdList = { raw ->
-    if (raw == null) {
-        return []
+toDoubleList = {raw ->
+  if (raw == null) {
+    return []
+    }  
+  if (raw instanceof List) {
+    return raw.collect{it as Double}
     }
-
-    if (raw instanceof List) {
-        return raw.collect { it as Double }
+  if (raw.getClass().isArray()) {
+    return raw.toList().collect {it as Double}
     }
-
-    if (raw.getClass().isArray()) {
-        return raw.toList().collect { it as Double }
+  
+  if (raw instanceof String) {
+    s = raw.trim()  
+    if (s == '' || s == '[]') {
+      return []
+      } 
+    // remove [ ... ] if present
+    if (s.startsWith('[') && s.endsWith(']')) {
+      s = s.substring(1, s.length() - 1)
+      } 
+    if (s.trim() == '') {
+      return []
+      } 
+    return s.split(/\s*,\s*/).collect { it as Double }
     }
-
-    if (raw instanceof String) {
-        s = raw.trim()
-
-        if (s == '' || s == '[]') {
-            return []
-        }
-
-        // remove [ ... ] if present
-        if (s.startsWith('[') && s.endsWith(']')) {
-            s = s.substring(1, s.length() - 1)
-        }
-
-        if (s.trim() == '') {
-            return []
-        }
-
-        return s.split(/\s*,\s*/).collect { it as Double }
-    }
-
-    // single scalar value
-    return [ raw as Double ]
-}  
+  // single scalar value
+  return [raw as Double]
+  }  
+  
 // ------------------------------------------------------------
 // 3) process each objectId
 //    - ensure object vertex
@@ -207,8 +201,7 @@ grouped.each {objectId, clsMap ->
     def oldInstances = []
     if (existingByCls.containsKey(cls) &&
         existingByCls[cls].instances != null) {
-      //oldInstances = existingByCls[cls].instances as List
-      oldInstances = toMjdList(existingByCls[cls].instances)
+      oldInstances = toDoubleList(existingByCls[cls].instances)
       }
     
     // new values from NewTag
