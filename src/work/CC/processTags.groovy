@@ -23,9 +23,9 @@ import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.config.Configurator
 
-// ------------------------------------------------------------
-// 0) setup
-// ------------------------------------------------------------
+// ---------------------------------------------------------
+// setup
+// ---------------------------------------------------------
 Configurator.initialize(null, '../src/java/log4j2.xml')
 logg = LogManager.getLogger(this.class)
 
@@ -52,10 +52,10 @@ gr = new FinkGremlinRecipiesG(jc)
 g = gr.g()
 graph = g.getGraph()
 
-// ------------------------------------------------------------
-// 1) collect all not-yet-imported NewTag vertices
-//    grouped as: objectId -> cls -> [tagVertexIds, mjds]
-// ------------------------------------------------------------
+// ----------------------------------------------------------
+//  collect all not-yet-imported NewTag vertices
+//  grouped as: objectId -> cls -> [tagVertexIds, mjds]
+// ----------------------------------------------------------
 logg.info("Accumulating up to ${ntags} NewTags")
 newTags = g.V().has('lbl', 'NewTag')
                .not(has('processed', true))
@@ -80,9 +80,9 @@ newTags.each {row ->
   grouped[objectId][cls].mjds   << mjd
   }
 
-// ------------------------------------------------------------
-// 2) helpers: upsert object vertex, OCol vertex, edge
-// ------------------------------------------------------------
+// ----------------------------------------------------------
+//  helpers: upsert object vertex, OCol vertex, edge
+// ----------------------------------------------------------
 getOrCreateObject = {objectId ->
   g.V().has('lbl',     'object')
        .has('objectId', objectId)
@@ -153,14 +153,14 @@ toDoubleList = {raw ->
   return [raw as Double]
   }  
   
-// ------------------------------------------------------------
-// 3) process each objectId
-//    - ensure object vertex
-//    - ensure all needed OCol vertices
-//    - merge new mjds into edge.instances
-//    - rebuild edge.weights as 1.0 per instance
-//    - normalize edge.weight across all classes for this object
-// ------------------------------------------------------------
+// ----------------------------------------------------------
+//  process each objectId
+//  - ensure object vertex
+//  - ensure all needed OCol vertices
+//  - merge new mjds into edge.instances
+//  - rebuild edge.weights as 1.0 per instance
+//  - normalize edge.weight across all classes for this object
+// ----------------------------------------------------------
 timer.start()
 grouped.each {objectId, clsMap ->
 
@@ -252,9 +252,9 @@ grouped.each {objectId, clsMap ->
   
   }
 
-// ------------------------------------------------------------
-// 4) mark processed NewTag vertices as imported
-// ------------------------------------------------------------
+// ----------------------------------------------------------
+//  mark processed NewTag vertices as imported
+// ----------------------------------------------------------
 processedTagIds = newTags.collect {it.tagId}
 
 if (!processedTagIds.isEmpty()) {
@@ -264,9 +264,9 @@ if (!processedTagIds.isEmpty()) {
 gr.commit()
 logg.info("done at ${jobImportDate}")
 
-// ------------------------------------------------------------
-// 5) generate correlations
-// ------------------------------------------------------------
+// ----------------------------------------------------------
+//  generate correlations
+// ----------------------------------------------------------
 classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', ''),
                                Classifier.instance('TAG',  'LSST', '')}
 gr.generateCorrelations(classifiers)

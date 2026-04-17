@@ -91,6 +91,11 @@ gr.classification(oid)
 ==>[weight:0.5588235294117647,classifier:FINK,flavor:,class:rubin.tag_early_snia_candidate]
 ==>[weight:0.4411764705882353,classifier:FINK,flavor:,class:rubin.tag_sn_near_galaxy_candidate]
 
+g.V().has('lbl', 'object').has('objectId', oid).inE().valueMap()
+==>[weights:[1.0, 1.0, 1.0, 1.0],instances:[61090.096429813224, 61090.09816415435, 61090.101626195785, 61090.104298484046],weight:0.5714285714285714,lbl:deepcontains]
+==>[weight:0.42857142857142855,lbl:deepcontains,weights:[1.0, 1.0, 1.0],instances:[61090.09448914582, 61091.077754213344, 61095.05978675199]]
+
+
 // what are the most similar objects
 gr.objectNeighborhood(oid, 'FINK', 10, 'JensenShannon')
 ==>170028486134595648=8.378261061303295E-4={rubin.tag_early_snia_candidate=0.56, rubin.tag_sn_near_galaxy_candidate=0.44}

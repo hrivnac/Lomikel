@@ -386,6 +386,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param classifier The {@link Classifier}s to be used. */
   public void generateCorrelations(Classifier... classifiers) {
     log.info("Generating correlations for OCol of " + Arrays.asList(classifiers));
+    // Clean all correlations 
+    g().E().has("lbl", "overlaps").
+            drop().
+            iterate();
     List<String> surveysL = new ArrayList<>();
     List<String> namesL   = new ArrayList<>();
     List<String> flavorsL = new ArrayList<>();
@@ -393,10 +397,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       surveysL.add(classifier.survey());
       namesL.add(  classifier.name()  );
       flavorsL.add(classifier.flavor());
-      // Clean all correlations 
-      g().E().has("lbl", "overlaps").
-              drop().
-              iterate();
       // Remove wrong OCol
       g().V().has("lbl",        "OCol"             ).
               has("classifier", classifier.name()  ).
