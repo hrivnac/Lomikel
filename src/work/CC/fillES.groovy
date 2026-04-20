@@ -64,7 +64,7 @@ public class PR extends ParquetReader {
         esclient.putValue("dia_mjd", "mjd", key, mjd);
         }
       else if (props().containsKey("ssSource.ssObjectId")) {
-        key = props().get("ssSource.ssObjectId").next();
+        key = props().get("ssSource.ssObjectId").iterator().next();
         esclient.putGeoPoint("ss_radec", "location", key, ra, dec);
         esclient.putValue("ss_mjd", "mjd", key, mjd );
         }
