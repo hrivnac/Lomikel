@@ -153,6 +153,7 @@ public class ESClient {
   /** Commit new values into index.
     * @param  idxName The index name.
     * @throws LomikelException If anything goes wrong. */
+  // TBD: check rc
   public void commit(String idxName) throws LomikelException {
     List<String> command = _commands.get(idxName);
     String jsonCmd = command.stream()

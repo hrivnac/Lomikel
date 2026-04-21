@@ -6,6 +6,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -624,13 +625,21 @@ public class SmallHttpClient {
                                                                              .register("https", sslsf)
                                                                              .register("http", new PlainConnectionSocketFactory())
                                                                              .build();
-    BasicHttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);
+    BasicHttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);   
+    RequestConfig config = RequestConfig.custom()
+                                        .setConnectTimeout(          _timeout * 1000)
+                                        .setConnectionRequestTimeout(_timeout * 1000)
+                                        .setSocketTimeout(           _timeout * 1000)
+                                        .build();                                       
     CloseableHttpClient httpClient = HttpClients.custom()
+                                                .setDefaultRequestConfig(config)
                                                 .setSSLSocketFactory(sslsf)
                                                 .setConnectionManager(connectionManager)
                                                 .build();
     return httpClient;
     }
+    
+  private int _timeout = 60; // 60s
       
   /** Logging . */
   private static Logger log = LogManager.getLogger(SmallHttpClient.class);
