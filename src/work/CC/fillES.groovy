@@ -72,7 +72,7 @@ public class PR extends ParquetReader {
         log.warn("no objectid");
         }
       props().clear();
-      esclient.commit();
+      esclient.commitWithRetry(10);
       }
     }
     
