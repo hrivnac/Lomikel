@@ -159,7 +159,7 @@ public class ESClient {
     String jsonCmd = command.stream()
                             .map(Object::toString)
                             .collect(Collectors.joining("\n"));
-    log.info("Inserting " + idxName + "[" + command.size() + "]");
+    //log.info("Inserting " + idxName + "[" + command.size() + "]");
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", null, null);
     _commands.remove(idxName);
