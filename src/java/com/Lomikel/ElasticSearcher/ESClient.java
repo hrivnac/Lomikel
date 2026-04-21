@@ -165,8 +165,7 @@ public class ESClient {
     _commands.remove(idxName);
     }
     
-  /** Commit all new values into index.
-    * @throws LomikelException If anything goes wrong. */
+  /** Commit all new values into index. */
   public void commit() {
     _commands.forEach((k, v) -> {
       try {
@@ -174,6 +173,28 @@ public class ESClient {
         }
       catch (LomikelException e) {
         log.error("Cannot commit " + k, e);
+        }});
+    }
+    
+  /** Commit all new values into index.
+    * @param n The number of retries (of each value) before failing. */
+  public void commitWithRetry(int n) {
+    _commands.forEach((k, v) -> {
+      int m = n;
+      while (m > 0) {
+        try {
+          commit(k);
+          m = 0;
+          }
+        catch (LomikelException e) {
+          m--;
+          if (m == 0) {
+            log.error("Cannot commit " + k, e);
+            }
+          else {
+            log.warn("Retrying commit, m = " + m);
+            }
+          }
         }});
     }
 
