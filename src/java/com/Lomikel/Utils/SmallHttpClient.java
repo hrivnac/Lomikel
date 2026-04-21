@@ -639,7 +639,7 @@ public class SmallHttpClient {
     return httpClient;
     }
     
-  private int _timeout = 60; // 60s
+  private static int _timeout = 60; // 60s
       
   /** Logging . */
   private static Logger log = LogManager.getLogger(SmallHttpClient.class);
