@@ -164,7 +164,7 @@ public class ESClient {
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", null, null);
     JSONObject answerJson = new JSONObject(answer);
     if (answerJson.getBoolean("errors")) {
-      throw LomikelException("HTTP Post error");
+      throw new LomikelException("HTTP Post error");
       }
     _commands.remove(idxName);
     }
