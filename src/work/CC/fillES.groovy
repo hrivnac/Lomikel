@@ -21,7 +21,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml");
 
-int delay = 2;
+int[] delays = new int[]{2};
 
 public class PR extends ParquetReader {
 
@@ -75,8 +75,9 @@ public class PR extends ParquetReader {
         log.warn("no objectid");
         }
       props().clear();
-      esclient.commitWithRetry(10);
-      timer.report();
+      if (timer.report()) {
+        esclient.commitWithRetry(10);
+        }
       }
     }
     
@@ -88,5 +89,10 @@ public class PR extends ParquetReader {
 //esclient.createIndex("dia_mjd", "mjd", "double");
 
 ParquetReader reader = new PR("hdfs://ccmaster1:8020");
-yesterday = LocalDate.now().minusDays(delay).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
-reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
+for (int delay : delays) {
+  aday = LocalDate.now()
+                  .minusDays(delay)
+                  .format(DateTimeFormatter
+                  .ofPattern("'year='yyyy'/month='MM'/day='dd"));
+  reader.processDir("/user/fink/archive/science/" + aday, "parquet");
+  }
