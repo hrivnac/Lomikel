@@ -1,5 +1,6 @@
 import com.Lomikel.ElasticSearcher.ESClient;
 import com.Lomikel.Parquet.ParquetReader;
+import com.Lomikel.Utils.Timer;
 
 // Parquet
 import org.apache.parquet.schema.GroupType;
@@ -26,6 +27,7 @@ public class PR extends ParquetReader {
 
   ESClient esclient = new ESClient("http://157.136.253.253:20200");
   Logger log = LogManager.getLogger(this.class);
+  Timer timer = new Timer("entries", 1000, 5);
 
   public PR(String url) {
     super(url);
@@ -73,6 +75,7 @@ public class PR extends ParquetReader {
         }
       props().clear();
       esclient.commitWithRetry(10);
+      timer.report();
       }
     }
     
