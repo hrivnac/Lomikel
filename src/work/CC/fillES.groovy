@@ -31,6 +31,7 @@ public class PR extends ParquetReader {
 
   public PR(String url) {
     super(url);
+    timer.start();
     }
 
   @Override
