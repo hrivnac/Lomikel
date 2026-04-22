@@ -53,7 +53,7 @@ public class PR extends ParquetReader {
       props().put(name, set);
       }
     }
-    
+
   @Override
   public void endGroup() {
     if (props().containsKey("diaObject.diaObjectId") || props().containsKey("ssSource.ssObjectId")) {
