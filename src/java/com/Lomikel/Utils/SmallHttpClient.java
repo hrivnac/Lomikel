@@ -17,6 +17,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.ContentType;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -274,6 +275,69 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
+    try {
+      HttpResponse response = client.execute(post);
+      StatusLine statusLine = response.getStatusLine();
+      int statusCode = statusLine.getStatusCode();
+      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
+        throw new LomikelException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+        }
+      else {
+        if (header != null) {
+          for (Header h : response.getHeaders(header)) {
+            for (HeaderElement helement : h.getElements()) {
+              answerB.append(helement.getName())
+                     .append(" = ")
+                     .append(helement.getValue())
+                     .append("\n");
+              }
+            }
+          //answer = response.getHeaders(header)[0].getElements()[0].getName();
+          }
+        else {
+          answerB = new StringBuffer(getResponseBody(response));   
+          }
+        }
+      }
+    catch (Exception e) {
+      throw new LomikelException("Post to " + url + " " + json + " failed", e);
+      }
+    finally {
+      post.releaseConnection();
+      }  
+    return answerB.toString();
+    }
+    
+  /** Make http post call. It accepts gzipped results.
+    * @param url     The http url.
+    * @param json    The request parameters as JSON string.
+    * @param headers The additional headers. May be <code>null</code>.
+    * @param header  The requested header (instead of answer body). May be <code>null</code>.
+    * @return        The answer.
+    * @throws LomikelException If anything goes wrong. */
+  public static String postNDJSON(String              url,
+                                  String              json,
+                                  Map<String, String> headers,
+                                  String              header) throws LomikelException {
+    StringBuffer answerB = new StringBuffer("");
+    //DefaultHttpClient client = new DefaultHttpClient();
+    CloseableHttpClient client = null;
+    try {
+      client = getSecureHttpsClient();
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new LomikelException("Cannot get http client", e);
+      }
+    HttpPost post = new HttpPost(url);
+    post.addHeader("Accept-Encoding", "gzip");
+    post.addHeader("Content-Type", "application/x-ndjson");
+    post.addHeader("Accept", "application/json");
+    if (headers != null) {
+      for (Map.Entry<String, String> entry : headers.entrySet()) {
+        post.addHeader(entry.getKey(), entry.getValue());
+        }
+      }
+    post.setEntity(new StringEntity(json, ContentType.create("application/x-ndjson", "UTF-8")));
     try {
       HttpResponse response = client.execute(post);
       StatusLine statusLine = response.getStatusLine();

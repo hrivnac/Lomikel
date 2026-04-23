@@ -33,12 +33,10 @@ public class ESClient {
     * @param url The <em>ElasticSearch</em> server. */
   public ESClient(String url) {
     log.info("Connection to " + url);
-    _url = url;
-    String Δ = "a";
+    _url = url;    
     }
     
   // Create index ==============================================================  
-  
     
   /** Create new <em>ElasticSearch</em> simple index.
     * @param  idxName   The index name.
@@ -161,7 +159,7 @@ public class ESClient {
     //log.info(jsonCmd);                        
     //log.info("Inserting " + idxName + "[" + command.size() + "]");
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
-    String answer = _httpClient.postJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", null, null);
+    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", null, null);
     JSONObject answerJson = new JSONObject(answer);
     if (answerJson.getBoolean("errors")) {
       throw new LomikelException("HTTP Post error");
