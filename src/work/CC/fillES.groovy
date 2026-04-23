@@ -27,7 +27,7 @@ public class PR extends ParquetReader {
 
   ESClient esclient = new ESClient("http://157.136.253.253:20200");
   Logger log = LogManager.getLogger(this.class);
-  Timer timer = new Timer("entries", 1000, 5);
+  Timer timer = new Timer("entries", 1000, 1);
 
   public PR(String url) {
     super(url);
@@ -79,6 +79,10 @@ public class PR extends ParquetReader {
         esclient.commitWithRetry(10);
         }
       }
+    } 
+    
+  public void cleanup() 
+    esclient.commitWithRetry(10);
     }
     
   }
@@ -95,4 +99,5 @@ for (int delay : delays) {
                   .format(DateTimeFormatter
                   .ofPattern("'year='yyyy'/month='MM'/day='dd"));
   reader.processDir("/user/fink/archive/science/" + aday, "parquet");
+  reader.cleanup();
   }

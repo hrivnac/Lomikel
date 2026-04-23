@@ -155,7 +155,7 @@ public class ESClient {
     List<String> command = _commands.get(idxName);
     String jsonCmd = command.stream()
                             .map(Object::toString)
-                            .collect(Collectors.joining("\n"));
+                            .collect(Collectors.joining("\n")) + "\n";
     //log.info(jsonCmd);                        
     //log.info("Inserting " + idxName + "[" + command.size() + "]");
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
@@ -164,6 +164,7 @@ public class ESClient {
     if (answerJson.getBoolean("errors")) {
       throw new LomikelException("HTTP Post error");
       }
+    log.info("Imported: " + answerJson.getJSONArray("items").length() + " of " + idxName);
     _commands.remove(idxName);
     }
     

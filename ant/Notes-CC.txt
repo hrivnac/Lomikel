@@ -44,6 +44,7 @@ Janusgraph:  almalinux@134.158.243.144
 
 src/work/CC/fillES.groovy
 
+curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
 
 Reading parquet example:
 
