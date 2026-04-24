@@ -363,6 +363,32 @@ public class ESClient {
     return results;
     }
     
+  // Info ======================================================================
+  
+  /** Search value from index.
+    * @param  idxName The index name.
+    * @param  jsonCmd The json command to execute.
+    * @return         The rowkey values.
+    * @throws LomikelException If anything goes wrong. */
+  public int size(String idxName) throws LomikelException {
+    int sz = 0;
+    String answer = "";
+    try {
+      Object match_all = null;
+      String jsonCmd = new JSONObject().put("query",
+                                            new JSONObject().put("match_all", match_all))
+                                       .toString();
+      answer = _httpClient.postJSON(_url + "/" + idxName + "/_count", jsonCmd, null, null);
+      JSONObject answerJ = new JSONObject(answer);
+      sz = answerJ.getInt("count");
+      }
+    catch (Exception e) {
+      log.error("size not found", e);
+      log.info("Elastic search answer:\t" + answer);
+      }
+    return sz;
+    }
+    
   // ===========================================================================
   
   /** Set the limit on number of results to show.

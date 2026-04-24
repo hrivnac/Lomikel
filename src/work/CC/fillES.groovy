@@ -81,7 +81,7 @@ public class PR extends ParquetReader {
       }
     } 
     
-  public void cleanup() 
+  public void cleanup() {
     esclient.commitWithRetry(10);
     }
     
