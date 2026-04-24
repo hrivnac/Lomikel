@@ -80,6 +80,22 @@ public class ESClient {
                                              .put("lon", lon)));
     }
     
+  /** Insert new String[] values entry into index.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  rowkey    The rowkey value.
+    * @param  value     The field values.
+    * @throws LomikelException If anything goes wrong. */
+  public void putValue(String   idxName, 
+                       String   fieldName,
+                       String   rowkey,
+                       String[] value) throws LomikelException { 
+    put(idxName,
+        new JSONObject().put("index",
+                             new JSONObject().put("_id", rowkey)),
+        new JSONObject().put(fieldName, value));
+    }
+    
   /** Insert new String value entry into index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
@@ -90,6 +106,22 @@ public class ESClient {
                        String fieldName,
                        String rowkey,
                        String value) throws LomikelException { 
+    put(idxName,
+        new JSONObject().put("index",
+                             new JSONObject().put("_id", rowkey)),
+        new JSONObject().put(fieldName, value));
+    }
+    
+  /** Insert new long[] values entry into index.
+    * @param  idxName   The index name.
+    * @param  fieldName The indexed field name.
+    * @param  rowkey    The rowkey value.
+    * @param  value     The field values.
+    * @throws LomikelException If anything goes wrong. */
+  public void putValue(String idxName, 
+                       String fieldName,
+                       String rowkey,
+                       long[] value) throws LomikelException { 
     put(idxName,
         new JSONObject().put("index",
                              new JSONObject().put("_id", rowkey)),
@@ -128,50 +160,22 @@ public class ESClient {
         new JSONObject().put(fieldName, value));
     }
     
-  /** Insert new double value entry into index.
+  /** Insert new double[] values entry into index.
     * @param  idxName   The index name.
     * @param  fieldName The indexed field name.
     * @param  rowkey    The rowkey value.
-    * @param  value     The field value.
+    * @param  value     The field values.
     * @throws LomikelException If anything goes wrong. */
   public void putValue(String   idxName, 
                        String   fieldName,
                        String   rowkey,
                        double[] value) throws LomikelException { 
-    String mvalue = "[";
-    boolean first = true;
-    for (double v : value) {
-      if (first) {
-        first = false;
-        }
-      else {
-        mvalue += ",";
-        }
-      mvalue += v;
-      }
-    mvalue += "]";
-    put(idxName,
-        new JSONObject().put("index",
-                             new JSONObject().put("_id", rowkey)),
-        new JSONObject().put(fieldName, mvalue));
-    }
-    
-  /** Insert new double value entry into index.
-    * @param  idxName   The index name.
-    * @param  fieldName The indexed field name.
-    * @param  rowkey    The rowkey value.
-    * @param  value     The field value.
-    * @throws LomikelException If anything goes wrong. */
-  public void putMultiValue(String idxName, 
-                            String fieldName,
-                            String rowkey,
-                            double value) throws LomikelException { 
     put(idxName,
         new JSONObject().put("index",
                              new JSONObject().put("_id", rowkey)),
         new JSONObject().put(fieldName, value));
     }
-    
+        
   /** Insert new value into index.
     * @param  idxName The index name.
     * @param  idx The index json entry.
@@ -405,6 +409,31 @@ public class ESClient {
       }
     log.info("" + results.size() + " results found");
     return results;
+    }
+    
+  /** Search value from index.
+    * @param  idxName The index name.
+    * @param  jsonCmd The json command to execute.
+    * @return         The rowkey values.
+    * @throws LomikelException If anything goes wrong. */
+  private String get(String idxName,
+                     String idxValue,
+                     String fieldName) throws LomikelException {
+    String answer = "no answer";
+    String value = null;
+    List<String> results = new ArrayList<>();
+    log.info("Searching " + idxName + "=" + idxValue + "/" + fieldName);
+    try {
+      answer = _httpClient.get(_url + "/" + idxName + "/_doc/" + idxValue + "?_source_includes=" + fieldName, null);
+      JSONObject answerJ = new JSONObject(answer);
+      value = answerJ.getJSONObject("_source")
+                     .getString(fieldName);
+      }
+    catch (Exception e) {
+      log.error("No results found", e);
+      log.info("Elastic search answer:\t" + answer);
+      }
+    return value;
     }
     
   // Info ======================================================================
