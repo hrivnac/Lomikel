@@ -411,23 +411,52 @@ public class ESClient {
     return results;
     }
     
-  /** Search value from index.
-    * @param  idxName The index name.
-    * @param  jsonCmd The json command to execute.
-    * @return         The rowkey values.
+  /** Get field value from index.
+    * @param  idxName   The index name.
+    * @param  idxValue  The index value.
+    * @param  fieldName The indexed field name.
+    * @return         The field value.
     * @throws LomikelException If anything goes wrong. */
-  private String get(String idxName,
-                     String idxValue,
-                     String fieldName) throws LomikelException {
+  private double getDouble(String idxName,
+                           String idxValue,
+                           String fieldName) throws LomikelException {
     String answer = "no answer";
-    String value = null;
-    List<String> results = new ArrayList<>();
+    double value = 0;
     log.info("Searching " + idxName + "=" + idxValue + "/" + fieldName);
     try {
       answer = _httpClient.get(_url + "/" + idxName + "/_doc/" + idxValue + "?_source_includes=" + fieldName, null);
       JSONObject answerJ = new JSONObject(answer);
       value = answerJ.getJSONObject("_source")
-                     .getString(fieldName);
+                     .getDouble(fieldName);
+      }
+    catch (Exception e) {
+      log.error("No results found", e);
+      log.info("Elastic search answer:\t" + answer);
+      }
+    return value;
+    }
+    
+  /** Get field value from index.
+    * @param  idxName   The index name.
+    * @param  idxValue  The index value.
+    * @param  fieldName The indexed field name.
+    * @return         The field values.
+    * @throws LomikelException If anything goes wrong. */
+  private double[] getDoubleArray(String idxName,
+                                  String idxValue,
+                                  String fieldName) throws LomikelException {
+    String answer = "no answer";
+    double[] value = null;
+    log.info("Searching " + idxName + "=" + idxValue + "/" + fieldName);
+    try {
+      answer = _httpClient.get(_url + "/" + idxName + "/_doc/" + idxValue + "?_source_includes=" + fieldName, null);
+      JSONObject answerJ = new JSONObject(answer);
+      JSONArray jvalue = answerJ.getJSONObject("_source")
+                                .getJSONArray(fieldName);
+      value = new double[jvalue.length()];
+      for (int i = 0; i < jvalue.length(); i++) {
+        value[i] = jvalue.getDouble(i);
+        }
       }
     catch (Exception e) {
       log.error("No results found", e);
