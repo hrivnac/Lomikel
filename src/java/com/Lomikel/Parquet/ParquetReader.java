@@ -89,33 +89,37 @@ public class ParquetReader {
     
   /** Process directory with <em>Avro</em> alert files (recursive).
     * @param dirFn        The dirname of directiory with data file.
-    * @param fileExt      The extention of the parquet data file.
-    * @throws IOException If problem with file reading. */
+    * @param fileExt      The extention of the parquet data file. */
   public void processDir(String dirFn,
-                         String fileExt) throws IOException {  
+                         String fileExt) {  
     log.info("Loading directory " + dirFn);
     Path path = new Path(dirFn);
     Path p;
     int i = 0;
-    for (FileStatus fileStatus : _fs.listStatus(path)) {
-      p = fileStatus.getPath();
-      if (_fs.isDirectory(p)) {
-        processDir(dirFn + "/" + p.getName(), fileExt);
-        }
-      else if (p.getName().endsWith("." + fileExt)) {
-        try {
-          process(dirFn + "/" + p.getName(), fileExt);
-          i++;
+    try {
+      for (FileStatus fileStatus : _fs.listStatus(path)) {
+        p = fileStatus.getPath();
+        if (_fs.isDirectory(p)) {
+          processDir(dirFn + "/" + p.getName(), fileExt);
           }
-        catch (IOException | LomikelException e) {
-          log.error("Failed to process " + p, e);
+        else if (p.getName().endsWith("." + fileExt)) {
+          try {
+            process(dirFn + "/" + p.getName(), fileExt);
+            i++;
+            }
+          catch (IOException | LomikelException e) {
+            log.error("Failed to process " + p, e);
+            }
+          }
+        else {
+          log.warn("Not " + fileExt + " file: " + p);
           }
         }
-      else {
-        log.warn("Not " + fileExt + " file: " + p);
-        }
+      log.info("" + i + " files loaded");
       }
-    log.info("" + i + " files loaded");
+    catch (IOException e) {
+      log.error("Failed to process " + dirFn, e);
+      }
     }
     
   /** Process <em>Parquet</em> file .
