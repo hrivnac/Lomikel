@@ -85,6 +85,12 @@ public class PR extends ParquetReader {
     esclient.commitWithRetry(10);
     }
     
+  public String sizes() {
+    String sizes = "";
+    for (String idxName : new String[]{"dia_mjd", "dia_radec", "ss_mjd", "ss_radec"}) {
+      size += idxName + "[" + esclient.size(idxName) + "], ";
+    }
+    
   }
   
 //esclient.createIndex("ss_radec", "location", "geo_point");
@@ -101,3 +107,4 @@ for (int delay : delays) {
   reader.processDir("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
+log.info(reader.sizes());

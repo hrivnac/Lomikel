@@ -365,10 +365,9 @@ public class ESClient {
     
   // Info ======================================================================
   
-  /** Search value from index.
+  /** Give the size of the index.
     * @param  idxName The index name.
-    * @param  jsonCmd The json command to execute.
-    * @return         The rowkey values.
+    * @return         The size of the index.
     * @throws LomikelException If anything goes wrong. */
   public int size(String idxName) throws LomikelException {
     int sz = 0;
@@ -376,7 +375,8 @@ public class ESClient {
     try {
       Object match_all = null;
       String jsonCmd = new JSONObject().put("query",
-                                            new JSONObject().put("match_all", match_all))
+                                            new JSONObject().put("match_all",
+                                                                 new JSONObject()))
                                        .toString();
       answer = _httpClient.postJSON(_url + "/" + idxName + "/_count", jsonCmd, null, null);
       JSONObject answerJ = new JSONObject(answer);
