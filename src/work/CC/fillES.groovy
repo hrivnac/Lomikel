@@ -90,6 +90,7 @@ public class PR extends ParquetReader {
     for (String idxName : new String[]{"dia_mjd", "dia_radec", "ss_mjd", "ss_radec"}) {
       sizes += idxName + "[" + esclient.size(idxName) + "], ";
       }
+    return sizes;
     }
     
   }
