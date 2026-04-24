@@ -411,12 +411,16 @@ public class ESClient {
     return results;
     }
     
+  // Get =======================================================================  
+    
   /** Get field value from index.
     * @param  idxName   The index name.
     * @param  idxValue  The index value.
     * @param  fieldName The indexed field name.
     * @return         The field value.
     * @throws LomikelException If anything goes wrong. */
+  // TBD: check value vs array
+  // TBD: do for String and long (and check)
   private double getDouble(String idxName,
                            String idxValue,
                            String fieldName) throws LomikelException {
@@ -430,13 +434,14 @@ public class ESClient {
                      .getDouble(fieldName);
       }
     catch (Exception e) {
-      log.error("No results found", e);
-      log.info("Elastic search answer:\t" + answer);
+      log.warn("No value found");
+      //log.error("No results found", e);
+      //log.info("Elastic search answer:\t" + answer);
       }
     return value;
     }
     
-  /** Get field value from index.
+  /** Get field values from index.
     * @param  idxName   The index name.
     * @param  idxValue  The index value.
     * @param  fieldName The indexed field name.
@@ -446,7 +451,7 @@ public class ESClient {
                                   String idxValue,
                                   String fieldName) throws LomikelException {
     String answer = "no answer";
-    double[] value = null;
+    double[] value = new double[]{};
     log.info("Searching " + idxName + "=" + idxValue + "/" + fieldName);
     try {
       answer = _httpClient.get(_url + "/" + idxName + "/_doc/" + idxValue + "?_source_includes=" + fieldName, null);
@@ -459,8 +464,9 @@ public class ESClient {
         }
       }
     catch (Exception e) {
-      log.error("No results found", e);
-      log.info("Elastic search answer:\t" + answer);
+      log.warn("No value found");
+      //log.error("No results found", e);
+      //log.info("Elastic search answer:\t" + answer);
       }
     return value;
     }
