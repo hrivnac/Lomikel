@@ -101,6 +101,7 @@ public class PR extends ParquetReader {
 //esclient.createIndex("dia_mjd", "mjd", "double");
 
 ParquetReader reader = new PR("hdfs://ccmaster1:8020");
+String osizes = reader.sizes();
 for (int delay : delays) {
   aday = LocalDate.now()
                   .minusDays(delay)
@@ -109,4 +110,5 @@ for (int delay : delays) {
   reader.processDir("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
-println("Final sizes: " + reader.sizes());
+println("Original sizes: " + osizes);
+println("Final    sizes: " + reader.sizes());
