@@ -21,7 +21,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml");
 
-int[] delays = new int[]{2};
+int[] delays = new int[]{2, 1};
 
 public class PR extends ParquetReader {
 
