@@ -108,4 +108,4 @@ for (int delay : delays) {
   reader.processDir("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
-log.info(reader.sizes());
+println("Final sizes: " + reader.sizes());
