@@ -473,7 +473,7 @@ public class ESClient {
     
   // Update Array ==============================================================
   
-  /** Update values in array index.
+  /** Update values in double array index.
     * It is automatically commited.
     * @param  idxName    The index name.
     * @param  fieldName  The indexed field name.
@@ -481,10 +481,10 @@ public class ESClient {
     * @param  fieldValue The indexed field value to be added to array
     *         (if not yet present).
     * @throws LomikelException If anything goes wrong. */
-  public void updateArray(String idxName,
-                          String fieldName,
-                          String idxValue,
-                          String fieldValue) throws LomikelException {
+  public void updateDoubleArray(String idxName,
+                                String fieldName,
+                                String idxValue,
+                                double fieldValue) throws LomikelException {
     String script = "{\n" +
                     "  \"script\": {\n" +
                     "    \"source\": \"if (ctx._source." + fieldName + " == null) { ctx._source." + fieldName + " = [params.value] } else { ctx._source." + fieldName + ".add(params.value) }\",\n" +
