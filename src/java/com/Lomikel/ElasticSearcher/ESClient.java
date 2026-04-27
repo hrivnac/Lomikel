@@ -480,6 +480,37 @@ public class ESClient {
     * @param  idxValue   The index value.
     * @param  fieldValue The indexed field value to be added to array
     *         (if not yet present).
+    * @param n The number of retries (of each value) before failing. */
+  public void updateDoubleArrayWithRetry(String idxName,
+                                         String fieldName,
+                                         String idxValue,
+                                         double fieldValue,
+                                         int n) {
+    int m = n;
+    while (m > 0) {
+      try {
+        updateDoubleArray(idxName, fieldName, idxValue, fieldValue);
+        m = 0;
+        }
+      catch (LomikelException e) {
+        m--;
+        if (m == 0) {
+          log.error("Cannot update " + idxName + "/" + fieldName + " = " + idxValue + "/" + fieldValue, e);
+          }
+        else {
+          log.warn("Retrying update, m = " + m);
+          }
+        }
+      }
+    }
+   
+  /** Update values in double array index.
+    * It is automatically commited.
+    * @param  idxName    The index name.
+    * @param  fieldName  The indexed field name.
+    * @param  idxValue   The index value.
+    * @param  fieldValue The indexed field value to be added to array
+    *         (if not yet present).
     * @throws LomikelException If anything goes wrong. */
   public void updateDoubleArray(String idxName,
                                 String fieldName,

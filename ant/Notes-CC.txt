@@ -46,6 +46,19 @@ src/work/CC/fillES.groovy
 
 curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
 
+curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": {
+      "script": {
+        "script": {
+          "lang": "painless",
+          "source": "doc[\"mjd\"].size() > 1"
+        }
+      }
+    }
+  }'
+
 Reading parquet example:
 
 from pyspark.sql import SparkSession
