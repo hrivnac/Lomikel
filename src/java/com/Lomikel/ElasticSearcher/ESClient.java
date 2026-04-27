@@ -485,18 +485,17 @@ public class ESClient {
                                 String fieldName,
                                 String idxValue,
                                 double fieldValue) throws LomikelException {
-   String script = "{\n" +
-                   "  \"scripted_upsert\": true,\n" +
-                   "  \"script\": {\n" +
-                   "    \"lang\": \"painless\",\n" +
-                   "    \"source\": \"if (ctx._source." + fieldName + " == null) { ctx._source." + fieldName + " = [params.value]; } else { ctx._source." + fieldName + ".add(params.value); }\",\n" +
-                   "    \"params\": {\n" +
-                   "      \"value\": " + fieldValue + "\n" +
-                   "    }\n" +
-                   "  },\n" +
-                   "  \"upsert\": {}\n" +
-                   "}";                 
-                    
+  String script = "{\n" +
+                  "  \"scripted_upsert\": true,\n" +
+                  "  \"script\": {\n" +
+                  "    \"lang\": \"painless\",\n" +
+                  "    \"source\": \"double v = (double) params.value; if (ctx._source." + fieldName + " == null) { ctx._source." + fieldName + " = [v]; } else if (!ctx._source." + fieldName + ".contains(v)) { ctx._source." + fieldName + ".add(v); } else { ctx.op = 'noop'; }\",\n" +
+                  "    \"params\": {\n" +
+                  "      \"value\": " + fieldValue + "\n" +
+                  "    }\n" +
+                  "  },\n" +
+                  "  \"upsert\": {}\n" +
+                  "}";                            
     String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, null, null);
     //JSONObject answerJson = new JSONObject(answer);
     //if (answerJson.getBoolean("errors")) {

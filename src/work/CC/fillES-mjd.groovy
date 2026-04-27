@@ -59,11 +59,11 @@ public class PR extends ParquetReader {
       String key;
       if (props().containsKey("diaObject.diaObjectId")) {
         key = props().get("diaObject.diaObjectId").iterator().next();
-        esclient.updateArray("dia_mjd", "mjd", key, mjd);
+        esclient.updateDoubleArray("dia_mjd", "mjd", key, mjd);
         }
       else if (props().containsKey("ssSource.ssObjectId")) {
         key = props().get("ssSource.ssObjectId").iterator().next();
-        esclient.updateArray("ss_mjd", "mjd", key, mjd );
+        esclient.updateDoubleArray("ss_mjd", "mjd", key, mjd );
         }
       else {
         log.warn("no objectid");
