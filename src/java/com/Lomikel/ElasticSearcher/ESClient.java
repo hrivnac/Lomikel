@@ -471,15 +471,20 @@ public class ESClient {
     return value;
     }
     
-  //   
+  // Update Array ==============================================================
   
-  /** Commit new values into index.
+  /** Update values in array index.
+    * It is automatically commited.
     * @param  idxName The index name.
+    * @param  idxValue  The index value.
+    * @param  fieldName The indexed field name.
+    * @param  fieldValue The indexed field value to be added to array
+    *         (if not yet present).
     * @throws LomikelException If anything goes wrong. */
-  public void update(String idxName,
-                     String idxValue,
-                     String fieldName,
-                     String fieldValue) throws LomikelException {
+  public void updateArray(String idxName,
+                          String idxValue,
+                          String fieldName,
+                          String fieldValue) throws LomikelException {
     String script = "{\n" +
                     "  \"script\": {\n" +
                     "    \"source\": \"if (ctx._source." + fieldName + " == null) { ctx._source." + fieldName + " = [params.value] } else { ctx._source." + fieldName + ".add(params.value) }\",\n" +
@@ -489,7 +494,7 @@ public class ESClient {
                     "    }\n" +
                     "  }\n" +
                     "}";
-    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update" , script, null, null);
+    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, null, null);
     JSONObject answerJson = new JSONObject(answer);
     if (answerJson.getBoolean("errors")) {
       throw new LomikelException("HTTP Post error");
