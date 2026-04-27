@@ -475,15 +475,15 @@ public class ESClient {
   
   /** Update values in array index.
     * It is automatically commited.
-    * @param  idxName The index name.
-    * @param  idxValue  The index value.
-    * @param  fieldName The indexed field name.
+    * @param  idxName    The index name.
+    * @param  fieldName  The indexed field name.
+    * @param  idxValue   The index value.
     * @param  fieldValue The indexed field value to be added to array
     *         (if not yet present).
     * @throws LomikelException If anything goes wrong. */
   public void updateArray(String idxName,
-                          String idxValue,
                           String fieldName,
+                          String idxValue,
                           String fieldValue) throws LomikelException {
     String script = "{\n" +
                     "  \"script\": {\n" +
