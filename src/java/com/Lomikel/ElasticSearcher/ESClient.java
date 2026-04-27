@@ -410,14 +410,14 @@ public class ESClient {
     log.info("" + results.size() + " results found");
     return results;
     }
-    
+        
   // Get =======================================================================  
     
   /** Get field value from index.
     * @param  idxName   The index name.
     * @param  idxValue  The index value.
     * @param  fieldName The indexed field name.
-    * @return         The field value.
+    * @return           The field value. <tt>0</tt> if no value found.
     * @throws LomikelException If anything goes wrong. */
   // TBD: check value vs array
   // TBD: do for String and long (and check)
@@ -445,7 +445,7 @@ public class ESClient {
     * @param  idxName   The index name.
     * @param  idxValue  The index value.
     * @param  fieldName The indexed field name.
-    * @return         The field values.
+    * @return           The field values. Empty array if no value found.
     * @throws LomikelException If anything goes wrong. */
   private double[] getDoubleArray(String idxName,
                                   String idxValue,
@@ -469,6 +469,31 @@ public class ESClient {
       //log.info("Elastic search answer:\t" + answer);
       }
     return value;
+    }
+    
+  //   
+  
+  /** Commit new values into index.
+    * @param  idxName The index name.
+    * @throws LomikelException If anything goes wrong. */
+  public void update(String idxName,
+                     String idxValue,
+                     String fieldName,
+                     String fieldValue) throws LomikelException {
+    String script = "{\n" +
+                    "  \"script\": {\n" +
+                    "    \"source\": \"if (ctx._source." + fieldName + " == null) { ctx._source." + fieldName + " = [params.value] } else { ctx._source." + fieldName + ".add(params.value) }\",\n" +
+                    "    \"lang\": \"painless\",\n" +
+                    "    \"params\": {\n" +
+                    "      \"value\": " + fieldValue + "\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
+    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update" , script, null, null);
+    JSONObject answerJson = new JSONObject(answer);
+    if (answerJson.getBoolean("errors")) {
+      throw new LomikelException("HTTP Post error");
+      }
     }
     
   // Info ======================================================================
