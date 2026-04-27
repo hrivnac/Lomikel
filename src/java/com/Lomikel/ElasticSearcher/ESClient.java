@@ -495,10 +495,10 @@ public class ESClient {
                     "  }\n" +
                     "}";
     String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, null, null);
-    JSONObject answerJson = new JSONObject(answer);
-    if (answerJson.getBoolean("errors")) {
-      throw new LomikelException("HTTP Post error");
-      }
+    //JSONObject answerJson = new JSONObject(answer);
+    //if (answerJson.getBoolean("errors")) {
+    //  throw new LomikelException("HTTP Post error");
+    //  }
     }
     
   // Info ======================================================================
