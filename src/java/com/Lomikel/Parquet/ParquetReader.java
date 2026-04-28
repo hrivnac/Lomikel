@@ -37,6 +37,7 @@ import org.apache.parquet.schema.MessageType;
 
 // Java
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
@@ -116,6 +117,9 @@ public class ParquetReader {
           }
         }
       log.info("" + i + " files loaded");
+      }
+    catch (FileNotFoundException e) {
+      log.error(e.getMessage());
       }
     catch (IOException e) {
       log.error("Failed to process " + dirFn, e);
