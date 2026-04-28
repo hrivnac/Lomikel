@@ -16,13 +16,22 @@
    
 <%
   String classifier = request.getParameter("classifier");
+  String survey     = request.getParameter("survey");
+  String janusip = "";
   if (classifier == null || classifier.isEmpty()) {
     classifier = "";
+    }
+  if (survey == null || survey.isEmpty()) {
+    survey = "ZTF";
+    janusip = "157.136.250.219";
+    }
+  else if (survey.equals("LLST")) {
+    janusip = "134.158.243.144";
     }
         
   Init.initWS("OverlapsWS");
 
-  JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph1");
+  JanusClient jc = new JanusClient(janusip, 2183, "janusgraph1");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
   String data = gr.overlaps2JSON(classifier);
   out.print(data);

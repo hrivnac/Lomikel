@@ -1,16 +1,16 @@
 const overlapCache = {};
 
-async function getOverlapPositions(classifier, classList, radius, centerX, centerY) {
+async function getOverlapPositions(survey, classifier, classList, radius, centerX, centerY) {
   let overlaps;
   try {
     showSpinner(true, "blue");
-    if (overlapCache[classifier]) {
-      console.log(`Using cached overlaps for ${classifier}`);
+    if (overlapCache[classifier]) { // BUG: cache doesn't handle survey
+      console.log(`Using cached overlaps for ${survey} ${classifier}`);
       overlaps = overlapCache[classifier]
       }
     else {
-      console.log(`Fetching overlaps for ${classifier}...`);
-      const url = `/FinkBrowser/Overlaps.jsp?classifier=${classifier}`;
+      console.log(`Fetching overlaps for ${survey} ${classifier}...`);
+      const url = `/FinkBrowser/Overlaps.jsp?survey=${survey}&classifier=${classifier}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch overlaps");
       overlaps = await response.json();

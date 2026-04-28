@@ -15,12 +15,22 @@
 <%@ page import="org.apache.logging.log4j.LogManager" %>
    
 <%
+  String survey       = request.getParameter("survey");
   String objectId     = request.getParameter("objectId");
   String classifier   = request.getParameter("classifier");
   String reclassifier = request.getParameter("reclassifier");
   String metric       = request.getParameter("metric");
   String nmax         = request.getParameter("nmax");
   String climit       = request.getParameter("climit");
+  String janusip = "";
+  // TBD: check for impossible combinations (survey and classifier,...)
+  if (survey == null || survey.isEmpty()) {
+    survey = "ZTF"; // demo
+    janusip = "157.136.250.219";
+    }
+  else if (survey.equals("LLST")) {
+    janusip = "134.158.243.144";
+    }
   if (objectId == null || objectId.isEmpty()) {
     objectId = "ZTF20aachcvz"; // demo
     }
@@ -42,7 +52,7 @@
         
   Init.initWS("NeighborhoodWS");
 
-  JanusClient jc = new JanusClient("157.136.250.219", 2183, "janusgraph1");
+  JanusClient jc = new JanusClient(janusip, 2183, "janusgraph1");
   FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(jc);
   String data = gr.objectNeighborhood2JSON(objectId, classifier, reclassifier, Double.parseDouble(nmax), metric, Double.parseDouble(climit));
   out.print(data);
