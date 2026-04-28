@@ -21,12 +21,16 @@
   if (classifier == null || classifier.isEmpty()) {
     classifier = "";
     }
-  if (survey == null || survey.isEmpty()) {
-    survey = "ZTF";
+  if (survey == null || survey.isEmpty() || survey.equals("LSST")) {
+    survey = "LSST";
+    janusip = "134.158.243.144";
+    }
+  else if (survey.equals("ZTF")) {
     janusip = "157.136.250.219";
     }
-  else if (survey.equals("LSST")) {
-    janusip = "134.158.243.144";
+  else { // TBD: make demo LSST
+    survey = "ZTF"; // demo
+    janusip = "157.136.250.219";
     }
         
   Init.initWS("OverlapsWS");

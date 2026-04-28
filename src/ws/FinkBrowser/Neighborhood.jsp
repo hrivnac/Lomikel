@@ -24,12 +24,16 @@
   String climit       = request.getParameter("climit");
   String janusip = "";
   // TBD: check for impossible combinations (survey and classifier,...)
-  if (survey == null || survey.isEmpty()) {
-    survey = "ZTF"; // demo
+  if (survey == null || survey.isEmpty() || survey.equals("LSST")) {
+    survey = "LSST";
+    janusip = "134.158.243.144";
+    }
+  else if (survey.equals("ZTF")) {
     janusip = "157.136.250.219";
     }
-  else if (survey.equals("LSST")) {
-    janusip = "134.158.243.144";
+  else { // TBD: make demo LSST
+    survey = "ZTF"; // demo
+    janusip = "157.136.250.219";
     }
   if (objectId == null || objectId.isEmpty()) {
     objectId = "ZTF20aachcvz"; // demo
