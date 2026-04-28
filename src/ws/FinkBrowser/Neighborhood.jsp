@@ -28,7 +28,7 @@
     survey = "ZTF"; // demo
     janusip = "157.136.250.219";
     }
-  else if (survey.equals("LLST")) {
+  else if (survey.equals("LSST")) {
     janusip = "134.158.243.144";
     }
   if (objectId == null || objectId.isEmpty()) {
