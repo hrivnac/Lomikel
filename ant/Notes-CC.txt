@@ -44,43 +44,6 @@ Janusgraph:  almalinux@134.158.243.144
 
 src/work/CC/fillES.groovy
 
-// set results limit
-esclient.setSizeSearch(10);
-
-// get all dia in a cone
-// dia_radec is 1-1 mapping
-println(esclient.searchGeoPoint("dia_radec", "location", 150.009977, 0.670251, 0.001));
-
-// get all dia within mjd range
-// dia-mj is 1-n mapping
-x = esclient.searchRange("dia_mjd", "mjd", 61134.99953458342, 61134.99953458342);
-println(x);
-// take the first one
-x0 = x.get(0);
-// get all its mjd
-println(esclient.getDoubleArray("dia_mjd", x0, "mjd"));
-
-
-for (String idxName : new String[]{"dia_mjd", "ss_mjd", "dia_radec", "ss_radec"}) {
-  println(idxName + "[" + esclient.size(idxName) + "]");
-  }
-
-
-
-curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
-
-curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "script": {
-        "script": {
-          "lang": "painless",
-          "source": "doc[\"mjd\"].size() > 10"
-        }
-      }
-    }
-  }'
 
 Reading parquet example:
 

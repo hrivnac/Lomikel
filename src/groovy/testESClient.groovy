@@ -1,20 +1,44 @@
 import com.Lomikel.ElasticSearcher.ESClient;
 
-esclient = new ESClient("http://127.0.0.1:20200");
-//esclient.setSize(20);
+esclient = new ESClient("http://157.136.253.253:20200"); // @CC
 
-//esclient.createIndex("radec", "location", "geo_point");
-//esclient.createIndex("jd_double", "jd_double", "double");
-//esclient.createIndex("jd_text", "jd_text", "text");
-//esclient.createIndex("jd_long", "jd_long", "long");
+// set results limit
+esclient.setSizeSearch(10);
 
-//esclient.putGeoPoint("radec", "location", "point 2", 45.12, 79.34);
-//esclient.commit();
-//esclient.putValue("jd_double", "jd_double", "date 1", 12.3456789);
-//esclient.putValue("jd_string", "jd_string", "date 1", "12.3456789");
-//esclient.putValue("jd_nano", "jd_nano", "date 1", 12345678900);
+// get all dia in a cone (the same for ss)
+// dia_radec is 1-1 mapping
+println(esclient.searchGeoPoint("dia_radec", "location", 150.009977, 0.670251, 0.001));
 
-println(esclient.searchGeoPoint("radec", "location", 45.12, 79.34, 0.00001));
-println(esclient.searchRange("jd_double", "jd_double", 2460970.82, 2460970.88));
-println(esclient.searchRange("jd_text", "jd_text", "2460970.82", "2460970.88"));
-println(esclient.searchRange("jd_long", "jd_long", 2460970820000000, 2460970880000000));
+// get all dia within mjd range (the same for ss)
+// dia-mjd is 1-n mapping
+x = esclient.searchRange("dia_mjd", "mjd", 61134.99953458342, 61134.99953458342);
+println(x);
+// get all mjd for the first one
+println(esclient.getDoubleArray("dia_mjd", x[0], "mjd"));
+
+// get sizes of all indexes
+for (idxName : ["dia_mjd", "ss_mjd", "dia_radec", "ss_radec"]) {
+  println(idxName + "[" + esclient.size(idxName) + "]");
+  }
+  
+/* interrogate via CURL:
+
+curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
+
+curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": {
+      "script": {
+        "script": {
+          "lang": "painless",
+          "source": "doc[\"mjd\"].size() > 10"
+        }
+      }
+    }
+  }'
+
+curl 'http://157.136.253.253:20200/_cat/indices?v'  
+  
+*/
+
