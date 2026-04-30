@@ -45,9 +45,9 @@ public class PR extends ParquetReader {
         set = props().get(name);
         }
       else {
-        set = new HashSet<>();
+        set = new HashSet<>(); 
         }
-      set.add(value);
+      set.add(value); 
       props().put(name, set);
       }
     }

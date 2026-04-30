@@ -1,3 +1,4 @@
+
 import com.Lomikel.ElasticSearcher.ESClient;
 import com.Lomikel.Parquet.ParquetReader;
 import com.Lomikel.Utils.Timer;
@@ -42,7 +43,7 @@ public class PR extends ParquetReader {
         name.equals("diaObject.diaObjectId") ||
         name.equals("ssSource.ssObjectId"  )) {
       Set<String> set;
-      if (props().containsKey(name)) {
+      if (props().containsKey(name)) { 
         set = props().get(name);
         }
       else {
