@@ -43,7 +43,7 @@ public class PR extends ParquetReader {
         name.equals("diaObject.diaObjectId") ||
         name.equals("ssSource.ssObjectId"  )) {
       Set<String> set;
-      if (props().containsKey(name)) { 
+      if (props().containsKey(name)) {
         set = props().get(name);
         }
       else {
