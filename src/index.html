@@ -108,15 +108,17 @@ $ alias lomikel='java -jar Lomikel*.exe.jar'
 #
 # then call
 $ lomikel -h
-usage: java -jar Lomikel.exe.jar [-a <language>] [-b] [-g] [-h] [-n] [-q] [-s &lt;file&gt;] [-w]
--a,--api &lt;language&gt; cli language: [groovy|python] (othewise taken from source extension, defauld is groovy
--b,--batch          run in a batch
--g,--gui            run in a graphical window
--h,--help           show help
--n,--notebook       run in an notebook
--q,--quiet          minimal direct feedback
--s,--source &lt;file&gt;  source script file (init.<language> is also sourced)
--w,--web            run as a web service
+usage: java -jar Lomikel.exe.jar
+ -a,--api &lt;language&gt;     cli language: [groovy|python] (othewise taken
+                         from source extension, defauld is groovy
+ -b,--batch              run in a batch
+ -g,--gui                run in a graphical window
+ -h,--help               show help
+ -o,--args &lt;arguments&gt;   additional arguments et before scripts:
+                         name=value,name=value,...
+ -q,--quiet              minimal direct feedback
+ -s,--source &lt;file&gt;      source script file (init.&lt;language&gt; is also
+                         sourced)
 </pre>
 
 <h4><a name="Bugs-ToDos">Bugs, Inconsistencies and ToDos</a></h4>

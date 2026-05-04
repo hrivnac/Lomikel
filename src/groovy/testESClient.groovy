@@ -24,6 +24,7 @@ for (idxName : ["dia_mjd", "ss_mjd", "dia_radec", "ss_radec"]) {
 /* interrogate via CURL:
 
 curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
+curl -X GET 'http://157.136.253.253:20200/dia_radec/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
 
 curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' \
   -H 'Content-Type: application/json' \

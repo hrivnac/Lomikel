@@ -74,7 +74,7 @@ public abstract class CLI {
                                    .withArgName("file")
                                    .create("s"));
     options.addOption(OptionBuilder.withLongOpt("args")
-                                   .withDescription("additional arguments et before scripts: name=value,name=value,...")
+                                   .withDescription("additional arguments set before scripts: name=value,name=value,...")
                                    .hasArg()
                                    .withArgName("arguments")
                                    .create("o"));
