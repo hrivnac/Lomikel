@@ -63,7 +63,7 @@ public class PR extends ParquetReader {
         }
       else if (props().containsKey("ssSource.ssObjectId")) {
         key = props().get("ssSource.ssObjectId").iterator().next();
-        esclient.updateDoubleArraywithRetry("ss_mjd", "mjd", key, mjd, 10);
+        esclient.updateDoubleArrayWithRetry("ss_mjd", "mjd", key, mjd, 10);
         }
       else {
         log.warn("no objectid");
