@@ -26,7 +26,7 @@ int[] delays = new int[]{2, 1};
 
 public class PR extends ParquetReader {
 
-  ESClient esclient = new ESClient("http://157.136.253.253:20200");
+  ESClient esclient = new ESClient("http://134.158.243.139:20200");
   Logger log = LogManager.getLogger(this.class);
   Timer timer = new Timer("entries", 1000, 1);
 

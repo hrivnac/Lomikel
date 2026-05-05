@@ -1,6 +1,6 @@
 import com.Lomikel.ElasticSearcher.ESClient;
 
-esclient = new ESClient("http://157.136.253.253:20200"); // @CC
+esclient = new ESClient("http://134.158.243.139:20200"); // @CC
 
 // set results limit
 esclient.setSizeSearch(10);
@@ -23,10 +23,10 @@ for (idxName : ["dia_mjd", "ss_mjd", "dia_radec", "ss_radec"]) {
   
 /* interrogate via CURL:
 
-curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
-curl -X GET 'http://157.136.253.253:20200/dia_radec/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
+curl -X GET 'http://134.158.243.139:20200/dia_mjd/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
+curl -X GET 'http://134.158.243.139:20200/dia_radec/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
 
-curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' \
+curl -X GET 'http://134.158.243.139:20200/dia_mjd/_search?pretty=true' \
   -H 'Content-Type: application/json' \
   -d '{
     "query": {
@@ -39,7 +39,7 @@ curl -X GET 'http://157.136.253.253:20200/dia_mjd/_search?pretty=true' \
     }
   }'
 
-curl 'http://157.136.253.253:20200/_cat/indices?v'  
+curl 'http://134.158.243.139:20200/_cat/indices?v'  
   
 */
 
