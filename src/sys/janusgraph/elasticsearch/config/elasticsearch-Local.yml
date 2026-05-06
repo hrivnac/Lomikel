@@ -1,4 +1,5 @@
 # for Local
 path.data: ../db/es/data
+path.repo: backups
 path.logs: logs
 xpack.security.enabled: false

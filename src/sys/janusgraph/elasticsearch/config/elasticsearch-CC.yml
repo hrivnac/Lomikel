@@ -1,5 +1,6 @@
 # for CC
 path.data: ../db/es/data
+path.repo: backups
 path.logs: logs
 xpack.security.enabled: false
 cluster.name: janus-graph-el
