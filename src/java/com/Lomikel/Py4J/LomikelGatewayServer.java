@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
   * </pre>
   * To access it from the remote client, you may need to setup a tunnel first:
   * <pre>
-  * ssh -L 25333:localhost:25333 remote_id@server_ip
+  * ssh -L local_port:localhost:server_port remote_id@server_ip
   * for example:
   * ssh -L 25333:localhost:25333 centos@157.136.253.253
   * ssh -L 25333:localhost:25333 almalinux@134.158.243.144

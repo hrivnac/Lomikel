@@ -85,9 +85,6 @@ public class PR extends ParquetReader {
     }
     
   }
-  
-//esclient.createIndex("ss_mjd", "mjd", "double");
-//esclient.createIndex("dia_mjd", "mjd", "double");
 
 ParquetReader reader = new PR("hdfs://ccmaster1:8020");
 String osizes = reader.sizes();

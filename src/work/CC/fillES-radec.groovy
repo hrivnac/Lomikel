@@ -1,4 +1,3 @@
-
 import com.Lomikel.ElasticSearcher.ESClient;
 import com.Lomikel.Parquet.ParquetReader;
 import com.Lomikel.Utils.Timer;
@@ -91,9 +90,6 @@ public class PR extends ParquetReader {
     }
     
   }
-  
-//esclient.createIndex("ss_radec", "location", "geo_point");
-//esclient.createIndex("dia_radec", "location", "geo_point");
 
 ParquetReader reader = new PR("hdfs://ccmaster1:8020");
 String osizes = reader.sizes();
@@ -105,5 +101,5 @@ for (int delay : delays) {
   reader.processDir("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
-println("Original sizes: " + osizes);
-println("Final    sizes: " + reader.sizes());
+log.info("Original sizes: " + osizes);
+log.info("Final    sizes: " + reader.sizes());
