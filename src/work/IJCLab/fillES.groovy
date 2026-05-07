@@ -53,7 +53,6 @@ while (client.scanning() || client.size() > 0) {
                                                                     Double.valueOf(v.get("i:jd")),
                                                                     10);
                          }                                                     
-    }
     if (timer.report()) {
       esclient.commitWithRetry(10);
       }
