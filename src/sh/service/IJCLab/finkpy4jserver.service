@@ -1,0 +1,20 @@
+[Unit]
+Description=Fink Py4J Server
+After=network.target
+
+[Service]
+Type=simple
+User=almalinux
+Group=almalinux
+WorkingDirectory=/localhome/janusgraph/Lomikel/run
+ExecStart=/localhome/janusgraph/Lomikel/src/sh/service/CC/finkpy4jserver.sh
+KillSignal=SIGTERM
+TimeoutStopSec=60
+Restart=always
+RestartSec=5
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
+
+
