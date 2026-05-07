@@ -1,8 +1,16 @@
 /etc/systemd/system/finkbrowser.service
 
-chcon -t bin_t /localhome/janusgraph/Lomikel/src/sh/service/CC/finkbrowser.sh
+chcon -t bin_t /localhome/janusgraph/Lomikel/src/sh/service/IJCLab/finkbrowser.sh
 systemctl daemon-reload
 systemctl start finkbrowser
 systemctl enable finkbrowser
 journalctl -u finkbrowser -f
+
+/etc/systemd/system/finkpy4jserver.service
+
+chcon -t bin_t /localhome/janusgraph/Lomikel/src/sh/service/CC/finkpy4jserver.sh
+systemctl daemon-reload
+systemctl start finkpy4jserver
+systemctl enable finkpy4jserver
+journalctl -u finkpy4jserver -f
 
