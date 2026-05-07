@@ -44,7 +44,7 @@ while (client.scanning() || client.size() > 0) {
   if (client.size() > 0) {
     client.poll().each {k, v ->  esclient.updateDoubleArrayWithRetry("mjd", 
                                                                      "mjd",
-                                                                     k,
+                                                                     k.split("_")[0],
                                                                      Double.valueOf(v.get("i:jd")),
                                                                      10);}
     timer.report();

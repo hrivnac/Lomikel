@@ -44,7 +44,7 @@ while (client.scanning() || client.size() > 0) {
   if (client.size() > 0) {
     client.poll().each {k, v -> esclient.putGeoPoint("radec",
                                                      "location",
-                                                     k,
+                                                     k.split("_")[0],
                                                      Double.valueOf(v.get("i:ra")),
                                                      Double.valueOf(v.get("i:dec")));}
     if (timer.report()) {
