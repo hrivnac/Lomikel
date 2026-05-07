@@ -1,8 +1,14 @@
-  
+--------------------------------------------------------------------------------
+
+CC:
 esclient.createIndex("ss_radec", "location", "geo_point");
 esclient.createIndex("dia_radec", "location", "geo_point");
 esclient.createIndex("ss_mjd", "mjd", "double");
 esclient.createIndex("dia_mjd", "mjd", "double");
+
+IJClab:
+esclient.createIndex("radec", "location", "geo_point");
+esclient.createIndex("mjd", "mjd", "double");
 
 --------------------------------------------------------------------------------
 
