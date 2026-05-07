@@ -20,6 +20,28 @@ println(esclient.getDoubleArray("dia_mjd", x[0], "mjd"));
 for (idxName : ["dia_mjd", "ss_mjd", "dia_radec", "ss_radec"]) {
   println(idxName + "[" + esclient.size(idxName) + "]");
   }
+
+/* Python:  
+
+from py4j.java_gateway import (JavaGateway, GatewayParameters)
+
+gateway = JavaGateway(gateway_parameters = GatewayParameters(address = "127.0.0.1",
+                                                             port = 25333))
+
+esclient = gateway.jvm.com.Lomikel.ElasticSearcher.ESClient("http://134.158.243.139:20200")
+
+esclient.setSizeSearch(10);
+
+print(esclient.searchGeoPoint("dia_radec", "location", 150.009977, 0.670251, 0.001));
+
+x = esclient.searchRange("dia_mjd", "mjd", 61134.99953458342, 61134.99953458342);
+print(x);
+print(list(esclient.getDoubleArray("dia_mjd", x[0], "mjd")));
+
+for idxName in ["dia_mjd", "ss_mjd", "dia_radec", "ss_radec"]:
+  print(idxName, "[", esclient.size(idxName), "]")
+
+*/
   
 /* interrogate via CURL:
 

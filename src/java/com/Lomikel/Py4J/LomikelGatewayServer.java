@@ -17,13 +17,16 @@ import org.apache.logging.log4j.LogManager;
 /** Simple {@link GatewayServer}. 
   * The Python client is called like:
   * <pre>
-  * from py4j.java_gateway import JavaGateway
-  * gateway = JavaGateway()
-  * gateway.jvm.java.lang.System.out.println("pokus")
+  * from py4j.java_gateway import (JavaGateway, GatewayParameters)
+  * gateway = JavaGateway(gateway_parameters = GatewayParameters(address = "127.0.0.1",
+  *                                                              port = 25333))
+  * gateway.jvm.java.lang.System.out.println("test")
   * </pre>
   * To access it from the remote client, you may need to setup a tunnel first:
   * <pre>
   * ssh -L 25333:localhost:25333 remote_id@server_ip
+  * for example:
+  * ssh -L 25333:localhost:25333 almalinux@134.158.243.144
   * </pre>
   * @opt attributes
   * @opt operations

@@ -31,3 +31,29 @@ println(gr.classification(oid));
 //  and the correlations between classification in FINK and TAG schemas,
 //  it doesn't use information how oid is actually classified in FINK)
 println(gr.reclassification(oid, "TAG", "FINK", 10, true));
+
+/* Python:  
+
+from py4j.java_gateway import (JavaGateway, GatewayParameters)
+
+gateway = JavaGateway(gateway_parameters = GatewayParameters(address = "127.0.0.1",
+                                                             port = 25333))
+
+jc = gateway.jvm.com.Lomikel.Januser.JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties")
+g = jc.g()
+gr = gateway.jvm.com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG(jc)
+
+oid = '313985349745377418'
+
+print(gr.classification(oid))
+
+print(gr.objectNeighborhood(oid, 'FINK', 10.0, 'JensenShannon', 0.0, False))
+
+print(gr.classification('170028486134595648'))
+
+gr.registerOCol(gateway.jvm.com.astrolabsoftware.FinkBrowser.Januser.Classifier.instance('TAG', 'LSST', ''), 'TestTag', oid, 1.0, '', '')
+print(gr.classification(oid))
+
+print(gr.reclassification(oid, "TAG", "FINK", 10.0, True))
+
+*/
