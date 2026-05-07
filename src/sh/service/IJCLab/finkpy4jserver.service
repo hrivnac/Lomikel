@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 Type=simple
-User=almalinux
-Group=almalinux
+User=janusgraph
+Group=janusgraph
 WorkingDirectory=/localhome/janusgraph/Lomikel/run
-ExecStart=/localhome/janusgraph/Lomikel/src/sh/service/CC/finkpy4jserver.sh
+ExecStart=/localhome/janusgraph/Lomikel/src/sh/service/IJCLab/finkpy4jserver.sh
 KillSignal=SIGTERM
 TimeoutStopSec=60
 Restart=always
