@@ -13,7 +13,7 @@ int delay = 1;
 
 public String sizes() {
   String sizes = "";
-  for (String idxName : new String[]{"dia_radec", "ss_radec"}) {
+  for (String idxName : new String[]{"radec"}) {
     sizes += idxName + "[" + esclient.size(idxName) + "], ";
     }
   return sizes;

@@ -13,7 +13,7 @@ int delay = 1;
 
 public String sizes() {
   String sizes = "";
-  for (String idxName : new String[]{"dia_mjd", "ss_mjd"}) {
+  for (String idxName : new String[]{"mjd"}) {
     sizes += idxName + "[" + esclient.size(idxName) + "], ";
     }
   return sizes;
@@ -42,7 +42,7 @@ timer.start();
 
 while (client.scanning() || client.size() > 0) {
   if (client.size() > 0) {
-    client.poll().each {k, v ->  esclient.updateDoubleArrayWithRetry("dia_mjd", 
+    client.poll().each {k, v ->  esclient.updateDoubleArrayWithRetry("mjd", 
                                                                      "mjd",
                                                                      k,
                                                                      Double.valueOf(v.get("i:jd")),
