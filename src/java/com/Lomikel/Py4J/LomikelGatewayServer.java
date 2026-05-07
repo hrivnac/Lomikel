@@ -6,6 +6,10 @@ import com.Lomikel.Utils.NotifierURL;
 // Py4J
 import py4j.GatewayServer;
 
+// Java
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -29,10 +33,17 @@ import org.apache.logging.log4j.LogManager;
 public class LomikelGatewayServer {
 
   /** Start the server. */
-  public static void main(String[] args) {
-    GatewayServer gatewayServer = new GatewayServer(new LomikelGatewayServer());
+  public static void main(String[] args) throws UnknownHostException {
+    GatewayServer gatewayServer = new GatewayServer(new LomikelGatewayServer(),
+                                                    GatewayServer.DEFAULT_PORT,
+                                                    GatewayServer.DEFAULT_PYTHON_PORT,
+                                                    InetAddress.getByName("0.0.0.0"),
+                                                    InetAddress.getByName("127.0.0.1"),
+                                                    0,
+                                                    0,
+                                                    null);
     gatewayServer.start();
-    log.info("Gateway Server Started at port 25333");
+    log.info("Gateway Server Started at port " + GatewayServer.DEFAULT_PORT);
     try {
       NotifierURL.notify("", "Lomikel-GatewayServer", Info.release());
       }
