@@ -20,7 +20,7 @@ public String sizes() {
   }
 
 
-ESClient esclient = new ESClient("http://157.136.253.253:20200");
+esclient = new ESClient("http://157.136.253.253:20200");
 Logger log = LogManager.getLogger(this.class);
 Timer timer = new Timer("entries", 1000, 1);
 
