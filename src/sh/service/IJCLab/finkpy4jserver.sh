@@ -1,3 +1,4 @@
 #!/usr/bin/bash
-exec /usr/lib/jvm/java-17-openjdk-17.0.14.0.7-2.el9.alma.1.x86_64/bin/java \
--jar '/localhome/janusgraph/Lomikel/lib/Lomikel-py4j-03.09.00x.exe.jar'
+source /localhome/janusgraph/Lomikel/ant/setup.sh
+exec ${JAVA_HOME}/bin/java \
+-jar '/localhome/janusgraph/Lomikel/lib/Lomikel-py4j-${version}.exe.jar'

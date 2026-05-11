@@ -22,8 +22,19 @@ import java.util.Map;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+/** <code>RemoteGroovyServer</code> allows .to execute <em>Groovy</em>
+  * scripts remotely.
+  * @opt attributes
+  * @opt operations
+  * @opt types
+  * @opt visibility
+  * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+// TBD: multi-entry (threads)
+// TBD: with request queue
+// TBD: timeout
 public class RemoteGroovyServer {
 
+  /** Start the server on defaulr port and with default security. */
   public static void main(String[] args) throws Exception {
     HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);   
     server.createContext("/eval", RemoteGroovyServer::handleEval);    
@@ -66,7 +77,7 @@ public class RemoteGroovyServer {
     send(exchange, 200, String.valueOf(result) + "\n");
     }
   
-  private static Object runGroovyScript(String script,
+  private static Object runGroovyScript(String                    script,
                                         Map<String, List<String>> params) throws ScriptException {
     // Create a fresh engine per request for this simple example.
     // That avoids shared mutable state between requests.
@@ -104,14 +115,13 @@ public class RemoteGroovyServer {
   private static void send(HttpExchange exchange,
                            int statusCode,
                            String response) throws IOException {
-      byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
-      exchange.getResponseHeaders().set("Content-Type",
-                                        "text/plain; charset=utf-8");
-      exchange.sendResponseHeaders(statusCode, bytes.length);
-      try (OutputStream os = exchange.getResponseBody()) {
-        os.write(bytes);
-        }
+    byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+    exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=utf-8");
+    exchange.sendResponseHeaders(statusCode, bytes.length);
+    try (OutputStream os = exchange.getResponseBody()) {
+      os.write(bytes);
       }
+    }
 
   /* Example server-side Java object. */
   public static class CalculatorService {
@@ -132,7 +142,7 @@ public class RemoteGroovyServer {
 
   private static final ScriptEngineManager SCRIPT_ENGINE_MANAGER = new ScriptEngineManager();
   
-   /** Logging . */
+  /** Logging . */
   private static Logger log = LogManager.getLogger(RemoteGroovyServer.class);
     
   }
