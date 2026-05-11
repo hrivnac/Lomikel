@@ -784,6 +784,15 @@
         <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar"/>
         </manifest>
       </jar> 
+    <jar jarfile="../lib/Lomikel-server-${version}.exe.jar" index="no">
+      <manifest>
+        <attribute name="Created-By" value="${user.name}"/>
+        <attribute name="AppName"    value="LomikelServer"/>
+        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
+        <attribute name="Main-Class" value="com.Lomikel.GroovyServer.RemoteGroovyServer"/>
+        <attribute name="Class-Path" value="Lomikel-${version}.jar Lomikel-ext-${version}.jar Lomikel-Janus-${version}.jar"/>
+        </manifest>
+      </jar> 
     <!--copy file="${dl4j_jar}" tofile="../lib/dl4j-all.jar"/>
     <jar jarfile="../lib/Lomikel-dl4j-${version}.exe.jar" index="no">
       <manifest>
@@ -1366,6 +1375,19 @@
       </java>
     </target>
     
+  <!-- Start Groovy Gateway Server ==========================================-->
+
+  <target name="start-server"
+          description="Start Groovy Gateway Server">
+    <echo>Starting Groovy Gateway Server</echo>
+    <java jar="../lib/Lomikel-server-${version}.exe.jar"
+          fork="true">
+      <classpath>
+        <path refid="classpath.janusgraph"/>
+        </classpath>
+      </java>
+    </target>
+    
   <!-- Start Py4J Gateway Server ============================================-->
 
   <target name="start-py4j"
@@ -1465,6 +1487,7 @@
       <group title="Utils"              packages="com.Lomikel.Utils*"/>
       <group title="Sockets"            packages="com.Lomikel.Sockets*"/>
       <group title="Py4J"               packages="com.Lomikel.Py4J*"/>
+      <group title="Groovy Server"      packages="com.Lomikel.GroovyServer*"/>
       <group title="GremlinPlugin"      packages="com.Lomikel.GremlinPlugin*"/>
       <group title="GUI"                packages="com.Lomikel.GUI*"/>
       <group title="TinkerPopPatch"     packages="com.Lomikel.TinerPopPatch*"/>

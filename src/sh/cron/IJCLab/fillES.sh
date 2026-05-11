@@ -1,7 +1,7 @@
 #!/usr/bin/bash -l
 NOW=`date +"%Y%m%d%H%M%s"`
-LOG=/tmp/fillES-radec-${NOW}.log
-LOCK=/tmp/fillES-radec.lock 
+LOG=/tmp/fillES-${NOW}.log
+LOCK=/tmp/fillES.lock 
 if [[ -e ${LOCK} ]]; then
   echo "Already filling ES-radec with ${LOCK}"
   exit

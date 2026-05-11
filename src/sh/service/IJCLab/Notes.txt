@@ -6,7 +6,15 @@ systemctl start finkbrowser
 systemctl enable finkbrowser
 journalctl -u finkbrowser -f
 
-/etc/systemd/system/finkpy4jserver.service
+/etc/systemd/system/finkgroovyserver.service
+
+chcon -t bin_t /localhome/janusgraph/Lomikel/src/sh/service/IJCLab/finkgroovyserver.sh
+systemctl daemon-reload
+systemctl start finkgroovyserver
+systemctl enable finkgroovyserver
+journalctl -u finkgroovyserver -f
+
+/etc/systemd/system/finkgroovyserver.service
 
 chcon -t bin_t /localhome/janusgraph/Lomikel/src/sh/service/IJCLab/finkpy4jserver.sh
 systemctl daemon-reload
