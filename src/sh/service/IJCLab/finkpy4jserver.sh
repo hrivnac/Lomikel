@@ -1,4 +1,5 @@
 #!/usr/bin/bash
-source /localhome/janusgraph/Lomikel/ant/setup.sh
+cd /localhome/janusgraph/Lomikel/ant
+source setup.sh
 exec ${JAVA_HOME}/bin/java \
--jar /localhome/janusgraph/Lomikel/lib/Lomikel-py4j-${version}.exe.jar
+-jar ../lib/Lomikel-py4j-${version}.exe.jar

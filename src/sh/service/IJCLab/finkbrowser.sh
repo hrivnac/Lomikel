@@ -1,7 +1,8 @@
 #!/usr/bin/bash
-source /localhome/janusgraph/Lomikel/ant/setup.sh
+cd /localhome/janusgraph/Lomikel/ant
+source setup.sh
 exec ${JAVA_HOME}/bin/java \
--jar /localhome/janusgraph/Lomikel/extlib/jetty-runner-9.4.54.v20240208.jar \
+-jar ${jetty_runner} \
 --path '/FinkBrowser' \
---port 8888 \
-/localhome/janusgraph/Lomikel/lib/FinkBrowser.war
+--port ${jetty_port} \
+../lib/FinkBrowser.war

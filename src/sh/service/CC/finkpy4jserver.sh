@@ -1,4 +1,5 @@
 #!/usr/bin/bash
-source /home/almalinux/Lomikel/ant/setup.sh
+cd /home/almalinux/Lomikel/ant
+source setup.sh
 exec /${JAVA_HOME}/bin/java \
--jar '/home/almalinux/Lomikel/lib/Lomikel-py4j-${version}.exe.jar'
+-jar ../lib/Lomikel-py4j-${version}.exe.jar
