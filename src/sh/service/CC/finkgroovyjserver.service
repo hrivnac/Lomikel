@@ -1,0 +1,20 @@
+[Unit]
+Description=Fink Groovy Server
+After=network.target
+
+[Service]
+Type=simple
+User=almalinux
+Group=almalinux
+WorkingDirectory=/home/almalinux/Lomikel/run
+ExecStart=/home/almalinux/Lomikel/src/sh/service/CC/finkgroovyjserver.sh
+KillSignal=SIGTERM
+TimeoutStopSec=60
+Restart=always
+RestartSec=5
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
+
+
