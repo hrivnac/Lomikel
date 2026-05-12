@@ -13,7 +13,7 @@ const classesLSST = {
   "in_tns": "127,255,127",
   "sn_near_galaxy_candidate": "255,127,255"
   };
- const classes = {...classesZTF, ...classesLSST};
+const classes = {...classesZTF, ...classesLSST};
  
 let fetchPeriod = 10; // every x minutes
 let fetchStart = 48; // hours before now

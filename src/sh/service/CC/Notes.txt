@@ -2,7 +2,7 @@
 
 chcon -t bin_t /home/almalinux/Lomikel/src/sh/service/CC/finkbrowser.sh
 systemctl daemon-reload
-systemctl start finkbrowser
+systemctl restart finkbrowser
 systemctl enable finkbrowser
 journalctl -u finkbrowser -f
 
@@ -11,7 +11,7 @@ journalctl -u finkbrowser -f
 
 chcon -t bin_t /home/almalinux/Lomikel/src/sh/service/CC/finkgroovyserver.sh
 systemctl daemon-reload
-systemctl start finkgroovyserver
+systemctl restart finkgroovyserver
 systemctl enable finkgroovyserver
 journalctl -u finkgroovyserver -f
 
@@ -19,7 +19,7 @@ journalctl -u finkgroovyserver -f
 
 chcon -t bin_t /home/almalinux/Lomikel/src/sh/service/CC/finkpy4jserver.sh
 systemctl daemon-reload
-systemctl start finkpy4jserver
+systemctl restart finkpy4jserver
 systemctl enable finkpy4jserver
 journalctl -u finkpy4jserver -f
 

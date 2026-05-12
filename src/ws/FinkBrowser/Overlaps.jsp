@@ -23,7 +23,7 @@
     }
   if (survey == null || survey.isEmpty() || survey.equals("LSST")) {
     survey = "LSST";
-    janusip = "134.158.243.144";
+    janusip = "134.158.243.163";
     }
   else if (survey.equals("ZTF")) {
     janusip = "157.136.250.219";
