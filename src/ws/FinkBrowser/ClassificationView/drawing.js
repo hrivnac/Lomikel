@@ -74,7 +74,7 @@ async function showObjectNeighborhood(data) {
     return {x: sumX / total, y: sumY / total};
     }
   const objectPos = weightedPosition(data.objectClassification);
-  drawObject(container, data.objectId, objectPos, "red", data.objectClassification, tooltip, hideTimeout, true);
+  drawObject(container, data.objectId, objectPos, "red", data.objectClassification, tooltip, hideTimeout, true, survey);
   for (const [id, obj] of Object.entries(data.objects)) {
     const pos = weightedPosition(obj.classes);
     container.append("line")
@@ -96,13 +96,13 @@ async function showObjectNeighborhood(data) {
              .text(obj.distance.toFixed(4))
              .style("font-size", "10px")
              .style("fill", "#666");
-    drawObject(container, id, pos, "blue", obj.classes, tooltip, hideTimeout, false);
+    drawObject(container, id, pos, "blue", obj.classes, tooltip, hideTimeout, false. survey);
     }
   tooltip.on("mouseover", () => clearTimeout(hideTimeout))
          .on("mouseout", () => {hideTimeout = setTimeout(() => tooltip.style("display", "none"), 900);});
   }
 
-function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, isMain) {
+function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, isMain, survey) {
   const symbol = container.append("path")
                           .datum({x: pos.x, y: pos.y})
                           .attr("class", "object-symbol")
@@ -114,7 +114,7 @@ function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, is
                                                              .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
                                                              .join("");
                                   tooltip.html(`<strong>${id}</strong><br>
-                                               <a href="https://ztf.fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
+                                               <a href="https://${survey.toLowerCase()}.fink-portal.org/${id}" target="_blank">View on Fink Portal</a><br>
                                                <a href="#" id="showObject-${id}">Expand here</a><br>
                                                <strong>Classes:</strong>
                                                <ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>
