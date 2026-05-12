@@ -71,3 +71,18 @@ df_sub = df.select(fields)
 
 df_sub.show()
 
+g.V().has('lbl', 'object').
+  where(
+    inE('deepcontains').
+      where(outV().has('lbl', 'OCol')).
+      count().is(gte(3))
+  ).
+  project('objectId', 'OCols').
+    by(values('objectId')).
+    by(
+      inE('deepcontains').
+        outV().
+        has('lbl', 'OCol').
+        values('cls').
+        fold()
+    )
