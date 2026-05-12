@@ -22,7 +22,3 @@ let fetchPeriod = 10; // every x minutes
 let fetchStart = 48; // hours before now
 let nAlerts = 10;
 let magMax = 6;
-
-early_snia_candidate,
-good_quality,
-uniform_sample 
