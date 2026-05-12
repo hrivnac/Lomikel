@@ -11,7 +11,10 @@ const classesLSST = {
   "extragalactic_new_candidate": "127,255,255",
   "hostless_candidate": "255,127,127",
   "in_tns": "127,255,127",
-  "sn_near_galaxy_candidate": "255,127,255"
+  "sn_near_galaxy_candidate": "255,127,255",
+  "early_snia_candidate":"127,127,255",
+  "good_quality":"127,255,127",
+  "uniform_sample":"127,127,127" 
   };
 const classes = {...classesZTF, ...classesLSST};
  
@@ -20,4 +23,6 @@ let fetchStart = 48; // hours before now
 let nAlerts = 10;
 let magMax = 6;
 
- 
+early_snia_candidate,
+good_quality,
+uniform_sample 

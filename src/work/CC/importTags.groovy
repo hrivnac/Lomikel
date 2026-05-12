@@ -18,11 +18,18 @@ try {
 catch (MissingPropertyException e) {
   cls = 'rubin.tag_early_snia_candidate'
   }
+  
+try {
+  delay
+  }  
+catch (MissingPropertyException e) {
+  delay = 2
+  }
                     
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
 gr = new FinkGremlinRecipiesG(jc);
   
-log.info("Importing NewTags for " + cls);
+log.info("Importing NewTags for " + cls + " within last " + delay + " days");
 
 timer = new Timer("entries", 100, 5);
 
@@ -37,7 +44,7 @@ timer.start();
 client.startScan(null,
                  null,
                  null,
-                 now - 180000000, // 2 days
+                 now - 90000000 * delay,
                  now,
                  false,
                  false);
