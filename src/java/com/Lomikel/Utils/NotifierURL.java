@@ -42,10 +42,10 @@ public class NotifierURL {
     * @param source  The message source.
     * @param release The service release.
     * @param text    The additional text. */
-  public static void text(String message,
-                          String source,
-                          String release,
-                          String text) {
+  public static void notify(String message,
+                            String source,
+                            String release,
+                            String text) {
     Thread thread = new Thread() {
       @Override
       public void run() {
