@@ -1,6 +1,8 @@
 import com.Lomikel.ElasticSearcher.ESClient;
 import com.Lomikel.Parquet.ParquetReader;
 import com.Lomikel.Utils.Timer;
+import com.Lomikel.Utils.NotifierURL;
+import com.Lomikel.Utils.Info;
 
 // Parquet
 import org.apache.parquet.schema.GroupType;
@@ -96,5 +98,7 @@ for (int delay : delays) {
   reader.processDir("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
-println("Original sizes: " + osizes);
-println("Final    sizes: " + reader.sizes());
+String psizes = sizes();
+log.info("Original sizes: " + osizes);
+log.info("Final    sizes: " + psizes);
+NotifierURL.notify("fillES", "Lomikel", Info.release() ,"Original sizes: " + osizes + "\nFinal    sizes: " + psizes);

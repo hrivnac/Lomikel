@@ -69,7 +69,6 @@ log.info("Final    sizes: " + psizes);
 
 NotifierURL.notify("fillES", "Lomikel", Info.release() ,"Original sizes: " + osizes + "\nFinal    sizes: " + psizes);
 
-
 client.stop();
 
 
