@@ -1,6 +1,8 @@
 import com.Lomikel.ElasticSearcher.ESClient;
 import com.Lomikel.HBaser.AsynchHBaseClient;
 import com.Lomikel.Utils.Timer;
+import com.Lomikel.Utils.NotifierURL;
+import com.Lomikel.Utils.Info;
 
 // Log
 import org.apache.logging.log4j.Logger;
@@ -61,8 +63,12 @@ while (client.scanning() || client.size() > 0) {
 
 esclient.commitWithRetry(10);
 
+String psizes = sizes();
 log.info("Original sizes: " + osizes);
-log.info("Final    sizes: " + sizes());
+log.info("Final    sizes: " + psizes);
+
+NotifierURL.notify("fillES", "Lomikel", Info.release() ,"Original sizes: " + osizes + "\nFinal    sizes: " + psizes);
+
 
 client.stop();
 

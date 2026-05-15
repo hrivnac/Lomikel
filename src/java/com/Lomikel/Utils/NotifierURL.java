@@ -26,7 +26,7 @@ public class NotifierURL {
                             String source) {
     notify(message, source, Info.release() + " of Lomikel");                       
     }
-
+    
   /** Connect to monitorring Web page.
     * @param message The message to be send.
     * @param source  The message source.
@@ -34,11 +34,27 @@ public class NotifierURL {
   public static void notify(String message,
                             String source,
                             String release) {
+    notify(message, source, release, null);
+    }
+
+  /** Connect to monitorring Web page.
+    * @param message The message to be send.
+    * @param source  The message source.
+    * @param release The service release.
+    * @param text    The additional text. */
+  public static void text(String message,
+                          String source,
+                          String release,
+                          String text) {
     Thread thread = new Thread() {
       @Override
       public void run() {
         try {
-          URL url = new URL("https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=" + (source + "_" + message + "_" + release).replaceAll(" ", "_"));
+          String urlS = "https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=" + (source + "_" + message + "_" + release).replaceAll(" ", "_");
+          if (text != null) {
+            urlS += "&text=" + text);
+            }
+          URL url = new URL(urlS);
           HttpURLConnection conn = (HttpURLConnection)url.openConnection();
           conn.setRequestMethod("GET");
           conn.getInputStream();
