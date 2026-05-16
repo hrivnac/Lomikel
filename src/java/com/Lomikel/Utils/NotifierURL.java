@@ -3,6 +3,7 @@ package com.Lomikel.Utils;
 // Java
 import java.net.URL;
 import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -52,7 +53,7 @@ public class NotifierURL {
         try {
           String urlS = "https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=" + (source + "_" + message + "_" + release).replaceAll(" ", "_");
           if (text != null) {
-            urlS += "&text=" + text;
+            urlS += "&text=" + URLEncoder.encode(text, "UTF-8");
             }
           URL url = new URL(urlS);
           HttpURLConnection conn = (HttpURLConnection)url.openConnection();
