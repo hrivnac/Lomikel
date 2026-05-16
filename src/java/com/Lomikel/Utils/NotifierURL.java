@@ -51,11 +51,10 @@ public class NotifierURL {
       @Override
       public void run() {
         try {
-          String urlS = "https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=" + (source + "_" + message + "_" + release).replaceAll(" ", "_");
+          String urlS = "https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=" + URLEncoder.encode((source + "_" + message + "_" + release).replaceAll(" ", "_"), "UTF-8");
           if (text != null) {
             urlS += "&text=" + URLEncoder.encode(text, "UTF-8");
             }
-          log.info(urlS);
           URL url = new URL(urlS);
           HttpURLConnection conn = (HttpURLConnection)url.openConnection();
           conn.setRequestMethod("GET");
