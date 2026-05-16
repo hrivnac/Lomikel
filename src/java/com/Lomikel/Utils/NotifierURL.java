@@ -55,6 +55,7 @@ public class NotifierURL {
           if (text != null) {
             urlS += "&text=" + URLEncoder.encode(text, "UTF-8");
             }
+          log.info(urlS);
           URL url = new URL(urlS);
           HttpURLConnection conn = (HttpURLConnection)url.openConnection();
           conn.setRequestMethod("GET");
