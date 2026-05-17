@@ -54,6 +54,8 @@ public class Timer {
     return false;
     }    
     
+  /** Report snapshot.
+    * @return The report. */
   public String info(String msg) {
     long dt = (System.currentTimeMillis() - _t) / 1000;
     if (dt == 0) {

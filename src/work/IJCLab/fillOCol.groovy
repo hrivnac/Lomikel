@@ -65,4 +65,5 @@ gr.generateCorrelations(classifiers);
 
 client.stop();
 
+NotifierURL.notify("importTags", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));
 
