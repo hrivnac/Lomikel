@@ -98,7 +98,7 @@ for (int delay : delays) {
   reader.processDir("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
-String psizes = sizes();
+String psizes = reader.sizes();
 log.info("Original sizes: " + osizes);
 log.info("Final    sizes: " + psizes);
 NotifierURL.notify("fillES", "Lomikel", Info.release() ,"Original sizes: " + osizes + "\nFinal    sizes: " + psizes);

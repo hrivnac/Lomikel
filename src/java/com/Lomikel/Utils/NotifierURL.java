@@ -66,9 +66,9 @@ public class NotifierURL {
     * @param release The service release.
     * @param text    The additional text. */
   public static void notifyExecution(String message,
-                                 String source,
-                                 String release,
-                                 String text) {
+                                     String source,
+                                     String release,
+                                     String text) {
     try {
       String urlS = "https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=" + URLEncoder.encode((source + "_" + message + "_" + release).replaceAll(" ", "_"), "UTF-8");
       if (text != null) {
@@ -78,9 +78,9 @@ public class NotifierURL {
       HttpURLConnection conn = (HttpURLConnection)url.openConnection();
       conn.setRequestMethod("GET");
       conn.getInputStream();
-      int rc = conn.getResponseCode();
-      String msg = conn.getResponseMessage();
-      log.info(msg + " : " + rc);
+      //int rc = conn.getResponseCode();
+      //String msg = conn.getResponseMessage();
+      //log.info(msg + " : " + rc);
       }
     catch (Exception e) {
       log.debug("Can not notify: " + message, e);
