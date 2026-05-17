@@ -15,12 +15,14 @@ import org.apache.logging.log4j.LogManager;
 public class NotifierURL {
 
   /** Connect to monitorring Web page.
+    * Non-blocking.
     * @param message The message to be send. */
   public static void notify(String message) {
     notify(message, "Lomikel");
     }
 
   /** Connect to monitorring Web page.
+    * Non-blocking.
     * @param message The message to be send.
     * @param source  The message source. */
   public static void notify(String message,
@@ -39,6 +41,7 @@ public class NotifierURL {
     }
 
   /** Connect to monitorring Web page.
+    * Non-blocking.
     * @param message The message to be send.
     * @param source  The message source.
     * @param release The service release.
@@ -50,23 +53,39 @@ public class NotifierURL {
     Thread thread = new Thread() {
       @Override
       public void run() {
-        try {
-          String urlS = "https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=" + URLEncoder.encode((source + "_" + message + "_" + release).replaceAll(" ", "_"), "UTF-8");
-          if (text != null) {
-            urlS += "&text=" + URLEncoder.encode(text, "UTF-8");
-            }
-          URL url = new URL(urlS);
-          HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-          conn.setRequestMethod("GET");
-          conn.getInputStream();
-          }
-        catch (Exception e) {
-          log.debug("Can not notify: " + message, e);
-          }
+        notifyExecution(message, source, release, text);
         }
       };
     thread.start();
     }
+    
+  /** Connect to monitorring Web page.
+    * Blocking.
+    * @param message The message to be send.
+    * @param source  The message source.
+    * @param release The service release.
+    * @param text    The additional text. */
+  public static void notifyExecution(String message,
+                                 String source,
+                                 String release,
+                                 String text) {
+    try {
+      String urlS = "https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=" + URLEncoder.encode((source + "_" + message + "_" + release).replaceAll(" ", "_"), "UTF-8");
+      if (text != null) {
+        urlS += "&text=" + URLEncoder.encode(text, "UTF-8");
+        }
+      URL url = new URL(urlS);
+      HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+      conn.setRequestMethod("GET");
+      conn.getInputStream();
+      int rc = conn.getResponseCode();
+      String msg = conn.getResponseMessage();
+      log.info(msg + " : " + rc);
+      }
+    catch (Exception e) {
+      log.debug("Can not notify: " + message, e);
+      }
+    }  
     
   /** Logging . */
   private static Logger log = LogManager.getLogger(NotifierURL.class);
