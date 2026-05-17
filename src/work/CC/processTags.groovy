@@ -2,6 +2,8 @@ import com.Lomikel.Januser.JanusClient
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG
 import com.astrolabsoftware.FinkBrowser.Januser.Classifier
 import com.Lomikel.Utils.Timer
+import com.Lomikel.Utils.NotifierURL;
+import com.Lomikel.Utils.Info;
 
 // TinkerPop
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.id
@@ -271,3 +273,4 @@ classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', ''),
                                Classifier.instance('TAG',  'LSST', '')}
 gr.generateCorrelations(classifiers)
 
+NotifierURL.notify("processTags", "Lomikel", Info.release(), timer.report(cls + "[" + delay + "]: "));

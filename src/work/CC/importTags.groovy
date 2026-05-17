@@ -3,6 +3,8 @@ import com.Lomikel.Januser.JanusClient;
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 import com.astrolabsoftware.FinkBrowser.Januser.Classifier;
 import com.Lomikel.Utils.Timer;
+import com.Lomikel.Utils.NotifierURL;
+import com.Lomikel.Utils.Info;
 
 // Log
 import org.apache.logging.log4j.Logger;
@@ -69,3 +71,5 @@ gr.commit();
 
 client.stop();
 client.close();
+
+NotifierURL.notify("importTags", "Lomikel", Info.release(), timer.report(cls + "[" + delay + "]: "));
