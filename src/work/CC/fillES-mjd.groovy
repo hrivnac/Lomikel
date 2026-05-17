@@ -25,6 +25,8 @@ Configurator.initialize(null, "../src/java/log4j2.xml");
 
 int[] delays = new int[]{2, 1};
 
+Logger log = LogManager.getLogger(this.class);
+
 public class PR extends ParquetReader {
 
   ESClient esclient = new ESClient("http://134.158.243.139:20200");
