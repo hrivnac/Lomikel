@@ -47,16 +47,20 @@ public class Timer {
       return false;
       }
     _j++;
-    long dt = (System.currentTimeMillis() - _t) / 1000;
-    if (dt == 0) {
-      dt = 1;
-      }
-    log.info(msg + _i + " " + _msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz");
+    log.info(info(msg));
     if (_commitF > -1 && _j % _commitF == 0) {
 	    return true;
       }
     return false;
     }    
+    
+  public String info(String msg) {
+    long dt = (System.currentTimeMillis() - _t) / 1000;
+    if (dt == 0) {
+      dt = 1;
+      }
+    return msg + _i + " " + _msg + " in " + dt + "s, freq = " + (_i / dt) + "Hz";
+    }
 
   private long _t = 0;
   
