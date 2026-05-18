@@ -67,9 +67,9 @@ String psizes = sizes();
 log.info("Original sizes: " + osizes);
 log.info("Final    sizes: " + psizes);
 
-NotifierURL.notify("fillES", "Lomikel", Info.release() ,"Original sizes: " + osizes + "\nFinal    sizes: " + psizes);
-
 client.stop();
+
+NotifierURL.notify("fillES", "Lomikel", Info.release() ,"Original sizes: " + osizes + "\nFinal    sizes: " + psizes);
 
 
 
