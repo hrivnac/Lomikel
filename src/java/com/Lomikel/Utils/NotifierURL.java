@@ -78,9 +78,9 @@ public class NotifierURL {
       HttpURLConnection conn = (HttpURLConnection)url.openConnection();
       conn.setRequestMethod("GET");
       conn.getInputStream();
-      //int rc = conn.getResponseCode();
-      //String msg = conn.getResponseMessage();
-      //log.info(msg + " : " + rc);
+      int rc = conn.getResponseCode();
+      String msg = conn.getResponseMessage();
+      log.info(msg + " : " + rc);
       }
     catch (Exception e) {
       log.debug("Can not notify: " + message, e);
