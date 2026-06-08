@@ -479,7 +479,7 @@ public class ESClient {
     * @param  fieldName  The indexed field name.
     * @param  idxValue   The index value.
     * @param  fieldValue The indexed field value to be added to array
-    *         (if not yet present).
+    *                    (if not yet present).
     * @param n The number of retries (of each value) before failing. */
   public void updateDoubleArrayWithRetry(String idxName,
                                          String fieldName,
@@ -508,27 +508,27 @@ public class ESClient {
     * @param  idxName    The index name.
     * @param  fieldName  The indexed geo_point field name.
     * @param  idxValue   The index value.
-    * @param  latValue   The indexed lat value to be added to array
-    *         (if not yet present).
-    * @param  lonValue  The indexed lon value to be added to array
-    *         (if not yet present).
+    * @param  ra         The indexed ra value to be added to array
+    *                    (if not yet present).
+    * @param  dec        The indexed dec value to be added to array
+    *                    (if not yet present).
     * @param n The number of retries (of each value) before failing. */
   public void updateGeoPointArrayWithRetry(String idxName,
                                            String fieldName,
                                            String idxValue,
-                                           double latValue,
-                                           double lonValue,
+                                           double ra,
+                                           double dec,
                                            int    n) {
     int m = n;
     while (m > 0) {
       try {
-        updateGeoPointArray(idxName, fieldName, idxValue, latValue, lonValue);
+        updateGeoPointArray(idxName, fieldName, idxValue, ra, dec);
         m = 0;
         }
       catch (LomikelException e) {
         m--;
         if (m == 0) {
-          log.error("Cannot update " + idxName + "/" + fieldName + " = " + idxValue + "/" + latValue + "-" + lonValue, e);
+          log.error("Cannot update " + idxName + "/" + fieldName + " = " + idxValue + "/" + ra + "-" + dec, e);
           }
         else {
           log.warn("Retrying update, m = " + m);
@@ -543,7 +543,7 @@ public class ESClient {
     * @param  fieldName  The indexed double field name.
     * @param  idxValue   The index value.
     * @param  fieldValue The indexed field value to be added to array
-    *         (if not yet present).
+    *                    (if not yet present).
     * @throws LomikelException If anything goes wrong. */
   public void updateDoubleArray(String idxName,
                                 String fieldName,
@@ -572,25 +572,27 @@ public class ESClient {
     * @param  idxName    The index name.
     * @param  fieldName  The indexed geo_point field name.
     * @param  idxValue   The index value.
-    * @param  latValue   The indexed lat value to be added to array
-    *         (if not yet present).
-    * @param  lonValue  The indexed lon value to be added to array
-    *         (if not yet present).
+    * @param  latValue   The indexed ra value to be added to array
+    *                    (if not yet present).
+    * @param  lonValue   The indexed dec value to be added to array
+    *                    (if not yet present).
     * @throws LomikelException If anything goes wrong. */
   public void updateGeoPointArray(String idxName,
                                   String fieldName,
                                   String idxValue,
-                                  double latValue,
-                                  double lonValue) throws LomikelException {
+                                  double ra,
+                                  double dec) throws LomikelException {
   
+    double lat = dec;
+    double lon = ra - 180;
     String script = "{\n" +
                     "  \"scripted_upsert\": true,\n" +
                     "  \"script\": {\n" +
                     "    \"lang\": \"painless\",\n" +
                     "    \"source\": \"Map v = ['lat': params.lat, 'lon': params.lon]; " + "if (ctx._source." + fieldName + " == null) { " + "ctx._source." + fieldName + " = [v]; " + "} else if (!ctx._source." + fieldName + ".contains(v)) { " + "ctx._source." + fieldName + ".add(v); " + "} else { ctx.op = 'noop'; }\",\n" +
                     "    \"params\": {\n" +
-                    "      \"lat\": " + latValue + ",\n" +
-                    "      \"lon\": " + lonValue + "\n" +
+                    "      \"lat\": " + lat + ",\n" +
+                    "      \"lon\": " + lon + "\n" +
                     "    }\n" +
                     "  },\n" +
                     "  \"upsert\": {}\n" +
