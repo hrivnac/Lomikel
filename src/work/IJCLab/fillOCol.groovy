@@ -65,5 +65,6 @@ gr.generateCorrelations(classifiers);
 
 client.stop();
 
-NotifierURL.notify("importTags", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));
+// BUG: why doesn't work in thread ?
+NotifierURL.notifyExecution("importTags", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));
 

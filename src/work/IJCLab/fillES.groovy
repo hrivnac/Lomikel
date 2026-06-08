@@ -69,7 +69,8 @@ log.info("Final    sizes: " + psizes);
 
 client.stop(); 
 
-NotifierURL.notify("fillES", "Lomikel", Info.release(), "Original sizes: " + osizes + "\nFinal    sizes: " + psizes);
+// BUG: why doesn't work in thread ?
+NotifierURL.notifyExecution("fillES", "Lomikel", Info.release(), "Original sizes: " + osizes + "\nFinal    sizes: " + psizes);
 
 
 
