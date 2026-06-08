@@ -60,6 +60,31 @@ curl -X GET 'http://134.158.243.139:20200/dia_mjd/_search?pretty=true' \
       }
     }
   }'
+curl -X GET 'http://134.158.243.139:20200/ss_radec/_search?pretty=true' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": {
+      "script": {
+        "script": {
+          "lang": "painless",
+          "source": "doc[\"location\"].size() > 2"
+        }
+      }
+    }
+  }'
+  
+curl -X GET 'http://134.158.243.139:20200/ss_radec/_search?pretty=true' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": {
+      "script": {
+        "script": {
+          "lang": "painless",
+          "source": "doc[\"location\"].size() > 10"
+        }
+      }
+    }
+  }'
 
 curl 'http://134.158.243.139:20200/_cat/indices?v'  
   
