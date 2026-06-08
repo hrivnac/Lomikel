@@ -585,18 +585,35 @@ public class ESClient {
   
     double lat = dec;
     double lon = ra - 180;
-    String script = "{\n" +
-                    "  \"scripted_upsert\": true,\n" +
-                    "  \"script\": {\n" +
-                    "    \"lang\": \"painless\",\n" +
-                    "    \"source\": \"Map v = ['lat': params.lat, 'lon': params.lon]; " + "if (ctx._source." + fieldName + " == null) { " + "ctx._source." + fieldName + " = [v]; " + "} else if (!ctx._source." + fieldName + ".contains(v)) { " + "ctx._source." + fieldName + ".add(v); " + "} else { ctx.op = 'noop'; }\",\n" +
-                    "    \"params\": {\n" +
-                    "      \"lat\": " + lat + ",\n" +
-                    "      \"lon\": " + lon + "\n" +
-                    "    }\n" +
-                    "  },\n" +
-                    "  \"upsert\": {}\n" +
-                    "}";
+    //String script = "{\n" +
+    //                "  \"scripted_upsert\": true,\n" +
+    //                "  \"script\": {\n" +
+    //                "    \"lang\": \"painless\",\n" +
+    //                "    \"source\": \"Map v = ['lat': params.lat, 'lon': params.lon]; " + "if (ctx._source." + fieldName + " == null) { " + "ctx._source." + fieldName + " = [v]; " + "} else if (!ctx._source." + fieldName + ".contains(v)) { " + "ctx._source." + fieldName + ".add(v); " + "} else { ctx.op = 'noop'; }\",\n" +
+    //                "    \"params\": {\n" +
+    //                "      \"lat\": " + lat + ",\n" +
+    //                "      \"lon\": " + lon + "\n" +
+    //                "    }\n" +
+    //                "  },\n" +
+    //                "  \"upsert\": {}\n" +
+    //                "}";
+  String script = "{\n" +
+                  "  \"scripted_upsert\": true,\n" +
+                  "  \"script\": {\n" +
+                  "    \"lang\": \"painless\",\n" +
+                  "    \"source\": \"Map v = ['lat': params.lat, 'lon': params.lon]; " +
+                  "if (ctx._source." + fieldName + " == null) { " +
+                  "ctx._source." + fieldName + " = [v]; " +
+                  "} else if (!ctx._source." + fieldName + ".contains(v)) { " +
+                  "ctx._source." + fieldName + ".add(v); " +
+                  "} else { ctx.op = 'noop'; }\",\n" +
+                  "    \"params\": {\n" +
+                  "      \"lat\": " + lat + ",\n" +
+                  "      \"lon\": " + lon + "\n" +
+                  "    }\n" +
+                  "  },\n" +
+                  "  \"upsert\": {}\n" +
+                  "}";
     String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, null, null);
     //JSONObject answerJson = new JSONObject(answer);
     //if (answerJson.getBoolean("errors")) {
