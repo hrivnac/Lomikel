@@ -485,7 +485,7 @@ public class ESClient {
                                          String fieldName,
                                          String idxValue,
                                          double fieldValue,
-                                         int n) {
+                                         int    n) {
     int m = n;
     while (m > 0) {
       try {
@@ -503,11 +503,44 @@ public class ESClient {
         }
       }
     }
+  /** Update values in geo_point array index.
+    * It is automatically commited.
+    * @param  idxName    The index name.
+    * @param  fieldName  The indexed geo_point field name.
+    * @param  idxValue   The index value.
+    * @param  latValue   The indexed lat value to be added to array
+    *         (if not yet present).
+    * @param  lonValue  The indexed lon value to be added to array
+    *         (if not yet present).
+    * @param n The number of retries (of each value) before failing. */
+  public void updateGeoPointArrayWithRetry(String idxName,
+                                           String fieldName,
+                                           String idxValue,
+                                           double latValue,
+                                           double lonValue,
+                                           int    n) {
+    int m = n;
+    while (m > 0) {
+      try {
+        updateGeoPointArray(idxName, fieldName, idxValue, latValue, lonValue);
+        m = 0;
+        }
+      catch (LomikelException e) {
+        m--;
+        if (m == 0) {
+          log.error("Cannot update " + idxName + "/" + fieldName + " = " + idxValue + "/" + latValue + "-" + lonValue, e);
+          }
+        else {
+          log.warn("Retrying update, m = " + m);
+          }
+        }
+      }
+    }
    
   /** Update values in double array index.
     * It is automatically commited.
     * @param  idxName    The index name.
-    * @param  fieldName  The indexed field name.
+    * @param  fieldName  The indexed double field name.
     * @param  idxValue   The index value.
     * @param  fieldValue The indexed field value to be added to array
     *         (if not yet present).
@@ -533,6 +566,41 @@ public class ESClient {
     //  throw new LomikelException("HTTP Post error");
     //  }
     }
+    
+  /** Update values in geo_point array index.
+    * It is automatically committed.
+    * @param  idxName    The index name.
+    * @param  fieldName  The indexed geo_point field name.
+    * @param  idxValue   The index value.
+    * @param  latValue   The indexed lat value to be added to array
+    *         (if not yet present).
+    * @param  lonValue  The indexed lon value to be added to array
+    *         (if not yet present).
+    * @throws LomikelException If anything goes wrong. */
+  public void updateGeoPointArray(String idxName,
+                                  String fieldName,
+                                  String idxValue,
+                                  double latValue,
+                                  double lonValue) throws LomikelException {
+  
+    String script = "{\n" +
+                    "  \"scripted_upsert\": true,\n" +
+                    "  \"script\": {\n" +
+                    "    \"lang\": \"painless\",\n" +
+                    "    \"source\": \"Map v = ['lat': params.lat, 'lon': params.lon]; " + "if (ctx._source." + fieldName + " == null) { " + "ctx._source." + fieldName + " = [v]; " + "} else if (!ctx._source." + fieldName + ".contains(v)) { " + "ctx._source." + fieldName + ".add(v); " + "} else { ctx.op = 'noop'; }\",\n" +
+                    "    \"params\": {\n" +
+                    "      \"lat\": " + latValue + ",\n" +
+                    "      \"lon\": " + lonValue + "\n" +
+                    "    }\n" +
+                    "  },\n" +
+                    "  \"upsert\": {}\n" +
+                    "}";
+    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, null, null);
+    //JSONObject answerJson = new JSONObject(answer);
+    //if (answerJson.getBoolean("errors")) {
+    //  throw new LomikelException("HTTP Post error");
+    //  }
+    }    
     
   // Info ======================================================================
   

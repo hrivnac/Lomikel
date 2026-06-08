@@ -69,7 +69,8 @@ public class PR extends ParquetReader {
         }
       else if (props().containsKey("ssSource.ssObjectId")) {
         key = props().get("ssSource.ssObjectId").iterator().next();
-        esclient.putGeoPoint("ss_radec", "location", key, ra, dec);
+        //esclient.putGeoPoint("ss_radec", "location", key, ra, dec);
+        esclient.updateGeoPointArrayWithRetry("ss_radec", "location", key, ra, dec, 10);
         }
       else {
         log.warn("no objectid");
