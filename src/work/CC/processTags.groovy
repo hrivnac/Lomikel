@@ -273,4 +273,4 @@ classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', ''),
                                Classifier.instance('TAG',  'LSST', '')}
 gr.generateCorrelations(classifiers)
 
-NotifierURL.notify("processTags", "Lomikel", Info.release(), timer.info(""));
+NotifierURL.notify("processTags-LSST", "Lomikel", Info.release(), timer.info(""));
