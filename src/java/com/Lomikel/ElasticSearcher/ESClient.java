@@ -618,7 +618,7 @@ String script = "{\n" +
                 "  \"scripted_upsert\": true,\n" +
                 "  \"script\": {\n" +
                 "    \"lang\": \"painless\",\n" +
-                "    \"source\": \"Map v = ['lat': params.lat, 'lon': params.lon]; " +
+                "    \"source\": \"Map v = [\\\"lat\\\": params.lat, \\\"lon\\\": params.lon];  " +
                 "if (ctx._source." + fieldName + " == null) { " +
                 "ctx._source." + fieldName + " = new ArrayList(); " +
                 "ctx._source." + fieldName + ".add(v); " +
@@ -640,7 +640,9 @@ String script = "{\n" +
                 "    }\n" +
                 "  },\n" +
                 "  \"upsert\": {}\n" +
-                "}";                  
+                "}"; 
+
+
     String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, null, null);
     //JSONObject answerJson = new JSONObject(answer);
     //if (answerJson.getBoolean("errors")) {
