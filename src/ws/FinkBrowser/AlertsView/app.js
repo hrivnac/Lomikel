@@ -89,11 +89,11 @@ function getBoundingBox(flashes) {
     minDec = Math.min(minDec, f.alert.dec);
     maxDec = Math.max(maxDec, f.alert.dec);
     }
-  return { minRa, maxRa, minDec, maxDec };
+  return {minRa, maxRa, minDec, maxDec};
   }
 function updateCamera() {
   if (camera.mode === "whole") {
-    camera.targetCenter = { ra: 180, dec: 0 };
+    camera.targetCenter = {ra: 180, dec: 0};
     camera.targetZoom = 1;
     return;
     }
