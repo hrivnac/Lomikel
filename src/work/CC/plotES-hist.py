@@ -184,6 +184,8 @@ def main():
         bins = bins,
         output = args.output,
         log_y = args.log_y,
+        index = args.index,
+        field = args.field
     )
 
 if __name__ == "__main__":
