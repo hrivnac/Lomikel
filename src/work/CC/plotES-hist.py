@@ -90,9 +90,9 @@ def plot_histogram(counts, bins = None, output = None, log_y = False):
         bins = range(1, max_count + 2)
     plt.figure(figsize = (9, 6))
     plt.hist(counts, bins=bins, edgecolor="black")
-    plt.xlabel("Number of RA/Dec points per object")
+    plt.xlabel(f"Number of {args.field} points per object")
     plt.ylabel("Number of objects")
-    plt.title("Histogram of RA/Dec point counts per SS object")
+    plt.title(f"Histogram of {args.field} point counts per {args.index} object")
     plt.grid(True, axis = "y")
     if log_y:
         plt.yscale("log")
@@ -190,6 +190,9 @@ if __name__ == "__main__":
     main()
     
 """
-scp almalinux@134.158.243.139:/home/almalinux/tmp/hist.png ./
+python3 ../src/work/CC/plotES-hist.py --index ss_radec --field location --log-y --output ss_radec.png
+python3 ../src/work/CC/plotES-hist.py --index ss_mjd   --field mjd      --log-y --output ss_mjd.png
+python3 ../src/work/CC/plotES-hist.py --index dia_mjd --field mjd       --log-y --output dia_mjd.png
+scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./
 """
         
