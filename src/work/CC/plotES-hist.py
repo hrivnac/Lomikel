@@ -82,7 +82,7 @@ def collect_point_counts(es_url, index, field, batch_size=1000):
         es_clear_scroll(es_url, scroll_id)
     return counts
 
-def plot_histogram(counts, bins = None, output = None, log_y = False):
+def plot_histogram(counts, bins = None, output = None, log_y = False, index = "", field = ""):
     if not counts:
         raise RuntimeError("No objects with radec points were found.")
     if bins is None:
@@ -90,9 +90,9 @@ def plot_histogram(counts, bins = None, output = None, log_y = False):
         bins = range(1, max_count + 2)
     plt.figure(figsize = (9, 6))
     plt.hist(counts, bins=bins, edgecolor="black")
-    plt.xlabel(f"Number of {args.field} points per object")
+    plt.xlabel(f"Number of {field} points per object")
     plt.ylabel("Number of objects")
-    plt.title(f"Histogram of {args.field} point counts per {args.index} object")
+    plt.title(f"Histogram of {field} point counts per {index} object")
     plt.grid(True, axis = "y")
     if log_y:
         plt.yscale("log")
