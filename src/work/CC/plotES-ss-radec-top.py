@@ -128,7 +128,7 @@ def plot_objects(top_objects, field, output = None, invert_ra = False):
         ra_values = [p[0] for p in points]
         dec_values = [p[1] for p in points]
         label = f"{doc_id} ({npoints})"
-        plt.scatter(ra_values, dec_values, s = 2, label = label)
+        plt.scatter(ra_values, dec_values, s = 4, label = label)
     plt.xlabel("ra [deg]")
     plt.ylabel("dec [deg]")
     plt.title("Top 10 ss objects by number of ra/dec points")
