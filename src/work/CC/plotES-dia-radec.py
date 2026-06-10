@@ -171,7 +171,7 @@ def subsample_points(points, max_points=None, seed=None):
     return rng.sample(points, max_points)
 
 
-def plot_points(points, output=None, invert_ra=False, marker_size=2.0, alpha=0.6):
+def plot_points(points, output=None, invert_ra=False, marker_size=1.0, alpha=0.6):
     if not points:
         raise RuntimeError("No DIA RA/Dec points to plot.")
 
@@ -192,7 +192,7 @@ def plot_points(points, output=None, invert_ra=False, marker_size=2.0, alpha=0.6
     plt.tight_layout()
 
     if output:
-        plt.savefig(output, dpi=150)
+        plt.savefig(output, dpi=300)
         print(f"Wrote {output}")
     else:
         plt.show()
@@ -298,3 +298,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+"""
+python3 ../src/work/CC/plotES-dia-radec.py --max-points 100000 --output dia_radec.png
+scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./
+"""
+    

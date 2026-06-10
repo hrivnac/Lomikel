@@ -62,7 +62,7 @@ def main():
     ra_values = [p[0] for p in points]
     dec_values = [p[1] for p in points]
     plt.figure(figsize = (8, 5))
-    plt.scatter(ra_values, dec_values, s = 5)
+    plt.scatter(ra_values, dec_values, s = 1)
     plt.xlabel("ra [deg]")
     plt.ylabel("dec [deg]")
     plt.title(f"ra/dec points for ss object {ss_id}")
@@ -71,7 +71,7 @@ def main():
     plt.gca().invert_xaxis()
     plt.tight_layout()
     #plt.show()
-    plt.savefig(f"{ss_id}.png")
+    plt.savefig(f"{ss_id}.png", dpi=300)
 
 if __name__ == "__main__":
     main()

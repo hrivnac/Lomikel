@@ -99,7 +99,7 @@ def plot_histogram(counts, bins = None, output = None, log_y = False, index = ""
         plt.ylabel("Number of objects, log scale")
     plt.tight_layout()
     if output:
-        plt.savefig(output, dpi = 150)
+        plt.savefig(output, dpi = 300)
         print(f"Wrote {output}")
     else:
         plt.show()

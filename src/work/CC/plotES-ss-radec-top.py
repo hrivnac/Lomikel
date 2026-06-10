@@ -128,7 +128,7 @@ def plot_objects(top_objects, field, output = None, invert_ra = False):
         ra_values = [p[0] for p in points]
         dec_values = [p[1] for p in points]
         label = f"{doc_id} ({npoints})"
-        plt.scatter(ra_values, dec_values, s = 5, label = label)
+        plt.scatter(ra_values, dec_values, s = 1, label = label)
     plt.xlabel("ra [deg]")
     plt.ylabel("dec [deg]")
     plt.title("Top 10 ss objects by number of ra/dec points")
@@ -138,7 +138,7 @@ def plot_objects(top_objects, field, output = None, invert_ra = False):
         plt.gca().invert_xaxis()
     plt.tight_layout()
     if output:
-        plt.savefig(output, dpi = 150)
+        plt.savefig(output, dpi = 300)
         print(f"Wrote {output}")
     else:
         plt.show()
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     main()
     
 """
-python3 ../src/work/CC/plotES-ss-radec-top.py --output top.png
+python3 ../src/work/CC/plotES-ss-radec-top.py --output ss_radec.png
 scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./
 """
     
