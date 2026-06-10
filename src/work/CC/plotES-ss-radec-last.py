@@ -126,9 +126,9 @@ def es_clear_scroll(es_url, scroll_id):
         pass
 
 
-def find_latest_ss_ids_by_mjd(es_url, mjd_index, mjd_field, n=10, batch_size=2000):
+def find_latest_ss_ids_by_mjd(es_url, mjd_index, mjd_field, n_candidates=100, batch_size=2000):
     """
-    Scan ss_mjd and keep N SS objects with largest max(mjd).
+    Scan ss_mjd and keep n_candidates SS objects with largest max(mjd).
 
     Returns list of:
       (max_mjd, doc_id)
@@ -175,7 +175,7 @@ def find_latest_ss_ids_by_mjd(es_url, mjd_index, mjd_field, n=10, batch_size=200
 
                 item = (mjd, doc_id)
 
-                if len(heap) < n:
+                if len(heap) < n_candidates:
                     heapq.heappush(heap, item)
                 elif mjd > heap[0][0]:
                     heapq.heapreplace(heap, item)
@@ -189,21 +189,23 @@ def find_latest_ss_ids_by_mjd(es_url, mjd_index, mjd_field, n=10, batch_size=200
     result = sorted(heap, key=lambda x: x[0], reverse=True)
 
     print(f"Scanned ss_mjd documents: {n_docs}")
-    print(f"Selected SS objects:      {len(result)}")
+    print(f"Selected MJD candidates:  {len(result)}")
 
     if n_bad:
         print(f"Bad MJD values:           {n_bad}")
 
     if result:
-        print(f"Newest MJD:               {result[0][0]}")
-        print(f"Oldest selected MJD:      {result[-1][0]}")
+        print(f"Newest MJD candidate:     {result[0][0]}")
+        print(f"Oldest MJD candidate:     {result[-1][0]}")
 
     return result
 
 
-def mget_ss_radec(es_url, radec_index, location_field, mjd_id_pairs, chunk_size=100):
+def mget_ss_radec(es_url, radec_index, location_field, mjd_id_pairs, min_points=10, chunk_size=100):
     """
     Fetch ss_radec locations for selected SS object ids.
+
+    Keeps only objects with at least min_points.
 
     Returns list of:
       (doc_id, mjd, points)
@@ -217,6 +219,7 @@ def mget_ss_radec(es_url, radec_index, location_field, mjd_id_pairs, chunk_size=
     objects = []
     n_missing = 0
     n_bad = 0
+    n_too_short = 0
 
     for i in range(0, len(ids), chunk_size):
         chunk = ids[i:i + chunk_size]
@@ -265,10 +268,17 @@ def mget_ss_radec(es_url, radec_index, location_field, mjd_id_pairs, chunk_size=
                     n_bad += 1
                     print(f"Skipping bad location for {doc_id}: {location!r} ({e})")
 
-            if points:
-                objects.append((doc_id, mjd_by_id[doc_id], points))
+            if len(points) < min_points:
+                n_too_short += 1
+                continue
+
+            objects.append((doc_id, mjd_by_id[doc_id], points))
 
     print(f"Fetched SS objects:        {len(objects)}")
+    print(f"Required min points:       {min_points}")
+
+    if n_too_short:
+        print(f"Rejected short curves:     {n_too_short}")
 
     if n_missing:
         print(f"Missing ss_radec docs:     {n_missing}")
@@ -279,7 +289,72 @@ def mget_ss_radec(es_url, radec_index, location_field, mjd_id_pairs, chunk_size=
     return objects
 
 
-def plot_objects(objects, output=None, invert_ra=False, marker_size=20.0):
+def find_latest_ss_objects_with_min_points(
+    es_url,
+    mjd_index,
+    radec_index,
+    mjd_field,
+    location_field,
+    number=10,
+    min_points=10,
+    batch_size=2000,
+    mget_chunk_size=100,
+    candidate_factor=20,
+):
+    """
+    Select the latest SS objects, but keep only curves with at least min_points.
+
+    Since the min-points condition lives in ss_radec, while latest selection
+    lives in ss_mjd, we first select more MJD candidates, then filter them.
+    """
+    n_candidates = max(number * candidate_factor, number)
+
+    while True:
+        latest_ids = find_latest_ss_ids_by_mjd(
+            es_url=es_url,
+            mjd_index=mjd_index,
+            mjd_field=mjd_field,
+            n_candidates=n_candidates,
+            batch_size=batch_size,
+        )
+
+        objects = mget_ss_radec(
+            es_url=es_url,
+            radec_index=radec_index,
+            location_field=location_field,
+            mjd_id_pairs=latest_ids,
+            min_points=min_points,
+            chunk_size=mget_chunk_size,
+        )
+
+        objects = sorted(objects, key=lambda x: x[1], reverse=True)
+
+        if len(objects) >= number:
+            return objects[:number]
+
+        if len(latest_ids) < n_candidates:
+            # We already reached the available data.
+            print(
+                f"Only found {len(objects)} objects with at least "
+                f"{min_points} points."
+            )
+            return objects
+
+        n_candidates *= 2
+        print(
+            f"Only found {len(objects)} good objects; "
+            f"increasing MJD candidates to {n_candidates}."
+        )
+
+
+def plot_objects(
+    objects,
+    output=None,
+    invert_ra=False,
+    marker_size=20.0,
+    line_width=1.0,
+    line_alpha=0.7,
+):
     if not objects:
         raise RuntimeError("No SS RA/Dec points to plot.")
 
@@ -290,11 +365,25 @@ def plot_objects(objects, output=None, invert_ra=False, marker_size=20.0):
         dec_values = [p[1] for p in points]
 
         label = f"{doc_id}, {len(points)} pts, mjd={mjd:.5f}"
-        plt.scatter(ra_values, dec_values, s=marker_size, label=label)
 
-        # Optional: connect points of each moving object.
+        scatter = plt.scatter(
+            ra_values,
+            dec_values,
+            s=marker_size,
+            label=label,
+        )
+
+        # Use exactly the same color for the connecting line as for the points.
+        color = scatter.get_facecolor()[0]
+
         if len(points) > 1:
-            plt.plot(ra_values, dec_values, linewidth=1, alpha=0.7)
+            plt.plot(
+                ra_values,
+                dec_values,
+                linewidth=line_width,
+                alpha=line_alpha,
+                color=color,
+            )
 
     plt.xlabel("RA [deg]")
     plt.ylabel("Dec [deg]")
@@ -316,7 +405,7 @@ def plot_objects(objects, output=None, invert_ra=False, marker_size=20.0):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Plot SS objects selected by latest hits from ss_mjd."
+        description="Plot latest SS objects from ss_mjd with at least N RA/Dec points."
     )
 
     parser.add_argument(
@@ -358,6 +447,23 @@ def main():
     )
 
     parser.add_argument(
+        "--min-points",
+        type=int,
+        default=10,
+        help="Minimum number of RA/Dec points per SS curve, default: 10",
+    )
+
+    parser.add_argument(
+        "--candidate-factor",
+        type=int,
+        default=20,
+        help=(
+            "How many more latest-MJD candidates to inspect before filtering "
+            "by min-points, default: 20"
+        ),
+    )
+
+    parser.add_argument(
         "--batch-size",
         type=int,
         default=2000,
@@ -379,6 +485,20 @@ def main():
     )
 
     parser.add_argument(
+        "--line-width",
+        type=float,
+        default=1.0,
+        help="Connecting line width, default: 1.0",
+    )
+
+    parser.add_argument(
+        "--line-alpha",
+        type=float,
+        default=0.7,
+        help="Connecting line transparency, default: 0.7",
+    )
+
+    parser.add_argument(
         "--invert-ra",
         action="store_true",
         help="Invert RA axis, common in astronomical plots.",
@@ -391,20 +511,17 @@ def main():
 
     args = parser.parse_args()
 
-    latest_ids = find_latest_ss_ids_by_mjd(
+    objects = find_latest_ss_objects_with_min_points(
         es_url=args.es_url,
         mjd_index=args.mjd_index,
-        mjd_field=args.mjd_field,
-        n=args.number,
-        batch_size=args.batch_size,
-    )
-
-    objects = mget_ss_radec(
-        es_url=args.es_url,
         radec_index=args.radec_index,
+        mjd_field=args.mjd_field,
         location_field=args.location_field,
-        mjd_id_pairs=latest_ids,
-        chunk_size=args.mget_chunk_size,
+        number=args.number,
+        min_points=args.min_points,
+        batch_size=args.batch_size,
+        mget_chunk_size=args.mget_chunk_size,
+        candidate_factor=args.candidate_factor,
     )
 
     plot_objects(
@@ -412,6 +529,8 @@ def main():
         output=args.output,
         invert_ra=args.invert_ra,
         marker_size=args.marker_size,
+        line_width=args.line_width,
+        line_alpha=args.line_alpha,
     )
 
 
