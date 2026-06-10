@@ -205,9 +205,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-"""
-python3 ../src/work/CC/plotES-ss-radec-top.py --output ss_radec.png
-scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./
-"""
-    
+        

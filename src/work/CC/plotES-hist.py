@@ -104,7 +104,6 @@ def plot_histogram(counts, bins = None, output = None, log_y = False, index = ""
     else:
         plt.show()
 
-
 def print_summary(counts):
     counts_sorted = sorted(counts)
     n = len(counts_sorted)
@@ -190,11 +189,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-"""
-python3 ../src/work/CC/plotES-hist.py --index ss_radec --field location --log-y --output ss_radec.png
-python3 ../src/work/CC/plotES-hist.py --index ss_mjd   --field mjd      --log-y --output ss_mjd.png
-python3 ../src/work/CC/plotES-hist.py --index dia_mjd  --field mjd      --log-y --output dia_mjd.png
-scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./
-"""
         
