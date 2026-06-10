@@ -358,7 +358,7 @@ def main():
     parser.add_argument(
         "--marker-size",
         type=float,
-        default=2.0,
+        default=1.0,
         help="Scatter marker size, default: 2.0",
     )
 
