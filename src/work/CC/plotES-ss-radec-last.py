@@ -351,7 +351,7 @@ def plot_objects(
     objects,
     output=None,
     invert_ra=False,
-    marker_size=20.0,
+    marker_size=1.0,
     line_width=1.0,
     line_alpha=0.7,
 ):
