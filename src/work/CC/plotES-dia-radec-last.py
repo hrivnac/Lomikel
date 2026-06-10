@@ -214,13 +214,23 @@ def mget_radec_points(es_url, radec_index, location_field, mjd_id_pairs, chunk_s
         chunk = ids[i:i + chunk_size]
 
         body = {
-            "ids": chunk,
-            "_source": [location_field],
+            "docs": [
+                {
+                    "_id": doc_id,
+                    "_source": [location_field],
+                }
+                for doc_id in chunk
+            ]
         }
 
         url = f"{es_url}/{radec_index}/_mget"
         r = requests.post(url, json=body)
-        r.raise_for_status()
+
+        if not r.ok:
+            print("Bad _mget request:")
+            print(r.text)
+            r.raise_for_status()
+
         data = r.json()
 
         for doc in data.get("docs", []):
@@ -253,8 +263,7 @@ def mget_radec_points(es_url, radec_index, location_field, mjd_id_pairs, chunk_s
         print(f"Bad RA/Dec locations:      {n_bad}")
 
     return points
-
-
+    
 def plot_points(points, output=None, invert_ra=False, marker_size=1.0, alpha=0.6):
     if not points:
         raise RuntimeError("No DIA RA/Dec points to plot.")
