@@ -374,16 +374,16 @@ def plot_objects(
         )
 
         # Use exactly the same color for the connecting line as for the points.
-        color = scatter.get_facecolor()[0]
-
-        if len(points) > 1:
-            plt.plot(
-                ra_values,
-                dec_values,
-                linewidth=line_width,
-                alpha=line_alpha,
-                color=color,
-            )
+        #color = scatter.get_facecolor()[0]
+        #
+        #if len(points) > 1:
+        #    plt.plot(
+        #        ra_values,
+        #        dec_values,
+        #        linewidth=line_width,
+        #        alpha=line_alpha,
+        #        color=color,
+        #    )
 
     plt.xlabel("RA [deg]")
     plt.ylabel("Dec [deg]")
