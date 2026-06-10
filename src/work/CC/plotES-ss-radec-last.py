@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
 
 import argparse
+import heapq
 import requests
 import matplotlib.pyplot as plt
 
 
 DEFAULT_ES_URL = "http://134.158.243.139:20200"
-DEFAULT_RADEC_INDEX = "dia_radec"
-DEFAULT_MJD_INDEX = "dia_mjd"
+
+DEFAULT_RADEC_INDEX = "ss_radec"
+DEFAULT_MJD_INDEX = "ss_mjd"
+
 DEFAULT_LOCATION_FIELD = "location"
 DEFAULT_MJD_FIELD = "mjd"
 
 
 def normalize_locations(value):
-    """
-    Return a list of geo_point-like values from _source[field].
-
-    For dia_radec there should normally be exactly one point.
-    """
+    """Return a list of geo_point-like values from _source[field]."""
     if value is None:
         return []
 
     if isinstance(value, list):
-        # geo_point as [lon, lat]
+        # Single geo_point encoded as [lon, lat]
         if len(value) == 2 and all(isinstance(x, (int, float)) for x in value):
             return [value]
 
-        # multiple points, just in case
+        # Multiple geo_points
         return value
 
     return [value]
@@ -49,7 +48,7 @@ def parse_point(point):
         lon = float(lon_s)
 
     elif isinstance(point, list) and len(point) == 2:
-        # Elasticsearch array geo_point convention is [lon, lat]
+        # Elasticsearch array geo_point convention is [lon, lat].
         lon = float(point[0])
         lat = float(point[1])
 
@@ -67,10 +66,7 @@ def parse_point(point):
 
 
 def max_mjd(value):
-    """
-    dia_mjd may contain either one MJD value or an array of MJD values.
-    Return the maximum one.
-    """
+    """Return maximum MJD from scalar or array."""
     if value is None:
         return None
 
@@ -90,7 +86,12 @@ def es_search(es_url, index, body, scroll=None):
         params["scroll"] = scroll
 
     r = requests.post(url, params=params, json=body)
-    r.raise_for_status()
+
+    if not r.ok:
+        print("Bad _search request:")
+        print(r.text)
+        r.raise_for_status()
+
     return r.json()
 
 
@@ -102,7 +103,12 @@ def es_scroll(es_url, scroll_id, scroll="2m"):
     }
 
     r = requests.post(url, json=body)
-    r.raise_for_status()
+
+    if not r.ok:
+        print("Bad _scroll request:")
+        print(r.text)
+        r.raise_for_status()
+
     return r.json()
 
 
@@ -120,12 +126,13 @@ def es_clear_scroll(es_url, scroll_id):
         pass
 
 
-def find_last_dia_ids_by_mjd(es_url, mjd_index, mjd_field, n=100000, batch_size=2000):
+def find_latest_ss_ids_by_mjd(es_url, mjd_index, mjd_field, n=10, batch_size=2000):
     """
-    Find the last N DIA objects according to their maximum MJD.
+    Scan ss_mjd and keep N SS objects with largest max(mjd).
 
-    This scans dia_mjd and keeps the top N documents by max(mjd).
-    This is robust whether mjd is a scalar or an array.
+    Returns list of:
+      (max_mjd, doc_id)
+    sorted newest first.
     """
     body = {
         "_source": [mjd_field],
@@ -140,23 +147,20 @@ def find_last_dia_ids_by_mjd(es_url, mjd_index, mjd_field, n=100000, batch_size=
     data = es_search(es_url, mjd_index, body, scroll="2m")
     scroll_id = data.get("_scroll_id")
 
-    # Min-heap of (max_mjd, doc_id).
-    # The smallest MJD among the kept objects is at heap[0].
-    import heapq
     heap = []
-
     n_docs = 0
     n_bad = 0
 
     try:
         while True:
             hits = data.get("hits", {}).get("hits", [])
+
             if not hits:
                 break
 
             for hit in hits:
                 n_docs += 1
-                doc_id = hit["_id"]
+                doc_id = str(hit["_id"]).strip()
                 source = hit.get("_source", {})
 
                 try:
@@ -184,34 +188,39 @@ def find_last_dia_ids_by_mjd(es_url, mjd_index, mjd_field, n=100000, batch_size=
 
     result = sorted(heap, key=lambda x: x[0], reverse=True)
 
-    print(f"Scanned dia_mjd documents: {n_docs}")
-    print(f"Selected latest objects:   {len(result)}")
+    print(f"Scanned ss_mjd documents: {n_docs}")
+    print(f"Selected SS objects:      {len(result)}")
+
     if n_bad:
-        print(f"Bad MJD values:            {n_bad}")
+        print(f"Bad MJD values:           {n_bad}")
 
     if result:
-        print(f"Newest MJD:                {result[0][0]}")
-        print(f"Oldest selected MJD:       {result[-1][0]}")
+        print(f"Newest MJD:               {result[0][0]}")
+        print(f"Oldest selected MJD:      {result[-1][0]}")
 
     return result
 
 
-def mget_radec_points(es_url, radec_index, location_field, mjd_id_pairs, chunk_size=1000):
+def mget_ss_radec(es_url, radec_index, location_field, mjd_id_pairs, chunk_size=100):
     """
-    Fetch radec locations for selected DIA object ids.
+    Fetch ss_radec locations for selected SS object ids.
 
-    Returns a list of:
-      (doc_id, mjd, ra, dec)
+    Returns list of:
+      (doc_id, mjd, points)
+
+    where points is:
+      [(ra, dec), ...]
     """
-    points = []
-    n_missing = 0
-    n_bad = 0
-
     mjd_by_id = {doc_id: mjd for mjd, doc_id in mjd_id_pairs}
     ids = list(mjd_by_id.keys())
 
+    objects = []
+    n_missing = 0
+    n_bad = 0
+
     for i in range(0, len(ids), chunk_size):
         chunk = ids[i:i + chunk_size]
+        chunk = [str(x).strip() for x in chunk]
 
         body = {
             "docs": [
@@ -234,7 +243,7 @@ def mget_radec_points(es_url, radec_index, location_field, mjd_id_pairs, chunk_s
         data = r.json()
 
         for doc in data.get("docs", []):
-            doc_id = doc["_id"]
+            doc_id = str(doc["_id"]).strip()
 
             if not doc.get("found", False):
                 n_missing += 1
@@ -247,44 +256,51 @@ def mget_radec_points(es_url, radec_index, location_field, mjd_id_pairs, chunk_s
                 n_missing += 1
                 continue
 
-            # DIA should have one point. If several are present, plot all.
+            points = []
+
             for location in locations:
                 try:
-                    ra, dec = parse_point(location)
-                    points.append((doc_id, mjd_by_id[doc_id], ra, dec))
+                    points.append(parse_point(location))
                 except Exception as e:
                     n_bad += 1
                     print(f"Skipping bad location for {doc_id}: {location!r} ({e})")
 
-    print(f"Fetched ra/dec points:     {len(points)}")
+            if points:
+                objects.append((doc_id, mjd_by_id[doc_id], points))
+
+    print(f"Fetched SS objects:        {len(objects)}")
+
     if n_missing:
-        print(f"Missing ra/dec documents:  {n_missing}")
+        print(f"Missing ss_radec docs:     {n_missing}")
+
     if n_bad:
-        print(f"Bad ra/dec locations:      {n_bad}")
+        print(f"Bad RA/Dec locations:      {n_bad}")
 
-    return points
-    
-def plot_points(points, output=None, invert_ra=False, marker_size=1.0, alpha=0.6):
-    if not points:
-        raise RuntimeError("No dia ra/dec points to plot.")
+    return objects
 
-    ra_values = [p[2] for p in points]
-    dec_values = [p[3] for p in points]
 
-    mjds = [p[1] for p in points]
-    min_mjd = min(mjds)
-    max_mjd = max(mjds)
+def plot_objects(objects, output=None, invert_ra=False, marker_size=20.0):
+    if not objects:
+        raise RuntimeError("No SS RA/Dec points to plot.")
 
-    plt.figure(figsize=(10, 6))
-    plt.scatter(ra_values, dec_values, s=marker_size, alpha=alpha)
+    plt.figure(figsize=(10, 7))
 
-    plt.xlabel("ra [deg]")
-    plt.ylabel("dec [deg]")
-    plt.title(
-        f"Latest dia object positions, {len(points)} points\n"
-        f"mjd range: {min_mjd:.5f} – {max_mjd:.5f}"
-    )
+    for doc_id, mjd, points in objects:
+        ra_values = [p[0] for p in points]
+        dec_values = [p[1] for p in points]
+
+        label = f"{doc_id}, {len(points)} pts, mjd={mjd:.5f}"
+        plt.scatter(ra_values, dec_values, s=marker_size, label=label)
+
+        # Optional: connect points of each moving object.
+        if len(points) > 1:
+            plt.plot(ra_values, dec_values, linewidth=1, alpha=0.7)
+
+    plt.xlabel("RA [deg]")
+    plt.ylabel("Dec [deg]")
+    plt.title(f"Latest SS objects by ss_mjd, {len(objects)} objects")
     plt.grid(True)
+    plt.legend(title="Object, points, latest MJD", fontsize="small")
 
     if invert_ra:
         plt.gca().invert_xaxis()
@@ -300,7 +316,7 @@ def plot_points(points, output=None, invert_ra=False, marker_size=1.0, alpha=0.6
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Plot latest DIA object RA/Dec positions selected by dia_mjd."
+        description="Plot SS objects selected by latest hits from ss_mjd."
     )
 
     parser.add_argument(
@@ -337,36 +353,29 @@ def main():
         "-n",
         "--number",
         type=int,
-        default=100000,
-        help="Number of latest DIA objects to plot, default: 100000",
+        default=10,
+        help="Number of latest SS objects to plot, default: 10",
     )
 
     parser.add_argument(
         "--batch-size",
         type=int,
         default=2000,
-        help="Elasticsearch scroll batch size for dia_mjd scan, default: 2000",
+        help="Elasticsearch scroll batch size for ss_mjd scan, default: 2000",
     )
 
     parser.add_argument(
         "--mget-chunk-size",
         type=int,
-        default=1000,
-        help="Number of ids per _mget request, default: 1000",
+        default=100,
+        help="Number of ids per _mget request, default: 100",
     )
 
     parser.add_argument(
         "--marker-size",
         type=float,
-        default=2.0,
-        help="Scatter marker size, default: 2.0",
-    )
-
-    parser.add_argument(
-        "--alpha",
-        type=float,
-        default=0.6,
-        help="Marker transparency, default: 0.6",
+        default=20.0,
+        help="Scatter marker size, default: 20.0",
     )
 
     parser.add_argument(
@@ -382,7 +391,7 @@ def main():
 
     args = parser.parse_args()
 
-    latest_ids = find_last_dia_ids_by_mjd(
+    latest_ids = find_latest_ss_ids_by_mjd(
         es_url=args.es_url,
         mjd_index=args.mjd_index,
         mjd_field=args.mjd_field,
@@ -390,7 +399,7 @@ def main():
         batch_size=args.batch_size,
     )
 
-    points = mget_radec_points(
+    objects = mget_ss_radec(
         es_url=args.es_url,
         radec_index=args.radec_index,
         location_field=args.location_field,
@@ -398,12 +407,11 @@ def main():
         chunk_size=args.mget_chunk_size,
     )
 
-    plot_points(
-        points=points,
+    plot_objects(
+        objects=objects,
         output=args.output,
         invert_ra=args.invert_ra,
         marker_size=args.marker_size,
-        alpha=args.alpha,
     )
 
 
