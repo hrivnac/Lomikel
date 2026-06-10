@@ -109,4 +109,4 @@ for (int delay : delays) {
 String psizes = reader.sizes();
 log.info("Original sizes: " + osizes);
 log.info("Final    sizes: " + psizes);
-NotifierURL.notify("fillES-radec-LSST", "Lomikel", Info.release(), "Original sizes: " + osizes + "\nFinal    sizes: " + psizes);
+NotifierURL.notifyExecution("fillES-radec-LSST", "Lomikel", Info.release(), "Original sizes: " + osizes + "\nFinal    sizes: " + psizes);

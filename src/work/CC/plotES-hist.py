@@ -146,7 +146,7 @@ def main():
     )
     parser.add_argument(
         "--batch-size",
-        type=int,
+        type = int,
         default = 1000,
         help = "Elasticsearch scroll batch size, default: 1000",
     )
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 """
 python3 ../src/work/CC/plotES-hist.py --index ss_radec --field location --log-y --output ss_radec.png
 python3 ../src/work/CC/plotES-hist.py --index ss_mjd   --field mjd      --log-y --output ss_mjd.png
-python3 ../src/work/CC/plotES-hist.py --index dia_mjd --field mjd       --log-y --output dia_mjd.png
+python3 ../src/work/CC/plotES-hist.py --index dia_mjd  --field mjd      --log-y --output dia_mjd.png
 scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./
 """
         

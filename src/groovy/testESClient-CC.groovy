@@ -5,16 +5,26 @@ esclient = new ESClient("http://134.158.243.139:20200"); // @CC
 // set results limit
 esclient.setSizeSearch(10);
 
-// get all dia in a cone (the same for ss)
+// get all dia in a cone
 // dia_radec is 1-1 mapping
 println(esclient.searchGeoPoint("dia_radec", "location", 150.009977, 0.670251, 0.001));
+// get all ss in a cone
+// ss_radec is 1-n mapping
+println(esclient.searchGeoPoint("ss_radec", "location", 150.009977, 0.670251, 0.1));
 
-// get all dia within mjd range (the same for ss)
+// get all dia within mjd range
 // dia-mjd is 1-n mapping
 x = esclient.searchRange("dia_mjd", "mjd", 61134.99953458342, 61134.99953458342);
 println(x);
 // get all mjd for the first one
 println(esclient.getDoubleArray("dia_mjd", x[0], "mjd"));
+
+// get all ss within mjd range
+// dia-ss is 1-n mapping
+x = esclient.searchRange("ss_mjd", "mjd", 61134.99953458342, 61134.99953458342);
+println(x);
+// get all mjd for the first one
+println(esclient.getDoubleArray("ss_mjd", x[0], "mjd"));
 
 // get sizes of all indexes
 for (idxName : ["dia_mjd", "ss_mjd", "dia_radec", "ss_radec"]) {

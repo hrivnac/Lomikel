@@ -760,6 +760,11 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       return overlaps('classifier':classifier);
       }
     }
+    
+  /** TBD */
+  def Map<String, Double> overlaps() {
+    return overlaps('classifier':null);
+    }
    
   /** Give all overlaps.
     * Using accumulated data in graph.

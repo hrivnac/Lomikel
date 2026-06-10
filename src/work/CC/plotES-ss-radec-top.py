@@ -118,9 +118,9 @@ def find_top_objects(es_url, index, field, top_n=10, batch_size=1000):
             scroll_id = data.get("_scroll_id", scroll_id)
     finally:
         es_clear_scroll(es_url, scroll_id)
-    return sorted(heap, key=lambda x: x[0], reverse=True)
+    return sorted(heap, key = lambda x: x[0], reverse = True)
 
-def plot_objects(top_objects, field, output=None, invert_ra=False):
+def plot_objects(top_objects, field, output = None, invert_ra = False):
     plt.figure(figsize=(10, 7))
     for npoints, doc_id, source in top_objects:
         locations = normalize_locations(source.get(field))
@@ -128,24 +128,24 @@ def plot_objects(top_objects, field, output=None, invert_ra=False):
         ra_values = [p[0] for p in points]
         dec_values = [p[1] for p in points]
         label = f"{doc_id} ({npoints})"
-        plt.scatter(ra_values, dec_values, s=20, label=label)
+        plt.scatter(ra_values, dec_values, s = 5, label = label)
     plt.xlabel("ra [deg]")
     plt.ylabel("dec [deg]")
     plt.title("Top 10 ss objects by number of ra/dec points")
     plt.grid(True)
-    plt.legend(title="Object ID (points)", fontsize="small")
+    plt.legend(title="Object ID (points)", fontsize = "small")
     if invert_ra:
         plt.gca().invert_xaxis()
     plt.tight_layout()
     if output:
-        plt.savefig(output, dpi=150)
+        plt.savefig(output, dpi = 150)
         print(f"Wrote {output}")
     else:
         plt.show()
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Plot 10 SS objects with maximal number of geo_point locations."
+        description = "Plot objects with maximal number of points locations."
     )
     parser.add_argument(
         "--es-url",
@@ -207,6 +207,7 @@ if __name__ == "__main__":
     main()
     
 """
-scp almalinux@134.158.243.139:/home/almalinux/tmp/top.png ./
+python3 ../src/work/CC/plotES-ss-radec-top.py --output top.png
+scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./
 """
     

@@ -72,4 +72,4 @@ gr.commit();
 client.stop();
 client.close();
 
-//NotifierURL.notify("importTags-LSST", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));
+//NotifierURL.notifyExecution("importTags-LSST", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));

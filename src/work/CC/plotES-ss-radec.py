@@ -61,8 +61,8 @@ def main():
         raise RuntimeError(f"No points found in field '{FIELD}' for {ss_id}")
     ra_values = [p[0] for p in points]
     dec_values = [p[1] for p in points]
-    plt.figure(figsize=(8, 5))
-    plt.scatter(ra_values, dec_values, s = 20)
+    plt.figure(figsize = (8, 5))
+    plt.scatter(ra_values, dec_values, s = 5)
     plt.xlabel("ra [deg]")
     plt.ylabel("dec [deg]")
     plt.title(f"ra/dec points for ss object {ss_id}")
