@@ -385,11 +385,11 @@ def plot_objects(
         #        color=color,
         #    )
 
-    plt.xlabel("RA [deg]")
-    plt.ylabel("Dec [deg]")
-    plt.title(f"Latest SS objects by ss_mjd, {len(objects)} objects")
+    plt.xlabel("ra [deg]")
+    plt.ylabel("dec [deg]")
+    plt.title(f"Latest ss objects by ss_mjd, {len(objects)} objects")
     plt.grid(True)
-    plt.legend(title="Object, points, latest MJD", fontsize="small")
+    plt.legend(title="Object, points, latest mjd", fontsize="small")
 
     if invert_ra:
         plt.gca().invert_xaxis()

@@ -4,6 +4,5 @@ python3 ../src/work/CC/plotES-ss-radec-top.py                                   
 python3 ../src/work/CC/plotES-ss-radec-latest.py        --number 10      --min-points 10 --output s_ss_radec_latest.png
 python3 ../src/work/CC/plotES-hist.py --index ss_radec  --field location --log-y         --output h_ss_radec.png
 python3 ../src/work/CC/plotES-hist.py --index ss_mjd    --field mjd      --log-y         --output h_ss_mjd.png
-python3 ../src/work/CC/plotES-hist.py --index dia_radec --field location --log-y         --output h_dia_radec.png
 python3 ../src/work/CC/plotES-hist.py --index dia_mjd   --field mjd      --log-y         --output h_dia_mjd.png
 echo "scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./"
