@@ -6,9 +6,11 @@ esclient = new ESClient("http://134.158.243.139:20200"); // @CC
 esclient.setSizeSearch(10);
 
 // get all dia in a cone
+// dia are indexed as diaObject.diaObjectId
 // dia_radec is 1-1 mapping
 println(esclient.searchGeoPoint("dia_radec", "location", 150.009977, 0.670251, 0.001));
 // get all ss in a cone
+// ss are indexed as ssSource.ssObjectId
 // ss_radec is 1-n mapping
 println(esclient.searchGeoPoint("ss_radec", "location", 150.009977, 0.670251, 0.1));
 
