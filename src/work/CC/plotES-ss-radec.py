@@ -60,9 +60,13 @@ def main():
     if not points:
         raise RuntimeError(f"No points found in field '{FIELD}' for {ss_id}")
     ra_values = [p[0] for p in points]
-    dec_values = [p[1] for p in points]
+
+dec_values = [p[1] for p in points]
     plt.figure(figsize = (8, 5))
-    plt.scatter(ra_values, dec_values, s = 10)
+    pl
+    
+t.scatter(ra_values, dec_values, s = 10
+      )
     plt.xlabel("ra [deg]")
     plt.ylabel("dec [deg]")
     plt.title(f"ra/dec points for ss object {ss_id}")
@@ -83,12 +87,12 @@ curl -X GET 'http://134.158.243.139:20200/ss_radec/_search?pretty=true' \
     "query": {
       "script": {
         "script": {
-          "lang": "painless",
-          "source": "doc[\"location\"].size() > 50"
-        }
-      }
-    }
-  }'
+          "lang":
+          ainless",
+          "source": "doc[\"location\"].size() > 50
 
-scp almalinux@134.158.243.139:/home/almalinux/tmp/21163611358705234.png ./
+
+}
+          }
+}'cp almalinux@134.158.243.139:/home/almalinux/tmp/21163611875234.png ./
 """

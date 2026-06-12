@@ -27,7 +27,7 @@ gr = new FinkGremlinRecipiesG(jc)
 
 classifiers = new Classifier[]{Classifier.instance('FINK',        'ZTF', ''          ),
                                Classifier.instance('XMATCH',      'ZTF', ''          ),
-                               Classifier.instance('FEATURES',    'ZTF', '2024/13-60'),
+                               //Classifier.instance('FEATURES',    'ZTF', '2024/13-60'),
                                Classifier.instance('FEATURES',    'ZTF', '2025/13-50'),
                                Classifier.instance('LIGHTCURVES', 'ZTF', 'Latent'    )
                                }
