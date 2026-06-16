@@ -63,6 +63,8 @@ public class AsynchHBaseClient extends    HBaseClient
       while (true) {
         if (_doscan) {
           log.info("Starting asynchronous scan");
+          log.info("Scan args: key={}, search={}, filter={}, start={}, stop={}, ifkey={}, iftime={}",
+                   _scanKey, _scanSearch, _scanFilter, _scanStart, _scanStop, _scanIfkey, _scanIftime);
           _scanning = true;
           setProcessor(_processor);
           scan(_scanKey,
@@ -79,10 +81,15 @@ public class AsynchHBaseClient extends    HBaseClient
         Thread.sleep(_loopWait);
         }
       }
-    catch (Exception e) {
-      _doscan   = false;
+    catch (InterruptedException e) {
+      _doscan = false;
       _scanning = false;
-      log.info("Stopped");
+      log.warn("Asynchronous scan interrupted", e);
+      }
+    catch (Exception e) {
+      _doscan = false;
+      _scanning = false;
+      log.error("Asynchronous scan failed", e);
       }
     }
     
@@ -123,7 +130,7 @@ public class AsynchHBaseClient extends    HBaseClient
       _scanFilter = filter;
       _scanStart  = start;
       _scanStop   = stop;
-      _scanIfkey  = true;
+      _scanIfkey  = ifkey;
       _scanIftime = iftime;
       _doscan     = true;
       log.info("Scheduling asynchronous scan");
