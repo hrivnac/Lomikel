@@ -651,7 +651,17 @@ public class ESClient {
   public void setSizeSearch(int size) {
     _size = size;
     }
- 
+    
+  /** Convert astronomical <tt>ra</tt> into geophysical <tt>lon<tt>.
+    * @param The astronomical <tt>ra [deg]</tt>.
+    * @return The geophysical <tt>lon [deg]<tt>. */
+  public static double ra2lon(double ra) {
+    double lon = ra % 360.0;
+    if (lon < 0) lon += 360.0;
+    if (lon > 180.0) lon -= 360.0;
+    return lon;
+    }
+    
   private String _url;
   
   private SmallHttpClient _httpClient = new SmallHttpClient();

@@ -67,8 +67,6 @@ public class AsynchHBaseClient extends    HBaseClient
                     _scanKey, _scanSearch, _scanFilter, _scanStart, _scanStop, _scanIfkey, _scanIftime);
           _scanning = true;
           setProcessor(_processor);
-          log.info("run this = {}", System.identityHashCode(this));
-          log.info("run table = {}", table());
           scan(_scanKey,
                _scanSearch,
                _scanFilter,
@@ -123,8 +121,6 @@ public class AsynchHBaseClient extends    HBaseClient
                         long    stop,
                         boolean ifkey,
                         boolean iftime) {
-    log.info("startScan this = {}", System.identityHashCode(this));
-    log.info("startScan table = {}", table());
     if (_doscan == true || _scanning == true) {
       log.error("Already scanning, new request ignored");
       }

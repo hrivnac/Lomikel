@@ -13,6 +13,9 @@ client.startScan(null,
                  0,
                  true,
                  true);
+while (!(client.scanning() || client.size() > 0)) {
+  println("waiting...");
+  }
 while (client.scanning() || client.size() > 0) {
   if (client.size() > 0) {
     println(client.size() + ":\t" + client.poll());
