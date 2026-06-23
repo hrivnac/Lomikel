@@ -44,6 +44,9 @@ client.startScan(null,
                  false,
                  false);
 
+while (!(client.scanning() || client.size() > 0)) {
+  println("waiting...");
+  }
 timer.start();
 while (client.scanning() || client.size() > 0) {
   if (client.size() > 0) {
