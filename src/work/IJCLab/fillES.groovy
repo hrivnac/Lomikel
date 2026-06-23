@@ -37,7 +37,7 @@ client.startScan(null,
                  "i:ra,i:dec,i:jd",
                  now - 90000000 * delay,
                  now,
-                 false,
+                 true,
                  false);
 
 while (!(client.scanning() || client.size() > 0)) {
