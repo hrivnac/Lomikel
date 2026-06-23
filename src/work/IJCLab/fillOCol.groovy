@@ -41,7 +41,7 @@ client.startScan(null,
                  "i:objectId",
                  now - 90000000 * delay,
                  now,
-                 false,
+                 true,
                  false);
 
 while (!(client.scanning() || client.size() > 0)) {
