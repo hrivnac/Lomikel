@@ -69,7 +69,7 @@ String psizes = sizes();
 log.info("Original sizes: " + osizes);
 log.info("Final    sizes: " + psizes);
 
-client.stop(); 
+//client.stop(); 
 
 // BUG: why doesn't work in thread ?
 NotifierURL.notifyExecution("fillES-ZTF", "Lomikel", Info.release(), "Original sizes: " + osizes + "\nFinal    sizes: " + psizes);
