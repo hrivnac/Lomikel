@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# LSST Elasticsearch plots.
 python3 ../src/work/CC/plotES-dia-radec.py              --max-points 100000              --output s_dia_radec.png
 python3 ../src/work/CC/plotES-dia-radec-latest.py       --number 100000                  --output s_dia_radec_latest.png
 python3 ../src/work/CC/plotES-ss-radec-top.py           --top-n 10                       --output s_ss_radec_top.png
@@ -5,4 +9,12 @@ python3 ../src/work/CC/plotES-ss-radec-latest.py        --number 10      --min-p
 python3 ../src/work/CC/plotES-hist.py --index ss_radec  --field location --log-y         --output h_ss_radec.png
 python3 ../src/work/CC/plotES-hist.py --index ss_mjd    --field mjd      --log-y         --output h_ss_mjd.png
 python3 ../src/work/CC/plotES-hist.py --index dia_mjd   --field mjd      --log-y         --output h_dia_mjd.png
+
+# ZTF Elasticsearch plots. ZTF has one data type, so there is no ss/dia split.
+# The ZTF radec index currently has one location per object, so top-location and
+# location-count histogram plots are intentionally omitted.
+python3 ../src/work/CC/plotES-ztf-radec.py              --max-points 100000              --output z_ztf_radec.png
+python3 ../src/work/CC/plotES-ztf-radec-latest.py       --number 100000                  --output z_ztf_radec_latest.png
+python3 ../src/work/CC/plotES-ztf-hist.py --index mjd   --field mjd      --log-y         --output z_h_ztf_mjd.png
+
 echo "scp almalinux@134.158.243.139:/home/almalinux/Lomikel/ant/'*'.png ./"

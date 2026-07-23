@@ -87,6 +87,18 @@ public class PR extends ParquetReader {
   }
   
 ParquetReader reader = new PR("hdfs://ccmaster1:8020");
-yesterday = LocalDate.now().minusDays(delay).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
+//yesterday = LocalDate.now().minusDays(8).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
+//reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
+yesterday = LocalDate.now().minusDays(7).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
+reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
+yesterday = LocalDate.now().minusDays(6).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
+reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
+yesterday = LocalDate.now().minusDays(5).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
+reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
+yesterday = LocalDate.now().minusDays(4).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
+reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
+yesterday = LocalDate.now().minusDays(3).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
+reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
+yesterday = LocalDate.now().minusDays(2).format(DateTimeFormatter.ofPattern("'year='yyyy'/month='MM'/day='dd"));
 reader.processDir("/user/fink/archive/science/" + yesterday, "parquet");
 gr.generateCorrelations(classifiers);
