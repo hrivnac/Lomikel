@@ -26,10 +26,10 @@ jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties")
 gr = new FinkGremlinRecipiesG(jc)
 
 classifiers = new Classifier[]{Classifier.instance('FINK',        'ZTF', ''          ),
-                               Classifier.instance('XMATCH',      'ZTF', ''          ),
+                               Classifier.instance('XMATCH',      'ZTF', ''          ) //,
                                //Classifier.instance('FEATURES',    'ZTF', '2024/13-60'),
-                               Classifier.instance('FEATURES',    'ZTF', '2025/13-50'),
-                               Classifier.instance('LIGHTCURVES', 'ZTF', 'Latent'    )
+                               //Classifier.instance('FEATURES',    'ZTF', '2025/13-50'),
+                               //Classifier.instance('LIGHTCURVES', 'ZTF', 'Latent'    )
                                }
 formula = "cdsxmatch != 'Unknown' && roid != 3 && ndethist >= 3";
 hbaseUrl = 'vdhbase1.lal.in2p3.fr:2183:ztf:schema_4.0_6.1.1'
