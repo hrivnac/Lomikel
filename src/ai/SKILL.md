@@ -46,6 +46,7 @@ Do **not** use this skill for generic astronomy facts that do not need Fink data
 | Fink docs | API, schema, migration, tutorials | `https://doc.ztf.fink-broker.org`, `https://doc.lsst.fink-broker.org` |
 | Fink broker site | Project/news/high-level docs | `https://fink-broker.org` |
 | LSST Elasticsearch | Low-level indexed LSST object documents | `http://134.158.243.139:20200` |
+| ZTF Elasticsearch | Low-level indexed ZTF object documents | `http://157.136.253.253:20200` |
 | JanusGraph / Gremlin | Graph relationships and graph analytics | Gremlin host currently seen as `134.158.243.144:24444`; direct Janus/HBase config below |
 | Lomikel docs/downloads | CLI and JanusGraph/HBase/ES tooling | `https://hrivnac.web.cern.ch/Activities/Packages/Lomikel/` |
 | Lomikel source | Source, examples, scripts | `https://github.com/hrivnac/Lomikel` |
@@ -122,13 +123,23 @@ For Hermes, use `web_search` and, when web extraction is available, fetch the ex
 
 ### Endpoint and indexes
 
-Current LSST Elasticsearch endpoint:
+Current Elasticsearch endpoints:
 
 ```text
-http://134.158.243.139:20200
+ZTF:  http://157.136.253.253:20200
+LSST: http://134.158.243.139:20200
 ```
 
-Important indexes:
+Important ZTF indexes:
+
+| Index | Meaning | Important field(s) |
+|---|---|---|
+| `radec` | ZTF object sky positions | `location` as `geo_point` |
+| `mjd` | ZTF object times | `mjd` as `double` |
+| `janusgraph_byobjectides` | JanusGraph backing/search index by object id | graph index |
+| `janusgraph_byimportdatees` | JanusGraph backing/search index by import date | graph index |
+
+Important LSST indexes:
 
 | Index | Meaning | Important field(s) |
 |---|---|---|
@@ -247,16 +258,30 @@ Lomikel-All-03.09.00.exe.jar        # with JanusGraph, Hadoop and HBase
 Lomikel-py4j-03.09.00.exe.jar       # for Py4J
 ```
 
-Recommended minimal setup for JanusGraph access is `Lomikel-Janus-03.09.00.exe.jar`; use `Lomikel-All-03.09.00.exe.jar` if Hadoop/HBase tooling is also needed.
+The `*.exe.jar` files are **MANIFEST-only launcher JARs**: they are meant to be called as `java -jar xxx.exe.jar`, and their manifest references the other needed Lomikel/library JAR files. Therefore, do not download only an `*.exe.jar` in isolation unless the referenced non-`exe` JARs/dependencies are also present in the same distribution layout.
+
+Recommended minimal launcher for JanusGraph access is `Lomikel-Janus-03.09.00.exe.jar`; use `Lomikel-All-03.09.00.exe.jar` if Hadoop/HBase tooling is also needed. Keep it together with the distribution JARs it references.
 
 ### Download recipe
 
 ```bash
 mkdir -p ~/lomikel-fink && cd ~/lomikel-fink
 BASE=https://hrivnac.web.cern.ch/Activities/Packages/Lomikel
-curl -fLO "$BASE/Lomikel-Janus-03.09.00.exe.jar"
-# Optional broader bundle:
+
+# Download the launcher plus the distribution JARs it references.
+for jar in \
+  Lomikel-03.09.00.jar \
+  Lomikel-ext-03.09.00.jar \
+  Lomikel-HBase-03.09.00.jar \
+  Lomikel-Janus-03.09.00.jar \
+  Lomikel-Janus-03.09.00.exe.jar
+  do curl -fLO "$BASE/$jar"
+done
+
+# Optional broader launcher/dependencies if Hadoop tooling is needed:
+# curl -fLO "$BASE/Lomikel-Hadoop-03.09.00.jar"
 # curl -fLO "$BASE/Lomikel-All-03.09.00.exe.jar"
+
 alias lomikel_janus='java -jar ~/lomikel-fink/Lomikel-Janus-03.09.00.exe.jar'
 lomikel_janus -h
 ```
@@ -280,9 +305,10 @@ lomikel_janus -s query.groovy -b
 
 ### Current connection facts
 
-Observed current Fink JanusGraph / HBase / ES configuration:
+Observed current Fink JanusGraph / HBase / ES configurations:
 
 ```text
+CC / LSST-like instance:
 Gremlin host:           134.158.243.144
 Gremlin port:           24444
 Gremlin CORS port:      24445
@@ -290,6 +316,17 @@ HBase/ZooKeeper host:   134.158.243.163
 HBase/ZooKeeper port:   2183
 JanusGraph HBase table: janusgraph1
 Elasticsearch hostname: 134.158.243.139:20200
+Backend HBase table:    ztf
+Backend HBase schema:   schema_0.7.0_0.3.8
+
+IJCLab / ZTF instance:
+Gremlin host:           157.136.253.253
+Gremlin port:           24444
+Gremlin CORS port:      24445
+HBase/ZooKeeper host:   157.136.250.219
+HBase/ZooKeeper port:   2183
+JanusGraph HBase table: janusgraph1
+Elasticsearch hostname: 157.136.253.253:20200
 Backend HBase table:    ztf
 Backend HBase schema:   schema_0.7.0_0.3.8
 ```
@@ -491,9 +528,12 @@ Current daily jobs in that environment:
 
 | Time | Job |
 |---:|---|
-| 22:00 | JanusGraph check |
-| 23:00 | Elasticsearch new-object check |
-| 23:15 | Elasticsearch plots |
+| 22:00 | LSST JanusGraph check |
+| 22:10 | ZTF JanusGraph check |
+| 23:00 | LSST Elasticsearch new-object check |
+| 23:10 | ZTF Elasticsearch new-object check |
+| 23:15 | LSST Elasticsearch plots |
+| 23:30 | ZTF Elasticsearch plots |
 | every 30m | disk/log watchdog |
 
 Do not assume these jobs exist for other users; provide setup scripts if they ask.
