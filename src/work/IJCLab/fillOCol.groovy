@@ -25,8 +25,8 @@ client.connect("ztf", "schema_3.1_5.6.2");
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties")
 gr = new FinkGremlinRecipiesG(jc)
 
-classifiers = new Classifier[]{Classifier.instance('FINK',        'ZTF', ''          ),
-                               Classifier.instance('XMATCH',      'ZTF', ''          ) //,
+classifiers = new Classifier[]{Classifier.instance('FINK',        'ZTF', ''          )//,
+                               //Classifier.instance('XMATCH',      'ZTF', ''          ),
                                //Classifier.instance('FEATURES',    'ZTF', '2024/13-60'),
                                //Classifier.instance('FEATURES',    'ZTF', '2025/13-50'),
                                //Classifier.instance('LIGHTCURVES', 'ZTF', 'Latent'    )
