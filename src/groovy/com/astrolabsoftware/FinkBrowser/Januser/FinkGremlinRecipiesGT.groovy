@@ -67,6 +67,7 @@ import org.apache.logging.log4j.LogManager;
 
 /** <code>FinkGremlinRecipiesG</code> provides various recipies to handle
   * and modify Gremlin Graphs for Fink.
+  * <em>Optimised by AI (ChatGPT-5.6 via Hermes).</em>
   * @opt attributes
   * @opt operations
   * @opt types
