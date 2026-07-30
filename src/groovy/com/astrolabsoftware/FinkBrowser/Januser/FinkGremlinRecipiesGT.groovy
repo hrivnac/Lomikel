@@ -481,17 +481,50 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                  double  nmax  = 10,
                                                  boolean check = true) {                        
     def classified = classification(oid, srcClassifier);
-    def reclassified = [:];      
-    def w;
+    def reclassified = [:];
     def cf = classifierWithFlavor(srcClassifier);
-    classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
-                             w = reclassify(it.class, 'OCol', srcClassifier, dstClassifier);
-                             w.each {cls, intersection -> if (reclassified[cls] == null) {
-                                                            reclassified[cls] = 0;
-                                                            }
-                                                          reclassified[cls] += intersection * it.weight;
-                               }
-                      }
+    def srcClasses = classified.findAll {it -> it.classifier == cf[0] && it.flavor == cf[1]}.
+                                collect {it -> it.class}.
+                                toSet();
+    def dstCf = classifierWithFlavor(dstClassifier);
+    def correlations = [:];
+    if (!srcClasses.isEmpty()) {
+      g().V().has('lbl',        'OCol').
+              has('classifier', cf[0]).
+              has('flavor',     cf[1]).
+              has('cls',        within(srcClasses)).
+              inE().has('lbl', 'overlaps').
+              as('e').
+              filter(outV().has('lbl',        'OCol').
+                            has('classifier', dstCf[0]).
+                            has('flavor',     dstCf[1])).
+              project('src', 'dst', 'intersection').
+              by(inV().values('cls')).
+              by(outV().values('cls')).
+              by(select('e').values('intersection')).
+              each {row ->
+                if (correlations[row['src']] == null) {
+                  correlations[row['src']] = [:];
+                  }
+                def previous = correlations[row['src']][row['dst']];
+                if (previous == null || row['intersection'] > previous) {
+                  correlations[row['src']][row['dst']] = row['intersection'];
+                  }
+                };
+      correlations.each {src, weights -> correlations[src] = weights.sort{-it.value}};
+      }
+    classified.each {it ->
+      if (it.classifier == cf[0] && it.flavor == cf[1]) {
+        def weights = correlations[it.class];
+        if (weights != null) {
+          weights.each {cls, intersection ->
+            if (reclassified[cls] == null) {
+              reclassified[cls] = 0;
+              }
+            reclassified[cls] += intersection * it.weight;
+            }
+          }
+        }
       }
     double total = reclassified.values().sum();
     if (total != 0) {
@@ -500,6 +533,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (check) {
       def classifiedDst = classification(oid, dstClassifier);
       if (classifiedDst.isEmpty()) {
+        _lastQuality = 0.0
         log.warn('Cannot check quality')
         }
       else {
@@ -515,11 +549,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     reclassified = limitMap(reclassified, nmax);
     def reclassifiedA = [];
-    reclassified.each {it -> cf = classifierWithFlavor(dstClassifier);
-                             reclassifiedA += ['classifier':cf[0],
-                                               'flavor':cf[1],
-                                               'weight':it.getValue(),
-                                               'class':it.getKey()]}
+    reclassified.each {it -> reclassifiedA += ['classifier':dstCf[0],
+                                                'flavor':dstCf[1],
+                                                'weight':it.getValue(),
+                                                'class':it.getKey()]}
     return reclassifiedA;
     } 
     
@@ -854,34 +887,30 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                      String srcClassifier,
                                      String dstClassifier) {
     def classification = [:];
+    if (cls == null || lbl == null || srcClassifier == null || dstClassifier == null) {
+      return classification;
+      }
     def srcCf = classifierWithFlavor(srcClassifier);
     def dstCf = classifierWithFlavor(dstClassifier);
-    g().E().has('lbl', 'overlaps').
-            order().
-            by('intersection', asc).
-            project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
-            by(inV().values('lbl')).
-            by(inV().values('classifier')).
-            by(inV().values('flavor')).
-            by(inV().values('cls')).
-            by(outV().values('lbl')).
-            by(outV().values('classifier')).
-            by(outV().values('flavor')).
+    g().V().has('lbl',        lbl).
+            has('classifier', srcCf[0]).
+            has('flavor',     srcCf[1]).
+            has('cls',        cls).
+            inE().has('lbl', 'overlaps').
+            as('e').
+            filter(outV().has('lbl',        lbl).
+                          has('classifier', dstCf[0]).
+                          has('flavor',     dstCf[1])).
+            project('dst', 'intersection').
             by(outV().values('cls')).
-            by(values('intersection')).
-            each {v -> 
-                  if (v['xlbl'       ].equals(lbl     ) &&
-                      v['ylbl'       ].equals(lbl     ) &&
-                      v['xcls'       ].equals(cls     ) &&
-                      v['xclassifier'].equals(srcCf[0]) &&
-                      v['yclassifier'].equals(dstCf[0]) &&
-                      v['xflavor'    ].equals(srcCf[1]) &&
-                      v['yflavor'    ].equals(dstCf[1])) {
-                    classification[v['ycls']] = v['intersection'];
-                    }
-                  };
-    classification = classification.sort{-it.value};
-    return classification;
+            by(select('e').values('intersection')).
+            each {row ->
+              def previous = classification[row['dst']];
+              if (previous == null || row['intersection'] > previous) {
+                classification[row['dst']] = row['intersection'];
+                }
+              };
+    return classification.sort{-it.value};
     }
     
   /** Export all <em/>OCol</em>
