@@ -215,14 +215,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return objectNeighborhood(args, oid0, classifier, null, null);
     }
 
-  /** The same method as {@link #objectNeighborhood(Map, String, String, ListMString>, List<String>},
+  /** The same method as {@link #objectNeighborhood(Map, String, String, Set, Set)},
     * appropriate for direct call from Java (instead of Groovy). */
   def Map<Map.Entry<String, Double>, Map<String, Double>> objectNeighborhood(String      oid0,
                                                                              String      classifier,
                                                                              Set<String> oidS,
                                                                              Set<String> classes0,
                                                                              Map         args) {
-    return objectNeighborhood(args, oid0, classifier, oidS, classes);
+    return objectNeighborhood(args, oid0, classifier, oidS, classes0);
     }
     
   /** Give {@link Map} of other <em>object</em>s ordered
@@ -230,12 +230,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * to weights to all (or selected) <em>OCol</em> classes.
     * @param oid0          The <em>objectId</em> of the <em>object</em>.
     * @param classifier    The classifier name to be used.
-    * @param oidS          A {@link List} of <em>object</em> objectIds to only avaluated.
-    *                      If <tt>null</tt>, all <em>object</em>s will be evaluated.
-    * @param classes0      A {@link List} of <em>OCol</em> classes to be
+    * @param oidS          A {@link Set} of <em>object</em> objectIds to evaluate exclusively.
+    *                      If <tt>null</tt> or empty, all <em>object</em>s will be evaluated.
+    * @param classes0      A {@link Set} of <em>OCol</em> classes to be
     *                      used in comparison.
     *                      All <em>OCol</em> classes of the specified
-    *                      <em>object</em> will be used if <tt>null</tt>.
+    *                      <em>object</em> will be used if <tt>null</tt> or empty.
     * @param nmax          The number of closest <em>object</em>s to give.
     *                      If less then 1, the relative distance cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
@@ -260,90 +260,128 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def climit     = args.climit     ?: 0.0;
     def allClasses = args.allClasses ?: false;
     def cf = classifierWithFlavor(classifier);
-    if (g().V().has('lbl', 'object').has('objectId', oid0).count().next() == 0) {
+    // Find the source object once. The previous count()+next() sequence
+    // evaluated the same indexed lookup twice.
+    def object0T = g().V().has('lbl', 'object').has('objectId', oid0).limit(1);
+    if (!object0T.hasNext()) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
       }
-    if (classes0 == null || classes0.isEmpty()) {
-      classes0 = g().V().has('lbl', 'OCol'      ).
-                         has('classifier', cf[0]).
-                         has('flavor',     cf[1]).
-                         values('cls'           ).
-                         toSet();
-      }
-    def object0 = g().V().has('lbl',      'object').
-                          has('objectId', oid0    ).
-                          next();
+    def object0 = object0T.next();
+    def restrictClasses = classes0 != null && !classes0.isEmpty();
     def m0 = [:];
-    g().V(object0).inE().
-                   as('e').
-                   filter(and(outV().values('classifier').is(eq(cf[0])),
-                              outV().values('flavor'    ).is(eq(cf[1])),
-                              outV().values('cls'       ).is(within(classes0)))).                   
-                   project('cls', 'w').
-                   by(select('e').outV().values('cls')).
-                   by(select('e').values('weight')).
-                   each {it -> m0[it['cls']] = it['w']}
-    log.info('calculating object distances from ' + oid0 + m0 + " using " + args);
-    if (climit > 0.0) {
-      m0.entrySet().removeIf(entry -> entry.getValue() < climit)
+    def sourceMemberships = g().V(object0).inE().
+                                as('e').
+                                filter(and(outV().values('classifier').is(eq(cf[0])),
+                                           outV().values('flavor'    ).is(eq(cf[1]))));
+    if (restrictClasses) {
+      sourceMemberships = sourceMemberships.filter(outV().values('cls').is(within(classes0)));
       }
-    def classes
+    if (climit > 0.0) {
+      sourceMemberships = sourceMemberships.has('weight', gte(climit));
+      }
+    sourceMemberships.project('cls', 'w').
+                      by(select('e').outV().values('cls')).
+                      by(select('e').values('weight')).
+                      each {it -> m0[it['cls']] = it['w']};
+    def classes;
     if (allClasses) {
-      classes = classes0
+      if (restrictClasses) {
+        classes = classes0;
+        }
+      else {
+        classes = g().V().has('lbl',        'OCol').
+                          has('classifier', cf[0]).
+                          has('flavor',     cf[1]).
+                          values('cls').toSet();
+        }
       }
     else {
-      classes = [];
-      for (entry : m0.entrySet()) {
-        classes += [entry.getKey()];
-        }
+      classes = m0.keySet();
       log.info("\tsearching only in " + classes);
       }
-    def distances = [:]
-    def objects;
-    if (oidS) {
+    log.info('calculating object distances from ' + oid0 + m0 + " using " + args);
+    if (classes.isEmpty() && (oidS == null || oidS.isEmpty())) {
+      return [:];
+      }
+    // Fetch every candidate membership in one traversal. Previously the code
+    // materialised candidate vertices and then issued g().V(s).inE() once per
+    // object, creating tens of thousands of graph traversals for common LSST
+    // neighborhoods.
+    def memberships;
+    def candidates = [:];
+    if (oidS != null && !oidS.isEmpty()) {
       log.info("\tsearching only " + oidS);
-      objects = g().V().has('lbl',      'object').
-                        has('objectId', within(oidS));
+      // Preserve explicitly requested objects even when none of their selected
+      // memberships survive the class/weight filters: they have an empty
+      // vector and therefore maximum distance, as in the original API.
+      g().V().has('lbl',      'object').
+              has('objectId', within(oidS)).
+              has('objectId', neq(oid0)).
+              values('objectId').
+              each {candidateOid -> candidates[candidateOid] = [:];};
+      // For an explicitly supplied object set, start from the objectId mixed
+      // index instead of expanding every matching class membership first.
+      memberships = g().V().has('lbl',      'object').
+                            has('objectId', within(oidS)).
+                            has('objectId', neq(oid0)).
+                            as('candidate').
+                            inE().
+                            as('membership').
+                            filter(and(outV().values('classifier').is(eq(cf[0])),
+                                       outV().values('flavor'    ).is(eq(cf[1])),
+                                       outV().values('cls'       ).is(within(classes))));
       }
     else {
-      // NOTE: Janus-all.jar doesn't allow some complex operations
-      objects = g().V().has('lbl',        'OCol').
-                        has('classifier', cf[0]).
-                        has('flavor',     cf[1]).
-                        has('cls',        within(classes)).
-                        out().
-                        has('lbl', 'object').
-                        dedup()  
+      memberships = g().V().has('lbl',        'OCol').
+                            has('classifier', cf[0]).
+                            has('flavor',     cf[1]).
+                            has('cls',        within(classes)).
+                            outE().
+                            as('membership').
+                            inV().
+                            has('lbl', 'object').
+                            has('objectId', neq(oid0)).
+                            as('candidate');
       }
-    def distance
-    def n = 0
-    def t = System.currentTimeMillis()
-    objects.each {s -> 
-                  def oid = g().V(s).values('objectId').next();
-                  def m = [:];
-                  g().V(s).inE().
-                           as('e').
-                           filter(and(inV().values('objectId'   ).is(neq(oid0)),
-                                      outV().values('classifier').is(eq(cf[0])),
-                                      outV().values('flavor'    ).is(eq(cf[1])),
-                                      outV().values('cls'       ).is(within(classes)))).
-                           project('cls', 'w').
-                           by(select('e').outV().values('cls')).
-                           by(select('e').values('weight')).
-                           each {it -> m[it['cls']] = it['w']}
-                  if (climit > 0.0) {
-                    m.entrySet().removeIf(entry -> entry.getValue() < climit)
+    memberships.project('oid', 'cls', 'w').
+                by(select('candidate').values('objectId')).
+                by(select('membership').outV().values('cls')).
+                by(select('membership').values('weight')).
+                each {row ->
+                  if (!candidates.containsKey(row['oid'])) {
+                    candidates[row['oid']] = [:];
                     }
-                  def dist = Metrics.distance(m0, m, allClasses, metric)
-                  n++
-                  distance = Map.entry(oid, dist)
-                  distances[distance] = m
-                  }
-    t = System.currentTimeMillis() - t
-    return limitMapMap(distances, nmax)
+                  candidates[row['oid']][row['cls']] = row['w'];
+                  };
+    def distances = [:];
+    def distanceCache = [:];
+    def cacheDistances = ['JensenShannon', 'Euclidean', 'Cosine'].contains(metric);
+    candidates.each {oid, m ->
+      if (climit > 0.0) {
+        m.entrySet().removeIf(entry -> entry.getValue() < climit);
+        }
+      def dist;
+      // Classification vectors repeat frequently (for example thousands of
+      // objects can have the same one-hot or 50/50 memberships). Avoid
+      // recomputing an identical deterministic metric for every object.
+      if (cacheDistances && distanceCache.containsKey(m)) {
+        dist = distanceCache[m];
+        }
+      else {
+        dist = Metrics.distance(m0, m, allClasses, metric);
+        if (cacheDistances) {
+          distanceCache[m] = dist;
+          }
+        }
+      distances[Map.entry(oid, dist)] = m;
+      };
+    log.info('evaluated ' + candidates.size() + ' candidate objects with ' +
+             (cacheDistances ? distanceCache.size() : candidates.size()) +
+             ' distance calculations');
+    return limitMapMap(distances, nmax);
     }
-  
+
   /** Drop all {@link Vertex} with specified <em>importDate</em>.
     * @param importDate The <em>importDate</em> of {@link Vertex}es to drop.
     *                   It's format should be like <tt>Mon Feb 14 05:51:20 UTC 2022</tt>.
