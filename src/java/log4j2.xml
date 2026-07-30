@@ -36,6 +36,7 @@
       <AppenderRef ref="file"/>
      </Root>
     <Logger name="org.apache.hadoop.util.NativeCodeLoader"                                  level="OFF"/>
+    <Logger name="org.reflections8.Reflections"                                             level="ERROR"/>
     <Logger name="org.apache.zookeeper.ZooKeeper"                                           level="WARN"/>
     <Logger name="org.apache.zookeeper.ClientCnxn"                                          level="WARN"/>
     <Logger name="org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient" level="WARN"/>
