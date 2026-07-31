@@ -7,7 +7,8 @@
       <ThresholdFilter level="INFO" 
                        onMatch="ACCEPT"
                        onMismatch="DENY"/>
-      <PatternLayout pattern="%5r %-5p (%-30c{2}:%4L) : %m%n"/>
+      <!--PatternLayout pattern="%5r %-5p (%-30c{2}:%4L) : %m%n"/-->
+      <PatternLayout pattern="%5r %-5p (%-30c:%4L) : %m%n"/>
       </Console>
     <Console name="stderr"
              target="SYSTEM_ERR">
@@ -38,7 +39,11 @@
     <Logger name="org.apache.hadoop.util.NativeCodeLoader"                                  level="OFF"/>
     <Logger name="org.reflections8.Reflections"                                             level="ERROR"/>
     <Logger name="org.apache.zookeeper.ZooKeeper"                                           level="WARN"/>
+    <Logger name="org.apache.hadoop.hbase.shaded.org.apache.zookeeper.ZooKeeper"            level="WARN"/>
     <Logger name="org.apache.zookeeper.ClientCnxn"                                          level="WARN"/>
+    <Logger name="org.apache.hadoop.hbase.shaded.org.apache.zookeeper.ClientCnxn"           level="WARN"/>
+    <Logger name="org.apache.zookeeper.ClientCnxnSocket"                                    level="WARN"/>
+    <Logger name="org.apache.hadoop.hbase.shaded.org.apache.zookeeper.ClientCnxnSocket"     level="WARN"/>
     <Logger name="org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient" level="WARN"/>
     <Logger name="org.apache.hadoop.hbase.client.ConnectionImplementation"                  level="WARN"/>
     <Logger name="org.apache.hadoop.hbase.unsafe.HBasePlatformDependent"                    level="ERROR"/>
