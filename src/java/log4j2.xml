@@ -38,15 +38,24 @@
      </Root>
     <Logger name="org.apache.hadoop.util.NativeCodeLoader"                                  level="OFF"/>
     <Logger name="org.reflections8.Reflections"                                             level="ERROR"/>
-    <Logger name="org.apache.zookeeper.ZooKeeper"                                           level="WARN"/>
+    <!--Logger name="org.apache.zookeeper.ZooKeeper"                                           level="WARN"/-->
     <Logger name="org.apache.hadoop.hbase.shaded.org.apache.zookeeper.ZooKeeper"            level="WARN"/>
-    <Logger name="org.apache.zookeeper.ClientCnxn"                                          level="WARN"/>
+    <!--ogger name="org.apache.zookeeper.ClientCnxn"                                          level="WARN"/-->
     <Logger name="org.apache.hadoop.hbase.shaded.org.apache.zookeeper.ClientCnxn"           level="WARN"/>
-    <Logger name="org.apache.zookeeper.ClientCnxnSocket"                                    level="WARN"/>
+    <!--Logger name="org.apache.zookeeper.ClientCnxnSocket"                                    level="WARN"/-->
     <Logger name="org.apache.hadoop.hbase.shaded.org.apache.zookeeper.ClientCnxnSocket"     level="WARN"/>
+    <Logger name="org.apache.hadoop.hbase.shaded.org.apache.zookeeper.common"               level="WARN"/>
     <Logger name="org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient" level="WARN"/>
     <Logger name="org.apache.hadoop.hbase.client.ConnectionImplementation"                  level="WARN"/>
     <Logger name="org.apache.hadoop.hbase.unsafe.HBasePlatformDependent"                    level="ERROR"/>
     <Logger name="org.apache.hadoop.io.compress.CodecPool"                                  level="WARN"/>
+    <Logger name="org.janusgraph.diskstorage"                                               level="WARN"/>
+    <Logger name="org.apache.commons.beanutils.FluentPropertyBeanIntrospector"              level="WARN"/>
+    <Logger name="org.apache.hadoop.conf.Configuration.deprecation"                         level="WARN"/>
+    <Logger name="org.janusgraph.core.util.ReflectiveConfigOptionLoader"                    level="WARN"/>
+    <Logger name="org.janusgraph.graphdb.idmanagement.UniqueInstanceIdRetriever"            level="WARN"/>
+    <Logger name="org.janusgraph.graphdb.database.IndexSerializer"                          level="WARN"/>
+    <Logger name="org.janusgraph.diskstorage.log.kcvs.KCVSLog"                              level="WARN"/>
+    
     </Loggers>
   </Configuration>
