@@ -10,7 +10,7 @@ FIELD = "location"
 
 def get_document(ss_id):
     url = f"{ES_URL}/{INDEX}/_doc/{ss_id}"
-    r = requests.get(url)
+    r = requests.get(url, headers={"-u":"elastic:elastic"})
     r.raise_for_status()
     data = r.json()
     if not data.get("found", False):

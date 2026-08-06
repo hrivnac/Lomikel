@@ -67,7 +67,7 @@ def max_mjd(value):
 
 def es_search(es_url, index, body, scroll = None):
     url = f"{es_url}/{index}/_search"
-    params = {}
+    params = {"-u":"elastic:elastic"}
     if scroll:
         params["scroll"] = scroll
     r = requests.post(url, params=params, json=body)
