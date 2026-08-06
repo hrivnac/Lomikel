@@ -51,6 +51,5 @@
     <Logger name="org.janusgraph.core.util.ReflectiveConfigOptionLoader"                    level="WARN"/>
     <Logger name="org.janusgraph.graphdb.idmanagement.UniqueInstanceIdRetriever"            level="WARN"/>
     <Logger name="org.janusgraph.graphdb.database.IndexSerializer"                          level="WARN"/>
-    
     </Loggers>
   </Configuration>

@@ -4,7 +4,7 @@ import argparse
 import requests
 import matplotlib.pyplot as plt
 
-DEFAULT_ES_URL = "http://157.136.253.253:20200"
+DEFAULT_ES_URL = "http://157.136.253.253:24499"
 DEFAULT_RADEC_INDEX = "radec"
 DEFAULT_MJD_INDEX = "mjd"
 DEFAULT_LOCATION_FIELD = "location"

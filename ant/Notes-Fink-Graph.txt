@@ -6,6 +6,12 @@
 # Bugs:
 #   WS table and graph don't see difference between classifications
 
+# CURL
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"gremlin": "g.V().count()"}' \
+  http://134.158.243.144:24444
+
+
 # Filling
 src/sh/cron/fillSOI.sh
 

@@ -14,29 +14,29 @@ esclient.createIndex("mjd", "mjd", "double");
 
 Check
 -----
-curl -X GET 'http://157.136.253.253:20200/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
+curl -X GET 'http://157.136.253.253:24499/_search?pretty=true' -H 'Content-Type: application/json' -d '{"query" : {"match_all" : {}}}'
 
 Change watermark
 ----------------
-curl -X PUT -H "Content-Type: application/json" http://127.0.0.1:20200/_all/_settings -d '{"index.blocks.read_only_allow_delete": null}'
-curl -X PUT "http://127.0.0.1:20200/_cluster/settings?pretty" -H 'Content-Type: application/json' -d' { "transient": { "cluster.routing.allocation.disk.watermark.low": "5gb", "cluster.routing.allocation.disk.watermark.high": "2gb", "cluster.routing.allocation.disk.watermark.flood_stage": "1gb", "cluster.info.update.interval": "1m"}}'
-curl -X PUT -H "Content-Type: application/json" http://127.0.0.1:20200/_all/_settings -d '{"index.blocks.read_only_allow_delete": null}'
+curl -X PUT -H "Content-Type: application/json" http://127.0.0.1:24499/_all/_settings -d '{"index.blocks.read_only_allow_delete": null}'
+curl -X PUT "http://127.0.0.1:24499/_cluster/settings?pretty" -H 'Content-Type: application/json' -d' { "transient": { "cluster.routing.allocation.disk.watermark.low": "5gb", "cluster.routing.allocation.disk.watermark.high": "2gb", "cluster.routing.allocation.disk.watermark.flood_stage": "1gb", "cluster.info.update.interval": "1m"}}'
+curl -X PUT -H "Content-Type: application/json" http://127.0.0.1:24499/_all/_settings -d '{"index.blocks.read_only_allow_delete": null}'
 
 List indexes
 ------------
-curl 'http://157.136.253.253:20200/_cat/indices?v'
-curl 'http://134.158.243.139:20200/_cat/indices?v'
+curl 'http://157.136.253.253:24499/_cat/indices?v'
+curl 'http://134.158.243.139:24499/_cat/indices?v'
 
 
 Delete index
 ------------
-curl -X DELETE 'http://134.158.243.139:20200/janusgraph_byjdes'
-curl -X DELETE 'http://134.158.243.139:20200/*'
+curl -X DELETE 'http://134.158.243.139:24499/janusgraph_byjdes'
+curl -X DELETE 'http://134.158.243.139:24499/*'
 
 Get configuration
 -----------------
-curl -X GET 'http://localhost:9200/_cdluster/settings?include_defaults=true'
-curl -X GET 'http://localhost:9200/_cluster/settings'
+curl -X GET 'http://localhost:24499/_cdluster/settings?include_defaults=true'
+curl -X GET 'http://localhost:24499/_cluster/settings'
 
 --------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ CC:     134.158.243.139
 migration IJCLab -> CC
 ----------------------
 
-curl -X PUT 'http://157.136.253.253:20200/_snapshot/migrate_repo?pretty' \
+curl -X PUT 'http://157.136.253.253:24499/_snapshot/migrate_repo?pretty' \
   -H 'Content-Type: application/json' \
   -d '{
     "type": "fs",
@@ -60,20 +60,20 @@ curl -X PUT 'http://157.136.253.253:20200/_snapshot/migrate_repo?pretty' \
     }
   }'    
   
-curl -X PUT 'http://157.136.253.253:20200/_snapshot/migrate_repo/move_2026_05_05?wait_for_completion=true&pretty' \
+curl -X PUT 'http://157.136.253.253:24499/_snapshot/migrate_repo/move_2026_05_05?wait_for_completion=true&pretty' \
   -H 'Content-Type: application/json' \
   -d '{
     "indices": "dia_radec,dia_mjd,ss_radec,ss_mjd",
     "include_global_state": false
   }'  
   
-curl -X GET 'http://157.136.253.253:20200/_cat/snapshots/migrate_repo?v'    
+curl -X GET 'http://157.136.253.253:24499/_cat/snapshots/migrate_repo?v'    
 
 # copy backups
 scp centos@157.136.253.253:/opt/janusgraph-1/elasticsearch/backups/backup.tar.gz ./                 
 scp backup.tar.gz almalinux@134.158.243.139:/opt/janusgraph-1/elasticsearch/backups/backup.tar.gz ./
 
-curl -X PUT 'http://134.158.243.139:20200/_snapshot/migrate_repo?pretty' \
+curl -X PUT 'http://134.158.243.139:24499/_snapshot/migrate_repo?pretty' \
   -H 'Content-Type: application/json' \
   -d '{
     "type": "fs",
@@ -83,16 +83,16 @@ curl -X PUT 'http://134.158.243.139:20200/_snapshot/migrate_repo?pretty' \
     }
   }'
   
-curl -X GET 'http://134.158.243.139:20200/_snapshot/migrate_repo/move_2026_05_05?pretty'
+curl -X GET 'http://134.158.243.139:24499/_snapshot/migrate_repo/move_2026_05_05?pretty'
 
-curl -X POST 'http://134.158.243.139:20200/_snapshot/migrate_repo/move_2026_05_05/_restore?pretty' \
+curl -X POST 'http://134.158.243.139:24499/_snapshot/migrate_repo/move_2026_05_05/_restore?pretty' \
   -H 'Content-Type: application/json' \
   -d '{
     "indices": "dia_radec,dia_mjd,ss_radec,ss_mjd",
     "include_global_state": false
   }'
   
-curl -X GET 'http://134.158.243.139:20200/_cat/indices/dia_radec,dia_mjd,ss_radec,ss_mjd?v'
-curl -X GET 'http://134.158.243.139:20200/dia_mjd/_count?pretty'
+curl -X GET 'http://134.158.243.139:24499/_cat/indices/dia_radec,dia_mjd,ss_radec,ss_mjd?v'
+curl -X GET 'http://134.158.243.139:24499/dia_mjd/_count?pretty'
 
 --------------------------------------------------------------------------------

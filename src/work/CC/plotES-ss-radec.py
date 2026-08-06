@@ -4,7 +4,7 @@ import sys
 import requests
 import matplotlib.pyplot as plt
 
-ES_URL = "http://134.158.243.139:20200"
+ES_URL = "http://134.158.243.139:24499"
 INDEX = "ss_radec"
 FIELD = "location"
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     main()
     
 """
-curl -X GET 'http://134.158.243.139:20200/ss_radec/_search?pretty=true' \
+curl -X GET 'http://134.158.243.139:24499/ss_radec/_search?pretty=true' \
   -H 'Content-Type: application/json' \
   -d '{
     "query": {

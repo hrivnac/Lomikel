@@ -45,8 +45,8 @@ Do **not** use this skill for generic astronomy facts that do not need Fink data
 | Fink Portal | Interactive visual inspection; future browser workflows | `https://ztf.fink-portal.org`, `https://lsst.fink-portal.org` |
 | Fink docs | API, schema, migration, tutorials | `https://doc.ztf.fink-broker.org`, `https://doc.lsst.fink-broker.org` |
 | Fink broker site | Project/news/high-level docs | `https://fink-broker.org` |
-| LSST Elasticsearch | Low-level indexed LSST object documents | `http://134.158.243.139:20200` |
-| ZTF Elasticsearch | Low-level indexed ZTF object documents | `http://157.136.253.253:20200` |
+| LSST Elasticsearch | Low-level indexed LSST object documents | `http://134.158.243.139:24499` |
+| ZTF Elasticsearch | Low-level indexed ZTF object documents | `http://157.136.253.253:24499` |
 | JanusGraph / Gremlin | Graph relationships and graph analytics | Gremlin host currently seen as `134.158.243.144:24444`; direct Janus/HBase config below |
 | Lomikel docs/downloads | CLI and JanusGraph/HBase/ES tooling | `https://hrivnac.web.cern.ch/Activities/Packages/Lomikel/` |
 | Lomikel source | Source, examples, scripts | `https://github.com/hrivnac/Lomikel` |
@@ -126,8 +126,8 @@ For Hermes, use `web_search` and, when web extraction is available, fetch the ex
 Current Elasticsearch endpoints:
 
 ```text
-ZTF:  http://157.136.253.253:20200
-LSST: http://134.158.243.139:20200
+ZTF:  http://157.136.253.253:24499
+LSST: http://134.158.243.139:24499
 ```
 
 Important ZTF indexes:
@@ -160,7 +160,7 @@ Terminology:
 ### Quick checks
 
 ```bash
-ES=http://134.158.243.139:20200
+ES=http://134.158.243.139:24499
 curl -s "$ES/_cluster/health?pretty"
 curl -s "$ES/_cat/indices?v"
 curl -s "$ES/dia_radec/_count?pretty"
@@ -170,7 +170,7 @@ curl -s "$ES/dia_radec/_count?pretty"
 
 ```python
 import json, urllib.request
-ES = "http://134.158.243.139:20200"
+ES = "http://134.158.243.139:24499"
 for index in ["ss_radec", "dia_radec", "ss_mjd", "dia_mjd"]:
     with urllib.request.urlopen(f"{ES}/{index}/_count", timeout=60) as r:
         data = json.load(r)
@@ -184,7 +184,7 @@ Use scrolling for full-index scans; clear scroll IDs afterward.
 ```python
 import json, urllib.request
 
-ES = "http://134.158.243.139:20200"
+ES = "http://134.158.243.139:24499"
 SCROLL_TTL = "2m"
 PAGE_SIZE = 10000
 
@@ -315,7 +315,7 @@ Gremlin CORS port:      24445
 HBase/ZooKeeper host:   134.158.243.163
 HBase/ZooKeeper port:   2183
 JanusGraph HBase table: janusgraph1
-Elasticsearch hostname: 134.158.243.139:20200
+Elasticsearch hostname: 134.158.243.139:24499
 Backend HBase table:    ztf
 Backend HBase schema:   schema_0.7.0_0.3.8
 
@@ -326,7 +326,7 @@ Gremlin CORS port:      24445
 HBase/ZooKeeper host:   157.136.250.219
 HBase/ZooKeeper port:   2183
 JanusGraph HBase table: janusgraph1
-Elasticsearch hostname: 157.136.253.253:20200
+Elasticsearch hostname: 157.136.253.253:24499
 Backend HBase table:    ztf
 Backend HBase schema:   schema_0.7.0_0.3.8
 ```
@@ -349,7 +349,7 @@ cache.db-cache-time=180000
 cache.db-cache-size=0.5
 
 index.search.backend=elasticsearch
-index.search.hostname=134.158.243.139:20200
+index.search.hostname=134.158.243.139:24499
 index.search.elasticsearch.client-only=false
 index.search.elasticsearch.local-mode=true
 index.search.elasticsearch.bulk-refresh=true

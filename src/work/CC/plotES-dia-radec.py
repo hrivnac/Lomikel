@@ -5,7 +5,7 @@ import random
 import requests
 import matplotlib.pyplot as plt
 
-DEFAULT_ES_URL = "http://134.158.243.139:20200"
+DEFAULT_ES_URL = "http://134.158.243.139:24499"
 DEFAULT_INDEX = "dia_radec"
 DEFAULT_FIELD = "location"
 

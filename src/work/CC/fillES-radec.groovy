@@ -29,7 +29,7 @@ Logger log = LogManager.getLogger(this.class);
 
 public class PR extends ParquetReader {
 
-  ESClient esclient = new ESClient("http://134.158.243.139:20200");
+  ESClient esclient = new ESClient("http://134.158.243.139:24499");
   Logger log = LogManager.getLogger(this.class);
   Timer timer = new Timer("entries", 1000, 1);
 
