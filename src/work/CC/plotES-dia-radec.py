@@ -57,7 +57,8 @@ def parse_point(point):
 
 def es_search(es_url, index, body, scroll = None):
     url = f"{es_url}/{index}/_search"
-    params = {"-u":"elastic:elastic"}
+    params = {}
+    params["-u"] = "elastic:elastic"
     
     if scroll:
         params["scroll"] = scroll
