@@ -37,6 +37,7 @@ public class ESClient {
     log.info("Connection to " + url);
     _url = url;
     if (_auth == null) {
+      _auth = new HashMap<>();
       _auth.put("-u", "elastic:elastic");
       }
     }
