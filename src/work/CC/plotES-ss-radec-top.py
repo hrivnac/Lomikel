@@ -50,10 +50,10 @@ def parse_point(point):
 
 def es_search(es_url, index, body, scroll=None):
     url = f"{es_url}/{index}/_search"
-    params = {"-u":"elastic:elastic"}
+    params = {}
     if scroll:
         params["scroll"] = scroll
-    r = requests.post(url, params=params, json=body)
+    r = requests.post(url, params=params, json=body, headers={"-u":"elastic:elastic"})
     r.raise_for_status()
     return r.json()
 
