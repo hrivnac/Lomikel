@@ -1187,8 +1187,14 @@
     
     <target name="es-clean"
           description="Clean Elastic Search">
-    <echo>Stopping Elastic Search</echo>
+    <echo>Cleaning Elastic Search</echo>
     <exec executable="../src/sh/cleanES.sh"/>
+    </target>
+   
+    <target name="es-setup"
+          description="Setup Elastic Search">
+    <echo>Stopping Elastic Search</echo>
+    <exec executable="../src/sh/setupES.sh"/>
     </target>
    
   <!-- Init JanusGraph ======================================================-->

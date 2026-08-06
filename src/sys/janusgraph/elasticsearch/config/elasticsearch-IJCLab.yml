@@ -2,10 +2,21 @@
 path.data: ../db/es/data
 path.repo: backups
 path.logs: logs
-xpack.security.enabled: false
+xpack.security.enabled: true
 cluster.name: janus-graph-el
 http.port: 24499
 network.bind_host: 0.0.0.0
 network.publish_host: 157.136.253.253
 transport.host: 127.0.0.1
 http.host: 0.0.0.0
+# anonymous read access
+xpack.security.authc:
+  anonymous:
+    username: anonymous_reader
+    roles: general_read_only
+    authz_exception: true
+#xpack.security.http.filter.allow:
+#  - "10.20.0.0/16"
+#  - "192.168.10.15"
+#  - "192.168.10.16"
+#xpack.security.http.filter.deny: "_all"
