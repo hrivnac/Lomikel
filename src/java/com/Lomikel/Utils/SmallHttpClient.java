@@ -344,7 +344,7 @@ public class SmallHttpClient {
       int statusCode = statusLine.getStatusCode();
       if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
         throw new LomikelException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
-        }
+        } 
       else {
         if (header != null) {
           for (Header h : response.getHeaders(header)) {
