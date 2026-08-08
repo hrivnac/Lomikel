@@ -38,7 +38,7 @@ public class ESClient {
     _url = url;
     if (_auth == null) {
       _auth = new HashMap<>();
-      _auth.put("-u", "elastic:elastic");
+      _auth.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(CREDENTIALS.getBytes(StandardCharsets.UTF_8);
       }
     }
     
@@ -675,6 +675,8 @@ public class ESClient {
   private int _size= 10;
   
   private Map<String, String> _auth;
+  
+  private static String CREDENTIALS = "elastic:elastic";
    
   private ConcurrentMap<String, List<String>> _commands = new ConcurrentHashMap<>();
         

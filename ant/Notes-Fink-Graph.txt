@@ -7,9 +7,10 @@
 #   WS table and graph don't see difference between classifications
 
 # CURL
-curl -X POST -H "Content-Type: application/json" \
-  -d '{"gremlin": "g.V().count()"}' \
-  http://134.158.243.144:24444
+curl -X POST -H "Content-Type: application/json" -d '{"gremlin": "g.V().count()"}' http://134.158.243.144:24444
+curl -X POST -H "Content-Type: application/json" -d '{"gremlin": "g.V().count()"}' http://157.136.253.253:24444
+
+curl -X POST -H "Content-Type: application/json" -d '{"gremlin": "g.addV(\"y\").property(\"lbl\",\"y\").next()"}' http://157.136.253.253:24444
 
 
 # Filling
