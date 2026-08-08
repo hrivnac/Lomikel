@@ -40,7 +40,7 @@ public class ESClient {
     _url = url;
     if (_auth == null) {
       _auth = new HashMap<>();
-      _auth.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(CREDENTIALS.getBytes(StandardCharsets.UTF_8));
+      _auth.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(CREDENTIALS.getBytes(StandardCharsets.UTF_8)));
       }
     }
     
