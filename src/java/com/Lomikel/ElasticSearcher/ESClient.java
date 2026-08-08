@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -38,7 +40,7 @@ public class ESClient {
     _url = url;
     if (_auth == null) {
       _auth = new HashMap<>();
-      _auth.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(CREDENTIALS.getBytes(StandardCharsets.UTF_8);
+      _auth.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(CREDENTIALS.getBytes(StandardCharsets.UTF_8));
       }
     }
     
