@@ -10,6 +10,8 @@ DEFAULT_MJD_INDEX = "mjd"
 DEFAULT_LOCATION_FIELD = "location"
 DEFAULT_MJD_FIELD = "mjd"
 
+REQUEST_TIMEOUT = 120
+
 def normalize_locations(value):
     """
     Return a list of geo_point-like values from _source[field].
@@ -87,7 +89,7 @@ def es_search(es_url, index, body, scroll=None):
     if scroll:
         params["scroll"] = scroll
 
-    r = requests.post(url, params=params, json=body, headers={"-u":"elastic:elastic"})
+    r = requests.post(url, params=params, json=body, timeout=REQUEST_TIMEOUT)
     r.raise_for_status()
     return r.json()
 
@@ -99,23 +101,14 @@ def es_scroll(es_url, scroll_id, scroll="2m"):
         "scroll_id": scroll_id,
     }
 
-    r = requests.post(url, json=body)
+    r = requests.post(url, json=body, timeout=REQUEST_TIMEOUT)
     r.raise_for_status()
     return r.json()
 
 
-def es_clear_scroll(es_url, scroll_id):
-    if not scroll_id:
-        return
-
-    try:
-        requests.delete(
-            f"{es_url}/_search/scroll",
-            json={"scroll_id": [scroll_id]},
-            timeout=10,
-        )
-    except Exception:
-        pass
+def es_clear_scroll(_es_url, _scroll_id):
+    """Let the short scroll TTL expire; never send credentials over plaintext HTTP."""
+    return
 
 
 def find_last_dia_ids_by_mjd(es_url, mjd_index, mjd_field, n=100000, batch_size=2000):
@@ -222,7 +215,7 @@ def mget_radec_points(es_url, radec_index, location_field, mjd_id_pairs, chunk_s
         }
 
         url = f"{es_url}/{radec_index}/_mget"
-        r = requests.post(url, json=body)
+        r = requests.post(url, json=body, timeout=REQUEST_TIMEOUT)
 
         if not r.ok:
             print("Bad _mget request:")

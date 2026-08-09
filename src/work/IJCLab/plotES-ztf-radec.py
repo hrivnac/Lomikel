@@ -9,6 +9,8 @@ DEFAULT_ES_URL = "http://157.136.253.253:24499"
 DEFAULT_INDEX = "radec"
 DEFAULT_FIELD = "location"
 
+REQUEST_TIMEOUT = 120
+
 def normalize_locations(value):
     """
     Return a list of geo_point-like values from _source[field].
@@ -60,7 +62,7 @@ def es_search(es_url, index, body, scroll = None):
     params = {}
     if scroll:
         params["scroll"] = scroll
-    r = requests.post(url, params=params, json=body, headers={"-u":"elastic:elastic"})
+    r = requests.post(url, params=params, json=body, timeout=REQUEST_TIMEOUT)
     r.raise_for_status()
     return r.json()
 
@@ -70,21 +72,14 @@ def es_scroll(es_url, scroll_id, scroll = "2m"):
         "scroll": scroll,
         "scroll_id": scroll_id,
     }
-    r = requests.post(url, json = body)
+    r = requests.post(url, json=body, timeout=REQUEST_TIMEOUT)
     r.raise_for_status()
     return r.json()
 
-def es_clear_scroll(es_url, scroll_id):
-    if not scroll_id:
-        return
-    try:
-        requests.delete(
-            f"{es_url}/_search/scroll",
-            json={"scroll_id": [scroll_id]},
-            timeout = 10,
-        )
-    except Exception:
-        pass
+def es_clear_scroll(_es_url, _scroll_id):
+    """Let the short scroll TTL expire; never send credentials over plaintext HTTP."""
+    return
+
 
 def collect_all_points(es_url, index, field, batch_size=1000):
     """
