@@ -678,6 +678,7 @@ public class ESClient {
   
   private Map<String, String> _auth;
   
+  // TBD: it shoould not be hardwired here
   private static String CREDENTIALS = "elastic:elastic";
    
   private ConcurrentMap<String, List<String>> _commands = new ConcurrentHashMap<>();
