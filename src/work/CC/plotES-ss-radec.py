@@ -10,7 +10,7 @@ FIELD = "location"
 
 def get_document(ss_id):
     url = f"{ES_URL}/{INDEX}/_doc/{ss_id}"
-    r = requests.get(url, headers={"-u":"elastic:elastic"})
+    r = requests.get(url, timeout=60)
     r.raise_for_status()
     data = r.json()
     if not data.get("found", False):
@@ -60,13 +60,9 @@ def main():
     if not points:
         raise RuntimeError(f"No points found in field '{FIELD}' for {ss_id}")
     ra_values = [p[0] for p in points]
-
-dec_values = [p[1] for p in points]
-    plt.figure(figsize = (8, 5))
-    pl
-    
-t.scatter(ra_values, dec_values, s = 10
-      )
+    dec_values = [p[1] for p in points]
+    plt.figure(figsize=(8, 5))
+    plt.scatter(ra_values, dec_values, s=10)
     plt.xlabel("ra [deg]")
     plt.ylabel("dec [deg]")
     plt.title(f"ra/dec points for ss object {ss_id}")
@@ -74,25 +70,7 @@ t.scatter(ra_values, dec_values, s = 10
     # Optional astronomical convention: RA increases to the left.
     plt.gca().invert_xaxis()
     plt.tight_layout()
-    #plt.show()
     plt.savefig(f"{ss_id}.png", dpi=300)
 
 if __name__ == "__main__":
     main()
-    
-"""
-curl -X GET 'http://134.158.243.139:24499/ss_radec/_search?pretty=true' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "script": {
-        "script": {
-          "lang":
-          ainless",
-          "source": "doc[\"location\"].size() > 50
-
-
-}
-          }
-}'cp almalinux@134.158.243.139:/home/almalinux/tmp/21163611875234.png ./
-"""
