@@ -2,7 +2,6 @@ package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Januser.ModifyingGremlinClient;
 import com.Lomikel.Januser.GremlinRecipies;
-import com.Lomikel.Phoenixer.PhoenixProxyClient;
 import com.Lomikel.HBaser.HBaseClient;
 
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;

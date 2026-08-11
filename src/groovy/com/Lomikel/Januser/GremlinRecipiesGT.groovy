@@ -1,7 +1,6 @@
 package com.Lomikel.Januser;
 
 import com.Lomikel.HBaser.HBaseClient
-import com.Lomikel.Phoenixer.PhoenixProxyClient
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -246,7 +245,6 @@ trait GremlinRecipiesGT {
   /** Give data associated with <em>datalink</em> {@link Vertex}.
     * The <em>datalink</em>s can be created like this:
     * <pre>
-    * w = g.addV().property('lbl', 'datalink').property('technology', 'Phoenix').property('url', 'jdbc:phoenix:ithdp2101.cern.ch:2181'      ).property('query', "select * from AEI.CANONICAL_0 where project = 'mc16_13TeV'").next()
     * w = g.addV().property('lbl', 'datalink').property('technology', 'Graph'  ).property('url', 'hbase:188.184.87.217:8182:janusgraph'     ).property('query', "g.V().limit(1)").next()
     * w = g.addV().property('lbl', 'datalink').property('technology', 'HBase'  ).property('url', '157.136.250.219:2183:ztf:schema'            ).property('query', "client.setLimit(10); return client.scan(null, null, null, 0, false, false)").next()
     * </pre>
@@ -283,10 +281,6 @@ trait GremlinRecipiesGT {
                                         set('storage.hbase.table', table   ).
                                         open();
           return Eval.me('g', g(), query);
-          break
-        case 'Phoenix':
-          return Sql.newInstance(url, 'org.apache.phoenix.jdbc.PhoenixDriver').
-                     rows(query);
           break
         default:
           return 'DataLink ' + v + ' unknown';

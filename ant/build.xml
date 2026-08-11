@@ -45,14 +45,6 @@
     <path refid="classpath.build"/>
     </path>
     
-  <path id="classpath_phoenix.run">
-    <pathelement path="${groovy_jar}"/>
-    <pathelement path="${groovy_sql_jar}"/>
-    <pathelement path="${hadoop_phoenix_conf}"/>
-    <pathelement path="${hbase_phoenix_conf}"/>
-    <!--path refid="classpath.build"/-->
-    </path>
-
   <path id="classpath.groovy">
     <fileset dir="${groovy_dir}/lib" includes="*.jar" excludes="groovy-ant-*.jar"/>
     </path>    
@@ -83,7 +75,6 @@
 
   <property name="classpath.build.content"       refid="classpath.build"/>
   <property name="classpath.run.content"         refid="classpath.run"/>
-  <property name="classpath_phoenix.run.content" refid="classpath_phoenix.run"/>
 
   <taskdef name="groovy"
            classname="org.codehaus.groovy.ant.Groovy"> 
@@ -288,9 +279,6 @@
       <fileset dir="../src/groovy" includes="*.groovy"/>
       <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
         <provider classname="com.Lomikel.GremlinPlugin.LomikelConnector"/>
-        </service>
-      <service type="java.sql.Driver">
-        <provider classname="org.apache.phoenix.jdbc.PhoenixDriver"/>
         </service>
      <manifest>
         <attribute name="Created-By" value="${user.name}"/>
@@ -1092,9 +1080,6 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.HBASE.SCHEMA@"           value="${hbase_schema}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.HBASE.PORT@"             value="${hbase_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.ROWKEY.NAME@"            value="${rowkey_name}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.PHOENIX.URL@"            value="${phoenix_url}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@EVENTS.TABLE@"                   value="${events_table}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@EVENTS.SCHEMA@"                  value="${events_schema}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@ELASTICSEARCH.HOSTNAME@"         value="${elasticsearch_hostname}"/>
@@ -1402,19 +1387,7 @@
         </classpath>
       </java>
     </target>
-    
-  <target name="check-phoenix"
-          description="Check Phoenix using Groovy">
-    <echo>Check Phoenix using Groovy</echo>
-    <groovy>
-      <fileset file="../src/groovy/testPhoenix.groovy"/>
-      <classpath>
-        <path refid="classpath_phoenix.run"/>
-        <pathelement location="${groovy_sql_jar}"/>
-        </classpath>
-      </groovy>
-    </target>
-  
+      
   <!-- JavaDoc ==============================================================-->
 
   <target name="doc"
@@ -1470,7 +1443,6 @@
       <group title="HBaser"             packages="com.Lomikel.HBaser*"/>
       <group title="Januser"            packages="com.Lomikel.Januser*"/>
       <group title="ElasticSearcher"    packages="com.Lomikel.ElasticSearcher*"/>
-      <group title="Phoenixer"          packages="com.Lomikel.Phoenixer*"/>
       <group title="Livyser"            packages="com.Lomikel.Livyser*"/>
       <group title="Graph"              packages="com.Lomikel.Graph*"/>
       <group title="Utils"              packages="com.Lomikel.Utils*"/>

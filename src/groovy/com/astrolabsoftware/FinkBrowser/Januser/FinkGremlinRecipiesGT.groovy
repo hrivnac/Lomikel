@@ -3,7 +3,6 @@ package com.astrolabsoftware.FinkBrowser.Januser;
 import com.Lomikel.Januser.ModifyingGremlinClient;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.GremlinRecipiesGT;
-import com.Lomikel.Phoenixer.PhoenixProxyClient;
 import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Utils.Metrics;
 import static com.Lomikel.Utils.Constants.π;

@@ -579,9 +579,9 @@ public abstract class Client<T, S extends Schema> {
     return _representations;
     }
     
-  /** Give Graph property name derived from the Phoenix column name.
+  /** Give Graph property name derived from the column name.
     * It uses {@link Schema#reMap}.
-    * @param name The Phoenix column name.
+    * @param name The column name.
     * @return     The correspinding Graph name. */
   public String rename(String name) {
     if (_schema.reMap() != null && _schema.reMap().containsKey(name)) {
