@@ -1081,10 +1081,6 @@
 			<fileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="*"/>
       </copy>                                                                
     <copy file="../src/sys/janusgraph/elasticsearch/config/elasticsearch-${site}.yml" tofile="${janusgraph_dir}/elasticsearch/config/elasticsearch.yml" overwrite="true"/>
-    <replace file="${janusgraph_dir}/conf/Local.yaml"                            token="@SERVER.HOST@"                    value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/Local.yaml"                            token="@SERVER.PORT@"                    value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/LocalCORS.yaml"                        token="@SERVER.HOST@"                    value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/LocalCORS.yaml"                        token="@SERVER.PORT.CORS@"               value="${gremlin_port_cors}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"             token="@SERVER.HOST@"                    value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"             token="@SERVER.PORT@"                    value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"         token="@SERVER.HOST@"                    value="${gremlin_host}"/>
