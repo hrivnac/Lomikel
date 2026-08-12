@@ -71,4 +71,4 @@ gr.generateCorrelations(classifiers);
 //client.stop();
 
 // BUG: why doesn't work in thread ?
-NotifierURL.notifyExecution("importTags-ZTF", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));
+NotifierURL.notifyExecution("importTags-ZTF", "Lomikel", Info.release(), timer.info("" + delay);
