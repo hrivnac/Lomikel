@@ -84,7 +84,7 @@ public class AsynchHBaseClient extends    HBaseClient
     catch (InterruptedException e) {
       _doscan = false;
       _scanning = false;
-      log.warn("Asynchronous scan interrupted", e);
+      log.info("Asynchronous scan interrupted");
       }
     catch (Exception e) {
       _doscan = false;
