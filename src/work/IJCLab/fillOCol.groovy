@@ -3,6 +3,8 @@ import com.Lomikel.Januser.JanusClient;
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;
 import com.astrolabsoftware.FinkBrowser.Januser.Classifier;
 import com.Lomikel.Utils.Timer;
+import com.Lomikel.Utils.NotifierURL;
+import com.Lomikel.Utils.Info;
 
 // Log
 import org.apache.logging.log4j.Logger;
@@ -69,5 +71,4 @@ gr.generateCorrelations(classifiers);
 //client.stop();
 
 // BUG: why doesn't work in thread ?
-NotifierURL.notifyExecution("importTags-ZTF", "Lomikel", Info.release(), "cls[delay] = " + cls + "[" + delay + "]: ");
-
+NotifierURL.notifyExecution("importTags-ZTF", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));
