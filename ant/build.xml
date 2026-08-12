@@ -1426,7 +1426,7 @@
              use="true"
              private="true"
              additionalparam=" -linksource -breakiterator -keywords -author -version"
-             source="11"
+             source="17"
              Overview="../src/java/com/Lomikel/overview.html"
              windowtitle="Lomikel">
       <doclet name="nl.talsmasoftware.umldoclet.UMLDoclet" pathref="umlDoclet.classpath">
