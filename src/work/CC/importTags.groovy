@@ -28,7 +28,7 @@ catch (MissingPropertyException e) {
   delay = 2
   }
                     
-jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CCRW.properties");
 gr = new FinkGremlinRecipiesG(jc);
   
 log.info("Importing NewTags for " + cls + " within last " + delay + " days");

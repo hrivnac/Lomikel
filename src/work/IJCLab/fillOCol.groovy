@@ -22,7 +22,7 @@ client.setMaxQueueSize(100);
 client.connect("ztf", "schema_3.1_5.6.2");
 //client.setLimit(20000);
 
-jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLab.properties")
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/IJCLabRW.properties")
 gr = new FinkGremlinRecipiesG(jc)
 
 classifiers = new Classifier[]{Classifier.instance('FINK',        'ZTF', ''          )//,

@@ -49,7 +49,7 @@ catch (MissingPropertyException e) {
   ntags = 100000
   }
 
-jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties")
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CCRW.properties")
 gr = new FinkGremlinRecipiesG(jc)
 g = gr.g()
 graph = g.getGraph()
