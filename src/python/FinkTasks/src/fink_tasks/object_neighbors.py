@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Find LSST/Fink objects nearest in classifier and sky distance."""
 
 from __future__ import annotations
