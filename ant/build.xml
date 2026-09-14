@@ -1387,6 +1387,25 @@
         </classpath>
       </java>
     </target>
+    
+  <target name="check-fink-tasks"
+          description="Check Python Fink Tasks">
+    <echo>Check Python Fink Tasks</echo>
+    <echo>most_points.py --allow-insecure-es --object-type ss --lightcurves</echo>
+    <exec executable="../src/python/FinkTasks/src/fink_tasks/most_points.py">
+      <arg value="--allow-insecure-es"/>
+      <arg value="--object-type"/>
+      <arg value="ss"/>
+      <arg value="--lightcurves"/>
+      </exec>
+    <echo>object_neighbors.py 170028486134595648 --allow-insecure-graph --columns r:g_psfFluxMax,r:nDiaSources</echo>
+    <exec executable="../src/python/FinkTasks/src/fink_tasks/object_neighbors.py">
+      <arg value="170028486134595648"/>
+      <arg value="--allow-insecure-graph"/>
+      <arg value="--columns"/>
+      <arg value="r:g_psfFluxMax,r:nDiaSources"/>
+      </exec>
+    </target>
       
   <!-- JavaDoc ==============================================================-->
 
