@@ -39,6 +39,29 @@ function raDecToXY(ra, dec) {
     };
   }
 
+function forEachWrappedScreenPosition(position, padding, callback, data1, data2) {
+  const period = canvas.width * camera.currentZoom;
+  if (!(period > 0)) {
+    callback(position.x, position.y, data1, data2);
+    return;
+    }
+  const firstCopy = Math.ceil((-padding - position.x) / period);
+  const lastCopy = Math.floor((canvas.width + padding - position.x) / period);
+  for (let copy = firstCopy; copy <= lastCopy; copy++) {
+    callback(position.x + copy * period, position.y, data1, data2);
+    }
+  }
+
+function getWrappedScreenPositions(position, padding = 0) {
+  const positions = [];
+  forEachWrappedScreenPosition(
+    position,
+    padding,
+    (x, y) => positions.push({...position, x, y})
+    );
+  return positions;
+  }
+
 function splitProjectedPolyline(points, viewportWidth) {
   const segments = [];
   let segment = [];

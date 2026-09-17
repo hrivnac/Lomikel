@@ -77,7 +77,9 @@ function drawEclipticMonths() {
   ctx.textAlign = "center";
   staticSkyGeometry.eclipticMonths.forEach(({month, ra, dec}) => {
     const pos = raDecToXY(ra, dec);
-    ctx.fillText(month, pos.x, pos.y);
+    for (const wrappedPosition of getWrappedScreenPositions(pos, 20)) {
+      ctx.fillText(month, wrappedPosition.x, wrappedPosition.y);
+      }
     });
   ctx.restore();
   }  
@@ -103,6 +105,17 @@ function drawProjectedPolyline(points) {
   }
 
 // Draw Stars
+function drawCatalogStarAt(x, y, star, radius) {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.font = "10px sans-serif";
+  ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+  if (star.r > 2.5) {
+    ctx.fillText(star.proper, x + 5, y - 5);
+    }
+  ctx.fill();
+  }
+
 function drawStars() {
   for (const s of stars) {
     const pos = raDecToXY(s.ra, s.dec);
@@ -110,14 +123,8 @@ function drawStars() {
       s.alpha += s.twinkleSpeed * (Math.random() < 0.5 ? 1 : -1);
       s.alpha = Math.max(0.3, Math.min(1, s.alpha));
       }
-    ctx.beginPath();
-    ctx.arc(pos.x, pos.y, s.r * camera.currentZoom, 0, Math.PI * 2);
-    ctx.font = "10px sans-serif";
-    ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-    if (s.r > 2.5) {
-      ctx.fillText(s.proper, pos.x + 5, pos.y - 5);
-      }
-    ctx.fill();
+    const radius = s.r * camera.currentZoom;
+    forEachWrappedScreenPosition(pos, radius + 100, drawCatalogStarAt, s, radius);
     }
   }
   
@@ -171,7 +178,9 @@ function drawConstellationLabels() {
     const avgRA = sumRA / points.length;
     const avgDec = sumDec / points.length;
     const pos = raDecToXY(avgRA, avgDec);
-    ctx.fillText(name, pos.x, pos.y);
+    for (const wrappedPosition of getWrappedScreenPositions(pos, 100)) {
+      ctx.fillText(name, wrappedPosition.x, wrappedPosition.y);
+      }
     });
     ctx.restore();
     }

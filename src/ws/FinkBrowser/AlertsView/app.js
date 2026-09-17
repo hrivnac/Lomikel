@@ -63,22 +63,27 @@ class Flash {
         });
       if (this.trail.length > 15) this.trail.shift();
       for (const trailPoint of this.trail) {
-        drawStar(
-          trailPoint.x,
-          trailPoint.y,
-          trailPoint.radius,
-          this.color,
-          trailPoint.alpha * 0.2,
-          trailPoint.sparklePhase,
-          this.spikes,
-          true
-          );
+        for (const wrappedTrailPoint of getWrappedScreenPositions(trailPoint, trailPoint.radius)) {
+          drawStar(
+            wrappedTrailPoint.x,
+            wrappedTrailPoint.y,
+            wrappedTrailPoint.radius,
+            this.color,
+            wrappedTrailPoint.alpha * 0.2,
+            wrappedTrailPoint.sparklePhase,
+            this.spikes,
+            true
+            );
+          }
         }
       }
-    drawStar(pos.x, pos.y, this.radius, this.color, this.alpha, this.sparklePhase, this.spikes, !prefersReducedMotion);
-    ctx.font = "bold 14px sans-serif";
-    ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
-    ctx.fillText(String(this.alert.objectId), pos.x + this.radius + 5, pos.y - this.radius - 5);
+    this.positions = getWrappedScreenPositions(pos, this.radius + 160);
+    for (const wrappedPosition of this.positions) {
+      drawStar(wrappedPosition.x, wrappedPosition.y, this.radius, this.color, this.alpha, this.sparklePhase, this.spikes, !prefersReducedMotion);
+      ctx.font = "bold 14px sans-serif";
+      ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
+      ctx.fillText(String(this.alert.objectId), wrappedPosition.x + this.radius + 5, wrappedPosition.y - this.radius - 5);
+      }
     this.pos = pos;
     return true;
     }
@@ -174,12 +179,23 @@ function updateCamera() {
   camera.targetZoom = Math.min(8, Math.max(1, 0.5 / span));
   }
 
+function getMaxZoomToKeepAlertsVisible(activeFlashes, centerRa) {
+  let largestRaDistance = 0;
+  for (const flash of activeFlashes) {
+    largestRaDistance = Math.max(largestRaDistance, Math.abs(signedRaDelta(flash.alert.ra, centerRa)));
+    }
+  if (largestRaDistance === 0) return Infinity;
+  return Math.max(1, 180 / largestRaDistance);
+  }
+
 function smoothCamera() {
   const amount = prefersReducedMotion ? 1 : 0.05;
   const lerp = (a, b, t) => a + (b - a) * t;
   camera.currentCenter.ra = interpolateRa(camera.currentCenter.ra, camera.targetCenter.ra, amount);
   camera.currentCenter.dec = lerp(camera.currentCenter.dec, camera.targetCenter.dec, amount);
-  camera.currentZoom = lerp(camera.currentZoom, camera.targetZoom, amount);
+  const smoothZoom = lerp(camera.currentZoom, camera.targetZoom, amount);
+  const visibleZoom = getMaxZoomToKeepAlertsVisible(flashes, camera.currentCenter.ra);
+  camera.currentZoom = Math.min(smoothZoom, visibleZoom);
   }
 
 // Overview Map
@@ -221,11 +237,13 @@ function findFlashAt(clientX, clientY) {
   const y = (clientY - bounds.top) * canvas.height / bounds.height;
   for (let i = flashes.length - 1; i >= 0; i--) {
     const flash = flashes[i];
-    if (!flash.pos) continue;
-    const dx = flash.pos.x - x;
-    const dy = flash.pos.y - y;
-    const radius = flash.radius + 14;
-    if (dx * dx + dy * dy <= radius * radius) return flash;
+    const positions = flash.positions || (flash.pos ? [flash.pos] : []);
+    for (const position of positions) {
+      const dx = position.x - x;
+      const dy = position.y - y;
+      const radius = flash.radius + 14;
+      if (dx * dx + dy * dy <= radius * radius) return flash;
+      }
     }
   return null;
   }
