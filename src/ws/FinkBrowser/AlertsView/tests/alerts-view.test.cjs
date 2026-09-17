@@ -40,6 +40,24 @@ test("sky projection uses one wrapped right-to-left RA convention", () => {
   assert.equal(context.raDecToXY(170, 0).x, 1900);
 });
 
+test("screen positions repeat across the horizontal sky boundary", () => {
+  const context = loadUtils({
+    canvas: {width: 1200, height: 600},
+    camera: {currentCenter: {ra: 180, dec: 0}, currentZoom: 1},
+  });
+  const positions = context.getWrappedScreenPositions({x: 1200, y: 300}, 20);
+  const visited = [];
+  context.forEachWrappedScreenPosition(
+    {x: 1200, y: 300},
+    20,
+    (x, y) => visited.push([x, y]),
+  );
+
+  assert.deepEqual(Array.from(positions, point => point.x), [0, 1200]);
+  assert.equal(positions.every(point => point.y === 300), true);
+  assert.deepEqual(visited, [[0, 300], [1200, 300]]);
+});
+
 test("circular RA bounds keep a seam-crossing group compact", () => {
   const context = loadUtils();
   const bounds = context.getCircularRaBounds([359, 1]);
@@ -166,6 +184,24 @@ test("reduced-motion stars do not sparkle between frames", () => {
   assert.deepEqual(points, firstFrame);
 });
 
+test("background stars repeat across the horizontal sky boundary", () => {
+  const arcs = [];
+  const noop = () => {};
+  const context = loadDrawing({
+    prefersReducedMotion: true,
+    stars: [{ra: 0, dec: 0, r: 2, proper: "Boundary", alpha: 1, twinkleSpeed: 0}],
+    ctx: {
+      arc: (x, y) => arcs.push([x, y]),
+      beginPath: noop, fill: noop, fillText: noop,
+    },
+    canvas: {width: 1200, height: 600},
+    camera: {currentCenter: {ra: 180, dec: 0}, currentZoom: 1},
+  });
+
+  vm.runInContext("drawStars();", context);
+  assert.deepEqual(Array.from(arcs, point => point[0]), [0, 1200]);
+});
+
 test("legend DOM is rebuilt only when the active classes change", () => {
   let replacements = 0;
   const legend = {
@@ -190,7 +226,7 @@ test("legend DOM is rebuilt only when the active classes change", () => {
   assert.equal(legend.children.length, 2);
 });
 
-function loadAppForInteraction() {
+function loadAppForInteraction({withUtils = false} = {}) {
   const noop = () => {};
   const listeners = new Map();
   const timers = new Map();
@@ -227,7 +263,7 @@ function loadAppForInteraction() {
   elements.get("overview").width = 200;
   elements.get("overview").height = 100;
   const context = {
-    Math, Date,
+    Math, Date, URLSearchParams,
     alertsPool: [], classes: {},
     clearTimeout: id => timers.delete(id),
     document: {
@@ -240,6 +276,7 @@ function loadAppForInteraction() {
     drawEclipticMonths: noop, drawGalacticPlane: noop, drawOverview: noop,
     drawStar: noop, drawStars: noop, getCircularRaBounds: () => ({center: 0, span: 0}),
     interpolateRa: (a, b) => b, normalizeRa: value => value,
+    signedRaDelta: (ra, center) => ((ra - center + 540) % 360) - 180,
     raDecToXY: () => ({x: 0, y: 0}), requestAnimationFrame: noop,
     setTimeout(callback, delay) {
       const id = nextTimerId++;
@@ -251,10 +288,14 @@ function loadAppForInteraction() {
       addEventListener: noop,
       innerHeight: 600,
       innerWidth: 1200,
+      location: {search: ""},
       matchMedia: () => ({matches: false}),
     },
   };
   vm.createContext(context);
+  if (withUtils) {
+    vm.runInContext(fs.readFileSync(path.join(alertsView, "utils.js"), "utf8"), context, {filename: "utils.js"});
+  }
   vm.runInContext(fs.readFileSync(path.join(alertsView, "app.js"), "utf8"), context, {filename: "app.js"});
   const runTimersAtDelay = delay => {
     const due = [...timers.entries()].filter(([, timer]) => timer.delay === delay);
@@ -275,6 +316,77 @@ test("view and help controls expose their state to keyboard and assistive techno
   vm.runInContext("toggleHelp();", context);
   assert.equal(elements.get("logo-help").hidden, false);
   assert.equal(elements.get("helpButton").getAttribute("aria-expanded"), "true");
+});
+
+test("camera zooms out before crossing the RA seam so all active alerts stay visible", () => {
+  const {context} = loadAppForInteraction();
+  const positions = vm.runInContext(`(() => {
+    interpolateRa = (current, target, amount) => ((current + ((((target - current) % 360) + 540) % 360 - 180) * amount) % 360 + 360) % 360;
+    raDecToXY = (ra, dec) => {
+      const dx = (((ra - camera.currentCenter.ra) % 360) + 540) % 360 - 180;
+      return {
+        x: canvas.width / 2 - dx / 360 * canvas.width * camera.currentZoom,
+        y: canvas.height / 2 - (dec - camera.currentCenter.dec) / 180 * canvas.height * camera.currentZoom
+      };
+    };
+    flashes = [
+      {alert: {ra: 359, dec: 0}},
+      {alert: {ra: 1, dec: 0}}
+    ];
+    camera.currentCenter = {ra: 180, dec: 0};
+    camera.targetCenter = {ra: 0, dec: 0};
+    camera.currentZoom = 8;
+    camera.targetZoom = 8;
+    smoothCamera();
+    return flashes.map(flash => raDecToXY(flash.alert.ra, flash.alert.dec).x);
+  })()`, context);
+
+  assert.equal(positions.every(x => x >= 0 && x <= context.window.innerWidth), true);
+});
+
+test("alert markers draw and hit-test on both sides of the horizontal boundary", () => {
+  const {context} = loadAppForInteraction();
+  const result = vm.runInContext(`(() => {
+    raDecToXY = () => ({x: canvas.width, y: 300});
+    getWrappedScreenPositions = (position, padding) => [
+      {...position, x: 0},
+      position
+    ];
+    const flash = new Flash({survey: "ZTF", ra: 0, dec: 0, class: "SN candidate", objectId: "wrapped", jd: 1});
+    flash.startTime = Date.now() - 1000;
+    flash.draw();
+    flashes = [flash];
+    return {
+      xs: flash.positions.map(position => position.x),
+      hitLeft: findFlashAt(0, 300) === flash,
+      hitRight: findFlashAt(canvas.width, 300) === flash
+    };
+  })()`, context);
+
+  assert.deepEqual(Array.from(result.xs), [0, 1200]);
+  assert.equal(result.hitLeft, true);
+  assert.equal(result.hitRight, true);
+});
+
+test("Flash uses the real wrap helper for drawing and hit-testing", () => {
+  const {context} = loadAppForInteraction({withUtils: true});
+  const result = vm.runInContext(`(() => {
+    camera.currentCenter = {ra: 180, dec: 0};
+    camera.currentZoom = 1;
+    const flash = new Flash({survey: "ZTF", ra: 0, dec: 0, class: "SN candidate", objectId: "integrated", jd: 1});
+    flash.startTime = Date.now() - 1000;
+    flash.draw();
+    flashes = [flash];
+    return {
+      xs: flash.positions.map(position => position.x),
+      hitLeft: findFlashAt(0, canvas.height / 2) === flash,
+      hitRight: findFlashAt(canvas.width, canvas.height / 2) === flash
+    };
+  })()`, context);
+
+  assert.deepEqual(Array.from(result.xs), [0, 1200]);
+  assert.equal(result.hitLeft, true);
+  assert.equal(result.hitRight, true);
 });
 
 test("pointer can move from a sky marker into the tooltip without hiding it", () => {
