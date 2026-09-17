@@ -92,6 +92,16 @@ function getStartDateParam() {
   getQueryParams();
   return formatStartDateUtc(fetchStart);
   }
+
+function getPortalUrl(alert) {
+  const portalOrigins = {
+    ZTF: "https://ztf.fink-portal.org/",
+    LSST: "https://lsst.fink-portal.org/"
+    };
+  const origin = portalOrigins[alert.survey];
+  if (!origin || alert.objectId === undefined || alert.objectId === null) return null;
+  return origin + encodeURIComponent(String(alert.objectId));
+  }
   
 function getQueryParams() {
   const params = new URLSearchParams(window.location.search);
