@@ -1,19 +1,57 @@
-// ra*dec to x*
-function raDecToXY(ra, dec, renorm = false) {
-  if (renorm) {
-    if (ra < 0) {
-      ra = -ra;
-      }
-    else {
-      ra = 360 - ra;
+// Keep all layers in physical RA and reverse only the screen direction.
+function normalizeRa(ra) {
+  return ((Number(ra) % 360) + 360) % 360;
+  }
+
+function signedRaDelta(ra, center) {
+  return ((normalizeRa(ra) - normalizeRa(center) + 540) % 360) - 180;
+  }
+
+function getCircularRaBounds(ras) {
+  const values = ras.map(normalizeRa).sort((a, b) => a - b);
+  if (values.length === 0) return null;
+  if (values.length === 1) return {center: values[0], span: 0};
+  let largestGap = -1;
+  let largestGapIndex = -1;
+  for (let i = 0; i < values.length; i++) {
+    const next = (i + 1 < values.length) ? values[i + 1] : values[0] + 360;
+    const gap = next - values[i];
+    if (gap > largestGap) {
+      largestGap = gap;
+      largestGapIndex = i;
       }
     }
-  const dx = (ra - camera.currentCenter.ra) / 360;
+  const start = values[(largestGapIndex + 1) % values.length];
+  const span = 360 - largestGap;
+  return {center: normalizeRa(start + span / 2), span};
+  }
+
+function interpolateRa(current, target, amount) {
+  return normalizeRa(current + signedRaDelta(target, current) * amount);
+  }
+
+function raDecToXY(ra, dec) {
+  const dx = signedRaDelta(ra, camera.currentCenter.ra) / 360;
   const dy = (dec - camera.currentCenter.dec) / 180;
   return {
-    x: canvas.width / 2 + dx * canvas.width * camera.currentZoom,
+    x: canvas.width / 2 - dx * canvas.width * camera.currentZoom,
     y: canvas.height / 2 - dy * canvas.height * camera.currentZoom
     };
+  }
+
+function splitProjectedPolyline(points, viewportWidth) {
+  const segments = [];
+  let segment = [];
+  for (const point of points) {
+    const previous = segment[segment.length - 1];
+    if (previous && Math.abs(point.x - previous.x) >= viewportWidth / 2) {
+      segments.push(segment);
+      segment = [];
+      }
+    segment.push(point);
+    }
+  if (segment.length > 0) segments.push(segment);
+  return segments;
   }
 
 function galacticToEquatorial(lDeg, bDeg) {
@@ -45,27 +83,30 @@ function eclipticToEquatorial(lambdaDeg) {
     };
   }
 
+function formatStartDateUtc(hours, now = new Date()) {
+  const past = new Date(now.getTime() - hours * 60 * 60 * 1000);
+  return past.toISOString().slice(0, 19).replace('T', ' ');
+  }
+
 function getStartDateParam() {
   getQueryParams();
-  const now = new Date();
-  const past = new Date(now.getTime() - fetchStart * 60 * 60 * 1000);
-  const yyyy = past.getFullYear();
-  const mm = String(past.getMonth() + 1).padStart(2, '0');
-  const dd = String(past.getDate()).padStart(2, '0');
-  const HH = String(past.getHours()).padStart(2, '0');
-  const MM = String(past.getMinutes()).padStart(2, '0');
-  const SS = String(past.getSeconds()).padStart(2, '0');
-  // format: YYYY-MM-DD HH:MM:SS
-  const formatted = `${yyyy}-${mm}-${dd} ${HH}:${MM}:${SS}`;
-  return formatted;
+  return formatStartDateUtc(fetchStart);
   }
   
 function getQueryParams() {
   const params = new URLSearchParams(window.location.search);
-  fetchPeriod = parseInt(params.get("fetchPeriod")) || fetchPeriod;
-  fetchStart  = parseInt(params.get("fetchStart"))  || fetchStart;
-  nAlerts     = parseInt(params.get("nAlerts"))     || nAlerts;
-  magMax      = parseInt(params.get("magMax"))      || magMax;
+  const boundedInt = (name, current, minimum, maximum) => {
+    const value = Number.parseInt(params.get(name), 10);
+    return Number.isFinite(value) ? Math.min(maximum, Math.max(minimum, value)) : current;
+    };
+  fetchPeriod = boundedInt("fetchPeriod", fetchPeriod, 1, 1440);
+  fetchStart  = boundedInt("fetchStart",  fetchStart,  1, 720);
+  nAlerts     = boundedInt("nAlerts",     nAlerts,     1, 100);
+  magMax      = boundedInt("magMax",      magMax,     -2, 6);
+  const lsstParam = params.get("fetchLSST");
+  if (lsstParam !== null) {
+    fetchLSST = ["1", "true", "yes"].includes(lsstParam.toLowerCase());
+    }
   }
   
   
