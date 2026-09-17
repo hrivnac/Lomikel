@@ -30,22 +30,16 @@ function generateEclipticPoints(nPoints = 360) {
     let ra = alpha * 180 / Math.PI;
     if (ra < 0) ra += 360;
     const dec = delta * 180 / Math.PI;
-    points.push([ra, -dec]);
+    points.push([ra, dec]);
     }
   return points;
   }  
 function drawEcliptic() {
-  const points = generateEclipticPoints(360);
+  const points = generateEclipticPoints(360).map(([ra, dec]) => raDecToXY(ra, dec));
   ctx.save();
   ctx.strokeStyle = "rgb(200,200,100,0.5)";
   ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  points.forEach(([ra, dec], idx) => {
-    const p = raDecToXY(ra, dec);
-    if (idx === 0) ctx.moveTo(p.x, p.y);
-    else ctx.lineTo(p.x, p.y);
-    });
-  ctx.stroke();
+  drawProjectedPolyline(points);
   ctx.restore();
   }
   
@@ -59,7 +53,7 @@ function drawEclipticMonths() {
   months.forEach((month, i) => {
     const lambda = 25 + i * 30; // 30° per month
     const {ra, dec} = eclipticToEquatorial(lambda);
-    const pos = raDecToXY(ra, -dec);
+    const pos = raDecToXY(ra, dec);
     ctx.fillText(month, pos.x, pos.y);
     });
   ctx.restore();
@@ -71,24 +65,29 @@ function drawGalacticPlane() {
   const step = 1; // 1° step in l
   for (let l = 0; l <= 360; l += step) {
     const {ra, dec} = galacticToEquatorial(l, 0);
-    points.push(raDecToXY(360 - ra, dec));
+    points.push(raDecToXY(ra, dec));
     }
   ctx.save();
   ctx.strokeStyle = "rgba(100,200,200,0.5)";
   ctx.lineWidth = 2;
-  ctx.beginPath();
-  points.forEach((p, i) => {
-    if (i === 117) ctx.moveTo(p.x, p.y);
-    else ctx.lineTo(p.x, p.y);
-    });
-  ctx.stroke();
+  drawProjectedPolyline(points);
   ctx.restore();
+  }
+
+function drawProjectedPolyline(points) {
+  for (const segment of splitProjectedPolyline(points, canvas.width)) {
+    if (segment.length < 2) continue;
+    ctx.beginPath();
+    ctx.moveTo(segment[0].x, segment[0].y);
+    for (const point of segment.slice(1)) ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+    }
   }
 
 // Draw Stars
 function drawStars() {
   for (const s of stars) {
-    const pos = raDecToXY(360 - s.ra, s.dec);
+    const pos = raDecToXY(s.ra, s.dec);
     s.alpha += s.twinkleSpeed * (Math.random() < 0.5 ? 1 : -1);
     s.alpha = Math.max(0.3, Math.min(1, s.alpha));
     ctx.beginPath();
@@ -114,8 +113,8 @@ function drawConstellations() {
         for (let i = 0; i < line.length - 1; i++) {
           const [ra1, dec1] = line[i    ];
           const [ra2, dec2] = line[i + 1];
-          const p1 = raDecToXY(ra1, dec1, true);
-          const p2 = raDecToXY(ra2, dec2, true);     
+          const p1 = raDecToXY(ra1, dec1);
+          const p2 = raDecToXY(ra2, dec2);
           if (Math.abs(p1.x - p2.x) < canvas.width / 2) {
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
@@ -151,7 +150,7 @@ function drawConstellationLabels() {
     points.forEach(([ra, dec]) => sumDec += dec);
     const avgRA = sumRA / points.length;
     const avgDec = sumDec / points.length;
-    const pos = raDecToXY(avgRA, avgDec, true);
+    const pos = raDecToXY(avgRA, avgDec);
     ctx.fillText(name, pos.x, pos.y);
     });
     ctx.restore();

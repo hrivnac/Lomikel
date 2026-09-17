@@ -2,4 +2,8 @@
   
 https://github.com/ofrohn/d3-celestial/blob/master/data/constellations.lines.json
 
+hyg_v38_mag6.csv is derived from HYG Database v3.8. It contains only the
+ra, dec, mag, and proper columns and rows with non-zero RA and magnitude < 6.
+The original hyg_v38.csv remains available in the repository history.
+
 python3 -m http.server 8000 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/AlertsView

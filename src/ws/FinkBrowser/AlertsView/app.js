@@ -82,14 +82,15 @@ function generateAlert() {
 // Camera
 function getBoundingBox(flashes) {
   if (flashes.length === 0) return null;
-  let minRa = Infinity, maxRa = -Infinity, minDec = Infinity, maxDec = -Infinity;
+  let minDec = Infinity, maxDec = -Infinity;
+  const ras = [];
   for (const f of flashes) {
-    minRa = Math.min(minRa, f.alert.ra);
-    maxRa = Math.max(maxRa, f.alert.ra);
+    ras.push(f.alert.ra);
     minDec = Math.min(minDec, f.alert.dec);
     maxDec = Math.max(maxDec, f.alert.dec);
     }
-  return {minRa, maxRa, minDec, maxDec};
+  const raBounds = getCircularRaBounds(ras);
+  return {raCenter: raBounds.center, raSpan: raBounds.span, minDec, maxDec};
   }
 function updateCamera() {
   if (camera.mode === "whole") {
@@ -99,16 +100,16 @@ function updateCamera() {
     }
   const box = getBoundingBox(flashes);
   if (!box) return;
-  camera.targetCenter.ra = (box.minRa + box.maxRa) / 2;
+  camera.targetCenter.ra = box.raCenter;
   camera.targetCenter.dec = (box.minDec + box.maxDec) / 2;
-  const raSpan = Math.max(5, box.maxRa - box.minRa);
+  const raSpan = Math.max(5, box.raSpan);
   const decSpan = Math.max(5, box.maxDec - box.minDec);
   const span = Math.max(raSpan / 360, decSpan / 180);
   camera.targetZoom = Math.min(8, Math.max(1, 0.5 / span));
   }
 function smoothCamera() {
   const lerp = (a, b, t) => a + (b - a) * t;
-  camera.currentCenter.ra = lerp(camera.currentCenter.ra, camera.targetCenter.ra, 0.05);
+  camera.currentCenter.ra = interpolateRa(camera.currentCenter.ra, camera.targetCenter.ra, 0.05);
   camera.currentCenter.dec = lerp(camera.currentCenter.dec, camera.targetCenter.dec, 0.05);
   camera.currentZoom = lerp(camera.currentZoom, camera.targetZoom, 0.05);
   }
@@ -118,7 +119,7 @@ function drawOverview() {
   octx.clearRect(0, 0, overview.width, overview.height);
   // draw all flashes
   for (const f of flashes) {
-    const ox = (f.alert.ra / 360) * overview.width;
+    const ox = ((360 - normalizeRa(f.alert.ra)) % 360) / 360 * overview.width;
     const oy = overview.height - ((f.alert.dec + 90) / 180) * overview.height;
     octx.beginPath();
     octx.arc(ox, oy, 2, 0, Math.PI * 2);
@@ -126,21 +127,24 @@ function drawOverview() {
     octx.fill();
     }
   // draw view rectangle
-  const halfW = canvas.width / 2 / canvas.width / camera.currentZoom;
-  const halfH = canvas.height / 2 / canvas.height / camera.currentZoom;
-  const minRa = camera.currentCenter.ra - 180 / camera.currentZoom;
-  const maxRa = camera.currentCenter.ra + 180 / camera.currentZoom;
-  const minDec = camera.currentCenter.dec - 90 / camera.currentZoom;
-  const maxDec = camera.currentCenter.dec + 90 / camera.currentZoom;
-  const x1 = (minRa / 360) * overview.width;
-  const x2 = (maxRa / 360) * overview.width;
-  const y1 = overview.height - ((minDec + 90) / 180) * overview.height;
-  const y2 = overview.height - ((maxDec + 90) / 180) * overview.height;
+  const viewWidth = Math.min(overview.width, overview.width / camera.currentZoom);
+  const viewHeight = Math.min(overview.height, overview.height / camera.currentZoom);
+  const centerX = ((360 - normalizeRa(camera.currentCenter.ra)) % 360) / 360 * overview.width;
+  const centerY = overview.height - ((camera.currentCenter.dec + 90) / 180) * overview.height;
+  const left = centerX - viewWidth / 2;
+  const top = Math.max(0, centerY - viewHeight / 2);
+  const bottom = Math.min(overview.height, centerY + viewHeight / 2);
   octx.strokeStyle = "red";
   octx.lineWidth = 2;
-  octx.strokeRect(x1, y2, x2 - x1, y1 - y2);
+  for (const offset of [-overview.width, 0, overview.width]) {
+    const segmentLeft = Math.max(0, left + offset);
+    const segmentRight = Math.min(overview.width, left + offset + viewWidth);
+    if (segmentRight > segmentLeft) {
+      octx.strokeRect(segmentLeft, top, segmentRight - segmentLeft, bottom - top);
+      }
+    }
   // update info
-  document.getElementById('viewInfo').textContent = `ra: ${minRa.toFixed(1)}–${maxRa.toFixed(1)}, dec: ${minDec.toFixed(1)}–${maxDec.toFixed(1)}`;
+  document.getElementById('viewInfo').textContent = `RA center: ${normalizeRa(camera.currentCenter.ra).toFixed(1)}°, span: ${(360 / camera.currentZoom).toFixed(1)}°, Dec center: ${camera.currentCenter.dec.toFixed(1)}°`;
    }
 
 // Tooltip
