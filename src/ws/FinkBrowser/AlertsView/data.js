@@ -113,20 +113,33 @@ fetch("constellations.lines.json").then(response => response.json()).
 
 // Stars
 const stars = [];
-d3.csv('hyg_v38_mag6.csv').
-   then(data => {
-     data.forEach(row => {
-       const ra     = row.ra * 15;
-       const dec    = row.dec;
-       const mag    = row.mag;
-       const proper = row.proper;
-       if (ra != 0 && mag < magMax) {
-         stars.push({ra: ra,
-                     dec: dec,
-                     r: Math.max(0.5, 2.5 - mag * 0.2),
-                     proper: proper,
-                     alpha:  Math.max(0, 1 - mag * 0.05),
-                     twinkleSpeed: Math.max(0, 0.1 * (1 - mag * 0.05))});
-         }
-       });
-     });
+function parseStellarCatalog(csvText) {
+  const lines = csvText.trim().split(/\r?\n/);
+  if (lines.shift() !== "ra,dec,mag,proper") throw new Error("Unexpected stellar catalogue columns");
+  return lines.map(line => {
+    const [ra, dec, mag, proper] = line.split(",");
+    return {ra: Number(ra), dec: Number(dec), mag: Number(mag), proper};
+    });
+  }
+
+fetch('hyg_v38_mag6.csv').
+  then(response => {
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.text();
+    }).
+  then(csvText => {
+    for (const row of parseStellarCatalog(csvText)) {
+      const ra = row.ra * 15;
+      if (ra !== 0 && row.mag < magMax) {
+        stars.push({
+          ra,
+          dec: row.dec,
+          r: Math.max(0.5, 2.5 - row.mag * 0.2),
+          proper: row.proper,
+          alpha: Math.max(0, 1 - row.mag * 0.05),
+          twinkleSpeed: Math.max(0, 0.1 * (1 - row.mag * 0.05))
+          });
+        }
+      }
+    }).
+  catch(error => console.error("Cannot load stellar catalogue", error));

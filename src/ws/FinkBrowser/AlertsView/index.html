@@ -2,41 +2,61 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>ZTF/LSST Alerts View</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=AlertsView"></script>                                                       |
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.ztf.fink-portal.org https://api.lsst.fink-portal.org; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <title>Fink ZTF and LSST Alerts on the Sky</title>
     <link rel="stylesheet" href="style.css">
-    </head>
+  </head>
   <body>
-    <div id="frame">
-      <canvas id="sky"></canvas>  
-      <div id="controls">
-        <button id="btnDynamic">Dynamic Sky</button>
-        <button id="btnWhole">Whole Sky</button>
-        </div> 
-      <div id="legend"></div>  
-      <div id="logoWrap">
-        <img id="logo" src="Fink_PrimaryLogo_WEB.png" width="100">
-        <div id="logo-help" role="tooltip">
-        <p>This application animates recent Fink alert samples projected on the night sky. ZTF polling is active; LSST polling is paused while recent LSST alerts are unavailable.</p>
-        <ul>
-          <li><b>Dynamic Sky:</b> zooms to current alerts region.</li>
-          <li><b>Whole Sky:</b> shows the entire sphere.</li>
-          <li>5-pointed stars represent ZTF alerts, 10-pointed stars represent LSST alerts.</li>
-          <li>Hover alerts for alert details, click for portal link.</li>
-          <li>Service parameters (nAlerts is per class):<br/><small><tt>fetchPeriod=10&amp;fetchStart=48&amp;nAlerts=10&amp;magMax=6&amp;fetchLSST=false</tt></small></li>
-          </ul>        
-          </div>
+    <main id="frame">
+      <canvas id="sky" role="img" aria-label="Animated all-sky map showing recent astronomical alerts, stars, constellations, the ecliptic, and the Galactic plane.">
+        Recent Fink alerts are also available as links in the Recent alerts panel.
+      </canvas>
+
+      <nav id="controls" aria-label="Sky view">
+        <button id="btnDynamic" type="button" aria-pressed="true">Follow alerts</button>
+        <button id="btnWhole" type="button" aria-pressed="false">Whole sky</button>
+      </nav>
+
+      <section id="legend" aria-label="Active alert classifications"></section>
+
+      <section id="logoWrap" aria-label="About this visualization">
+        <button id="helpButton" type="button" aria-expanded="false" aria-controls="logo-help">
+          <img id="logo" src="Fink_PrimaryLogo_WEB.png" width="100" alt="Fink broker">
+          <span class="visually-hidden">About this visualization</span>
+        </button>
+        <div id="logo-help" hidden>
+          <p><strong>Recent astronomical alerts on the night sky.</strong> Fink classifies detections from survey telescopes so unusual or rapidly changing objects can be followed up.</p>
+          <ul>
+            <li><strong>Follow alerts</strong> moves the view toward currently animated alerts.</li>
+            <li><strong>Whole sky</strong> shows the complete celestial sphere.</li>
+            <li>Five-pointed markers are ZTF alerts; ten-pointed markers are LSST alerts.</li>
+            <li>Point to or tap a marker for details. Keyboard users can open the same objects from Recent alerts.</li>
+            <li>ZTF polling is active. LSST polling is paused while recent LSST alerts are unavailable.</li>
+            <li>Optional URL parameters:<br><code>fetchPeriod=10&amp;fetchStart=48&amp;nAlerts=10&amp;magMax=6&amp;fetchLSST=false</code></li>
+          </ul>
         </div>
-      <div id="infoContainer">
-        <div id="statusPanel"></div>
-        <div id="viewInfo"></div>
-        </div>
+      </section>
+
+      <section id="recentAlertsPanel" aria-labelledby="recentAlertsHeading">
+        <h2 id="recentAlertsHeading">Recent alerts</h2>
+        <ul id="recentAlerts">
+          <li id="recentAlertsEmpty">Waiting for alerts…</li>
+        </ul>
+      </section>
+
+      <section id="infoContainer" aria-label="Data and view status">
+        <div id="statusPanel" role="status" aria-live="polite" aria-label="Survey status"></div>
+        <output id="viewInfo" aria-label="Current sky coordinates"></output>
+      </section>
+
       <div id="overview-container">
-        <canvas id="overview"></canvas>
-        </div>
-      <div id="tooltip"></div>
-      </div>  
+        <canvas id="overview" width="200" height="100" role="img" aria-label="Overview of the current sky viewport"></canvas>
+      </div>
+
+      <div id="tooltip" role="status" aria-live="polite"></div>
+    </main>
+
     <script src="consts.js"></script>
     <script src="params.js"></script>
     <script src="utils.js"></script>
@@ -44,5 +64,5 @@
     <script src="data.js"></script>
     <script src="drawing.js"></script>
     <script src="app.js"></script>
-    </body>
-  </html>
+  </body>
+</html>
