@@ -1,33 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'">
     <title>LSST Light Curve Visualizer</title>
-    <script src="https://cdn.plot.ly/plotly-3.1.0.min.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=LightCurveView"></script>                                                       |
     <link rel="stylesheet" href="style.css">
-    </head>
+    <script src="vendor/plotly-gl2d-3.1.0.min.js"></script>
+  </head>
   <body>
-    <div id="plot"></div>
-    <div id="controls">
-      <div id="formulaX" class="formula"></div>
-      <div id="formulaY" class="formula"></div>
-      <div class="buttons">
-        <button id="resetRandom">Reset (Random)</button>
-        <button id="resetZero">Reset (Zero)</button>
-        <button id="resetRainbow">Reset (Rainbow)</button>
-        </div>
-      <div>
-      <div class="buttons">
-        <div id="snid-buttons"></div>
-        </div>
-      <div class="buttons">
-        <div id="save-buttons"></div>
-        </div>
-      <div id="sliders"></div>
-      <div id="lightcurvePlot" class="w-full h-64"></div>
-      </div>
+    <main id="application">
+      <section id="projection-pane" aria-labelledby="page-title">
+        <header class="introduction">
+          <h1 id="page-title">LSST Light Curve Visualizer</h1>
+          <p>Explore linear projections of six-band LSST light curves into two dimensions.</p>
+        </header>
+        <div id="plot" role="img" aria-label="Two-dimensional projection of the selected light curve"></div>
+      </section>
+
+      <aside id="controls" aria-label="Light curve controls">
+        <p id="status" role="status" aria-live="polite" data-state="ready">Random demo ready.</p>
+
+        <section aria-labelledby="projection-heading">
+          <h2 id="projection-heading">Projection</h2>
+          <div id="formulaX" class="formula"></div>
+          <div id="formulaY" class="formula"></div>
+          <div class="buttons reset-buttons">
+            <button id="resetRandom" type="button">Random coefficients</button>
+            <button id="resetZero" type="button">Zero coefficients</button>
+            <button id="resetRainbow" type="button">Time / wavelength</button>
+          </div>
+        </section>
+
+        <section aria-labelledby="samples-heading">
+          <h2 id="samples-heading">Example light curves</h2>
+          <div id="snid-buttons" class="buttons sample-buttons"></div>
+        </section>
+
+        <section aria-labelledby="coefficients-heading">
+          <h2 id="coefficients-heading">Band coefficients</h2>
+          <p class="hint">Drag a colored handle. With keyboard focus, use arrow keys; hold Shift for larger steps.</p>
+          <div id="sliders"></div>
+        </section>
+
+        <section aria-labelledby="presets-heading">
+          <h2 id="presets-heading">Saved projections</h2>
+          <div id="save-buttons" class="buttons preset-buttons"></div>
+        </section>
+
+        <section aria-labelledby="lightcurve-heading">
+          <h2 id="lightcurve-heading">Six-band light curve</h2>
+          <div id="lightcurvePlot" role="img" aria-label="Magnitude versus elapsed time for the six LSST bands"></div>
+        </section>
+      </aside>
+    </main>
+
     <script src="consts.js"></script>
     <script src="params.js"></script>
     <script src="data.js"></script>
@@ -37,6 +65,5 @@
     <script src="update.js"></script>
     <script src="utils.js"></script>
     <script src="app.js"></script>
-    </body>
-  </html>
-
+  </body>
+</html>

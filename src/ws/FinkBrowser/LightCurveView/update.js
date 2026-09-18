@@ -1,3 +1,14 @@
+let plotUpdateScheduled = false;
+
+function schedulePlotUpdate() {
+  if (plotUpdateScheduled) return;
+  plotUpdateScheduled = true;
+  requestAnimationFrame(() => {
+    plotUpdateScheduled = false;
+    updatePlot();
+    });
+  }
+
 function updateFormulas() {
   let fx, fy;
   if (xTime) {
@@ -12,10 +23,10 @@ function updateFormulas() {
   }
 
 function updatePlot() {
-  if (lightcurve != "") {
+  if (lightcurve) {
     demo = lightcurve;
     }
-  const {L, M ,R , startJD, endJD} = projectXY(demo, coeffs);
+  const {L, M, R, startJD, endJD, missingBands = []} = projectXY(demo, coeffs);
   activeX = M.map(p => p.x);
   activeY = M.map(p => p.y);
   const traces = [];
@@ -39,7 +50,7 @@ function updatePlot() {
         colorscale:'Viridis',
         size:6,
         colorbar: {
-          title:'JD',
+          title:'ΔMJD (days)',
           len:0.5
           }
         },
@@ -77,62 +88,63 @@ function updatePlot() {
   //    name:'Extrapolated (right)'
   //    });
   //  }
-  Plotly.newPlot('plot', traces, {
+  const annotations = M.length ? [] : [{
+    x: 0.5, y: 0.5, xref: "paper", yref: "paper", showarrow: false,
+    text: missingBands.length
+      ? `A projection needs observations in all six LSST bands. Missing: ${missingBands.join(", ")}.`
+      : "The six bands have no common observing interval.",
+    }];
+  Plotly.react('plot', traces, {
     margin:{t:24},
     xaxis:{title:'X'},
     yaxis:{title:'Y'},
-    legend:{orientation:'h'}
-    });
+    legend:{orientation:'h'},
+    annotations
+    }, {responsive: true});
   }
   
 function plotLightCurves(data) {
-  const minMJD = Math.min(...filters.flatMap(f => data[f].times.length ? [data[f].times[0]] : []));
-  let traces = [];
-  for (let band of filters) {
+  const observedTimes = filters.flatMap(f => data[f] ? data[f].times : []);
+  if (!observedTimes.length) {
+    Plotly.react("lightcurvePlot", [], {height: 300}, {displayModeBar: false, responsive: true});
+    return;
+    }
+  const minMJD = Math.min(...observedTimes);
+  const totalPoints = filters.reduce((count, band) => count + (data[band]?.times.length || 0), 0);
+  const traceType = totalPoints > 2000 ? "scattergl" : "scatter";
+  const traces = [];
+  for (const band of filters) {
     if (data[band] && data[band].times.length > 0) {
-      // Filter out zero magnitudes
-      let times = [];
-      let mags  = [];
-      for (let i = 0; i < data[band].times.length; i++) {
-        if (data[band].values[i] !== 0) {
-          times.push(data[band].times[i]);
-          mags.push(data[band].values[i]);
-          }
-        }
-      if (times.length > 0) {
-        traces.push({
-          x: times.map(t => t - minMJD),
-          y: mags,
-          mode: 'lines+markers',
-          name: band,
-          line: {color: bandColors[band]},
-          marker: {size: 6,
-                   color: bandColors[band]}
-          });
-        }
+      traces.push({
+        type: traceType,
+        x: data[band].times.map(t => t - minMJD),
+        y: data[band].values,
+        mode: "lines+markers",
+        name: band,
+        line: {color: bandColors[band]},
+        marker: {size: 6, color: bandColors[band]},
+        });
       }
-    }  
-  Plotly.newPlot("lightcurvePlot", 
-                 traces, 
-                 {margin: {t: 20},
-                  xaxis: {title: "ΔMJD (days)"},
-                  yaxis: {title: "Magnitude"},  // mag axis inverted
-                  height: 300,
-                  legend: {
-                    orientation: "h",        // horizontal legend
-                    x: 0, y: -0.2,           // place it below the plot
-                    bgcolor: "rgba(0,0,0,0)" // transparent background
-                    }
-                  },
-                 {displayModeBar: false      // hide Plotly toolbar
-                });
+    }
+  Plotly.react("lightcurvePlot",
+               traces,
+               {margin: {t: 20},
+                xaxis: {title: "ΔMJD (days)"},
+                yaxis: {title: "Magnitude", autorange: "reversed"},
+                height: 300,
+                legend: {
+                  orientation: "h",
+                  x: 0, y: -0.2,
+                  bgcolor: "rgba(0,0,0,0)"
+                  }
+                },
+               {displayModeBar: false, responsive: true});
   }
   
 function updateSlidersFromCoeffs() {
   if (!window.sliderHandles) return;
-  const {handles, scale} = window.sliderHandles;
-  handles.attr("cx", d => scale(coeffs.x[d.band]))
-         .attr("cy", d => scale(-coeffs.y[d.band]));
+  const {handles} = window.sliderHandles;
+  handles.forEach(updateCoefficientHandle);
   }
 
 function update(){
