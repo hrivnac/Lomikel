@@ -75,6 +75,11 @@ p {
   background: #fff4cf;
 }
 
+#status[data-state="warning"] {
+  color: #6b4b00;
+  background: #fff4cf;
+}
+
 #status[data-state="error"] {
   color: #8b1020;
   background: #fde7ea;
@@ -89,6 +94,32 @@ p {
 .hint {
   color: #4a5568;
   font-size: 0.86rem;
+}
+
+.object-loader {
+  display: flex;
+  gap: 7px;
+  margin-top: 6px;
+}
+
+#fink-object-id {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #9da9ba;
+  border-radius: 8px;
+  font: inherit;
+}
+
+#fink-object-id:focus-visible {
+  outline: 3px solid #155eef;
+  outline-offset: 2px;
+}
+
+.portal-link:not([hidden]) {
+  display: inline-block;
+  margin-top: 8px;
 }
 
 .buttons {
