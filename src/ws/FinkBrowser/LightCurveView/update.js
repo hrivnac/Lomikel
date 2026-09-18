@@ -11,13 +11,19 @@ function schedulePlotUpdate() {
 
 function updateFormulas() {
   let fx, fy;
+  const curve = lightcurve || demo;
+  const availableBands = filters.filter(f => curve?.[f]?.times?.length && curve?.[f]?.values?.length);
   if (xTime) {
     fx = "x = ΔMJD";
     }
   else {
-    fx = 'x = ' + filters.map(f => `${(coeffs.x[f] ?? 0).toFixed(2)}·${f}`).join(" + ");
+    fx = availableBands.length
+      ? 'x = ' + availableBands.map(f => `${(coeffs.x[f] ?? 0).toFixed(2)}·${f}`).join(" + ")
+      : "x = no available bands";
     }
-  fy = 'y = ' + filters.map(f => `${(coeffs.y[f] ?? 0).toFixed(2)}·${f}`).join(" + ");
+  fy = availableBands.length
+    ? 'y = ' + availableBands.map(f => `${(coeffs.y[f] ?? 0).toFixed(2)}·${f}`).join(" + ")
+    : "y = no available bands";
   document.getElementById('formulaX').textContent = fx;
   document.getElementById('formulaY').textContent = fy;
   }
@@ -90,9 +96,9 @@ function updatePlot() {
   //  }
   const annotations = M.length ? [] : [{
     x: 0.5, y: 0.5, xref: "paper", yref: "paper", showarrow: false,
-    text: missingBands.length
-      ? `A projection needs observations in all six LSST bands. Missing: ${missingBands.join(", ")}.`
-      : "The six bands have no common observing interval.",
+    text: missingBands.length === filters.length
+      ? "No light curves are available for projection."
+      : "The available bands have no common observing interval.",
     }];
   Plotly.react('plot', traces, {
     margin:{t:24},

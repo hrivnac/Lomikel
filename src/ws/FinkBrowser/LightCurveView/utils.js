@@ -60,17 +60,18 @@ function interp1D(times, values, t){
 
 // Build grid and compute combined X,Y with segmentation (left/interp/right)
 function projectXY(data, coeffs){
-  const missingBands = filters.filter(f => !data[f] || !data[f].times.length || !data[f].values.length);
-  if (missingBands.length) {
+  const availableBands = filters.filter(f => data[f] && data[f].times.length && data[f].values.length);
+  const missingBands = filters.filter(f => !availableBands.includes(f));
+  if (!availableBands.length) {
     return {L: [], M: [], R: [], startJD: null, endJD: null, missingBands};
     }
-  // intersection domain where all filters are within their observed ranges
-  const firsts = filters.map(f => data[f].times[0]);
-  const lasts  = filters.map(f => data[f].times[data[f].times.length - 1]);
+  // intersection domain where every available filter is within its observed range
+  const firsts = availableBands.map(f => data[f].times[0]);
+  const lasts  = availableBands.map(f => data[f].times[data[f].times.length - 1]);
   const startJD = Math.max(...firsts);
   const endJD   = Math.min(...lasts);
   if (!Number.isFinite(startJD) || !Number.isFinite(endJD) || endJD < startJD) {
-    return {L: [], M: [], R: [], startJD: null, endJD: null, missingBands: []};
+    return {L: [], M: [], R: [], startJD: null, endJD: null, missingBands};
     }
   const span = endJD - startJD;
   const gridStep = span > 0 ? span / 200 : 0;
@@ -85,9 +86,9 @@ function projectXY(data, coeffs){
     : [];
   function combineAt(t) {
     let x = 0, y = 0;
-    for (const f of filters){
+    for (const f of availableBands){
       const it = interp1D(data[f].times, data[f].values, t);
-      if (it.val == null) return null; // give up if any is undefined
+      if (it.val == null) return null;
       if (xTime) {
         x = t - startJD;
         }
@@ -103,7 +104,7 @@ function projectXY(data, coeffs){
   const L = gridLeft.map(combineAt).filter(Boolean);
   const M = gridMid.map(combineAt).filter(Boolean);
   const R = gridRight.map(combineAt).filter(Boolean);
-  return {L, M, R, startJD, endJD, missingBands: []};
+  return {L, M, R, startJD, endJD, missingBands};
   }
   
 function rainbowCoefficients() {

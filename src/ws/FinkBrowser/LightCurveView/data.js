@@ -151,10 +151,11 @@ async function loadFinkObject(value) {
     updateSNIDHighlight();
     plotLightCurves(lightcurve);
     setFinkPortalLink(objectId);
+    const availableBands = filters.filter(band => loaded[band].times.length > 0);
     const missingBands = filters.filter(band => loaded[band].times.length === 0);
     if (missingBands.length) {
       setLoadStatus(
-        `Loaded Fink object ${objectId}: ${sourceCount} sources. Missing ${missingBands.join(", ")}; the 2D projection needs all six bands.`,
+        `Loaded Fink object ${objectId}: ${sourceCount} sources. Missing ${missingBands.join(", ")}; projection uses ${availableBands.join(", ")}.`,
         "warning"
         );
       }
