@@ -89,11 +89,33 @@ test("projection uses the common observed domain and includes both endpoints", (
   assert.equal(Object.hasOwn(context, "mode"), false);
 });
 
-test("projection returns no trajectory when any LSST band is absent", () => {
+test("projection ignores absent LSST bands and uses the available curves", () => {
   const context = loadScripts(["consts.js", "utils.js"], {xTime: false});
   context.input = sixBands(band => band === "u"
     ? {times: [], values: []}
     : {times: [1, 2], values: [20, 19]});
+  context.coefficients = {
+    x: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 1])),
+    y: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 2])),
+  };
+
+  const result = vm.runInContext("projectXY(normalizeLightcurve(input), coefficients)", context);
+
+  assert.equal(result.M.length, 201);
+  assert.deepEqual(Array.from(result.missingBands), ["u"]);
+  assert.equal(result.startJD, 1);
+  assert.equal(result.endJD, 2);
+  assert.equal(result.M[0].x, 100);
+  assert.equal(result.M[0].y, 200);
+});
+
+test("projection preserves missing bands when available curves do not overlap", () => {
+  const context = loadScripts(["consts.js", "utils.js"], {xTime: false});
+  context.input = sixBands(band => {
+    if (band === "Y") return {times: [1, 2], values: [20, 19]};
+    if (band === "z") return {times: [3, 4], values: [18, 17]};
+    return {times: [], values: []};
+  });
   context.coefficients = {
     x: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 1])),
     y: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 1])),
@@ -102,7 +124,7 @@ test("projection returns no trajectory when any LSST band is absent", () => {
   const result = vm.runInContext("projectXY(normalizeLightcurve(input), coefficients)", context);
 
   assert.deepEqual(Array.from(result.M), []);
-  assert.deepEqual(Array.from(result.missingBands), ["u"]);
+  assert.deepEqual(Array.from(result.missingBands), ["g", "i", "u", "r"]);
   assert.equal(result.startJD, null);
   assert.equal(result.endJD, null);
 });
@@ -202,7 +224,7 @@ test("loading a Fink object posts an exact ID and installs its live light curve"
   assert.equal(portalLink.hidden, false);
 });
 
-test("a partial Fink light curve loads but reports bands missing from the projection", async () => {
+test("a partial Fink light curve reports that projection uses the available bands", async () => {
   const status = {textContent: "", dataset: {}};
   const plotted = [];
   const rows = ["g", "r"].map((band, index) => ({
@@ -224,7 +246,7 @@ test("a partial Fink light curve loads but reports bands missing from the projec
   assert.equal(plotted.length, 1);
   assert.equal(status.dataset.state, "warning");
   assert.match(status.textContent, /missing Y, z, i, u/i);
-  assert.match(status.textContent, /projection/i);
+  assert.match(status.textContent, /projection uses g, r/i);
 });
 
 test("a stalled Fink request is aborted and reports a timeout", async () => {
@@ -337,6 +359,30 @@ test("light-curve rendering uses incremental Plotly updates and an inverted magn
   assert.equal(calls[0].args[2].yaxis.autorange, "reversed");
 });
 
+test("projection formulas omit bands without light curves", () => {
+  const formulaX = {textContent: ""};
+  const formulaY = {textContent: ""};
+  const curve = sixBands(band => ["z", "g", "i", "r"].includes(band)
+    ? {times: [1], values: [20]}
+    : {times: [], values: []});
+  const coefficients = {
+    x: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 1])),
+    y: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 2])),
+  };
+  const context = loadScripts(["consts.js", "update.js"], {
+    activeX: [], activeY: [], coeffs: coefficients, demo: curve,
+    document: {getElementById: id => id === "formulaX" ? formulaX : formulaY},
+    lightcurve: curve, window: {}, xTime: false,
+  });
+
+  vm.runInContext("updateFormulas()", context);
+
+  assert.match(formulaX.textContent, /·z/);
+  assert.match(formulaY.textContent, /·r/);
+  assert.doesNotMatch(formulaX.textContent, /·Y|·u/);
+  assert.doesNotMatch(formulaY.textContent, /·Y|·u/);
+});
+
 test("projection rendering uses Plotly.react and labels elapsed time correctly", () => {
   const calls = [];
   const curve = sixBands(() => ({times: [10, 11], values: [20, 19]}));
@@ -360,20 +406,22 @@ test("projection rendering uses Plotly.react and labels elapsed time correctly",
   assert.equal(calls[0].args[1][0].marker.colorbar.title, "ΔMJD (days)");
 });
 
-test("projection explains when a six-band trajectory cannot be computed", () => {
+test("projection explains when no light curves are available", () => {
   const calls = [];
   const context = loadScripts(["consts.js", "update.js"], {
     Plotly: {react: (...args) => calls.push(args)},
     activeX: [], activeY: [], coeffs: {x: {}, y: {}}, demo: {},
     lightcurve: null, window: {}, xTime: false,
-    projectXY: () => ({L: [], M: [], R: [], startJD: null, endJD: null, missingBands: ["u", "Y"]}),
+    projectXY: () => ({
+      L: [], M: [], R: [], startJD: null, endJD: null,
+      missingBands: ["Y", "z", "g", "i", "u", "r"],
+    }),
   });
 
   vm.runInContext("updatePlot()", context);
 
   const layout = calls[0][2];
-  assert.match(layout.annotations[0].text, /u, Y/);
-  assert.match(layout.annotations[0].text, /all six/i);
+  assert.match(layout.annotations[0].text, /no light curves/i);
 });
 
 test("projection redraw requests are coalesced to one update per animation frame", () => {
