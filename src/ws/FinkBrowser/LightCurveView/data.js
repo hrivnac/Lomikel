@@ -29,12 +29,12 @@ function generateDemoData(snid = "random") {
     let shapes;
     if (snid == "peak") {
       shapes = {
-        Y: 18 + 1.8 * Math.exp(-Math.pow((tt - 40) / 12, 2)) + 0.05 * Math.random(), // Gaussian dip (magnitudes)
-        z: 18 + 1.0 * Math.exp(-Math.pow((tt - 40) / 8, 2)) + 0.25 * Math.random(), // Gaussian dip (magnitudes)
-        g: 18 + 2.2 * Math.exp(-Math.pow((tt - 40) / 12, 2)) + 0.05 * Math.random(), // Gaussian dip (magnitudes)
-        i: 18 + 1.8 * Math.exp(-Math.pow((tt - 40) / 20, 2)) + 0.55 * Math.random(), // Gaussian dip (magnitudes)
-        u: 18 - 0.0008 * tt * tt + 0.06 * tt + 0.1 * Math.random(),
-        r: 18 - 0.0008 * tt * tt + 0.06 * tt + 0.3 * Math.random(),
+        Y: 18 - 1.8 * Math.exp(-Math.pow((tt - 40) / 12, 2)) + 0.05 * Math.random(),
+        z: 18 - 1.0 * Math.exp(-Math.pow((tt - 40) / 8, 2)) + 0.05 * Math.random(),
+        g: 18 - 2.2 * Math.exp(-Math.pow((tt - 40) / 12, 2)) + 0.05 * Math.random(),
+        i: 18 - 1.8 * Math.exp(-Math.pow((tt - 40) / 20, 2)) + 0.05 * Math.random(),
+        u: 18 - 2.5 * Math.exp(-Math.pow((tt - 40) / 9, 2)) + 0.05 * Math.random(),
+        r: 18 - 2.0 * Math.exp(-Math.pow((tt - 40) / 15, 2)) + 0.05 * Math.random(),
         };
       }
     else if (snid == "periodic") {
@@ -64,27 +64,50 @@ function generateDemoData(snid = "random") {
         }
       });
     });
-  plotLightCurves(data);
-  return data;
+  return normalizeLightcurve(data);
   }
  
-lightcurve = "";
-function loadSNID(snid) {
-  lightcurve = "";
-  fetch(`${snid}.json`).then(resp => resp.json()).
-                                       then(data => {
-                                         lightcurve = data;
-                                         resetRandom();     
-                                         activeSNID = String(snid);
-                                         updateSNIDHighlight();
-                                         plotLightCurves(lightcurve);
-                                         }).
-                                       catch(err => console.error("Failed to load SNID", snid, err));
+let lightcurve = null;
+let loadGeneration = 0;
+
+function setLoadStatus(message, state = "ready") {
+  if (typeof document === "undefined") return;
+  const status = document.getElementById("status");
+  if (!status) return;
+  status.textContent = message;
+  status.dataset.state = state;
   }
-function loadDemo(demo) {
-  lightcurve = generateDemoData(demo);
-  resetRandom();     
-  activeSNID = String(demo);
+
+async function loadSNID(snid) {
+  const generation = ++loadGeneration;
+  setLoadStatus(`Loading sample ${snid}…`, "loading");
+  try {
+    const response = await fetch(`${snid}.json`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status || "error"}`);
+      }
+    const loaded = normalizeLightcurve(await response.json());
+    if (generation !== loadGeneration) return;
+    lightcurve = loaded;
+    resetRandom();
+    activeSNID = String(snid);
+    updateSNIDHighlight();
+    plotLightCurves(lightcurve);
+    setLoadStatus(`Loaded sample ${snid}.`);
+    }
+  catch (error) {
+    if (generation === loadGeneration) {
+      setLoadStatus(`Failed to load sample ${snid}.`, "error");
+      }
+    }
+  }
+
+function loadDemo(kind) {
+  loadGeneration++;
+  lightcurve = generateDemoData(kind);
+  resetRandom();
+  activeSNID = String(kind);
   updateSNIDHighlight();
   plotLightCurves(lightcurve);
+  setLoadStatus(`Generated ${kind} demo.`);
   }

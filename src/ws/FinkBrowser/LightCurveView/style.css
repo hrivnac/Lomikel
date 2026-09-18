@@ -1,113 +1,228 @@
-body { 
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #172033;
+  background: #eef2f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
   margin: 0;
+  min-width: 320px;
+}
+
+#application {
   display: flex;
-  height: 100vh;
-  font-family: system-ui, sans-serif;
-  }
-  
-#plot {
-  flex: 3;
-  }
-  
-#controls {
-  flex: 1;
+  width: 100%;
+  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+#projection-pane {
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 12px;
-  box-sizing: border-box;
-  background:#f7f7f7;
-  overflow-y:auto;
-  }
- 
+  background: #fff;
+}
+
+.introduction {
+  padding: 14px 20px 0;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.3rem, 2vw, 2rem);
+}
+
+h2 {
+  margin: 16px 0 8px;
+  font-size: 1rem;
+}
+
+p {
+  margin: 6px 0;
+}
+
+#plot {
+  flex: 1 1 auto;
+  min-height: 360px;
+}
+
+#controls {
+  flex: 0 0 min(390px, 34vw);
+  min-width: 340px;
+  padding: 14px;
+  background: #f7f9fc;
+  border-left: 1px solid #d8dee9;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#status {
+  min-height: 1.5em;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: #e8f0fb;
+  font-size: 0.9rem;
+}
+
+#status[data-state="loading"] {
+  background: #fff4cf;
+}
+
+#status[data-state="error"] {
+  color: #8b1020;
+  background: #fde7ea;
+}
+
 .formula {
-  font-size: 0.7em;
-  font-weight: 700;
+  overflow-wrap: anywhere;
   margin: 4px 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
-  
+  font: 700 0.78rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.hint {
+  color: #4a5568;
+  font-size: 0.86rem;
+}
+
 .buttons {
-  display:flex;
-  gap:8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
   margin: 10px 0;
-  }
-  
+}
+
 button {
-  flex:1;
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  background:#eee;
-  cursor:pointer;
-  }
-  
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 8px 11px;
+  border: 1px solid #b8c1cf;
+  border-radius: 8px;
+  color: #172033;
+  background: #edf1f6;
+  cursor: pointer;
+  font: inherit;
+}
+
 button:hover {
-  background:#e2e2e2;
-  }
-  
-.slider-row {
-  margin: 8px 0;
-  }
-  
-.slider-row label {
-  display:block;
-  font-size: 12px;
-  margin-bottom: 4px;
-  }
-  
-.slider-row input[type=range] {
-  width: 100%;
-  }
+  background: #dfe6ef;
+}
 
-#snid-buttons {
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:10px;
-  }
-  
- #save-buttons {
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:10px;
-  }
- 
+button:focus-visible,
+circle[role="slider"]:focus-visible {
+  outline: 3px solid #155eef;
+  outline-offset: 2px;
+}
+
 .snid-btn {
-  padding:6px 10px; border:1px solid #ccc; border-radius:8px;
-  background:#3b82f6; color:#fff; cursor:pointer;
-  }
-  
-.snid-btn.active {
-  background:#16a34a; border-color:#0ea34a;
-  }
-  
-.save-btn {
-  padding:6px 10px; border:1px solid #ccc; border-radius:8px;
-  background:red; color:#fff; cursor:pointer;
-  }
-  
-.save-btn.active {
-  background:#16a34a; border-color:#0ea34a;
-  }
-  
-.preset-btn {
-  padding:6px 10px; border:1px solid #ccc; border-radius:8px;
-  background:green; color:#fff; cursor:pointer;
-  }
-  
+  color: #fff;
+  background: #2867c7;
+}
+
+.snid-btn.active,
 .preset-btn.active {
-  background:#16a34a; border-color:#0ea34a;
-  }
-  
+  color: #fff;
+  background: #167447;
+  border-color: #0f673d;
+}
+
+.preset-btn {
+  color: #fff;
+  background: #28714d;
+}
+
 .del-btn {
-  padding:6px 10px; border:1px solid #ccc; border-radius:8px;
-  background:grey; color:#fff; cursor:pointer;
+  flex: 0 0 44px;
+  color: #fff;
+  background: #6b7280;
+}
+
+#sliders svg {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  overflow: visible;
+  touch-action: none;
+}
+
+.grid-line {
+  stroke: #d7dce4;
+  stroke-width: 1;
+}
+
+.tick-label,
+.axis-label,
+.handle-label {
+  fill: #283244;
+  font-size: 12px;
+  user-select: none;
+}
+
+.axis-label {
+  font-weight: 700;
+}
+
+.handle-label {
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  font-weight: 800;
+}
+
+circle[role="slider"] {
+  cursor: grab;
+}
+
+circle[role="slider"]:active {
+  cursor: grabbing;
+}
+
+#lightcurvePlot {
+  width: 100%;
+  min-height: 300px;
+}
+
+@media (max-width: 800px) {
+  #application {
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
   }
-  
-.del-btn.active {
-  background:#16a34a; border-color:#0ea34a;
+
+  #projection-pane {
+    flex: none;
+    min-height: 62dvh;
   }
 
+  #plot {
+    min-height: 480px;
+  }
 
+  #controls {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+    border-top: 1px solid #d8dee9;
+    border-left: 0;
+  }
 
+  #sliders svg {
+    margin-inline: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+  }
+}

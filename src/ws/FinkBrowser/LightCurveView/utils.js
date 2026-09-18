@@ -1,3 +1,39 @@
+function normalizeLightcurve(data) {
+  const normalized = {};
+  for (const band of filters) {
+    const source = data && data[band] ? data[band] : {};
+    const times = Array.isArray(source.times) ? source.times : [];
+    const values = Array.isArray(source.values) ? source.values : [];
+    const samples = [];
+    for (let index = 0; index < Math.min(times.length, values.length); index++) {
+      const time = times[index];
+      const value = values[index];
+      if (Number.isFinite(time) && Number.isFinite(value)) {
+        samples.push({time, value});
+        }
+      }
+    samples.sort((left, right) => left.time - right.time);
+    const timesNormalized = [];
+    const valuesNormalized = [];
+    for (let start = 0; start < samples.length;) {
+      let end = start + 1;
+      let sum = samples[start].value;
+      while (end < samples.length && samples[end].time === samples[start].time) {
+        sum += samples[end].value;
+        end++;
+        }
+      timesNormalized.push(samples[start].time);
+      valuesNormalized.push(sum / (end - start));
+      start = end;
+      }
+    normalized[band] = {
+      times: timesNormalized,
+      values: valuesNormalized,
+      };
+    }
+  return normalized;
+  }
+
 // Linear interpolation with linear extrapolation (edge slopes)
 function interp1D(times, values, t){
   const n = times.length;
@@ -24,21 +60,29 @@ function interp1D(times, values, t){
 
 // Build grid and compute combined X,Y with segmentation (left/interp/right)
 function projectXY(data, coeffs){
+  const missingBands = filters.filter(f => !data[f] || !data[f].times.length || !data[f].values.length);
+  if (missingBands.length) {
+    return {L: [], M: [], R: [], startJD: null, endJD: null, missingBands};
+    }
   // intersection domain where all filters are within their observed ranges
-  const firsts = filters.map(f => data[f].times[0]).filter(v => v != null);
-  const lasts  = filters.map(f => data[f].times[data[f].times.length - 1]).filter(v => v != null);
-  const startJD = Math.max.apply(null, firsts);
-  const endJD   = Math.min.apply(null, lasts);
-  const span = Math.max(1, endJD - startJD);
-  const leftTail  = 0.15 * span;
-  const rightTail = 0.15 * span;
-  // grids
-  const gridLeft = [];
-  for (let t = startJD - leftTail; t < startJD; t += span / 200) gridLeft.push(t);
-  const gridMid = [];
-  for (let t = startJD; t <= endJD; t += span / 200) gridMid.push(t);
-  const gridRight = [];
-  for (let t = endJD; t <= endJD + rightTail; t += span / 200) gridRight.push(t);
+  const firsts = filters.map(f => data[f].times[0]);
+  const lasts  = filters.map(f => data[f].times[data[f].times.length - 1]);
+  const startJD = Math.max(...firsts);
+  const endJD   = Math.min(...lasts);
+  if (!Number.isFinite(startJD) || !Number.isFinite(endJD) || endJD < startJD) {
+    return {L: [], M: [], R: [], startJD: null, endJD: null, missingBands: []};
+    }
+  const span = endJD - startJD;
+  const gridStep = span > 0 ? span / 200 : 0;
+  const gridLeft = span > 0
+    ? Array.from({length: 30}, (_, index) => startJD - (30 - index) * gridStep)
+    : [];
+  const gridMid = span > 0
+    ? Array.from({length: 201}, (_, index) => index === 200 ? endJD : startJD + index * gridStep)
+    : [startJD];
+  const gridRight = span > 0
+    ? Array.from({length: 30}, (_, index) => endJD + (index + 1) * gridStep)
+    : [];
   function combineAt(t) {
     let x = 0, y = 0;
     for (const f of filters){
@@ -52,16 +96,14 @@ function projectXY(data, coeffs){
         }
       y += coeffs.y[f] * it.val;
       }
-    if (t < startJD) mode = "extrapLeft";
-    else if (t > endJD) mode = "extrapRight";
-    else mode = "interp";
+    const mode = t < startJD ? "extrapLeft" : (t > endJD ? "extrapRight" : "interp");
     return {x, y, mode, t: t - startJD};
     } 
     
   const L = gridLeft.map(combineAt).filter(Boolean);
   const M = gridMid.map(combineAt).filter(Boolean);
   const R = gridRight.map(combineAt).filter(Boolean);
-  return {L, M, R, startJD, endJD};
+  return {L, M, R, startJD, endJD, missingBands: []};
   }
   
 function rainbowCoefficients() {

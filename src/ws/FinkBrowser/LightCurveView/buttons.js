@@ -31,11 +31,28 @@ function updateSNIDHighlight() {
     });
   }
   
+function isPresetCollection(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  return Object.values(value).every(preset =>
+    preset && typeof preset === "object" &&
+    preset.x && typeof preset.x === "object" &&
+    preset.y && typeof preset.y === "object" &&
+    filters.every(band => Number.isFinite(preset.x[band]) && Number.isFinite(preset.y[band]))
+    );
+  }
+
 function loadPresets() {
   const stored = localStorage.getItem("savedPresets");
-  if (stored) {
-    savedPresets = JSON.parse(stored);
+  if (!stored) return;
+  try {
+    const parsed = JSON.parse(stored);
+    if (!isPresetCollection(parsed)) throw new TypeError("Invalid preset data");
+    savedPresets = parsed;
     Object.keys(savedPresets).forEach(name => createPresetButton(name));
+    }
+  catch (error) {
+    savedPresets = {};
+    localStorage.removeItem("savedPresets");
     }
   }
 
