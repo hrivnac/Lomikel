@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.lsst.fink-portal.org; worker-src 'self' blob:; object-src 'none'; base-uri 'none'">
     <title>LSST Light Curve Visualizer</title>
     <link rel="stylesheet" href="style.css">
     <script src="vendor/plotly-gl2d-3.1.0.min.js"></script>
@@ -31,6 +31,19 @@
             <button id="resetZero" type="button">Zero coefficients</button>
             <button id="resetRainbow" type="button">Time / wavelength</button>
           </div>
+        </section>
+
+        <section aria-labelledby="fink-heading">
+          <h2 id="fink-heading">Load from Fink</h2>
+          <form id="fink-object-form">
+            <label for="fink-object-id">LSST diaObjectId</label>
+            <div class="object-loader">
+              <input id="fink-object-id" name="diaObjectId" type="text" inputmode="numeric" pattern="[0-9]+" maxlength="30" autocomplete="off" required>
+              <button type="submit">Load object</button>
+            </div>
+          </form>
+          <a id="fink-portal-link" class="portal-link" target="_blank" rel="noopener noreferrer" hidden>Open object in Fink Portal</a>
+          <p class="hint">Positive PSF difference fluxes are converted from nJy to AB magnitudes.</p>
         </section>
 
         <section aria-labelledby="samples-heading">
