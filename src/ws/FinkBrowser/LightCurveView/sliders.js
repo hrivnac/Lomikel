@@ -36,11 +36,25 @@ function updateCoefficientHandle(handle) {
   }
 
 function setCoefficient(handle, x, y) {
+  const changedProjectionMode = coeffs.source !== "manual";
   coeffs.x[handle.band] = +clampCoefficient(x).toFixed(2);
   coeffs.y[handle.band] = +clampCoefficient(y).toFixed(2);
+  coeffs.offsetX = 0;
+  coeffs.offsetY = 0;
+  coeffs.bands = null;
+  coeffs.interval = null;
+  coeffs.source = "manual";
+  if (typeof activeTrajectoryAnalysis !== "undefined") activeTrajectoryAnalysis = null;
+  if (typeof document !== "undefined") {
+    const analysis = document.getElementById("analysis-results");
+    if (analysis) analysis.hidden = true;
+    }
   updateCoefficientHandle(handle);
   updateFormulas();
   schedulePlotUpdate();
+  if (changedProjectionMode && typeof setLoadStatus === "function") {
+    setLoadStatus("Manual projection.");
+    }
   }
 
 function pointerCoefficients(svg, event) {
