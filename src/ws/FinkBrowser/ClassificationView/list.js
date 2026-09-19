@@ -1,42 +1,53 @@
+function portalUrl(survey, objectId) {
+  const hosts = { LSST: "lsst.fink-portal.org", ZTF: "ztf.fink-portal.org" };
+  const host = hosts[survey];
+  if (!host || !/^[A-Za-z0-9_.:-]+$/.test(String(objectId))) return null;
+  const url = new URL(`https://${host}/${encodeURIComponent(String(objectId))}`);
+  return url.href;
+}
+
+function appendClasses(parent, classes) {
+  for (const [name, weight] of Object.entries(classes || {})) {
+    const line = document.createElement("div");
+    line.textContent = `${name}: ${Number(weight).toFixed(4)}`;
+    parent.append(line);
+  }
+}
+
+function objectLink(survey, objectId) {
+  const url = portalUrl(survey, objectId);
+  if (!url) return null;
+  const link = document.createElement("a");
+  link.href = url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = "Fink Portal";
+  return link;
+}
+
+function appendObjectRow(parent, objectId, value, survey, main = false) {
+  const row = document.createElement("div");
+  row.className = `objLine${main ? " mainObj" : ""}`;
+  const heading = document.createElement("div");
+  const strong = document.createElement("strong");
+  strong.textContent = String(objectId);
+  heading.append(strong);
+  const link = objectLink(survey, objectId);
+  if (link) {
+    heading.append(" (", link, ")");
+  }
+  if (!main) heading.append(` — distance ${Number(value.distance).toFixed(4)}`);
+  row.append(heading);
+  appendClasses(row, main ? value : value.classes);
+  parent.append(row);
+}
+
 function updateDetailsPanel(data, survey) {
   const panel = document.getElementById("objectList");
-  if (!panel) return;
-  
-  const rows = [];
-
-  let row = `<div class="objLine mainObj"><div><b><u>${data.objectId}</u></b> (<a href="https://${survey.toLowerCase()}.fink-portal.org/${data.objectId}" target="_blank">Fink</a>)</div><div>`;
-  for (var [k, v] of iterate_object(data.objectClassification)) {
-    row += `${k}: ${v.toFixed(4)}<br/>`;
-    }
-  row += `</div></div>`;
-  rows.push(row);
-    
-  for (var o of objects(data.objects)) {
-    row = `<div class="objLine"><div><b><u>${o.objectId}</b>: ${o.v.distance.toFixed(4)}</u> (<a href="https://${survey.toLowerCase()}.fink-portal.org/${o.objectId}" target="_blank">Fink</a>)</div><div>`;
-    for (var [k, v] of iterate_object(o.v.classes)) {
-      row += `${k}: ${v.toFixed(4)}<br/>`;
-      }
-    row += `</div></div>`;
-    rows.push(row);
-    }
-
-  panel.innerHTML = rows.join("");
-  }
-
-function* iterate_object(o) {
-  var keys = Object.keys(o);
-  for (var i = 0; i  < keys.length; i++) {
-    yield [keys[i], o[keys[i]]];
-    }
-  }
-
-function objects(o) {
-  let os = [];
-  var keys = Object.keys(o);
-  for (var i = 0; i  < keys.length; i++) {
-    os.push({objectId:keys[i], v:o[keys[i]]});
-    }
-  let oss = os.sort((a, b) => a.v.distance - b.v.distance);
-  return oss;
-  }
- 
+  panel.replaceChildren();
+  appendObjectRow(panel, data.objectId, data.objectClassification, survey, true);
+  Object.entries(data.objects || {})
+    .map(([objectId, value]) => ({ objectId: String(objectId), value }))
+    .sort((a, b) => Number(a.value.distance) - Number(b.value.distance))
+    .forEach(({ objectId, value }) => appendObjectRow(panel, objectId, value, survey));
+}
