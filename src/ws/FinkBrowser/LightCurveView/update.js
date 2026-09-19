@@ -12,17 +12,20 @@ function schedulePlotUpdate() {
 function updateFormulas() {
   let fx, fy;
   const curve = lightcurve || demo;
-  const availableBands = filters.filter(f => curve?.[f]?.times?.length && curve?.[f]?.values?.length);
+  const selectedBands = Array.isArray(coeffs.bands) ? coeffs.bands : filters;
+  const availableBands = filters.filter(f => selectedBands.includes(f)
+    && curve?.[f]?.times?.length && curve?.[f]?.values?.length);
+  const terms = axis => availableBands.map(f => `${(coeffs[axis][f] ?? 0).toPrecision(5)}·${f}`).join(" + ");
   if (xTime) {
     fx = "x = ΔMJD";
     }
   else {
     fx = availableBands.length
-      ? 'x = ' + availableBands.map(f => `${(coeffs.x[f] ?? 0).toFixed(2)}·${f}`).join(" + ")
+      ? `x = ${(coeffs.offsetX || 0).toFixed(3)} + ${terms("x")}`
       : "x = no available bands";
     }
   fy = availableBands.length
-    ? 'y = ' + availableBands.map(f => `${(coeffs.y[f] ?? 0).toFixed(2)}·${f}`).join(" + ")
+    ? `y = ${(coeffs.offsetY || 0).toFixed(3)} + ${terms("y")}`
     : "y = no available bands";
   document.getElementById('formulaX').textContent = fx;
   document.getElementById('formulaY').textContent = fy;

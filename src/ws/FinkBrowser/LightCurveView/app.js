@@ -20,6 +20,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initSaveButton();
   initFinkObjectForm();
   loadPresets();
+  document.getElementById("autoProjection")?.addEventListener("click", applyAutomaticProjection);
   document.getElementById("resetRandom").addEventListener("click", resetRandom);
   document.getElementById("resetZero").addEventListener("click", resetZero);
   document.getElementById("resetRainbow").addEventListener("click", resetRainbow);

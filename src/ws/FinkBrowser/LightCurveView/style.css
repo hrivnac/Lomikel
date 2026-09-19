@@ -91,6 +91,42 @@ p {
   font: 700 0.78rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+.analysis-disclaimer {
+  padding: 8px 10px;
+  border-left: 4px solid #9a6700;
+  background: #fff4cf;
+  font-weight: 650;
+}
+
+.analysis-metrics {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.analysis-metrics > div {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(100px, auto);
+  gap: 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #d8dee9;
+}
+
+.analysis-metrics dt {
+  font-weight: 650;
+}
+
+.analysis-metrics dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#analysis-variance {
+  width: 95px;
+  vertical-align: middle;
+}
+
 .hint {
   color: #4a5568;
   font-size: 0.86rem;

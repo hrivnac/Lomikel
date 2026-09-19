@@ -27,10 +27,31 @@
           <div id="formulaX" class="formula"></div>
           <div id="formulaY" class="formula"></div>
           <div class="buttons reset-buttons">
+            <button id="autoProjection" type="button">Automatic PCA projection</button>
             <button id="resetRandom" type="button">Random coefficients</button>
             <button id="resetZero" type="button">Zero coefficients</button>
             <button id="resetRainbow" type="button">Time / wavelength</button>
           </div>
+        </section>
+
+        <section id="analysis-results" aria-labelledby="analysis-heading" hidden>
+          <h2 id="analysis-heading">Exploratory projection diagnostics</h2>
+          <p class="analysis-disclaimer">Descriptive only — not a classifier or class probability.</p>
+          <dl class="analysis-metrics">
+            <div><dt>Demo-calibrated pattern</dt><dd><output id="analysis-pattern">Not available</output></dd></div>
+            <div><dt>Included bands</dt><dd><output id="analysis-bands">Not available</output></dd></div>
+            <div><dt>2D variance retained</dt><dd><output id="analysis-variance-text">Not available</output> <meter id="analysis-variance" min="0" max="1" value="0"></meter></dd></div>
+            <div><dt>Line score</dt><dd><output id="analysis-line">Not available</output></dd></div>
+            <div><dt>Winding</dt><dd><output id="analysis-winding">Not available</output></dd></div>
+            <div><dt>Angular coherence</dt><dd><output id="analysis-monotonicity">Not available</output></dd></div>
+            <div><dt>Closure / RMS radius</dt><dd><output id="analysis-closure">Not available</output></dd></div>
+            <div><dt>Radial variation</dt><dd><output id="analysis-radial">Not available</output></dd></div>
+            <div><dt>Roughness</dt><dd><output id="analysis-roughness">Not available</output></dd></div>
+          </dl>
+          <details>
+            <summary>How this projection is derived</summary>
+            <p class="hint">Bands are standardized over their common observed interval. PCA selects the two directions retaining most standardized variance. The pattern label uses thresholds calibrated only on the generated demos.</p>
+          </details>
         </section>
 
         <section aria-labelledby="fink-heading">
@@ -77,6 +98,7 @@
     <script src="buttons.js"></script>
     <script src="update.js"></script>
     <script src="utils.js"></script>
+    <script src="analysis.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

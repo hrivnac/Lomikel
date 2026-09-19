@@ -37,6 +37,14 @@ function isPresetCollection(value) {
     preset && typeof preset === "object" &&
     preset.x && typeof preset.x === "object" &&
     preset.y && typeof preset.y === "object" &&
+    (preset.offsetX === undefined || Number.isFinite(preset.offsetX)) &&
+    (preset.offsetY === undefined || Number.isFinite(preset.offsetY)) &&
+    (preset.bands === undefined || preset.bands === null ||
+      (Array.isArray(preset.bands) && new Set(preset.bands).size === preset.bands.length &&
+       preset.bands.every(band => filters.includes(band)))) &&
+    (preset.interval === undefined || preset.interval === null ||
+      (Number.isFinite(preset.interval.start) && Number.isFinite(preset.interval.end) &&
+       preset.interval.end >= preset.interval.start)) &&
     filters.every(band => Number.isFinite(preset.x[band]) && Number.isFinite(preset.y[band]))
     );
   }
@@ -72,6 +80,10 @@ function initSaveButton() {
     savedPresets[name] = {
       x: JSON.parse(JSON.stringify(coeffs.x)),
       y: JSON.parse(JSON.stringify(coeffs.y)),
+      offsetX: coeffs.offsetX || 0,
+      offsetY: coeffs.offsetY || 0,
+      bands: Array.isArray(coeffs.bands) ? coeffs.bands.slice() : null,
+      interval: coeffs.interval ? {...coeffs.interval} : null,
       rainbowMode: xTime
       };
       
@@ -94,13 +106,23 @@ function createPresetButton(name) {
   delBtn.textContent = "×";
   delBtn.className = "del-btn";
   presetBtn.addEventListener("click", () => {
-    Object.keys(savedPresets[name].x).forEach(f => {
-      coeffs.x[f] = savedPresets[name].x[f];
-      coeffs.y[f] = savedPresets[name].y[f];
-      rainbowMode = savedPresets[name].rainbowMode;
-      xTime = rainbowMode;
+    const preset = savedPresets[name];
+    Object.keys(preset.x).forEach(f => {
+      coeffs.x[f] = preset.x[f];
+      coeffs.y[f] = preset.y[f];
       });
+    coeffs.offsetX = preset.offsetX || 0;
+    coeffs.offsetY = preset.offsetY || 0;
+    coeffs.bands = Array.isArray(preset.bands) ? preset.bands.slice() : null;
+    coeffs.interval = preset.interval ? {...preset.interval} : null;
+    coeffs.source = "preset";
+    rainbowMode = preset.rainbowMode;
+    xTime = rainbowMode;
+    if (typeof activeTrajectoryAnalysis !== "undefined") activeTrajectoryAnalysis = null;
+    const analysis = document.getElementById("analysis-results");
+    if (analysis) analysis.hidden = true;
     update();
+    if (typeof setLoadStatus === "function") setLoadStatus(`Projection preset "${name}" loaded.`);
     });
   delBtn.addEventListener("click", () => {
     if (confirm(`Delete preset "${name}"?`)) {

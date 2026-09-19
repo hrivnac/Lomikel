@@ -109,6 +109,26 @@ test("projection ignores absent LSST bands and uses the available curves", () =>
   assert.equal(result.M[0].y, 200);
 });
 
+test("projection applies affine offsets from automatic standardized PCA", () => {
+  const context = loadScripts(["consts.js", "utils.js"], {xTime: false});
+  context.input = sixBands(band => band === "g" || band === "r"
+    ? {times: [1, 2], values: [20, 19]}
+    : {times: [], values: []});
+  context.coefficients = {
+    x: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 0])),
+    y: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 0])),
+    offsetX: 3.5,
+    offsetY: -2.25,
+  };
+
+  const result = vm.runInContext("projectXY(normalizeLightcurve(input), coefficients)", context);
+
+  assert.equal(result.M[0].x, 3.5);
+  assert.equal(result.M[0].y, -2.25);
+  assert.equal(result.M.at(-1).x, 3.5);
+  assert.equal(result.M.at(-1).y, -2.25);
+});
+
 test("projection preserves missing bands when available curves do not overlap", () => {
   const context = loadScripts(["consts.js", "utils.js"], {xTime: false});
   context.input = sixBands(band => {
@@ -368,6 +388,9 @@ test("projection formulas omit bands without light curves", () => {
   const coefficients = {
     x: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 1])),
     y: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 2])),
+    offsetX: 3,
+    offsetY: -2,
+    bands: ["z", "g", "i"],
   };
   const context = loadScripts(["consts.js", "update.js"], {
     activeX: [], activeY: [], coeffs: coefficients, demo: curve,
@@ -377,10 +400,11 @@ test("projection formulas omit bands without light curves", () => {
 
   vm.runInContext("updateFormulas()", context);
 
+  assert.match(formulaX.textContent, /^x = 3\.000 \+ /);
+  assert.match(formulaY.textContent, /^y = -2\.000 \+ /);
   assert.match(formulaX.textContent, /·z/);
-  assert.match(formulaY.textContent, /·r/);
-  assert.doesNotMatch(formulaX.textContent, /·Y|·u/);
-  assert.doesNotMatch(formulaY.textContent, /·Y|·u/);
+  assert.doesNotMatch(formulaX.textContent, /·Y|·u|·r/);
+  assert.doesNotMatch(formulaY.textContent, /·Y|·u|·r/);
 });
 
 test("projection rendering uses Plotly.react and labels elapsed time correctly", () => {
@@ -446,6 +470,93 @@ test("projection redraw requests are coalesced to one update per animation frame
   assert.equal(calls.length, 1);
 });
 
+test("preset validation accepts legacy offsets and rejects invalid affine offsets", () => {
+  const context = loadScripts(["buttons.js"], {
+    filters: ["Y", "z", "g", "i", "u", "r"],
+  });
+  const axes = Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 0]));
+  context.legacy = {old: {x: axes, y: axes}};
+  context.affine = {pca: {x: axes, y: axes, offsetX: 2.5, offsetY: -1.5}};
+  context.invalid = {bad: {x: axes, y: axes, offsetX: Number.POSITIVE_INFINITY, offsetY: 0}};
+  context.invalidSelection = {bad: {x: axes, y: axes, bands: ["g", "evil"], interval: {start: 9, end: 1}}};
+
+  assert.equal(vm.runInContext("isPresetCollection(legacy)", context), true);
+  assert.equal(vm.runInContext("isPresetCollection(affine)", context), true);
+  assert.equal(vm.runInContext("isPresetCollection(invalid)", context), false);
+  assert.equal(vm.runInContext("isPresetCollection(invalidSelection)", context), false);
+});
+
+test("saved projections preserve automatic affine offsets", () => {
+  let saveButton;
+  let stored;
+  const container = {appendChild: element => {
+    if (element.className === "save-btn") saveButton = element;
+  }};
+  const context = loadScripts(["buttons.js"], {
+    coeffs: {
+      x: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 1])),
+      y: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 2])),
+      offsetX: 3.25, offsetY: -4.5,
+      bands: ["z", "g", "i"], interval: {start: 1, end: 9},
+    },
+    document: {
+      createElement: () => ({listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; }}),
+      getElementById: id => id === "save-buttons" ? container : {},
+    },
+    filters: ["Y", "z", "g", "i", "u", "r"],
+    localStorage: {setItem: (_key, value) => { stored = JSON.parse(value); }},
+    prompt: () => "auto",
+    savedPresets: {},
+    xTime: false,
+  });
+
+  vm.runInContext("initSaveButton()", context);
+  saveButton.listeners.click();
+
+  assert.equal(stored.auto.offsetX, 3.25);
+  assert.equal(stored.auto.offsetY, -4.5);
+  assert.deepEqual(stored.auto.bands, ["z", "g", "i"]);
+  assert.deepEqual(stored.auto.interval, {start: 1, end: 9});
+});
+
+test("loading a saved projection restores affine offsets", () => {
+  let wrapper;
+  let updates = 0;
+  let status = "";
+  const element = () => ({
+    children: [], listeners: {},
+    addEventListener(name, callback) { this.listeners[name] = callback; },
+    appendChild(child) { this.children.push(child); },
+  });
+  const container = {appendChild: item => { wrapper = item; }};
+  const axesX = Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 1]));
+  const axesY = Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 2]));
+  const context = loadScripts(["buttons.js"], {
+    activeTrajectoryAnalysis: {status: "ok"},
+    coeffs: {x: {}, y: {}, offsetX: 0, offsetY: 0},
+    document: {
+      createElement: element,
+      getElementById: id => id === "save-buttons" ? container : null,
+    },
+    filters: ["Y", "z", "g", "i", "u", "r"],
+    savedPresets: {auto: {x: axesX, y: axesY, offsetX: 3.25, offsetY: -4.5, bands: ["z", "g", "i"], interval: {start: 1, end: 9}, rainbowMode: false}},
+    setLoadStatus: message => { status = message; },
+    update: () => { updates += 1; },
+    xTime: true,
+  });
+
+  vm.runInContext("createPresetButton('auto')", context);
+  wrapper.children[0].listeners.click();
+
+  assert.equal(context.coeffs.offsetX, 3.25);
+  assert.equal(context.coeffs.offsetY, -4.5);
+  assert.deepEqual(Array.from(context.coeffs.bands), ["z", "g", "i"]);
+  assert.deepEqual({...context.coeffs.interval}, {start: 1, end: 9});
+  assert.equal(context.activeTrajectoryAnalysis, null);
+  assert.equal(updates, 1);
+  assert.match(status, /projection preset "auto" loaded/i);
+});
+
 test("invalid saved presets are discarded without breaking initialization", () => {
   for (const stored of ["{broken", "null", "[]"]) {
     const removed = [];
@@ -486,6 +597,16 @@ test("a sample load failure is visible and does not replace the current curve", 
   assert.equal(consoleErrors, 0);
 });
 
+test("the page exposes automatic exploratory projection diagnostics", () => {
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+
+  assert.match(html, /id="autoProjection"/);
+  assert.match(html, /id="analysis-results"/);
+  assert.match(html, /id="analysis-variance"[^>]*><\/meter>/);
+  assert.match(html, /Descriptive only[^<]*not a classifier/i);
+  assert.match(html, /<script src="analysis\.js"><\/script>/);
+});
+
 test("the page is mobile-ready and uses only local executable dependencies", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
@@ -515,6 +636,55 @@ test("coefficient controls do not require D3 and expose keyboard slider semantic
   assert.match(source, /aria-valuetext/);
 });
 
+test("manual coefficient edits clear automatic offsets and diagnostics", () => {
+  const circleAttributes = {};
+  const labelAttributes = {};
+  let status = "";
+  const context = loadScripts(["sliders.js"], {
+    activeTrajectoryAnalysis: {status: "ok"},
+    coeffs: {x: {g: 0}, y: {g: 0}, offsetX: 7, offsetY: -4, bands: ["g", "r", "i"], interval: {start: 1, end: 2}, source: "automatic-pca"},
+    schedulePlotUpdate: () => {},
+    setLoadStatus: message => { status = message; },
+    updateFormulas: () => {},
+  });
+  context.handle = {
+    band: "g",
+    circle: {setAttribute: (name, value) => { circleAttributes[name] = value; }},
+    label: {setAttribute: (name, value) => { labelAttributes[name] = value; }},
+  };
+
+  vm.runInContext("setCoefficient(handle, 1, -1)", context);
+
+  assert.equal(context.coeffs.offsetX, 0);
+  assert.equal(context.coeffs.offsetY, 0);
+  assert.equal(context.coeffs.bands, null);
+  assert.equal(context.coeffs.interval, null);
+  assert.equal(context.coeffs.source, "manual");
+  assert.equal(context.activeTrajectoryAnalysis, null);
+  assert.equal(status, "Manual projection.");
+});
+
+test("projection resets clear automatic offsets and diagnostics", () => {
+  let status = "";
+  const context = loadScripts(["reset.js"], {
+    activeTrajectoryAnalysis: {status: "ok"},
+    coeffs: {x: {}, y: {}, offsetX: 7, offsetY: -4, bands: ["g", "r", "i"], interval: {start: 1, end: 2}, source: "automatic-pca"},
+    filters: ["Y", "z", "g", "i", "u", "r"],
+    setLoadStatus: message => { status = message; },
+    update: () => {},
+  });
+
+  vm.runInContext("resetZero()", context);
+
+  assert.equal(context.coeffs.offsetX, 0);
+  assert.equal(context.coeffs.offsetY, 0);
+  assert.equal(context.coeffs.bands, null);
+  assert.equal(context.coeffs.interval, null);
+  assert.equal(context.coeffs.source, "manual");
+  assert.equal(context.activeTrajectoryAnalysis, null);
+  assert.equal(status, "Zero projection.");
+});
+
 test("coefficient reset refreshes the native slider handles", () => {
   const source = fs.readFileSync(path.join(root, "update.js"), "utf8");
 
@@ -540,14 +710,21 @@ test("the Fink object loader remains usable in the narrow control column", () =>
   assert.match(css, /#fink-object-id\s*\{[^}]*min-height:\s*44px/s);
 });
 
-test("startup initializes each chart once after the DOM is ready", () => {
+test("startup initializes each chart once and wires automatic PCA", () => {
   let ready;
+  let autoClick;
+  let autoCalls = 0;
   let resetCalls = 0;
   let lightCurveCalls = 0;
   const context = loadScripts(["app.js"], {
     window: {addEventListener: (name, callback) => { if (name === "DOMContentLoaded") ready = callback; }},
-    document: {getElementById: () => ({addEventListener: () => {}})},
+    document: {getElementById: id => ({
+      addEventListener: (name, callback) => {
+        if (id === "autoProjection" && name === "click") autoClick = callback;
+      },
+    })},
     generateDemoData: () => ({Y: {times: [1], values: [20]}}),
+    applyAutomaticProjection: () => { autoCalls += 1; },
     resetRandom: () => { resetCalls += 1; }, resetZero: () => {}, resetRainbow: () => {},
     plotLightCurves: () => { lightCurveCalls += 1; },
     initSaveButton: () => {}, loadPresets: () => {}, initSliders: () => {}, createSNIDButtons: () => {},
@@ -556,8 +733,10 @@ test("startup initializes each chart once after the DOM is ready", () => {
   assert.equal(resetCalls, 0);
   assert.equal(lightCurveCalls, 0);
   ready();
+  autoClick();
   assert.equal(resetCalls, 1);
   assert.equal(lightCurveCalls, 1);
+  assert.equal(autoCalls, 1);
 });
 
 test("submitting the Fink form loads the exact text identifier", async () => {

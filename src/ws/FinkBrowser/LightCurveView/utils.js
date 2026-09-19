@@ -60,16 +60,22 @@ function interp1D(times, values, t){
 
 // Build grid and compute combined X,Y with segmentation (left/interp/right)
 function projectXY(data, coeffs){
-  const availableBands = filters.filter(f => data[f] && data[f].times.length && data[f].values.length);
-  const missingBands = filters.filter(f => !availableBands.includes(f));
+  const observedBands = filters.filter(f => data[f] && data[f].times.length && data[f].values.length);
+  const selectedBands = Array.isArray(coeffs.bands)
+    ? filters.filter(f => coeffs.bands.includes(f))
+    : filters;
+  const availableBands = selectedBands.filter(f => observedBands.includes(f));
+  const missingBands = filters.filter(f => !observedBands.includes(f));
   if (!availableBands.length) {
     return {L: [], M: [], R: [], startJD: null, endJD: null, missingBands};
     }
   // intersection domain where every available filter is within its observed range
   const firsts = availableBands.map(f => data[f].times[0]);
   const lasts  = availableBands.map(f => data[f].times[data[f].times.length - 1]);
-  const startJD = Math.max(...firsts);
-  const endJD   = Math.min(...lasts);
+  const requestedStart = Number.isFinite(coeffs.interval?.start) ? coeffs.interval.start : -Infinity;
+  const requestedEnd = Number.isFinite(coeffs.interval?.end) ? coeffs.interval.end : Infinity;
+  const startJD = Math.max(requestedStart, ...firsts);
+  const endJD   = Math.min(requestedEnd, ...lasts);
   if (!Number.isFinite(startJD) || !Number.isFinite(endJD) || endJD < startJD) {
     return {L: [], M: [], R: [], startJD: null, endJD: null, missingBands};
     }
@@ -85,7 +91,8 @@ function projectXY(data, coeffs){
     ? Array.from({length: 30}, (_, index) => endJD + (index + 1) * gridStep)
     : [];
   function combineAt(t) {
-    let x = 0, y = 0;
+    let x = coeffs.offsetX || 0;
+    let y = coeffs.offsetY || 0;
     for (const f of availableBands){
       const it = interp1D(data[f].times, data[f].values, t);
       if (it.val == null) return null;
