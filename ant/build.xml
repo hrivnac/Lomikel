@@ -878,6 +878,7 @@
       <fileset dir="../src/ws/FinkBrowser">
         <include name="**/*"/>
         <exclude name="Apps.html"/>
+	    	<exclude name="LightCurveView/sn_lightcurves/**/*"/>
         </fileset>
       <fileset dir="../build/FinkBrowser">
         <include name="Apps.html"/>
@@ -899,7 +900,7 @@
         <exclude name="HBaseClient.jsp"/>
         <exclude name="profiles/*"/>
         <exclude name="styles/*"/>
-        <exclude name="d3/actions.js"/>
+        <exclude name="FinkBrowser/*"/>
         </fileset>
       <fileset dir="../extlib/ws">
 	    	<include name="**/*"/>
@@ -916,8 +917,7 @@
         </fileset>
       <classes dir="../src/ws/FinkBrowser">
         <include name="d3/actions.js"/>
-        <include name="log4j.xml"/>
-        </classes>
+       </classes>
       <lib file="../lib/Lomikel-Janus-${version}.exe.jar"/>
       <lib file="../lib/Lomikel-Janus-${version}.jar"/>
       <lib file="../lib/Lomikel-${version}.jar"/>
@@ -1347,6 +1347,45 @@
       <arg value="stop"/>
       <arg value="--stop"/>
       </java>
+    </target>
+    
+  <target name="start-AlertsView"
+          depends="init"
+          description="Run local AlertsView">
+    <echo>Go to http://localhost:8000</echo>
+    <exec executable="/usr/bin/python3">
+      <arg value="-m"/>
+      <arg value="http.server"/>
+      <arg value="8000"/>
+      <arg value="-d"/>
+      <arg value="../src/ws/FinkBrowser/AlertsView"/>
+      </exec>
+    </target>
+    
+  <target name="start-LightCurveView"
+          depends="init"
+          description="Run local LightCurveView">
+    <echo>Go to http://localhost:8001</echo>
+    <exec executable="/usr/bin/python3">
+      <arg value="-m"/>
+      <arg value="http.server"/>
+      <arg value="8001"/>
+      <arg value="-d"/>
+      <arg value="../src/ws/FinkBrowser/LightCurveView"/>
+      </exec>
+    </target>
+    
+  <target name="start-ClassificationView"
+          depends="init"
+          description="Run local ClassificationView">
+    <echo>Go to http://localhost:8002</echo>
+    <exec executable="/usr/bin/python3">
+      <arg value="-m"/>
+      <arg value="http.server"/>
+      <arg value="8002"/>
+      <arg value="-d"/>
+      <arg value="../src/ws/FinkBrowser/ClassificationView"/>
+      </exec>
     </target>
     
   <!-- Start Groovy Gateway Server ==========================================-->
