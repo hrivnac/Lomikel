@@ -91,7 +91,7 @@ test("objectNeighborhood2JSON calls the matching gr method and parses its JSON",
   assert.equal(calls[0][0], "https://graph.example.test/gremlin");
   assert.equal(calls[0][1].method, "POST");
   assert.equal(calls[0][1].redirect, "error");
-  assert.equal(calls[0][1].headers["Content-Type"], "application/json");
+  assert.equal(calls[0][1].headers["Content-Type"], "text/plain;charset=UTF-8");
   assert.deepEqual(JSON.parse(calls[0][1].body), {
     gremlin:
       "gr.objectNeighborhood2JSON('170028486134595648','FINK=default','FINK=experimental',12,'Cosine',0.2)",

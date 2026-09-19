@@ -1,128 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Neighborhood Visualization</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://hrivnac.web.cern.ch/cgi-bin/record.pl?page=ClassificationView"></script>                                                       |
-    </head>
-  <body>
-    <button id="help-btn">?</button>
-    <!-- Help modal -->
-    <div id="help-modal" class="modal">
-      <div class="modal-content">
-        <span id="close-help" class="close">&times;</span>
-        <h2>Help</h2>
-        <p>Application shows classification-based neigborhood (i.e. other objects with similar classification)
-           for any object of ZTF or LSST. User can choose:
-           <ul>
-             <li><b>Object ID</b> of requested object from either ZTF or LSST.</li>
-             <li><b>Classifier</b> used to classify objects.
-                 <ul>
-                   <li><b>FINK</b> is based on the FINK classiofication.</li>
-                   <li><b>XMATCH</b> is based on other classifications aquired via FINK.</li>
-                   <li><b>FEATURES</b> uses classification based on PCA and clusterring of alerts physical properties.</li>
-                   <li><b>LIGHTCURVES</b> uses learned properties of objects light curves.</li>
-                   <li><b>TAG</b> is using user-supplied selections.</li>
-                   </ul>
-               </li>
-             <li><b>Re-Classifier</b> can re-interpred classification by another Classifier. 
-                 <ul>
-                   <li><b>none</b> doesn't re-interpret.</li>
-                   </ul>
-               </li>
-             <li><b>Metric</b> to calculate distances between objects in the space of classifications.</li>
-             <li><b>nmax</b> - the maximal number of closest objects to show. If less than 1, the number of objects
-                               to show is calculated via differences in distances between subsequent objects
-                               (smaller numbers is less selective). 0 gives all close objects.</li>
-             </ul>
-           Double-click on an object (represented by blue star) triggers the search centered on that object.
-           Objects pop-up shows classification details and allows to navigate to Fink Portal of concerned object.shown 
-           A list of those objects is shown too, with the same information (distances and classifications).
-           If data loading fails, the demo data are shown.
-           </p>
-        </div>
-      </div> 
-    <!-- Movable details panel -->
-    <div id="list" class="draggable">
-       <div id="list-header">Neighbours</div>
-       <div id="list-body">
-         <div id="objectList">No objects loaded</div>
-         </div>
-      </div>
-    <!-- Movable controls panel -->
-    <div id="controls" class="draggable">
-      <div id="controls-header">Neighborhood Parameters</div>
-      <div id="controls-body">
-        <label>Survey:
-          <select id="survey">
-            <option value="ZTF">ZTF</option>
-            <option value="LSST"selected>LSST</option>
-            </select>
-          </label>
-        <br>  
-        <label>Object ID:
-          <!--input type="text" id="objectId" value="ZTF20aalmymq"-->
-          <input type="text" id="objectId" value="170028526873870371">
-          </label>
-        <br>  
-        <label>Classifier:
-          <select id="classifier">
-            <option value="FINK" selected>FINK</option>
-            <option value="XMATCH"XMATCH</option>
-            <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
-            <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
-            <option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option>
-            <option value="TAG">TAG</option>
-            </select>
-          </label>
-        <br>  
-        <label>Re-Classifier:
-          <select id="reclassifier">
-            <option value="none" selected>none</option>
-            <option value="FINK">FINK</option>
-            <option value="XMATCH">XMATCH</option>
-            <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
-            <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
-            <option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option>
-            <option value="TAG">TAG</option>
-            </select>
-          </label>
-        <br>  
-        <label>Metric:
-          <select id="metric">
-            <option value="JensenShannon" selected>JensenShannon</option>
-            <option value="Euclidean">Euclidean</option>
-            <option value="Cosine">Cosine</option>
-            </select>
-          </label>
-        <br>  
-        <!-- slider range remains 0..1 but initial value set to 0.25 so displayed nmax = 0.5 -->
-        <label>nmax:
-          <input type="range" id="nmax" min="0" max="1" step="0.001" value="0.25">
-          <span id="nmaxValue">0.5</span>
-          </label>
-        <br>  
-        <button id="showBtn">Show</button>
-        </div>
-      </div>
-    <!-- Tooltip and Viz -->
-    <div id="tooltip"></div>
-    <div id="viz"></div>
-    <button id="resetBtn">Reset Zoom</button>  
-    <!-- Loading spinner -->
-    <div id="loading-spinner" class="spinner-overlay">
-      <div id="spinner-wheel" class="spinner"></div>
-      </div> 
-    <script src="data.js"></script>
-    <script src="overlaps.js"></script>
-    <script src="drawing.js"></script>
-    <script src="menu.js"></script>
-    <script src="list.js"></script>
-    <script src="help.js"></script>
-    <script src="spinner.js"></script>
-    <script src="app.js"></script>
-    </body>
-  </html>
-  
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' http://134.158.243.144:24444; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Classification Neighborhood</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <button id="help-btn" type="button" aria-controls="help-modal" aria-expanded="false">?</button>
+  <section id="help-modal" class="modal" hidden aria-labelledby="help-title">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button id="close-help" class="close" type="button" aria-label="Close help">×</button>
+      <h2 id="help-title">Classification neighborhood</h2>
+      <p>Objects are placed from their classifications. Classes are arranged approximately around a circle using their measured mutual overlaps; nearest objects are connected by JanusGraph classification distance.</p>
+      <p>LSST is configured for the public graph endpoint. ZTF remains unavailable until a verified endpoint is configured; the application never substitutes unrelated demo data.</p>
+    </div>
+  </section>
+  <div id="status" role="status" aria-live="polite" data-state="idle">Not loaded.</div>
+  <div id="list" class="draggable"><div id="list-header">Nearest objects</div><div id="list-body"><div id="objectList">No objects loaded</div></div></div>
+  <div id="controls" class="draggable"><div id="controls-header">Neighborhood parameters</div><div id="controls-body">
+    <label>Survey: <select id="survey"><option value="LSST" selected>LSST</option><option value="ZTF">ZTF (unconfigured)</option></select></label>
+    <label>Object ID: <input id="objectId" value="170028526873870371" inputmode="text"></label>
+    <label>Classifier: <select id="classifier"><option value="FINK" selected>FINK</option><option value="XMATCH">XMATCH</option><option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option><option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option><option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option><option value="TAG">TAG</option></select></label>
+    <label>Re-classifier: <select id="reclassifier"><option value="none" selected>none</option><option value="FINK">FINK</option><option value="XMATCH">XMATCH</option><option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option><option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option><option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option><option value="TAG">TAG</option></select></label>
+    <label>Metric: <select id="metric"><option value="JensenShannon" selected>JensenShannon</option><option value="Euclidean">Euclidean</option><option value="Cosine">Cosine</option></select></label>
+    <label>nmax: <input type="number" id="nmaxValue" min="0" max="20" step="1" value="5"></label>
+    <button id="showBtn" type="button">Show</button>
+  </div></div>
+  <div id="tooltip" role="status"></div><main id="viz"></main><button id="resetBtn" type="button">Reset zoom</button>
+  <div id="loading-spinner" class="spinner-overlay" hidden aria-label="Loading"><div class="spinner"></div></div>
+  <script src="d3.min.js"></script>
+  <script src="fink_graph.js"></script>
+  <script src="data.js"></script>
+  <script src="overlaps.js"></script>
+  <script src="drawing.js"></script>
+  <script src="menu.js"></script>
+  <script src="list.js"></script>
+  <script src="help.js"></script>
+  <script src="spinner.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

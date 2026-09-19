@@ -2,7 +2,7 @@ body {
   font-family: sans-serif;
   background: #fafafa;
   margin: 0;
-  overflow: hidden;
+  overflow: auto;
   }
 
 #viz {
@@ -24,6 +24,20 @@ body {
   display: none;
   z-index: 100;
   }
+
+#status {
+  position: fixed;
+  z-index: 250;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ccc;
+}
+
+#status[data-state="error"] { color: #a00; }
+#status[data-state="warning"] { color: #8a5200; }
 
 button {
   cursor: pointer;
@@ -173,6 +187,8 @@ button:hover {
   justify-content: center;
   }
 
+.spinner-overlay:not([hidden]) { display: flex; }
+
 .spinner {
   border: 6px solid #f3f3f3;
   border-top: 6px solid #555;
@@ -185,3 +201,9 @@ button:hover {
 @keyframes spin {
   to {transform: rotate(360deg);}
   }
+
+@media (max-width: 700px) {
+  #controls, #list { position: relative; top: auto; right: auto; left: auto; width: auto; margin: 8px; }
+  #viz { height: 60vh; min-height: 320px; }
+  .modal-content { width: auto; margin: 10% 5%; }
+}
