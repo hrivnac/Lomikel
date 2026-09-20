@@ -78,11 +78,13 @@ public class JanusClient implements ModifyingGremlinClient {
     * @param properties The file with the complete properties. */
   public JanusClient(String properties) {
     Init.init("JanusClient");
+    _properties = properties;
     open(properties);
     }
     
   /** Open graph with already set parameters. */
   public void open() {
+    _properties = null;
     log.info("Opening " + _table + "@" + _hostname);
     if (_batch) {
       log.info("\tas batch");
@@ -101,6 +103,7 @@ public class JanusClient implements ModifyingGremlinClient {
   /** Open graph with file-based properties.
     * @param properties The file with the complete properties. */
   public void open(String properties) {
+    _properties = properties;
     log.info("Opening " + properties);
     Properties p = new Properties();
     try {
@@ -138,7 +141,12 @@ public class JanusClient implements ModifyingGremlinClient {
   public void reopen() {
     commit();
     close();
-    open();
+    if (_properties == null) {
+      open();
+      }
+    else {
+      open(_properties);
+      }
     }
     
   @Override
@@ -186,6 +194,9 @@ public class JanusClient implements ModifyingGremlinClient {
   private int _port;
   
   private boolean _batch;
+
+  /** File-based configuration, or {@code null} for explicit HBase parameters. */
+  private String _properties;
     
   private boolean _found;  
     

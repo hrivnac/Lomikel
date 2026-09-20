@@ -9,6 +9,7 @@ import com.astrolabsoftware.FinkBrowser.Januser.OCol;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -21,10 +22,12 @@ public final class JanuserRegressionTest {
 
   public static void main(String[] args) throws Exception {
     testGetOrCreateCreatesMissingVertexAndReusesExistingVertex();
+    testDeepDropHandlesCyclesAndNonJanusVertices();
     testRecipeCommitUsesClientAbstraction();
     testOColEqualityDoesNotCollapseHashCollisions();
     testFinkRegistrationPreservesNumericWeights();
     testTimerCommitsIndependentlyOfReportingInterval();
+    testReopenPreservesPropertiesConfiguration();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -52,6 +55,53 @@ public final class JanuserRegressionTest {
       }
     finally {
       client.close();
+      }
+    }
+
+  private static void testDeepDropHandlesCyclesAndNonJanusVertices() throws Exception {
+    FakeClient client = new FakeClient();
+    Thread worker = null;
+    try {
+      Vertex root = client.g().addV("node").property("lbl", "node").property("id", "root").next();
+      Vertex[] previous = new Vertex[] {root};
+      for (int layer = 0; layer < 22; layer++) {
+        Vertex left = client.g().addV("node").property("lbl", "node").property("id", "left-" + layer).next();
+        Vertex right = client.g().addV("node").property("lbl", "node").property("id", "right-" + layer).next();
+        for (Vertex parent : previous) {
+          parent.addEdge("contains", left);
+          parent.addEdge("contains", right);
+          }
+        previous = new Vertex[] {left, right};
+        }
+      for (Vertex leaf : previous) {
+        leaf.addEdge("contains", root);
+        }
+      Vertex unrelated = client.g().addV("node").property("lbl", "node").property("id", "other").next();
+      AtomicReference<Throwable> failure = new AtomicReference<>();
+      worker = new Thread(() -> {
+        try {
+          new GremlinRecipies(client).drop("node", "id", "root", true);
+          }
+        catch (Throwable e) {
+          failure.set(e);
+          }
+        }, "deep-drop-regression");
+      worker.setDaemon(true);
+      worker.start();
+      worker.join(2000L);
+
+      require(!worker.isAlive(), "deep drop must terminate without enumerating every simple path");
+      if (failure.get() != null) {
+        throw new AssertionError("deep drop must support non-JanusGraph vertices", failure.get());
+        }
+      require(client.g().V().has("id", "root").hasNext() == false, "deep drop must remove the selected root");
+      require(client.g().V().has("id", "left-21").hasNext() == false, "deep drop must remove reachable children");
+      require(client.g().V(unrelated.id()).hasNext(), "deep drop must not remove unrelated vertices");
+      }
+    finally {
+      if (worker == null || !worker.isAlive()) {
+        client.close();
+        }
       }
     }
 
@@ -93,6 +143,32 @@ public final class JanuserRegressionTest {
       }
     finally {
       Files.deleteIfExists(properties);
+      }
+    }
+
+  private static void testReopenPreservesPropertiesConfiguration() throws Exception {
+    Path firstProperties = Files.createTempFile("januser-reopen-first-", ".properties");
+    Path secondProperties = Files.createTempFile("januser-reopen-second-", ".properties");
+    Files.writeString(firstProperties, "storage.backend=inmemory\n");
+    Files.writeString(secondProperties, "storage.backend=inmemory\n");
+    JanusClient client = null;
+    try {
+      client = new JanusClient(firstProperties.toString());
+      client.close();
+      client.open(secondProperties.toString());
+      Files.delete(firstProperties);
+
+      client.reopen();
+
+      require(client.g().V().count().next() == 0L,
+              "reopen must reuse the most recently opened file-based configuration");
+      }
+    finally {
+      if (client != null) {
+        client.close();
+        }
+      Files.deleteIfExists(firstProperties);
+      Files.deleteIfExists(secondProperties);
       }
     }
 

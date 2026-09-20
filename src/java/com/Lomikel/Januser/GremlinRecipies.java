@@ -15,8 +15,6 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
-// Janus Graph
-import org.janusgraph.graphdb.vertices.StandardVertex;
 
 // HBase
 import org.apache.hadoop.hbase.client.Get;
@@ -24,6 +22,7 @@ import org.apache.hadoop.hbase.client.Get;
 
 // Java
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -135,18 +134,30 @@ public GraphTraversal<Vertex, Vertex> allV() {
                    Object  propertyValue,
                    boolean deep) {
     if (deep) {
-      List<Object> vv = g().V().has("lbl", label).
-                                has(propertyName, propertyValue).
-                                store("s").
-                                repeat(out().
-                                store("s")).
-                                cap("s").
-                                unfold().
-                                toList();
-      StandardVertex v;
-      for (Object o : vv) {
-        v = (StandardVertex)o;
-        v.remove();
+      Set<Object> visited = new HashSet<>(g().V().has("lbl", label).
+                                                   has(propertyName, propertyValue).
+                                                   id().
+                                                   toList());
+      Set<Object> frontier = new HashSet<>(visited);
+      while (!frontier.isEmpty()) {
+        Set<Object> next = new HashSet<>();
+        for (Object id : g().V(frontier.toArray()).out().id().toList()) {
+          if (visited.add(id)) {
+            next.add(id);
+            }
+          }
+        frontier = next;
+        }
+      List<Object> batch = new ArrayList<>(1000);
+      for (Object id : visited) {
+        batch.add(id);
+        if (batch.size() == 1000) {
+          g().V(batch.toArray()).drop().iterate();
+          batch.clear();
+          }
+        }
+      if (!batch.isEmpty()) {
+        g().V(batch.toArray()).drop().iterate();
         }
       }
     else {    
