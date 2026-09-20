@@ -97,6 +97,14 @@
     return result;
   }
 
+  function createAbortError(reason) {
+    if (reason instanceof Error && reason.name === "AbortError") return reason;
+    const error = new Error("graph request was cancelled");
+    error.name = "AbortError";
+    if (reason !== undefined) error.cause = reason;
+    return error;
+  }
+
   function parseMethodResult(payload, methodName, expectedType) {
     if (payload === null || typeof payload !== "object") {
       throw new TypeError("invalid Gremlin response payload");
@@ -169,11 +177,37 @@
 
     const controller =
       typeof AbortController === "function" ? new AbortController() : null;
+    const externalSignal = options.signal;
+    if (
+      externalSignal !== undefined &&
+      (externalSignal === null ||
+        typeof externalSignal.aborted !== "boolean" ||
+        typeof externalSignal.addEventListener !== "function")
+    ) {
+      throw new TypeError("signal must be an AbortSignal");
+    }
+    if (externalSignal?.aborted) {
+      throw createAbortError(externalSignal.reason);
+    }
     const timeoutError = new Error(
       `request to ${graphUrl} timed out after ${timeoutMs} ms`,
     );
     let timedOut = false;
+    let externallyAborted = false;
     let timer;
+    let rejectExternalAbort;
+    const externalAbortPromise = new Promise((_, reject) => {
+      rejectExternalAbort = reject;
+    });
+    const handleExternalAbort = () => {
+      externallyAborted = true;
+      const abortError = createAbortError(externalSignal.reason);
+      rejectExternalAbort(abortError);
+      if (controller) controller.abort(abortError);
+    };
+    if (externalSignal) {
+      externalSignal.addEventListener("abort", handleExternalAbort, { once: true });
+    }
     const timeoutPromise = new Promise((_, reject) => {
       timer = setTimeout(() => {
         timedOut = true;
@@ -194,6 +228,7 @@
         });
       } catch (error) {
         if (timedOut) throw timeoutError;
+        if (externallyAborted) throw createAbortError(externalSignal.reason);
         throw new Error(`request to ${graphUrl} failed: ${error.message}`, {
           cause: error,
         });
@@ -209,6 +244,7 @@
             detail = (await response.text()).slice(0, 1000);
           } catch (_) {
             if (timedOut) throw timeoutError;
+            if (externallyAborted) throw createAbortError(externalSignal.reason);
             detail = "";
           }
         }
@@ -222,6 +258,7 @@
         payload = await response.json();
       } catch (error) {
         if (timedOut) throw timeoutError;
+        if (externallyAborted) throw createAbortError(externalSignal.reason);
         throw new SyntaxError(`invalid JSON response from ${graphUrl}`, {
           cause: error,
         });
@@ -230,9 +267,16 @@
     })();
 
     try {
-      return await Promise.race([requestPromise, timeoutPromise]);
+      return await Promise.race([
+        requestPromise,
+        timeoutPromise,
+        externalAbortPromise,
+      ]);
     } finally {
       clearTimeout(timer);
+      if (externalSignal) {
+        externalSignal.removeEventListener("abort", handleExternalAbort);
+      }
     }
   }
 
@@ -246,6 +290,7 @@
    * @param {number} [options.nmax=5] Count (>=1), relative cutoff (0<n<1), or 0.
    * @param {"JensenShannon"|"Euclidean"|"Cosine"} [options.metric="JensenShannon"]
    * @param {number} [options.climit=0] Classification-weight lower limit.
+   * @param {AbortSignal} [options.signal] Optional caller cancellation signal.
    * @returns {Promise<object>}
    */
   async function objectNeighborhood2JSON(objectId, classifier, options = {}) {

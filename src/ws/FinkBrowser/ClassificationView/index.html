@@ -8,32 +8,129 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <button id="help-btn" type="button" aria-controls="help-modal" aria-expanded="false">?</button>
-  <section id="help-modal" class="modal" hidden aria-labelledby="help-title">
-    <div class="modal-content" role="dialog" aria-modal="true">
-      <button id="close-help" class="close" type="button" aria-label="Close help">×</button>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Fink graph explorer</p>
+      <h1>Classification neighborhood</h1>
+    </div>
+    <button id="help-btn" class="icon-button" type="button" aria-controls="help-modal" aria-expanded="false" aria-label="Open help">?</button>
+  </header>
+
+  <section id="help-modal" class="modal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="help-title" tabindex="-1">
+      <button id="close-help" class="close icon-button" type="button" aria-label="Close help">×</button>
+      <p class="eyebrow">How to read the map</p>
       <h2 id="help-title">Classification neighborhood</h2>
-      <p>Objects are placed from their classifications. Classes are arranged approximately around a circle using their measured mutual overlaps; nearest objects are connected by JanusGraph classification distance.</p>
-      <p>LSST is configured for the public graph endpoint. ZTF remains unavailable until a verified endpoint is configured; the application never substitutes unrelated demo data.</p>
+      <p>The red star is the selected alert and blue stars are its nearest JanusGraph neighbors. Edge labels report their original graph distance.</p>
+      <p>Classes are arranged around the outer ring using raw common-alert intersection counts. The force projection makes stronger overlaps tend to smaller angular separations, but it is not an exact distance scale.</p>
+      <p>Object positions are an approximate 2D projection: direction reflects classification affinity, while distance from the selected alert reflects JanusGraph distance. Coincident symbols are fanned apart slightly; when two alerts have identical affinity, their direction is mathematically undefined and deterministic spacing is used only for selection.</p>
+      <p>Alerts with an exact zero graph distance are separated by a tiny dashed visual offset so that each remains selectable; their displayed distance stays 0.</p>
+      <p>Hover, focus, or tap a star for classifications. Press <kbd>Enter</kbd> on a focused star, or double-click it, to make that alert the new center. Pan by dragging the map and zoom with the wheel or pinch gesture.</p>
+      <p class="notice">LSST uses the configured public graph endpoint. ZTF stays disabled until a verified endpoint is available; no unrelated demo data is substituted.</p>
     </div>
   </section>
-  <div id="status" role="status" aria-live="polite" data-state="idle">Not loaded.</div>
-  <div id="list" class="draggable"><div id="list-header">Nearest objects</div><div id="list-body"><div id="objectList">No objects loaded</div></div></div>
-  <div id="controls" class="draggable"><div id="controls-header">Neighborhood parameters</div><div id="controls-body">
-    <label>Survey: <select id="survey"><option value="LSST" selected>LSST</option><option value="ZTF">ZTF (unconfigured)</option></select></label>
-    <label>Object ID: <input id="objectId" value="170028526873870371" inputmode="text"></label>
-    <label>Classifier: <select id="classifier"><option value="FINK" selected>FINK</option><option value="XMATCH">XMATCH</option><option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option><option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option><option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option><option value="TAG">TAG</option></select></label>
-    <label>Re-classifier: <select id="reclassifier"><option value="none" selected>none</option><option value="FINK">FINK</option><option value="XMATCH">XMATCH</option><option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option><option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option><option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option><option value="TAG">TAG</option></select></label>
-    <label>Metric: <select id="metric"><option value="JensenShannon" selected>JensenShannon</option><option value="Euclidean">Euclidean</option><option value="Cosine">Cosine</option></select></label>
-    <label>nmax: <input type="number" id="nmaxValue" min="0" max="20" step="1" value="5"></label>
-    <button id="showBtn" type="button">Show</button>
-  </div></div>
-  <div id="tooltip" role="status"></div><main id="viz"></main><button id="resetBtn" type="button">Reset zoom</button>
-  <div id="loading-spinner" class="spinner-overlay" hidden aria-label="Loading"><div class="spinner"></div></div>
+
+  <div id="workspace">
+    <aside id="list" class="panel draggable" aria-labelledby="list-heading">
+      <div id="list-header" class="panel-header">
+        <h2 id="list-heading">Nearest alerts</h2>
+        <span class="drag-hint" aria-hidden="true">drag</span>
+      </div>
+      <div id="list-body" class="panel-body">
+        <div class="legend" aria-label="Map legend">
+          <span><i class="legend-mark main"></i>Selected</span>
+          <span><i class="legend-mark neighbor"></i>Neighbor</span>
+          <span><i class="legend-mark class"></i>Class ring</span>
+        </div>
+        <div id="objectList">No alerts loaded.</div>
+      </div>
+    </aside>
+
+    <aside id="controls" class="panel draggable" aria-labelledby="controls-heading">
+      <div id="controls-header" class="panel-header">
+        <h2 id="controls-heading">Neighborhood</h2>
+        <span class="drag-hint" aria-hidden="true">drag</span>
+      </div>
+      <form id="controlsForm" class="panel-body">
+        <label for="survey">Survey</label>
+        <select id="survey" name="survey">
+          <option value="LSST" selected>LSST</option>
+          <option value="ZTF" disabled>ZTF — endpoint unavailable</option>
+        </select>
+
+        <label for="objectId">Object ID</label>
+        <input id="objectId" name="objectId" value="170028486134595648" inputmode="text" autocomplete="off" spellcheck="false" required>
+
+        <label for="classifier">Classifier</label>
+        <select id="classifier" name="classifier">
+          <option value="FINK" selected>FINK</option>
+          <option value="XMATCH">XMATCH</option>
+          <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
+          <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
+          <option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option>
+          <option value="TAG">TAG</option>
+        </select>
+
+        <label for="reclassifier">Re-classifier</label>
+        <select id="reclassifier" name="reclassifier">
+          <option value="none" selected>None</option>
+          <option value="FINK">FINK</option>
+          <option value="XMATCH">XMATCH</option>
+          <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
+          <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
+          <option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option>
+          <option value="TAG">TAG</option>
+        </select>
+
+        <label for="metric">Distance metric</label>
+        <select id="metric" name="metric">
+          <option value="JensenShannon" selected>Jensen–Shannon</option>
+          <option value="Euclidean">Euclidean</option>
+          <option value="Cosine">Cosine</option>
+        </select>
+
+        <label for="nmaxValue">Neighbor limit</label>
+        <input type="number" id="nmaxValue" name="nmax" min="0" max="20" step="any" value="2" aria-describedby="nmax-help" required>
+        <small id="nmax-help">1–20: count · 0 &lt; cutoff &lt; 1: relative cutoff · 0: all (slow)</small>
+
+        <button id="showBtn" class="primary-button" type="submit">Show neighborhood</button>
+      </form>
+    </aside>
+
+    <main id="viz" aria-label="Classification neighborhood map">
+      <div id="empty-state">
+        <div class="empty-icon" aria-hidden="true">✦</div>
+        <h2>Explore an alert neighborhood</h2>
+        <p>Choose the graph parameters and press <strong>Show neighborhood</strong>.</p>
+        <p class="muted">Queries run against the live graph and may take several seconds.</p>
+      </div>
+    </main>
+
+    <div id="graph-tools" aria-label="Map controls">
+      <button id="resetBtn" type="button" disabled>Reset view</button>
+    </div>
+  </div>
+
+  <div id="tooltip" role="tooltip" hidden></div>
+  <div id="status" role="status" aria-live="polite" data-state="idle">Ready.</div>
+
+  <div id="loading-spinner" class="spinner-overlay" hidden aria-live="polite">
+    <div class="loading-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <div>
+        <strong>Querying the graph…</strong>
+        <p>This can take several seconds.</p>
+      </div>
+      <button id="cancelBtn" type="button">Cancel</button>
+    </div>
+  </div>
+
   <script src="d3.min.js"></script>
   <script src="fink_graph.js"></script>
+  <script src="validation.js"></script>
   <script src="data.js"></script>
   <script src="overlaps.js"></script>
+  <script src="layout.js"></script>
   <script src="drawing.js"></script>
   <script src="menu.js"></script>
   <script src="list.js"></script>

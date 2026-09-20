@@ -243,6 +243,23 @@ test("keeps timeout active while the response body is consumed", async () => {
   );
 });
 
+test("external AbortSignal cancels an in-flight graph request", async () => {
+  const controller = new AbortController();
+  const request = overlaps2JSON("FINK", {
+    graphUrl: "https://graph.example.test",
+    fetchImpl: async () => new Promise(() => {}),
+    signal: controller.signal,
+    timeoutMs: 50,
+  });
+
+  setTimeout(() => controller.abort(), 5);
+
+  await assert.rejects(request, (error) => {
+    assert.equal(error.name, "AbortError");
+    return true;
+  });
+});
+
 test("reports HTTP, Gremlin, and malformed payload failures", async (t) => {
   await t.test("HTTP failure", async () => {
     await assert.rejects(

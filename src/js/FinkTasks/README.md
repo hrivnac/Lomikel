@@ -91,12 +91,14 @@ Options:
 - `climit`: classification-weight lower limit from 0 through 1 (default: `0`);
 - `graphUrl`: absolute Gremlin HTTP(S) endpoint;
 - `timeoutMs`: positive request timeout in milliseconds (default: `180000`);
+- `signal`: optional `AbortSignal` for caller-controlled cancellation;
 - `allowInsecureGraph`: explicit opt-in for a remote HTTP endpoint;
 - `fetchImpl`: optional Fetch-compatible implementation.
 
 ### `overlaps2JSON(classifier = null, options = {})`
 
-The classifier may include a flavor after `=`, such as `FINK=default`. Pass
+The classifier may include a flavor after `=`, including slash-containing
+values such as `FEATURES=2025/13-50`. Pass
 `null` to request all classifiers. Transport options are the same as above.
 
 ## Test
