@@ -38,6 +38,30 @@ test("ClassificationView calls reusable graph APIs with all query controls", () 
   assert.match(overlaps, /classifier/);
 });
 
+test("both LSST and ZTF graph endpoints are enabled under CSP", () => {
+  const data = read("data.js");
+  const html = read("index.html");
+  assert.match(data, /LSST:[\s\S]*134\.158\.243\.144:24444/);
+  assert.match(data, /ZTF:[\s\S]*157\.136\.253\.253:24444/);
+  assert.match(html, /connect-src[^\n]*134\.158\.243\.144:24444[^\n]*157\.136\.253\.253:24444/);
+  assert.match(html, /<option value="ZTF">ZTF<\/option>/);
+});
+
+test("survey selection provides verified sample object IDs without overwriting custom input", () => {
+  const app = read("app.js");
+  assert.match(app, /LSST: "170028486134595648"/);
+  assert.match(app, /ZTF: "ZTF17aackceb"/);
+  assert.match(app, /surveyInput\.addEventListener\("change"/);
+  assert.match(app, /previousSurvey/);
+});
+
+test("survey changes invalidate pending work and clear results from the old endpoint", () => {
+  const app = read("app.js");
+  const data = read("data.js");
+  assert.match(app, /surveyInput\.addEventListener\("change", \(\) => \{[\s\S]*invalidateNeighborhoodLoad\(\)[\s\S]*viz[\s\S]*replaceChildren\(\)[\s\S]*objectList/);
+  assert.match(data, /function invalidateNeighborhoodLoad\(\) \{[\s\S]*neighborhoodRequestSerial \+= 1/);
+});
+
 test("application renders errors instead of fabricating demo science", () => {
   const all = ["data.js", "overlaps.js", "drawing.js", "list.js"]
     .map(read).join("\n");
@@ -70,8 +94,9 @@ test("cancellation also invalidates non-abortable layout work", () => {
   const data = read("data.js");
   assert.match(
     data,
-    /function cancelNeighborhoodLoad[\s\S]*neighborhoodRequestSerial \+= 1;[\s\S]*showSpinner\(false\)/,
+    /function invalidateNeighborhoodLoad[\s\S]*neighborhoodRequestSerial \+= 1;[\s\S]*showSpinner\(false\)/,
   );
+  assert.match(data, /function cancelNeighborhoodLoad[\s\S]*invalidateNeighborhoodLoad\(\)/);
 });
 
 test("help modal has a visible non-hidden state", () => {

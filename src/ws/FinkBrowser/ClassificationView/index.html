@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' http://134.158.243.144:24444; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' http://134.158.243.144:24444 http://157.136.253.253:24444; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Classification Neighborhood</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -26,7 +26,7 @@
       <p>Object positions are an approximate 2D projection: direction reflects classification affinity, while distance from the selected alert reflects JanusGraph distance. Coincident symbols are fanned apart slightly; when two alerts have identical affinity, their direction is mathematically undefined and deterministic spacing is used only for selection.</p>
       <p>Alerts with an exact zero graph distance are separated by a tiny dashed visual offset so that each remains selectable; their displayed distance stays 0.</p>
       <p>Hover, focus, or tap a star for classifications. Press <kbd>Enter</kbd> on a focused star, or double-click it, to make that alert the new center. Pan by dragging the map and zoom with the wheel or pinch gesture.</p>
-      <p class="notice">LSST uses the configured public graph endpoint. ZTF stays disabled until a verified endpoint is available; no unrelated demo data is substituted.</p>
+      <p class="notice">LSST and ZTF use their configured plaintext graph endpoints. ZTF availability depends on firewall or tunnel access; no unrelated demo data is substituted.</p>
     </div>
   </section>
 
@@ -55,7 +55,7 @@
         <label for="survey">Survey</label>
         <select id="survey" name="survey">
           <option value="LSST" selected>LSST</option>
-          <option value="ZTF" disabled>ZTF — endpoint unavailable</option>
+          <option value="ZTF">ZTF</option>
         </select>
 
         <label for="objectId">Object ID</label>
