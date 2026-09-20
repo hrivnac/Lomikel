@@ -28,6 +28,16 @@ final class JanuserGroovyRegressionTest {
         throw failure.get()
         }
       assert source.V().has('importDate', 'test-date').count().next() == 0L
+
+      source.addV('left').property('lbl', 'left').property('id', 'L').iterate()
+      source.addV('right').property('lbl', 'right').property('id', 'R').iterate()
+      recipes.get_or_create_edge('left', 'id', 'L', 'right', 'id', 'R', 'links').iterate()
+      recipes.get_or_create_edge('left', 'id', 'L', 'right', 'id', 'R', 'links').iterate()
+      assert source.E().hasLabel('links').has('lbl', 'links').count().next() == 1L :
+             'get_or_create_edge must create one edge and reuse it'
+      assert source.V().has('lbl', 'left').has('id', 'L').out('links').
+                    has('lbl', 'right').has('id', 'R').count().next() == 1L :
+             'get_or_create_edge must preserve the requested direction and endpoints'
       }
     finally {
       graph.close()

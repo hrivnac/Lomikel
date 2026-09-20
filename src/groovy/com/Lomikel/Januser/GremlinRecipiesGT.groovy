@@ -19,6 +19,8 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.values;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.count;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addE;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inE;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
@@ -69,20 +71,30 @@ trait GremlinRecipiesGT {
     }
           
     
-  /** Get (if exists) or create (if doesn't exist) {@link Edge}.
-    * @param lbl   The {@link Edge} label.
-    * @param name  The name of the {@link Edge} property to check or set.
-    * @param value The value of the {@link Edge} property to check or set.
-    * @return      The found or created {@link Edge}. */
+  /** Get (if it exists) or create an {@link Edge} between two vertices.
+    * @return The found or created {@link Edge} traversal. */
+  def GraphTraversal get_or_create_edge(String lbl1,
+                                        String name1,
+                                        String value1,
+                                        String lbl2,
+                                        String name2,
+                                        String value2,
+                                        String edge) {
+    return g().V().has('lbl', lbl1).
+                   has(name1, value1).
+                   as('fromVertex').
+               V().has('lbl', lbl2).
+                   has(name2, value2).
+               coalesce(inE(edge).where(outV().as('fromVertex')),
+                        addE(edge).from('fromVertex').property('lbl', edge));
+    }
+
+  /** Obsolete incomplete signature retained for source compatibility. */
+  @Deprecated
   def GraphTraversal get_or_create_edge(String lbl,
                                         String name,
                                         String value) {
-    return g().V().has('lbl', lbl1).
-                   has(name1, value1).
-                   as('v').
-               V().has('lbl', lbl2).
-                   has(name2, value2).
-               coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
+    throw new UnsupportedOperationException('Both edge endpoints and the edge label are required');
     }
                     
   /** Drop {@link Vertex}es by groups.
