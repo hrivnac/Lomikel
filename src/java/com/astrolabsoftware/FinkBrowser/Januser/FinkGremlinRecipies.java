@@ -274,7 +274,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     if (weightsS != null && !weightsS.trim().equals("")) {
       for (String weighs : weightsS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
-        weights.add(Double.valueOf(weight));
+        weights.add(Double.valueOf(weighs.trim()));
         }
       }
     registerOCol(classifier, cls, objectId, weight, instances, weights);
@@ -296,8 +296,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                            double       weight,
                            List<String> instances,
                            List<Double> weights) { 
-    Map<String, String> attributes = new HashMap<>();
-    attributes.put("weight",    "" + weight);
+    Map<String, Object> attributes = new HashMap<>();
+    attributes.put("weight",    weight);
     attributes.put("instances", instances.toString().replaceFirst("\\[", "").replaceAll("]", ""));
     attributes.put("weights",   weights.toString().replaceFirst("\\[", "").replaceAll("]", ""));
     registerOCol(classifier, cls, objectId, attributes, true);
@@ -314,7 +314,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   public void registerOCol(Classifier          classifier,
                            String              cls,
                            String              objectId,
-                           Map<String, String> attributes,
+                           Map<String, ?> attributes,
                            boolean             replace) {   
     //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
     log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + attributes.get("weight") + ", replace = " + replace);
@@ -346,13 +346,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
               g().V(s).next(),
               "deepcontains",
               attributes.keySet().toArray(new String[0]),
-              attributes.values().toArray(new String[0]),
+              attributes.values().toArray(new Object[0]),
               true);
       }
     else {
       Edge e = ocol.addEdge("deepcontains", s);
       e.property("lbl", "deepcontains");
-      for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+      for (Map.Entry<String, ?> attribute : attributes.entrySet()) {
         e.property(attribute.getKey(), attribute.getValue());
         }
       }

@@ -390,22 +390,37 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def drop_by_date(String importDate,
                    int    nCommit,
                    int    tWait) {
-    def i = 0;
+    if (nCommit <= 0) {
+      throw new IllegalArgumentException('nCommit must be positive');
+      }
+    if (tWait < 0) {
+      throw new IllegalArgumentException('tWait must not be negative');
+      }
     def tot = 0;
     def nMax = g().V().has('importDate', importDate).count().next();
     log.info('' + nMax + ' vertexes to drop');
+    if (nMax == 0) {
+      return;
+      }
     def t0 = System.currentTimeMillis();
-    while(true) {
-      g().V().has('importDate', importDate).limit(nCommit).out().out().drop().iterate();
-      g().V().has('importDate', importDate).limit(nCommit).out().drop().iterate();
-      g().V().has('importDate', importDate).limit(nCommit).drop().iterate();
-      graph().traversal().tx().commit();
-      Thread.sleep(tWait)
-      tot = nCommit * ++i;
-      def dt = (System.currentTimeMillis() - t0) / 1000;
-      def per = 100 * tot / nMax;
+    while (true) {
+      def batch = g().V().has('importDate', importDate).limit(nCommit).id().toList();
+      if (batch.isEmpty()) {
+        break;
+        }
+      def ids = batch.toArray();
+      g().V(ids).out().out().drop().iterate();
+      g().V(ids).out().drop().iterate();
+      g().V(ids).drop().iterate();
+      commit();
+      tot += batch.size();
+      if (tWait > 0) {
+        Thread.sleep(tWait * 1000L);
+        }
+      def dt = Math.max(1.0, (System.currentTimeMillis() - t0) / 1000.0);
+      def per = Math.min(100.0, 100.0 * tot / nMax);
       def freq = tot / dt;
-      def rest = (nMax - tot) / freq / 60 /60;
+      def rest = freq == 0 ? 0 : Math.max(0.0, (nMax - tot) / freq / 3600.0);
       log.info(tot + ' = ' + per + '% at ' + freq + 'Hz, ' + rest + 'h to go');
       }
     }

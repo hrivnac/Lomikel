@@ -181,7 +181,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
        return null;
        }
      GraphTraversal<Vertex, Vertex> vertexes = hasProperties(g().V().has("lbl", label), propertyNames, propertyValues);
-     if (!vertexes.hasNext()) {
+     if (vertexes.hasNext()) {
        _found = true;
        }
      else {
@@ -277,6 +277,35 @@ public GraphTraversal<Vertex, Vertex> allV() {
       }
     }
     
+  /** Add an edge with heterogeneously typed properties. */
+  public void addEdge(Vertex   v1,
+                      Vertex   v2,
+                      String   relation,
+                      String[] names,
+                      Object[] values,
+                      boolean  reset) {
+    boolean create = !checkEdge(v1, v2, relation);
+    if (create) {
+      Edge e = v1.addEdge(relation, v2);
+      e.property("lbl", relation);
+      for (int i = 0; i < names.length; i++) {
+        e.property(names[i], values[i]);
+        }
+      }
+    if (!create && reset) {
+      List<Edge> edges = getEdge(v1, v2, relation);
+      if (edges.size() != 1) {
+        log.error("" + edges.size() + " edges exists, none modified");
+        }
+      else {
+        Edge e = edges.get(0);
+        for (int i = 0; i < names.length; i++) {
+          e.property(names[i], values[i]);
+          }
+        }
+      }
+    }
+
   /** Check whether an {@link Edge} exists.
     * @param v1       The source {@link Vertex}.
     * @param v2       The destination {@link Vertex}.
@@ -324,12 +353,12 @@ public GraphTraversal<Vertex, Vertex> allV() {
   
   /** Commit. */
   public void commit() {
-    //if (_client != null) {
-    //  _client.commit();
-    //  }
-    //else {
-    g().getGraph().tx().commit();
-    //  }
+    if (_client != null) {
+      _client.commit();
+      }
+    else {
+      g().getGraph().tx().commit();
+      }
     }
     
   /** Close, if operating via {@link ModifyingGremlinClient},

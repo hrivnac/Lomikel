@@ -164,18 +164,19 @@ public class JanusClient implements ModifyingGremlinClient {
     if (i == 0) {
       return false;
       }
-    if (modulus > -1 && i%modulus != 0) {
-      return false;
+    boolean report = modulus < 0 || (modulus > 0 && i%modulus == 0);
+    boolean commit = modulusCommit > 0 && i%modulusCommit == 0;
+    if (report) {
+      long dt = (System.currentTimeMillis() - _t) / 1000;
+      if (dt == 0) {
+        dt = 1;
+        }
+      log.info("" + i + " " + msg + " in " + dt + "s, freq = " + (i / dt) + "Hz");
       }
-    long dt = (System.currentTimeMillis() - _t) / 1000;
-    if (dt == 0) {
-      dt = 1;
+    if (commit) {
+      commit();
       }
-    log.info("" + i + " " + msg + " in " + dt + "s, freq = " + (i / dt) + "Hz");
-    if (modulusCommit > -1 && i%modulusCommit == 0) {
-	    commit();
-      }
-    return true;
+    return report || commit;
     }    
     
   private String _table;
