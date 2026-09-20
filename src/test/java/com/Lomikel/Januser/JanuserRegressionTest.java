@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
@@ -28,6 +29,7 @@ public final class JanuserRegressionTest {
     testFinkRegistrationPreservesNumericWeights();
     testClassificationRejectsNonTransactionalClient();
     testFailedClassificationRollsBackReplacement();
+    testCorrelationRegenerationIsScoped();
     testTimerCommitsIndependentlyOfReportingInterval();
     testReopenPreservesPropertiesConfiguration();
     System.out.println("JanuserRegressionTest: OK");
@@ -174,6 +176,54 @@ public final class JanuserRegressionTest {
       }
     }
 
+  private static void testCorrelationRegenerationIsScoped() throws Exception {
+    Path properties = Files.createTempFile("januser-correlation-test-", ".properties");
+    Files.writeString(properties, "storage.backend=inmemory\n");
+    JanusClient client = null;
+    try {
+      client = new JanusClient(properties.toString());
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier selected = new TestClassifier();
+      OtherClassifier unrelated = new OtherClassifier();
+      recipes.registerOCol(selected, "selected", "ZTF-shared", 1.0, "[1]", "[1.0]");
+      recipes.registerOCol(unrelated, "unrelated", "ZTF-shared", 1.0, "[1]", "[1.0]");
+
+      Vertex selectedOCol = client.g().V().has("lbl", "OCol").has("cls", "selected").next();
+      Vertex object = client.g().V().has("lbl", "object").has("objectId", "ZTF-shared").next();
+      Vertex externalA = client.g().addV("OCol").property("lbl", "OCol").
+                                property("survey", "LSST").property("classifier", "OTHER").
+                                property("flavor", "").property("cls", "external-a").next();
+      Vertex externalB = client.g().addV("OCol").property("lbl", "OCol").
+                                property("survey", "LSST").property("classifier", "OTHER").
+                                property("flavor", "").property("cls", "external-b").next();
+      externalA.addEdge("overlaps", externalB, "lbl", "overlaps", "marker", "keep");
+      selectedOCol.addEdge("overlaps", externalA, "lbl", "overlaps", "marker", "stale");
+      Vertex malformedUnrelated = client.g().addV("OCol").property("lbl", "OCol").
+                                          property("classifier", "BROKEN").property("flavor", "").
+                                          property("cls", "malformed-unrelated").next();
+      malformedUnrelated.addEdge("deepcontains", object, "lbl", "deepcontains", "weight", 1.0);
+
+      recipes.generateCorrelations(selected);
+
+      require(client.g().E().has("marker", "keep").hasNext(),
+              "regeneration must preserve overlaps outside the requested classifier scope");
+      require(!client.g().E().has("marker", "stale").hasNext(),
+              "regeneration must remove stale overlaps adjacent to requested OCols");
+      require(!client.g().V().has("lbl", "OCol").has("cls", "unrelated").bothE("overlaps").hasNext(),
+              "regeneration must not include classifications outside the requested scope");
+      require(client.g().V(selectedOCol).outE("overlaps").where(inV().is(selectedOCol)).
+                       has("intersection", 1.0).has("sizeIn", 1.0).has("sizeOut", 1.0).
+                       count().next() == 1L,
+              "regeneration must create the expected weighted scoped correlation");
+      }
+    finally {
+      if (client != null) {
+        client.close();
+        }
+      Files.deleteIfExists(properties);
+      }
+    }
+
   private static void testClassificationRejectsNonTransactionalClient() throws Exception {
     FakeClient client = new FakeClient();
     try {
@@ -275,6 +325,27 @@ public final class JanuserRegressionTest {
       catch (Exception e) {
         throw new RuntimeException(e);
         }
+      }
+    }
+
+  private static final class OtherClassifier extends Classifier {
+
+    private OtherClassifier() {
+      setType(Type.XMATCH);
+      setFlavor("other");
+      }
+
+    @Override
+    public void classify(FinkGremlinRecipies recipes, String oid) throws LomikelException {}
+
+    @Override
+    public String survey() {
+      return "ZTF";
+      }
+
+    @Override
+    public FPC fpc() {
+      return null;
       }
     }
 

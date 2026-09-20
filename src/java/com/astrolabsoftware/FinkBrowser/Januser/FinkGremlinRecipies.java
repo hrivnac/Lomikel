@@ -408,30 +408,44 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * Possibly between two {@link Classifier}s.
     * @param classifier The {@link Classifier}s to be used. */
   public void generateCorrelations(Classifier... classifiers) {
-    log.info("Generating correlations for OCol of " + Arrays.asList(classifiers));
-    // Clean all correlations 
-    g().E().has("lbl", "overlaps").
-            drop().
-            iterate();
-    List<String> surveysL = new ArrayList<>();
-    List<String> namesL   = new ArrayList<>();
-    List<String> flavorsL = new ArrayList<>();
-    for (Classifier classifier : classifiers) {
-      surveysL.add(classifier.survey());
-      namesL.add(  classifier.name()  );
-      flavorsL.add(classifier.flavor());
-      // Remove wrong OCol
-      g().V().has("lbl",        "OCol"             ).
-              has("classifier", classifier.name()  ).
-              has("flavor",     classifier.flavor()).
-              not(has("cls")).
-              drop().
-              iterate();
+    if (!supportsTransactions()) {
+      throw new UnsupportedOperationException("Atomic correlation regeneration requires rollback-capable transactions");
       }
-    String[] surveys = surveysL.toArray(String[]::new);
-    String[] names   = namesL.toArray(  String[]::new);
-    String[] flavors = flavorsL.toArray(String[]::new);
-    commit();
+    try {
+      generateCorrelationsInTransaction(classifiers);
+      }
+    catch (RuntimeException e) {
+      try {
+        rollback();
+        }
+      catch (RuntimeException rollbackFailure) {
+        e.addSuppressed(rollbackFailure);
+        }
+      throw e;
+      }
+    }
+
+  /** Generate correlations inside one caller-owned transaction. */
+  private void generateCorrelationsInTransaction(Classifier... classifiers) {
+    log.info("Generating correlations for OCol of " + Arrays.asList(classifiers));
+    Set<String> classifierScopes = new HashSet<>();
+    List<Vertex> scopedOCols = new ArrayList<>();
+    List<Vertex> malformedScopedOCols = new ArrayList<>();
+    for (Classifier classifier : classifiers) {
+      classifierScopes.add(correlationScope(classifier.survey(), classifier.name(), classifier.flavor()));
+      scopedOCols.addAll(g().V().has("lbl",        "OCol"             ).
+                                has("survey",     classifier.survey()).
+                                has("classifier", classifier.name()  ).
+                                has("flavor",     classifier.flavor()).
+                                has("cls").
+                                toList());
+      malformedScopedOCols.addAll(g().V().has("lbl",        "OCol"             ).
+                                          has("survey",     classifier.survey()).
+                                          has("classifier", classifier.name()  ).
+                                          has("flavor",     classifier.flavor()).
+                                          not(has("cls")).
+                                          toList());
+      }
     // Accumulate correlations and sizes
     Map<OCol, Double>             weights0 = new HashMap<>(); // cls -> weight (for one objext)
     Map<Pair<OCol, OCol>, Double> corrS    = new HashMap<>(); // [cls1, cls2] -> weight (for all object between OCol-OCol)
@@ -457,12 +471,36 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       weights0.clear();
       types0.clear();
       object = objectT.next();
-      deepcontainsIt = object.edges(Direction.IN);
-      // Get all weights to this object
+      deepcontainsIt = object.edges(Direction.IN, "deepcontains");
+      // Get weights only from OCols in the requested classifier scope.
       while (deepcontainsIt.hasNext()) {
         deepcontains = deepcontainsIt.next();
-        weight = Double.parseDouble(deepcontains.property("weight").value().toString());
         ocol1 = deepcontains.outVertex();
+        if (!ocol1.property("lbl").isPresent() ||
+            !"OCol".equals(ocol1.property("lbl").value()) ||
+            !ocol1.property("survey").isPresent() ||
+            !ocol1.property("classifier").isPresent() ||
+            !ocol1.property("flavor").isPresent() ||
+            !ocol1.property("cls").isPresent()) {
+          continue;
+          }
+        if (!classifierScopes.contains(correlationScope(ocol1.property("survey").value().toString(),
+                                                         ocol1.property("classifier").value().toString(),
+                                                         ocol1.property("flavor").value().toString()))) {
+          continue;
+          }
+        if (!deepcontains.property("weight").isPresent()) {
+          throw new IllegalArgumentException("Scoped deepcontains edge has no weight");
+          }
+        try {
+          weight = Double.parseDouble(deepcontains.property("weight").value().toString());
+          }
+        catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Scoped deepcontains edge has a non-numeric weight", e);
+          }
+        if (!Double.isFinite(weight) || weight < 0.0) {
+          throw new IllegalArgumentException("Scoped deepcontains edge has an invalid weight: " + weight);
+          }
         cls = new OCol(ocol1);
         types0.add(cls);
         types.add(cls);
@@ -494,6 +532,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       sizeS.put(cls1, sizeS0);
+      }
+    // Mutate only after all scoped correlation inputs have been validated.
+    for (Vertex malformedScopedOCol : malformedScopedOCols) {
+      g().V(malformedScopedOCol).drop().iterate();
+      }
+    // Replace correlations only for OCols in the requested scope.
+    for (Vertex scopedOCol : scopedOCols) {
+      g().V(scopedOCol).bothE("overlaps").drop().iterate();
       }
     // Create overlaps
     int ns = 0;
@@ -566,6 +612,13 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     return _fhclientUrl;
     }
     
+  /** Build an unambiguous identity for a correlation-generation scope. */
+  private static String correlationScope(String survey,
+                                         String classifier,
+                                         String flavor) {
+    return survey + "\u0000" + classifier + "\u0000" + flavor;
+    }
+
   private FinkHBaseClient _fhclient;
   
   private String _fhclientUrl;
