@@ -16,7 +16,7 @@ Then open:
 http://127.0.0.1:8768/src/ws/FinkBrowser/ClassificationView/index.html
 ```
 
-The configured LSST endpoint currently uses plaintext HTTP. A page served over HTTPS cannot call it because browsers block mixed content. Plaintext graph use is explicitly opted into in `data.js`. ZTF is disabled until a verified endpoint is configured.
+The configured LSST and ZTF endpoints currently use plaintext HTTP. A page served over HTTPS cannot call them because browsers block mixed content. Plaintext graph use is explicitly opted into in `data.js`. The ZTF service may additionally require firewall or SSH-tunnel access from the client network.
 
 Neighbor limits accept an integer count from 1 through 20, a relative cutoff strictly between 0 and 1, or 0 for all neighbors. The last mode can be slow. Before rendering, responses are checked for exact object IDs, finite non-negative graph distances and classification weights, matching focal IDs, and bounded object/class counts. Classification weights emitted as canonical decimal or scientific-notation strings by the current backend are normalized to numbers; other JSON types and malformed strings are rejected.
 

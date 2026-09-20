@@ -3,7 +3,10 @@ const GRAPH_ENDPOINTS = Object.freeze({
     graphUrl: "http://134.158.243.144:24444",
     allowInsecureGraph: true,
   }),
-  ZTF: null,
+  ZTF: Object.freeze({
+    graphUrl: "http://157.136.253.253:24444",
+    allowInsecureGraph: true,
+  }),
 });
 
 let neighborhoodRequestSerial = 0;
@@ -61,13 +64,17 @@ function showLoadError(error) {
   setStatus(`Load failed: ${error.message}`, "error");
 }
 
-function cancelNeighborhoodLoad() {
-  if (!activeNeighborhoodController) return;
+function invalidateNeighborhoodLoad() {
   neighborhoodRequestSerial += 1;
   const controller = activeNeighborhoodController;
   activeNeighborhoodController = null;
-  controller.abort();
+  controller?.abort();
   showSpinner(false);
+}
+
+function cancelNeighborhoodLoad() {
+  if (!activeNeighborhoodController) return;
+  invalidateNeighborhoodLoad();
   setStatus("Graph request cancelled. The previous visualization was kept.", "idle");
 }
 
