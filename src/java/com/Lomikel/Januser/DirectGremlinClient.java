@@ -120,7 +120,7 @@ public class DirectGremlinClient extends    GremlinClient
       log.info("Commited");
       }
     }
-    
+
   @Override
   public GraphTraversalSource g() {
     return _g;

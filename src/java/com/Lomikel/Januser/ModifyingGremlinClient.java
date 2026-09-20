@@ -18,7 +18,7 @@ public interface ModifyingGremlinClient {
 
   /** Commit transaction. */
   public abstract void commit();
-    
+
   /** Close graph. */
   public abstract void close();
 

@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class JanusClient implements ModifyingGremlinClient {
+public class JanusClient implements TransactionalGremlinClient {
 
   /** Extract implicite schema.
     * @param args[0] The operation: <tt>extract,populate</tt>.
@@ -129,6 +129,12 @@ public class JanusClient implements ModifyingGremlinClient {
   public void commit() {
     _graph.tx().commit();
     log.debug("Commited");
+    }
+
+  @Override
+  public void rollback() {
+    _graph.tx().rollback();
+    log.debug("Rolled back");
     }
     
   @Override

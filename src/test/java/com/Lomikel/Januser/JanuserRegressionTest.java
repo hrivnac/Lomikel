@@ -26,6 +26,8 @@ public final class JanuserRegressionTest {
     testRecipeCommitUsesClientAbstraction();
     testOColEqualityDoesNotCollapseHashCollisions();
     testFinkRegistrationPreservesNumericWeights();
+    testClassificationRejectsNonTransactionalClient();
+    testFailedClassificationRollsBackReplacement();
     testTimerCommitsIndependentlyOfReportingInterval();
     testReopenPreservesPropertiesConfiguration();
     System.out.println("JanuserRegressionTest: OK");
@@ -172,6 +174,58 @@ public final class JanuserRegressionTest {
       }
     }
 
+  private static void testClassificationRejectsNonTransactionalClient() throws Exception {
+    FakeClient client = new FakeClient();
+    try {
+      boolean rejected = false;
+      try {
+        new FinkGremlinRecipies(client).classifySource(new TestClassifier(), "ZTF-remote");
+        }
+      catch (UnsupportedOperationException expected) {
+        rejected = true;
+        }
+      require(rejected, "atomic classification must reject clients without transaction rollback");
+      require(client.g().V().count().next() == 0L,
+              "transaction capability must be checked before graph mutation");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testFailedClassificationRollsBackReplacement() throws Exception {
+    Path properties = Files.createTempFile("januser-classification-test-", ".properties");
+    Files.writeString(properties, "storage.backend=inmemory\n");
+    JanusClient client = null;
+    try {
+      client = new JanusClient(properties.toString());
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      FailingClassifier classifier = new FailingClassifier();
+      recipes.registerOCol(classifier, "old", "ZTF-atomic", 1.0, "[1]", "[1.0]");
+
+      try {
+        recipes.classifySource(classifier, "ZTF-atomic");
+        throw new AssertionError("classification fixture must fail");
+        }
+      catch (LomikelException expected) {
+        // Expected: verify the original committed classification below.
+        }
+
+      require(client.g().V().has("lbl", "OCol").has("cls", "old").out("deepcontains").
+                       has("objectId", "ZTF-atomic").hasNext(),
+              "failed replacement must preserve the prior classification");
+      require(!client.g().V().has("lbl", "OCol").has("cls", "new").out("deepcontains").
+                        has("objectId", "ZTF-atomic").hasNext(),
+              "failed replacement must not commit a partial new classification");
+      }
+    finally {
+      if (client != null) {
+        client.close();
+        }
+      Files.deleteIfExists(properties);
+      }
+    }
+
   private static void testFinkRegistrationPreservesNumericWeights() {
     FakeClient client = new FakeClient();
     try {
@@ -221,6 +275,30 @@ public final class JanuserRegressionTest {
       catch (Exception e) {
         throw new RuntimeException(e);
         }
+      }
+    }
+
+  private static final class FailingClassifier extends Classifier {
+
+    private FailingClassifier() {
+      setType(Type.TAG);
+      setFlavor("atomic-test");
+      }
+
+    @Override
+    public void classify(FinkGremlinRecipies recipes, String oid) throws LomikelException {
+      recipes.registerOCol(this, "new", oid, 2.0, "[2]", "[2.0]");
+      throw new LomikelException("intentional classification failure");
+      }
+
+    @Override
+    public String survey() {
+      return "ZTF";
+      }
+
+    @Override
+    public FPC fpc() {
+      return null;
       }
     }
 

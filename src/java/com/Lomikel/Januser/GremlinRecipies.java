@@ -371,6 +371,28 @@ public GraphTraversal<Vertex, Vertex> allV() {
       g().getGraph().tx().commit();
       }
     }
+
+  /** Whether the attached client or graph supports rollback-capable transactions.
+    * @return {@code true} when a logical operation can be committed or rolled back atomically. */
+  public boolean supportsTransactions() {
+    if (_client != null) {
+      return _client instanceof TransactionalGremlinClient;
+      }
+    return g().getGraph().features().graph().supportsTransactions();
+    }
+
+  /** Roll back the current transaction. */
+  public void rollback() {
+    if (_client != null) {
+      if (!(_client instanceof TransactionalGremlinClient)) {
+        throw new UnsupportedOperationException("Gremlin client does not support rollback-capable transactions");
+        }
+      ((TransactionalGremlinClient)_client).rollback();
+      }
+    else {
+      g().getGraph().tx().rollback();
+      }
+    }
     
   /** Close, if operating via {@link ModifyingGremlinClient},
     * do nothing otherwise. */

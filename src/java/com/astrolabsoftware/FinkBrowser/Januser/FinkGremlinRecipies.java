@@ -222,30 +222,51 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param objectId   The <tt>objectId</tt> of <em>object</em> to be added.
     * @throws LomikelException If anything fails. */
   public void classifySource(Classifier classifier,
-                             String     objectId) throws LomikelException {  
-    if (g().V().has("lbl", "object").has("objectId", objectId).hasNext()) {
-      Vertex v1 = g().V().has("lbl", "object").has("objectId", objectId).next();
-      List<Vertex> v2s = g().V(v1).in().
-                                   has("lbl",        "OCol").
-                                   has("survey",     classifier.survey()).
-                                   has("classifier", classifier.name()  ).
-                                   has("flavor",     classifier.flavor()).
-                                   toList();
-      Iterator<Edge> edges;
-      for (Vertex v2 : v2s) {
-        edges = g().V(v1).inE().
-                          has("lbl", "deepcontains").
-                          where(otherV().
-                          is(v2)).
-                          toStream().
-                          iterator();
-        while (edges.hasNext()) {
-          edges.next().remove(); 
-          }
-        }        
-      // will be commited in registration
+                             String     objectId) throws LomikelException {
+    if (!supportsTransactions()) {
+      throw new UnsupportedOperationException("Atomic classification requires rollback-capable transactions");
       }
-    classifier.classify(this, objectId);
+    if (_classificationTransaction.get()) {
+      throw new IllegalStateException("Nested classification transactions are not supported");
+      }
+    _classificationTransaction.set(true);
+    try {
+      if (g().V().has("lbl", "object").has("objectId", objectId).hasNext()) {
+        Vertex v1 = g().V().has("lbl", "object").has("objectId", objectId).next();
+        List<Vertex> v2s = g().V(v1).in().
+                                     has("lbl",        "OCol").
+                                     has("survey",     classifier.survey()).
+                                     has("classifier", classifier.name()  ).
+                                     has("flavor",     classifier.flavor()).
+                                     toList();
+        Iterator<Edge> edges;
+        for (Vertex v2 : v2s) {
+          edges = g().V(v1).inE().
+                            has("lbl", "deepcontains").
+                            where(otherV().
+                            is(v2)).
+                            toStream().
+                            iterator();
+          while (edges.hasNext()) {
+            edges.next().remove();
+            }
+          }
+        }
+      classifier.classify(this, objectId);
+      commit();
+      }
+    catch (LomikelException | RuntimeException e) {
+      try {
+        rollback();
+        }
+      catch (RuntimeException rollbackFailure) {
+        e.addSuppressed(rollbackFailure);
+        }
+      throw e;
+      }
+    finally {
+      _classificationTransaction.remove();
+      }
     }
        
   /** Register  <em>object</em> in <em>OCol</em>.
@@ -356,7 +377,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         e.property(attribute.getKey(), attribute.getValue());
         }
       }
-    commit();
+    if (!_classificationTransaction.get()) {
+      commit();
+      }
     }
    
   /** Clean tree under <em>OCol</em>.
@@ -546,6 +569,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   private FinkHBaseClient _fhclient;
   
   private String _fhclientUrl;
+
+  /** Whether this thread's registration participates in a classification transaction. */
+  private ThreadLocal<Boolean> _classificationTransaction = ThreadLocal.withInitial(() -> false);
    
   private String _now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()).toString();
  
