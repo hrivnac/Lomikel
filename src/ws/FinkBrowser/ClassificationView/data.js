@@ -7,6 +7,7 @@ const GRAPH_ENDPOINTS = Object.freeze({
 });
 
 let neighborhoodRequestSerial = 0;
+let activeNeighborhoodController = null;
 
 function selectedGraphOptions(survey) {
   const endpoint = GRAPH_ENDPOINTS[survey];
@@ -16,57 +17,106 @@ function selectedGraphOptions(survey) {
   return { ...endpoint };
 }
 
-async function fetchNeighborhood(params) {
-  const options = selectedGraphOptions(params.survey);
-  showSpinner(true, "green");
-  try {
-    return await LomikelGraph.objectNeighborhood2JSON(
-      String(params.objectId),
-      params.classifier,
-      {
-        reclassifier: params.reclassifier === "none" ? null : params.reclassifier,
-        nmax: params.nmax,
-        metric: params.metric,
-        climit: 0,
-        ...options,
-      },
-    );
-  } finally {
-    showSpinner(false);
-  }
-}
+function readNeighborhoodParameters(objectId = null) {
+  const inputId = objectId === null
+    ? document.getElementById("objectId").value
+    : objectId;
+  const trimmedId = String(inputId).trim();
+  if (!trimmedId) throw new Error("Enter an object ID");
 
-function showLoadError(error) {
-  const status = document.getElementById("status");
-  status.textContent = `Load failed: ${error.message}`;
-  status.dataset.state = "error";
-  document.getElementById("viz").replaceChildren();
-  document.getElementById("objectList").replaceChildren();
-}
-
-async function loadNeighborhood(objectId = null) {
-  const requestSerial = ++neighborhoodRequestSerial;
-  const survey = document.getElementById("survey").value;
-  const params = {
-    survey,
-    objectId: objectId === null ? document.getElementById("objectId").value : objectId,
+  return {
+    survey: document.getElementById("survey").value,
+    objectId: trimmedId,
     classifier: document.getElementById("classifier").value,
     reclassifier: document.getElementById("reclassifier").value,
     metric: document.getElementById("metric").value,
-    nmax: Number(document.getElementById("nmaxValue").textContent),
+    nmax: parseNeighborhoodLimit(document.getElementById("nmaxValue").value),
   };
+}
+
+async function fetchNeighborhood(params, signal) {
+  const options = selectedGraphOptions(params.survey);
+  return LomikelGraph.objectNeighborhood2JSON(
+    params.objectId,
+    params.classifier,
+    {
+      reclassifier: params.reclassifier === "none" ? null : params.reclassifier,
+      nmax: params.nmax,
+      metric: params.metric,
+      climit: 0,
+      signal,
+      timeoutMs: 90_000,
+      ...options,
+    },
+  );
+}
+
+function setStatus(message, state) {
   const status = document.getElementById("status");
-  status.textContent = `Loading ${survey} graph data…`;
-  status.dataset.state = "loading";
+  status.textContent = message;
+  status.dataset.state = state;
+}
+
+function showLoadError(error) {
+  setStatus(`Load failed: ${error.message}`, "error");
+}
+
+function cancelNeighborhoodLoad() {
+  if (!activeNeighborhoodController) return;
+  neighborhoodRequestSerial += 1;
+  const controller = activeNeighborhoodController;
+  activeNeighborhoodController = null;
+  controller.abort();
+  showSpinner(false);
+  setStatus("Graph request cancelled. The previous visualization was kept.", "idle");
+}
+
+async function loadNeighborhood(objectId = null) {
+  let params;
   try {
-    const data = await fetchNeighborhood(params);
-    if (requestSerial !== neighborhoodRequestSerial) return;
-    data.objectId = String(data.objectId);
-    updateDetailsPanel(data, survey);
-    await showObjectNeighborhood(data, survey, requestSerial);
-    status.textContent = `Loaded ${Object.keys(data.objects || {}).length} nearest objects from ${survey}.`;
-    status.dataset.state = "ok";
+    params = readNeighborhoodParameters(objectId);
+    selectedGraphOptions(params.survey);
   } catch (error) {
-    if (requestSerial === neighborhoodRequestSerial) showLoadError(error);
+    showLoadError(error);
+    return;
+  }
+
+  activeNeighborhoodController?.abort();
+  const controller = new AbortController();
+  activeNeighborhoodController = controller;
+  const requestSerial = ++neighborhoodRequestSerial;
+
+  document.getElementById("objectId").value = params.objectId;
+  setStatus(`Querying ${params.survey} for ${params.objectId}…`, "loading");
+  showSpinner(true, "green");
+
+  try {
+    const response = await fetchNeighborhood(params, controller.signal);
+    if (requestSerial !== neighborhoodRequestSerial) return;
+    const data = validateNeighborhoodData(response, params.objectId);
+    const layoutResult = await showObjectNeighborhood(data, params, requestSerial);
+    if (requestSerial !== neighborhoodRequestSerial) return;
+    updateDetailsPanel(data, params.survey);
+    const count = Object.keys(data.objects || {}).length;
+    if (layoutResult?.warning) {
+      setStatus(
+        `Loaded ${count} nearest objects; class overlaps were unavailable, so classes are evenly spaced.`,
+        "warning",
+      );
+    } else {
+      setStatus(`Loaded ${count} nearest objects from ${params.survey}.`, "ok");
+    }
+  } catch (error) {
+    if (requestSerial !== neighborhoodRequestSerial) return;
+    if (error.name === "AbortError") {
+      setStatus("Graph request cancelled. The previous visualization was kept.", "idle");
+    } else {
+      showLoadError(error);
+    }
+  } finally {
+    if (activeNeighborhoodController === controller) {
+      activeNeighborhoodController = null;
+      showSpinner(false);
+    }
   }
 }
