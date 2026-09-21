@@ -34,6 +34,8 @@ public final class JanuserRegressionTest {
     testFailedStandaloneRegistrationRollsBack();
     testClassificationRejectsNonTransactionalClient();
     testFailedClassificationRollsBackReplacement();
+    testClassificationCleanupPreservesUnrelatedEdges();
+    testCleanOColPreservesUnrelatedBranches();
     testCorrelationRegenerationIsScoped();
     testTimerCommitsIndependentlyOfReportingInterval();
     testReopenPreservesPropertiesConfiguration();
@@ -320,6 +322,68 @@ public final class JanuserRegressionTest {
         client.close();
         }
       Files.deleteIfExists(properties);
+      }
+    }
+
+  private static void testClassificationCleanupPreservesUnrelatedEdges() throws Exception {
+    Path properties = Files.createTempFile("januser-classification-edge-test-", ".properties");
+    Files.writeString(properties, "storage.backend=inmemory\n");
+    JanusClient client = null;
+    try {
+      client = new JanusClient(properties.toString());
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      recipes.registerOCol(classifier, "old", "ZTF-edge-scope",
+                           1.0, "[1]", "[1.0]");
+      Vertex ocol = client.g().V().has("lbl", "OCol").has("cls", "old").next();
+      Vertex object = client.g().V().has("lbl", "object").
+                             has("objectId", "ZTF-edge-scope").next();
+      ocol.addEdge("audit", object, "lbl", "deepcontains", "marker", "preserve");
+      recipes.commit();
+
+      recipes.classifySource(classifier, "ZTF-edge-scope");
+
+      require(client.g().E().hasLabel("audit").has("marker", "preserve").hasNext(),
+              "classification cleanup must preserve unrelated structural edges");
+      require(!client.g().E().hasLabel("deepcontains").hasNext(),
+              "classification cleanup must remove prior deepcontains memberships");
+      }
+    finally {
+      if (client != null) {
+        client.close();
+        }
+      Files.deleteIfExists(properties);
+      }
+    }
+
+  private static void testCleanOColPreservesUnrelatedBranches() throws Exception {
+    FakeClient client = new FakeClient();
+    try {
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      Vertex ocol = client.g().addV("OCol").property("lbl", "OCol").
+                          property("survey", "ZTF").property("classifier", "TAG").
+                          property("flavor", "").property("cls", "cleanup").next();
+      Vertex object = client.g().addV("object").property("lbl", "object").next();
+      Vertex alert = client.g().addV("alert").property("lbl", "alert").next();
+      Vertex unrelated = client.g().addV("unrelated").property("lbl", "unrelated").next();
+      Vertex victim = client.g().addV("victim").property("lbl", "victim").next();
+      Object alertId = alert.id();
+      Object victimId = victim.id();
+      ocol.addEdge("deepcontains", object);
+      object.addEdge("contains", alert);
+      ocol.addEdge("audit", unrelated, "lbl", "deepcontains");
+      unrelated.addEdge("links", victim);
+
+      recipes.cleanOCol(classifier, "cleanup");
+
+      require(!client.g().V(alertId).hasNext(),
+              "OCol cleanup must drop descendants of real memberships");
+      require(client.g().V(victimId).hasNext(),
+              "OCol cleanup must preserve descendants of unrelated edges");
+      }
+    finally {
+      client.close();
       }
     }
 

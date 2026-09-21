@@ -270,7 +270,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def object0 = object0T.next();
     def restrictClasses = classes0 != null && !classes0.isEmpty();
     def m0 = [:];
-    def sourceMemberships = g().V(object0).inE().
+    def sourceMemberships = g().V(object0).inE('deepcontains').
                                 as('e').
                                 filter(and(outV().values('classifier').is(eq(cf[0])),
                                            outV().values('flavor'    ).is(eq(cf[1]))));
@@ -326,7 +326,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                             has('objectId', within(oidS)).
                             has('objectId', neq(oid0)).
                             as('candidate').
-                            inE().
+                            inE('deepcontains').
                             as('membership').
                             filter(and(outV().values('classifier').is(eq(cf[0])),
                                        outV().values('flavor'    ).is(eq(cf[1])),
@@ -337,7 +337,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                             has('classifier', cf[0]).
                             has('flavor',     cf[1]).
                             has('cls',        within(classes)).
-                            outE().
+                            outE('deepcontains').
                             as('membership').
                             inV().
                             has('lbl', 'object').
@@ -462,7 +462,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classified = [];
     g().V().has('lbl',      'object').
             has('objectId', oid).
-            inE().
+            inE('deepcontains').
             project('weight', 'classifier', 'flavor', 'class').
             by(values('weight')).
             by(outV().values('classifier')).
@@ -508,7 +508,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
               has('classifier', cf[0]).
               has('flavor',     cf[1]).
               has('cls',        within(srcClasses)).
-              inE().has('lbl', 'overlaps').
+              inE('overlaps').
               as('e').
               filter(outV().has('lbl',        'OCol').
                             has('classifier', dstCf[0]).
@@ -588,7 +588,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             has('classifier', cf[0]).
             has('flavor',     cf[1]).
             has('cls',        cls).
-            out().
+            out('deepcontains').
             has('lbl', 'object').
             limit(sample).
             values('objectId').
@@ -626,7 +626,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             has('flavor',     cf[1]).
             group().
             by(values('cls')).
-            by(out().count()).
+            by(out('deepcontains').count()).
             unfold().each {clsMap[it.key] = it.value}                                  
     clsMap = clsMap.sort{-it.value}
     clsMap.take(nclasses).each {
@@ -864,7 +864,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classifier = args?.classifier;
     def overlaps = [:];
     def cf = classifierWithFlavor(classifier);
-    g().E().has('lbl', 'overlaps').
+    g().E().hasLabel('overlaps').
             order().
             by('intersection', asc).
             project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
@@ -911,7 +911,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             has('classifier', srcCf[0]).
             has('flavor',     srcCf[1]).
             has('cls',        cls).
-            inE().has('lbl', 'overlaps').
+            inE('overlaps').
             as('e').
             filter(outV().has('lbl',        lbl).
                           has('classifier', dstCf[0]).
@@ -934,8 +934,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param fn The full filename of the output <em>GraphML</em> file. */
   def exportOCol(String fn) {  
     g().V().has('lbl', 'OCol').
-            outE().
-            has('lbl', 'overlaps').
+            outE('overlaps').
             subgraph('x').
             cap('x').
             next().

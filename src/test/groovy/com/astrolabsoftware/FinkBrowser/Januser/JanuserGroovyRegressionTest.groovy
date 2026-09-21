@@ -52,6 +52,37 @@ final class JanuserGroovyRegressionTest {
                     has('lbl', 'right').has('id', 'R').count().next() == 1L :
              'get_or_create_edge must preserve the requested direction and endpoints'
 
+      def membershipSource = source.addV('object').property('lbl', 'object').
+                                    property('objectId', 'membership-source').next()
+      def membershipCandidate = source.addV('object').property('lbl', 'object').
+                                       property('objectId', 'membership-candidate').next()
+      def membershipClass = source.addV('OCol').property('lbl', 'OCol').
+                                  property('survey', 'ZTF').property('classifier', 'TAG').
+                                  property('flavor', '').property('cls', 'forged').next()
+      membershipClass.addEdge('audit', membershipSource, 'lbl', 'deepcontains', 'weight', 1.0d)
+      membershipClass.addEdge('audit', membershipCandidate, 'lbl', 'deepcontains', 'weight', 1.0d)
+      assert recipes.classification('membership-source', 'TAG').isEmpty() :
+             'classification must ignore non-deepcontains edges with forged lbl properties'
+      assert recipes.objectNeighborhood([:], 'membership-source', 'TAG', null, null).isEmpty() :
+             'neighborhoods must ignore non-deepcontains membership edges'
+
+      def reclassObject = source.addV('object').property('lbl', 'object').
+                                property('objectId', 'reclass-object').next()
+      def sourceClass = source.addV('OCol').property('lbl', 'OCol').
+                              property('survey', 'ZTF').property('classifier', 'SRC').
+                              property('flavor', '').property('cls', 'source').next()
+      def destinationClass = source.addV('OCol').property('lbl', 'OCol').
+                                   property('survey', 'ZTF').property('classifier', 'DST').
+                                   property('flavor', '').property('cls', 'destination').next()
+      sourceClass.addEdge('deepcontains', reclassObject,
+                          'lbl', 'deepcontains', 'weight', 1.0d)
+      destinationClass.addEdge('audit', sourceClass,
+                               'lbl', 'overlaps', 'intersection', 1.0d)
+      assert recipes.reclassification('reclass-object', 'SRC', 'DST', 10, false).isEmpty() :
+             'reclassification must ignore non-overlaps edges with forged lbl properties'
+      assert recipes.overlaps().isEmpty() :
+             'overlap listings must ignore non-overlaps edges with forged lbl properties'
+
       def marker = 'januser.datalink.regression'
       System.clearProperty(marker)
       try {

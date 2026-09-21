@@ -233,7 +233,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     try {
       if (g().V().has("lbl", "object").has("objectId", objectId).hasNext()) {
         Vertex v1 = g().V().has("lbl", "object").has("objectId", objectId).next();
-        List<Vertex> v2s = g().V(v1).in().
+        List<Vertex> v2s = g().V(v1).in("deepcontains").
                                      has("lbl",        "OCol").
                                      has("survey",     classifier.survey()).
                                      has("classifier", classifier.name()  ).
@@ -241,8 +241,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                      toList();
         Iterator<Edge> edges;
         for (Vertex v2 : v2s) {
-          edges = g().V(v1).inE().
-                            has("lbl", "deepcontains").
+          edges = g().V(v1).inE("deepcontains").
                             where(otherV().
                             is(v2)).
                             toStream().
@@ -448,7 +447,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             has("classifier", classifier.name()  ).
             has("flavor",     classifier.flavor()).
             has("cls",        cls                ).
-            out().
+            out("deepcontains").
             out().
             drop().
             iterate();
