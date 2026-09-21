@@ -154,7 +154,7 @@ public class Hertex extends Wertex {
     for (Vertex v : vertexes) {
       newVertexes.add(enhance(v, fields));
       }
-    return vertexes;
+    return newVertexes;
     }
     
   //@Override

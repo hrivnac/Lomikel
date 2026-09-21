@@ -1,5 +1,7 @@
 package com.Lomikel.Januser;
 
+import com.Lomikel.DB.Client;
+import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Utils.LomikelException;
 import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 import com.astrolabsoftware.FinkBrowser.Januser.Classifier;
@@ -35,6 +37,7 @@ public final class JanuserRegressionTest {
     testReopenPreservesPropertiesConfiguration();
     testMissingPropertiesFileFailsExplicitly();
     testRemoteClientConstructionPropagatesOpenFailure();
+    testHertexGetOrCreateReturnsEnhancedVertices();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -313,6 +316,35 @@ public final class JanuserRegressionTest {
       }
     }
 
+  private static void testHertexGetOrCreateReturnsEnhancedVertices() throws Exception {
+    HBaseClient hbase = allocateWithoutConstructor(HBaseClient.class);
+    GraphTraversalSource source = TinkerGraph.open().traversal();
+    try {
+      Client.registerVertexType("enhanced", TestWertex.class);
+      Wertex.setRowkeyName("enhanced", TestWertex.class, "rowkey");
+      Hertex.setHBaseClient(hbase);
+
+      java.util.List<Vertex> vertices = Hertex.getOrCreate("enhanced", "row-1", source, "");
+
+      require(vertices.size() == 1, "Hertex getOrCreate must return one matching vertex");
+      require(vertices.get(0) instanceof TestWertex,
+              "Hertex getOrCreate must return the enhanced representation");
+      }
+    finally {
+      Hertex.setHBaseClient(null);
+      source.close();
+      }
+    }
+
+  @SuppressWarnings("unchecked")
+  private static <T> T allocateWithoutConstructor(Class<T> type) throws Exception {
+    Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+    java.lang.reflect.Field field = unsafeClass.getDeclaredField("theUnsafe");
+    field.setAccessible(true);
+    Object unsafe = field.get(null);
+    return (T)unsafeClass.getMethod("allocateInstance", Class.class).invoke(unsafe, type);
+    }
+
   private static void testFinkRegistrationPreservesNumericWeights() {
     FakeClient client = new FakeClient();
     try {
@@ -387,6 +419,18 @@ public final class JanuserRegressionTest {
       catch (Exception e) {
         throw new RuntimeException(e);
         }
+      }
+    }
+
+  public static final class TestWertex extends Wertex {
+
+    public TestWertex(Vertex vertex, String fields) {
+      super(vertex, fields == null ? null : fields.split(","));
+      }
+
+    @Override
+    public Client client() {
+      return null;
       }
     }
 
