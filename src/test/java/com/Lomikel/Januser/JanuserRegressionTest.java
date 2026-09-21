@@ -31,6 +31,7 @@ public final class JanuserRegressionTest {
     testOColEqualityDoesNotCollapseHashCollisions();
     testFinkRegistrationPreservesNumericWeights();
     testFinkRegistrationRejectsInvalidWeightsBeforeMutation();
+    testFailedStandaloneRegistrationRollsBack();
     testClassificationRejectsNonTransactionalClient();
     testFailedClassificationRollsBackReplacement();
     testCorrelationRegenerationIsScoped();
@@ -280,6 +281,39 @@ public final class JanuserRegressionTest {
       require(!client.g().V().has("lbl", "OCol").has("cls", "new").out("deepcontains").
                         has("objectId", "ZTF-atomic").hasNext(),
               "failed replacement must not commit a partial new classification");
+      }
+    finally {
+      if (client != null) {
+        client.close();
+        }
+      Files.deleteIfExists(properties);
+      }
+    }
+
+  private static void testFailedStandaloneRegistrationRollsBack() throws Exception {
+    Path properties = Files.createTempFile("januser-registration-test-", ".properties");
+    Files.writeString(properties, "storage.backend=inmemory\n");
+    JanusClient client = null;
+    try {
+      client = new JanusClient(properties.toString());
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      java.util.Map<String, Object> invalid = new java.util.LinkedHashMap<>();
+      invalid.put("weight", 1.0);
+      invalid.put(null, "invalid-key");
+      try {
+        recipes.registerOCol(classifier, "failed", "ZTF-failed", invalid, true);
+        throw new AssertionError("invalid property key must fail registration");
+        }
+      catch (RuntimeException expected) {
+        // A later successful registration must not commit this failed transaction.
+        }
+
+      recipes.registerOCol(classifier, "successful", "ZTF-successful",
+                           1.0, "[1]", "[1.0]");
+      require(!client.g().V().has("lbl", "OCol").has("cls", "failed").hasNext() &&
+              !client.g().V().has("lbl", "object").has("objectId", "ZTF-failed").hasNext(),
+              "failed standalone registration must be rolled back before a later commit");
       }
     finally {
       if (client != null) {

@@ -367,6 +367,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Map<String, Object> validatedAttributes = new HashMap<>();
     validatedAttributes.putAll(attributes);
     validatedAttributes.put("weight", weight);
+    boolean rollbackOnFailure = !_classificationTransaction.get() && supportsTransactions();
+    try {
     //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
     log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + weight + ", replace = " + replace);
     Vertex ocol = g().V().has("lbl",        "OCol"             ).
@@ -409,6 +411,18 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     if (!_classificationTransaction.get()) {
       commit();
+      }
+      }
+    catch (RuntimeException e) {
+      if (rollbackOnFailure) {
+        try {
+          rollback();
+          }
+        catch (RuntimeException rollbackFailure) {
+          e.addSuppressed(rollbackFailure);
+          }
+        }
+      throw e;
       }
     }
 
