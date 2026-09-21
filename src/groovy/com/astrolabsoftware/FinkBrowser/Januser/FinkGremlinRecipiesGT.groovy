@@ -950,10 +950,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (classifier == null) {
       return new String[] {null, ''};
       }
-    if (!classifier.contains('=')) {
+    if (classifier.isEmpty() || classifier.startsWith('=') ||
+        classifier.indexOf('=', classifier.indexOf('=') + 1) >= 0) {
+      throw new IllegalArgumentException("Malformed classifier: ${classifier}");
+      }
+    int separator = classifier.indexOf('=');
+    if (separator < 0) {
       return new String[]{classifier, ''};
       }
-    return classifier.split('=');
+    return new String[]{classifier.substring(0, separator),
+                        classifier.substring(separator + 1)};
     }
     
   def Random _random = new Random();

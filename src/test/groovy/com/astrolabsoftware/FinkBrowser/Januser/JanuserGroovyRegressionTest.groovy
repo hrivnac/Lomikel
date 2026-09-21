@@ -11,6 +11,19 @@ final class JanuserGroovyRegressionTest {
       source.addV('object').property('lbl', 'object').property('importDate', 'test-date').iterate()
       source.tx().commit()
       def recipes = new TestRecipes(source: source)
+      assert (recipes.classifierWithFlavor(null) as List) == [null, '']
+      assert (recipes.classifierWithFlavor('classifier') as List) == ['classifier', '']
+      assert (recipes.classifierWithFlavor('classifier=') as List) == ['classifier', '']
+      assert (recipes.classifierWithFlavor('classifier=flavor') as List) == ['classifier', 'flavor']
+      for (String malformed : ['', '=flavor', 'a=b=c']) {
+        try {
+          recipes.classifierWithFlavor(malformed)
+          assert false : "malformed classifier must be rejected: ${malformed}"
+          }
+        catch (IllegalArgumentException expected) {
+          // Expected validation failure.
+          }
+        }
       def failure = new java.util.concurrent.atomic.AtomicReference<Throwable>()
       Thread worker = new Thread({
         try {
