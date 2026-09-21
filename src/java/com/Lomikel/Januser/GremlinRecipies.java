@@ -210,6 +210,8 @@ public GraphTraversal<Vertex, Vertex> allV() {
   public void addEdge(Vertex v1,
                       Vertex v2,
                       String relation) {
+    v1 = Wertex.unwrap(v1);
+    v2 = Wertex.unwrap(v2);
     if (!checkEdge(v1, v2, relation)) {
       v1.addEdge(relation, v2).
          property("lbl", relation);
@@ -230,6 +232,8 @@ public GraphTraversal<Vertex, Vertex> allV() {
                       String[] names,
                       Double[] values,
                       boolean  reset) {
+    v1 = Wertex.unwrap(v1);
+    v2 = Wertex.unwrap(v2);
     boolean create = !checkEdge(v1, v2, relation);
     if (create) {
       Edge e = v1.addEdge(relation, v2);
@@ -266,6 +270,8 @@ public GraphTraversal<Vertex, Vertex> allV() {
                       String[] names,
                       String[] values,
                       boolean  reset) {
+    v1 = Wertex.unwrap(v1);
+    v2 = Wertex.unwrap(v2);
     boolean create = !checkEdge(v1, v2, relation);
     if (create) {
       Edge e = v1.addEdge(relation, v2);
@@ -295,6 +301,8 @@ public GraphTraversal<Vertex, Vertex> allV() {
                       String[] names,
                       Object[] values,
                       boolean  reset) {
+    v1 = Wertex.unwrap(v1);
+    v2 = Wertex.unwrap(v2);
     boolean create = !checkEdge(v1, v2, relation);
     if (create) {
       Edge e = v1.addEdge(relation, v2);
@@ -325,10 +333,12 @@ public GraphTraversal<Vertex, Vertex> allV() {
   public boolean checkEdge(Vertex v1,
                            Vertex v2,
                            String relation) {
+    Vertex source = Wertex.unwrap(v1);
+    Vertex target = Wertex.unwrap(v2);
     _found = false;
-    if (v1.vertices(Direction.OUT, relation).hasNext()) {
-      v1.vertices(Direction.OUT, relation).forEachRemaining(v -> {
-                                             if (v.equals(v2)) {
+    if (source.vertices(Direction.OUT, relation).hasNext()) {
+      source.vertices(Direction.OUT, relation).forEachRemaining(v -> {
+                                             if (v.equals(target)) {
                                                _found = true;
                                                }
                                              });
@@ -344,6 +354,8 @@ public GraphTraversal<Vertex, Vertex> allV() {
   public List<Edge> getEdge(Vertex v1,
                             Vertex v2,
                             String relation) {
+  v1 = Wertex.unwrap(v1);
+  v2 = Wertex.unwrap(v2);
   List<Edge> edges = g().V(v1).outE(relation).filter(inV().is(v2)).toList();
   edges.addAll(g().V(v2).outE(relation).filter(inV().is(v1)).toList());
   return edges;

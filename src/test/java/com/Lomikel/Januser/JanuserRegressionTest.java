@@ -42,6 +42,7 @@ public final class JanuserRegressionTest {
     testHBaseCloseAttemptsConnectionAfterTableFailure();
     testHertexMissingRowDoesNotFailSelectiveEnhancement();
     testHBaseEmptyResultIsIgnored();
+    testWertexPreservesVertexIdentity();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -422,6 +423,36 @@ public final class JanuserRegressionTest {
     EmptyHBaseClient hbase = allocateWithoutConstructor(EmptyHBaseClient.class);
     require(!hbase.addEmptyResult(),
             "an HBase Result without a row key must be ignored safely");
+    }
+
+  private static void testWertexPreservesVertexIdentity() {
+    FakeClient client = new FakeClient();
+    try {
+      Wertex.setRowkeyName("wrapped", TestWertex.class, "rowkey");
+      Vertex source = client.g().addV("wrapped").property("lbl", "wrapped").
+                            property("rowkey", "source").next();
+      Vertex target = client.g().addV("wrapped").property("lbl", "wrapped").
+                            property("rowkey", "target").next();
+      Vertex wrappedSource = new TestWertex(source, "");
+      Vertex wrappedTarget1 = new TestWertex(target, "");
+      Vertex wrappedTarget2 = new TestWertex(target, "");
+
+      require(wrappedTarget1.equals(target), "a Wertex must equal its underlying vertex");
+      require(target.equals(wrappedTarget1), "vertex identity equality must remain symmetric");
+      require(wrappedTarget1.equals(wrappedTarget2),
+              "wrappers around the same vertex must compare equal");
+      require(wrappedTarget1.hashCode() == target.hashCode(),
+              "a Wertex must preserve the underlying vertex hash code");
+
+      GremlinRecipies recipes = new GremlinRecipies(client);
+      recipes.addEdge(wrappedSource, wrappedTarget2, "links");
+      recipes.addEdge(source, target, "links");
+      require(client.g().E().hasLabel("links").count().next() == 1L,
+              "dressed endpoints must not create duplicate edges");
+      }
+    finally {
+      client.close();
+      }
     }
 
   private static Object primitiveDefault(Class<?> type) {

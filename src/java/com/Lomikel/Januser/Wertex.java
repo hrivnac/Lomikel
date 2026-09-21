@@ -144,7 +144,15 @@ public abstract class Wertex implements Vertex {
     
   @Override
   public Edge addEdge(String label, Vertex inVertex, Object... keyValues) {
-    return _vertex.addEdge(label, inVertex, keyValues);
+    return _vertex.addEdge(label, unwrap(inVertex), keyValues);
+    }
+
+  /** Return the provider vertex beneath any number of Wertex wrappers. */
+  public static Vertex unwrap(Vertex vertex) {
+    while (vertex instanceof Wertex) {
+      vertex = ((Wertex)vertex)._vertex;
+      }
+    return vertex;
     }
     
   @Override  
@@ -254,6 +262,27 @@ public abstract class Wertex implements Vertex {
       }
     }
     
+  @Override
+  public int hashCode() {
+    return _vertex.hashCode();
+    }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+      }
+    if (other instanceof Wertex) {
+      return _vertex.equals(((Wertex)other)._vertex);
+      }
+    return _vertex.equals(other);
+    }
+
+  @Override
+  public String toString() {
+    return _vertex.toString();
+    }
+
   /** Give the associated {@link Client}.
     * @return The associated {@link Client}. */
   public abstract Client client();
