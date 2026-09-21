@@ -39,6 +39,7 @@ public final class JanuserRegressionTest {
     testRemoteClientConstructionPropagatesOpenFailure();
     testHertexGetOrCreateReturnsEnhancedVertices();
     testHertexEnhanceWithoutLabelReturnsOriginalVertex();
+    testHBaseCloseAttemptsConnectionAfterTableFailure();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -350,6 +351,56 @@ public final class JanuserRegressionTest {
       Hertex.setHBaseClient(null);
       graph.close();
       }
+    }
+
+  private static void testHBaseCloseAttemptsConnectionAfterTableFailure() throws Exception {
+    AtomicBoolean connectionClosed = new AtomicBoolean();
+    HBaseClient client = allocateWithoutConstructor(HBaseClient.class);
+    org.apache.hadoop.hbase.client.Table table =
+      (org.apache.hadoop.hbase.client.Table)java.lang.reflect.Proxy.newProxyInstance(
+        JanuserRegressionTest.class.getClassLoader(),
+        new Class<?>[] {org.apache.hadoop.hbase.client.Table.class},
+        (proxy, method, args) -> {
+          if (method.getName().equals("close")) {
+            throw new java.io.IOException("intentional table close failure");
+            }
+          return primitiveDefault(method.getReturnType());
+          });
+    org.apache.hadoop.hbase.client.Connection connection =
+      (org.apache.hadoop.hbase.client.Connection)java.lang.reflect.Proxy.newProxyInstance(
+        JanuserRegressionTest.class.getClassLoader(),
+        new Class<?>[] {org.apache.hadoop.hbase.client.Connection.class},
+        (proxy, method, args) -> {
+          if (method.getName().equals("close")) {
+            connectionClosed.set(true);
+            }
+          return primitiveDefault(method.getReturnType());
+          });
+    setField(client, "_table", table);
+    setField(client, "_connection", connection);
+
+    client.close();
+
+    require(connectionClosed.get(),
+            "HBase close must attempt connection cleanup after table cleanup fails");
+    }
+
+  private static Object primitiveDefault(Class<?> type) {
+    if (!type.isPrimitive() || type == void.class) return null;
+    if (type == boolean.class) return false;
+    if (type == char.class) return '\0';
+    if (type == byte.class) return (byte)0;
+    if (type == short.class) return (short)0;
+    if (type == int.class) return 0;
+    if (type == long.class) return 0L;
+    if (type == float.class) return 0.0f;
+    return 0.0d;
+    }
+
+  private static void setField(Object target, String name, Object value) throws Exception {
+    java.lang.reflect.Field field = HBaseClient.class.getDeclaredField(name);
+    field.setAccessible(true);
+    field.set(target, value);
     }
 
   @SuppressWarnings("unchecked")
