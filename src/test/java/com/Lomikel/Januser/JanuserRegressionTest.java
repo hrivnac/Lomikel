@@ -38,6 +38,7 @@ public final class JanuserRegressionTest {
     testMissingPropertiesFileFailsExplicitly();
     testRemoteClientConstructionPropagatesOpenFailure();
     testHertexGetOrCreateReturnsEnhancedVertices();
+    testHertexEnhanceWithoutLabelReturnsOriginalVertex();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -333,6 +334,21 @@ public final class JanuserRegressionTest {
     finally {
       Hertex.setHBaseClient(null);
       source.close();
+      }
+    }
+
+  private static void testHertexEnhanceWithoutLabelReturnsOriginalVertex() throws Exception {
+    HBaseClient hbase = allocateWithoutConstructor(HBaseClient.class);
+    TinkerGraph graph = TinkerGraph.open();
+    Vertex original = graph.addVertex("rowkey", "row-1");
+    try {
+      Hertex.setHBaseClient(hbase);
+      require(Hertex.enhance(original, null) == original,
+              "enhancing a vertex without lbl must safely return the original vertex");
+      }
+    finally {
+      Hertex.setHBaseClient(null);
+      graph.close();
       }
     }
 

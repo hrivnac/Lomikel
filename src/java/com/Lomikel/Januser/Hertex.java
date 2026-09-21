@@ -99,7 +99,7 @@ public class Hertex extends Wertex {
       log.warn( "Cannot enhance");
       return vertex;
       }
-    if (vertex.property("lbl") == null) {
+    if (!vertex.property("lbl").isPresent()) {
       log.warn( "Cannot enhance, no label");
       return vertex;
       }
