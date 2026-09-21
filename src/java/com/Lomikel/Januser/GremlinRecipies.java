@@ -77,8 +77,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
     Property<Edge>   eP;
     log.info("Scanning Vertexes");
     for (Vertex v : g().V().toList()) {
-      vSet = new HashSet<>();
-      vMap.put(v.label(), vSet);
+      vSet = vMap.computeIfAbsent(v.label(), key -> new HashSet<>());
       for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
         vP = i.next();
         vSet.add(vP.key());
@@ -86,8 +85,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
       }
     log.info("Scanning Edges");
     for (Edge e : g().E().toList()) {
-      eSet = new HashSet<>();
-      eMap.put(e.label(), eSet);
+      eSet = eMap.computeIfAbsent(e.label(), key -> new HashSet<>());
       evMap.put(e.label(), e.outVertex().label() + " " + e.inVertex().label());
       for (Iterator<Property<Edge>> i = e.properties(); i.hasNext();) { 
         eP = i.next();

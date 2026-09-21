@@ -26,6 +26,7 @@ public final class JanuserRegressionTest {
 
   public static void main(String[] args) throws Exception {
     testGetOrCreateCreatesMissingVertexAndReusesExistingVertex();
+    testMetaSchemaUnionsPropertiesAcrossSameLabelElements();
     testDeepDropHandlesCyclesAndNonJanusVertices();
     testRecipeCommitUsesClientAbstraction();
     testOColEqualityDoesNotCollapseHashCollisions();
@@ -75,6 +76,34 @@ public final class JanuserRegressionTest {
       }
     finally {
       client.close();
+      }
+    }
+
+  private static void testMetaSchemaUnionsPropertiesAcrossSameLabelElements() throws Exception {
+    FakeClient client = new FakeClient();
+    TinkerGraph graph = (TinkerGraph)client.g().getGraph();
+    Vertex first = client.g().addV("node").property("firstProperty", "one").next();
+    Vertex second = client.g().addV("node").property("secondProperty", "two").next();
+    Vertex target = client.g().addV("target").next();
+    first.addEdge("relation", target, "firstEdgeProperty", "one");
+    second.addEdge("relation", target, "secondEdgeProperty", "two");
+
+    new GremlinRecipies(client).createMetaSchema();
+
+    try (GraphTraversalSource check = graph.traversal()) {
+      Vertex metaNode = check.V().hasLabel("MetaGraph").
+                              has("MetaLabel", "node").next();
+      require(metaNode.property("firstProperty").isPresent() &&
+              metaNode.property("secondProperty").isPresent(),
+              "meta schema must union properties from every vertex with the same label");
+      org.apache.tinkerpop.gremlin.structure.Edge metaEdge =
+        check.E().hasLabel("MetaGraph").has("MetaLabel", "relation").next();
+      require(metaEdge.property("firstEdgeProperty").isPresent() &&
+              metaEdge.property("secondEdgeProperty").isPresent(),
+              "meta schema must union properties from every edge with the same label");
+      }
+    finally {
+      graph.close();
       }
     }
 
