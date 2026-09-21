@@ -9,6 +9,7 @@ import com.astrolabsoftware.FinkBrowser.Januser.OCol;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -33,6 +34,7 @@ public final class JanuserRegressionTest {
     testTimerCommitsIndependentlyOfReportingInterval();
     testReopenPreservesPropertiesConfiguration();
     testMissingPropertiesFileFailsExplicitly();
+    testRemoteClientConstructionPropagatesOpenFailure();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -290,6 +292,27 @@ public final class JanuserRegressionTest {
       }
     }
 
+  private static void testRemoteClientConstructionPropagatesOpenFailure() {
+    try {
+      new DirectGremlinClient("localhost", -1);
+      throw new AssertionError("invalid remote connection parameters must fail construction");
+      }
+    catch (IllegalStateException expected) {
+      require(expected.getCause() != null, "remote connection failure must retain its cause");
+      }
+
+    AtomicBoolean closed = new AtomicBoolean();
+    try {
+      new FailingInitializationClient(closed);
+      throw new AssertionError("connect failure must fail construction");
+      }
+    catch (IllegalStateException expected) {
+      require(closed.get(), "failed construction must close partially initialized resources");
+      require(expected.getSuppressed().length == 1,
+              "cleanup failure must be suppressed on the original connect failure");
+      }
+    }
+
   private static void testFinkRegistrationPreservesNumericWeights() {
     FakeClient client = new FakeClient();
     try {
@@ -309,6 +332,31 @@ public final class JanuserRegressionTest {
   private static void require(boolean condition, String message) {
     if (!condition) {
       throw new AssertionError(message);
+      }
+    }
+
+  private static final class FailingInitializationClient extends GremlinClient {
+
+    private final AtomicBoolean _closed;
+
+    private FailingInitializationClient(AtomicBoolean closed) {
+      super("test", 1, true);
+      _closed = closed;
+      initialize("test", 1);
+      }
+
+    @Override
+    public void open(String hostname, int port) {}
+
+    @Override
+    public void connect() {
+      throw new IllegalStateException("intentional connect failure");
+      }
+
+    @Override
+    public void close() {
+      _closed.set(true);
+      throw new IllegalStateException("intentional cleanup failure");
       }
     }
 

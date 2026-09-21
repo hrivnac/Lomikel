@@ -27,10 +27,51 @@ public abstract class GremlinClient {
     * @param table    The Gremlin port. */
   public GremlinClient(String  hostname,
                        int     port) {
+    this(hostname, port, false);
+    }
+
+  /** Create with optional deferred initialization for subclasses that need
+    * their own state initialized before {@link #open} and {@link #connect}. */
+  protected GremlinClient(String  hostname,
+                          int     port,
+                          boolean deferInitialization) {
     Init.init("GremlinClient");
     log.info("Opening " + hostname + ":" + port);
-    open(hostname, port);
-    connect();
+    if (!deferInitialization) {
+      initialize(hostname, port);
+      }
+    }
+
+  /** Open and connect, closing partial resources if initialization fails. */
+  protected final void initialize(String hostname,
+                                  int    port) {
+    try {
+      open(hostname, port);
+      connect();
+      }
+    catch (RuntimeException e) {
+      try {
+        close();
+        }
+      catch (RuntimeException cleanupFailure) {
+        e.addSuppressed(cleanupFailure);
+        }
+      throw e;
+      }
+    }
+
+  /** Accumulate cleanup failures without preventing later resources from closing. */
+  protected static RuntimeException collectCleanupFailure(RuntimeException failure,
+                                                           String           resource,
+                                                           Exception        cause) {
+    RuntimeException next = cause instanceof RuntimeException
+                          ? (RuntimeException)cause
+                          : new IllegalStateException("Cannot close " + resource, cause);
+    if (failure == null) {
+      return next;
+      }
+    failure.addSuppressed(next);
+    return failure;
     }
    
   /** Open.  

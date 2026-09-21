@@ -45,7 +45,8 @@ public class DirectGremlinClient extends    GremlinClient
     * @param table    The Gremlin port. */
   public DirectGremlinClient(String  hostname,
                              int     port) {
-    super(hostname, port);
+    super(hostname, port, true);
+    initialize(hostname, port);
     }
     
   /** Open with <em>GraphBinary</em> serializer.
@@ -69,20 +70,19 @@ public class DirectGremlinClient extends    GremlinClient
       log.info("Opened");
       }
     catch (Exception e) {
-      log.error("Cannot open connection", e);
+      throw new IllegalStateException("Cannot open Gremlin connection", e);
       }
     }
    
   @Override
   public void connect() {
     try {
-      cluster().connect();
+      _client = cluster().connect().alias("g").init();
       _g = traversal().withRemote(DriverRemoteConnection.using(cluster(), "g"));
       _graph = _g.getGraph();
-      _client = cluster().connect().alias("g");
       }
     catch (Exception e) {
-      log.error("Cannot connect", e);
+      throw new IllegalStateException("Cannot connect Gremlin client", e);
       }
     log.info("Connected");
     }
@@ -102,15 +102,35 @@ public class DirectGremlinClient extends    GremlinClient
     
   @Override
   public void close() {
+    RuntimeException failure = null;
     try {
-      _graph.close();
+      if (_client != null) {
+        _client.close();
+        }
       }
     catch (Exception e) {
-      log.warn("Cannot Close graph");
-      log.debug("Cannot Close graph", e);
+      failure = collectCleanupFailure(failure, "Gremlin client", e);
       }
-    cluster().close();
+    try {
+      if (_g != null) {
+        _g.close();
+        }
+      }
+    catch (Exception e) {
+      failure = collectCleanupFailure(failure, "remote traversal", e);
+      }
+    try {
+      if (cluster() != null) {
+        cluster().close();
+        }
+      }
+    catch (Exception e) {
+      failure = collectCleanupFailure(failure, "Gremlin cluster", e);
+      }
     log.info("Closed");
+    if (failure != null) {
+      throw failure;
+      }
     }
     
   @Override
