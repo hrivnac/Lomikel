@@ -78,7 +78,6 @@ public class JanusClient implements TransactionalGremlinClient {
     * @param properties The file with the complete properties. */
   public JanusClient(String properties) {
     Init.init("JanusClient");
-    _properties = properties;
     open(properties);
     }
     
@@ -103,16 +102,13 @@ public class JanusClient implements TransactionalGremlinClient {
   /** Open graph with file-based properties.
     * @param properties The file with the complete properties. */
   public void open(String properties) {
-    _properties = properties;
     log.info("Opening " + properties);
     Properties p = new Properties();
-    try {
-      FileInputStream propStream = new FileInputStream(properties);
+    try (FileInputStream propStream = new FileInputStream(properties)) {
       p.load(propStream);
-      propStream.close();
       }
     catch (IOException e) {
-      log.error("Properties " + properties + " cannot be loaded", e);
+      throw new IllegalArgumentException("Properties " + properties + " cannot be loaded", e);
       }
     _hostname = p.getProperty("storage.hostname");
     _table    = p.getProperty("storage.hbase.table");
@@ -122,6 +118,7 @@ public class JanusClient implements TransactionalGremlinClient {
       }
     _graph = JanusGraphFactory.open(properties);
     _g = _graph.traversal();
+    _properties = properties;
     log.info("Connected");
     }
     

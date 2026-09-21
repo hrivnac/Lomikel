@@ -32,6 +32,7 @@ public final class JanuserRegressionTest {
     testCorrelationRegenerationIsScoped();
     testTimerCommitsIndependentlyOfReportingInterval();
     testReopenPreservesPropertiesConfiguration();
+    testMissingPropertiesFileFailsExplicitly();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -273,6 +274,19 @@ public final class JanuserRegressionTest {
         client.close();
         }
       Files.deleteIfExists(properties);
+      }
+    }
+
+  private static void testMissingPropertiesFileFailsExplicitly() throws Exception {
+    Path missing = Files.createTempFile("januser-missing-", ".properties");
+    Files.delete(missing);
+    try {
+      new JanusClient(missing.toString());
+      throw new AssertionError("a missing properties file must fail construction");
+      }
+    catch (IllegalArgumentException expected) {
+      require(expected.getCause() instanceof java.io.IOException,
+              "configuration load failure must retain its IOException cause");
       }
     }
 
