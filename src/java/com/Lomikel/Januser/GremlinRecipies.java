@@ -389,7 +389,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
     if (_client != null) {
       _client.commit();
       }
-    else {
+    else if (g().getGraph().features().graph().supportsTransactions()) {
       g().getGraph().tx().commit();
       }
     }

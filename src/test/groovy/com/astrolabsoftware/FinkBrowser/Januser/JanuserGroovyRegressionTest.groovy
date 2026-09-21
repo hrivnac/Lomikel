@@ -52,6 +52,50 @@ final class JanuserGroovyRegressionTest {
                     has('lbl', 'right').has('id', 'R').count().next() == 1L :
              'get_or_create_edge must preserve the requested direction and endpoints'
 
+      5.times { source.addV('batchVertex').property('lbl', 'batchVertex').iterate() }
+      source.tx().commit()
+      recipes.commitCount = 0
+      def invalidBatchFailure = new java.util.concurrent.atomic.AtomicReference<Throwable>()
+      Thread invalidBatch = new Thread({
+        try {
+          recipes.dropV('batchVertex', 0)
+          }
+        catch (Throwable t) {
+          invalidBatchFailure.set(t)
+          }
+        } as Runnable)
+      invalidBatch.daemon = true
+      invalidBatch.start()
+      invalidBatch.join(2000)
+      assert !invalidBatch.alive : 'zero-sized dropV batches must be rejected without looping'
+      assert invalidBatchFailure.get() instanceof IllegalArgumentException
+      assert source.V().has('lbl', 'batchVertex').count().next() == 5L :
+             'invalid dropV batches must not mutate the graph'
+      recipes.dropV('batchVertex', 2)
+      assert source.V().has('lbl', 'batchVertex').count().next() == 0L
+      assert recipes.commitCount == 3 :
+             'dropV must commit each actual batch through the recipe abstraction'
+
+      6.times {
+        def edgeFrom = source.addV('batchEndpoint').next()
+        def edgeTo = source.addV('batchEndpoint').next()
+        edgeFrom.addEdge('batchEdge', edgeTo, 'lbl', 'batchEdge')
+        }
+      source.tx().commit()
+      recipes.commitCount = 0
+      try {
+        recipes.dropE('batchEdge', -1)
+        assert false : 'negative dropE batches must be rejected'
+        }
+      catch (IllegalArgumentException expected) {
+        assert source.E().has('lbl', 'batchEdge').count().next() == 6L :
+               'invalid dropE batches must not mutate the graph'
+        }
+      recipes.dropE('batchEdge', 4)
+      assert source.E().has('lbl', 'batchEdge').count().next() == 0L
+      assert recipes.commitCount == 2 :
+             'dropE must commit each actual batch through the recipe abstraction'
+
       def membershipSource = source.addV('object').property('lbl', 'object').
                                     property('objectId', 'membership-source').next()
       def membershipCandidate = source.addV('object').property('lbl', 'object').
@@ -165,9 +209,13 @@ final class JanuserGroovyRegressionTest {
     def source
     def hbaseClient
     def targetGraph
+    int commitCount
     def g() { source }
     def graph() { source.graph }
-    def commit() { source.tx().commit() }
+    def commit() {
+      commitCount++
+      source.tx().commit()
+      }
     def createHBaseDataLinkClient(String hostname, String port) { hbaseClient }
     def openDataLinkGraph(String backend, String hostname, String port, String table) { targetGraph }
     }

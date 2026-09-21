@@ -106,35 +106,30 @@ trait GremlinRecipiesGT {
             int    n,
             String attName  = null,
             String attValue = null) {
-    def m;
-    if (attName == null) {
-      m = g().V().has('lbl', label)
-                 .count()
-                 .next();
-      }      
-    else {
-      m = g().V().has('lbl', label)
-                 .has(attName, attValue)
-                 .count()
-                 .next();
+    if (n <= 0) {
+      throw new IllegalArgumentException('Batch size must be positive')
       }
-    while (m > 0) {
-      println('' + m + ' ' + label + 's to drop');
+    while (true) {
+      def batch;
       if (attName == null) {
-        g().V().has('lbl', label)
-               .limit(n)
-               .drop()
-               .iterate();  
+        batch = g().V().has('lbl', label)
+                   .limit(n)
+                   .id()
+                   .toList();
         }
       else {
-        g().V().has('lbl', label)
-               .has(attName, attValue)
-               .limit(n)
-               .drop()
-               .iterate();  
+        batch = g().V().has('lbl', label)
+                   .has(attName, attValue)
+                   .limit(n)
+                   .id()
+                   .toList();
         }
-      graph().traversal().tx().commit();
-      m -= n;
+      if (batch.isEmpty()) {
+        break;
+        }
+      println('' + batch.size() + ' ' + label + 's to drop');
+      g().V(batch.toArray()).drop().iterate();
+      commit();
       }
     }
     
@@ -147,35 +142,30 @@ trait GremlinRecipiesGT {
             int    n,
             String attName  = null,
             String attValue = null) {
-    def m;
-    if (attName == null) {
-      m = g().E().has('lbl', label)
-                 .count()
-                 .next();
+    if (n <= 0) {
+      throw new IllegalArgumentException('Batch size must be positive')
       }
-    else {
-      m = g().E().has('lbl', label)
-                 .has(attName, attValue)
-                 .count()
-                 .next();
-      }
-    while (m > 0) {
-      println('' + m + ' ' + label + 's to drop');
+    while (true) {
+      def batch;
       if (attName == null) {
-        g().E().has('lbl', label)
-               .limit(n)
-               .drop()
-               .iterate();
+        batch = g().E().has('lbl', label)
+                   .limit(n)
+                   .id()
+                   .toList();
         }
       else {
-        g().E().has('lbl', label)
-               .has(attName, attValue)
-               .limit(n)
-               .drop()
-               .iterate();
+        batch = g().E().has('lbl', label)
+                   .has(attName, attValue)
+                   .limit(n)
+                   .id()
+                   .toList();
         }
-      graph().traversal().tx().commit();
-      m -= n;
+      if (batch.isEmpty()) {
+        break;
+        }
+      println('' + batch.size() + ' ' + label + 's to drop');
+      g().E(batch.toArray()).drop().iterate();
+      commit();
       }
     }
 

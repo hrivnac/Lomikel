@@ -32,6 +32,7 @@ public final class JanuserRegressionTest {
     testMetaSchemaPreservesAllEndpointPairs();
     testDeepDropHandlesCyclesAndNonJanusVertices();
     testRecipeCommitUsesClientAbstraction();
+    testRecipeCommitSupportsTransactionFreeGraphs();
     testOColEqualityDoesNotCollapseHashCollisions();
     testFinkRegistrationPreservesNumericWeights();
     testFinkRegistrationRejectsInvalidWeightsBeforeMutation();
@@ -204,6 +205,19 @@ public final class JanuserRegressionTest {
       }
     finally {
       client.close();
+      }
+    }
+
+  private static void testRecipeCommitSupportsTransactionFreeGraphs() throws Exception {
+    TinkerGraph graph = TinkerGraph.open();
+    try (GraphTraversalSource source = graph.traversal()) {
+      source.addV("node").iterate();
+      new GremlinRecipies(source).commit();
+      require(source.V().hasLabel("node").count().next() == 1L,
+              "commit must be a no-op when a raw graph does not support transactions");
+      }
+    finally {
+      graph.close();
       }
     }
 
