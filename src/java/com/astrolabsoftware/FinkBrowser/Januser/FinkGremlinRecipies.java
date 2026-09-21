@@ -317,6 +317,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                            double       weight,
                            List<String> instances,
                            List<Double> weights) { 
+    validateWeight(weight, "aggregate weight");
+    if (instances == null || weights == null || instances.size() != weights.size()) {
+      throw new IllegalArgumentException("Instances and weights must have equal lengths");
+      }
+    for (Double instanceWeight : weights) {
+      if (instanceWeight == null) {
+        throw new IllegalArgumentException("Per-instance weight must not be null");
+        }
+      validateWeight(instanceWeight, "per-instance weight");
+      }
     Map<String, Object> attributes = new HashMap<>();
     attributes.put("weight",    weight);
     attributes.put("instances", instances.toString().replaceFirst("\\[", "").replaceAll("]", ""));
@@ -337,8 +347,28 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                            String              objectId,
                            Map<String, ?> attributes,
                            boolean             replace) {   
+    Object weightValue = attributes == null ? null : attributes.get("weight");
+    double weight;
+    if (weightValue instanceof Number) {
+      weight = ((Number)weightValue).doubleValue();
+      }
+    else if (weightValue instanceof String) {
+      try {
+        weight = Double.parseDouble(((String)weightValue).trim());
+        }
+      catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Registration weight must be numeric", e);
+        }
+      }
+    else {
+      throw new IllegalArgumentException("Registration weight must be numeric");
+      }
+    validateWeight(weight, "aggregate weight");
+    Map<String, Object> validatedAttributes = new HashMap<>();
+    validatedAttributes.putAll(attributes);
+    validatedAttributes.put("weight", weight);
     //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
-    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + attributes.get("weight") + ", replace = " + replace);
+    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + weight + ", replace = " + replace);
     Vertex ocol = g().V().has("lbl",        "OCol"             ).
                           has("survey",     classifier.survey()).
                           has("classifier", classifier.name()  ).
@@ -366,19 +396,26 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       addEdge(g().V(ocol).next(),
               g().V(s).next(),
               "deepcontains",
-              attributes.keySet().toArray(new String[0]),
-              attributes.values().toArray(new Object[0]),
+              validatedAttributes.keySet().toArray(new String[0]),
+              validatedAttributes.values().toArray(new Object[0]),
               true);
       }
     else {
       Edge e = ocol.addEdge("deepcontains", s);
       e.property("lbl", "deepcontains");
-      for (Map.Entry<String, ?> attribute : attributes.entrySet()) {
+      for (Map.Entry<String, Object> attribute : validatedAttributes.entrySet()) {
         e.property(attribute.getKey(), attribute.getValue());
         }
       }
     if (!_classificationTransaction.get()) {
       commit();
+      }
+    }
+
+  /** Validate scientific registration weights before graph mutation. */
+  private static void validateWeight(double weight, String description) {
+    if (!Double.isFinite(weight) || weight < 0.0) {
+      throw new IllegalArgumentException("Invalid " + description + ": " + weight);
       }
     }
    

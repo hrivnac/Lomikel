@@ -30,6 +30,7 @@ public final class JanuserRegressionTest {
     testRecipeCommitUsesClientAbstraction();
     testOColEqualityDoesNotCollapseHashCollisions();
     testFinkRegistrationPreservesNumericWeights();
+    testFinkRegistrationRejectsInvalidWeightsBeforeMutation();
     testClassificationRejectsNonTransactionalClient();
     testFailedClassificationRollsBackReplacement();
     testCorrelationRegenerationIsScoped();
@@ -543,6 +544,52 @@ public final class JanuserRegressionTest {
       Object weights = client.g().E().hasLabel("deepcontains").values("weights").next();
       require(weight instanceof Double, "aggregate weight must be stored as a number");
       require("0.25, 0.75".equals(weights), "per-instance weights must preserve parsed values");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testFinkRegistrationRejectsInvalidWeightsBeforeMutation() {
+    FakeClient client = new FakeClient();
+    try {
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      double[] invalidWeights = new double[] {-1.0, Double.NaN,
+                                               Double.POSITIVE_INFINITY,
+                                               Double.NEGATIVE_INFINITY};
+      for (double invalidWeight : invalidWeights) {
+        expectIllegalArgument(
+          () -> recipes.registerOCol(classifier, "invalid", "ZTF-invalid",
+                                     invalidWeight, "[1]", "[1.0]"),
+          "invalid aggregate weights must be rejected");
+        }
+      for (double invalidWeight : invalidWeights) {
+        expectIllegalArgument(
+          () -> recipes.registerOCol(classifier, "invalid", "ZTF-invalid",
+                                     1.0, java.util.List.of("1"),
+                                     java.util.List.of(invalidWeight)),
+          "invalid per-instance weights must be rejected");
+        }
+      expectIllegalArgument(
+        () -> recipes.registerOCol(classifier, "invalid", "ZTF-invalid",
+                                   1.0, java.util.List.of("1", "2"),
+                                   java.util.List.of(1.0)),
+        "instance and weight counts must match");
+      require(client.g().V().count().next() == 0L &&
+              client.g().E().count().next() == 0L,
+              "invalid registration payloads must not mutate the graph");
+
+      java.util.Map<String, Object> legacyAttributes = new java.util.LinkedHashMap<>();
+      legacyAttributes.put("weight", "1.5");
+      legacyAttributes.put("origin", "legacy-map");
+      recipes.registerOCol(classifier, "legacy", "ZTF-legacy",
+                           legacyAttributes, true);
+      Object storedWeight = client.g().E().hasLabel("deepcontains").
+                                  values("weight").next();
+      require(storedWeight instanceof Double &&
+              ((Double)storedWeight).doubleValue() == 1.5,
+              "legacy numeric-string map weights must remain accepted and become numeric");
       }
     finally {
       client.close();
