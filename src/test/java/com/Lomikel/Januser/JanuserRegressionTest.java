@@ -43,6 +43,7 @@ public final class JanuserRegressionTest {
     testHertexMissingRowDoesNotFailSelectiveEnhancement();
     testHBaseEmptyResultIsIgnored();
     testWertexPreservesVertexIdentity();
+    testEdgePropertiesAreValidatedBeforeMutation();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -452,6 +453,56 @@ public final class JanuserRegressionTest {
       }
     finally {
       client.close();
+      }
+    }
+
+  private static void testEdgePropertiesAreValidatedBeforeMutation() {
+    FakeClient client = new FakeClient();
+    try {
+      Vertex source = client.g().addV("node").next();
+      Vertex target = client.g().addV("node").next();
+      GremlinRecipies recipes = new GremlinRecipies(client);
+      String[] names = new String[] {"first", "second"};
+
+      expectIllegalArgument(
+        () -> recipes.addEdge(source, target, "double-edge", names,
+                              new Double[] {1.0}, false),
+        "mismatched Double edge properties must be rejected");
+      expectIllegalArgument(
+        () -> recipes.addEdge(source, target, "string-edge", names,
+                              new String[] {"one"}, false),
+        "mismatched String edge properties must be rejected");
+      expectIllegalArgument(
+        () -> recipes.addEdge(source, target, "object-edge", names,
+                              new Object[] {1}, false),
+        "mismatched Object edge properties must be rejected");
+      require(client.g().E().count().next() == 0L,
+              "invalid edge properties must not create partial edges");
+
+      recipes.addEdge(source, target, "existing", new String[] {"first", "second"},
+                      new Object[] {"old-first", "old-second"}, false);
+      expectIllegalArgument(
+        () -> recipes.addEdge(source, target, "existing", names,
+                              new Object[] {"new-first"}, true),
+        "mismatched reset properties must be rejected");
+      org.apache.tinkerpop.gremlin.structure.Edge edge =
+        client.g().E().hasLabel("existing").next();
+      require("old-first".equals(edge.value("first")) &&
+              "old-second".equals(edge.value("second")),
+              "invalid reset properties must not partially update an edge");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void expectIllegalArgument(Runnable action, String message) {
+    try {
+      action.run();
+      throw new AssertionError(message);
+      }
+    catch (IllegalArgumentException expected) {
+      // Expected validation failure.
       }
     }
 

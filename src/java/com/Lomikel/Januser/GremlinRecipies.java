@@ -232,6 +232,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
                       String[] names,
                       Double[] values,
                       boolean  reset) {
+    validateEdgeProperties(names, values);
     v1 = Wertex.unwrap(v1);
     v2 = Wertex.unwrap(v2);
     boolean create = !checkEdge(v1, v2, relation);
@@ -270,6 +271,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
                       String[] names,
                       String[] values,
                       boolean  reset) {
+    validateEdgeProperties(names, values);
     v1 = Wertex.unwrap(v1);
     v2 = Wertex.unwrap(v2);
     boolean create = !checkEdge(v1, v2, relation);
@@ -301,6 +303,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
                       String[] names,
                       Object[] values,
                       boolean  reset) {
+    validateEdgeProperties(names, values);
     v1 = Wertex.unwrap(v1);
     v2 = Wertex.unwrap(v2);
     boolean create = !checkEdge(v1, v2, relation);
@@ -322,6 +325,13 @@ public GraphTraversal<Vertex, Vertex> allV() {
           e.property(names[i], values[i]);
           }
         }
+      }
+    }
+
+  /** Validate parallel edge-property arrays before any graph mutation. */
+  private static void validateEdgeProperties(String[] names, Object[] values) {
+    if (names == null || values == null || names.length != values.length) {
+      throw new IllegalArgumentException("Edge property names and values must have equal lengths");
       }
     }
 
