@@ -52,10 +52,14 @@ public class Hertex extends Wertex {
     if (rowkey() != null) {
       String n = null;
       Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
-      if (!results.isEmpty()) {
-        property("hbase", true);
+      if (results.isEmpty()) {
+        return;
         }
       Map<String, String> allFields = results.get(rowkey());
+      if (allFields == null || allFields.isEmpty()) {
+        return;
+        }
+      property("hbase", true);
       Map<String, String> fields2fill;
       if (fields == null) {
         fields2fill = allFields;

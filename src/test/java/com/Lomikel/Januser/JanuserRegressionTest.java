@@ -40,6 +40,8 @@ public final class JanuserRegressionTest {
     testHertexGetOrCreateReturnsEnhancedVertices();
     testHertexEnhanceWithoutLabelReturnsOriginalVertex();
     testHBaseCloseAttemptsConnectionAfterTableFailure();
+    testHertexMissingRowDoesNotFailSelectiveEnhancement();
+    testHBaseEmptyResultIsIgnored();
     System.out.println("JanuserRegressionTest: OK");
     }
 
@@ -385,6 +387,43 @@ public final class JanuserRegressionTest {
             "HBase close must attempt connection cleanup after table cleanup fails");
     }
 
+  private static void testHertexMissingRowDoesNotFailSelectiveEnhancement() throws Exception {
+    EmptyHBaseClient hbase = allocateWithoutConstructor(EmptyHBaseClient.class);
+    TinkerGraph graph = TinkerGraph.open();
+    Vertex vertex = graph.addVertex("lbl", "missing-row", "rowkey", "row-1");
+    try {
+      Wertex.setRowkeyName("missing-row", Hertex.class, "rowkey");
+      Hertex.setHBaseClient(hbase);
+
+      Vertex enhanced = new Hertex(vertex, "");
+
+      require(enhanced.id().equals(vertex.id()),
+              "missing HBase rows must leave the graph vertex usable");
+      require(!vertex.property("hbase").isPresent(),
+              "missing HBase rows must not mark the vertex as HBase-backed");
+
+      hbase.resultMode = "missing-key";
+      new Hertex(vertex, "");
+      require(!vertex.property("hbase").isPresent(),
+              "a response without the requested row must not mark the vertex as HBase-backed");
+
+      hbase.resultMode = "empty-row";
+      new Hertex(vertex, "");
+      require(!vertex.property("hbase").isPresent(),
+              "an empty requested row must not mark the vertex as HBase-backed");
+      }
+    finally {
+      Hertex.setHBaseClient(null);
+      graph.close();
+      }
+    }
+
+  private static void testHBaseEmptyResultIsIgnored() throws Exception {
+    EmptyHBaseClient hbase = allocateWithoutConstructor(EmptyHBaseClient.class);
+    require(!hbase.addEmptyResult(),
+            "an HBase Result without a row key must be ignored safely");
+    }
+
   private static Object primitiveDefault(Class<?> type) {
     if (!type.isPrimitive() || type == void.class) return null;
     if (type == boolean.class) return false;
@@ -498,6 +537,34 @@ public final class JanuserRegressionTest {
     @Override
     public Client client() {
       return null;
+      }
+    }
+
+  public static final class EmptyHBaseClient extends HBaseClient {
+
+    public String resultMode;
+
+    public EmptyHBaseClient() throws LomikelException {
+      super(null, (String)null);
+      }
+
+    @Override
+    public java.util.Map<String, java.util.Map<String, String>> scan(
+      String key, String search, String filter, long start, long stop,
+      boolean ifkey, boolean iftime) {
+      if ("missing-key".equals(resultMode)) {
+        return java.util.Collections.singletonMap(
+          "other-row", java.util.Collections.singletonMap("i:value", "other"));
+        }
+      if ("empty-row".equals(resultMode)) {
+        return java.util.Collections.singletonMap(key, java.util.Collections.emptyMap());
+        }
+      return java.util.Collections.emptyMap();
+      }
+
+    public boolean addEmptyResult() {
+      return addResult(org.apache.hadoop.hbase.client.Result.EMPTY_RESULT,
+                       new java.util.TreeMap<>(), "*", false, true);
       }
     }
 
