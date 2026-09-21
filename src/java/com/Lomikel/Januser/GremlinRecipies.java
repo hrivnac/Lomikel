@@ -70,7 +70,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
     commit();
     Map<String, Set<String>> vMap  = new HashMap<>();
     Map<String, Set<String>> eMap  = new HashMap<>();
-    Map<String, String>      evMap = new HashMap<>();
+    Map<String, Set<List<String>>> evMap = new HashMap<>();
     Set<String> vSet;
     Set<String> eSet;
     Property<Vertex> vP;
@@ -86,7 +86,8 @@ public GraphTraversal<Vertex, Vertex> allV() {
     log.info("Scanning Edges");
     for (Edge e : g().E().toList()) {
       eSet = eMap.computeIfAbsent(e.label(), key -> new HashSet<>());
-      evMap.put(e.label(), e.outVertex().label() + " " + e.inVertex().label());
+      evMap.computeIfAbsent(e.label(), key -> new HashSet<>()).
+            add(List.of(e.outVertex().label(), e.inVertex().label()));
       for (Iterator<Property<Edge>> i = e.properties(); i.hasNext();) { 
         eP = i.next();
         eSet.add(eP.key());
@@ -106,16 +107,17 @@ public GraphTraversal<Vertex, Vertex> allV() {
         log.error("... failed");
         }
       }
-    String[] vvS;
     Edge e;
-    for (Map.Entry<String, String> entry : evMap.entrySet()) {
-      log.info("Adding Edge " + entry.getKey() + " : " + entry.getValue());
-      vvS = entry.getValue().split(" ");
-      v = g().V().has("MetaGraph", "MetaLabel", vvS[0]).next();
-      e = v.addEdge("MetaGraph", g().V().has("MetaGraph", "MetaLabel", vvS[1]).next());
-      e.property("MetaLabel", entry.getKey());
-      for (String p : eMap.get(entry.getKey())) {
-        e.property(p, "");
+    for (Map.Entry<String, Set<List<String>>> entry : evMap.entrySet()) {
+      for (List<String> endpoints : entry.getValue()) {
+        log.info("Adding Edge " + entry.getKey() + " : " + endpoints);
+        v = g().V().has("MetaGraph", "MetaLabel", endpoints.get(0)).next();
+        e = v.addEdge("MetaGraph",
+                      g().V().has("MetaGraph", "MetaLabel", endpoints.get(1)).next());
+        e.property("MetaLabel", entry.getKey());
+        for (String p : eMap.get(entry.getKey())) {
+          e.property(p, "");
+          }
         }
       }
     commit();

@@ -10,7 +10,9 @@ import com.astrolabsoftware.FinkBrowser.Januser.OCol;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,6 +29,7 @@ public final class JanuserRegressionTest {
   public static void main(String[] args) throws Exception {
     testGetOrCreateCreatesMissingVertexAndReusesExistingVertex();
     testMetaSchemaUnionsPropertiesAcrossSameLabelElements();
+    testMetaSchemaPreservesAllEndpointPairs();
     testDeepDropHandlesCyclesAndNonJanusVertices();
     testRecipeCommitUsesClientAbstraction();
     testOColEqualityDoesNotCollapseHashCollisions();
@@ -101,6 +104,33 @@ public final class JanuserRegressionTest {
       require(metaEdge.property("firstEdgeProperty").isPresent() &&
               metaEdge.property("secondEdgeProperty").isPresent(),
               "meta schema must union properties from every edge with the same label");
+      }
+    finally {
+      graph.close();
+      }
+    }
+
+  private static void testMetaSchemaPreservesAllEndpointPairs() throws Exception {
+    FakeClient client = new FakeClient();
+    TinkerGraph graph = (TinkerGraph)client.g().getGraph();
+    Vertex alpha = client.g().addV("alpha").next();
+    Vertex beta = client.g().addV("beta").next();
+    Vertex gamma = client.g().addV("gamma").next();
+    Vertex delta = client.g().addV("delta").next();
+    alpha.addEdge("relation", beta);
+    gamma.addEdge("relation", delta);
+
+    new GremlinRecipies(client).createMetaSchema();
+
+    try (GraphTraversalSource check = graph.traversal()) {
+      Set<String> endpointPairs = new HashSet<>();
+      for (org.apache.tinkerpop.gremlin.structure.Edge edge :
+             check.E().hasLabel("MetaGraph").has("MetaLabel", "relation").toList()) {
+        endpointPairs.add(edge.outVertex().value("MetaLabel") + "->" +
+                          edge.inVertex().value("MetaLabel"));
+        }
+      require(endpointPairs.equals(Set.of("alpha->beta", "gamma->delta")),
+              "meta schema must preserve every endpoint-label pair used by an edge label");
       }
     finally {
       graph.close();
