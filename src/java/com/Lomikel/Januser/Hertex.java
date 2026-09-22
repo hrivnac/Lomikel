@@ -153,7 +153,11 @@ public class Hertex extends Wertex {
                                          String                 rowkey,
                                          GraphTraversalSource   g,
                                          String                 fields) {
-    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyName(representant(lbl)), rowkey).toList();
+    String propertyName = rowkeyName(representant(lbl));
+    if (propertyName == null) {
+      throw new IllegalStateException("No row-key mapping configured for label " + lbl);
+      }
+    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, propertyName, rowkey).toList();
     List<Vertex> newVertexes = new ArrayList<>();
     for (Vertex v : vertexes) {
       newVertexes.add(enhance(v, fields));

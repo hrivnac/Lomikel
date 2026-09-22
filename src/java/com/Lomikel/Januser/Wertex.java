@@ -134,11 +134,16 @@ public abstract class Wertex implements Vertex {
     *                     <tt>null</tt> if not set.
     *                     Concatenated with <tt>#</tt> if multivalue. */
   public static String rowkeyName(String representant) {
-    if (_rowkeyNames.get(representant).length == 0) {
+    if (representant == null) {
+      log.error("Representant not set");
+      return null;
+      }
+    String[] names = _rowkeyNames.get(representant);
+    if (names == null || names.length == 0) {
       log.error("RowkeyName not set");
       return null;
       }
-    return String.join("#", _rowkeyNames.get(representant));
+    return String.join("#", names);
     }
       
     
@@ -206,9 +211,15 @@ public abstract class Wertex implements Vertex {
     *         <tt>null</tt> if not set.
     *         Concatenated with <tt>#</tt> if multivalue. */
   public String rowkey() {
-    if (_rowkeys.length == 0) {
+    if (_rowkeys == null || _rowkeys.length == 0) {
       log.error("Rowkey not set");
       return null;
+      }
+    for (String rowkey : _rowkeys) {
+      if (rowkey == null) {
+        log.error("Rowkey property not set");
+        return null;
+        }
       }
     return String.join("#", _rowkeys);
     }

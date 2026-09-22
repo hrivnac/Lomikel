@@ -57,6 +57,7 @@ public final class JanuserRegressionTest {
     testHertexEnhanceWithoutLabelReturnsOriginalVertex();
     testHBaseCloseAttemptsConnectionAfterTableFailure();
     testHertexMissingRowDoesNotFailSelectiveEnhancement();
+    testHertexHandlesMissingRowKeyConfiguration();
     testHBaseEmptyResultIsIgnored();
     testWertexPreservesVertexIdentity();
     testDirectedEdgeResetIgnoresReverseEdge();
@@ -802,6 +803,38 @@ public final class JanuserRegressionTest {
       }
     }
 
+  private static void testHertexHandlesMissingRowKeyConfiguration() throws Exception {
+    FakeClient client = new FakeClient();
+    EmptyHBaseClient hbase = allocateWithoutConstructor(EmptyHBaseClient.class);
+    Hertex.setHBaseClient(hbase);
+    try {
+      Vertex unconfigured = client.g().addV("unconfigured").next();
+      NoRowkeyHertex noMapping = new NoRowkeyHertex(unconfigured);
+      require(noMapping.rowkey() == null,
+              "Hertex without row-key configuration must remain usable without HBase dressing");
+
+      Wertex.setRowkeyName("configured-missing", MissingRowkeyHertex.class, "objectId");
+      Vertex missingProperty = client.g().addV("configured-missing").next();
+      MissingRowkeyHertex missing = new MissingRowkeyHertex(missingProperty);
+      require(missing.rowkey() == null,
+              "Hertex with a missing configured property must not dereference null row-key values");
+
+      long before = client.g().V().count().next();
+      try {
+        Hertex.getOrCreate("unmapped-label", "row", client.g(), false);
+        throw new AssertionError("missing row-key mappings must be rejected");
+        }
+      catch (IllegalStateException expected) {
+        require(client.g().V().count().next() == before,
+                "missing row-key mapping rejection must happen before graph mutation");
+        }
+      }
+    finally {
+      Hertex.setHBaseClient(null);
+      client.close();
+      }
+    }
+
   private static void testDirectedEdgeResetIgnoresReverseEdge() {
     FakeClient client = new FakeClient();
     try {
@@ -1039,6 +1072,22 @@ public final class JanuserRegressionTest {
     public Client client() {
       return null;
       }
+    }
+
+  public static final class NoRowkeyHertex extends Hertex {
+
+    public NoRowkeyHertex(Vertex vertex) {
+      super(vertex, (String[])null);
+      }
+
+    }
+
+  public static final class MissingRowkeyHertex extends Hertex {
+
+    public MissingRowkeyHertex(Vertex vertex) {
+      super(vertex, (String[])null);
+      }
+
     }
 
   public static final class EmptyHBaseClient extends HBaseClient {
