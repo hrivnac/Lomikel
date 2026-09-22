@@ -59,6 +59,7 @@ public final class JanuserRegressionTest {
     testHertexMissingRowDoesNotFailSelectiveEnhancement();
     testHBaseEmptyResultIsIgnored();
     testWertexPreservesVertexIdentity();
+    testDirectedEdgeResetIgnoresReverseEdge();
     testEdgePropertiesAreValidatedBeforeMutation();
     System.out.println("JanuserRegressionTest: OK");
     }
@@ -795,6 +796,33 @@ public final class JanuserRegressionTest {
       recipes.addEdge(source, target, "links");
       require(client.g().E().hasLabel("links").count().next() == 1L,
               "dressed endpoints must not create duplicate edges");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testDirectedEdgeResetIgnoresReverseEdge() {
+    FakeClient client = new FakeClient();
+    try {
+      Vertex source = client.g().addV("node").next();
+      Vertex target = client.g().addV("node").next();
+      org.apache.tinkerpop.gremlin.structure.Edge forward =
+        source.addEdge("links", target, "value", "forward");
+      org.apache.tinkerpop.gremlin.structure.Edge reverse =
+        target.addEdge("links", source, "value", "reverse");
+      GremlinRecipies recipes = new GremlinRecipies(client);
+
+      recipes.addEdge(source, target, "links", new String[] {"value"},
+                      new Object[] {"updated"}, true);
+
+      require("updated".equals(forward.value("value")),
+              "reset must update the requested directed edge");
+      require("reverse".equals(reverse.value("value")),
+              "reset must not modify the reverse edge");
+      require(recipes.getEdge(source, target, "links").equals(java.util.List.of(forward)) &&
+              recipes.getEdge(target, source, "links").equals(java.util.List.of(reverse)),
+              "getEdge must respect source-to-destination direction");
       }
     finally {
       client.close();

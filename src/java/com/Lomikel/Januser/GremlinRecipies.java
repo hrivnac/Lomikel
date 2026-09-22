@@ -367,7 +367,6 @@ public GraphTraversal<Vertex, Vertex> allV() {
   v1 = Wertex.unwrap(v1);
   v2 = Wertex.unwrap(v2);
   List<Edge> edges = g().V(v1).outE(relation).filter(inV().is(v2)).toList();
-  edges.addAll(g().V(v2).outE(relation).filter(inV().is(v1)).toList());
   return edges;
   }
     
