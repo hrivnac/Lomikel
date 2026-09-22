@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.TreeMap;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -524,6 +524,20 @@ public GraphTraversal<Vertex, Vertex> allV() {
                       int                  depthOut,
                       boolean              inclCycles,
                       String[]             onlyLabels) {
+    return gimme(v, g1, depthIn, depthOut, inclCycles, onlyLabels,
+                 new HashMap<>(), new HashSet<>(), new HashMap<>());
+    }
+
+  /** Clone one vertex within a single replication operation. */
+  private Vertex gimme(Vertex               v,
+                       GraphTraversalSource g1,
+                       int                  depthIn,
+                       int                  depthOut,
+                       boolean              inclCycles,
+                       String[]             onlyLabels,
+                       Map<Object, Vertex>  replicatedVertices,
+                       Set<Object>          replicatedEdges,
+                       Map<Object, List<int[]>> explorationFrontiers) {
     if (depthIn < 0) {
       depthIn = Integer.MAX_VALUE;
       }
@@ -534,23 +548,41 @@ public GraphTraversal<Vertex, Vertex> allV() {
     if (onlyLabels != null && !Arrays.asList(onlyLabels).contains(label)) {
       return null;
       }
-    long id = 0;
-    if (inclCycles) {
-      id = (Long)(v.id());
-      if (_replicatedIds.containsKey(id)) {
-        return g1.V(_replicatedIds.get(id)).next();
+    Object id = v.id();
+    Vertex v1 = replicatedVertices.get(id);
+    if (v1 == null) {
+      v1 = g1.addV(label).next();
+      replicatedVertices.put(id, v1);
+      for (String key : v.keys()) {
+        List<VertexProperty<Object>> sourceProperties = new ArrayList<>();
+        Iterator<VertexProperty<Object>> it = v.properties(key);
+        while (it.hasNext()) {
+          sourceProperties.add(it.next());
+          }
+        VertexProperty.Cardinality cardinality =
+          v.graph().features().vertex().getCardinality(key);
+        if (sourceProperties.size() > 1 && cardinality == VertexProperty.Cardinality.single) {
+          cardinality = VertexProperty.Cardinality.list;
+          }
+        for (VertexProperty<Object> sourceProperty : sourceProperties) {
+          VertexProperty<Object> clonedProperty =
+            v1.property(cardinality, key, sourceProperty.value());
+          for (String metaKey : sourceProperty.keys()) {
+            clonedProperty.property(metaKey, sourceProperty.property(metaKey).value());
+            }
+          }
         }
       }
-    Vertex v1 = g1.addV(label).next();
-    if (inclCycles) {
-      _replicatedIds.put(id, (Long)(v1.id()));
-      }
-    for (String key : v.keys()) {
-      Iterator<VertexProperty<Double>> it = v.properties(key);
-      while (it.hasNext()) {
-        v1.property(key, it.next().value());
+    List<int[]> frontier = explorationFrontiers.computeIfAbsent(id, key -> new ArrayList<>());
+    for (int[] explored : frontier) {
+      if (explored[0] >= depthIn && explored[1] >= depthOut) {
+        return v1;
         }
       }
+    final int requestedIn = depthIn;
+    final int requestedOut = depthOut;
+    frontier.removeIf(explored -> explored[0] <= requestedIn && explored[1] <= requestedOut);
+    frontier.add(new int[] {depthIn, depthOut});
     Iterator<Edge> edges;
     Edge e;
     Edge e1;
@@ -561,13 +593,13 @@ public GraphTraversal<Vertex, Vertex> allV() {
       while (edges.hasNext()) {
         e = edges.next();
         ve = e.outVertex();
-        ve1 = gimme(ve, g1, depthIn - 1, inclCycles ? depthOut : 0, inclCycles, onlyLabels);
-        if (ve1 != null) {
-          if (!checkEdge(ve1, v1, e.label())) {
-            e1 = ve1.addEdge(e.label(), v1);
-            for (String key : e.keys()) {
-              e1.property(key, e.property(key).value());
-              }
+        ve1 = gimme(ve, g1, depthIn - 1, inclCycles ? depthOut : 0,
+                    inclCycles, onlyLabels, replicatedVertices, replicatedEdges,
+                    explorationFrontiers);
+        if (ve1 != null && replicatedEdges.add(e.id())) {
+          e1 = ve1.addEdge(e.label(), v1);
+          for (String key : e.keys()) {
+            e1.property(key, e.property(key).value());
             }
           }
         }
@@ -577,13 +609,13 @@ public GraphTraversal<Vertex, Vertex> allV() {
       while (edges.hasNext()) {
         e = edges.next();
         ve = e.inVertex();
-        ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1, inclCycles, onlyLabels);
-        if (ve1 != null) {
-          if (!checkEdge(ve1, v1, e.label())) {
-            e1 = v1.addEdge(e.label(), ve1);
-            for (String key : e.keys()) {
-              e1.property(key, e.property(key).value());
-              }
+        ve1 = gimme(ve, g1, inclCycles ? depthIn : 0, depthOut - 1,
+                    inclCycles, onlyLabels, replicatedVertices, replicatedEdges,
+                    explorationFrontiers);
+        if (ve1 != null && replicatedEdges.add(e.id())) {
+          e1 = v1.addEdge(e.label(), ve1);
+          for (String key : e.keys()) {
+            e1.property(key, e.property(key).value());
             }
           }
         }
@@ -591,8 +623,6 @@ public GraphTraversal<Vertex, Vertex> allV() {
     return v1;
     }
     
-  private Map<Long, Long> _replicatedIds = new TreeMap<>(); // original id -> replicated id
-     
   private GraphTraversalSource _g;
     
   private ModifyingGremlinClient _client;

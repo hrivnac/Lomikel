@@ -11,6 +11,7 @@ import com.astrolabsoftware.FinkBrowser.Januser.OCol;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,6 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 /** Focused regression tests for Januser correctness bugs. */
@@ -33,6 +35,11 @@ public final class JanuserRegressionTest {
     testDeepDropHandlesCyclesAndNonJanusVertices();
     testRecipeCommitUsesClientAbstraction();
     testRecipeCommitSupportsTransactionFreeGraphs();
+    testGimmePreservesPropertyTypes();
+    testGimmeScopesCycleIdentityPerDestination();
+    testGimmePreservesIdentityWithoutBidirectionalTraversal();
+    testGimmeBoundedDepthIsPathOrderIndependent();
+    testGimmeTracksIncomparableDepthBudgets();
     testOColEqualityDoesNotCollapseHashCollisions();
     testFinkRegistrationPreservesNumericWeights();
     testFinkRegistrationRejectsInvalidWeightsBeforeMutation();
@@ -218,6 +225,172 @@ public final class JanuserRegressionTest {
       }
     finally {
       graph.close();
+      }
+    }
+
+  private static void testGimmePreservesPropertyTypes() throws Exception {
+    TinkerGraph sourceGraph = TinkerGraph.open();
+    TinkerGraph targetGraph = TinkerGraph.open();
+    try (GraphTraversalSource source = sourceGraph.traversal();
+         GraphTraversalSource target = targetGraph.traversal()) {
+      Vertex original = source.addV("node").
+                               property("text", "value").
+                               property("integer", 7).
+                               property("flag", true).
+                               property("decimal", 2.5d).next();
+      original.property(VertexProperty.Cardinality.list, "tag", "x", "source", "first");
+      original.property(VertexProperty.Cardinality.list, "tag", "y", "source", "second");
+      Vertex clone = new GremlinRecipies(source).gimme(original, target, 0, 0, false, null);
+      require(clone.value("text").equals("value") && clone.value("text") instanceof String,
+              "gimme must preserve string properties");
+      require(clone.value("integer").equals(7) && clone.value("integer") instanceof Integer,
+              "gimme must preserve integer properties");
+      require(clone.value("flag").equals(true) && clone.value("flag") instanceof Boolean,
+              "gimme must preserve boolean properties");
+      require(clone.value("decimal").equals(2.5d) && clone.value("decimal") instanceof Double,
+              "gimme must preserve double properties");
+      Set<Object> tags = new HashSet<>();
+      Set<Object> tagSources = new HashSet<>();
+      Iterator<VertexProperty<Object>> tagProperties = clone.properties("tag");
+      while (tagProperties.hasNext()) {
+        VertexProperty<Object> tag = tagProperties.next();
+        tags.add(tag.value());
+        tagSources.add(tag.value("source"));
+        }
+      require(tags.equals(Set.of("x", "y")) &&
+              tagSources.equals(Set.of("first", "second")),
+              "gimme must preserve multi-valued properties and their meta-properties");
+      }
+    finally {
+      sourceGraph.close();
+      targetGraph.close();
+      }
+    }
+
+  private static void testGimmeScopesCycleIdentityPerDestination() throws Exception {
+    TinkerGraph sourceGraph = TinkerGraph.open();
+    TinkerGraph firstTargetGraph = TinkerGraph.open();
+    TinkerGraph secondTargetGraph = TinkerGraph.open();
+    try (GraphTraversalSource source = sourceGraph.traversal();
+         GraphTraversalSource firstTarget = firstTargetGraph.traversal();
+         GraphTraversalSource secondTarget = secondTargetGraph.traversal()) {
+      Vertex first = source.addV("node").
+                            property(org.apache.tinkerpop.gremlin.structure.T.id, "source-first").next();
+      Vertex second = source.addV("node").
+                             property(org.apache.tinkerpop.gremlin.structure.T.id, "source-second").next();
+      first.addEdge("links", second, "rank", 3);
+      first.addEdge("links", second, "rank", 4);
+      GremlinRecipies recipes = new GremlinRecipies(source);
+
+      Vertex firstClone = recipes.gimme(first, firstTarget, -1, -1, true, null);
+      secondTarget.addV("sentinel").
+                   property(org.apache.tinkerpop.gremlin.structure.T.id, firstClone.id()).iterate();
+      Vertex secondClone = recipes.gimme(first, secondTarget, -1, -1, true, null);
+
+      require(secondClone.label().equals("node"),
+              "gimme must not reuse identity state from another destination graph");
+      require(secondTarget.V().count().next() == 3L,
+              "gimme must create both cycle vertices beside an ID-colliding destination vertex");
+      require(secondTarget.E().hasLabel("links").count().next() == 2L,
+              "gimme must preserve parallel edges without duplicating traversal copies");
+      require(new HashSet<>(secondTarget.E().hasLabel("links").values("rank").toList()).
+                equals(Set.of(3, 4)),
+              "gimme must preserve properties on every parallel edge");
+      }
+    finally {
+      sourceGraph.close();
+      firstTargetGraph.close();
+      secondTargetGraph.close();
+      }
+    }
+
+  private static void testGimmePreservesIdentityWithoutBidirectionalTraversal() throws Exception {
+    TinkerGraph sourceGraph = TinkerGraph.open();
+    TinkerGraph targetGraph = TinkerGraph.open();
+    try (GraphTraversalSource source = sourceGraph.traversal();
+         GraphTraversalSource target = targetGraph.traversal()) {
+      Vertex a = source.addV("node").next();
+      Vertex b = source.addV("node").next();
+      Vertex c = source.addV("node").next();
+      Vertex d = source.addV("node").next();
+      a.addEdge("links", b);
+      a.addEdge("links", c);
+      b.addEdge("links", d);
+      c.addEdge("links", d);
+      d.addEdge("links", a);
+
+      new GremlinRecipies(source).gimme(a, target, 0, -1, false, null);
+
+      require(target.V().count().next() == 4L,
+              "gimme must clone shared and cyclic descendants once without bidirectional traversal");
+      require(target.E().hasLabel("links").count().next() == 5L,
+              "gimme must terminate while preserving every outbound edge in a directed cycle");
+      }
+    finally {
+      sourceGraph.close();
+      targetGraph.close();
+      }
+    }
+
+  private static void testGimmeBoundedDepthIsPathOrderIndependent() throws Exception {
+    for (boolean shallowPathFirst : new boolean[] {true, false}) {
+      TinkerGraph sourceGraph = TinkerGraph.open();
+      TinkerGraph targetGraph = TinkerGraph.open();
+      try (GraphTraversalSource source = sourceGraph.traversal();
+           GraphTraversalSource target = targetGraph.traversal()) {
+        Vertex a = source.addV("node").next();
+        Vertex x = source.addV("node").next();
+        Vertex b = source.addV("node").next();
+        Vertex c = source.addV("node").next();
+        if (shallowPathFirst) {
+          a.addEdge("links", x);
+          a.addEdge("links", b);
+          }
+        else {
+          a.addEdge("links", b);
+          a.addEdge("links", x);
+          }
+        x.addEdge("links", b);
+        b.addEdge("links", c);
+
+        new GremlinRecipies(source).gimme(a, target, 0, 2, false, null);
+
+        require(target.V().count().next() == 4L &&
+                target.E().hasLabel("links").count().next() == 4L,
+                "gimme bounded-depth output must not depend on path visitation order");
+        }
+      finally {
+        sourceGraph.close();
+        targetGraph.close();
+        }
+      }
+    }
+
+  private static void testGimmeTracksIncomparableDepthBudgets() throws Exception {
+    TinkerGraph sourceGraph = TinkerGraph.open();
+    TinkerGraph targetGraph = TinkerGraph.open();
+    try (GraphTraversalSource source = sourceGraph.traversal();
+         GraphTraversalSource target = targetGraph.traversal()) {
+      Vertex root = source.addV("node").property("name", "root").next();
+      Vertex shared = source.addV("node").property("name", "shared").next();
+      Vertex outward = source.addV("node").property("name", "outward").next();
+      Vertex unlocked = source.addV("node").property("name", "unlocked").next();
+      shared.addEdge("links", root);
+      root.addEdge("links", shared);
+      shared.addEdge("links", outward);
+      unlocked.addEdge("links", outward);
+
+      new GremlinRecipies(source).gimme(root, target, 1, 2, true, null);
+
+      require(new HashSet<>(target.V().values("name").toList()).
+                equals(Set.of("root", "shared", "outward", "unlocked")),
+              "gimme must explore every nondominated inbound/outbound depth budget");
+      require(target.E().hasLabel("links").count().next() == 4L,
+              "gimme must preserve edges discovered through incomparable depth budgets");
+      }
+    finally {
+      sourceGraph.close();
+      targetGraph.close();
       }
     }
 
