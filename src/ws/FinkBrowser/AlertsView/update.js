@@ -12,6 +12,7 @@ function updateStatusPanel() {
     return `${survey}: ${status.count} alerts, ${updated}`;
     };
   const configInfo = `fetchPeriod=${fetchPeriod}m, fetchStart=${fetchStart}h, nAlerts/class=${nAlerts}, magMax=${magMax}`;
-  statusPanel.textContent = `${configInfo} | ${describe("ZTF", surveyStatus.ZTF)} | ${describe("LSST", surveyStatus.LSST)}`;
+  document.getElementById("configInfo").textContent = configInfo;
+  statusPanel.textContent = `${describe("ZTF", surveyStatus.ZTF)} | ${describe("LSST", surveyStatus.LSST)}`;
   }
   

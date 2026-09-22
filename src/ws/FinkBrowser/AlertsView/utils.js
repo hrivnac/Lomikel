@@ -126,6 +126,29 @@ function getPortalUrl(alert) {
   return origin + encodeURIComponent(String(alert.objectId));
   }
   
+function parseAlertSettings(values) {
+  const parseInteger = (name, minimum, maximum) => {
+    const raw = String(values[name] ?? "").trim();
+    if (!/^-?\d+$/.test(raw)) {
+      throw new TypeError(`${name} must be an integer`);
+      }
+    const value = Number(raw);
+    if (!Number.isSafeInteger(value)) {
+      throw new TypeError(`${name} must be an integer`);
+      }
+    if (value < minimum || value > maximum) {
+      throw new RangeError(`${name} must be between ${minimum} and ${maximum}`);
+      }
+    return value;
+    };
+  return {
+    fetchPeriod: parseInteger("fetchPeriod", 1, 1440),
+    fetchStart: parseInteger("fetchStart", 1, 720),
+    nAlerts: parseInteger("nAlerts", 1, 100),
+    magMax: parseInteger("magMax", -2, 6)
+    };
+  }
+
 function getQueryParams() {
   const params = new URLSearchParams(window.location.search);
   const boundedInt = (name, current, minimum, maximum) => {

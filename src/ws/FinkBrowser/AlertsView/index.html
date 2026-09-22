@@ -33,7 +33,8 @@
             <li>Five-pointed markers are ZTF alerts; ten-pointed markers are LSST alerts.</li>
             <li>Point to or tap a marker for details. Keyboard users can open the same objects from Recent alerts.</li>
             <li>ZTF polling is active. LSST polling is paused while recent LSST alerts are unavailable.</li>
-            <li>Optional URL parameters:<br><code>fetchPeriod=10&amp;fetchStart=48&amp;nAlerts=10&amp;magMax=6&amp;fetchLSST=false</code></li>
+            <li>Select the underlined parameter readout at lower left to change the refresh period, look-back window, alerts per class, or limiting star magnitude.</li>
+            <li>The same settings remain available as URL parameters:<br><code>fetchPeriod=10&amp;fetchStart=48&amp;nAlerts=10&amp;magMax=6&amp;fetchLSST=false</code></li>
           </ul>
         </div>
       </section>
@@ -46,6 +47,10 @@
       </section>
 
       <section id="infoContainer" aria-label="Data and view status">
+        <button id="paramsButton" type="button" aria-haspopup="dialog" aria-controls="paramsDialog">
+          <span class="visually-hidden">Edit alert parameters: </span>
+          <span id="configInfo"></span>
+        </button>
         <div id="statusPanel" role="status" aria-live="polite" aria-label="Survey status"></div>
         <output id="viewInfo" aria-label="Current sky coordinates"></output>
       </section>
@@ -55,6 +60,28 @@
       </div>
 
       <div id="tooltip" role="status" aria-live="polite"></div>
+
+      <dialog id="paramsDialog" aria-labelledby="paramsHeading">
+        <form id="paramsForm" method="dialog">
+          <h2 id="paramsHeading">Alert parameters</h2>
+          <p>Changes take effect immediately and are stored in the page URL.</p>
+          <div class="params-grid">
+            <label for="fetchPeriodInput">Refresh period (minutes)</label>
+            <input id="fetchPeriodInput" name="fetchPeriod" type="number" min="1" max="1440" step="1" required>
+            <label for="fetchStartInput">Look-back window (hours)</label>
+            <input id="fetchStartInput" name="fetchStart" type="number" min="1" max="720" step="1" required>
+            <label for="nAlertsInput">Alerts per class</label>
+            <input id="nAlertsInput" name="nAlerts" type="number" min="1" max="100" step="1" required>
+            <label for="magMaxInput">Faintest star magnitude</label>
+            <input id="magMaxInput" name="magMax" type="number" min="-2" max="6" step="1" required>
+          </div>
+          <p id="paramsError" class="form-error" role="alert" hidden></p>
+          <div class="dialog-actions">
+            <button id="paramsCancel" type="button">Cancel</button>
+            <button type="submit">Apply and refresh</button>
+          </div>
+        </form>
+      </dialog>
     </main>
 
     <script src="consts.js"></script>
@@ -62,6 +89,7 @@
     <script src="utils.js"></script>
     <script src="update.js"></script>
     <script src="data.js"></script>
+    <script src="settings.js"></script>
     <script src="drawing.js"></script>
     <script src="app.js"></script>
   </body>
