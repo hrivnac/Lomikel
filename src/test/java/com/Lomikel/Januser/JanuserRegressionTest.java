@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -31,6 +32,9 @@ public final class JanuserRegressionTest {
   public static void main(String[] args) throws Exception {
     testGetOrCreateCreatesMissingVertexAndReusesExistingVertex();
     testGetOrCreateSkipsWildcardProperties();
+    testGetOrCreateMaterializesBeforeReturning();
+    testGetOrCreateRequiresMatchingNativeLabel();
+    testLabelMirrorCannotBeOverwritten();
     testMetaSchemaUnionsPropertiesAcrossSameLabelElements();
     testMetaSchemaPreservesAllEndpointPairs();
     testDeepDropHandlesCyclesAndNonJanusVertices();
@@ -43,6 +47,10 @@ public final class JanuserRegressionTest {
     testGimmeTracksIncomparableDepthBudgets();
     testOColEqualityDoesNotCollapseHashCollisions();
     testFinkRegistrationPreservesNumericWeights();
+    testFinkRegistrationReplacementRemovesStaleAttributes();
+    testFinkRegistrationReplacementCollapsesParallelEdges();
+    testFailedNontransactionalReplacementPreservesExistingEdge();
+    testConcurrentFinkRegistrationDoesNotDuplicateEdges();
     testFinkRegistrationRejectsInvalidWeightsBeforeMutation();
     testFinkRegistrationUsesOperationTimestamp();
     testFailedStandaloneRegistrationRollsBack();
@@ -124,6 +132,85 @@ public final class JanuserRegressionTest {
       }
     finally {
       client.close();
+      }
+    }
+
+  private static void testGetOrCreateMaterializesBeforeReturning() {
+    FakeClient client = new FakeClient();
+    try {
+      GremlinRecipies recipes = new GremlinRecipies(client);
+      org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal<Vertex, Vertex> first =
+        recipes.getOrCreate("object", "objectId", "deferred");
+      org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal<Vertex, Vertex> second =
+        recipes.getOrCreate("object", "objectId", "deferred");
+      Vertex firstVertex = first.next();
+      Vertex secondVertex = second.next();
+      require(firstVertex.id().equals(secondVertex.id()),
+              "deferred getOrCreate traversals must resolve to one materialized vertex");
+      require(client.g().V().hasLabel("object").has("objectId", "deferred").count().next() == 1L,
+              "deferred getOrCreate calls must not create duplicate vertices");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testGetOrCreateRequiresMatchingNativeLabel() {
+    FakeClient client = new FakeClient();
+    try {
+      client.g().addV("wrong-native").property("lbl", "desired").
+                 property("objectId", "native-check").next();
+      GremlinRecipies recipes = new GremlinRecipies(client);
+      Vertex result = recipes.getOrCreate("desired", "objectId", "native-check").next();
+      require("desired".equals(result.label()) && "desired".equals(result.value("lbl")),
+              "getOrCreate must require both native label and indexed lbl to match");
+      require(client.g().V().hasLabel("desired").has("objectId", "native-check").count().next() == 1L,
+              "a mismatched native-label vertex must not suppress correct creation");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testLabelMirrorCannotBeOverwritten() throws Exception {
+    FakeClient client = new FakeClient();
+    TinkerGraph cloneGraph = TinkerGraph.open();
+    try {
+      GremlinRecipies recipes = new GremlinRecipies(client);
+      Vertex source = recipes.getOrCreate("source",
+                                          new String[] {"id", "lbl"},
+                                          new Object[] {"source-1", "corrupt-vertex"}).next();
+      Vertex target = recipes.getOrCreate("target", "id", "target-1").next();
+      recipes.addEdge(source, target, "relation",
+                      new String[] {"lbl", "value"},
+                      new Object[] {"corrupt-edge", 1}, true);
+      new TestWertex(source, null).addEdge("wrapped", target, "lbl", "corrupt-wrapped");
+      source.property("lbl").property("provenance", "source-label");
+
+      GraphTraversalSource cloneTraversal = cloneGraph.traversal();
+      recipes.gimme(source, cloneTraversal, 0, 1, false, null);
+      require("source-label".equals(cloneTraversal.V().hasLabel("source").next().
+                                                property("lbl").property("provenance").value()),
+              "cloning must preserve meta-properties attached to the mirrored lbl property");
+      recipes.createMetaSchema();
+
+      requireAllLabelsMirrored(client.g());
+      requireAllLabelsMirrored(cloneTraversal);
+      }
+    finally {
+      client.close();
+      cloneGraph.close();
+      }
+    }
+
+  private static void requireAllLabelsMirrored(GraphTraversalSource traversal) {
+    for (Vertex vertex : traversal.V().toList()) {
+      require(vertex.property("lbl").isPresent() && vertex.label().equals(vertex.value("lbl")),
+              "vertex lbl must exactly mirror its native label");
+      }
+    for (Edge edge : traversal.E().toList()) {
+      require(edge.property("lbl").isPresent() && edge.label().equals(edge.value("lbl")),
+              "edge lbl must exactly mirror its native label");
       }
     }
 
@@ -1006,6 +1093,161 @@ public final class JanuserRegressionTest {
       Object weights = client.g().E().hasLabel("deepcontains").values("weights").next();
       require(weight instanceof Double, "aggregate weight must be stored as a number");
       require("0.25, 0.75".equals(weights), "per-instance weights must preserve parsed values");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testFinkRegistrationReplacementRemovesStaleAttributes() {
+    FakeClient client = new FakeClient();
+    try {
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      java.util.Map<String, Object> original = new java.util.LinkedHashMap<>();
+      original.put("weight", 1.0);
+      original.put("obsolete", "stale");
+      recipes.registerOCol(classifier, "replacement", "ZTF-replacement", original, true);
+
+      java.util.Map<String, Object> replacement = new java.util.LinkedHashMap<>();
+      replacement.put("weight", 2.0);
+      replacement.put("current", "fresh");
+      replacement.put("lbl", "corrupt");
+      recipes.registerOCol(classifier, "replacement", "ZTF-replacement", replacement, true);
+
+      Edge edge = client.g().E().hasLabel("deepcontains").next();
+      require(client.g().E().hasLabel("deepcontains").count().next() == 1L,
+              "replacement must retain exactly one registration edge");
+      require(!edge.property("obsolete").isPresent(),
+              "replacement must remove attributes omitted by the new payload");
+      require(Double.valueOf(2.0).equals(edge.value("weight")) &&
+              "fresh".equals(edge.value("current")),
+              "replacement must store exactly the new registration attributes");
+      require("deepcontains".equals(edge.value("lbl")),
+              "replacement must preserve the structural edge marker");
+
+      java.util.Map<String, Object> appended = new java.util.LinkedHashMap<>();
+      appended.put("weight", 3.0);
+      appended.put("lbl", "corrupt");
+      recipes.registerOCol(classifier, "replacement", "ZTF-appended", appended, false);
+      Edge appendedEdge = client.g().V().has("objectId", "ZTF-appended").
+                                inE("deepcontains").next();
+      require("deepcontains".equals(appendedEdge.value("lbl")),
+              "append registration must preserve the structural edge marker");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testFinkRegistrationReplacementCollapsesParallelEdges() {
+    FakeClient client = new FakeClient();
+    try {
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      java.util.Map<String, Object> original = new java.util.LinkedHashMap<>();
+      original.put("weight", 1.0);
+      original.put("obsolete", "first");
+      recipes.registerOCol(classifier, "parallel", "ZTF-parallel", original, true);
+      Vertex ocol = client.g().V().hasLabel("OCol").has("cls", "parallel").next();
+      Vertex object = client.g().V().hasLabel("object").has("objectId", "ZTF-parallel").next();
+      ocol.addEdge("deepcontains", object, "lbl", "deepcontains", "obsolete", "second");
+
+      java.util.Map<String, Object> replacement = new java.util.LinkedHashMap<>();
+      replacement.put("weight", 2.0);
+      replacement.put("current", "only");
+      recipes.registerOCol(classifier, "parallel", "ZTF-parallel", replacement, true);
+
+      java.util.List<Edge> edges = client.g().V(ocol).outE("deepcontains").
+                                         where(inV().is(object)).toList();
+      require(edges.size() == 1, "replacement must collapse parallel registration edges");
+      Edge edge = edges.get(0);
+      require(!edge.property("obsolete").isPresent() &&
+              Double.valueOf(2.0).equals(edge.value("weight")) &&
+              "only".equals(edge.value("current")),
+              "collapsed replacement edge must contain exactly the new payload");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testFailedNontransactionalReplacementPreservesExistingEdge() {
+    FakeClient client = new FakeClient();
+    try {
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      java.util.Map<String, Object> original = new java.util.LinkedHashMap<>();
+      original.put("weight", 1.0);
+      original.put("stable", "keep");
+      recipes.registerOCol(classifier, "safe-failure", "ZTF-safe-failure", original, true);
+
+      java.util.Map<String, Object> invalid = new java.util.LinkedHashMap<>();
+      invalid.put("weight", 2.0);
+      invalid.put("", "invalid-key");
+      expectIllegalArgument(
+        () -> recipes.registerOCol(classifier, "safe-failure", "ZTF-safe-failure", invalid, true),
+        "invalid replacement property must fail");
+
+      java.util.List<Edge> edges = client.g().E().hasLabel("deepcontains").toList();
+      require(edges.size() == 1, "failed nontransactional replacement must preserve one old edge");
+      Edge edge = edges.get(0);
+      require("keep".equals(edge.value("stable")) &&
+              Double.valueOf(1.0).equals(edge.value("weight")),
+              "failed nontransactional replacement must preserve the old payload");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testConcurrentFinkRegistrationDoesNotDuplicateEdges() throws Exception {
+    FakeClient client = new FakeClient();
+    try {
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      int threadCount = 24;
+      java.util.concurrent.CountDownLatch ready =
+        new java.util.concurrent.CountDownLatch(threadCount);
+      java.util.concurrent.CountDownLatch start = new java.util.concurrent.CountDownLatch(1);
+      AtomicReference<Throwable> failure = new AtomicReference<>();
+      java.util.List<Thread> threads = new java.util.ArrayList<>();
+      for (int i = 0; i < threadCount; i++) {
+        final int weight = i + 1;
+        Thread thread = new Thread(() -> {
+          try {
+            ready.countDown();
+            start.await();
+            java.util.Map<String, Object> attributes = new java.util.LinkedHashMap<>();
+            attributes.put("weight", (double)weight);
+            attributes.put("writer", weight);
+            recipes.registerOCol(classifier, "concurrent", "ZTF-concurrent", attributes, true);
+            }
+          catch (Throwable t) {
+            failure.compareAndSet(null, t);
+            }
+          });
+        threads.add(thread);
+        thread.start();
+        }
+      require(ready.await(10, java.util.concurrent.TimeUnit.SECONDS),
+              "concurrent registration workers did not become ready");
+      start.countDown();
+      for (Thread thread : threads) {
+        thread.join(10000L);
+        require(!thread.isAlive(), "concurrent registration worker did not terminate");
+        }
+      if (failure.get() != null) {
+        throw new AssertionError("concurrent registration failed", failure.get());
+        }
+
+      require(client.g().V().has("lbl", "OCol").has("cls", "concurrent").count().next() == 1L,
+              "concurrent registration must create one OCol vertex");
+      require(client.g().V().has("lbl", "object").has("objectId", "ZTF-concurrent").count().next() == 1L,
+              "concurrent registration must create one object vertex");
+      require(client.g().E().hasLabel("deepcontains").count().next() == 1L,
+              "concurrent replacement must retain one registration edge");
+      requireAllLabelsMirrored(client.g());
       }
     finally {
       client.close();

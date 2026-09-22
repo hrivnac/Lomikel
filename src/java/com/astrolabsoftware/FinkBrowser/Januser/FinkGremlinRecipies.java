@@ -341,11 +341,11 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   It will be created if not yet exists.
     * @param attributes The additional {@link Edge} attributes.    
     * @param replace    Whether to replace existing resistration. */
-  public void registerOCol(Classifier          classifier,
-                           String              cls,
-                           String              objectId,
-                           Map<String, ?> attributes,
-                           boolean             replace) {   
+  public synchronized void registerOCol(Classifier          classifier,
+                                        String              cls,
+                                        String              objectId,
+                                        Map<String, ?> attributes,
+                                        boolean             replace) {
     Object weightValue = attributes == null ? null : attributes.get("weight");
     double weight;
     if (weightValue instanceof Number) {
@@ -365,13 +365,15 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     validateWeight(weight, "aggregate weight");
     Map<String, Object> validatedAttributes = new HashMap<>();
     validatedAttributes.putAll(attributes);
+    validatedAttributes.remove("lbl");
     validatedAttributes.put("weight", weight);
     boolean rollbackOnFailure = !_classificationTransaction.get() && supportsTransactions();
     try {
     //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
     log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + weight + ", replace = " + replace);
     String importDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-    Vertex ocol = g().V().has("lbl",        "OCol"             ).
+    Vertex ocol = g().V().hasLabel("OCol").
+                          has("lbl",        "OCol"             ).
                           has("survey",     classifier.survey()).
                           has("classifier", classifier.name()  ).
                           has("flavor",     classifier.flavor()).
@@ -385,7 +387,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                   property("flavor",     classifier.flavor()).
                                   property("cls",        cls                )).
                          next();
-    Vertex s = g().V().has("lbl",      "object").
+    Vertex s = g().V().hasLabel("object").
+                       has("lbl",      "object").
                        has("objectId", objectId).
                        fold().
                        coalesce(unfold(), 
@@ -395,19 +398,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                        property("importDate", importDate).
                        next();
     if (replace) {
-      addEdge(g().V(ocol).next(),
-              g().V(s).next(),
-              "deepcontains",
-              validatedAttributes.keySet().toArray(new String[0]),
-              validatedAttributes.values().toArray(new Object[0]),
-              true);
+      replaceRegistrationEdge(ocol, s, validatedAttributes);
       }
     else {
-      Edge e = ocol.addEdge("deepcontains", s);
-      e.property("lbl", "deepcontains");
-      for (Map.Entry<String, Object> attribute : validatedAttributes.entrySet()) {
-        e.property(attribute.getKey(), attribute.getValue());
-        }
+      createRegistrationEdge(ocol, s, validatedAttributes);
       }
     if (!_classificationTransaction.get()) {
       commit();
@@ -423,6 +417,59 @@ public class FinkGremlinRecipies extends GremlinRecipies {
           }
         }
       throw e;
+      }
+    }
+
+  /** Replace all parallel registrations with one fully prepared edge. */
+  private void replaceRegistrationEdge(Vertex              ocol,
+                                       Vertex              object,
+                                       Map<String, Object> attributes) {
+    List<Edge> existingEdges = getEdge(ocol, object, "deepcontains");
+    if (supportsTransactions()) {
+      for (Edge edge : existingEdges) {
+        edge.remove();
+        }
+      createRegistrationEdge(ocol, object, attributes);
+      return;
+      }
+
+    Edge replacement = createRegistrationEdge(ocol, object, attributes);
+    try {
+      for (Edge edge : existingEdges) {
+        edge.remove();
+        }
+      }
+    catch (RuntimeException failure) {
+      try {
+        replacement.remove();
+        }
+      catch (RuntimeException cleanupFailure) {
+        failure.addSuppressed(cleanupFailure);
+        }
+      throw failure;
+      }
+    }
+
+  /** Create a complete registration edge or remove its partial state on failure. */
+  private Edge createRegistrationEdge(Vertex              ocol,
+                                      Vertex              object,
+                                      Map<String, Object> attributes) {
+    Edge edge = ocol.addEdge("deepcontains", object);
+    try {
+      edge.property("lbl", "deepcontains");
+      for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+        edge.property(attribute.getKey(), attribute.getValue());
+        }
+      return edge;
+      }
+    catch (RuntimeException failure) {
+      try {
+        edge.remove();
+        }
+      catch (RuntimeException cleanupFailure) {
+        failure.addSuppressed(cleanupFailure);
+        }
+      throw failure;
       }
     }
 

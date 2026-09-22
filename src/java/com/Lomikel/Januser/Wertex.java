@@ -149,7 +149,9 @@ public abstract class Wertex implements Vertex {
     
   @Override
   public Edge addEdge(String label, Vertex inVertex, Object... keyValues) {
-    return _vertex.addEdge(label, unwrap(inVertex), keyValues);
+    Edge edge = _vertex.addEdge(label, unwrap(inVertex), keyValues);
+    edge.property("lbl", label);
+    return edge;
     }
 
   /** Return the provider vertex beneath any number of Wertex wrappers. */
