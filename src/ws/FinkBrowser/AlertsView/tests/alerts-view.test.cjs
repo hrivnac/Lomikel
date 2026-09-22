@@ -89,6 +89,34 @@ test("Fink start dates are formatted in UTC", () => {
   assert.equal(context.formatStartDateUtc(48, now), "2026-06-29 10:00:00");
 });
 
+test("runtime alert settings accept only nonblank bounded integers", () => {
+  const context = loadUtils();
+  const valid = vm.runInContext(`parseAlertSettings({
+    fetchPeriod: "15",
+    fetchStart: "72",
+    nAlerts: "20",
+    magMax: "5"
+  })`, context);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(valid)), {
+    fetchPeriod: 15,
+    fetchStart: 72,
+    nAlerts: 20,
+    magMax: 5,
+  });
+  for (const candidate of [
+    {fetchPeriod: "", fetchStart: "48", nAlerts: "10", magMax: "6"},
+    {fetchPeriod: "1.5", fetchStart: "48", nAlerts: "10", magMax: "6"},
+    {fetchPeriod: "0", fetchStart: "48", nAlerts: "10", magMax: "6"},
+    {fetchPeriod: "10", fetchStart: "721", nAlerts: "10", magMax: "6"},
+    {fetchPeriod: "10", fetchStart: "48", nAlerts: "101", magMax: "6"},
+    {fetchPeriod: "10", fetchStart: "48", nAlerts: "10", magMax: "7"},
+  ]) {
+    context.candidate = candidate;
+    assert.throws(() => vm.runInContext("parseAlertSettings(candidate)", context), /must be an integer|between/);
+  }
+});
+
 test("portal links allow only known surveys and encode API object identifiers", () => {
   const context = loadUtils();
   const hostileId = 'bad\"><img src=x onerror=alert(1)>';
@@ -417,10 +445,10 @@ test("touch pointerleave keeps the tooltip available for a second tap", () => {
 async function loadData({failClasses = [], emptyClasses = []} = {}) {
   const requests = [];
   const elements = new Map();
-  let timerCallback;
+  const timerState = {callback: null, delay: null, cleared: []};
   const context = {
-    URLSearchParams,
-    clearInterval() {},
+    AbortController, URLSearchParams,
+    clearInterval(id) { timerState.cleared.push(id); },
     console: {error() {}, log() {}},
 
     document: {
@@ -459,8 +487,9 @@ async function loadData({failClasses = [], emptyClasses = []} = {}) {
         },
       };
     },
-    setInterval(callback) {
-      timerCallback = callback;
+    setInterval(callback, delay) {
+      timerState.callback = callback;
+      timerState.delay = delay;
       return 1;
     },
     window: {location: {search: ""}},
@@ -474,7 +503,7 @@ async function loadData({failClasses = [], emptyClasses = []} = {}) {
     );
   }
   await vm.runInContext("initialRefreshPromise", context);
-  return {context, requests, timerCallback};
+  return {context, requests, timerCallback: timerState.callback, timerState};
 }
 
 test("refresh scheduling calls ZTF once and leaves stopped LSST paused", async () => {
@@ -504,6 +533,55 @@ test("simultaneous survey refreshes are coalesced", async () => {
   assert.equal(requests.length - before, 5);
 });
 
+test("runtime settings can rebuild stars and replace the refresh interval", async () => {
+  const {context, timerState} = await loadData();
+  const counts = vm.runInContext(`(() => {
+    stellarCatalog.push(
+      {ra: 15, dec: 1, mag: 3, proper: "bright"},
+      {ra: 30, dec: 2, mag: 5, proper: "faint"}
+    );
+    magMax = 4;
+    rebuildStars();
+    const brightOnly = stars.length;
+    magMax = 6;
+    rebuildStars();
+    fetchPeriod = 23;
+    scheduleRefreshTimer();
+    return [brightOnly, stars.length];
+  })()`, context);
+
+  assert.deepEqual(Array.from(counts), [1, 2]);
+  assert.deepEqual(timerState.cleared, [1]);
+  assert.equal(timerState.delay, 23 * 60 * 1000);
+  assert.equal(typeof timerState.callback, "function");
+});
+
+test("changing parameters aborts and invalidates an in-flight alert refresh", async () => {
+  const {context} = await loadData();
+  let aborted = false;
+  context.fetch = (_url, options = {}) => new Promise((resolve, reject) => {
+    if (!options.signal) {
+      reject(new Error("missing abort signal"));
+      return;
+    }
+    options.signal.addEventListener("abort", () => {
+      aborted = true;
+      const error = new Error("aborted");
+      error.name = "AbortError";
+      reject(error);
+    }, {once: true});
+  });
+
+  const pending = vm.runInContext('fetchAlerts("ZTF")', context);
+  await Promise.resolve();
+  vm.runInContext("invalidateAlertRefreshes()", context);
+  const result = await pending;
+
+  assert.equal(aborted, true);
+  assert.equal(result, false);
+  assert.equal(vm.runInContext("refreshInProgress.size", context), 0);
+});
+
 test("partial, empty, and failed API responses have distinct states", async () => {
   const classNames = [
     "Microlensing candidate",
@@ -528,6 +606,76 @@ test("partial, empty, and failed API responses have distinct states", async () =
 test("status code loads before data startup invokes it", () => {
   const html = fs.readFileSync(path.join(alertsView, "index.html"), "utf8");
   assert.equal(html.indexOf('src="update.js"') < html.indexOf('src="data.js"'), true);
+});
+
+test("displayed alert parameters open an accessible editing dialog", () => {
+  const html = fs.readFileSync(path.join(alertsView, "index.html"), "utf8");
+  assert.match(html, /id="paramsButton"[^>]+aria-haspopup="dialog"[^>]+aria-controls="paramsDialog"/);
+  assert.match(html, /<dialog id="paramsDialog"[^>]+aria-labelledby="paramsHeading"/);
+  assert.match(html, /<form id="paramsForm"/);
+  for (const name of ["fetchPeriod", "fetchStart", "nAlerts", "magMax"]) {
+    assert.match(html, new RegExp(`id="${name}Input"[^>]+name="${name}"`));
+  }
+  assert.match(html, /id="paramsError"[^>]+role="alert"/);
+  assert.equal(html.indexOf('src="data.js"') < html.indexOf('src="settings.js"'), true);
+  const settings = fs.readFileSync(path.join(alertsView, "settings.js"), "utf8");
+  assert.match(settings, /paramsDialog\.addEventListener\("cancel"[\s\S]*preventDefault\(\)[\s\S]*paramsButton\.focus\(\)/);
+});
+
+function loadSettings() {
+  const elements = new Map();
+  const makeElement = () => ({
+    hidden: true,
+    textContent: "",
+    value: "",
+    listeners: new Map(),
+    addEventListener(type, handler) { this.listeners.set(type, handler); },
+    close() { this.open = false; },
+    focus() {},
+    showModal() { this.open = true; },
+  });
+  for (const id of [
+    "paramsButton", "paramsDialog", "paramsForm", "paramsError", "paramsCancel",
+    "fetchPeriodInput", "fetchStartInput", "nAlertsInput", "magMaxInput",
+  ]) elements.set(id, makeElement());
+  const calls = {invalidate: 0, rebuild: 0, schedule: 0, status: 0, refresh: 0, url: null};
+  const context = {
+    URLSearchParams,
+    fetchPeriod: 10,
+    fetchStart: 48,
+    nAlerts: 10,
+    magMax: 6,
+    document: {getElementById: id => elements.get(id)},
+    invalidateAlertRefreshes: () => { calls.invalidate += 1; },
+    rebuildStars: () => { calls.rebuild += 1; },
+    scheduleRefreshTimer: () => { calls.schedule += 1; },
+    updateStatusPanel: () => { calls.status += 1; },
+    refreshEnabledSurveys: async () => { calls.refresh += 1; },
+    window: {
+      history: {replaceState: (_state, _title, url) => { calls.url = url; }},
+      location: {hash: "#sky", pathname: "/AlertsView/", search: "?fetchLSST=false"},
+    },
+  };
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(alertsView, "utils.js"), "utf8"), context, {filename: "utils.js"});
+  vm.runInContext(fs.readFileSync(path.join(alertsView, "settings.js"), "utf8"), context, {filename: "settings.js"});
+  return {calls, context, elements};
+}
+
+test("applying alert settings updates data, stars, timer, URL, and refresh", async () => {
+  const {calls, context} = loadSettings();
+  await vm.runInContext(`applyAlertSettings({
+    fetchPeriod: "15", fetchStart: "72", nAlerts: "20", magMax: "5"
+  })`, context);
+
+  assert.equal(context.fetchPeriod, 15);
+  assert.equal(context.fetchStart, 72);
+  assert.equal(context.nAlerts, 20);
+  assert.equal(context.magMax, 5);
+  assert.deepEqual(calls, {
+    invalidate: 1, rebuild: 1, schedule: 1, status: 1, refresh: 1,
+    url: "/AlertsView/?fetchLSST=false&fetchPeriod=15&fetchStart=72&nAlerts=20&magMax=5#sky",
+  });
 });
 
 test("page self-hosts scripts and exposes keyboard-accessible status and help", () => {

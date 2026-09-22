@@ -20,7 +20,7 @@ button, a {
   font: inherit;
   }
 
-button:focus-visible, a:focus-visible {
+button:focus-visible, a:focus-visible, input:focus-visible {
   outline: 3px solid #ffd43b;
   outline-offset: 3px;
   }
@@ -227,7 +227,7 @@ button:focus-visible, a:focus-visible {
   background: transparent;
   }
 
-#statusPanel, #viewInfo {
+#paramsButton, #statusPanel, #viewInfo {
   padding: 6px 9px;
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.76);
@@ -238,6 +238,79 @@ button:focus-visible, a:focus-visible {
 
 #statusPanel {
   color: #b9ffb9;
+  }
+
+#paramsButton {
+  border: 1px solid #6687a5;
+  color: #cce8ff;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  }
+
+#paramsButton:hover {
+  border-color: #8cc8ff;
+  background: rgba(23, 105, 170, 0.78);
+  }
+
+#paramsDialog {
+  width: min(520px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid #7797b5;
+  border-radius: 10px;
+  background: #10151c;
+  color: #fff;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.72);
+  }
+
+#paramsDialog::backdrop {
+  background: rgba(0, 0, 0, 0.72);
+  }
+
+#paramsDialog h2 {
+  margin: 0 0 6px;
+  }
+
+.params-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 8rem;
+  gap: 10px 14px;
+  align-items: center;
+  margin: 18px 0;
+  }
+
+.params-grid input {
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 8px;
+  border: 1px solid #718096;
+  border-radius: 5px;
+  background: #05080c;
+  color: #fff;
+  }
+
+.form-error {
+  color: #ff9f9f;
+  }
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  }
+
+.dialog-actions button {
+  min-height: 40px;
+  padding: 7px 13px;
+  border: 1px solid #718096;
+  border-radius: 5px;
+  background: #263342;
+  color: #fff;
+  cursor: pointer;
   }
 
 #viewInfo {
@@ -317,9 +390,14 @@ button:focus-visible, a:focus-visible {
     gap: 4px;
     }
 
-  #statusPanel, #viewInfo {
+  #paramsButton, #statusPanel, #viewInfo {
     padding: 4px 6px;
     font-size: 10px;
+    }
+
+  .params-grid {
+    grid-template-columns: 1fr;
+    gap: 5px;
     }
   }
 

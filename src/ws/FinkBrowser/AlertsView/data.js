@@ -5,7 +5,9 @@ const surveyStatus = {
   ZTF:  {state: "idle", count: 0, errors: [], updatedAt: null},
   LSST: {state: "paused", count: 0, errors: [], updatedAt: null}
   };
-const refreshInProgress = new Set();
+const refreshInProgress = new Map();
+let alertConfigGeneration = 0;
+let refreshTimer = null;
 
 function rebuildAlertsPool() {
   alertsPool = [...surveySnapshots.ZTF.values(), ...surveySnapshots.LSST.values()];
@@ -28,21 +30,28 @@ function replaceSurveySnapshot(survey, alerts) {
 
 async function fetchAlerts(survey) {
   if (refreshInProgress.has(survey)) return false;
-  refreshInProgress.add(survey);
+  const controller = new AbortController();
+  const generation = alertConfigGeneration;
+  const requestSettings = {fetchStart, nAlerts};
+  refreshInProgress.set(survey, controller);
   const allAlerts = [];
   const errors = [];
   let successfulRequests = 0;
   surveyStatus[survey] = {...surveyStatus[survey], state: "loading", errors: []};
   updateStatusPanel();
-  const startdate = getStartDateParam();
+  const startdate = formatStartDateUtc(requestSettings.fetchStart);
   const classMap = (survey === "LSST") ? classesLSST : classesZTF;
   try {
     for (const cls of Object.keys(classMap)) {
       const url = (survey === "LSST")
-        ? `https://api.lsst.fink-portal.org/api/v1/tags?tag=${encodeURIComponent(cls)}&n=${encodeURIComponent(nAlerts)}&columns=r%3AdiaObjectId%2Cr%3AmidpointMjdTai%2Cr%3Ara%2Cr%3Adec&startdate=${encodeURIComponent(startdate)}&output-format=json`
-        : `https://api.ztf.fink-portal.org/api/v1/latests?class=${encodeURIComponent(cls)}&n=${encodeURIComponent(nAlerts)}&columns=i%3AobjectId%2Ci%3Ajd%2Ci%3Ara%2Ci%3Adec&startdate=${encodeURIComponent(startdate)}&output-format=json`;
+        ? `https://api.lsst.fink-portal.org/api/v1/tags?tag=${encodeURIComponent(cls)}&n=${encodeURIComponent(requestSettings.nAlerts)}&columns=r%3AdiaObjectId%2Cr%3AmidpointMjdTai%2Cr%3Ara%2Cr%3Adec&startdate=${encodeURIComponent(startdate)}&output-format=json`
+        : `https://api.ztf.fink-portal.org/api/v1/latests?class=${encodeURIComponent(cls)}&n=${encodeURIComponent(requestSettings.nAlerts)}&columns=i%3AobjectId%2Ci%3Ajd%2Ci%3Ara%2Ci%3Adec&startdate=${encodeURIComponent(startdate)}&output-format=json`;
       try {
-        const response = await fetch(url, {headers: {"accept": "application/json"}});
+        const response = await fetch(url, {
+          headers: {"accept": "application/json"},
+          signal: controller.signal
+          });
+        if (generation !== alertConfigGeneration) return false;
         if (!response.ok) {
           errors.push(`${cls}: HTTP ${response.status}`);
           continue;
@@ -60,9 +69,11 @@ async function fetchAlerts(survey) {
         allAlerts.push(...data);
         }
       catch (err) {
+        if (err.name === "AbortError" || generation !== alertConfigGeneration) return false;
         errors.push(`${cls}: ${err.message}`);
         }
       }
+    if (generation !== alertConfigGeneration) return false;
     const updatedAt = new Date();
     if (successfulRequests > 0) {
       replaceSurveySnapshot(survey, allAlerts);
@@ -82,8 +93,25 @@ async function fetchAlerts(survey) {
     return true;
     }
   finally {
-    refreshInProgress.delete(survey);
-    updateStatusPanel();
+    if (refreshInProgress.get(survey) === controller) {
+      refreshInProgress.delete(survey);
+      }
+    if (generation === alertConfigGeneration) updateStatusPanel();
+    }
+  }
+
+function invalidateAlertRefreshes() {
+  alertConfigGeneration += 1;
+  for (const controller of refreshInProgress.values()) controller.abort();
+  refreshInProgress.clear();
+  for (const survey of ["ZTF", "LSST"]) {
+    if (surveyStatus[survey].state === "loading") {
+      surveyStatus[survey] = {
+        ...surveyStatus[survey],
+        state: survey === "LSST" && !fetchLSST ? "paused" : "idle",
+        errors: []
+        };
+      }
     }
   }
 
@@ -98,13 +126,18 @@ async function refreshEnabledSurveys() {
   await Promise.all(refreshes);
   }
 
+function scheduleRefreshTimer() {
+  if (refreshTimer !== null) clearInterval(refreshTimer);
+  refreshTimer = setInterval(refreshEnabledSurveys, fetchPeriod * 60 * 1000);
+  }
+
 getQueryParams();
 if (!fetchLSST) {
   surveyStatus.LSST = {state: "paused", count: 0, errors: [], updatedAt: null};
   }
 updateStatusPanel();
 const initialRefreshPromise = refreshEnabledSurveys();
-const refreshTimer = setInterval(refreshEnabledSurveys, fetchPeriod * 60 * 1000);
+scheduleRefreshTimer();
 
 // Constellations
 let constellations = [];
@@ -113,6 +146,23 @@ fetch("constellations.lines.json").then(response => response.json()).
 
 // Stars
 const stars = [];
+const stellarCatalog = [];
+function rebuildStars() {
+  stars.length = 0;
+  for (const row of stellarCatalog) {
+    if (row.ra !== 0 && row.mag < magMax) {
+      stars.push({
+        ra: row.ra,
+        dec: row.dec,
+        r: Math.max(0.5, 2.5 - row.mag * 0.2),
+        proper: row.proper,
+        alpha: Math.max(0, 1 - row.mag * 0.05),
+        twinkleSpeed: Math.max(0, 0.1 * (1 - row.mag * 0.05))
+        });
+      }
+    }
+  }
+
 function parseStellarCatalog(csvText) {
   const lines = csvText.trim().split(/\r?\n/);
   if (lines.shift() !== "ra,dec,mag,proper") throw new Error("Unexpected stellar catalogue columns");
@@ -129,17 +179,8 @@ fetch('hyg_v38_mag6.csv').
     }).
   then(csvText => {
     for (const row of parseStellarCatalog(csvText)) {
-      const ra = row.ra * 15;
-      if (ra !== 0 && row.mag < magMax) {
-        stars.push({
-          ra,
-          dec: row.dec,
-          r: Math.max(0.5, 2.5 - row.mag * 0.2),
-          proper: row.proper,
-          alpha: Math.max(0, 1 - row.mag * 0.05),
-          twinkleSpeed: Math.max(0, 0.1 * (1 - row.mag * 0.05))
-          });
-        }
+      stellarCatalog.push({...row, ra: row.ra * 15});
       }
+    rebuildStars();
     }).
   catch(error => console.error("Cannot load stellar catalogue", error));
