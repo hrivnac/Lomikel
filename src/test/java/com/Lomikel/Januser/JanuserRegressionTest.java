@@ -66,6 +66,7 @@ public final class JanuserRegressionTest {
     testHertexGetOrCreateReturnsEnhancedVertices();
     testHertexEnhanceWithoutLabelReturnsOriginalVertex();
     testHBaseCloseAttemptsConnectionAfterTableFailure();
+    testMalformedFinkHBaseUrlDoesNotPoisonCache();
     testHertexMissingRowDoesNotFailSelectiveEnhancement();
     testHertexHandlesMissingRowKeyConfiguration();
     testHBaseEmptyResultIsIgnored();
@@ -878,6 +879,35 @@ public final class JanuserRegressionTest {
 
     require(connectionClosed.get(),
             "HBase close must attempt connection cleanup after table cleanup fails");
+    }
+
+  private static void testMalformedFinkHBaseUrlDoesNotPoisonCache() throws Exception {
+    FakeClient client = new FakeClient();
+    try {
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      for (int attempt = 0; attempt < 2; attempt++) {
+        boolean rejected = false;
+        try {
+          recipes.fhclient("malformed");
+          }
+        catch (LomikelException expected) {
+          rejected = true;
+          }
+        require(rejected, "each malformed HBase URL call must fail explicitly");
+        require(recipes.hbaseUrl() == null,
+                "a malformed HBase URL must not enter the client cache");
+        try {
+          recipes.fhclient();
+          throw new AssertionError("malformed URL must not initialize an HBase client");
+          }
+        catch (LomikelException expected) {
+          // Expected: cache remains uninitialized.
+          }
+        }
+      }
+    finally {
+      client.close();
+      }
     }
 
   private static void testHertexMissingRowDoesNotFailSelectiveEnhancement() throws Exception {

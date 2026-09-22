@@ -676,21 +676,42 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param hbaseUrl The HBase url as <tt>ip:port:table[:schema]</tt>.
     * @return         The corresponding {@link FinkHBaseClient}, created and initialised if needed.
     * @throws LomikelException If cannot be created. */
-  public FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
-    if (hbaseUrl == null || hbaseUrl.equals(_fhclientUrl)) {
+  public synchronized FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
+    if (hbaseUrl == null) {
       return _fhclient;
       }
-    _fhclientUrl = hbaseUrl;
-    String[] url = hbaseUrl.split(":");
+    if (hbaseUrl.equals(_fhclientUrl) && _fhclient != null) {
+      return _fhclient;
+      }
+    String[] url = hbaseUrl.split(":", -1);
+    if ((url.length != 3 && url.length != 4) ||
+        url[0].isEmpty() || url[1].isEmpty() || url[2].isEmpty()) {
+      throw new LomikelException("Invalid HBase URL (expected ip:port:table[:schema]): " + hbaseUrl);
+      }
     String ip     = url[0];
     String port   = url[1];
     String table  = url[2];
-    String schema = "";
-    if (url.length >= 4) {
-      schema = url[3];
+    String schema = url.length == 4 ? url[3] : "";
+    FinkHBaseClient candidate = null;
+    try {
+      candidate = new FinkHBaseClient(ip, port);
+      candidate.connect(table, schema);
       }
-    _fhclient = new FinkHBaseClient(ip, port);
-    _fhclient.connect(table, schema);
+    catch (RuntimeException | LomikelException failure) {
+      if (candidate != null) {
+        candidate.close();
+        }
+      if (failure instanceof LomikelException) {
+        throw (LomikelException)failure;
+        }
+      throw new LomikelException("Cannot initialise FinkHBaseClient for " + hbaseUrl, failure);
+      }
+    FinkHBaseClient previous = _fhclient;
+    _fhclient = candidate;
+    _fhclientUrl = hbaseUrl;
+    if (previous != null) {
+      previous.close();
+      }
     return _fhclient;
     }
     
