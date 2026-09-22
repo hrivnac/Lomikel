@@ -249,14 +249,28 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   @Override
   public void close() {
     log.debug("Closing");
-    try {
-      _table.close();
-      _connection.close();
+    if (_table != null) {
+      try {
+        _table.close();
+        }
+      catch (IOException e) {
+        log.warn("Cannot close Table", e);
+        }
+      finally {
+        _table = null;
+        }
       }
-    catch (IOException e) {
-      log.warn("Cannot close Table", e);
+    if (_connection != null) {
+      try {
+        _connection.close();
+        }
+      catch (IOException e) {
+        log.warn("Cannot close Connection", e);
+        }
+      finally {
+        _connection = null;
+        }
       }
-    _table = null;
     }
     
   // Search --------------------------------------------------------------------
@@ -807,7 +821,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
                               String              filter,
                               boolean             ifkey,
                               boolean             iftime) {
-    if (r == null) {
+    if (r == null || r.getRow() == null || r.isEmpty()) {
       return false;
       }
     String key = Bytes.toString(r.getRow());

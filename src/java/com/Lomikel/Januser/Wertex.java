@@ -134,17 +134,32 @@ public abstract class Wertex implements Vertex {
     *                     <tt>null</tt> if not set.
     *                     Concatenated with <tt>#</tt> if multivalue. */
   public static String rowkeyName(String representant) {
-    if (_rowkeyNames.get(representant).length == 0) {
+    if (representant == null) {
+      log.error("Representant not set");
+      return null;
+      }
+    String[] names = _rowkeyNames.get(representant);
+    if (names == null || names.length == 0) {
       log.error("RowkeyName not set");
       return null;
       }
-    return String.join("#", _rowkeyNames.get(representant));
+    return String.join("#", names);
     }
       
     
   @Override
   public Edge addEdge(String label, Vertex inVertex, Object... keyValues) {
-    return _vertex.addEdge(label, inVertex, keyValues);
+    Edge edge = _vertex.addEdge(label, unwrap(inVertex), keyValues);
+    edge.property("lbl", label);
+    return edge;
+    }
+
+  /** Return the provider vertex beneath any number of Wertex wrappers. */
+  public static Vertex unwrap(Vertex vertex) {
+    while (vertex instanceof Wertex) {
+      vertex = ((Wertex)vertex)._vertex;
+      }
+    return vertex;
     }
     
   @Override  
@@ -198,9 +213,15 @@ public abstract class Wertex implements Vertex {
     *         <tt>null</tt> if not set.
     *         Concatenated with <tt>#</tt> if multivalue. */
   public String rowkey() {
-    if (_rowkeys.length == 0) {
+    if (_rowkeys == null || _rowkeys.length == 0) {
       log.error("Rowkey not set");
       return null;
+      }
+    for (String rowkey : _rowkeys) {
+      if (rowkey == null) {
+        log.error("Rowkey property not set");
+        return null;
+        }
       }
     return String.join("#", _rowkeys);
     }
@@ -254,6 +275,27 @@ public abstract class Wertex implements Vertex {
       }
     }
     
+  @Override
+  public int hashCode() {
+    return _vertex.hashCode();
+    }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+      }
+    if (other instanceof Wertex) {
+      return _vertex.equals(((Wertex)other)._vertex);
+      }
+    return _vertex.equals(other);
+    }
+
+  @Override
+  public String toString() {
+    return _vertex.toString();
+    }
+
   /** Give the associated {@link Client}.
     * @return The associated {@link Client}. */
   public abstract Client client();

@@ -222,30 +222,50 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * @param objectId   The <tt>objectId</tt> of <em>object</em> to be added.
     * @throws LomikelException If anything fails. */
   public void classifySource(Classifier classifier,
-                             String     objectId) throws LomikelException {  
-    if (g().V().has("lbl", "object").has("objectId", objectId).hasNext()) {
-      Vertex v1 = g().V().has("lbl", "object").has("objectId", objectId).next();
-      List<Vertex> v2s = g().V(v1).in().
-                                   has("lbl",        "OCol").
-                                   has("survey",     classifier.survey()).
-                                   has("classifier", classifier.name()  ).
-                                   has("flavor",     classifier.flavor()).
-                                   toList();
-      Iterator<Edge> edges;
-      for (Vertex v2 : v2s) {
-        edges = g().V(v1).inE().
-                          has("lbl", "deepcontains").
-                          where(otherV().
-                          is(v2)).
-                          toStream().
-                          iterator();
-        while (edges.hasNext()) {
-          edges.next().remove(); 
-          }
-        }        
-      // will be commited in registration
+                             String     objectId) throws LomikelException {
+    if (!supportsTransactions()) {
+      throw new UnsupportedOperationException("Atomic classification requires rollback-capable transactions");
       }
-    classifier.classify(this, objectId);
+    if (_classificationTransaction.get()) {
+      throw new IllegalStateException("Nested classification transactions are not supported");
+      }
+    _classificationTransaction.set(true);
+    try {
+      if (g().V().has("lbl", "object").has("objectId", objectId).hasNext()) {
+        Vertex v1 = g().V().has("lbl", "object").has("objectId", objectId).next();
+        List<Vertex> v2s = g().V(v1).in("deepcontains").
+                                     has("lbl",        "OCol").
+                                     has("survey",     classifier.survey()).
+                                     has("classifier", classifier.name()  ).
+                                     has("flavor",     classifier.flavor()).
+                                     toList();
+        Iterator<Edge> edges;
+        for (Vertex v2 : v2s) {
+          edges = g().V(v1).inE("deepcontains").
+                            where(otherV().
+                            is(v2)).
+                            toStream().
+                            iterator();
+          while (edges.hasNext()) {
+            edges.next().remove();
+            }
+          }
+        }
+      classifier.classify(this, objectId);
+      commit();
+      }
+    catch (LomikelException | RuntimeException e) {
+      try {
+        rollback();
+        }
+      catch (RuntimeException rollbackFailure) {
+        e.addSuppressed(rollbackFailure);
+        }
+      throw e;
+      }
+    finally {
+      _classificationTransaction.remove();
+      }
     }
        
   /** Register  <em>object</em> in <em>OCol</em>.
@@ -274,7 +294,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     if (weightsS != null && !weightsS.trim().equals("")) {
       for (String weighs : weightsS.replaceAll("\\[", "").replaceAll("]", "").split(",")) {
-        weights.add(Double.valueOf(weight));
+        weights.add(Double.valueOf(weighs.trim()));
         }
       }
     registerOCol(classifier, cls, objectId, weight, instances, weights);
@@ -296,8 +316,18 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                            double       weight,
                            List<String> instances,
                            List<Double> weights) { 
-    Map<String, String> attributes = new HashMap<>();
-    attributes.put("weight",    "" + weight);
+    validateWeight(weight, "aggregate weight");
+    if (instances == null || weights == null || instances.size() != weights.size()) {
+      throw new IllegalArgumentException("Instances and weights must have equal lengths");
+      }
+    for (Double instanceWeight : weights) {
+      if (instanceWeight == null) {
+        throw new IllegalArgumentException("Per-instance weight must not be null");
+        }
+      validateWeight(instanceWeight, "per-instance weight");
+      }
+    Map<String, Object> attributes = new HashMap<>();
+    attributes.put("weight",    weight);
     attributes.put("instances", instances.toString().replaceFirst("\\[", "").replaceAll("]", ""));
     attributes.put("weights",   weights.toString().replaceFirst("\\[", "").replaceAll("]", ""));
     registerOCol(classifier, cls, objectId, attributes, true);
@@ -311,14 +341,39 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   It will be created if not yet exists.
     * @param attributes The additional {@link Edge} attributes.    
     * @param replace    Whether to replace existing resistration. */
-  public void registerOCol(Classifier          classifier,
-                           String              cls,
-                           String              objectId,
-                           Map<String, String> attributes,
-                           boolean             replace) {   
+  public synchronized void registerOCol(Classifier          classifier,
+                                        String              cls,
+                                        String              objectId,
+                                        Map<String, ?> attributes,
+                                        boolean             replace) {
+    Object weightValue = attributes == null ? null : attributes.get("weight");
+    double weight;
+    if (weightValue instanceof Number) {
+      weight = ((Number)weightValue).doubleValue();
+      }
+    else if (weightValue instanceof String) {
+      try {
+        weight = Double.parseDouble(((String)weightValue).trim());
+        }
+      catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Registration weight must be numeric", e);
+        }
+      }
+    else {
+      throw new IllegalArgumentException("Registration weight must be numeric");
+      }
+    validateWeight(weight, "aggregate weight");
+    Map<String, Object> validatedAttributes = new HashMap<>();
+    validatedAttributes.putAll(attributes);
+    validatedAttributes.remove("lbl");
+    validatedAttributes.put("weight", weight);
+    boolean rollbackOnFailure = !_classificationTransaction.get() && supportsTransactions();
+    try {
     //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
-    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + attributes.get("weight") + ", replace = " + replace);
-    Vertex ocol = g().V().has("lbl",        "OCol"             ).
+    log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + weight + ", replace = " + replace);
+    String importDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
+    Vertex ocol = g().V().hasLabel("OCol").
+                          has("lbl",        "OCol"             ).
                           has("survey",     classifier.survey()).
                           has("classifier", classifier.name()  ).
                           has("flavor",     classifier.flavor()).
@@ -332,31 +387,97 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                   property("flavor",     classifier.flavor()).
                                   property("cls",        cls                )).
                          next();
-    Vertex s = g().V().has("lbl",      "object").
+    Vertex s = g().V().hasLabel("object").
+                       has("lbl",      "object").
                        has("objectId", objectId).
                        fold().
                        coalesce(unfold(), 
                                 addV("object").
                                 property("lbl",      "object").
                                 property("objectId", objectId)).
-                       property("importDate", _now).
+                       property("importDate", importDate).
                        next();
     if (replace) {
-      addEdge(g().V(ocol).next(),
-              g().V(s).next(),
-              "deepcontains",
-              attributes.keySet().toArray(new String[0]),
-              attributes.values().toArray(new String[0]),
-              true);
+      replaceRegistrationEdge(ocol, s, validatedAttributes);
       }
     else {
-      Edge e = ocol.addEdge("deepcontains", s);
-      e.property("lbl", "deepcontains");
-      for (Map.Entry<String, String> attribute : attributes.entrySet()) {
-        e.property(attribute.getKey(), attribute.getValue());
+      createRegistrationEdge(ocol, s, validatedAttributes);
+      }
+    if (!_classificationTransaction.get()) {
+      commit();
+      }
+      }
+    catch (RuntimeException e) {
+      if (rollbackOnFailure) {
+        try {
+          rollback();
+          }
+        catch (RuntimeException rollbackFailure) {
+          e.addSuppressed(rollbackFailure);
+          }
+        }
+      throw e;
+      }
+    }
+
+  /** Replace all parallel registrations with one fully prepared edge. */
+  private void replaceRegistrationEdge(Vertex              ocol,
+                                       Vertex              object,
+                                       Map<String, Object> attributes) {
+    List<Edge> existingEdges = getEdge(ocol, object, "deepcontains");
+    if (supportsTransactions()) {
+      for (Edge edge : existingEdges) {
+        edge.remove();
+        }
+      createRegistrationEdge(ocol, object, attributes);
+      return;
+      }
+
+    Edge replacement = createRegistrationEdge(ocol, object, attributes);
+    try {
+      for (Edge edge : existingEdges) {
+        edge.remove();
         }
       }
-    commit();
+    catch (RuntimeException failure) {
+      try {
+        replacement.remove();
+        }
+      catch (RuntimeException cleanupFailure) {
+        failure.addSuppressed(cleanupFailure);
+        }
+      throw failure;
+      }
+    }
+
+  /** Create a complete registration edge or remove its partial state on failure. */
+  private Edge createRegistrationEdge(Vertex              ocol,
+                                      Vertex              object,
+                                      Map<String, Object> attributes) {
+    Edge edge = ocol.addEdge("deepcontains", object);
+    try {
+      edge.property("lbl", "deepcontains");
+      for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+        edge.property(attribute.getKey(), attribute.getValue());
+        }
+      return edge;
+      }
+    catch (RuntimeException failure) {
+      try {
+        edge.remove();
+        }
+      catch (RuntimeException cleanupFailure) {
+        failure.addSuppressed(cleanupFailure);
+        }
+      throw failure;
+      }
+    }
+
+  /** Validate scientific registration weights before graph mutation. */
+  private static void validateWeight(double weight, String description) {
+    if (!Double.isFinite(weight) || weight < 0.0) {
+      throw new IllegalArgumentException("Invalid " + description + ": " + weight);
+      }
     }
    
   /** Clean tree under <em>OCol</em>.
@@ -374,7 +495,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
             has("classifier", classifier.name()  ).
             has("flavor",     classifier.flavor()).
             has("cls",        cls                ).
-            out().
+            out("deepcontains").
             out().
             drop().
             iterate();
@@ -385,30 +506,44 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     * Possibly between two {@link Classifier}s.
     * @param classifier The {@link Classifier}s to be used. */
   public void generateCorrelations(Classifier... classifiers) {
-    log.info("Generating correlations for OCol of " + Arrays.asList(classifiers));
-    // Clean all correlations 
-    g().E().has("lbl", "overlaps").
-            drop().
-            iterate();
-    List<String> surveysL = new ArrayList<>();
-    List<String> namesL   = new ArrayList<>();
-    List<String> flavorsL = new ArrayList<>();
-    for (Classifier classifier : classifiers) {
-      surveysL.add(classifier.survey());
-      namesL.add(  classifier.name()  );
-      flavorsL.add(classifier.flavor());
-      // Remove wrong OCol
-      g().V().has("lbl",        "OCol"             ).
-              has("classifier", classifier.name()  ).
-              has("flavor",     classifier.flavor()).
-              not(has("cls")).
-              drop().
-              iterate();
+    if (!supportsTransactions()) {
+      throw new UnsupportedOperationException("Atomic correlation regeneration requires rollback-capable transactions");
       }
-    String[] surveys = surveysL.toArray(String[]::new);
-    String[] names   = namesL.toArray(  String[]::new);
-    String[] flavors = flavorsL.toArray(String[]::new);
-    commit();
+    try {
+      generateCorrelationsInTransaction(classifiers);
+      }
+    catch (RuntimeException e) {
+      try {
+        rollback();
+        }
+      catch (RuntimeException rollbackFailure) {
+        e.addSuppressed(rollbackFailure);
+        }
+      throw e;
+      }
+    }
+
+  /** Generate correlations inside one caller-owned transaction. */
+  private void generateCorrelationsInTransaction(Classifier... classifiers) {
+    log.info("Generating correlations for OCol of " + Arrays.asList(classifiers));
+    Set<String> classifierScopes = new HashSet<>();
+    List<Vertex> scopedOCols = new ArrayList<>();
+    List<Vertex> malformedScopedOCols = new ArrayList<>();
+    for (Classifier classifier : classifiers) {
+      classifierScopes.add(correlationScope(classifier.survey(), classifier.name(), classifier.flavor()));
+      scopedOCols.addAll(g().V().has("lbl",        "OCol"             ).
+                                has("survey",     classifier.survey()).
+                                has("classifier", classifier.name()  ).
+                                has("flavor",     classifier.flavor()).
+                                has("cls").
+                                toList());
+      malformedScopedOCols.addAll(g().V().has("lbl",        "OCol"             ).
+                                          has("survey",     classifier.survey()).
+                                          has("classifier", classifier.name()  ).
+                                          has("flavor",     classifier.flavor()).
+                                          not(has("cls")).
+                                          toList());
+      }
     // Accumulate correlations and sizes
     Map<OCol, Double>             weights0 = new HashMap<>(); // cls -> weight (for one objext)
     Map<Pair<OCol, OCol>, Double> corrS    = new HashMap<>(); // [cls1, cls2] -> weight (for all object between OCol-OCol)
@@ -428,18 +563,50 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex ocol2;
     OCol cls;
     Pair<OCol, OCol> rel;
+    Map<OCol, Vertex> uniqueOCols = new HashMap<>();
+    Set<OCol> duplicateOCols = new HashSet<>();
+    for (Vertex scopedOCol : scopedOCols) {
+      cls = new OCol(scopedOCol);
+      if (uniqueOCols.putIfAbsent(cls, scopedOCol) != null) {
+        duplicateOCols.add(cls);
+        }
+      }
     // Loop over objets and accumulated weights to each object
     GraphTraversal<Vertex, Vertex> objectT = g().V().has("lbl", "object");
     while (objectT.hasNext()) {
       weights0.clear();
       types0.clear();
       object = objectT.next();
-      deepcontainsIt = object.edges(Direction.IN);
-      // Get all weights to this object
+      deepcontainsIt = object.edges(Direction.IN, "deepcontains");
+      // Get weights only from OCols in the requested classifier scope.
       while (deepcontainsIt.hasNext()) {
         deepcontains = deepcontainsIt.next();
-        weight = Double.parseDouble(deepcontains.property("weight").value().toString());
         ocol1 = deepcontains.outVertex();
+        if (!ocol1.property("lbl").isPresent() ||
+            !"OCol".equals(ocol1.property("lbl").value()) ||
+            !ocol1.property("survey").isPresent() ||
+            !ocol1.property("classifier").isPresent() ||
+            !ocol1.property("flavor").isPresent() ||
+            !ocol1.property("cls").isPresent()) {
+          continue;
+          }
+        if (!classifierScopes.contains(correlationScope(ocol1.property("survey").value().toString(),
+                                                         ocol1.property("classifier").value().toString(),
+                                                         ocol1.property("flavor").value().toString()))) {
+          continue;
+          }
+        if (!deepcontains.property("weight").isPresent()) {
+          throw new IllegalArgumentException("Scoped deepcontains edge has no weight");
+          }
+        try {
+          weight = Double.parseDouble(deepcontains.property("weight").value().toString());
+          }
+        catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Scoped deepcontains edge has a non-numeric weight", e);
+          }
+        if (!Double.isFinite(weight) || weight < 0.0) {
+          throw new IllegalArgumentException("Scoped deepcontains edge has an invalid weight: " + weight);
+          }
         cls = new OCol(ocol1);
         types0.add(cls);
         types.add(cls);
@@ -472,6 +639,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         }
       sizeS.put(cls1, sizeS0);
       }
+    // Mutate only after all scoped correlation inputs have been validated.
+    for (Vertex malformedScopedOCol : malformedScopedOCols) {
+      g().V(malformedScopedOCol).drop().iterate();
+      }
+    // Replace correlations only for OCols in the requested scope.
+    for (Vertex scopedOCol : scopedOCols) {
+      g().V(scopedOCol).bothE("overlaps").drop().iterate();
+      }
     // Create overlaps
     int ns = 0;
     // Loop over OCol-OCol and create overlaps Edge OCol-OCol if non empty 
@@ -482,18 +657,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       cls1 = rel.first();
       cls2 = rel.second();
       weight = entry.getValue();
-      ocol1 = g().V().has("lbl",        "OCol"          ).
-                      has("survey",     cls1.survey()    ).
-                      has("classifier", cls1.classifier()).
-                      has("flavor",     cls1.flavor()    ).
-                      has("cls",        cls1.cls()       ).
-                      next();
-      ocol2 = g().V().has("lbl",        "OCol"          ).
-                      has("survey",     cls2.survey()    ).
-                      has("classifier", cls2.classifier()).
-                      has("flavor",     cls2.flavor()    ).
-                      has("cls",        cls2.cls()       ).
-                      next();
+      ocol1 = duplicateOCols.contains(cls1) ? findOCol(cls1) : uniqueOCols.get(cls1);
+      ocol2 = duplicateOCols.contains(cls2) ? findOCol(cls2) : uniqueOCols.get(cls2);
       overlaps = ocol1.addEdge("overlaps", ocol2);
       overlaps.property("lbl",          "overlaps");
       overlaps.property("intersection", weight);
@@ -504,26 +669,57 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     commit();
     log.info("" + ns + " object-object correlations generated");
     }
+
+  /** Find the endpoint selected by the existing indexed OCol lookup. */
+  protected Vertex findOCol(OCol cls) {
+    return g().V().has("lbl",        "OCol"          ).
+                   has("survey",     cls.survey()    ).
+                   has("classifier", cls.classifier()).
+                   has("flavor",     cls.flavor()    ).
+                   has("cls",        cls.cls()       ).
+                   next();
+    }
     
   /** Create a new {@link FinkHBaseClient}. Singleton when url unchanged.
     * @param hbaseUrl The HBase url as <tt>ip:port:table[:schema]</tt>.
     * @return         The corresponding {@link FinkHBaseClient}, created and initialised if needed.
     * @throws LomikelException If cannot be created. */
-  public FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
-    if (hbaseUrl == null || hbaseUrl.equals(_fhclientUrl)) {
+  public synchronized FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
+    if (hbaseUrl == null) {
       return _fhclient;
       }
-    _fhclientUrl = hbaseUrl;
-    String[] url = hbaseUrl.split(":");
+    if (hbaseUrl.equals(_fhclientUrl) && _fhclient != null) {
+      return _fhclient;
+      }
+    String[] url = hbaseUrl.split(":", -1);
+    if ((url.length != 3 && url.length != 4) ||
+        url[0].isEmpty() || url[1].isEmpty() || url[2].isEmpty()) {
+      throw new LomikelException("Invalid HBase URL (expected ip:port:table[:schema]): " + hbaseUrl);
+      }
     String ip     = url[0];
     String port   = url[1];
     String table  = url[2];
-    String schema = "";
-    if (url.length >= 4) {
-      schema = url[3];
+    String schema = url.length == 4 ? url[3] : "";
+    FinkHBaseClient candidate = null;
+    try {
+      candidate = new FinkHBaseClient(ip, port);
+      candidate.connect(table, schema);
       }
-    _fhclient = new FinkHBaseClient(ip, port);
-    _fhclient.connect(table, schema);
+    catch (RuntimeException | LomikelException failure) {
+      if (candidate != null) {
+        candidate.close();
+        }
+      if (failure instanceof LomikelException) {
+        throw (LomikelException)failure;
+        }
+      throw new LomikelException("Cannot initialise FinkHBaseClient for " + hbaseUrl, failure);
+      }
+    FinkHBaseClient previous = _fhclient;
+    _fhclient = candidate;
+    _fhclientUrl = hbaseUrl;
+    if (previous != null) {
+      previous.close();
+      }
     return _fhclient;
     }
     
@@ -543,11 +739,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     return _fhclientUrl;
     }
     
+  /** Build an unambiguous identity for a correlation-generation scope. */
+  private static String correlationScope(String survey,
+                                         String classifier,
+                                         String flavor) {
+    return survey + "\u0000" + classifier + "\u0000" + flavor;
+    }
+
   private FinkHBaseClient _fhclient;
   
   private String _fhclientUrl;
+
+  /** Whether this thread's registration participates in a classification transaction. */
+  private ThreadLocal<Boolean> _classificationTransaction = ThreadLocal.withInitial(() -> false);
    
-  private String _now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()).toString();
  
   private static String FINK_OBJECTS_WS = "https://api.ztf.fink-portal.org/api/v1/objects";
   private static String FINK_LATESTS_WS = "https://api.ztf.fink-portal.org/api/v1/latests";

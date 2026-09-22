@@ -270,7 +270,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def object0 = object0T.next();
     def restrictClasses = classes0 != null && !classes0.isEmpty();
     def m0 = [:];
-    def sourceMemberships = g().V(object0).inE().
+    def sourceMemberships = g().V(object0).inE('deepcontains').
                                 as('e').
                                 filter(and(outV().values('classifier').is(eq(cf[0])),
                                            outV().values('flavor'    ).is(eq(cf[1]))));
@@ -326,7 +326,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                             has('objectId', within(oidS)).
                             has('objectId', neq(oid0)).
                             as('candidate').
-                            inE().
+                            inE('deepcontains').
                             as('membership').
                             filter(and(outV().values('classifier').is(eq(cf[0])),
                                        outV().values('flavor'    ).is(eq(cf[1])),
@@ -337,7 +337,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                             has('classifier', cf[0]).
                             has('flavor',     cf[1]).
                             has('cls',        within(classes)).
-                            outE().
+                            outE('deepcontains').
                             as('membership').
                             inV().
                             has('lbl', 'object').
@@ -390,22 +390,37 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
   def drop_by_date(String importDate,
                    int    nCommit,
                    int    tWait) {
-    def i = 0;
+    if (nCommit <= 0) {
+      throw new IllegalArgumentException('nCommit must be positive');
+      }
+    if (tWait < 0) {
+      throw new IllegalArgumentException('tWait must not be negative');
+      }
     def tot = 0;
     def nMax = g().V().has('importDate', importDate).count().next();
     log.info('' + nMax + ' vertexes to drop');
+    if (nMax == 0) {
+      return;
+      }
     def t0 = System.currentTimeMillis();
-    while(true) {
-      g().V().has('importDate', importDate).limit(nCommit).out().out().drop().iterate();
-      g().V().has('importDate', importDate).limit(nCommit).out().drop().iterate();
-      g().V().has('importDate', importDate).limit(nCommit).drop().iterate();
-      graph().traversal().tx().commit();
-      Thread.sleep(tWait)
-      tot = nCommit * ++i;
-      def dt = (System.currentTimeMillis() - t0) / 1000;
-      def per = 100 * tot / nMax;
+    while (true) {
+      def batch = g().V().has('importDate', importDate).limit(nCommit).id().toList();
+      if (batch.isEmpty()) {
+        break;
+        }
+      def ids = batch.toArray();
+      g().V(ids).out().out().drop().iterate();
+      g().V(ids).out().drop().iterate();
+      g().V(ids).drop().iterate();
+      commit();
+      tot += batch.size();
+      if (tWait > 0) {
+        Thread.sleep(tWait * 1000L);
+        }
+      def dt = Math.max(1.0, (System.currentTimeMillis() - t0) / 1000.0);
+      def per = Math.min(100.0, 100.0 * tot / nMax);
       def freq = tot / dt;
-      def rest = (nMax - tot) / freq / 60 /60;
+      def rest = freq == 0 ? 0 : Math.max(0.0, (nMax - tot) / freq / 3600.0);
       log.info(tot + ' = ' + per + '% at ' + freq + 'Hz, ' + rest + 'h to go');
       }
     }
@@ -447,7 +462,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classified = [];
     g().V().has('lbl',      'object').
             has('objectId', oid).
-            inE().
+            inE('deepcontains').
             project('weight', 'classifier', 'flavor', 'class').
             by(values('weight')).
             by(outV().values('classifier')).
@@ -493,7 +508,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
               has('classifier', cf[0]).
               has('flavor',     cf[1]).
               has('cls',        within(srcClasses)).
-              inE().has('lbl', 'overlaps').
+              inE('overlaps').
               as('e').
               filter(outV().has('lbl',        'OCol').
                             has('classifier', dstCf[0]).
@@ -573,7 +588,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             has('classifier', cf[0]).
             has('flavor',     cf[1]).
             has('cls',        cls).
-            out().
+            out('deepcontains').
             has('lbl', 'object').
             limit(sample).
             values('objectId').
@@ -611,7 +626,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             has('flavor',     cf[1]).
             group().
             by(values('cls')).
-            by(out().count()).
+            by(out('deepcontains').count()).
             unfold().each {clsMap[it.key] = it.value}                                  
     clsMap = clsMap.sort{-it.value}
     clsMap.take(nclasses).each {
@@ -849,7 +864,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classifier = args?.classifier;
     def overlaps = [:];
     def cf = classifierWithFlavor(classifier);
-    g().E().has('lbl', 'overlaps').
+    g().E().hasLabel('overlaps').
             order().
             by('intersection', asc).
             project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
@@ -896,7 +911,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             has('classifier', srcCf[0]).
             has('flavor',     srcCf[1]).
             has('cls',        cls).
-            inE().has('lbl', 'overlaps').
+            inE('overlaps').
             as('e').
             filter(outV().has('lbl',        lbl).
                           has('classifier', dstCf[0]).
@@ -919,8 +934,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param fn The full filename of the output <em>GraphML</em> file. */
   def exportOCol(String fn) {  
     g().V().has('lbl', 'OCol').
-            outE().
-            has('lbl', 'overlaps').
+            outE('overlaps').
             subgraph('x').
             cap('x').
             next().
@@ -935,10 +949,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (classifier == null) {
       return new String[] {null, ''};
       }
-    if (!classifier.contains('=')) {
+    if (classifier.isEmpty() || classifier.startsWith('=') ||
+        classifier.indexOf('=', classifier.indexOf('=') + 1) >= 0) {
+      throw new IllegalArgumentException("Malformed classifier: ${classifier}");
+      }
+    int separator = classifier.indexOf('=');
+    if (separator < 0) {
       return new String[]{classifier, ''};
       }
-    return classifier.split('=');
+    return new String[]{classifier.substring(0, separator),
+                        classifier.substring(separator + 1)};
     }
     
   def Random _random = new Random();

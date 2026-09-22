@@ -19,6 +19,8 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.values;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.count;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addE;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inE;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
@@ -69,20 +71,30 @@ trait GremlinRecipiesGT {
     }
           
     
-  /** Get (if exists) or create (if doesn't exist) {@link Edge}.
-    * @param lbl   The {@link Edge} label.
-    * @param name  The name of the {@link Edge} property to check or set.
-    * @param value The value of the {@link Edge} property to check or set.
-    * @return      The found or created {@link Edge}. */
+  /** Get (if it exists) or create an {@link Edge} between two vertices.
+    * @return The found or created {@link Edge} traversal. */
+  def GraphTraversal get_or_create_edge(String lbl1,
+                                        String name1,
+                                        String value1,
+                                        String lbl2,
+                                        String name2,
+                                        String value2,
+                                        String edge) {
+    return g().V().has('lbl', lbl1).
+                   has(name1, value1).
+                   as('fromVertex').
+               V().has('lbl', lbl2).
+                   has(name2, value2).
+               coalesce(inE(edge).where(outV().as('fromVertex')),
+                        addE(edge).from('fromVertex').property('lbl', edge));
+    }
+
+  /** Obsolete incomplete signature retained for source compatibility. */
+  @Deprecated
   def GraphTraversal get_or_create_edge(String lbl,
                                         String name,
                                         String value) {
-    return g().V().has('lbl', lbl1).
-                   has(name1, value1).
-                   as('v').
-               V().has('lbl', lbl2).
-                   has(name2, value2).
-               coalesce(__.inE(edge).where(outV().as('v')), addE(edge).from('v'));
+    throw new UnsupportedOperationException('Both edge endpoints and the edge label are required');
     }
                     
   /** Drop {@link Vertex}es by groups.
@@ -94,35 +106,30 @@ trait GremlinRecipiesGT {
             int    n,
             String attName  = null,
             String attValue = null) {
-    def m;
-    if (attName == null) {
-      m = g().V().has('lbl', label)
-                 .count()
-                 .next();
-      }      
-    else {
-      m = g().V().has('lbl', label)
-                 .has(attName, attValue)
-                 .count()
-                 .next();
+    if (n <= 0) {
+      throw new IllegalArgumentException('Batch size must be positive')
       }
-    while (m > 0) {
-      println('' + m + ' ' + label + 's to drop');
+    while (true) {
+      def batch;
       if (attName == null) {
-        g().V().has('lbl', label)
-               .limit(n)
-               .drop()
-               .iterate();  
+        batch = g().V().has('lbl', label)
+                   .limit(n)
+                   .id()
+                   .toList();
         }
       else {
-        g().V().has('lbl', label)
-               .has(attName, attValue)
-               .limit(n)
-               .drop()
-               .iterate();  
+        batch = g().V().has('lbl', label)
+                   .has(attName, attValue)
+                   .limit(n)
+                   .id()
+                   .toList();
         }
-      graph().traversal().tx().commit();
-      m -= n;
+      if (batch.isEmpty()) {
+        break;
+        }
+      println('' + batch.size() + ' ' + label + 's to drop');
+      g().V(batch.toArray()).drop().iterate();
+      commit();
       }
     }
     
@@ -135,35 +142,30 @@ trait GremlinRecipiesGT {
             int    n,
             String attName  = null,
             String attValue = null) {
-    def m;
-    if (attName == null) {
-      m = g().E().has('lbl', label)
-                 .count()
-                 .next();
+    if (n <= 0) {
+      throw new IllegalArgumentException('Batch size must be positive')
       }
-    else {
-      m = g().E().has('lbl', label)
-                 .has(attName, attValue)
-                 .count()
-                 .next();
-      }
-    while (m > 0) {
-      println('' + m + ' ' + label + 's to drop');
+    while (true) {
+      def batch;
       if (attName == null) {
-        g().E().has('lbl', label)
-               .limit(n)
-               .drop()
-               .iterate();
+        batch = g().E().has('lbl', label)
+                   .limit(n)
+                   .id()
+                   .toList();
         }
       else {
-        g().E().has('lbl', label)
-               .has(attName, attValue)
-               .limit(n)
-               .drop()
-               .iterate();
+        batch = g().E().has('lbl', label)
+                   .has(attName, attValue)
+                   .limit(n)
+                   .id()
+                   .toList();
         }
-      graph().traversal().tx().commit();
-      m -= n;
+      if (batch.isEmpty()) {
+        break;
+        }
+      println('' + batch.size() + ' ' + label + 's to drop');
+      g().E(batch.toArray()).drop().iterate();
+      commit();
       }
     }
 
@@ -242,11 +244,67 @@ trait GremlinRecipiesGT {
     return graph0;
     }
     
+  /** Execute one of the legacy HBase DataLink forms generated by Lomikel.
+    * Arbitrary Groovy is intentionally rejected. */
+  def executeHBaseDataLinkQuery(client,
+                                String query) {
+    def scan = query =~ /^\s*return\s+client\.scan\('([^'\\]*)',\s*null,\s*'\*',\s*0,\s*true,\s*true\)\s*;?\s*$/
+    if (scan.matches()) {
+      return client.scan(scan.group(1), null, '*', 0, 0, true, true)
+      }
+
+    def cutout = query =~ /^\s*x\s*=\s*client\.scan\('([^'\\]*)',\s*null,\s*'([^'\\]*)',\s*0,\s*false,\s*false\)\.get\('([^'\\]*)'\)\.get\('([^'\\]*)'\)\s*;\s*y\s*=\s*client\.repository\(\)\.get\(x\)\s*;\s*java\.util\.Base64\.getEncoder\(\)\.encodeToString\(y\)\s*;?\s*$/
+    if (cutout.matches()) {
+      def key = cutout.group(1)
+      def column = cutout.group(2)
+      if (key != cutout.group(3) || column != cutout.group(4)) {
+        throw new IllegalArgumentException('Inconsistent HBase DataLink parameters')
+        }
+      def rows = client.scan(key, null, column, 0, 0, false, false)
+      def reference = rows?.get(key)?.get(column)
+      def bytes = client.repository().get(reference)
+      return java.util.Base64.getEncoder().encodeToString(bytes)
+      }
+
+    throw new IllegalArgumentException('Unsupported HBase DataLink query')
+    }
+
+  /** Execute the only supported legacy Graph DataLink form.
+    * Arbitrary Groovy is intentionally rejected. */
+  def executeGraphDataLinkQuery(GraphTraversalSource source,
+                                String               query) {
+    def limitQuery = query =~ /^\s*g\.V\(\)\.limit\((\d+)\)\s*;?\s*$/
+    if (!limitQuery.matches()) {
+      throw new IllegalArgumentException('Unsupported Graph DataLink query')
+      }
+    long limit = Long.parseLong(limitQuery.group(1))
+    return source.V().limit(limit)
+    }
+
+  /** Create an HBase DataLink client. Isolated for lifecycle testing. */
+  def createHBaseDataLinkClient(String hostname,
+                                String port) {
+    return new HBaseClient(hostname, port)
+    }
+
+  /** Open the graph selected by a Graph DataLink URL. */
+  def openDataLinkGraph(String backend,
+                        String hostname,
+                        String port,
+                        String table) {
+    return JanusGraphFactory.build().
+                             set('storage.backend',     backend ).
+                             set('storage.hostname',    hostname).
+                             set('storage.port',        port    ).
+                             set('storage.hbase.table', table   ).
+                             open()
+    }
+
   /** Give data associated with <em>datalink</em> {@link Vertex}.
     * The <em>datalink</em>s can be created like this:
     * <pre>
     * w = g.addV().property('lbl', 'datalink').property('technology', 'Graph'  ).property('url', 'hbase:188.184.87.217:8182:janusgraph'     ).property('query', "g.V().limit(1)").next()
-    * w = g.addV().property('lbl', 'datalink').property('technology', 'HBase'  ).property('url', '157.136.250.219:2183:ztf:schema'            ).property('query', "client.setLimit(10); return client.scan(null, null, null, 0, false, false)").next()
+    * w = g.addV().property('lbl', 'datalink').property('technology', 'HBase'  ).property('url', '157.136.250.219:2183:ztf:schema'            ).property('query', "return client.scan('object_1', null, '*', 0, true, true)").next()
     * </pre>
     * @param v The <em>datalink</em> {@link Vertex}.
     * @param q The special (external) database query to be used in place of the standard one. Optiponal.
@@ -268,20 +326,58 @@ trait GremlinRecipiesGT {
       switch (v.values('technology').next()) {
         case 'HBase':
           def (hostname, port, table, schema) = url.split(':'); // 157.136.250.219:2181:ztf:schema_0.7.0_0.3.8
-          def client = new HBaseClient(hostname, port);
-          client.connect(table, schema);
-          return Eval.me('client', client, query);
-          break
+          def client
+          try {
+            client = createHBaseDataLinkClient(hostname, port)
+            client.connect(table, schema)
+            return executeHBaseDataLinkQuery(client, query)
+            }
+          finally {
+            if (client != null) {
+              try {
+                client.close()
+                }
+              catch (Exception closeFailure) {
+                log.warn('Cannot close HBase DataLink client', closeFailure)
+                }
+              }
+            }
         case 'Graph':
           def (backend, hostname, port, table) = url.split(':'); // hbase:188.184.87.217:8182:janusgraph
-          def graph = JanusGraphFactory.build().
-                                        set('storage.backend',     backend ).
-                                        set('storage.hostname',    hostname).
-                                        set('storage.port',        port    ).
-                                        set('storage.hbase.table', table   ).
-                                        open();
-          return Eval.me('g', g(), query);
-          break
+          def targetGraph
+          def targetSource
+          try {
+            targetGraph = openDataLinkGraph(backend, hostname, port, table)
+            targetSource = targetGraph.traversal()
+            return executeGraphDataLinkQuery(targetSource, query).toList()
+            }
+          finally {
+            Exception closeFailure = null
+            if (targetSource != null) {
+              try {
+                targetSource.close()
+                }
+              catch (Exception e) {
+                closeFailure = e
+                }
+              }
+            if (targetGraph != null) {
+              try {
+                targetGraph.close()
+                }
+              catch (Exception e) {
+                if (closeFailure == null) {
+                  closeFailure = e
+                  }
+                else {
+                  closeFailure.addSuppressed(e)
+                  }
+                }
+              }
+            if (closeFailure != null) {
+              throw closeFailure
+              }
+            }
         default:
           return 'DataLink ' + v + ' unknown';
           }

@@ -35,7 +35,8 @@ public class StringGremlinClient extends GremlinClient {
     * @param table    The Gremlin port. */
   public StringGremlinClient(String  hostname,
                              int     port) {
-    super(hostname, port);
+    super(hostname, port, true);
+    initialize(hostname, port);
     }
    
   /** Open with <em>GraphSON</em> serializer.
@@ -55,21 +56,44 @@ public class StringGremlinClient extends GremlinClient {
       log.info("Opened");
       }
     catch (Exception e) {
-      log.error("Cannot open connection", e);
+      throw new IllegalStateException("Cannot open Gremlin connection", e);
       }
     }
     
   @Override
   public void connect() {
-    _client = cluster().connect().init();
-    log.info("Connected");
+    try {
+      _client = cluster().connect().init();
+      log.info("Connected");
+      }
+    catch (Exception e) {
+      throw new IllegalStateException("Cannot connect Gremlin client", e);
+      }
     }
        
   @Override
   public void close() {
-    _client.close();
-    cluster().close();
+    RuntimeException failure = null;
+    try {
+      if (_client != null) {
+        _client.close();
+        }
+      }
+    catch (Exception e) {
+      failure = collectCleanupFailure(failure, "Gremlin client", e);
+      }
+    try {
+      if (cluster() != null) {
+        cluster().close();
+        }
+      }
+    catch (Exception e) {
+      failure = collectCleanupFailure(failure, "Gremlin cluster", e);
+      }
     log.info("Closed");
+    if (failure != null) {
+      throw failure;
+      }
     }
  
   /** Interpret Gremlin String.
