@@ -563,6 +563,14 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex ocol2;
     OCol cls;
     Pair<OCol, OCol> rel;
+    Map<OCol, Vertex> uniqueOCols = new HashMap<>();
+    Set<OCol> duplicateOCols = new HashSet<>();
+    for (Vertex scopedOCol : scopedOCols) {
+      cls = new OCol(scopedOCol);
+      if (uniqueOCols.putIfAbsent(cls, scopedOCol) != null) {
+        duplicateOCols.add(cls);
+        }
+      }
     // Loop over objets and accumulated weights to each object
     GraphTraversal<Vertex, Vertex> objectT = g().V().has("lbl", "object");
     while (objectT.hasNext()) {
@@ -649,18 +657,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       cls1 = rel.first();
       cls2 = rel.second();
       weight = entry.getValue();
-      ocol1 = g().V().has("lbl",        "OCol"          ).
-                      has("survey",     cls1.survey()    ).
-                      has("classifier", cls1.classifier()).
-                      has("flavor",     cls1.flavor()    ).
-                      has("cls",        cls1.cls()       ).
-                      next();
-      ocol2 = g().V().has("lbl",        "OCol"          ).
-                      has("survey",     cls2.survey()    ).
-                      has("classifier", cls2.classifier()).
-                      has("flavor",     cls2.flavor()    ).
-                      has("cls",        cls2.cls()       ).
-                      next();
+      ocol1 = duplicateOCols.contains(cls1) ? findOCol(cls1) : uniqueOCols.get(cls1);
+      ocol2 = duplicateOCols.contains(cls2) ? findOCol(cls2) : uniqueOCols.get(cls2);
       overlaps = ocol1.addEdge("overlaps", ocol2);
       overlaps.property("lbl",          "overlaps");
       overlaps.property("intersection", weight);
@@ -670,6 +668,16 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     commit();
     log.info("" + ns + " object-object correlations generated");
+    }
+
+  /** Find the endpoint selected by the existing indexed OCol lookup. */
+  protected Vertex findOCol(OCol cls) {
+    return g().V().has("lbl",        "OCol"          ).
+                   has("survey",     cls.survey()    ).
+                   has("classifier", cls.classifier()).
+                   has("flavor",     cls.flavor()    ).
+                   has("cls",        cls.cls()       ).
+                   next();
     }
     
   /** Create a new {@link FinkHBaseClient}. Singleton when url unchanged.

@@ -59,6 +59,7 @@ public final class JanuserRegressionTest {
     testClassificationCleanupPreservesUnrelatedEdges();
     testCleanOColPreservesUnrelatedBranches();
     testCorrelationRegenerationIsScoped();
+    testCorrelationRegenerationPreservesDuplicateEndpointSelection();
     testTimerCommitsIndependentlyOfReportingInterval();
     testReopenPreservesPropertiesConfiguration();
     testMissingPropertiesFileFailsExplicitly();
@@ -609,6 +610,49 @@ public final class JanuserRegressionTest {
         }
       Files.deleteIfExists(properties);
       }
+    }
+
+  private static void testCorrelationRegenerationPreservesDuplicateEndpointSelection() throws Exception {
+    Path properties = Files.createTempFile("januser-correlation-duplicate-test-", ".properties");
+    Files.writeString(properties, "storage.backend=inmemory\n");
+    JanusClient client = null;
+    try {
+      client = new JanusClient(properties.toString());
+      Vertex a1 = correlationOCol(client.g(), "a1", "A");
+      Vertex a2 = correlationOCol(client.g(), "a2", "A");
+      Vertex b = correlationOCol(client.g(), "b", "B");
+      Vertex object1 = client.g().addV("object").property("lbl", "object").next();
+      Vertex object2 = client.g().addV("object").property("lbl", "object").next();
+      a1.addEdge("deepcontains", object1, "lbl", "deepcontains", "weight", 4.0);
+      a2.addEdge("deepcontains", object2, "lbl", "deepcontains", "weight", 1.0);
+      b.addEdge("deepcontains", object1, "lbl", "deepcontains", "weight", 9.0);
+      client.commit();
+      Vertex cachedA = client.g().V().has("lbl", "OCol").
+                                 has("survey", "ZTF").has("classifier", "TAG").
+                                 has("flavor", "f").has("cls", "A").toList().get(0);
+      Vertex lookupA = cachedA.id().equals(a1.id()) ? a2 : a1;
+
+      new DeterministicCorrelationRecipes(client, lookupA, b).
+        generateCorrelations(new DuplicateCorrelationClassifier());
+
+      require(client.g().V(lookupA).bothE("overlaps").hasNext(),
+              "correlation regeneration must preserve lookup-based duplicate endpoint selection");
+      require(!client.g().V(cachedA).bothE("overlaps").hasNext(),
+              "correlation regeneration must not redirect overlaps to another duplicate OCol");
+      }
+    finally {
+      if (client != null) {
+        client.close();
+        }
+      Files.deleteIfExists(properties);
+      }
+    }
+
+  private static Vertex correlationOCol(GraphTraversalSource g, String marker, String cls) {
+    return g.addV("OCol").property("lbl", "OCol").
+             property("survey", "ZTF").property("classifier", "TAG").
+             property("flavor", "f").property("cls", cls).
+             property("marker", marker).next();
     }
 
   private static void testClassificationRejectsNonTransactionalClient() throws Exception {
@@ -1490,6 +1534,43 @@ public final class JanuserRegressionTest {
     public FPC fpc() {
       return null;
       }
+    }
+
+  private static final class DuplicateCorrelationClassifier extends Classifier {
+
+    private DuplicateCorrelationClassifier() {
+      setType(Type.TAG);
+      setFlavor("f");
+      }
+
+    @Override
+    public void classify(FinkGremlinRecipies recipes, String oid) throws LomikelException {}
+
+    @Override
+    public String survey() {
+      return "ZTF";
+      }
+
+    @Override
+    public FPC fpc() {
+      return null;
+      }
+    }
+
+  private static final class DeterministicCorrelationRecipes extends FinkGremlinRecipies {
+
+    private DeterministicCorrelationRecipes(ModifyingGremlinClient client, Vertex a, Vertex b) {
+      super(client);
+      _a = a;
+      _b = b;
+      }
+
+    protected Vertex findOCol(OCol cls) {
+      return "A".equals(cls.cls()) ? _a : _b;
+      }
+
+    private final Vertex _a;
+    private final Vertex _b;
     }
 
   private static final class TestClassifier extends Classifier {
