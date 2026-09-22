@@ -433,7 +433,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
   /** Check multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
-    * @param values The proerties values (<tt>null</tt> will skip search for that value).
+    * @param values The property values (<tt>null</tt> or <tt>"*"</tt> will skip that property).
     * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
   private GraphTraversal<Vertex, Vertex> hasProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
@@ -443,7 +443,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
        return v;
        }
     for (int i = 0; i < names.length; i++) {
-      if (values[i] != null) {
+      if (!skipProperty(values[i])) {
         v = v.has(names[i], values[i]);
         }
       }
@@ -453,7 +453,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
   /** Add multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
-    * @param values The properties values (<tt>null</tt> will skip search for that value).
+    * @param values The property values (<tt>null</tt> or <tt>"*"</tt> will skip that property).
     * @return       The resulting  {@link GraphTraversal} carrying {@link Vnew String(value)ertex}es. */
   private GraphTraversal<Vertex, Vertex> addProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
@@ -463,11 +463,16 @@ public GraphTraversal<Vertex, Vertex> allV() {
        return v;
        }
     for (int i = 0; i < names.length; i++) {
-      if (values[i] != null) {
+      if (!skipProperty(values[i])) {
         v.property(names[i], values[i]);
         }
       }
     return v;
+    }
+
+  /** Whether a property value is the documented lookup/creation wildcard. */
+  private boolean skipProperty(Object value) {
+    return value == null || "*".equals(value);
     }
     
   /** Attach <em>datalink</em> {@link Vertex} to an existing {@link Vertex}.

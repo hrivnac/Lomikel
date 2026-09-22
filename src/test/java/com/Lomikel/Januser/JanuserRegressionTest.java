@@ -30,6 +30,7 @@ public final class JanuserRegressionTest {
 
   public static void main(String[] args) throws Exception {
     testGetOrCreateCreatesMissingVertexAndReusesExistingVertex();
+    testGetOrCreateSkipsWildcardProperties();
     testMetaSchemaUnionsPropertiesAcrossSameLabelElements();
     testMetaSchemaPreservesAllEndpointPairs();
     testDeepDropHandlesCyclesAndNonJanusVertices();
@@ -87,6 +88,39 @@ public final class JanuserRegressionTest {
       require(created.id().equals(found.id()), "the existing vertex must be returned");
       require(client.g().V().has("lbl", "object").has("objectId", "A").count().next() == 1L,
               "repeated lookup must not create a duplicate");
+      }
+    finally {
+      client.close();
+      }
+    }
+
+  private static void testGetOrCreateSkipsWildcardProperties() {
+    FakeClient client = new FakeClient();
+    try {
+      GremlinRecipies recipes = new GremlinRecipies(client);
+      Vertex existing = client.g().addV("object").
+                               property("lbl", "object").
+                               property("objectId", "wildcard-existing").
+                               property("kind", "real").
+                               next();
+
+      Vertex found = recipes.getOrCreate("object",
+                                         new String[] {"objectId", "kind"},
+                                         new Object[] {"wildcard-existing", "*"}).next();
+      require(!recipes.created(), "a wildcard lookup must reuse the matching vertex");
+      require(existing.id().equals(found.id()), "wildcard lookup returned the wrong vertex");
+      require(client.g().V().has("lbl", "object").has("objectId", "wildcard-existing").
+                             count().next() == 1L,
+              "wildcard lookup must not create a duplicate vertex");
+      require("real".equals(found.value("kind")),
+              "wildcard lookup must not overwrite the existing property");
+
+      Vertex created = recipes.getOrCreate("object",
+                                           new String[] {"objectId", "kind"},
+                                           new Object[] {"wildcard-created", "*"}).next();
+      require(recipes.created(), "a missing wildcard lookup must create a vertex");
+      require(!created.property("kind").isPresent(),
+              "a wildcard must not be persisted as a literal property value");
       }
     finally {
       client.close();
