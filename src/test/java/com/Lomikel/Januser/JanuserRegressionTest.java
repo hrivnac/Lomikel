@@ -43,6 +43,7 @@ public final class JanuserRegressionTest {
     testOColEqualityDoesNotCollapseHashCollisions();
     testFinkRegistrationPreservesNumericWeights();
     testFinkRegistrationRejectsInvalidWeightsBeforeMutation();
+    testFinkRegistrationUsesOperationTimestamp();
     testFailedStandaloneRegistrationRollsBack();
     testClassificationRejectsNonTransactionalClient();
     testFailedClassificationRollsBackReplacement();
@@ -537,6 +538,28 @@ public final class JanuserRegressionTest {
         client.close();
         }
       Files.deleteIfExists(properties);
+      }
+    }
+
+  private static void testFinkRegistrationUsesOperationTimestamp() throws Exception {
+    FakeClient client = new FakeClient();
+    try {
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      TestClassifier classifier = new TestClassifier();
+      recipes.registerOCol(classifier, "first", "timestamp-first", 1.0,
+                           "[1]", "[1.0]");
+      String firstDate = client.g().V().has("objectId", "timestamp-first").
+                               values("importDate").next().toString();
+      Thread.sleep(20L);
+      recipes.registerOCol(classifier, "second", "timestamp-second", 1.0,
+                           "[2]", "[1.0]");
+      String secondDate = client.g().V().has("objectId", "timestamp-second").
+                                values("importDate").next().toString();
+      require(!firstDate.equals(secondDate),
+              "each registration must record its operation time, not recipe construction time");
+      }
+    finally {
+      client.close();
       }
     }
 

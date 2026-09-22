@@ -370,6 +370,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     try {
     //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
     log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + weight + ", replace = " + replace);
+    String importDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
     Vertex ocol = g().V().has("lbl",        "OCol"             ).
                           has("survey",     classifier.survey()).
                           has("classifier", classifier.name()  ).
@@ -391,7 +392,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                 addV("object").
                                 property("lbl",      "object").
                                 property("objectId", objectId)).
-                       property("importDate", _now).
+                       property("importDate", importDate).
                        next();
     if (replace) {
       addEdge(g().V(ocol).next(),
@@ -676,7 +677,6 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Whether this thread's registration participates in a classification transaction. */
   private ThreadLocal<Boolean> _classificationTransaction = ThreadLocal.withInitial(() -> false);
    
-  private String _now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()).toString();
  
   private static String FINK_OBJECTS_WS = "https://api.ztf.fink-portal.org/api/v1/objects";
   private static String FINK_LATESTS_WS = "https://api.ztf.fink-portal.org/api/v1/latests";
