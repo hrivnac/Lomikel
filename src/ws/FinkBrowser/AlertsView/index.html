@@ -32,9 +32,9 @@
             <li><strong>Whole sky</strong> shows the complete celestial sphere.</li>
             <li>Five-pointed markers are ZTF alerts; ten-pointed markers are LSST alerts.</li>
             <li>Point to or tap a marker for details. Keyboard users can open the same objects from Recent alerts.</li>
-            <li>With a zero look-back window, ZTF loads its latest classified alerts and LSST loads the newest DIA alerts from the local Elasticsearch indexes.</li>
+            <li>When server mode is available, a zero look-back window loads the latest ZTF classifications and LSST DIA alerts. Standalone mode requires a positive time window and never accesses Elasticsearch.</li>
             <li>Select the underlined parameter readout at lower left to change the refresh period, look-back window, alerts per class, or limiting star magnitude.</li>
-            <li>The same settings remain available as URL parameters:<br><code>fetchPeriod=0&amp;fetchStart=0&amp;nAlerts=10&amp;magMax=6&amp;fetchLSST=true</code></li>
+            <li>The same settings remain available as URL parameters:<br><code>fetchPeriod=10&amp;fetchStart=48&amp;nAlerts=10&amp;magMax=6&amp;fetchLSST=false</code></li>
           </ul>
         </div>
       </section>
@@ -52,6 +52,7 @@
           <span id="configInfo"></span>
         </button>
         <div id="statusPanel" role="status" aria-live="polite" aria-label="Survey status"></div>
+        <div id="runtimeModeInfo" role="status">Detecting server capabilities…</div>
         <output id="viewInfo" aria-label="Current sky coordinates"></output>
       </section>
 
@@ -68,8 +69,8 @@
           <div class="params-grid">
             <label for="fetchPeriodInput">Refresh period (minutes; 0 = load once)</label>
             <input id="fetchPeriodInput" name="fetchPeriod" type="number" min="0" max="1440" step="1" required>
-            <label for="fetchStartInput">Look-back window (hours; 0 = latest available)</label>
-            <input id="fetchStartInput" name="fetchStart" type="number" min="0" max="720" step="1" required>
+            <label id="fetchStartLabel" for="fetchStartInput">Look-back window (hours)</label>
+            <input id="fetchStartInput" name="fetchStart" type="number" min="1" max="720" step="1" required>
             <label for="nAlertsInput">Alerts per class</label>
             <input id="nAlertsInput" name="nAlerts" type="number" min="1" max="100" step="1" required>
             <label for="magMaxInput">Faintest star magnitude</label>

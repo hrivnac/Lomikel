@@ -127,6 +127,7 @@ function getPortalUrl(alert) {
   }
   
 function parseAlertSettings(values) {
+  const fetchStartMinimum = typeof latestAlertsAvailable !== "undefined" && latestAlertsAvailable ? 0 : 1;
   const parseInteger = (name, minimum, maximum) => {
     const raw = String(values[name] ?? "").trim();
     if (!/^-?\d+$/.test(raw)) {
@@ -143,7 +144,7 @@ function parseAlertSettings(values) {
     };
   return {
     fetchPeriod: parseInteger("fetchPeriod", 0, 1440),
-    fetchStart: parseInteger("fetchStart", 0, 720),
+    fetchStart: parseInteger("fetchStart", fetchStartMinimum, 720),
     nAlerts: parseInteger("nAlerts", 1, 100),
     magMax: parseInteger("magMax", -2, 6)
     };
@@ -156,7 +157,13 @@ function getQueryParams() {
     return Number.isFinite(value) ? Math.min(maximum, Math.max(minimum, value)) : current;
     };
   fetchPeriod = boundedInt("fetchPeriod", fetchPeriod, 0, 1440);
-  fetchStart  = boundedInt("fetchStart",  fetchStart,  0, 720);
+  const requestedFetchStart = Number.parseInt(params.get("fetchStart"), 10);
+  if (!latestAlertsAvailable && requestedFetchStart === 0) {
+    fetchStart = 48;
+    }
+  else {
+    fetchStart = boundedInt("fetchStart", fetchStart, latestAlertsAvailable ? 0 : 1, 720);
+    }
   nAlerts     = boundedInt("nAlerts",     nAlerts,     1, 100);
   magMax      = boundedInt("magMax",      magMax,     -2, 6);
   const lsstParam = params.get("fetchLSST");

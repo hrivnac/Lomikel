@@ -227,7 +227,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   background: transparent;
   }
 
-#paramsButton, #statusPanel, #viewInfo {
+#paramsButton, #statusPanel, #runtimeModeInfo, #viewInfo {
   padding: 6px 9px;
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.76);
@@ -238,6 +238,10 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 
 #statusPanel {
   color: #b9ffb9;
+  }
+
+#runtimeModeInfo {
+  color: #ffe08a;
   }
 
 #paramsButton {
@@ -390,7 +394,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
     gap: 4px;
     }
 
-  #paramsButton, #statusPanel, #viewInfo {
+  #paramsButton, #statusPanel, #runtimeModeInfo, #viewInfo {
     padding: 4px 6px;
     font-size: 10px;
     }

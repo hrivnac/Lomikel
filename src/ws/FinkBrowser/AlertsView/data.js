@@ -175,13 +175,75 @@ function scheduleRefreshTimer() {
   refreshTimer = setInterval(refreshEnabledSurveys, fetchPeriod * 60 * 1000);
   }
 
-getQueryParams();
-if (!fetchLSST) {
-  surveyStatus.LSST = {state: "paused", count: 0, errors: [], updatedAt: null};
+async function detectLatestAlertsSupport() {
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller && typeof setTimeout === "function"
+    ? setTimeout(() => controller.abort(), 3000)
+    : null;
+  try {
+    const response = await fetch("LatestAlerts.jsp?probe=1", {
+      cache: "no-store",
+      headers: {"accept": "application/json"},
+      ...(controller ? {signal: controller.signal} : {})
+      });
+    if (!response.ok) return false;
+    const payload = await response.json();
+    return payload && payload.latestAlerts === true;
+    }
+  catch (_error) {
+    return false;
+    }
+  finally {
+    if (timeoutId !== null && typeof clearTimeout === "function") clearTimeout(timeoutId);
+    }
   }
-updateStatusPanel();
-const initialRefreshPromise = refreshEnabledSurveys();
-scheduleRefreshTimer();
+
+function normalizeStandaloneLatestQuery() {
+  if (latestAlertsAvailable || typeof window === "undefined" || !window.location) return false;
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("fetchStart") !== "0") return false;
+  params.set("fetchStart", String(fetchStart));
+  if (window.history && typeof window.history.replaceState === "function") {
+    const query = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname || ""}${query ? `?${query}` : ""}${window.location.hash || ""}`);
+    }
+  return true;
+  }
+
+function updateRuntimeModeUi(normalizedLatestQuery = false) {
+  const fetchStartInput = document.getElementById("fetchStartInput");
+  const fetchStartLabel = document.getElementById("fetchStartLabel");
+  const runtimeModeInfo = document.getElementById("runtimeModeInfo");
+  if (fetchStartInput) fetchStartInput.min = latestAlertsAvailable ? "0" : "1";
+  if (fetchStartLabel) {
+    fetchStartLabel.textContent = latestAlertsAvailable
+      ? "Look-back window (hours; 0 = latest available)"
+      : "Look-back window (hours)";
+    }
+  if (runtimeModeInfo) {
+    runtimeModeInfo.textContent = latestAlertsAvailable
+      ? "Mode: latest alerts (server)"
+      : `Mode: time window (standalone)${normalizedLatestQuery ? "; zero look-back replaced with 48 hours" : ""}`;
+    }
+  }
+
+async function initializeAlertsData() {
+  latestAlertsAvailable = await detectLatestAlertsSupport();
+  fetchPeriod = latestAlertsAvailable ? 0 : 10;
+  fetchStart = latestAlertsAvailable ? 0 : 48;
+  fetchLSST = latestAlertsAvailable;
+  getQueryParams();
+  updateRuntimeModeUi(normalizeStandaloneLatestQuery());
+  if (!fetchLSST) {
+    surveyStatus.LSST = {state: "paused", count: 0, errors: [], updatedAt: null};
+    }
+  updateStatusPanel();
+  const initialRefresh = refreshEnabledSurveys();
+  scheduleRefreshTimer();
+  await initialRefresh;
+  }
+
+const initialRefreshPromise = initializeAlertsData();
 
 // Constellations
 let constellations = [];
