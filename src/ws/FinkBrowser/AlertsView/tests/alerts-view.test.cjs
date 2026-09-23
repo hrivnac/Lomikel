@@ -104,10 +104,17 @@ test("runtime alert settings accept only nonblank bounded integers", () => {
     nAlerts: 20,
     magMax: 5,
   });
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(vm.runInContext(`parseAlertSettings({
+      fetchPeriod: "0", fetchStart: "0", nAlerts: "10", magMax: "6"
+    })`, context))),
+    {fetchPeriod: 0, fetchStart: 0, nAlerts: 10, magMax: 6},
+  );
   for (const candidate of [
     {fetchPeriod: "", fetchStart: "48", nAlerts: "10", magMax: "6"},
     {fetchPeriod: "1.5", fetchStart: "48", nAlerts: "10", magMax: "6"},
-    {fetchPeriod: "0", fetchStart: "48", nAlerts: "10", magMax: "6"},
+    {fetchPeriod: "-1", fetchStart: "48", nAlerts: "10", magMax: "6"},
+    {fetchPeriod: "10", fetchStart: "-1", nAlerts: "10", magMax: "6"},
     {fetchPeriod: "10", fetchStart: "721", nAlerts: "10", magMax: "6"},
     {fetchPeriod: "10", fetchStart: "48", nAlerts: "101", magMax: "6"},
     {fetchPeriod: "10", fetchStart: "48", nAlerts: "10", magMax: "7"},
@@ -115,6 +122,16 @@ test("runtime alert settings accept only nonblank bounded integers", () => {
     context.candidate = candidate;
     assert.throws(() => vm.runInContext("parseAlertSettings(candidate)", context), /must be an integer|between/);
   }
+});
+
+test("latest one-shot mode is the default and enables both surveys", () => {
+  const context = {};
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(alertsView, "params.js"), "utf8"), context, {filename: "params.js"});
+
+  assert.equal(vm.runInContext("fetchPeriod", context), 0);
+  assert.equal(vm.runInContext("fetchStart", context), 0);
+  assert.equal(vm.runInContext("fetchLSST", context), true);
 });
 
 test("portal links allow only known surveys and encode API object identifiers", () => {
@@ -442,7 +459,7 @@ test("touch pointerleave keeps the tooltip available for a second tap", () => {
   assert.equal(tooltip.style.display, "flex");
 });
 
-async function loadData({failClasses = [], emptyClasses = []} = {}) {
+async function loadData({failClasses = [], emptyClasses = [], search = ""} = {}) {
   const requests = [];
   const elements = new Map();
   const timerState = {callback: null, delay: null, cleared: []};
@@ -458,6 +475,23 @@ async function loadData({failClasses = [], emptyClasses = []} = {}) {
       },
     },
     fetch: async url => {
+      if (String(url).startsWith("LatestAlerts.jsp")) {
+        requests.push(url);
+        return {
+          ok: true,
+          status: 200,
+          async json() {
+            return {
+              mjdHits: [{_id: "lsst-dia-object", _source: {mjd: [61235.4]}}],
+              radecDocs: [{
+                _id: "lsst-dia-object",
+                found: true,
+                _source: {location: {lon: 133.1, lat: -24}},
+              }],
+            };
+          },
+        };
+      }
       if (!String(url).startsWith("http")) {
         return {
           ok: true,
@@ -492,7 +526,7 @@ async function loadData({failClasses = [], emptyClasses = []} = {}) {
       timerState.delay = delay;
       return 1;
     },
-    window: {location: {search: ""}},
+    window: {location: {search}},
   };
   vm.createContext(context);
   for (const file of ["params.js", "utils.js", "update.js", "data.js"]) {
@@ -507,7 +541,9 @@ async function loadData({failClasses = [], emptyClasses = []} = {}) {
 }
 
 test("refresh scheduling calls ZTF once and leaves stopped LSST paused", async () => {
-  const {context, requests, timerCallback} = await loadData();
+  const {context, requests, timerCallback} = await loadData({
+    search: "?fetchPeriod=10&fetchStart=48&fetchLSST=false",
+  });
 
   assert.equal(typeof timerCallback, "function");
   assert.equal(requests.length, 5);
@@ -516,8 +552,24 @@ test("refresh scheduling calls ZTF once and leaves stopped LSST paused", async (
   assert.equal(vm.runInContext("alertsPool.length", context), 5);
 });
 
+test("default latest mode omits the date filter, loads LSST, and does not poll", async () => {
+  const {context, requests, timerCallback, timerState} = await loadData();
+  const ztfRequests = requests.filter(url => String(url).includes("api.ztf.fink-portal.org"));
+  const lsstRequests = requests.filter(url => String(url).startsWith("LatestAlerts.jsp"));
+
+  assert.equal(ztfRequests.length, 5);
+  assert.equal(ztfRequests.every(url => !new URL(url).searchParams.has("startdate")), true);
+  assert.deepEqual(lsstRequests, ["LatestAlerts.jsp?n=10"]);
+  assert.equal(timerCallback, null);
+  assert.equal(timerState.delay, null);
+  assert.equal(vm.runInContext("surveyStatus.LSST.state", context), "ready");
+  assert.equal(vm.runInContext("alertsPool.length", context), 6);
+});
+
 test("refresh replaces the survey snapshot instead of accumulating duplicates", async () => {
-  const {context, requests, timerCallback} = await loadData();
+  const {context, requests, timerCallback} = await loadData({
+    search: "?fetchPeriod=10&fetchStart=48&fetchLSST=false",
+  });
 
   await timerCallback();
   assert.equal(requests.length, 10);
@@ -534,7 +586,9 @@ test("simultaneous survey refreshes are coalesced", async () => {
 });
 
 test("runtime settings can rebuild stars and replace the refresh interval", async () => {
-  const {context, timerState} = await loadData();
+  const {context, timerState} = await loadData({
+    search: "?fetchPeriod=10&fetchStart=48&fetchLSST=false",
+  });
   const counts = vm.runInContext(`(() => {
     stellarCatalog.push(
       {ra: 15, dec: 1, mag: 3, proper: "bright"},
@@ -603,6 +657,64 @@ test("partial, empty, and failed API responses have distinct states", async () =
   assert.equal(vm.runInContext("surveyStatus.ZTF.errors.length", failed.context), 5);
 });
 
+test("latest LSST payload joins stationary positions by object ID", async () => {
+  const {context} = await loadData();
+  context.latestPayload = {
+    mjdHits: [
+      {_id: "A", _source: {mjd: [10, 14, 12]}},
+      {_id: "missing", _source: {mjd: [20]}},
+    ],
+    radecDocs: [
+      {_id: "other", found: true, _source: {location: {lon: -40, lat: 3}}},
+      {_id: "A", found: true, _source: {location: {lon: 179.5, lat: -24}}},
+    ],
+  };
+
+  const rows = vm.runInContext("normalizeLatestLsstPayload(latestPayload)", context);
+  assert.deepEqual(JSON.parse(JSON.stringify(rows)), [{
+    "r:diaObjectId": "A",
+    "r:midpointMjdTai": 14,
+    "r:ra": 359.5,
+    "r:dec": -24,
+    "v:classification": "LSST DIA source",
+  }]);
+  context.latestPayload = {mjdHits: null, radecDocs: []};
+  assert.throws(
+    () => vm.runInContext("normalizeLatestLsstPayload(latestPayload)", context),
+    /invalid latest LSST response/,
+  );
+});
+
+test("same-origin LSST latest endpoint uses fixed read-only Elasticsearch indexes", () => {
+  const endpointPath = path.join(alertsView, "LatestAlerts.jsp");
+  assert.equal(fs.existsSync(endpointPath), true);
+  const jsp = fs.readFileSync(endpointPath, "utf8");
+
+  assert.match(jsp, /http:\/\/134\.158\.243\.139:24499/);
+  for (const pathSuffix of ["dia_mjd/_search", "dia_radec/_mget"]) {
+    assert.equal(jsp.includes(pathSuffix), true);
+  }
+  assert.doesNotMatch(jsp, /ss_mjd|ss_radec/);
+  assert.doesNotMatch(jsp, /SmallHttpClient/);
+  assert.match(jsp, /HttpURLConnection/);
+  assert.match(jsp, /setConnectTimeout\s*\(/);
+  assert.match(jsp, /setReadTimeout\s*\(/);
+  assert.match(jsp, /disconnect\s*\(\s*\)/);
+  assert.doesNotMatch(jsp, /getParameter\s*\(\s*["']server["']/);
+  assert.match(jsp, /Math\.min\s*\(\s*100\s*,\s*Math\.max\s*\(\s*1/);
+  assert.match(jsp, /application\/json/);
+});
+
+test("local AlertsView target runs the JSP-capable FinkBrowser WAR", () => {
+  const build = fs.readFileSync(path.resolve(alertsView, "../../../..", "ant/build.xml"), "utf8");
+  const target = build.match(/<target name="start-AlertsView"[\s\S]*?<\/target>/)?.[0] || "";
+
+  assert.match(target, /depends="war"/);
+  assert.match(target, /FinkBrowser\.war/);
+  assert.match(target, /\/FinkBrowser\/AlertsView/);
+  assert.doesNotMatch(target, /http\.server/);
+});
+
 test("status code loads before data startup invokes it", () => {
   const html = fs.readFileSync(path.join(alertsView, "index.html"), "utf8");
   assert.equal(html.indexOf('src="update.js"') < html.indexOf('src="data.js"'), true);
@@ -616,6 +728,10 @@ test("displayed alert parameters open an accessible editing dialog", () => {
   for (const name of ["fetchPeriod", "fetchStart", "nAlerts", "magMax"]) {
     assert.match(html, new RegExp(`id="${name}Input"[^>]+name="${name}"`));
   }
+  assert.match(html, /id="fetchPeriodInput"[^>]+min="0"/);
+  assert.match(html, /id="fetchStartInput"[^>]+min="0"/);
+  assert.match(html, /0 = load once/);
+  assert.match(html, /0 = latest available/);
   assert.match(html, /id="paramsError"[^>]+role="alert"/);
   assert.equal(html.indexOf('src="data.js"') < html.indexOf('src="settings.js"'), true);
   const settings = fs.readFileSync(path.join(alertsView, "settings.js"), "utf8");

@@ -142,8 +142,8 @@ function parseAlertSettings(values) {
     return value;
     };
   return {
-    fetchPeriod: parseInteger("fetchPeriod", 1, 1440),
-    fetchStart: parseInteger("fetchStart", 1, 720),
+    fetchPeriod: parseInteger("fetchPeriod", 0, 1440),
+    fetchStart: parseInteger("fetchStart", 0, 720),
     nAlerts: parseInteger("nAlerts", 1, 100),
     magMax: parseInteger("magMax", -2, 6)
     };
@@ -155,8 +155,8 @@ function getQueryParams() {
     const value = Number.parseInt(params.get(name), 10);
     return Number.isFinite(value) ? Math.min(maximum, Math.max(minimum, value)) : current;
     };
-  fetchPeriod = boundedInt("fetchPeriod", fetchPeriod, 1, 1440);
-  fetchStart  = boundedInt("fetchStart",  fetchStart,  1, 720);
+  fetchPeriod = boundedInt("fetchPeriod", fetchPeriod, 0, 1440);
+  fetchStart  = boundedInt("fetchStart",  fetchStart,  0, 720);
   nAlerts     = boundedInt("nAlerts",     nAlerts,     1, 100);
   magMax      = boundedInt("magMax",      magMax,     -2, 6);
   const lsstParam = params.get("fetchLSST");

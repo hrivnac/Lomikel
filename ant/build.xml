@@ -1350,16 +1350,26 @@
     </target>
     
   <target name="start-AlertsView"
-          depends="init"
-          description="Run local AlertsView">
-    <echo>Go to http://localhost:8000</echo>
-    <exec executable="/usr/bin/python3">
-      <arg value="-m"/>
-      <arg value="http.server"/>
+          depends="war"
+          description="Run local AlertsView with JSP support">
+    <echo>Go to http://localhost:8000/FinkBrowser/AlertsView/</echo>
+    <java jar="${jetty_runner}" fork="true">
+      <arg value="--path"/>
+      <arg value="/FinkBrowser"/>
+      <arg value="--host"/>
+      <arg value="127.0.0.1"/>
+      <arg value="--port"/>
       <arg value="8000"/>
-      <arg value="-d"/>
-      <arg value="../src/ws/FinkBrowser/AlertsView"/>
-      </exec>
+      <arg value="--stop-port"/>
+      <arg value="${jetty_port_stop}"/>
+      <arg value="--stop-key"/>
+      <arg value="stop"/>
+      <arg value="--log"/>
+      <arg value="AlertsViewServer.log"/>
+      <arg value="--out"/>
+      <arg value="AlertsViewServer.out"/>
+      <arg value="../lib/FinkBrowser.war"/>
+      </java>
     </target>
     
   <target name="start-LightCurveView"
