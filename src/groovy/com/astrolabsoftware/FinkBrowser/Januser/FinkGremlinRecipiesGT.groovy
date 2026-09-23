@@ -37,6 +37,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.constant;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.identity;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.and;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.or;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.select;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.neq;
@@ -864,10 +865,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classifier = args?.classifier;
     def overlaps = [:];
     def cf = classifierWithFlavor(classifier);
-    g().E().hasLabel('overlaps').
-            order().
-            by('intersection', asc).
-            project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
+    def traversal = g().E().hasLabel('overlaps').
+                        order().
+                        by('intersection', asc).
+                        barrier();
+    if (lbl != null) {
+      traversal = traversal.filter(or(inV().has('lbl', lbl),
+                                      outV().has('lbl', lbl)));
+      }
+    if (classifier != null) {
+      traversal = traversal.filter(and(inV().has('classifier', cf[0]).has('flavor', cf[1]),
+                                       outV().has('classifier', cf[0]).has('flavor', cf[1])));
+      }
+    traversal.project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
             by(inV().values('lbl')).
             by(inV().values('classifier')).
             by(inV().values('flavor')).
@@ -878,13 +888,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
-                  if ((lbl        == null ||  v['xlbl'].equals(lbl) || v['ylbl'].equals(lbl)) &&
-                      (classifier == null || (v['xclassifier'].equals(cf[0]) &&
-                                              v['yclassifier'].equals(cf[0]) &&
-                                              v['xflavor'    ].equals(cf[1]) && 
-                                              v['yflavor'    ].equals(cf[1])))) {
-                    overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xflavor'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['yflavor'] + ':' + v['ycls']] = v['intersection'];
-                    }
+                  overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xflavor'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['yflavor'] + ':' + v['ycls']] = v['intersection'];
                   };
     overlaps = overlaps.sort{-it.value};
     return overlaps;

@@ -2,6 +2,13 @@ package com.astrolabsoftware.FinkBrowser.Januser
 
 import org.janusgraph.core.JanusGraphFactory
 import org.janusgraph.core.attribute.Geoshape
+import org.apache.tinkerpop.gremlin.process.traversal.Traversal
+import org.apache.tinkerpop.gremlin.process.traversal.step.filter.AndStep
+import org.apache.tinkerpop.gremlin.process.traversal.step.filter.OrStep
+import org.apache.tinkerpop.gremlin.process.traversal.step.map.ProjectStep
+import org.apache.tinkerpop.gremlin.process.traversal.strategy.AbstractTraversalStrategy
+import org.apache.tinkerpop.gremlin.process.traversal.strategy.verification.VerificationException
+import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategy.VerificationStrategy
 
 final class JanuserGroovyRegressionTest {
 
@@ -143,6 +150,47 @@ final class JanuserGroovyRegressionTest {
       assert recipes.overlaps().isEmpty() :
              'overlap listings must ignore non-overlaps edges with forged lbl properties'
 
+      def overlapA = source.addV('OCol').property('lbl', 'OCol').
+                            property('classifier', 'TAG').property('flavor', 'f').property('cls', 'A').next()
+      def overlapB = source.addV('OCol').property('lbl', 'OCol').
+                            property('classifier', 'TAG').property('flavor', 'f').property('cls', 'B').next()
+      def overlapC = source.addV('OCol').property('lbl', 'Special').
+                            property('classifier', 'TAG').property('flavor', 'f').property('cls', 'C').next()
+      def overlapOtherA = source.addV('OCol').property('lbl', 'OCol').
+                                 property('classifier', 'OTHER').property('flavor', '').property('cls', 'X').next()
+      def overlapOtherB = source.addV('OCol').property('lbl', 'OCol').
+                                 property('classifier', 'OTHER').property('flavor', '').property('cls', 'Y').next()
+      overlapA.addEdge('overlaps', overlapB, 'lbl', 'overlaps', 'intersection', 1.0d)
+      overlapA.addEdge('overlaps', overlapC, 'lbl', 'overlaps', 'intersection', 5.0d)
+      overlapA.addEdge('overlaps', overlapB, 'lbl', 'overlaps', 'intersection', 7.0d)
+      overlapOtherA.addEdge('overlaps', overlapOtherB, 'lbl', 'overlaps', 'intersection', 100.0d)
+      overlapA.addEdge('overlaps', overlapOtherA, 'lbl', 'overlaps', 'intersection', 90.0d)
+      overlapA.addEdge('audit', overlapB, 'lbl', 'overlaps', 'intersection', 200.0d)
+      source.tx().commit()
+      recipes.source = source.withStrategies(new RequireOverlapFilterBeforeProjectionStrategy())
+      def filteredOverlaps = recipes.overlaps([classifier: 'TAG=f'])
+      assert filteredOverlaps == [
+        'OCol:TAG:f:B * OCol:TAG:f:A': 7.0d,
+        'Special:TAG:f:C * OCol:TAG:f:A': 5.0d
+        ] : 'overlaps must preserve duplicate-key overwrite and descending-value semantics'
+      assert filteredOverlaps.keySet().toList() == [
+        'OCol:TAG:f:B * OCol:TAG:f:A',
+        'Special:TAG:f:C * OCol:TAG:f:A'
+        ] : 'overlaps must preserve final map order'
+      assert recipes.overlaps([lbl: 'Special']) == [
+        'Special:TAG:f:C * OCol:TAG:f:A': 5.0d
+        ] : 'overlaps must preserve endpoint-OR label filtering'
+      overlapA.addEdge('overlaps', overlapC, 'lbl', 'overlaps')
+      source.tx().commit()
+      def malformedKey = 'Special:TAG:f:C * OCol:TAG:f:A'
+      def malformedByLabel = recipes.overlaps([lbl: 'Special'])
+      assert malformedByLabel.containsKey(malformedKey) && malformedByLabel[malformedKey] == null :
+             'overlaps must preserve ordered duplicate overwrite by a missing intersection'
+      def malformedCombined = recipes.overlaps([lbl: 'Special', classifier: 'TAG=f'])
+      assert malformedCombined.containsKey(malformedKey) && malformedCombined[malformedKey] == null :
+             'combined overlap filters must preserve malformed duplicate overwrite semantics'
+      recipes.source = source
+
       def marker = 'januser.datalink.regression'
       System.clearProperty(marker)
       try {
@@ -242,6 +290,20 @@ final class JanuserGroovyRegressionTest {
       }
     def createHBaseDataLinkClient(String hostname, String port) { hbaseClient }
     def openDataLinkGraph(String backend, String hostname, String port, String table) { targetGraph }
+    }
+
+  private static final class RequireOverlapFilterBeforeProjectionStrategy
+      extends AbstractTraversalStrategy<VerificationStrategy>
+      implements VerificationStrategy {
+
+    @Override
+    void apply(Traversal.Admin<?, ?> traversal) {
+      int project = traversal.steps.findIndexOf { it instanceof ProjectStep }
+      if (project >= 0 && !traversal.steps.subList(0, project).
+                                  any { it instanceof AndStep || it instanceof OrStep }) {
+        throw new VerificationException('overlap endpoint filters must precede projection', traversal)
+        }
+      }
     }
 
   private static final class FakeHBaseClient {
