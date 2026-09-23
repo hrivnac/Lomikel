@@ -1,4 +1,5 @@
 #!/usr/bin/bash -l
+#deprecated
 F=${1}
 LOG=/tmp/process.`basename ${F}`
 cd ~/Lomikel/ant

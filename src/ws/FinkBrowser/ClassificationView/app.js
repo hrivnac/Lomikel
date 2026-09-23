@@ -1,5 +1,5 @@
 const DEFAULT_OBJECT_IDS = Object.freeze({
-  LSST: "170028486134595648",
+  LSST: "313985349745377418",
   ZTF: "ZTF17aackceb",
 });
 const startupParameters = new URLSearchParams(window.location.search);

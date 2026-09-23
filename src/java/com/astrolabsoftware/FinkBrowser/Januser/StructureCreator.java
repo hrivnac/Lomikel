@@ -41,6 +41,7 @@ import org.apache.logging.log4j.LogManager;
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
+@Deprecated
 public class StructureCreator extends JanusClient {
 
   /** Create JanusGraph structures from the HBase database.

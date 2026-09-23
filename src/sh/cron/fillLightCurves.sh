@@ -3,7 +3,7 @@ NOW=`date +"%Y%m%d%H%M%s"`
 LOG=/tmp/fillLC-${NOW}.log
 LOCK=/tmp/fillLC.lock 
 if [[ -e ${LOCK} ]]; then
-  echo "Already filling ES with ${LOCK}"
+  echo "Already filling LC with ${LOCK}"
   exit
   fi
 PID=$$
