@@ -42,10 +42,12 @@ import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.neq;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.gte;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.inside;
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.asc;
 
 // Janus Graph
 import org.janusgraph.core.SchemaViolationException;
+import org.janusgraph.core.attribute.Geoshape;
 import org.janusgraph.graphdb.vertices.StandardVertex;
 import org.janusgraph.graphdb.database.StandardJanusGraph;
 import static org.janusgraph.core.attribute.Geo.geoWithin;
@@ -85,12 +87,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def lat = dec;
     def lon = ra - 180;
     def dist = ang * 6371.0087714 * π / 180;
-    def nDir = g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).count().next();
-    def nJD  = g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).count().next();
-    if (limit < nJD) {
-      nJD = limit;
-      }
-    return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
+    return g().V().
+               has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).
+               has('jd', inside(jdmin, jdmax)).
+               limit(limit);
     }
 
   /** Give JSON of other <em>object</em>s ordered

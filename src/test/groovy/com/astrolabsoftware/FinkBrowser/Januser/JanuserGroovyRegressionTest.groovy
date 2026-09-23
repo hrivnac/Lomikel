@@ -1,6 +1,7 @@
 package com.astrolabsoftware.FinkBrowser.Januser
 
 import org.janusgraph.core.JanusGraphFactory
+import org.janusgraph.core.attribute.Geoshape
 
 final class JanuserGroovyRegressionTest {
 
@@ -11,6 +12,21 @@ final class JanuserGroovyRegressionTest {
       source.addV('object').property('lbl', 'object').property('importDate', 'test-date').iterate()
       source.tx().commit()
       def recipes = new TestRecipes(source: source)
+      source.addV('alert').property('marker', 'geo-inside-1').
+             property('direction', Geoshape.point(0.0d, 0.0d)).property('jd', 5.0d).iterate()
+      source.addV('alert').property('marker', 'geo-inside-2').
+             property('direction', Geoshape.point(0.1d, 0.1d)).property('jd', 6.0d).iterate()
+      source.addV('alert').property('marker', 'geo-date-boundary').
+             property('direction', Geoshape.point(0.0d, 0.0d)).property('jd', 10.0d).iterate()
+      source.addV('alert').property('marker', 'geo-outside').
+             property('direction', Geoshape.point(10.0d, 10.0d)).property('jd', 5.0d).iterate()
+      source.tx().commit()
+      recipes.gCount = 0
+      assert recipes.geosearch(180.0, 0.0, 1.0, 0.0, 10.0, 10).
+                     values('marker').toSet() == ['geo-inside-1', 'geo-inside-2'] as Set
+      assert recipes.gCount == 1 : 'geosearch must execute through one graph traversal source'
+      assert recipes.geosearch(180.0, 0.0, 1.0, 0.0, 10.0, 1).count().next() == 1
+      assert recipes.geosearch(180.0, 0.0, 1.0, 0.0, 10.0, 0).count().next() == 0
       assert (recipes.classifierWithFlavor(null) as List) == [null, '']
       assert (recipes.classifierWithFlavor('classifier') as List) == ['classifier', '']
       assert (recipes.classifierWithFlavor('classifier=') as List) == ['classifier', '']
@@ -210,7 +226,15 @@ final class JanuserGroovyRegressionTest {
     def hbaseClient
     def targetGraph
     int commitCount
-    def g() { source }
+    int gCount
+    def g() {
+      gCount++
+      source
+      }
+    def getGeoshape() { Geoshape }
+    def inside(def lower, def upper) {
+      org.apache.tinkerpop.gremlin.process.traversal.P.inside(lower, upper)
+      }
     def graph() { source.graph }
     def commit() {
       commitCount++
