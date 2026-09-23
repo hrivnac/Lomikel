@@ -5,10 +5,14 @@ import org.janusgraph.core.attribute.Geoshape
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal
 import org.apache.tinkerpop.gremlin.process.traversal.step.filter.AndStep
 import org.apache.tinkerpop.gremlin.process.traversal.step.filter.OrStep
+import org.apache.tinkerpop.gremlin.process.traversal.step.filter.TraversalFilterStep
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.ProjectStep
 import org.apache.tinkerpop.gremlin.process.traversal.strategy.AbstractTraversalStrategy
 import org.apache.tinkerpop.gremlin.process.traversal.strategy.verification.VerificationException
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategy.VerificationStrategy
+import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.structure.VertexProperty
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 final class JanuserGroovyRegressionTest {
 
@@ -132,6 +136,41 @@ final class JanuserGroovyRegressionTest {
              'classification must ignore non-deepcontains edges with forged lbl properties'
       assert recipes.objectNeighborhood([:], 'membership-source', 'TAG', null, null).isEmpty() :
              'neighborhoods must ignore non-deepcontains membership edges'
+
+      def classifiedObject = source.addV('object').property('lbl', 'object').
+                                    property('objectId', 'classified-source').next()
+      def selectedOne = source.addV('OCol').property('lbl', 'OCol').
+                              property('classifier', 'TAG').property('flavor', 'f').property('cls', 'one').next()
+      def selectedTwo = source.addV('OCol').property('lbl', 'OCol').
+                              property('classifier', 'TAG').property('flavor', 'f').property('cls', 'two').next()
+      def otherClassifier = source.addV('OCol').property('lbl', 'OCol').
+                                  property('classifier', 'OTHER').property('flavor', '').property('cls', 'other').next()
+      def otherFlavor = source.addV('OCol').property('lbl', 'OCol').
+                              property('classifier', 'TAG').property('flavor', 'other').property('cls', 'flavor').next()
+      def missingClass = source.addV('OCol').property('lbl', 'OCol').
+                               property('classifier', 'TAG').property('flavor', 'f').next()
+      selectedOne.addEdge('deepcontains', classifiedObject, 'lbl', 'deepcontains', 'weight', 1.0d)
+      selectedTwo.addEdge('deepcontains', classifiedObject, 'lbl', 'deepcontains', 'weight', 2.0d)
+      otherClassifier.addEdge('deepcontains', classifiedObject, 'lbl', 'deepcontains', 'weight', 100.0d)
+      otherFlavor.addEdge('deepcontains', classifiedObject, 'lbl', 'deepcontains', 'weight', 50.0d)
+      missingClass.addEdge('deepcontains', classifiedObject, 'lbl', 'deepcontains', 'weight', 9.0d)
+      selectedOne.addEdge('audit', classifiedObject, 'lbl', 'deepcontains', 'weight', 200.0d)
+      source.tx().commit()
+      recipes.source = source.withStrategies(new RequireClassificationFilterBeforeProjectionStrategy())
+      def filteredClassification = recipes.classification('classified-source', 'TAG=f')
+      assert filteredClassification as Set == [
+        [weight: 1.0d, classifier: 'TAG', flavor: 'f', class: 'one'],
+        [weight: 2.0d, classifier: 'TAG', flavor: 'f', class: 'two'],
+        [weight: 9.0d, classifier: 'TAG', flavor: 'f']
+        ] as Set : 'classification must preserve selected productive values, including a partial malformed row'
+      recipes.source = source
+      assert recipes.classification('classified-source') as Set == [
+        [weight: 1.0d, classifier: 'TAG',   flavor: 'f',     class: 'one'],
+        [weight: 2.0d, classifier: 'TAG',   flavor: 'f',     class: 'two'],
+        [weight: 100.0d, classifier: 'OTHER', flavor: '',    class: 'other'],
+        [weight: 50.0d, classifier: 'TAG',  flavor: 'other', class: 'flavor'],
+        [weight: 9.0d, classifier: 'TAG',   flavor: 'f']
+        ] as Set : 'unfiltered classification must retain every productive membership row'
 
       def reclassObject = source.addV('object').property('lbl', 'object').
                                 property('objectId', 'reclass-object').next()
@@ -266,7 +305,44 @@ final class JanuserGroovyRegressionTest {
     finally {
       graph.close()
       }
+    assertClassificationMultiPropertyEquivalence()
     println 'JanuserGroovyRegressionTest: OK'
+    }
+
+  private static void assertClassificationMultiPropertyEquivalence() {
+    def graph = TinkerGraph.open()
+    def source = graph.traversal()
+    try {
+      def object = source.addV('object').property('lbl', 'object').
+                         property('objectId', 'multi-property-object').next()
+      def firstMismatch = graph.addVertex(T.label, 'OCol', 'lbl', 'OCol', 'cls', 'excluded')
+      firstMismatch.property(VertexProperty.Cardinality.list, 'classifier', 'OTHER')
+      firstMismatch.property(VertexProperty.Cardinality.list, 'classifier', 'TAG')
+      firstMismatch.property(VertexProperty.Cardinality.list, 'flavor', 'f')
+      firstMismatch.addEdge('deepcontains', object, 'lbl', 'deepcontains', 'weight', 1.0d)
+      def firstMatch = graph.addVertex(T.label, 'OCol', 'lbl', 'OCol', 'cls', 'included')
+      firstMatch.property(VertexProperty.Cardinality.list, 'classifier', 'TAG')
+      firstMatch.property(VertexProperty.Cardinality.list, 'classifier', 'OTHER')
+      firstMatch.property(VertexProperty.Cardinality.list, 'flavor', 'f')
+      firstMatch.addEdge('deepcontains', object, 'lbl', 'deepcontains', 'weight', 2.0d)
+      def recipes = new TestRecipes(source: source)
+      def baseline = []
+      source.V().has('lbl', 'object').has('objectId', 'multi-property-object').inE('deepcontains').
+             project('weight', 'classifier', 'flavor', 'class').
+             by(org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.values('weight')).
+             by(org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV().values('classifier')).
+             by(org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV().values('flavor')).
+             by(org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV().values('cls')).
+             each { row ->
+               if (row.classifier == 'TAG' && row.flavor == 'f') baseline += row
+               }
+      assert recipes.classification('multi-property-object', 'TAG=f') == baseline :
+             'filtering must use the same first multi-property values that projection exposes'
+      }
+    finally {
+      source.close()
+      graph.close()
+      }
     }
 
   private static final class TestRecipes implements FinkGremlinRecipiesGT {
@@ -302,6 +378,23 @@ final class JanuserGroovyRegressionTest {
       if (project >= 0 && !traversal.steps.subList(0, project).
                                   any { it instanceof AndStep || it instanceof OrStep }) {
         throw new VerificationException('overlap endpoint filters must precede projection', traversal)
+        }
+      }
+    }
+
+  private static final class RequireClassificationFilterBeforeProjectionStrategy
+      extends AbstractTraversalStrategy<VerificationStrategy>
+      implements VerificationStrategy {
+
+    @Override
+    void apply(Traversal.Admin<?, ?> traversal) {
+      int project = traversal.steps.findIndexOf { step ->
+        step instanceof ProjectStep &&
+        step.projectKeys == ['weight', 'classifier', 'flavor', 'class']
+        }
+      if (project >= 0 && !traversal.steps.subList(0, project).
+                                  any { it instanceof TraversalFilterStep }) {
+        throw new VerificationException('classification endpoint filter must precede projection', traversal)
         }
       }
     }

@@ -461,17 +461,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       cf = classifierWithFlavor(classifier);
       }
     def classified = [];
-    g().V().has('lbl',      'object').
-            has('objectId', oid).
-            inE('deepcontains').
-            project('weight', 'classifier', 'flavor', 'class').
-            by(values('weight')).
-            by(outV().values('classifier')).
-            by(outV().values('flavor')).
-            by(outV().values('cls')).each {it -> if (classifier == null || (cf[0] == it.classifier && cf[1] == it.flavor)) {
-                                                   classified += it;
-                                                   }
-            }
+    def traversal = g().V().has('lbl',      'object').
+                            has('objectId', oid).
+                            inE('deepcontains');
+    if (classifier != null) {
+      traversal = traversal.filter(outV().values('classifier').limit(1).is(eq(cf[0]))).
+                            filter(outV().values('flavor').limit(1).is(eq(cf[1])));
+      }
+    traversal.project('weight', 'classifier', 'flavor', 'class').
+              by(values('weight')).
+              by(outV().values('classifier')).
+              by(outV().values('flavor')).
+              by(outV().values('cls')).
+              each {classified += it};
     return classified;
     }
    
