@@ -58,6 +58,8 @@ public final class JanuserRegressionTest {
     testConcurrentFinkRegistrationDoesNotDuplicateEdges();
     testFinkRegistrationRejectsInvalidWeightsBeforeMutation();
     testFinkRegistrationUsesOperationTimestamp();
+    testClassificationReusesActiveObject();
+    testClassificationDoesNotCachePropertyOnlyObject();
     testFailedStandaloneRegistrationRollsBack();
     testClassificationRejectsNonTransactionalClient();
     testFailedClassificationRollsBackReplacement();
@@ -743,6 +745,11 @@ public final class JanuserRegressionTest {
       require(!client.g().V().has("lbl", "OCol").has("cls", "new").out("deepcontains").
                         has("objectId", "ZTF-atomic").hasNext(),
               "failed replacement must not commit a partial new classification");
+
+      recipes.classifySource(new MultiRegistrationClassifier(), "ZTF-atomic");
+      require(client.g().V().has("lbl", "OCol").has("flavor", "active-cache").
+                       out("deepcontains").has("objectId", "ZTF-atomic").count().next() == 3L,
+              "a failed classification must not leak its active-object cache into a retry");
       }
     finally {
       if (client != null) {
@@ -771,6 +778,64 @@ public final class JanuserRegressionTest {
       }
     finally {
       client.close();
+      }
+    }
+
+  private static void testClassificationReusesActiveObject() throws Exception {
+    Path properties = Files.createTempFile("januser-classification-object-cache-", ".properties");
+    Files.writeString(properties, "storage.backend=inmemory\n");
+    JanusClient client = null;
+    try {
+      client = new JanusClient(properties.toString());
+      client.g().addV("object").property("lbl", "object").
+                 property("objectId", "active-object").iterate();
+      client.commit();
+      CountingClassificationRecipes recipes = new CountingClassificationRecipes(client);
+
+      recipes.classifySource(new MultiRegistrationClassifier(), "active-object");
+
+      require(recipes.gCalls() == 8,
+              "classification must reuse its selected object across all registrations; calls=" +
+              recipes.gCalls());
+      Vertex object = client.g().V().hasLabel("object").has("lbl", "object").
+                             has("objectId", "active-object").next();
+      require(client.g().V(object).inE("deepcontains").count().next() == 3L,
+              "active-object reuse must retain every registration");
+      require(client.g().V().hasLabel("object").has("objectId", "active-object").count().next() == 1L,
+              "active-object reuse must not create duplicate objects");
+      }
+    finally {
+      if (client != null) {
+        client.close();
+        }
+      Files.deleteIfExists(properties);
+      }
+    }
+
+  private static void testClassificationDoesNotCachePropertyOnlyObject() throws Exception {
+    Path properties = Files.createTempFile("januser-classification-object-label-", ".properties");
+    Files.writeString(properties, "storage.backend=inmemory\n");
+    JanusClient client = null;
+    try {
+      client = new JanusClient(properties.toString());
+      Vertex malformed = client.g().addV("not-object").property("lbl", "object").
+                               property("objectId", "label-object").next();
+      client.commit();
+
+      FinkGremlinRecipies recipes = new FinkGremlinRecipies(client);
+      recipes.classifySource(new MultiRegistrationClassifier(), "label-object");
+
+      require(client.g().V(malformed).inE("deepcontains").count().next() == 0L,
+              "classification must not cache an object selected only by mirrored lbl");
+      require(client.g().V().hasLabel("object").has("lbl", "object").
+                       has("objectId", "label-object").inE("deepcontains").count().next() == 3L,
+              "classification registrations must preserve native-label endpoint selection");
+      }
+    finally {
+      if (client != null) {
+        client.close();
+        }
+      Files.deleteIfExists(properties);
       }
     }
 
@@ -1591,6 +1656,31 @@ public final class JanuserRegressionTest {
 
     @Override
     public void classify(FinkGremlinRecipies recipes, String oid) throws LomikelException {}
+
+    @Override
+    public String survey() {
+      return "ZTF";
+      }
+
+    @Override
+    public FPC fpc() {
+      return null;
+      }
+    }
+
+  private static final class MultiRegistrationClassifier extends Classifier {
+
+    private MultiRegistrationClassifier() {
+      setType(Type.TAG);
+      setFlavor("active-cache");
+      }
+
+    @Override
+    public void classify(FinkGremlinRecipies recipes, String oid) throws LomikelException {
+      recipes.registerOCol(this, "one",   oid, 1.0, "[1]", "[1.0]");
+      recipes.registerOCol(this, "two",   oid, 2.0, "[2]", "[2.0]");
+      recipes.registerOCol(this, "three", oid, 3.0, "[3]", "[3.0]");
+      }
 
     @Override
     public String survey() {
