@@ -64,9 +64,10 @@ public GraphTraversal<Vertex, Vertex> allV() {
     
   /** Extract implicite schema. */
   public void createMetaSchema() {
+    GraphTraversalSource source = g();
     log.info("Cleaning MetaGraph");
-    g().V().hasLabel("MetaGraph").drop().iterate();
-    g().E().hasLabel("MetaGraph").drop().iterate();
+    source.V().hasLabel("MetaGraph").drop().iterate();
+    source.E().hasLabel("MetaGraph").drop().iterate();
     commit();
     Map<String, Set<String>> vMap  = new HashMap<>();
     Map<String, Set<String>> eMap  = new HashMap<>();
@@ -76,34 +77,40 @@ public GraphTraversal<Vertex, Vertex> allV() {
     Property<Vertex> vP;
     Property<Edge>   eP;
     log.info("Scanning Vertexes");
-    for (Vertex v : g().V().toList()) {
-      vSet = vMap.computeIfAbsent(v.label(), key -> new HashSet<>());
-      for (Iterator<VertexProperty<Vertex>> i = v.properties(); i.hasNext();) { 
+    GraphTraversal<Vertex, Vertex> vertexes = source.V();
+    while (vertexes.hasNext()) {
+      Vertex vertex = vertexes.next();
+      vSet = vMap.computeIfAbsent(vertex.label(), key -> new HashSet<>());
+      for (Iterator<VertexProperty<Vertex>> i = vertex.properties(); i.hasNext();) {
         vP = i.next();
         vSet.add(vP.key());
         }
       }
     log.info("Scanning Edges");
-    for (Edge e : g().E().toList()) {
-      eSet = eMap.computeIfAbsent(e.label(), key -> new HashSet<>());
-      evMap.computeIfAbsent(e.label(), key -> new HashSet<>()).
-            add(List.of(e.outVertex().label(), e.inVertex().label()));
-      for (Iterator<Property<Edge>> i = e.properties(); i.hasNext();) { 
+    GraphTraversal<Edge, Edge> edges = source.E();
+    while (edges.hasNext()) {
+      Edge edge = edges.next();
+      eSet = eMap.computeIfAbsent(edge.label(), key -> new HashSet<>());
+      evMap.computeIfAbsent(edge.label(), key -> new HashSet<>()).
+            add(List.of(edge.outVertex().label(), edge.inVertex().label()));
+      for (Iterator<Property<Edge>> i = edge.properties(); i.hasNext();) {
         eP = i.next();
         eSet.add(eP.key());
         }
       }
+    Map<String, Vertex> metaVertexes = new HashMap<>();
     Vertex v;
     for (Map.Entry<String, Set<String>> entry : vMap.entrySet()) {
       log.info("Adding Vertex " + entry.getKey());
       try {
-        v = g().addV("MetaGraph").property("lbl", "MetaGraph").next();
+        v = source.addV("MetaGraph").property("lbl", "MetaGraph").next();
         v.property("MetaLabel", entry.getKey());
         for (String p : entry.getValue()) {
           if (!p.equals("lbl")) {
             v.property(p, "");
             }
           }
+        metaVertexes.put(entry.getKey(), v);
         }
       catch (Exception e) {
         log.error("... failed");
@@ -113,9 +120,15 @@ public GraphTraversal<Vertex, Vertex> allV() {
     for (Map.Entry<String, Set<List<String>>> entry : evMap.entrySet()) {
       for (List<String> endpoints : entry.getValue()) {
         log.info("Adding Edge " + entry.getKey() + " : " + endpoints);
-        v = g().V().has("MetaGraph", "MetaLabel", endpoints.get(0)).next();
-        e = v.addEdge("MetaGraph",
-                      g().V().has("MetaGraph", "MetaLabel", endpoints.get(1)).next());
+        Vertex outVertex = metaVertexes.get(endpoints.get(0));
+        Vertex inVertex  = metaVertexes.get(endpoints.get(1));
+        if (outVertex == null) {
+          outVertex = source.V().has("MetaGraph", "MetaLabel", endpoints.get(0)).next();
+          }
+        if (inVertex == null) {
+          inVertex = source.V().has("MetaGraph", "MetaLabel", endpoints.get(1)).next();
+          }
+        e = outVertex.addEdge("MetaGraph", inVertex);
         e.property("lbl", "MetaGraph");
         e.property("MetaLabel", entry.getKey());
         for (String p : eMap.get(entry.getKey())) {

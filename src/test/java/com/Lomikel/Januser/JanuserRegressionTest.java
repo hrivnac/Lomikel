@@ -17,6 +17,9 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.schema.JanusGraphManagement;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -37,6 +40,8 @@ public final class JanuserRegressionTest {
     testLabelMirrorCannotBeOverwritten();
     testMetaSchemaUnionsPropertiesAcrossSameLabelElements();
     testMetaSchemaPreservesAllEndpointPairs();
+    testMetaSchemaReusesTraversalSource();
+    testMetaSchemaDoesNotCachePartiallyInitializedVertices();
     testDeepDropHandlesCyclesAndNonJanusVertices();
     testRecipeCommitUsesClientAbstraction();
     testRecipeCommitSupportsTransactionFreeGraphs();
@@ -267,6 +272,46 @@ public final class JanuserRegressionTest {
               "meta schema must preserve every endpoint-label pair used by an edge label");
       }
     finally {
+      graph.close();
+      }
+    }
+
+  private static void testMetaSchemaReusesTraversalSource() {
+    FakeClient client = new FakeClient();
+    Vertex source = client.g().addV("source").property("lbl", "source").next();
+    Vertex target = client.g().addV("target").property("lbl", "target").next();
+    source.addEdge("relation", target, "lbl", "relation");
+    CountingMetaSchemaRecipes recipes = new CountingMetaSchemaRecipes(client);
+
+    recipes.createMetaSchema();
+
+    require(recipes.gCalls() == 1,
+            "meta schema extraction must reuse one traversal source instead of repeated graph lookups");
+    }
+
+  private static void testMetaSchemaDoesNotCachePartiallyInitializedVertices() throws Exception {
+    JanusGraph graph = JanusGraphFactory.build().set("storage.backend", "inmemory").open();
+    JanusGraphManagement management = graph.openManagement();
+    management.makePropertyKey("MetaLabel").dataType(Integer.class).make();
+    management.commit();
+    GraphTraversalSource source = graph.traversal();
+    try {
+      Vertex left = source.addV("left").property("lbl", "left").next();
+      Vertex right = source.addV("right").property("lbl", "right").next();
+      left.addEdge("relation", right, "lbl", "relation");
+      RuntimeException failure = null;
+      try {
+        new GremlinRecipies(new NoCloseClient(source)).createMetaSchema();
+        }
+      catch (RuntimeException e) {
+        failure = e;
+        }
+      require(failure != null, "an incompatible MetaLabel schema must still fail extraction");
+      require(source.E().hasLabel("MetaGraph").count().next() == 0L,
+              "partially initialized meta vertices must not be used to create physical meta edges");
+      }
+    finally {
+      source.close();
       graph.close();
       }
     }
@@ -1431,6 +1476,26 @@ public final class JanuserRegressionTest {
       }
     }
 
+  private static final class NoCloseClient implements ModifyingGremlinClient {
+
+    private NoCloseClient(GraphTraversalSource source) {
+      _source = source;
+      }
+
+    @Override
+    public GraphTraversalSource g() {
+      return _source;
+      }
+
+    @Override
+    public void commit() {}
+
+    @Override
+    public void close() {}
+
+    private final GraphTraversalSource _source;
+    }
+
   private static final class FakeClient implements ModifyingGremlinClient {
 
     private final GraphTraversalSource _source = TinkerGraph.open().traversal();
@@ -1581,6 +1646,25 @@ public final class JanuserRegressionTest {
     public FPC fpc() {
       return null;
       }
+    }
+
+  private static final class CountingMetaSchemaRecipes extends GremlinRecipies {
+
+    private CountingMetaSchemaRecipes(ModifyingGremlinClient client) {
+      super(client);
+      }
+
+    @Override
+    public GraphTraversalSource g() {
+      _gCalls++;
+      return super.g();
+      }
+
+    private int gCalls() {
+      return _gCalls;
+      }
+
+    private int _gCalls;
     }
 
   private static final class DeterministicCorrelationRecipes extends FinkGremlinRecipies {
