@@ -775,15 +775,41 @@ public final class JanuserRegressionTest {
       Vertex ocol = client.g().V().has("lbl", "OCol").has("cls", "old").next();
       Vertex object = client.g().V().has("lbl", "object").
                              has("objectId", "ZTF-edge-scope").next();
+      Vertex duplicate = client.g().addV("OCol").property("lbl", "OCol").
+                               property("survey", "ZTF").property("classifier", "TAG").
+                               property("flavor", "").property("cls", "duplicate").next();
+      duplicate.addEdge("deepcontains", object, "lbl", "deepcontains", "marker", "remove-1");
+      duplicate.addEdge("deepcontains", object, "lbl", "deepcontains", "marker", "remove-2");
+      Vertex unrelated = client.g().addV("OCol").property("lbl", "OCol").
+                               property("survey", "ZTF").property("classifier", "XMATCH").
+                               property("flavor", "").property("cls", "unrelated").next();
+      unrelated.addEdge("deepcontains", object, "lbl", "deepcontains", "marker", "keep-scope");
+      Vertex propertyMatched = client.g().addV("not-OCol").property("lbl", "OCol").
+                                   property("survey", "ZTF").property("classifier", "TAG").
+                                   property("flavor", "").property("cls", "property-matched").next();
+      propertyMatched.addEdge("deepcontains", object, "lbl", "deepcontains", "marker", "remove-property");
+      Vertex propertyExcluded = client.g().addV("OCol").property("lbl", "not-OCol").
+                                    property("survey", "ZTF").property("classifier", "TAG").
+                                    property("flavor", "").property("cls", "property-excluded").next();
+      propertyExcluded.addEdge("deepcontains", object, "lbl", "deepcontains", "marker", "keep-label");
       ocol.addEdge("audit", object, "lbl", "deepcontains", "marker", "preserve");
       recipes.commit();
 
-      recipes.classifySource(classifier, "ZTF-edge-scope");
+      CountingClassificationRecipes cleanup = new CountingClassificationRecipes(client);
+      cleanup.classifySource(classifier, "ZTF-edge-scope");
 
       require(client.g().E().hasLabel("audit").has("marker", "preserve").hasNext(),
               "classification cleanup must preserve unrelated structural edges");
-      require(!client.g().E().hasLabel("deepcontains").hasNext(),
-              "classification cleanup must remove prior deepcontains memberships");
+      require(client.g().E().hasLabel("deepcontains").has("marker", "keep-scope").count().next() == 1L,
+              "classification cleanup must preserve memberships outside classifier scope");
+      require(client.g().E().hasLabel("deepcontains").has("marker", "keep-label").count().next() == 1L,
+              "classification cleanup must preserve memberships excluded by indexed lbl");
+      require(!client.g().E().hasLabel("deepcontains").has("marker", "remove-1").hasNext() &&
+              !client.g().E().hasLabel("deepcontains").has("marker", "remove-2").hasNext() &&
+              !client.g().E().hasLabel("deepcontains").has("marker", "remove-property").hasNext(),
+              "classification cleanup must remove all scoped memberships, including parallel edges");
+      require(cleanup.gCalls() == 2,
+              "classification cleanup must use one object lookup and one scoped edge traversal");
       }
     finally {
       if (client != null) {
@@ -1571,6 +1597,25 @@ public final class JanuserRegressionTest {
 
     private final Vertex _a;
     private final Vertex _b;
+    }
+
+  private static final class CountingClassificationRecipes extends FinkGremlinRecipies {
+
+    private int _gCalls;
+
+    private CountingClassificationRecipes(ModifyingGremlinClient client) {
+      super(client);
+      }
+
+    @Override
+    public GraphTraversalSource g() {
+      _gCalls++;
+      return super.g();
+      }
+
+    private int gCalls() {
+      return _gCalls;
+      }
     }
 
   private static final class TestClassifier extends Classifier {
