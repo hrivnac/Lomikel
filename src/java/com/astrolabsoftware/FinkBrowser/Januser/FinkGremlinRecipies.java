@@ -10,7 +10,7 @@ import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.otherV;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.fold;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.has;
@@ -231,24 +231,20 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       }
     _classificationTransaction.set(true);
     try {
-      if (g().V().has("lbl", "object").has("objectId", objectId).hasNext()) {
-        Vertex v1 = g().V().has("lbl", "object").has("objectId", objectId).next();
-        List<Vertex> v2s = g().V(v1).in("deepcontains").
-                                     has("lbl",        "OCol").
-                                     has("survey",     classifier.survey()).
-                                     has("classifier", classifier.name()  ).
-                                     has("flavor",     classifier.flavor()).
-                                     toList();
-        Iterator<Edge> edges;
-        for (Vertex v2 : v2s) {
-          edges = g().V(v1).inE("deepcontains").
-                            where(otherV().
-                            is(v2)).
-                            toStream().
-                            iterator();
-          while (edges.hasNext()) {
-            edges.next().remove();
-            }
+      Iterator<Vertex> objects = g().V().has("lbl", "object").
+                                        has("objectId", objectId).
+                                        limit(1);
+      if (objects.hasNext()) {
+        Vertex object = objects.next();
+        List<Edge> edges = g().V(object).inE("deepcontains").
+                              where(outV().
+                                has("lbl",        "OCol").
+                                has("survey",     classifier.survey()).
+                                has("classifier", classifier.name()  ).
+                                has("flavor",     classifier.flavor())).
+                              toList();
+        for (Edge edge : edges) {
+          edge.remove();
           }
         }
       classifier.classify(this, objectId);
