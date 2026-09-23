@@ -236,6 +236,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                         limit(1);
       if (objects.hasNext()) {
         Vertex object = objects.next();
+        // Cleanup intentionally follows the indexed lbl property. Registration
+        // additionally requires the native label, so only cache an endpoint
+        // that standalone registration would select as well.
+        if ("object".equals(object.label())) {
+          _classificationObjects.get().put(objectId, object);
+          }
         List<Edge> edges = g().V(object).inE("deepcontains").
                               where(outV().
                                 has("lbl",        "OCol").
@@ -260,6 +266,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
       throw e;
       }
     finally {
+      _classificationObjects.remove();
       _classificationTransaction.remove();
       }
     }
@@ -383,16 +390,25 @@ public class FinkGremlinRecipies extends GremlinRecipies {
                                   property("flavor",     classifier.flavor()).
                                   property("cls",        cls                )).
                          next();
-    Vertex s = g().V().hasLabel("object").
-                       has("lbl",      "object").
-                       has("objectId", objectId).
-                       fold().
-                       coalesce(unfold(), 
-                                addV("object").
-                                property("lbl",      "object").
-                                property("objectId", objectId)).
-                       property("importDate", importDate).
-                       next();
+    boolean classificationTransaction = _classificationTransaction.get();
+    Vertex s = classificationTransaction ? _classificationObjects.get().get(objectId) : null;
+    boolean cacheObject = false;
+    if (s == null) {
+      s = g().V().hasLabel("object").
+                  has("lbl",      "object").
+                  has("objectId", objectId).
+                  fold().
+                  coalesce(unfold(),
+                           addV("object").
+                           property("lbl",      "object").
+                           property("objectId", objectId)).
+                  next();
+      cacheObject = classificationTransaction;
+      }
+    s.property("importDate", importDate);
+    if (cacheObject) {
+      _classificationObjects.get().put(objectId, s);
+      }
     if (replace) {
       replaceRegistrationEdge(ocol, s, validatedAttributes);
       }
@@ -748,6 +764,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
 
   /** Whether this thread's registration participates in a classification transaction. */
   private ThreadLocal<Boolean> _classificationTransaction = ThreadLocal.withInitial(() -> false);
+
+  /** Objects already selected or created by this thread's classification transaction. */
+  private ThreadLocal<Map<String, Vertex>> _classificationObjects = ThreadLocal.withInitial(HashMap::new);
    
  
   private static String FINK_OBJECTS_WS = "https://api.ztf.fink-portal.org/api/v1/objects";
