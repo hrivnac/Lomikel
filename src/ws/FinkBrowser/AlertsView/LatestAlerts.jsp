@@ -56,6 +56,10 @@
 
 <%
   response.setHeader("Cache-Control", "no-store");
+  if ("1".equals(request.getParameter("probe"))) {
+    out.print(new JSONObject().put("latestAlerts", true).toString());
+    return;
+    }
   int limit = 10;
   try {
     limit = Integer.parseInt(request.getParameter("n"));

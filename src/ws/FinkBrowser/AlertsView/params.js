@@ -22,8 +22,9 @@ const classesLSSTLatest = {
 const classesLSST = {...classesLSSTTags, ...classesLSSTLatest};
 const classes = {...classesZTF, ...classesLSST};
  
-let fetchPeriod = 0; // minutes; 0 loads once
-let fetchStart = 0; // hours before now; 0 requests the latest available alerts
+let latestAlertsAvailable = false;
+let fetchPeriod = 10; // minutes; 0 loads once
+let fetchStart = 48; // hours before now; 0 requests the latest available alerts in server mode
 let nAlerts = 10;
 let magMax = 6;
-let fetchLSST = true;
+let fetchLSST = false;

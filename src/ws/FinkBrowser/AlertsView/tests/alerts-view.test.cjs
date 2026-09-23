@@ -104,11 +104,18 @@ test("runtime alert settings accept only nonblank bounded integers", () => {
     nAlerts: 20,
     magMax: 5,
   });
+  const serverContext = loadUtils({latestAlertsAvailable: true});
   assert.deepEqual(
     JSON.parse(JSON.stringify(vm.runInContext(`parseAlertSettings({
       fetchPeriod: "0", fetchStart: "0", nAlerts: "10", magMax: "6"
-    })`, context))),
+    })`, serverContext))),
     {fetchPeriod: 0, fetchStart: 0, nAlerts: 10, magMax: 6},
+  );
+  assert.throws(
+    () => vm.runInContext(`parseAlertSettings({
+      fetchPeriod: "0", fetchStart: "0", nAlerts: "10", magMax: "6"
+    })`, context),
+    /fetchStart must be between 1 and 720/,
   );
   for (const candidate of [
     {fetchPeriod: "", fetchStart: "48", nAlerts: "10", magMax: "6"},
@@ -124,14 +131,15 @@ test("runtime alert settings accept only nonblank bounded integers", () => {
   }
 });
 
-test("latest one-shot mode is the default and enables both surveys", () => {
+test("safe standalone defaults are used before server capability detection", () => {
   const context = {};
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(path.join(alertsView, "params.js"), "utf8"), context, {filename: "params.js"});
 
-  assert.equal(vm.runInContext("fetchPeriod", context), 0);
-  assert.equal(vm.runInContext("fetchStart", context), 0);
-  assert.equal(vm.runInContext("fetchLSST", context), true);
+  assert.equal(vm.runInContext("fetchPeriod", context), 10);
+  assert.equal(vm.runInContext("fetchStart", context), 48);
+  assert.equal(vm.runInContext("fetchLSST", context), false);
+  assert.equal(vm.runInContext("latestAlertsAvailable", context), false);
 });
 
 test("portal links allow only known surveys and encode API object identifiers", () => {
@@ -459,12 +467,16 @@ test("touch pointerleave keeps the tooltip available for a second tap", () => {
   assert.equal(tooltip.style.display, "flex");
 });
 
-async function loadData({failClasses = [], emptyClasses = [], search = ""} = {}) {
+async function loadData({failClasses = [], emptyClasses = [], search = "", jspMode = "available"} = {}) {
   const requests = [];
+  const probeRequests = [];
+  const replacedUrls = [];
   const elements = new Map();
   const timerState = {callback: null, delay: null, cleared: []};
+  let probeTimeoutCallback = null;
   const context = {
     AbortController, URLSearchParams,
+    clearTimeout() {},
     clearInterval(id) { timerState.cleared.push(id); },
     console: {error() {}, log() {}},
 
@@ -474,7 +486,31 @@ async function loadData({failClasses = [], emptyClasses = [], search = ""} = {})
         return elements.get(id);
       },
     },
-    fetch: async url => {
+    fetch: async (url, options = {}) => {
+      if (String(url).startsWith("LatestAlerts.jsp?probe=1")) {
+        probeRequests.push(url);
+        if (jspMode === "timeout") {
+          return new Promise((_resolve, reject) => {
+            options.signal.addEventListener("abort", () => reject(new Error("aborted")));
+          });
+        }
+        if (jspMode === "network-error") throw new TypeError("Failed to fetch");
+        if (jspMode === "missing") {
+          return {ok: false, status: 404, async json() { return {}; }};
+        }
+        if (jspMode === "source") {
+          return {
+            ok: true,
+            status: 200,
+            async json() { throw new SyntaxError("Unexpected token '<'"); },
+          };
+        }
+        return {
+          ok: true,
+          status: 200,
+          async json() { return {latestAlerts: true}; },
+        };
+      }
       if (String(url).startsWith("LatestAlerts.jsp")) {
         requests.push(url);
         return {
@@ -526,7 +562,15 @@ async function loadData({failClasses = [], emptyClasses = [], search = ""} = {})
       timerState.delay = delay;
       return 1;
     },
-    window: {location: {search}},
+    setTimeout(callback, delay) {
+      probeTimeoutCallback = callback;
+      timerState.probeTimeoutDelay = delay;
+      return 2;
+    },
+    window: {
+      location: {search, pathname: "/AlertsView/", hash: ""},
+      history: {replaceState(_state, _title, url) { replacedUrls.push(url); }},
+    },
   };
   vm.createContext(context);
   for (const file of ["params.js", "utils.js", "update.js", "data.js"]) {
@@ -536,9 +580,19 @@ async function loadData({failClasses = [], emptyClasses = [], search = ""} = {})
       {filename: file},
     );
   }
+  if (jspMode === "timeout") probeTimeoutCallback();
   await vm.runInContext("initialRefreshPromise", context);
-  return {context, requests, timerCallback: timerState.callback, timerState};
+  return {context, elements, probeRequests, requests, timerCallback: timerState.callback, timerState, replacedUrls};
 }
+
+test("startup installs the refresh timer before waiting for network data", () => {
+  const source = fs.readFileSync(path.join(alertsView, "data.js"), "utf8");
+  const initialize = source.slice(source.indexOf("async function initializeAlertsData"));
+  const refreshStart = initialize.indexOf("const initialRefresh = refreshEnabledSurveys();");
+  const schedule = initialize.indexOf("scheduleRefreshTimer();", refreshStart);
+  const wait = initialize.indexOf("await initialRefresh;", schedule);
+  assert.equal(refreshStart >= 0 && schedule > refreshStart && wait > schedule, true);
+});
 
 test("refresh scheduling calls ZTF once and leaves stopped LSST paused", async () => {
   const {context, requests, timerCallback} = await loadData({
@@ -552,18 +606,67 @@ test("refresh scheduling calls ZTF once and leaves stopped LSST paused", async (
   assert.equal(vm.runInContext("alertsPool.length", context), 5);
 });
 
-test("default latest mode omits the date filter, loads LSST, and does not poll", async () => {
-  const {context, requests, timerCallback, timerState} = await loadData();
+test("JSP capability enables default latest mode for both surveys", async () => {
+  const {context, probeRequests, requests, timerCallback, timerState} = await loadData();
   const ztfRequests = requests.filter(url => String(url).includes("api.ztf.fink-portal.org"));
   const lsstRequests = requests.filter(url => String(url).startsWith("LatestAlerts.jsp"));
 
+  assert.deepEqual(probeRequests, ["LatestAlerts.jsp?probe=1"]);
   assert.equal(ztfRequests.length, 5);
   assert.equal(ztfRequests.every(url => !new URL(url).searchParams.has("startdate")), true);
   assert.deepEqual(lsstRequests, ["LatestAlerts.jsp?n=10"]);
   assert.equal(timerCallback, null);
   assert.equal(timerState.delay, null);
+  assert.equal(vm.runInContext("latestAlertsAvailable", context), true);
+  assert.equal(vm.runInContext("fetchStart", context), 0);
+  assert.equal(vm.runInContext("fetchPeriod", context), 0);
+  assert.equal(vm.runInContext("fetchLSST", context), true);
   assert.equal(vm.runInContext("surveyStatus.LSST.state", context), "ready");
   assert.equal(vm.runInContext("alertsPool.length", context), 6);
+});
+
+test("missing or unexecuted JSP selects standalone timed defaults", async () => {
+  for (const jspMode of ["missing", "source", "network-error", "timeout"]) {
+    const {context, probeRequests, requests, timerCallback, timerState} = await loadData({jspMode});
+    const ztfRequests = requests.filter(url => String(url).includes("api.ztf.fink-portal.org"));
+
+    assert.deepEqual(probeRequests, ["LatestAlerts.jsp?probe=1"]);
+    assert.equal(requests.some(url => String(url).startsWith("LatestAlerts.jsp")), false);
+    assert.equal(ztfRequests.length, 5);
+    assert.equal(ztfRequests.every(url => new URL(url).searchParams.has("startdate")), true);
+    assert.equal(vm.runInContext("latestAlertsAvailable", context), false);
+    assert.equal(vm.runInContext("fetchStart", context), 48);
+    assert.equal(vm.runInContext("fetchPeriod", context), 10);
+    assert.equal(vm.runInContext("fetchLSST", context), false);
+    assert.equal(vm.runInContext("surveyStatus.LSST.state", context), "paused");
+    assert.equal(timerState.delay, 10 * 60 * 1000);
+    assert.equal(typeof timerCallback, "function");
+  }
+});
+
+test("standalone mode replaces an unsupported zero look-back with 48 hours", async () => {
+  const {context, requests, replacedUrls} = await loadData({
+    jspMode: "missing",
+    search: "?fetchStart=0&fetchPeriod=0&fetchLSST=false",
+  });
+
+  assert.equal(vm.runInContext("fetchStart", context), 48);
+  assert.equal(vm.runInContext("fetchPeriod", context), 0);
+  assert.equal(vm.runInContext("fetchLSST", context), false);
+  assert.equal(requests.every(url => !String(url).startsWith("LatestAlerts.jsp")), true);
+  assert.match(replacedUrls.at(-1), /fetchStart=48/);
+});
+
+test("detected mode updates the parameter controls and explanation", async () => {
+  const server = await loadData();
+  assert.equal(server.elements.get("fetchStartInput").min, "0");
+  assert.match(server.elements.get("runtimeModeInfo").textContent, /latest alerts \(server\)/);
+  assert.match(server.elements.get("fetchStartLabel").textContent, /0 = latest available/);
+
+  const standalone = await loadData({jspMode: "missing"});
+  assert.equal(standalone.elements.get("fetchStartInput").min, "1");
+  assert.match(standalone.elements.get("runtimeModeInfo").textContent, /time window \(standalone\)/);
+  assert.doesNotMatch(standalone.elements.get("fetchStartLabel").textContent, /0 = latest available/);
 });
 
 test("refresh replaces the survey snapshot instead of accumulating duplicates", async () => {
@@ -700,6 +803,8 @@ test("same-origin LSST latest endpoint uses fixed read-only Elasticsearch indexe
   assert.match(jsp, /setConnectTimeout\s*\(/);
   assert.match(jsp, /setReadTimeout\s*\(/);
   assert.match(jsp, /disconnect\s*\(\s*\)/);
+  assert.match(jsp, /getParameter\s*\(\s*["']probe["']\s*\)/);
+  assert.match(jsp, /put\s*\(\s*["']latestAlerts["']\s*,\s*true\s*\)/);
   assert.doesNotMatch(jsp, /getParameter\s*\(\s*["']server["']/);
   assert.match(jsp, /Math\.min\s*\(\s*100\s*,\s*Math\.max\s*\(\s*1/);
   assert.match(jsp, /application\/json/);
@@ -729,9 +834,10 @@ test("displayed alert parameters open an accessible editing dialog", () => {
     assert.match(html, new RegExp(`id="${name}Input"[^>]+name="${name}"`));
   }
   assert.match(html, /id="fetchPeriodInput"[^>]+min="0"/);
-  assert.match(html, /id="fetchStartInput"[^>]+min="0"/);
   assert.match(html, /0 = load once/);
-  assert.match(html, /0 = latest available/);
+  assert.match(html, /id="runtimeModeInfo"/);
+  assert.match(html, /id="fetchStartLabel"/);
+  assert.match(html, /id="fetchStartInput"[^>]*min="1"/);
   assert.match(html, /id="paramsError"[^>]+role="alert"/);
   assert.equal(html.indexOf('src="data.js"') < html.indexOf('src="settings.js"'), true);
   const settings = fs.readFileSync(path.join(alertsView, "settings.js"), "utf8");
