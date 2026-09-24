@@ -170,12 +170,16 @@ grouped.each {objectId, clsMap ->
 
   def objectV = getOrCreateObject(objectId)
 
-  // read all existing deepcontains edges into this object
+  // Read only memberships in the configured scope being updated. Other
+  // classifiers may have the same cls but independent instances and weights.
   def existingByCls = [:]
   g.V(objectV).inE('deepcontains')
               .as('e')
               .outV()
-              .has('lbl', 'OCol')
+              .has('lbl',        'OCol')
+              .has('survey',     defaultSurvey)
+              .has('classifier', defaultClassifier)
+              .has('flavor',     defaultFlavor)
               .as('ocol')
               .project('edge', 'cls', 'instances', 'weights')
               .by(select('e'))
@@ -230,7 +234,7 @@ grouped.each {objectId, clsMap ->
       ]
     }
 
-  // normalize edge.weight for this object so all outgoing OCol->object
+  // normalize edge.weight within the configured classifier scope for this object
   // deepcontains weights sum to 1
   double totalWeight = merged.values().sum {it.sumWeight ?: 0.0d} as double
 
