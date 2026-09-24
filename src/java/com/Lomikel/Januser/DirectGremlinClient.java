@@ -2,24 +2,15 @@ package com.Lomikel.Januser;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
 import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 import org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection;
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 import org.apache.tinkerpop.gremlin.util.MessageSerializer;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3;
-import org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.ResultSet;
 import org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3;
 import org.apache.tinkerpop.gremlin.structure.io.binary.TypeSerializerRegistry;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
-import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
 // Java
 import java.util.List;
@@ -31,7 +22,11 @@ import java.util.HashMap;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>DirectGremlinClient</code> provides direct connection to Gremlin Graph.
+/** Provides typed traversal-bytecode access to a remote Gremlin server.
+  *
+  * <p>The returned traversal source is remote. Traversal-only recipes can use
+  * it directly; operations that call host-side methods on returned elements
+  * still require live provider elements and are not generally remote-safe.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -40,9 +35,9 @@ import org.apache.logging.log4j.LogManager;
 public class DirectGremlinClient extends    GremlinClient
                                  implements ModifyingGremlinClient {
    
-  /** Create with connection parameters, using <em>Gryo</em> serializer.
+  /** Create with connection parameters, using the GraphBinary serializer.
     * @param hostname The Gremlin hostname.
-    * @param table    The Gremlin port. */
+    * @param port     The Gremlin port. */
   public DirectGremlinClient(String  hostname,
                              int     port) {
     super(hostname, port, true);
@@ -51,7 +46,7 @@ public class DirectGremlinClient extends    GremlinClient
     
   /** Open with <em>GraphBinary</em> serializer.
     * @param hostname The Gremlin hostname.
-    * @param table    The Gremlin port. */
+    * @param port     The Gremlin port. */
   @Override
   public void open(String hostname,
                    int    port) {
@@ -94,7 +89,7 @@ public class DirectGremlinClient extends    GremlinClient
     return _client.submit(traversal);
     }
   /** Submit Gremlin request as a {@link String}.
-    * @param traversal The Gremlin request as a {@link String}.
+    * @param gremlin The Gremlin request as a {@link String}.
     * @return          The {@link ResultSet}. */
   public ResultSet submit(String gremlin) {
     return _client.submit(gremlin);

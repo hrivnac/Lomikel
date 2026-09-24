@@ -19,7 +19,11 @@ import java.io.IOException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>JanusClient</code> provides connection to Janus Graph.
+/** Owns an embedded, rollback-capable JanusGraph connection.
+  *
+  * <p>This is the mutation client for recipes that need a real transaction.
+  * It opens the graph from explicit HBase parameters or a JanusGraph
+  * properties file and owns both the traversal source and graph lifecycle.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -27,11 +31,9 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class JanusClient implements TransactionalGremlinClient {
 
-  /** Extract implicite schema.
-    * @param args[0] The operation: <tt>extract,populate</tt>.
-    * @param args[1] The HBase hostname.
-    * @param args[2] The HBase port.
-    * @param args[3] The HBase table.
+  /** Extract the implicit schema.
+    * @param args The operation ({@code extract}), HBase hostname, HBase port,
+    *             and HBase table.
     * @throws Exception If fails. */ 
   public static void main(String[] args) throws Exception {
     Init.init("JanusClient");
@@ -51,6 +53,7 @@ public class JanusClient implements TransactionalGremlinClient {
        
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
+    * @param port     The HBase port.
     * @param table    The HBase table. */
   public JanusClient(String hostname,
                      int    port,
@@ -60,6 +63,7 @@ public class JanusClient implements TransactionalGremlinClient {
    
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
+    * @param port     The HBase port.
     * @param table    The HBase table.
     * @param batch    Whether open graph for batch loading. */
   public JanusClient(String  hostname,
@@ -200,8 +204,6 @@ public class JanusClient implements TransactionalGremlinClient {
 
   /** File-based configuration, or {@code null} for explicit HBase parameters. */
   private String _properties;
-    
-  private boolean _found;  
     
   private JanusGraph _graph;
   

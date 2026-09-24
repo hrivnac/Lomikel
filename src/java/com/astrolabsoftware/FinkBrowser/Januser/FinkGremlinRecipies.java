@@ -5,7 +5,6 @@ import com.Lomikel.Utils.LomikelException;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.ModifyingGremlinClient;
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
-import com.astrolabsoftware.FinkBrowser.FinkPortalClient.FPC;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -26,14 +25,6 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 
-// HBase
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Get;
-
-// org.json
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 // Java
 import java.lang.Math;
 import java.util.Arrays;
@@ -46,8 +37,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -55,14 +44,17 @@ import java.text.SimpleDateFormat;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>FinkGremlinRecipies</code> provides various recipies to handle
-  * and modify Gremlin Graphs for Fink.
+/** Fink-specific graph mutation and lifecycle recipes.
+  *
+  * <p>The package documentation defines the graph model, label-mirror
+  * invariant, and transaction ownership shared by this class and the Groovy
+  * traversal recipes.</p>
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-// TBD: check precodition for methods, wgich doesn't work with 'client' creation
+// Client-dependent preconditions are checked by the operation that needs them.
 public class FinkGremlinRecipies extends GremlinRecipies {
     
   /** Create and attach to {@link GraphTraversalSource}.
@@ -77,107 +69,19 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     super(client);
     }
     
-  /** Execute full chain of new <em>object</em> correlations analyses.
-    * @param classifiers The {@link Classifier}s to be used.
-    *                        They can contain the {@link Classifier} flavor after <em>=</em> symbol.
-    * @param filter          The HBase evaluation formula to be applied.
-    *                        Ignored if <tt>clss</tt> are specified.
-    * @param hbaseUrl        The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
-    * @param nLimit          The maximal number of alerts getting from HBase or Fink Portal.
-    *                        <tt>0</tt> means no limit.
-    * @param timeLimit       How far into the past the search should search (in minutes).
-    * @param clss            An array of <em>classes</em> taken from {@link FPC},
-    *                        if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
-    *                        if <tt>null</tt>, analyse <em>object</em>s from HBase database.
-    * @throws LomikelException If anything fails. */
-  /*@Deprecated
-  public void processOCol(Classifier[] classifiers,
-                          String       filter,
-                          String       hbaseUrl,
-                          int          nLimit,
-                          int          timeLimit,
-                          String[]     clss) throws LomikelException {
-    fillOCol(classifiers, filter, hbaseUrl, nLimit, timeLimit, clss);
-    generateCorrelations(classifiers);
-    }*/
-        
-  /** Fill graph with <em>OCol</em>.
-    * @param classifiers The {@link Classifier}s to be used.
-    * @param filter      The HBase evaluation formula to be applied.
-    *                    Ignored if <tt>clss</tt> are specified.
-    * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
-    * @param nLimit      The maximal number of alerts getting from HBase or Fink Portal.
-    *                    <tt>0</tt> means no limit.
-    * @param timeLimit   How far into the past the search should search (in minutes).
-    * @param clss        An array of <em>classes</em> taken from {@link FPC},
-    *                    if contains <tt>Anomaly</tt>, get anomalies from {@link FPC},                  
-    *                    if <tt>null</tt>, analyse <em>object</em>s from HBase database.
-
-    * @throws LomikelException If anything fails. */
-  /*@Deprecated
-  public void fillOCol(Classifier[] classifiers,
-                       String       filter,
-                       String       hbaseUrl,
-                       int          nLimit,
-                       int          timeLimit,
-                       String[]     clss) throws LomikelException {
-    String clssDesc = "";
-    if (clss != null) {
-      clssDesc = "of " + Arrays.toString(clss);
-      }
-    log.info("Filling OCol " + clssDesc + " using " + Arrays.toString(classifiers) + " classifiers, nLimit = " + nLimit + ", timeLimit = " + timeLimit);
-    log.info("Importing from " + hbaseUrl + ":");
-    fhclient(hbaseUrl);
-    Set<String> oids = new HashSet<>();;
-    if (clss == null) { 
-      fhclient().setEvaluation(filter);
-      if (nLimit > 0) {
-        fhclient().setLimit(nLimit);
-        }
-      oids = fhclient().latestsT("i:objectId",
-                                 null,
-                                 timeLimit,
-                                 true);
-      fhclient().setEvaluation(null);
-      }
-    else {
-      Calendar cal;
-      Date d;
-      String sd;
-      JSONArray ja;
-      JSONObject jo;
-      for (String cls : clss) {
-        cal = Calendar.getInstance();
-        cal.add(Calendar.MINUTE, -nLimit);
-        d = cal.getTime();
-        sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
-        if (cls.equals("*")) {
-          ja = FPC.anomaly(new JSONObject().put("n",             nLimit).
-                                            put("startdate",     sd).
-                                            put("columns",       "i:objectId").
-                                            put("output-format", "json"));
-          }
-        else {
-          ja = FPC.latests(new JSONObject().put("n",             nLimit).
-                                            put("class",         cls).
-                                            put("startdate",     sd).
-                                            put("columns",       "i:objectId").
-                                            put("output-format", "json"));
-          }
-        for (int i = 0; i < ja.length(); i++) {
-          jo = ja.getJSONObject(i);
-          oids.add(jo.getString("i:objectId"));
-          }
-        log.info("*** " + cls + "[" + ja.length() + "]:");
-        }
-      }
-    classifySources(classifiers, oids, hbaseUrl);
-    }*/
+  /*
+   * The deprecated processOCol/fillOCol orchestration was intentionally
+   * removed from the compiled API. It mixed source discovery (HBase/Fink
+   * Portal), classification, and correlation generation in one operation.
+   * Supported callers select object IDs explicitly, call classifySources or
+   * classifySource, and invoke generateCorrelations as a separate lifecycle
+   * step.
+   */
     
   /** Classify <em>object</em> .
     * @param classifiers The {@link Classifier}s to be used.
-    * @param oids        The {@link Set} of <tt>objectId</tt>s of <em>object</em> to be added.
-    * @param hbaseUrl    The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
+    * @param oids        The {@link Set} of {@code objectId}s of <em>object</em> to be added.
+    * @param hbaseUrl    The url of HBase with alerts as {@code ip:port:table:schema}.
     * @throws LomikelException If anything fails. */
   public void classifySources(Classifier[] classifiers,
                               Set<String>  oids,
@@ -207,8 +111,8 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     
    /** Classify <em>object</em>.
     * @param classifier The {@link Classifier} to be used.
-    * @param objectId   The <tt>objectId</tt> of <em>object</em> to be added.
-    * @param hbaseUrl   The url of HBase with alerts as <tt>ip:port:table:schema</tt>.
+    * @param objectId   The {@code objectId} of <em>object</em> to be added.
+    * @param hbaseUrl   The url of HBase with alerts as {@code ip:port:table:schema}.
     * @throws LomikelException If anything fails. */
   public void classifySource(Classifier classifier,
                              String     objectId,
@@ -219,7 +123,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
    
   /** Classify <em>object</em>.
     * @param classifier The {@link Classifier} to be used.
-    * @param objectId   The <tt>objectId</tt> of <em>object</em> to be added.
+    * @param objectId   The {@code objectId} of <em>object</em> to be added.
     * @throws LomikelException If anything fails. */
   public void classifySource(Classifier classifier,
                              String     objectId) throws LomikelException {
@@ -279,9 +183,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     *                   It will be created if not yet exists.
     * @param weight     The weight of the connection.
     *                   Usualy the number of <em>Alerts</em> of this type. 
-    * @param instanceS  The <em>jd</em> of related <em>Alerts</em> as strings separated by comma.
+    * @param instancesS The <em>jd</em> of related <em>Alerts</em> as strings separated by comma.
     *                   Potential square brackets are removed.
-    *                   May be <tt>null</tt> or empty. */
+    *                   May be {@code null} or empty.
+    * @param weightsS   The corresponding per-alert weights, separated by comma. */
   public void registerOCol(Classifier classifier,
                            String     cls,
                            String     objectId,
@@ -516,7 +421,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
         
   /** Generate <em>overlaps</em> Edges between <em>OCol</em>.
     * Possibly between two {@link Classifier}s.
-    * @param classifier The {@link Classifier}s to be used. */
+    * @param classifiers The {@link Classifier}s to be used. */
   public void generateCorrelations(Classifier... classifiers) {
     if (!supportsTransactions()) {
       throw new UnsupportedOperationException("Atomic correlation regeneration requires rollback-capable transactions");
@@ -682,7 +587,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     log.info("" + ns + " object-object correlations generated");
     }
 
-  /** Find the endpoint selected by the existing indexed OCol lookup. */
+  /** Find the endpoint selected by the existing indexed OCol lookup.
+    * @param cls The logical OCol identity.
+    * @return The first matching physical OCol endpoint. */
   protected Vertex findOCol(OCol cls) {
     return g().V().has("lbl",        "OCol"          ).
                    has("survey",     cls.survey()    ).
@@ -693,7 +600,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Create a new {@link FinkHBaseClient}. Singleton when url unchanged.
-    * @param hbaseUrl The HBase url as <tt>ip:port:table[:schema]</tt>.
+    * @param hbaseUrl The HBase url as {@code ip:port:table[:schema]}.
     * @return         The corresponding {@link FinkHBaseClient}, created and initialised if needed.
     * @throws LomikelException If cannot be created. */
   public synchronized FinkHBaseClient fhclient(String hbaseUrl) throws LomikelException {
@@ -746,7 +653,7 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     }
     
   /** Give HBase url.
-    * @return The HBase url as <tt>ip:port:table[:schema]</tt>. */
+    * @return The HBase url as {@code ip:port:table[:schema]}. */
   public String hbaseUrl() {
     return _fhclientUrl;
     }
