@@ -67,9 +67,14 @@ import java.util.Map;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>FinkGremlinRecipiesG</code> provides various recipies to handle
-  * and modify Gremlin Graphs for Fink.
-  * <em>Optimised by AI (ChatGPT-5.6 via Hermes).</em>
+/** Fink-specific traversal, analysis, and batch-deletion helpers mixed into
+  * {@link FinkGremlinRecipiesG}.
+  *
+  * <p>The trait uses the implementing recipe's traversal source through
+  * {@code g()}. The destructive {@link #drop_by_date(String, int, int)} method
+  * calls the recipe's {@code commit()} once per batch; it does not own or close
+  * the recipe's source or client. Generic resource-owning helpers are inherited
+  * from {@link GremlinRecipiesGT}.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -78,7 +83,18 @@ import org.apache.logging.log4j.LogManager;
 // TBD: use classifier.survey
 public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
-  /** TBD */
+  /** Build a spatial and Julian-date traversal over vertices with a
+    * {@code direction} Geoshape and {@code jd} property. The traversal is
+    * returned without consuming it or committing a transaction.
+    * @param ra    Right ascension in degrees; converted to longitude by
+    *              subtracting 180 degrees.
+    * @param dec   Declination in degrees, used as latitude.
+    * @param ang   Search radius in degrees, converted to kilometres using
+    *              the Earth's mean radius.
+    * @param jdmin Exclusive lower bound on {@code jd}.
+    * @param jdmax Exclusive upper bound on {@code jd}.
+    * @param limit Maximum number of matching vertices in the traversal.
+    * @return A lazy traversal of matching vertices. */
   def GraphTraversal geosearch(double ra,
                                double dec,
                                double ang,
@@ -383,11 +399,15 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return limitMapMap(distances, nmax);
     }
 
-  /** Drop all {@link Vertex} with specified <em>importDate</em>.
-    * @param importDate The <em>importDate</em> of {@link Vertex}es to drop.
-    *                   It's format should be like <tt>Mon Feb 14 05:51:20 UTC 2022</tt>.
-    * @param nCommit    The number of {Vertex}es to drop before each commit.
-    * @param tWait      The times (in <tt>s</tt>) to wait after each commit. */
+  /** Drop vertices with the given {@code importDate} in batches, along with
+    * vertices reachable by one or two outgoing hops from each selected batch.
+    * This traversal does not restrict those reachable vertices by date; use
+    * only when that deletion scope is intended. Each batch invokes the
+    * implementing recipe's {@code commit()} after its drop traversals.
+    * @param importDate Exact {@code importDate} property to select; for example,
+    *                   {@code Mon Feb 14 05:51:20 UTC 2022}.
+    * @param nCommit    Positive maximum number of selected vertices per batch.
+    * @param tWait      Non-negative seconds to wait after each commit. */
   def drop_by_date(String importDate,
                    int    nCommit,
                    int    tWait) {
@@ -426,8 +446,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     }
     
-  /** Give status of importing from the <em>Import</em> {@link Vetex}es.
-    * @return The status of importing from the <em>Import</em> {@link Vetex}es. */
+  /** Report two status sections for vertices marked {@code lbl=Import}.
+    * The "Imported" section selects vertices with nonzero {@code nAlerts};
+    * the "Importing" section selects vertices without a {@code complete}
+    * property. These selections are independent and can overlap. Each section
+    * is ordered by {@code importSource}.
+    * @return Textual import status. */
   def String importStatus() {
     def txt = '';
     txt += 'Imported:\n';
