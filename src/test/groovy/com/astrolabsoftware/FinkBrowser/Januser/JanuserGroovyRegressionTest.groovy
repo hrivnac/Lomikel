@@ -338,6 +338,43 @@ final class JanuserGroovyRegressionTest {
                }
       assert recipes.classification('multi-property-object', 'TAG=f') == baseline :
              'filtering must use the same first multi-property values that projection exposes'
+
+      def reclassObject2 = source.addV('object').property('lbl', 'object').
+                                  property('objectId', 'multistage-object').next()
+      def srcA = source.addV('OCol').property('lbl', 'OCol').property('classifier', 'SRC2').
+                       property('flavor', '').property('cls', 'A').next()
+      def srcB = source.addV('OCol').property('lbl', 'OCol').property('classifier', 'SRC2').
+                       property('flavor', '').property('cls', 'B').next()
+      def midX = source.addV('OCol').property('lbl', 'OCol').property('classifier', 'MID2').
+                       property('flavor', '').property('cls', 'X').next()
+      def midY = source.addV('OCol').property('lbl', 'OCol').property('classifier', 'MID2').
+                       property('flavor', '').property('cls', 'Y').next()
+      def dstD1 = source.addV('OCol').property('lbl', 'OCol').property('classifier', 'DST2').
+                        property('flavor', '').property('cls', 'D1').next()
+      def dstD2 = source.addV('OCol').property('lbl', 'OCol').property('classifier', 'DST2').
+                        property('flavor', '').property('cls', 'D2').next()
+      srcA.addEdge('deepcontains', reclassObject2, 'lbl', 'deepcontains', 'weight', 0.6d)
+      srcB.addEdge('deepcontains', reclassObject2, 'lbl', 'deepcontains', 'weight', 0.4d)
+      midX.addEdge('overlaps', srcA, 'lbl', 'overlaps', 'intersection', 0.8d)
+      midY.addEdge('overlaps', srcA, 'lbl', 'overlaps', 'intersection', 0.2d)
+      midX.addEdge('overlaps', srcB, 'lbl', 'overlaps', 'intersection', 0.1d)
+      midY.addEdge('overlaps', srcB, 'lbl', 'overlaps', 'intersection', 0.9d)
+      dstD1.addEdge('overlaps', midX, 'lbl', 'overlaps', 'intersection', 0.7d)
+      dstD2.addEdge('overlaps', midX, 'lbl', 'overlaps', 'intersection', 0.3d)
+      dstD1.addEdge('overlaps', midY, 'lbl', 'overlaps', 'intersection', 0.2d)
+      dstD2.addEdge('overlaps', midY, 'lbl', 'overlaps', 'intersection', 0.8d)
+      recipes.gCount = 0
+      assert recipes.reclassification('missing-multistage-object', 'SRC2', 'MID2', 'a=b=c', 10, false).isEmpty() :
+             'malformed destination must stay unobserved when no source classification exists'
+      assert recipes.reclassification('multistage-object', 'SRC2', 'NO-MID', 'a=b=c', 10, false).isEmpty() :
+             'malformed destination must stay unobserved when no intermediate class exists'
+      recipes.gCount = 0
+      def multistage = recipes.reclassification('multistage-object', 'SRC2', 'MID2', 'DST2', 10, false)
+      assert multistage.keySet().toList() == ['D2', 'D1']
+      assert Math.abs(multistage.D2 - 0.54d) < 1.0e-12
+      assert Math.abs(multistage.D1 - 0.46d) < 1.0e-12
+      assert recipes.gCount == 3 :
+             "multistage reclassification must use classification plus two bulk traversals; calls=${recipes.gCount}"
       }
     finally {
       source.close()

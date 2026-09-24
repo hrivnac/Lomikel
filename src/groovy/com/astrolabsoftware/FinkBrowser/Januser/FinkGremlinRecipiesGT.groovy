@@ -678,9 +678,61 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def wMid;
     def cf = classifierWithFlavor(srcClassifier);
     def cg = classifierWithFlavor(midClassifier);
+    def bulkReclassify = {Collection<String> classes, sourceCf, destinationCf ->
+      def classifications = [:];
+      classes.each {cls -> classifications[cls] = [:]};
+      if (!classes.isEmpty()) {
+        def branches = classes.collect {cls ->
+          V().has('lbl',        'OCol').
+              has('classifier', sourceCf[0]).
+              has('flavor',     sourceCf[1]).
+              has('cls',        cls).
+              inE('overlaps').
+              as('e').
+              filter(outV().has('lbl',        'OCol').
+                            has('classifier', destinationCf[0]).
+                            has('flavor',     destinationCf[1])).
+              project('src', 'dst', 'intersection').
+              by(constant(cls)).
+              by(outV().values('cls')).
+              by(select('e').values('intersection'))
+          };
+        g().inject(0).
+            union(*(branches as GraphTraversal[])).
+            each {row ->
+              def classification = classifications[row['src']];
+              def previous = classification[row['dst']];
+              if (previous == null || row['intersection'] > previous) {
+                classification[row['dst']] = row['intersection'];
+                }
+              };
+        classifications.each {cls, classification ->
+          classifications[cls] = classification.sort{-it.value};
+          };
+        }
+      return classifications;
+      };
+    def sourceClasses = new LinkedHashSet<String>();
+    classified.each {it ->
+      if (it.classifier == cf[0] && it.flavor == cf[1]) {
+        sourceClasses.add(it.class);
+        }
+      }
+    def sourceToMid = bulkReclassify(sourceClasses, cf, cg);
+    def midClasses = new LinkedHashSet<String>();
+    classified.each {it ->
+      if (it.classifier == cf[0] && it.flavor == cf[1]) {
+        sourceToMid[it.class].each {clsMid, intersectionMid -> midClasses.add(clsMid)};
+        }
+      }
+    def midToDestination = [:];
+    if (!midClasses.isEmpty()) {
+      def ch = classifierWithFlavor(dstClassifier);
+      midToDestination = bulkReclassify(midClasses, cg, ch);
+      }
     classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
-                             wMid = reclassify(it.class, 'OCol', srcClassifier, midClassifier);
-                             wMid.each {clsMid, intersectionMid -> w = reclassify(clsMid, 'OCol', midClassifier, dstClassifier);
+                             wMid = sourceToMid[it.class];
+                             wMid.each {clsMid, intersectionMid -> w = midToDestination[clsMid];
                                             w.each {cls, intersection -> if (reclassified[cls] == null) {
                                                                            reclassified[cls] = 0;
                                                                            }
@@ -896,6 +948,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return overlaps;
     }
     
+
   /** Give classification from another {@link Classifier}.
     * Using accumulated data in graph.
     * @param cls           The class in the object classifier. 
