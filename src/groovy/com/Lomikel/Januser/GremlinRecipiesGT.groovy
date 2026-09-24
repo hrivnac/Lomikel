@@ -5,7 +5,6 @@ import com.Lomikel.HBaser.HBaseClient
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
-import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.property;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V;
@@ -29,15 +28,18 @@ import static org.apache.tinkerpop.gremlin.process.traversal.Scope.local;
 // JanusGraph
 import org.janusgraph.core.JanusGraphFactory;
 
-// Groovy
-import groovy.sql.Sql
-
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>GremlinRecipiesGT</code> provides various recipies to handle
-  * and modify Gremlin Graphs.
+/** Adds generic Groovy traversal helpers to a {@link GremlinRecipies} host.
+  *
+  * <p>The trait does not own a traversal source. Calls to {@code g()} and
+  * {@code commit()} resolve against the implementing recipe. Traversal-building
+  * helpers can operate on a remote source. {@link #getDataLink(Object, String)}
+  * closes the temporary resources it creates. The lower-level
+  * {@code createHBaseDataLinkClient} and {@code openDataLinkGraph} factories,
+  * and {@link #myGraph(String)}, instead return caller-owned resources.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -72,6 +74,13 @@ trait GremlinRecipiesGT {
           
     
   /** Get (if it exists) or create an {@link Edge} between two vertices.
+    * @param lbl1   The outgoing vertex label mirrored in {@code lbl}.
+    * @param name1  The outgoing vertex identity-property name.
+    * @param value1 The outgoing vertex identity-property value.
+    * @param lbl2   The incoming vertex label mirrored in {@code lbl}.
+    * @param name2  The incoming vertex identity-property name.
+    * @param value2 The incoming vertex identity-property value.
+    * @param edge   The native edge label, also copied to {@code lbl}.
     * @return The found or created {@link Edge} traversal. */
   def GraphTraversal get_or_create_edge(String lbl1,
                                         String name1,
@@ -89,7 +98,9 @@ trait GremlinRecipiesGT {
                         addE(edge).from('fromVertex').property('lbl', edge));
     }
 
-  /** Obsolete incomplete signature retained for source compatibility. */
+  /** Obsolete incomplete signature retained only for source compatibility.
+    * @deprecated Use {@link #get_or_create_edge(String, String, String,
+    * String, String, String, String)} with both endpoints and the edge label. */
   @Deprecated
   def GraphTraversal get_or_create_edge(String lbl,
                                         String name,
@@ -172,7 +183,8 @@ trait GremlinRecipiesGT {
   /** Calculate deviations of {@link Vertex}es.
     * @param lbl           The label for {@link Vertex}es to evaluate.
     * @param variableNames The names of variables to analyse. 
-    * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
+    * @return              The {@link Map} with results as
+    *                      {@code variableName - deviation}. */
   def Map standardDeviationV(String       lbl,
                              List<String> variableNames) {
     def sdMap = [:];
@@ -198,7 +210,8 @@ trait GremlinRecipiesGT {
   /** Calculate deviations of {@link Edge}s.
     * @param lbl           The label for {@link Edge}s to evaluate.
     * @param variableNames The names of variables to analyse. 
-    * @return              The {Link Map} with results as <tt>variableName - deviation</tt>. */
+    * @return              The {@link Map} with results as
+    *                      {@code variableName - deviation}. */
   def Map standardDeviationE(String       lbl,
                              List<String> variableNames) {
     def sdMap = [:];
@@ -221,9 +234,12 @@ trait GremlinRecipiesGT {
     return sdMap;
     }
    
-  /** Create a new {@link Graph} (on the default storage).
+  /** Create a new embedded {@link Graph} independent of the recipe source.
     * @param myName The name of the created {@link Graph}.
-    *               If <tt>null</tt>, the graph will be only created in memory.
+    *               If {@code null}, the graph is created in memory; otherwise
+    *               the recipe instance must expose a {@code config} property
+    *               with {@code getString} values for the storage backend,
+    *               hostname, and port.
     * @return       The created {@link Graph}. */
   def Graph myGraph(String myName = null) {
     def graph0
@@ -303,13 +319,14 @@ trait GremlinRecipiesGT {
   /** Give data associated with <em>datalink</em> {@link Vertex}.
     * The <em>datalink</em>s can be created like this:
     * <pre>
-    * w = g.addV().property('lbl', 'datalink').property('technology', 'Graph'  ).property('url', 'hbase:188.184.87.217:8182:janusgraph'     ).property('query', "g.V().limit(1)").next()
-    * w = g.addV().property('lbl', 'datalink').property('technology', 'HBase'  ).property('url', '157.136.250.219:2183:ztf:schema'            ).property('query', "return client.scan('object_1', null, '*', 0, true, true)").next()
+    * w = g.addV().property('lbl', 'datalink').property('technology', 'Graph').property('url', 'hbase:storage-host:2181:janusgraph').property('query', "g.V().limit(1)").next()
+    * w = g.addV().property('lbl', 'datalink').property('technology', 'HBase').property('url', 'hbase-host:2181:table:schema').property('query', "return client.scan('object_1', null, '*', 0, true, true)").next()
     * </pre>
     * @param v The <em>datalink</em> {@link Vertex}.
-    * @param q The special (external) database query to be used in place of the standard one. Optiponal.
+    * @param q The optional external-database query used instead of the stored one.
     * @return The <em>datalink</em> content. */
-    def String getDataLink(v, // TBD: type ?
+    // Kept dynamically typed for source compatibility with existing Groovy callers.
+    def String getDataLink(v,
                            String q = null) {
     def url   = v.values('url'  ).next();
     def query;
@@ -325,7 +342,7 @@ trait GremlinRecipiesGT {
     try {
       switch (v.values('technology').next()) {
         case 'HBase':
-          def (hostname, port, table, schema) = url.split(':'); // 157.136.250.219:2181:ztf:schema_0.7.0_0.3.8
+          def (hostname, port, table, schema) = url.split(':');
           def client
           try {
             client = createHBaseDataLinkClient(hostname, port)
@@ -343,7 +360,7 @@ trait GremlinRecipiesGT {
               }
             }
         case 'Graph':
-          def (backend, hostname, port, table) = url.split(':'); // hbase:188.184.87.217:8182:janusgraph
+          def (backend, hostname, port, table) = url.split(':');
           def targetGraph
           def targetSource
           try {
