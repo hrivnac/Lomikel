@@ -1,21 +1,16 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
 import com.Lomikel.Januser.ModifyingGremlinClient;
-import com.Lomikel.Januser.GremlinRecipies;
-import com.Lomikel.HBaser.HBaseClient;
-
-import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
-import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies;
 
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 
-// Log4J
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-/** <code>FinkGremlinRecipiesG</code> provides various recipies to handle
-  * and modify Gremlin Graphs for Fink.
+/** Concrete composition of Fink Java mutations and Groovy traversal analyses.
+  *
+  * <p>This class adds no graph or lifecycle state. Ordinary inherited
+  * operations share the traversal source and optional client owned by {@link
+  * FinkGremlinRecipies}. Generic methods documented as opening independent
+  * resources retain their own explicit ownership contracts.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -36,7 +31,4 @@ public class FinkGremlinRecipiesG extends FinkGremlinRecipies
     super(client);
     }
     
-  /** Logging . */
-  private static Logger log = LogManager.getLogger(FinkGremlinRecipiesG.class);
-
   }

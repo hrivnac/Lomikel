@@ -3,12 +3,13 @@ package com.Lomikel.Januser;
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 
-// Log4J
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-/** <code>GremlinRecipiesG</code> provides various recipies to handle
-  * and modify Gremlin Graphs.
+/** Concrete composition of the Java mutation recipes and Groovy traversal
+  * helpers.
+  *
+  * <p>This class adds no graph or lifecycle state. Ordinary inherited Java and
+  * trait operations use the traversal source and optional client owned by
+  * {@link GremlinRecipies}. Methods documented as opening independent
+  * resources retain their own explicit ownership contracts.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -28,8 +29,5 @@ public class GremlinRecipiesG extends GremlinRecipies
   public GremlinRecipiesG(ModifyingGremlinClient client) {
     super(client);
     }
-    
-  /** Logging . */
-  private static Logger log = LogManager.getLogger(GremlinRecipiesG.class);
     
   }
