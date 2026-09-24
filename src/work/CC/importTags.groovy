@@ -48,28 +48,37 @@ client.startScan(null,
                  null,
                  now - 90000000 * delay,
                  now,
-                 false,
+                 true,
                  false);
                 
-while (client.scanning() || client.size() > 0) {
-  if (client.size() > 0) {
-    client.poll().each {k, v -> (mjd, oid) = k.tokenize('_');
-                                 gr.g().addV('NewTag')
-                                       .property('lbl',      'NewTag')
-                                       .property('objectId', oid)
-                                       .property('cls',      cls)
-                                       .property('mjd',      mjd)
-                                       .iterate();
-                         }
-    if (timer.report(cls + ": ")) {
-      gr.commit();
+try {
+  while (client.scanPending() || client.size() > 0) {
+    if (client.size() > 0) {
+      client.poll().each {k, v -> (mjd, oid) = k.tokenize('_');
+                                   gr.g().addV('NewTag')
+                                         .property('lbl',      'NewTag')
+                                         .property('objectId', oid)
+                                         .property('cls',      cls)
+                                         .property('mjd',      mjd)
+                                         .iterate();
+                           }
+      if (timer.report(cls + ": ")) {
+        gr.commit();
+        }
+      }
+    else {
+      Thread.sleep(50);
       }
     }
-  }
-  
-gr.commit();
 
-client.stop();
-client.close();
+  if (client.scanFailure() != null) {
+    throw new IllegalStateException('NewTag HBase scan failed', client.scanFailure());
+    }
+  gr.commit();
+  }
+finally {
+  client.stop();
+  client.close();
+  }
 
 //NotifierURL.notifyExecution("importTags-LSST", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));

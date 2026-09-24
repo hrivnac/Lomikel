@@ -16,4 +16,4 @@ jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CCRW.properties");
 gr = new FinkGremlinRecipiesG(jc);
     
 log.info("Cleaning already processed NewTags");
-gr.dropV("NewTag", 1000, "processed", "true");
+gr.dropV("NewTag", 1000, "processed", true);

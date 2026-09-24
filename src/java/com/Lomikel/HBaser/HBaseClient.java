@@ -559,11 +559,17 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         }
       catch (IOException e) {
         log.error("Cannot search", e);
+        handleScanIOException(e);
         }
       }
     log.debug(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
     return results;
     } 
+
+  /** Preserve synchronous partial-result behavior; asynchronous clients may fail the scan. */
+  protected void handleScanIOException(IOException failure) {
+    // The synchronous scan API historically returns any rows already read.
+    }
 
   @Override 
   // TBD: refactor with scan

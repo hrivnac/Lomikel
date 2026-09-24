@@ -13,6 +13,8 @@ import static cds.healpix.VerticesAndPathComputer.LAT_INDEX;
 import org.json.JSONObject;
 
 // Java
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;  
 import java.util.TreeMap;  
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -82,15 +84,24 @@ public class AsynchHBaseClient extends    HBaseClient
         }
       }
     catch (InterruptedException e) {
+      if (_doscan || _scanning) {
+        _scanFailure = e;
+        }
       _doscan = false;
       _scanning = false;
       log.info("Asynchronous scan interrupted");
       }
     catch (Exception e) {
+      _scanFailure = e;
       _doscan = false;
       _scanning = false;
       log.error("Asynchronous scan failed", e);
       }
+    }
+
+  @Override
+  protected void handleScanIOException(IOException failure) {
+    throw new UncheckedIOException("Asynchronous HBase scan failed", failure);
     }
     
   /** Start scan assynchronously.
@@ -132,6 +143,7 @@ public class AsynchHBaseClient extends    HBaseClient
       _scanStop   = stop;
       _scanIfkey  = ifkey;
       _scanIftime = iftime;
+      _scanFailure = null;
       _doscan     = true;
       log.info("Scheduling asynchronous scan");
       }
@@ -285,6 +297,16 @@ public class AsynchHBaseClient extends    HBaseClient
   public boolean scanning() {
     return _scanning;
     }
+
+  /** Whether a scheduled scan is pending, even before its worker starts. */
+  public boolean scanPending() {
+    return _doscan || _scanning;
+    }
+
+  /** Failure of the last asynchronous scan, or null if none was recorded. */
+  public Exception scanFailure() {
+    return _scanFailure;
+    }
     
   /** Set maximum size of the queue.
     * Queue accumlation will stop till its size goes bellow this limit.
@@ -332,8 +354,9 @@ public class AsynchHBaseClient extends    HBaseClient
   protected boolean _scanIfkey; 
   protected boolean _scanIftime;
     
-  protected boolean _doscan   = false;  
-  protected boolean _scanning = false;
+  protected volatile boolean _doscan   = false;
+  protected volatile boolean _scanning = false;
+  protected volatile Exception _scanFailure;
   
   protected int     _loopWait = 1000; // 1s = 1000ms
   
