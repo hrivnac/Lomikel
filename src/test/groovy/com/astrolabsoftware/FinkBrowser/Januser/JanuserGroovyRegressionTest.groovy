@@ -103,6 +103,20 @@ final class JanuserGroovyRegressionTest {
       assert recipes.commitCount == 3 :
              'dropV must commit each actual batch through the recipe abstraction'
 
+      source.addV('NewTag').property('lbl', 'NewTag').property('processed', true).iterate()
+      source.addV('NewTag').property('lbl', 'NewTag').property('processed', false).iterate()
+      source.tx().commit()
+      recipes.dropV('NewTag', 1, 'processed', true)
+      assert source.V().has('lbl', 'NewTag').has('processed', true).count().next() == 0L :
+             'boolean processed tags must be removed by the batch helper'
+      assert source.V().has('lbl', 'NewTag').has('processed', false).count().next() == 1L :
+             'cleanup must leave unprocessed tags untouched'
+      source.addV('legacy').property('lbl', 'legacy').property('state', 'done').iterate()
+      source.tx().commit()
+      recipes.dropV('legacy', 1, 'state', 'done')
+      assert source.V().has('lbl', 'legacy').count().next() == 0L :
+             'string attribute calls must keep their existing behavior'
+
       6.times {
         def edgeFrom = source.addV('batchEndpoint').next()
         def edgeTo = source.addV('batchEndpoint').next()

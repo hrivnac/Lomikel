@@ -117,6 +117,25 @@ trait GremlinRecipiesGT {
             int    n,
             String attName  = null,
             String attValue = null) {
+    dropVMatching(label, n, attName, attValue)
+    }
+
+  /** Drop vertices matching a boolean attribute without converting it to text.
+    * @param label    The vertex label marker.
+    * @param n        Maximum vertices dropped per commit.
+    * @param attName  Attribute name to match.
+    * @param attValue Boolean attribute value. */
+  def dropV(String label,
+            int    n,
+            String attName,
+            boolean attValue) {
+    dropVMatching(label, n, attName, attValue)
+    }
+
+  private def dropVMatching(String label,
+                            int    n,
+                            String attName,
+                            Object attValue) {
     if (n <= 0) {
       throw new IllegalArgumentException('Batch size must be positive')
       }
