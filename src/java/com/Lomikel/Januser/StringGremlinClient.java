@@ -1,9 +1,6 @@
 package com.Lomikel.Januser;
 
 // Tinker Pop
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 import org.apache.tinkerpop.gremlin.util.MessageSerializer;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONMapper;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3;
@@ -12,7 +9,6 @@ import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.ResultSet;
 import org.apache.tinkerpop.gremlin.driver.Result;
 import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerIoRegistryV3;
 import org.apache.tinkerpop.gremlin.util.ser.GraphSONMessageSerializerV3;
 
 // Java
@@ -22,7 +18,11 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>StringGremlinClient</code> provides connection to Gremlin Graph passing Gremlin commands as Strings.
+/** Submits complete Gremlin scripts to a remote Gremlin server.
+  *
+  * <p>This API is deliberately separate from typed traversal recipes: the
+  * server evaluates each string and the client converts driver results for
+  * callers that explicitly need script submission.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -30,9 +30,9 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class StringGremlinClient extends GremlinClient {
    
-  /** Create with connection parameters, using <em>GraphBinary</em> serializer.
+  /** Create with connection parameters, using the GraphSON serializer.
     * @param hostname The Gremlin hostname.
-    * @param table    The Gremlin port. */
+    * @param port     The Gremlin port. */
   public StringGremlinClient(String  hostname,
                              int     port) {
     super(hostname, port, true);
@@ -41,7 +41,7 @@ public class StringGremlinClient extends GremlinClient {
    
   /** Open with <em>GraphSON</em> serializer.
     * @param hostname The Gremlin hostname.
-    * @param table    The Gremlin port. */
+    * @param port     The Gremlin port. */
   @Override
   public void open(String hostname,
                    int    port) {

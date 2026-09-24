@@ -16,10 +16,6 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
 
-// HBase
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Get;
-
 // Java
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -27,16 +23,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>GremlinRecipies</code> provides various recipies to handle and modify Gramlin Graphs.
+/** Common graph mutation and lifecycle recipes.
+  *
+  * <p>The package documentation describes client modes, transaction ownership,
+  * and the native-label/{@code lbl} invariant used by these operations.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -57,12 +54,14 @@ public class GremlinRecipies {
     _g      = client.g();
     }
   
-public GraphTraversal<Vertex, Vertex> allV() {
+  /** Start a traversal over all vertices.
+    * @return A traversal over all vertices in the attached graph. */
+  public GraphTraversal<Vertex, Vertex> allV() {
     return g().V();
-}    
-    
-    
-  /** Extract implicite schema. */
+    }
+
+
+  /** Extract the implicit schema into the meta-schema subgraph. */
   public void createMetaSchema() {
     GraphTraversalSource source = g();
     log.info("Cleaning MetaGraph");
@@ -200,7 +199,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
   /** Get {@link Vertex}es, create them if necessary.
     * @param label          The {@link Vertex} label.
     * @param propertyNames  The name of {@link Vertex} properties.
-    * @param propertyValues The value of {@link Vertex} properties (<tt>*</tt> will skip search for that value).
+    * @param propertyValues The value of {@link Vertex} properties ({@code *} will skip search for that value).
     * @return               The created {@link Vertex}es. */
   public synchronized GraphTraversal<Vertex, Vertex> getOrCreate(String   label,
                                                                  String[] propertyNames,
@@ -328,7 +327,13 @@ public GraphTraversal<Vertex, Vertex> allV() {
       }
     }
     
-  /** Add an edge with heterogeneously typed properties. */
+  /** Add an edge with heterogeneously typed properties.
+    * @param v1       The outgoing endpoint.
+    * @param v2       The incoming endpoint.
+    * @param relation The native edge label, also copied to {@code lbl}.
+    * @param names    The property names.
+    * @param values   The property values in the same order as {@code names}.
+    * @param reset    Whether to replace properties on one existing edge. */
   public synchronized void addEdge(Vertex   v1,
                       Vertex   v2,
                       String   relation,
@@ -460,9 +465,9 @@ public GraphTraversal<Vertex, Vertex> allV() {
       }
     }
     
-  /** Give the porting {@link ModifyingGremlinClient}.
-    * @return The porting {@link ModifyingGremlinClient}.
-    *         <tt>null</tt> if directkly connected to graph. */
+  /** Return the owning {@link ModifyingGremlinClient}.
+    * @return The owning client, or {@code null} when this recipe was attached
+    *         directly to a traversal source. */
   public ModifyingGremlinClient client() {
     return _client;
     }
@@ -470,7 +475,7 @@ public GraphTraversal<Vertex, Vertex> allV() {
   /** Check multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
-    * @param values The property values (<tt>null</tt> or <tt>"*"</tt> will skip that property).
+    * @param values The property values ({@code null} or {@code "*"} will skip that property).
     * @return       The resulting  {@link GraphTraversal} carrying {@link Vertex}es. */
   private GraphTraversal<Vertex, Vertex> hasProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
@@ -490,8 +495,8 @@ public GraphTraversal<Vertex, Vertex> allV() {
   /** Add multiple properties.
     * @param v      The {@link GraphTraversal} carrying {@link Vertex}es.
     * @param names  The properties names.
-    * @param values The property values (<tt>null</tt> or <tt>"*"</tt> will skip that property).
-    * @return       The resulting  {@link GraphTraversal} carrying {@link Vnew String(value)ertex}es. */
+    * @param values The property values ({@code null} or {@code "*"} will skip that property).
+    * @return       The resulting {@link GraphTraversal} carrying {@link Vertex}es. */
   private GraphTraversal<Vertex, Vertex> addProperties(GraphTraversal<Vertex, Vertex> v,
                                                        String[]                       names,
                                                        Object[]                       values) {
@@ -534,9 +539,9 @@ public GraphTraversal<Vertex, Vertex> allV() {
     addEdge(vertex, datalink, "from");
     }
     
-  /** Give status of the most recent creation operation.
-    * @return Whether the most recent <tt>#getOrCreate</tt>
-    * or <tt>#checkEdge</tt> operation created new object. */
+  /** Return the status of the most recent creation operation in this thread.
+    * @return Whether the most recent {@code getOrCreate} or {@code checkEdge}
+    *         operation created a new element. */
   public boolean created() {
     return !_found.get();
     }  
@@ -555,8 +560,8 @@ public GraphTraversal<Vertex, Vertex> allV() {
     *                   unless <code>inclCycles = true</code>.
     * @param inclCycles Whether include cycles. If <code>false</code>,
     *                   function will only traverse in one direction (in or out),
-    *                   without going back. If <true>true</code>, each step will
-    *                   both directions.
+    *                   without going back. If {@code true}, each step will
+    *                   traverse both directions.
     * @param onlyLabels Restrict replication to some labels. Can be <code>null</code>.
     * @return           The cloned {@link Vertex} or <code> null</code>. */
   public Vertex gimme(Vertex               v,
