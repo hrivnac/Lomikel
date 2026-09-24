@@ -560,9 +560,25 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     for (Vertex malformedScopedOCol : malformedScopedOCols) {
       g().V(malformedScopedOCol).drop().iterate();
       }
-    // Replace correlations only for OCols in the requested scope.
+    // Preserve overlaps crossing the requested-scope boundary; those require
+    // both classifier scopes to be regenerated together.
+    Set<Object> scopedIds = new HashSet<>();
     for (Vertex scopedOCol : scopedOCols) {
-      g().V(scopedOCol).bothE("overlaps").drop().iterate();
+      scopedIds.add(scopedOCol.id());
+      }
+    Set<Object> internalOverlapIds = new HashSet<>();
+    for (Vertex scopedOCol : scopedOCols) {
+      Iterator<Edge> overlapsIt = scopedOCol.edges(Direction.BOTH, "overlaps");
+      while (overlapsIt.hasNext()) {
+        Edge oldOverlap = overlapsIt.next();
+        if (scopedIds.contains(oldOverlap.outVertex().id()) &&
+            scopedIds.contains(oldOverlap.inVertex().id())) {
+          internalOverlapIds.add(oldOverlap.id());
+          }
+        }
+      }
+    if (!internalOverlapIds.isEmpty()) {
+      g().E(internalOverlapIds.toArray()).drop().iterate();
       }
     // Create overlaps
     int ns = 0;

@@ -14,6 +14,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 Configurator.initialize(null, "../src/java/log4j2.xml")
 
 delay = 1;
+startupWaitMillis = 30000;
 
 log = LogManager.getLogger(this.class)
 
@@ -46,24 +47,42 @@ client.startScan(null,
                  true,
                  false);
 
-while (!(client.scanning() || client.size() > 0)) {
-  println("waiting...");
-  }
-timer.start();
-while (client.scanning() || client.size() > 0) {
-  if (client.size() > 0) {
-    //println(client.size() + ":");
-    client.poll().each {k, v -> for (Classifier classifier : classifiers) {
-                                  try {
-                                    gr.classifySource(classifier, v.get("i:objectId"));
-                                    }
-                                  catch (Exception e) {
-                                    log.error("Cannot classify " + v.get("i:objectId") + " with " + classifier, e);
-                                    }
-                                  }
-                         }
-    timer.report();
+// The scan can start asynchronously, but a completed empty scan must not wait forever.
+try {
+  long startupDeadline = System.currentTimeMillis() + startupWaitMillis;
+  while (client.scanPending() && !client.scanning() && client.size() == 0 &&
+         System.currentTimeMillis() < startupDeadline) {
+    Thread.sleep(100);
     }
+  if (client.scanPending() && !client.scanning() && client.size() == 0) {
+    throw new IllegalStateException('ZTF HBase scan did not start before deadline');
+    }
+  timer.start();
+  while (client.scanPending() || client.size() > 0) {
+    if (client.size() > 0) {
+      client.poll().each {k, v -> for (Classifier classifier : classifiers) {
+                                    try {
+                                      gr.classifySource(classifier, v.get("i:objectId"));
+                                      }
+                                    catch (Exception e) {
+                                      log.error("Cannot classify " + v.get("i:objectId") + " with " + classifier, e);
+                                      throw e;
+                                      }
+                                    }
+                           }
+      timer.report();
+      }
+    else {
+      Thread.sleep(100);
+      }
+    }
+  if (client.scanFailure() != null) {
+    throw new IllegalStateException('ZTF HBase scan failed', client.scanFailure());
+    }
+  }
+finally {
+  client.stop();
+  client.close();
   }
 
 gr.generateCorrelations(classifiers);

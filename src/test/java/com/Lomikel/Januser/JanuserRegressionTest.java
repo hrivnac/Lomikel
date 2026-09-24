@@ -632,18 +632,29 @@ public final class JanuserRegressionTest {
                                 property("survey", "LSST").property("classifier", "OTHER").
                                 property("flavor", "").property("cls", "external-b").next();
       externalA.addEdge("overlaps", externalB, "lbl", "overlaps", "marker", "keep");
-      selectedOCol.addEdge("overlaps", externalA, "lbl", "overlaps", "marker", "stale");
+      selectedOCol.addEdge("overlaps", externalA, "lbl", "overlaps", "marker", "boundary-out");
+      externalB.addEdge("overlaps", selectedOCol, "lbl", "overlaps", "marker", "boundary-in");
+      selectedOCol.addEdge("overlaps", selectedOCol, "lbl", "overlaps", "marker", "internal-stale");
       Vertex malformedUnrelated = client.g().addV("OCol").property("lbl", "OCol").
                                           property("classifier", "BROKEN").property("flavor", "").
                                           property("cls", "malformed-unrelated").next();
       malformedUnrelated.addEdge("deepcontains", object, "lbl", "deepcontains", "weight", 1.0);
+      client.commit();
+      Object boundaryOutId = client.g().E().has("marker", "boundary-out").next().id();
+      Object boundaryInId = client.g().E().has("marker", "boundary-in").next().id();
 
       recipes.generateCorrelations(selected);
 
       require(client.g().E().has("marker", "keep").hasNext(),
               "regeneration must preserve overlaps outside the requested classifier scope");
-      require(!client.g().E().has("marker", "stale").hasNext(),
-              "regeneration must remove stale overlaps adjacent to requested OCols");
+      require(client.g().E(boundaryOutId).has("marker", "boundary-out").
+                     has("lbl", "overlaps").hasNext(),
+              "regeneration must preserve outgoing boundary edge identity and properties");
+      require(client.g().E(boundaryInId).has("marker", "boundary-in").
+                     has("lbl", "overlaps").hasNext(),
+              "regeneration must preserve incoming boundary edge identity and properties");
+      require(!client.g().E().has("marker", "internal-stale").hasNext(),
+              "regeneration must replace stale internal overlaps");
       require(!client.g().V().has("lbl", "OCol").has("cls", "unrelated").bothE("overlaps").hasNext(),
               "regeneration must not include classifications outside the requested scope");
       require(client.g().V(selectedOCol).outE("overlaps").where(inV().is(selectedOCol)).

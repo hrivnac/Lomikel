@@ -1,14 +1,18 @@
 #!/usr/bin/bash -l
-NOW=`date +"%Y%m%d%H%M%s"`
-LOG=/tmp/fillOCol-${NOW}.log
-LOCK=/tmp/fillOCol.lock 
-if [[ -e ${LOCK} ]]; then
-  echo "Already filling OCol with ${LOCK}"
-  exit
-  fi
-PID=$$
-echo ${PID} > ${LOCK}
-cd ~/Lomikel/ant
-source ./setup.sh
-java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/IJCLab/fillOCol.groovy | tee -a ${LOG} 2>&1
-/bin/rm -f ${LOCK} 
+NOW=$(date +"%Y%m%d%H%M%S")
+LOG=$(mktemp "${TMPDIR:-/tmp}/fillOCol-${NOW}-XXXXXXXX.log") || exit 1
+LOCK_DIR="${HOME}/.cache/Lomikel/cron"
+mkdir -p -m 700 "${LOCK_DIR}" || exit 1
+LOCK="${LOCK_DIR}/fillOCol.lock"
+
+# Keep the lock file: removing a flock file permits two different inodes/owners.
+exec 9>"${LOCK}" || exit 1
+if ! flock -n 9; then
+  echo "Already filling OCol with ${LOCK}" >&2
+  exit 1
+fi
+
+exec >>"${LOG}" 2>&1 || exit 1
+cd ~/Lomikel/ant || exit 1
+source ./setup.sh || exit 1
+exec java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/IJCLab/fillOCol.groovy
