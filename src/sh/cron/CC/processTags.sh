@@ -9,11 +9,11 @@ LOCK="${LOCK_DIR}/processTags.lock"
 # Keep the lock file: removing a flock file permits two different inodes/owners.
 exec 9>"${LOCK}"
 if ! flock -n 9; then
-  echo "Already processing tags (${LOCK})" >&2
+  echo "Already processing tags with ${LOCK}" >&2
   exit 75
   fi
   
-exec >>"${LOG}" 2>&1 || exit 1
+exec > >(tee -a "${LOG}") 2>&1 || exit 1
 cd ~/Lomikel/ant
 source ./setup.sh
-java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/processTags.groovy 2>&1 | tee -a "${LOG}"
+java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/processTags.groovy
