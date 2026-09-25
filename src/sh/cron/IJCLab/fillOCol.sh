@@ -1,7 +1,8 @@
 #!/usr/bin/bash -l
-NOW=$(date +"%Y%m%d%H%M%S")
+set -eo pipefail
+NOW=$(date +"%Y%m%d%H%M%s")
 LOG=$(mktemp "${TMPDIR:-/tmp}/fillOCol-${NOW}-XXXXXXXX.log") || exit 1
-LOCK_DIR="${HOME}/.cache/Lomikel/cron"
+LOCK_DIR="/tmp"
 mkdir -p -m 700 "${LOCK_DIR}" || exit 1
 LOCK="${LOCK_DIR}/fillOCol.lock"
 
@@ -9,8 +10,8 @@ LOCK="${LOCK_DIR}/fillOCol.lock"
 exec 9>"${LOCK}" || exit 1
 if ! flock -n 9; then
   echo "Already filling OCol with ${LOCK}" >&2
-  exit 1
-fi
+  exit 75
+  fi
 
 exec >>"${LOG}" 2>&1 || exit 1
 cd ~/Lomikel/ant || exit 1
