@@ -443,6 +443,10 @@ public class FinkGremlinRecipies extends GremlinRecipies {
   /** Generate correlations inside one caller-owned transaction. */
   private void generateCorrelationsInTransaction(Classifier... classifiers) {
     log.info("Generating correlations for OCol of " + Arrays.asList(classifiers));
+    // Clean all correlations 
+    g().E().has("lbl", "overlaps").
+            drop().
+            iterate();
     Set<String> classifierScopes = new HashSet<>();
     List<Vertex> scopedOCols = new ArrayList<>();
     List<Vertex> malformedScopedOCols = new ArrayList<>();
