@@ -16,4 +16,4 @@ if ! flock -n 9; then
 exec >>"${LOG}" 2>&1 || exit 1
 cd ~/Lomikel/ant || exit 1
 source ./setup.sh || exit 1
-exec java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/IJCLab/fillOCol.groovy
+exec java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/IJCLab/fillOCol.groovy 2>&1 | tee -a "${LOG}"
