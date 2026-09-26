@@ -71,8 +71,9 @@ try {
                                       gr.classifySource(classifier, v.get("i:objectId"));
                                       }
                                     catch (Exception e) {
-                                      log.error("Cannot classify " + v.get("i:objectId") + " with " + classifier, e);
-                                      throw e;
+                                      log.error("Cannot classify " + v.get("i:objectId") + " with " + classifier);
+                                      log.debug("Cannot classify " + v.get("i:objectId") + " with " + classifier, e);
+                                      //throw e;
                                       }
                                     }
                            }
