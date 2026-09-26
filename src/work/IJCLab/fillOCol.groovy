@@ -13,7 +13,8 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml")
 
-delay = 1;
+delay1 = 1;
+delay2 = 2
 startupWaitMillis = 30000;
 
 log = LogManager.getLogger(this.class)
@@ -42,8 +43,8 @@ client.setEvaluation(formula);
 client.startScan(null,
                  null,
                  "i:objectId",
-                 now - 90000000 * delay,
-                 now,
+                 now - 90000000 * delay1,
+                 now - 90000000 * delay2,
                  true,
                  false);
 
