@@ -35,6 +35,8 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.constant;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.coalesce;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.label;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.identity;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.and;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.or;
@@ -943,9 +945,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classifier = args?.classifier;
     def overlaps = [:];
     def cf = classifierWithFlavor(classifier);
-    def traversal = g().E().hasLabel('overlaps').
+    def traversal = g().E().has('lbl', 'overlaps').
+                        filter(label().is('overlaps')).
                         order().
-                        by('intersection', asc).
+                        by(coalesce(values('intersection'), constant(Double.POSITIVE_INFINITY)), asc).
                         barrier();
     if (lbl != null) {
       traversal = traversal.filter(or(inV().has('lbl', lbl),

@@ -40,6 +40,7 @@ public final class JanuserRegressionTest {
     testLabelMirrorCannotBeOverwritten();
     testMetaSchemaUnionsPropertiesAcrossSameLabelElements();
     testMetaSchemaPreservesAllEndpointPairs();
+    testMetaSchemaCleanupRequiresMatchingNativeLabels();
     testMetaSchemaReusesTraversalSource();
     testMetaSchemaDoesNotCachePartiallyInitializedVertices();
     testDeepDropHandlesCyclesAndNonJanusVertices();
@@ -272,6 +273,34 @@ public final class JanuserRegressionTest {
         }
       require(endpointPairs.equals(Set.of("alpha->beta", "gamma->delta")),
               "meta schema must preserve every endpoint-label pair used by an edge label");
+      }
+    finally {
+      graph.close();
+      }
+    }
+
+  private static void testMetaSchemaCleanupRequiresMatchingNativeLabels() throws Exception {
+    FakeClient client = new FakeClient();
+    TinkerGraph graph = (TinkerGraph) client.g().getGraph();
+    Vertex forged = client.g().addV("OCol").property("lbl", "MetaGraph").
+                              property("marker", "forged-vertex").next();
+    Vertex target = client.g().addV("object").property("lbl", "object").next();
+    Edge forgedEdge = forged.addEdge("audit", target, "lbl", "MetaGraph", "marker", "forged-edge");
+    Vertex stale = client.g().addV("MetaGraph").property("lbl", "MetaGraph").
+                             property("marker", "stale-vertex").next();
+    Edge staleEdge = stale.addEdge("MetaGraph", target, "lbl", "MetaGraph", "marker", "stale-edge");
+    Object forgedId = forged.id();
+    Object forgedEdgeId = forgedEdge.id();
+    Object staleId = stale.id();
+    Object staleEdgeId = staleEdge.id();
+
+    new GremlinRecipies(client).createMetaSchema();
+
+    try (GraphTraversalSource check = graph.traversal()) {
+      require(check.V(forgedId).hasNext(), "MetaGraph cleanup must retain vertices with forged lbl");
+      require(check.E(forgedEdgeId).hasNext(), "MetaGraph cleanup must retain edges with forged lbl");
+      require(!check.V(staleId).hasNext(), "MetaGraph cleanup must drop stale native MetaGraph vertices");
+      require(!check.E(staleEdgeId).hasNext(), "MetaGraph cleanup must drop stale native MetaGraph edges");
       }
     finally {
       graph.close();
@@ -640,19 +669,14 @@ public final class JanuserRegressionTest {
                                           property("cls", "malformed-unrelated").next();
       malformedUnrelated.addEdge("deepcontains", object, "lbl", "deepcontains", "weight", 1.0);
       client.commit();
-      Object boundaryOutId = client.g().E().has("marker", "boundary-out").next().id();
-      Object boundaryInId = client.g().E().has("marker", "boundary-in").next().id();
-
       recipes.generateCorrelations(selected);
 
-      require(client.g().E().has("marker", "keep").hasNext(),
-              "regeneration must preserve overlaps outside the requested classifier scope");
-      require(client.g().E(boundaryOutId).has("marker", "boundary-out").
-                     has("lbl", "overlaps").hasNext(),
-              "regeneration must preserve outgoing boundary edge identity and properties");
-      require(client.g().E(boundaryInId).has("marker", "boundary-in").
-                     has("lbl", "overlaps").hasNext(),
-              "regeneration must preserve incoming boundary edge identity and properties");
+      require(!client.g().E().has("marker", "keep").hasNext(),
+              "regeneration must clear previous overlaps throughout this survey graph");
+      require(!client.g().E().has("marker", "boundary-out").hasNext(),
+              "regeneration must clear stale outgoing overlaps");
+      require(!client.g().E().has("marker", "boundary-in").hasNext(),
+              "regeneration must clear stale incoming overlaps");
       require(!client.g().E().has("marker", "internal-stale").hasNext(),
               "regeneration must replace stale internal overlaps");
       require(!client.g().V().has("lbl", "OCol").has("cls", "unrelated").bothE("overlaps").hasNext(),

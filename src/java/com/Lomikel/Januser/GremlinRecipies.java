@@ -14,6 +14,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.unfold
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.label;
 
 
 // Java
@@ -65,8 +66,8 @@ public class GremlinRecipies {
   public void createMetaSchema() {
     GraphTraversalSource source = g();
     log.info("Cleaning MetaGraph");
-    source.V().hasLabel("MetaGraph").drop().iterate();
-    source.E().hasLabel("MetaGraph").drop().iterate();
+    source.V().has("lbl", "MetaGraph").filter(label().is("MetaGraph")).drop().iterate();
+    source.E().has("lbl", "MetaGraph").filter(label().is("MetaGraph")).drop().iterate();
     commit();
     Map<String, Set<String>> vMap  = new HashMap<>();
     Map<String, Set<String>> eMap  = new HashMap<>();
@@ -208,8 +209,9 @@ public class GremlinRecipies {
        log.error("Wrong number of search values: " + propertyValues.length + ", should be: " + propertyNames.length);
        return null;
        }
-     GraphTraversal<Vertex, Vertex> vertexes = hasProperties(g().V().hasLabel(label).has("lbl", label),
-                                                              propertyNames, propertyValues);
+     GraphTraversal<Vertex, Vertex> vertexes = hasProperties(g().V().has("lbl", label),
+                                                              propertyNames, propertyValues).
+                                              filter(label().is(label));
      Vertex vertex;
      if (vertexes.hasNext()) {
        vertex = vertexes.next();
