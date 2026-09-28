@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="application/json"%>
+<!-- deprecated -->
 
 <%
   response.setContentType("application/json");

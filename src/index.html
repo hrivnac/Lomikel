@@ -75,6 +75,59 @@
 <li><a href="build.dot.jpg">build dependencies</a></li>
 </ul>
 
+<h4><a name="Agent">AI Agent</a></h4>
+<a href="https://github.com/hrivnac/Lomikel/tree/e3bbf26b6fa9c88f712b4e63b808cab564a076ad/src/AI">Fink Skill</a>
+is available for Agentic use (Hermes, OpenClaw,...).
+Some <a href="https://github.com/hrivnac/Lomikel/tree/e3bbf26b6fa9c88f712b4e63b808cab564a076ad/src/python/FinkTasks">Python scripts</a>,
+created with the help of the skill, are available.
+<u>object_neighbors.py</u>
+<pre>
+$ object_neighbors.py -h
+usage: object_neighbors.py [-h] [--classifier CLASSIFIER] [--distance {JensenShannon,Euclidean,Cosine}] [-n RESULTS] [--rest-columns COLUMN[,COLUMN...]] [--json] [--allow-insecure-graph] [--timeout TIMEOUT] object_id
+
+Find LSST/Fink classifier neighbors and sort them by JanusGraph distance, then angular separation.
+
+positional arguments:
+  object_id             required LSST diaObjectId
+
+options:
+  -h, --help            show this help message and exit
+  --classifier CLASSIFIER
+                        classifier (default: FINK)
+  --distance {JensenShannon,Euclidean,Cosine}
+                        JanusGraph distance metric (default: JensenShannon)
+  -n, --results RESULTS
+                        result count when &gt;=1; 0 returns all; &lt;n&lt;1 is Lomikel's relative distance-gap cutoff (default: 10)
+  --rest-columns, --columns COLUMN[,COLUMN...]
+                        additional Fink REST /objects values to include; repeatable or comma-separated, e.g. r:g_psfFluxMax
+  --json                emit JSON instead of a table
+  --allow-insecure-graph
+                        explicitly allow the default remote plaintext Gremlin endpoint
+  --timeout TIMEOUT     HTTP timeout in seconds
+</pre>
+<u>most_points.py</u>
+<pre>
+$ most_points.py -h     
+usage: most_points.py [-h] [--object-type {ss,dia,both}] [-n RESULTS] [--lightcurves] [--output-dir OUTPUT_DIR] [--allow-insecure-es] [--timeout TIMEOUT]
+
+Rank Fink LSST SS/DIA objects by Elasticsearch MJD point count and optionally export all-band SS light curves as JSON and PNG.
+
+options:
+  -h, --help            show this help message and exit
+  --object-type {ss,dia,both}
+                        objects to rank (default: both)
+  -n, --results RESULTS
+                        objects per type (default: 10)
+  --lightcurves, --ss-lightcurves
+                        download all-band Fink REST light curves and PNG plots for ranked SS objects
+  --output-dir OUTPUT_DIR
+                        artifact directory (default: fink-most-points-output)
+  --allow-insecure-es   explicitly allow the public remote plaintext Elasticsearch endpoint
+  --timeout TIMEOUT
+</pre>
+You can send <a href="http://cern.ch/hrivnac">us</a> any new script you may created with the help of this skill.
+Or, if you don't have access to the functional argentic system, ask <a href="http://cern.ch/hrivnac">us</a> to create it for you.
+  
 <h4><a name="WebService">Web Service</a></h4>
 <b><u>Customisation</u></b>
 <ul>                                                                      
@@ -368,10 +421,30 @@ usage: java -jar Lomikel.exe.jar
     <li>Added -o option to lomikel command to specify arguments.</li>
     <li>Importing new tags in CC.</li>
     </ul></li>
-<li><u>**.**.**:</u>
+<li><u>03.10.00:</u>
     <ul>
     <li>Added Remote Groovy server.</li>
     <li>Added multivalue ElasticSearch indexes.</li>
+    </ul></li>
+<li><u>03.10.01:</u>
+    <ul>
+    <li>Added Fink (Hermes) skill and pythn scripts generated with it.</li>
+    <li>Optimised neigborhood and reclassification (with help of ChatGPT-5.6 via Hermes).</li>
+    <li>Migrated ES port from 20200 to 24499.</li>
+    <li>Restricted ES anonymous access to read_only.</li>
+    <li>JanusGraph REST server made read-only.</li>
+    <li>Support for Phoenix removed.</li>
+    <li>Refactoring of AlertsView with Hermes.</li> 
+    <li>Refactoring of LightCurveView with Hermes.
+        Added possibility to load curves from database.
+        Added a prototype of classification schema.</li>
+    <li>src/js tree introduced.</li>
+    <li>Refactoring of ClassificationView.
+        Making it standalone js.</li>
+    </ul></li>
+<li><u>**.**.**:</u>
+    <ul>
+    <li>First phase of Januser refactoring with Hermes.</li>
     </ul></li>
 </ul>
 

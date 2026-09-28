@@ -1,5 +1,7 @@
 package com.astrolabsoftware.FinkBrowser.Januser;
 
+import java.util.Objects;
+
 // Tinker Pop
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
@@ -21,9 +23,19 @@ public class OCol implements Comparable<OCol> {
     }
 
   @Override
-    public int compareTo(OCol o) {
-      return this.hashCode() - o.hashCode();
-      }    
+  public int compareTo(OCol o) {
+    int comparison = _survey.compareTo(o._survey);
+    if (comparison == 0) {
+      comparison = _classifier.compareTo(o._classifier);
+      }
+    if (comparison == 0) {
+      comparison = _flavor.compareTo(o._flavor);
+      }
+    if (comparison == 0) {
+      comparison = _cls.compareTo(o._cls);
+      }
+    return comparison;
+    }
     
   @Override
   public boolean equals(Object o) {
@@ -33,15 +45,16 @@ public class OCol implements Comparable<OCol> {
     if (!(o instanceof OCol)) {
       return false;
       }
-    return o.hashCode() == this.hashCode();
+    OCol other = (OCol)o;
+    return Objects.equals(_survey,     other._survey)     &&
+           Objects.equals(_classifier, other._classifier) &&
+           Objects.equals(_flavor,     other._flavor)     &&
+           Objects.equals(_cls,        other._cls);
     }
     
   @Override
   public int hashCode() {
-    if (_hash == 0) {
-      _hash = (_survey + _classifier + _flavor + _cls).hashCode();
-      }
-    return _hash;
+    return Objects.hash(_survey, _classifier, _flavor, _cls);
     }
     
   /** Give contained classifier survey.
@@ -87,6 +100,4 @@ public class OCol implements Comparable<OCol> {
   
   private String _cls;
   
-  private int _hash = 0;
-      
   }

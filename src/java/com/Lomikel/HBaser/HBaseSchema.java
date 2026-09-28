@@ -196,24 +196,7 @@ public class HBaseSchema extends Schema<ByteArray> {
       }
     return new HBaseSchema(name(), newMap);
     }    
-       
-  /** Give SQL view creation command for this schema.
-    * To be used in Phoenix representation of the HBase table. 
-    * @param viewName The name of created SQL view.
-    * @return The SQL table creation command for this schema. */
-  public String toSQLView(String viewName) {
-    String sql = "DROP VIEW \"" + viewName + "\";\n";
-    sql += "CREATE VIEW \"" + viewName + "\" (";
-    sql += "ROWKEY VARCHAR PRIMARY KEY,";
-    sql += sqlCompatibleSchema().map()
-                                .entrySet()
-                                .stream()
-                                .map(e -> "\"" + e.getKey().split(":")[0] + "\".\"" + e.getKey().split(":")[1] + "\" VARCHAR")
-                                .collect(Collectors.joining(","));
-    sql += ");";
-    return sql;
-    }
-    
+           
   /** Give SQL table creation command for this schema.
     * @param tableName The name of created SQL table.
     * @return          The SQL table creation command for this schema. */

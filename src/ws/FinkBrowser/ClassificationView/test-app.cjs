@@ -1,115 +1,128 @@
+"use strict";
 // Run with: node --test src/ws/FinkBrowser/ClassificationView/test-app.cjs
-const {test} = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const vm = require('node:vm');
-const path = require('node:path');
+const { test } = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const vm = require("node:vm");
+const path = require("node:path");
 const dir = __dirname;
-const html = fs.readFileSync(path.join(dir, 'index.html'), 'utf8');
+const html = fs.readFileSync(path.join(dir, "index.html"), "utf8");
 
-function harness(neighborhoodFetch) {
-  const requests = [];
-  const renders = {details: [], drawings: []};
+function harness({ query = "", graph = async (id) => ({ objectId: id, objects: {}, objectClassification: {} }), catalog = async () => [] } = {}) {
   const elements = new Map();
-  const el = id => elements.get(id);
-  function select(id) {
-    const node = {options: [], value: '', onchange: null,
-      replaceChildren(...children) {this.options = children; this.value = children[0]?.value || '';},
-      add(child) {this.options.push(child); if (this.options.length === 1) this.value = child.value;}};
+  const requests = [];
+  const renders = [];
+  function element(id) {
+    const handlers = {};
+    const node = { value: "", textContent: "", dataset: {}, disabled: false, options: [], hidden: true,
+      addEventListener(type, fn) { handlers[type] = fn; },
+      fire(type) { handlers[type]?.({ target: node }); },
+      replaceChildren(...children) { node.options = children; node.value = children[0]?.value || ""; },
+    };
     elements.set(id, node);
+    return node;
   }
-  for (const id of ['survey', 'classifier', 'reclassifier', 'metric']) select(id);
-  el('survey').value = 'ZTF'; // Browser selects the first HTML option by default.
-  for (const id of ['objectId', 'nmax', 'nmaxValue', 'showBtn', 'resetBtn']) elements.set(id, {value:'', textContent:'', onclick:null, oninput:null, dispatchEvent(e){this.oninput?.(e);}});
-  for (const id of ['controls-header','controls','list-header','list']) elements.set(id,{addEventListener:()=>{},style:{}});
-  const document = {getElementById:id => el(id), createElement:() => ({value:'', textContent:''})};
-  const context = vm.createContext({document, URLSearchParams, Event: class {constructor(type){this.type=type;}},
-    showSpinner:()=>{}, showObjectNeighborhood:data=>renders.drawings.push(data),
-    updateDetailsPanel:(data,survey)=>renders.details.push({data,survey}), resetZoom:()=>{},
-    window: {alert:()=>{},addEventListener:()=>{}}, console,
-    fetch:async url => {requests.push(url); if (url.includes('Classifiers.jsp')) return {ok:true, json:async()=>[
-       {classifier:'FINK', flavor:'', survey:'ZTF'}, {classifier:'XMATCH', flavor:'', survey:'ZTF'},
-       {classifier:'FEATURES', flavor:'2025/13-50', survey:'ZTF'},
-       {classifier:'FEATURES', flavor:'2024/13-60', survey:'ZTF'},
-       {classifier:'TAG', flavor:'', survey:'ANY'}]};
-      return neighborhoodFetch ? neighborhoodFetch(url) :
-        {ok:true,json:async()=>({objectId:el('objectId').value,objects:{},objectClassification:{}})};
-    }});
-  for (const file of ['menu.js','data.js','app.js']) vm.runInContext(fs.readFileSync(path.join(dir,file),'utf8'),context,{filename:file});
-  return {el,requests,context,renders};
+  for (const id of ["survey", "objectId", "classifier", "reclassifier", "metric", "nmaxValue", "status", "viz", "objectList", "resetBtn"]) element(id);
+  elements.get("survey").value = "LSST";
+  const document = { getElementById: (id) => elements.get(id), createElement: () => ({}) };
+  const context = vm.createContext({ document, window: { location: { search: query } }, URLSearchParams, Object,
+    AbortController, console, hideTooltip() {}, showSpinner() {},
+    validateNeighborhoodData: (data) => data,
+    parseNeighborhoodLimit: (value) => Number(value),
+    showObjectNeighborhood: async (data) => { renders.push(data); return {}; },
+    updateDetailsPanel() {},
+    fetch: async (url) => { requests.push(url); return { ok: true, json: () => catalog(url) }; },
+    LomikelGraph: { objectNeighborhood2JSON: graph },
+  });
+  for (const file of ["data.js", "app.js"]) vm.runInContext(fs.readFileSync(path.join(dir, file), "utf8"), context, { filename: file });
+  return { el: (id) => elements.get(id), requests, renders, run: (code) => vm.runInContext(code, context) };
 }
-const settle = () => new Promise(resolve => setTimeout(resolve, 10));
+const settle = () => new Promise((resolve) => setImmediate(resolve));
 
-test('a delayed ZTF neighborhood cannot replace the latest LSST object render', async () => {
-  const pending = new Map();
-  const {el,requests,context,renders} = harness(url => new Promise(resolve => pending.set(
-    new URL(url,'http://localhost').searchParams.get('objectId'), resolve)));
-  const ztfId = 'ZTF17aackceb';
-  const lsstId = '170028526873870371';
-  assert.equal(pending.has(ztfId), true);
-  el('objectId').value = lsstId;
-  el('objectId').oninput();
-  const latest = vm.runInContext('loadNeighborhood()', context);
-  assert.equal(new URL(requests.at(-1),'http://localhost').searchParams.get('survey'), 'LSST');
-  const lsstData = {objectId:lsstId,objects:{},objectClassification:{LSST:1}};
-  pending.get(lsstId)({ok:true,json:async()=>lsstData});
-  await latest;
-  assert.deepEqual(renders.details, [{data:lsstData,survey:'LSST'}]);
-  assert.deepEqual(renders.drawings, [lsstData]);
-  const ztfData = {objectId:ztfId,objects:{},objectClassification:{ZTF:1}};
-  pending.get(ztfId)({ok:true,json:async()=>ztfData});
-  await new Promise(resolve => setImmediate(resolve));
-  assert.deepEqual(renders.details, [{data:lsstData,survey:'LSST'}]);
-  assert.deepEqual(renders.drawings, [lsstData]);
-});
-
-test('defaults are JS-only and initial request is ZTF with requested values', async () => {
-  for (const id of ['objectId','nmax','survey','classifier','metric']) {
-    const tag = html.match(new RegExp(`<(?:(?:input)|(?:select))[^>]*id="${id}"[^>]*>`))?.[0] || '';
-    assert.ok(!/\bvalue=|\bselected\b/.test(tag), `${id} has hard-coded default`);
+test("startup defaults come only from app.js and do not start slow graph work", async () => {
+  for (const id of ["objectId", "survey", "classifier", "metric", "nmaxValue"]) {
+    const tag = html.match(new RegExp(`<(?:(?:input)|(?:select))[^>]*id="${id}"[^>]*>`))?.[0] || "";
+    assert.doesNotMatch(tag, /\bvalue=|\bselected\b/, id);
   }
-  const {el,requests} = harness(); await settle();
-  assert.equal(el('objectId').value,'ZTF17aackceb');
-  assert.equal(el('survey').value,'ZTF');
-  assert.deepEqual(Array.from(el('classifier').options,o=>o.value),['FINK','XMATCH','FEATURES=2025/13-50','FEATURES=2024/13-60','TAG']);
-  assert.equal(el('metric').value,'JensenShannon');
-  assert.equal(el('nmaxValue').textContent,'20');
-  const query = new URL(requests.find(x=>x.includes('Neighborhood.jsp')),'http://localhost').searchParams;
-  assert.equal(query.get('survey'),'ZTF'); assert.equal(query.get('objectId'),'ZTF17aackceb');
-  assert.equal(query.get('nmax'),'20'); assert.equal(query.get('metric'),'JensenShannon');
+  let calls = 0;
+  const h = harness({ graph: async () => { calls++; } });
+  await settle();
+  assert.equal(h.el("objectId").value, "ZTF17aackceb");
+  assert.equal(h.el("survey").value, "ZTF");
+  assert.equal(h.el("nmaxValue").value, "20");
+  assert.equal(h.el("metric").value, "JensenShannon");
+  assert.equal(calls, 0);
 });
 
-test('numeric ID selects LSST and switches classifiers, then ZTF restores choices', async () => {
-  const {el,requests,context} = harness(); await settle();
-  el('objectId').value='170028526873870371'; el('objectId').oninput(); await settle();
-  assert.equal(el('survey').value,'LSST');
-  assert.deepEqual(Array.from(el('classifier').options,o=>o.value),['FINK','TAG']);
-  assert.deepEqual(Array.from(el('reclassifier').options,o=>o.value),['none','FINK','TAG']);
-  await vm.runInContext('loadNeighborhood()',context);
-  assert.equal(new URL(requests.at(-1),'http://localhost').searchParams.get('survey'),'LSST');
-  el('survey').value='ZTF'; el('survey').onchange({target:el('survey')}); await settle();
-  assert.deepEqual(Array.from(el('classifier').options,o=>o.value),['FINK','XMATCH','FEATURES=2025/13-50','FEATURES=2024/13-60','TAG']);
+test("typed numeric ID changes survey and both classifier menus, preserving graph flavors", async () => {
+  const h = harness({ catalog: async () => [
+    { survey: "ZTF", classifier: "FEATURES", flavor: "2026/new" },
+    { survey: "LSST", classifier: "XMATCH" },
+  ] });
+  await settle();
+  assert.ok(h.el("classifier").options.some((option) => option.value === "FEATURES=2026/new"));
+  assert.ok(h.el("classifier").options.some((option) => option.value === "LIGHTCURVES=Latent"));
+  h.el("objectId").value = "170028526873870371";
+  h.el("objectId").fire("input");
+  await settle();
+  assert.equal(h.el("survey").value, "LSST");
+  assert.deepEqual(h.el("classifier").options.map((option) => option.value), ["FINK", "TAG", "XMATCH"]);
+  assert.deepEqual(h.el("reclassifier").options.map((option) => option.value), ["none", "FINK", "TAG", "XMATCH"]);
 });
 
-test('navigation by object ID switches survey and submits that ID', async () => {
-  const {el,requests,context} = harness(); await settle();
-  await vm.runInContext("loadNeighborhood('170028526873870371')",context);
-  assert.equal(el('survey').value,'LSST'); assert.equal(el('objectId').value,'170028526873870371');
-  const query=new URL(requests.at(-1),'http://localhost').searchParams;
-  assert.equal(query.get('survey'),'LSST'); assert.equal(query.get('objectId'),'170028526873870371');
+test("URL object ID overrides conflicting survey and navigation infers survey", async () => {
+  const calls = [];
+  const h = harness({ query: "?survey=ZTF&objectId=170028526873870371", graph: async (id, classifier, options) => {
+    calls.push({ id, classifier, options });
+    return { objectId: id, objects: {} };
+  } });
+  assert.equal(h.el("survey").value, "LSST");
+  await h.run("loadNeighborhood('ZTF17aackceb')");
+  assert.equal(h.el("survey").value, "ZTF");
+  assert.equal(h.el("objectId").value, "ZTF17aackceb");
+  assert.equal(calls[0].options.nmax, 20);
+  assert.equal(calls[0].options.metric, "JensenShannon");
+  assert.equal(calls[0].options.graphUrl, "http://157.136.253.253:24444");
 });
 
-test('neighbor links receive their survey and overlap cache separates surveys', () => {
-  const drawing = fs.readFileSync(path.join(dir,'drawing.js'),'utf8');
-  const overlaps = fs.readFileSync(path.join(dir,'overlaps.js'),'utf8');
-  assert.match(drawing, /false, survey\)/);
-  assert.match(overlaps, /overlapCache\[cacheKey\]/);
+test("late graph and catalog responses cannot overwrite the latest survey", async () => {
+  const pending = new Map();
+  const catalogs = new Map();
+  const h = harness({
+    graph: (id) => new Promise((resolve) => pending.set(id, resolve)),
+    catalog: (url) => new Promise((resolve) => catalogs.set(new URL(url, "http://localhost").searchParams.get("survey"), resolve)),
+  });
+  const old = h.run("loadNeighborhood()");
+  h.el("objectId").value = "170028526873870371";
+  h.el("objectId").fire("input");
+  const latest = h.run("loadNeighborhood()");
+  await settle();
+  catalogs.get("LSST")([{ survey: "LSST", classifier: "TAG" }]);
+  pending.get("170028526873870371")({ objectId: "170028526873870371", objects: {} });
+  await latest;
+  catalogs.get("ZTF")([{ survey: "ZTF", classifier: "FEATURES", flavor: "old" }]);
+  pending.get("ZTF17aackceb")({ objectId: "ZTF17aackceb", objects: {} });
+  await old;
+  await settle();
+  assert.deepEqual(h.renders.map((data) => data.objectId), ["170028526873870371"]);
+  assert.equal(h.el("classifier").options.some((option) => option.value === "FEATURES=old"), false);
 });
 
-test('an invalid ID cannot submit an ambiguous survey', async () => {
-  const {el,requests,context} = harness(); await settle();
-  const before=requests.filter(x=>x.includes('Neighborhood.jsp')).length;
-  el('objectId').value='invalid';
-  await vm.runInContext('loadNeighborhood()',context);
-  assert.equal(requests.filter(x=>x.includes('Neighborhood.jsp')).length,before);
+test("invalid ID is rejected before graph access", async () => {
+  let calls = 0;
+  const h = harness({ graph: async () => { calls++; } });
+  h.el("objectId").value = "not-an-id";
+  await h.run("loadNeighborhood()");
+  assert.equal(calls, 0);
+  assert.equal(h.el("status").dataset.state, "error");
+});
+
+test("overlap cache separates surveys and graph endpoints", async () => {
+  const source = fs.readFileSync(path.join(dir, "overlaps.js"), "utf8");
+  const calls = [];
+  const ctx = vm.createContext({ Map, GRAPH_ENDPOINTS: { ZTF: { graphUrl: "ztf" }, LSST: { graphUrl: "lsst" } },
+    LomikelGraph: { overlaps2JSON: async (classifier, options) => { calls.push(options.graphUrl); return []; } }, module: { exports: {} } });
+  vm.runInContext(source, ctx);
+  await vm.runInContext('Promise.all([loadOverlaps("ZTF", "FINK", GRAPH_ENDPOINTS.ZTF), loadOverlaps("ZTF", "FINK", GRAPH_ENDPOINTS.ZTF), loadOverlaps("LSST", "FINK", GRAPH_ENDPOINTS.LSST)])', ctx);
+  assert.deepEqual(calls, ["ztf", "lsst"]);
 });

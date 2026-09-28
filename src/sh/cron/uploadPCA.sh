@@ -1,4 +1,5 @@
 #!/usr/bin/bash -l
+#deprecated
 LOG=/tmp/uploadPCA
 cd ~/Lomikel/ant
 source ./setup.sh

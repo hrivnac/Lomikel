@@ -1,140 +1,194 @@
-async function showObjectNeighborhood(data) {
-  d3.select("#viz").selectAll("*").remove();
-  const width = document.getElementById("viz").clientWidth;
-  const height = document.getElementById("viz").clientHeight;
-  const radius = Math.min(width, height) / 3;
-  const centerX = width / 2, centerY = height / 2;
-  const svg = d3.select("#viz")
-                .append("svg")
-                .attr("width", width)
-                .attr("height", height);
+let tooltipHideTimer;
+
+function hideTooltip(delay = 250) {
+  clearTimeout(tooltipHideTimer);
+  tooltipHideTimer = setTimeout(() => {
+    document.getElementById("tooltip").hidden = true;
+  }, delay);
+}
+
+function populateTooltip(id, classes) {
+  const tooltip = document.getElementById("tooltip");
+  tooltip.replaceChildren();
+  const heading = document.createElement("strong");
+  heading.textContent = id;
+  tooltip.append(heading);
+  tooltip.append(document.createElement("br"));
+  appendClasses(tooltip, classes);
+  tooltip.hidden = false;
+}
+
+async function showObjectNeighborhood(data, params, requestSerial) {
+  const viz = document.getElementById("viz");
+  const width = viz.clientWidth || window.innerWidth;
+  const height = viz.clientHeight || window.innerHeight * 0.7;
+  const radius = Math.max(90, Math.min(width, height) / 2 - 70);
+  const centerX = width / 2;
+  const centerY = height / 2;
+
+  const allClasses = new Set(Object.keys(data.objectClassification || {}));
+  for (const object of Object.values(data.objects || {})) {
+    Object.keys(object.classes || {}).forEach((name) => allClasses.add(name));
+  }
+  const classList = [...allClasses];
+  const classifier = params.reclassifier === "none"
+    ? params.classifier
+    : params.reclassifier;
+
+  let classPositions;
+  let warning = false;
+  try {
+    classPositions = await getOverlapPositions(
+      params.survey,
+      classifier,
+      classList,
+      radius,
+      centerX,
+      centerY,
+    );
+  } catch (_) {
+    if (requestSerial !== neighborhoodRequestSerial) return null;
+    classPositions = equidistantPositions(classList, radius, centerX, centerY);
+    warning = true;
+  }
+  if (requestSerial !== neighborhoodRequestSerial) return null;
+
+  const objectLayout = computeObjectLayout(data, classPositions, {
+    centerX,
+    centerY,
+    radius,
+  });
+
+  viz.replaceChildren();
+  const svg = d3.select(viz)
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .attr("role", "group")
+    .attr(
+      "aria-label",
+      `Classification neighborhood for ${objectLayout.main.id} with ${objectLayout.neighbors.length} nearest alerts`,
+    );
   const container = svg.append("g");
-  const zoom = d3.zoom()
-                 .scaleExtent([0.5, 20])
-                 .on("zoom", event => {const {k, x, y} = event.transform;
-                                       container.attr("transform", `translate(${x},${y}) scale(${k})`);
-                                       container.selectAll(".object-symbol")
-                                                .attr("transform", d => `translate(${d.x},${d.y}) scale(${1 / k})`);                 
-                                       container.selectAll(".distance-label")
-                                                .style("font-size", `${10 / k}px`);                            
-                                       container.selectAll(".class-label")
-                                                .style("font-size", `${12 / k}px`);
-                                       container.selectAll(".link-line")
-                                                .style("stroke-width", `${1.5 / k}px`);
-                                       });    
-  svg.call(zoom);
-  window.resetZoom = () => svg.transition()
-                              .duration(500)
-                              .call(zoom.transform, d3.zoomIdentity);
-  const tooltip = d3.select("#tooltip");
-  let hideTimeout = null;
-  const allClasses = new Set();
-  Object.keys(data.objectClassification).forEach(c => allClasses.add(c));
-  Object.values(data.objects).forEach(obj => Object.keys(obj.classes).forEach(c => allClasses.add(c)));
-  const classList = Array.from(allClasses);
-  let survey = document.getElementById("survey").value;
-  let overlapClassifier = document.getElementById("reclassifier").value;
-  if (overlapClassifier == "none") {
-    overlapClassifier = document.getElementById("classifier").value;
-    }
-  const classPositions = await getOverlapPositions(survey, overlapClassifier, classList, radius, centerX, centerY);  
-  classList.forEach((cls, i) => {
+  const zoom = d3.zoom().scaleExtent([0.5, 12]).on("zoom", (event) => {
+    container.attr("transform", event.transform);
+    container.selectAll(".object-symbol")
+      .attr("transform", (position) => (
+        `translate(${position.x},${position.y}) scale(${1 / event.transform.k})`
+      ));
+  });
+  svg.call(zoom).on("dblclick.zoom", null);
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.resetZoom = () => {
+    const target = reducedMotion ? svg : svg.transition().duration(250);
+    target.call(zoom.transform, d3.zoomIdentity);
+  };
+  document.getElementById("resetBtn").disabled = false;
+
+  if (classList.length > 0) {
+    container.append("circle")
+      .attr("class", "link-line class-ring")
+      .attr("cx", centerX)
+      .attr("cy", centerY)
+      .attr("r", radius)
+      .attr("fill", "none")
+      .attr("stroke", "#9c8fc4")
+      .attr("stroke-width", 1.2)
+      .attr("stroke-dasharray", "5 4");
+  }
+  for (const name of classList) {
+    const position = classPositions[name];
+    if (!position) continue;
     container.append("text")
-             .attr("class", "class-label")
-             .attr("x", classPositions[cls].x)
-             .attr("y", classPositions[cls].y)
-             .attr("text-anchor", "middle")
-             .attr("alignment-baseline", "middle")
-             .text(cls)
-             .style("font-size", "12px")
-             .style("font-weight", "bold");
-    });
-  const classLine = d3.line()
-                      .x(d => d.x)
-                      .y(d => d.y)
-                      .curve(d3.curveLinearClosed);
-  container.append("path")
-           .datum(classList.map(cls => classPositions[cls]).sort((a, b) => a.angle - b.angle))
-           .attr("class", "link-line")
-           .attr("d", classLine)
-           .attr("fill", "none")
-           .attr("stroke", "#ccc")
-           .attr("stroke-dasharray", "4 2");
-  function weightedPosition(classMap) {
-    let sumX = 0, sumY = 0, total = 0;
-    for (const cls in classMap) {
-      const weight = classMap[cls];
-      const pos = classPositions[cls];
-      if (pos) {
-        sumX += pos.x * weight;
-        sumY += pos.y * weight;
-        total += weight;
-        }
-      }
-    return {x: sumX / total, y: sumY / total};
-    }
-  const objectPos = weightedPosition(data.objectClassification);
-  drawObject(container, data.objectId, objectPos, "red", data.objectClassification, tooltip, hideTimeout, true, survey);
-  for (const [id, obj] of Object.entries(data.objects)) {
-    const pos = weightedPosition(obj.classes);
+      .attr("class", "class-label")
+      .attr("x", position.x)
+      .attr("y", position.y)
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "middle")
+      .text(name);
+  }
+
+  for (const object of objectLayout.neighbors) {
+    const labelPosition = edgeLabelPosition(objectLayout.main, object, 9);
     container.append("line")
-             .attr("class", "link-line")
-             .attr("x1", objectPos.x)
-             .attr("y1", objectPos.y)
-             .attr("x2", pos.x)
-             .attr("y2", pos.y)
-             .attr("stroke", "#aaa");
-             //.attr("stroke-dasharray", "2 2");
-    const labelX = (objectPos.x + pos.x) / 2;
-    const labelY = (objectPos.y + pos.y) / 2;
+      .attr("class", `link-line neighbor-link${object.visuallyOffset ? " zero-distance" : ""}`)
+      .attr("x1", objectLayout.main.x)
+      .attr("y1", objectLayout.main.y)
+      .attr("x2", object.x)
+      .attr("y2", object.y)
+      .attr("stroke", "#8f9eb2")
+      .attr("stroke-width", 1.15)
+      .attr("stroke-dasharray", object.visuallyOffset ? "2 3" : null);
     container.append("text")
-             .attr("class", "distance-label")
-             .attr("x", labelX)
-             .attr("y", labelY)
-             .attr("text-anchor", "middle")
-             .attr("alignment-baseline", "middle")
-             .text(obj.distance.toFixed(4))
-             .style("font-size", "10px")
-             .style("fill", "#666");
-    drawObject(container, id, pos, "blue", obj.classes, tooltip, hideTimeout, false, survey);
-    }
-  tooltip.on("mouseover", () => clearTimeout(hideTimeout))
-         .on("mouseout", () => {hideTimeout = setTimeout(() => tooltip.style("display", "none"), 900);});
+      .attr("class", "distance-label")
+      .attr("x", labelPosition.x)
+      .attr("y", labelPosition.y)
+      .attr("text-anchor", "middle")
+      .text(object.distance.toPrecision(4));
   }
 
-function drawObject(container, id, pos, color, classes, tooltip, hideTimeout, isMain, survey) {
+  drawObject(container, objectLayout.main, true);
+  for (const object of objectLayout.neighbors) {
+    drawObject(container, object, false);
+  }
+  return { warning };
+}
+
+function drawObject(container, object, isMain) {
+  const color = isMain ? "#d83a52" : "#1e70b7";
   const symbol = container.append("path")
-                          .datum({x: pos.x, y: pos.y})
-                          .attr("class", "object-symbol")
-                          .attr("d", d3.symbol().type(d3.symbolStar).size(isMain ? 200 : 100))
-                          .attr("transform", `translate(${pos.x},${pos.y})`)
-                          .attr("fill", color);
-  const showDetails = (event) => {clearTimeout(hideTimeout);
-                                  const classEntries = Object.entries(classes)
-                                                             .map(([cls, wt]) => `<li>${cls}: ${wt.toFixed(4)}</li>`)
-                                                             .join("");
-                                  tooltip.html(`<strong>${id}</strong><br>
-                                               <a href="https://${survey.toLowerCase()}.fink-portal.org/${id}" target="_blank">View on ${survey} Fink Portal</a><br>
-                                               <a href="#" id="showObject-${id}">Expand here</a><br>
-                                               <strong>Classes:</strong>
-                                               <ul style="margin:4px 0; padding-left:16px;">${classEntries}</ul>
-                                  `            )
-                                        .style("display", "block")
-                                        .style("left", (event.pageX + 10) + "px")
-                                        .style("top", (event.pageY - 20) + "px");                                 
-                                  setTimeout(() => {const link = document.getElementById(`showObject-${id}`);
-                                                    if (link) link.onclick = (e) => {
-                                                      e.preventDefault();
-                                                      tooltip.style("display", "none");
-                                                      loadNeighborhood(id);
-                                                      };
-                                                    }, 100);
-                                };
+    .datum(object)
+    .attr("class", "object-symbol")
+    .attr("d", d3.symbol().type(d3.symbolStar).size(isMain ? 230 : 130)())
+    .attr("transform", `translate(${object.x},${object.y})`)
+    .attr("fill", color)
+    .attr("tabindex", 0)
+    .attr("focusable", "true")
+    .attr("role", "button")
+    .attr(
+      "aria-label",
+      isMain
+        ? `Selected alert ${object.id}. Press Enter to reload.`
+        : `Neighbor alert ${object.id}, graph distance ${object.distance.toPrecision(4)}. Press Enter to center it.`,
+    );
 
-  symbol.on("mouseover", showDetails)
-        .on("mousemove", event => {tooltip.style("left", (event.pageX + 10) + "px")
-                                          .style("top",  (event.pageY - 20) + "px");
-                                   })
-        .on("mouseout", () => {hideTimeout = setTimeout(() => tooltip.style("display", "none"), 900);})
-        .on("dblclick", () => loadNeighborhood(id));
-  }
+  const showTooltip = () => {
+    clearTimeout(tooltipHideTimer);
+    populateTooltip(object.id, object.classes);
+  };
+  const activate = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    loadNeighborhood(object.id);
+  };
+
+  symbol
+    .on("pointerenter", showTooltip)
+    .on("pointerleave", (event) => {
+      if (event.pointerType === "mouse") hideTooltip();
+    })
+    .on("click", showTooltip)
+    .on("focus", showTooltip)
+    .on("blur", () => hideTooltip())
+    .on("dblclick", activate)
+    .on("keyup", (event) => {
+      if (event.key === "Tab") showTooltip();
+    })
+    .on("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") activate(event);
+      if (event.key === "Escape") hideTooltip(0);
+    });
+}
+
+const tooltipElement = document.getElementById("tooltip");
+tooltipElement.addEventListener("pointerenter", () => clearTimeout(tooltipHideTimer));
+tooltipElement.addEventListener("pointerleave", () => hideTooltip());
+const dismissTooltipOutside = (event) => {
+  const target = event.target instanceof Element ? event.target : null;
+  if (!target?.closest(".object-symbol, #tooltip")) hideTooltip(0);
+};
+document.addEventListener("pointerdown", dismissTooltipOutside);
+document.addEventListener("click", dismissTooltipOutside);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !tooltipElement.hidden) hideTooltip(0);
+});

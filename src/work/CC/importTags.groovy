@@ -27,19 +27,22 @@ try {
 catch (MissingPropertyException e) {
   delay = 2
   }
-                    
-jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
-gr = new FinkGremlinRecipiesG(jc);
   
-log.info("Importing NewTags for " + cls + " within last " + delay + " days");
+startupWaitMillis = 30000;
 
 timer = new Timer("entries", 100, 5);
 
 now = System.currentTimeMillis();
-
+    
 client = new AsynchHBaseClient("cchbase1.in2p3.fr", 2183);
 client.setMaxQueueSize(1000);
 client.connect(cls, null);
+//client.setLimit(20000);
+        
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CCRW.properties");
+gr = new FinkGremlinRecipiesG(jc);
+  
+log.info("Importing NewTags for " + cls + " within last " + delay + " days");
 
 timer.start();
 
@@ -48,28 +51,46 @@ client.startScan(null,
                  null,
                  now - 90000000 * delay,
                  now,
-                 false,
+                 true,
                  false);
                 
-while (client.scanning() || client.size() > 0) {
-  if (client.size() > 0) {
-    client.poll().each {k, v -> (mjd, oid) = k.tokenize('_');
-                                 gr.g().addV('NewTag')
-                                       .property('lbl',      'NewTag')
-                                       .property('objectId', oid)
-                                       .property('cls',      cls)
-                                       .property('mjd',      mjd)
-                                       .iterate();
-                         }
-    if (timer.report(cls + ": ")) {
-      gr.commit();
+// The scan can start asynchronously, but a completed empty scan must not wait forever.
+try {
+  long startupDeadline = System.currentTimeMillis() + startupWaitMillis;
+  while (client.scanPending() && !client.scanning() && client.size() == 0 &&
+         System.currentTimeMillis() < startupDeadline) {
+    Thread.sleep(100);
+    }
+  if (client.scanPending() && !client.scanning() && client.size() == 0) {
+    throw new IllegalStateException('ZTF HBase scan did not start before deadline');
+    }
+  while (client.scanPending() || client.size() > 0) {
+    if (client.size() > 0) {
+      client.poll().each {k, v -> (mjd, oid) = k.tokenize('_');
+                                   gr.g().addV('NewTag')
+                                         .property('lbl',      'NewTag')
+                                         .property('objectId', oid)
+                                         .property('cls',      cls)
+                                         .property('mjd',      mjd)
+                                         .iterate();
+                           }
+      if (timer.report(cls + ": ")) {
+        gr.commit();
+        }
+      }
+    else {
+      Thread.sleep(100);
       }
     }
-  }
-  
-gr.commit();
 
-client.stop();
-client.close();
+  if (client.scanFailure() != null) {
+    throw new IllegalStateException('NewTag HBase scan failed', client.scanFailure());
+    }
+  gr.commit();
+  }
+finally {
+  client.stop();
+  client.close();
+  }
 
 //NotifierURL.notifyExecution("importTags-LSST", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));

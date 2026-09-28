@@ -16,8 +16,8 @@ class LomikelServer {
   def static hi() {
     return "Hello World from Lomikel Server !";
     }
-   
-  def static graph = JanusGraphFactory.build().set("storage.backend", "hbase").set("storage.hostname", "@STORAGE.HOSTNAME@").set("storage.port", "@STORAGE.PORT@").set("storage.hbase.table", "@STORAGE.JANUS.TABLE@").open();
+    
+  def static graph = JanusGraphFactory.open("conf/gremlin-server/Local.properties")
   def static g     = graph.traversal();
   def static gr    = new com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG(g);
 

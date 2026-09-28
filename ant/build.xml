@@ -45,14 +45,6 @@
     <path refid="classpath.build"/>
     </path>
     
-  <path id="classpath_phoenix.run">
-    <pathelement path="${groovy_jar}"/>
-    <pathelement path="${groovy_sql_jar}"/>
-    <pathelement path="${hadoop_phoenix_conf}"/>
-    <pathelement path="${hbase_phoenix_conf}"/>
-    <!--path refid="classpath.build"/-->
-    </path>
-
   <path id="classpath.groovy">
     <fileset dir="${groovy_dir}/lib" includes="*.jar" excludes="groovy-ant-*.jar"/>
     </path>    
@@ -83,7 +75,6 @@
 
   <property name="classpath.build.content"       refid="classpath.build"/>
   <property name="classpath.run.content"         refid="classpath.run"/>
-  <property name="classpath_phoenix.run.content" refid="classpath_phoenix.run"/>
 
   <taskdef name="groovy"
            classname="org.codehaus.groovy.ant.Groovy"> 
@@ -289,9 +280,6 @@
       <service type="org.apache.tinkerpop.gremlin.jsr223.GremlinPlugin">
         <provider classname="com.Lomikel.GremlinPlugin.LomikelConnector"/>
         </service>
-      <service type="java.sql.Driver">
-        <provider classname="org.apache.phoenix.jdbc.PhoenixDriver"/>
-        </service>
      <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="Lomikel"/>
@@ -346,6 +334,8 @@
 			<zipfileset includes="**/*" src="${janusgraph_dir}/lib/javaparser-core-3.25.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-core-2.20.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-api-2.20.0.jar"/>
+      <!-- Single shared SLF4J 1.7 binding for all launcher combinations. -->
+      <zipfileset includes="**/*" src="${janusgraph_dir}/lib/log4j-slf4j-impl-2.20.0.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpasyncclient-4.1.5.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
       <zipfileset includes="**/*" src="${janusgraph_dir}/lib/httpclient-4.5.14.jar"/>
@@ -437,7 +427,6 @@
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/common/lib/kerby-pkix-1.0.1.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/common/lib/jackson-jaxrs-1.9.13.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/common/lib/jetty-security-9.3.24.v20180605.jar"/>
-      <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/common/lib/slf4j-log4j12-1.7.25.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/common/lib/jersey-server-1.19.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/common/lib/asm-5.0.4.jar"/>
       <zipfileset includes="**/*" src="${hadoop_dir}/share/hadoop/common/lib/nimbus-jose-jwt-4.41.1.jar"/>
@@ -889,6 +878,7 @@
       <fileset dir="../src/ws/FinkBrowser">
         <include name="**/*"/>
         <exclude name="Apps.html"/>
+	    	<exclude name="LightCurveView/sn_lightcurves/**/*"/>
         </fileset>
       <fileset dir="../build/FinkBrowser">
         <include name="Apps.html"/>
@@ -910,7 +900,7 @@
         <exclude name="HBaseClient.jsp"/>
         <exclude name="profiles/*"/>
         <exclude name="styles/*"/>
-        <exclude name="d3/actions.js"/>
+        <exclude name="FinkBrowser/*"/>
         </fileset>
       <fileset dir="../extlib/ws">
 	    	<include name="**/*"/>
@@ -927,8 +917,7 @@
         </fileset>
       <classes dir="../src/ws/FinkBrowser">
         <include name="d3/actions.js"/>
-        <include name="log4j.xml"/>
-        </classes>
+       </classes>
       <lib file="../lib/Lomikel-Janus-${version}.exe.jar"/>
       <lib file="../lib/Lomikel-Janus-${version}.jar"/>
       <lib file="../lib/Lomikel-${version}.jar"/>
@@ -1080,20 +1069,6 @@
 			<fileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="*"/>
       </copy>                                                                
     <copy file="../src/sys/janusgraph/elasticsearch/config/elasticsearch-${site}.yml" tofile="${janusgraph_dir}/elasticsearch/config/elasticsearch.yml" overwrite="true"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@STORAGE.HOSTNAME@"               value="${zookeeper}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@STORAGE.JANUS.TABLE@"            value="${janus_table}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@STORAGE.HBASE.TABLE@"            value="${hbase_table}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@STORAGE.HBASE.SCHEMA@"           value="${hbase_schema}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@STORAGE.PORT@"                   value="${hbase_port}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@ROWKEY.NAME@"                    value="${rowkey_name}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@ROWKEY.NAME@"                    value="${rowkey_name}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@BACKEND.PHOENIX.URL@"            value="${phoenix_url}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
-    <replace file="${janusgraph_dir}/scripts/setup-lomikel.groovy"               token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
-    <replace file="${janusgraph_dir}/conf/Local.yaml"                            token="@SERVER.HOST@"                    value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/Local.yaml"                            token="@SERVER.PORT@"                    value="${gremlin_port}"/>
-    <replace file="${janusgraph_dir}/conf/LocalCORS.yaml"                        token="@SERVER.HOST@"                    value="${gremlin_host}"/>
-    <replace file="${janusgraph_dir}/conf/LocalCORS.yaml"                        token="@SERVER.PORT.CORS@"               value="${gremlin_port_cors}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"             token="@SERVER.HOST@"                    value="${gremlin_host}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.yaml"             token="@SERVER.PORT@"                    value="${gremlin_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"         token="@SERVER.HOST@"                    value="${gremlin_host}"/>
@@ -1105,9 +1080,6 @@
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.HBASE.SCHEMA@"           value="${hbase_schema}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.HBASE.PORT@"             value="${hbase_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.ROWKEY.NAME@"            value="${rowkey_name}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.PHOENIX.URL@"            value="${phoenix_url}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.PHOENIX.PROXY.HOSTNAME@" value="${backend_phoenix_proxy_hostname}"/>
-    <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@BACKEND.PHOENIX.PROXY.PORT@"     value="${backend_phoenix_proxy_port}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@EVENTS.TABLE@"                   value="${events_table}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@EVENTS.SCHEMA@"                  value="${events_schema}"/>
     <replace file="${janusgraph_dir}/conf/gremlin-server/Local.properties"       token="@ELASTICSEARCH.HOSTNAME@"         value="${elasticsearch_hostname}"/>
@@ -1136,8 +1108,6 @@
       <env key="PID_FILE"        value="${janusgraph_dir}/run/janusgraph.pid"/>
       <env key="LOG_DIR"         value="${janusgraph_dir}/logs"/>
       <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/Local.yaml"/>
-      <env key="HBASE_CONF_DIR"  value="${phoenix_conf_dir}"/>
-      <env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/>
       <arg line="start"/>
       </exec>
       </target>
@@ -1148,8 +1118,6 @@
       <env key="PID_FILE"        value="${janusgraph_dir}/run/janusgraphCORS.pid"/>
       <env key="LOG_DIR"         value="${janusgraph_dir}/logsCORS"/>
       <env key="JANUSGRAPH_YAML" value="${janusgraph_dir}/conf/gremlin-server/LocalCORS.yaml"/>
-      <env key="HBASE_CONF_DIR"  value="${phoenix_conf_dir}"/>
-      <env key="CLASSPATH"       value="${classpath_phoenix.run.content}"/>
       <arg line="start"/>
       </exec>
     </target>
@@ -1186,8 +1154,14 @@
     
     <target name="es-clean"
           description="Clean Elastic Search">
-    <echo>Stopping Elastic Search</echo>
+    <echo>Cleaning Elastic Search</echo>
     <exec executable="../src/sh/cleanES.sh"/>
+    </target>
+   
+    <target name="es-setup"
+          description="Setup Elastic Search">
+    <echo>Stopping Elastic Search</echo>
+    <exec executable="../src/sh/setupES.sh"/>
     </target>
    
   <!-- Init JanusGraph ======================================================-->
@@ -1340,10 +1314,10 @@
       <arg value="../lib/Lomikel.war"/>
       </java>
     </target>
-  
+        
   <target name="start-FinkBrowser"
           depends="init"
-          description="Run local FinkBrowser Server">
+          description="Run local FinkBrowser server">
     <echo>Go to http://localhost:${jetty_port}/FinkBrowser</echo>
     <java jar="${jetty_runner}" fork="true">
       <arg value="--path"/>
@@ -1361,18 +1335,44 @@
       <arg value="../lib/FinkBrowser.war"/>
       </java>
     </target>
-  
-  <target name="stop-FinkBrowser"
+    
+  <target name="start-AlertsView"
           depends="init"
-          description="Run local FinkBrowser Server">
-    <echo>Go to http://localhost:${jetty_port}/FinkBrowser</echo>
-    <java jar="${jetty_runner}" fork="true">
-      <arg value="--stop-port"/>
-      <arg value="${jetty_port_stop}"/>
-      <arg value="--stop-key"/>
-      <arg value="stop"/>
-      <arg value="--stop"/>
-      </java>
+          description="Run local AlertsView">
+    <echo>Go to http://localhost:8000</echo>
+    <exec executable="/usr/bin/python3">
+      <arg value="-m"/>
+      <arg value="http.server"/>
+      <arg value="8000"/>
+      <arg value="-d"/>
+      <arg value="../src/ws/FinkBrowser/AlertsView"/>
+      </exec>
+    </target>
+    
+  <target name="start-LightCurveView"
+          depends="init"
+          description="Run local LightCurveView">
+    <echo>Go to http://localhost:8001</echo>
+    <exec executable="/usr/bin/python3">
+      <arg value="-m"/>
+      <arg value="http.server"/>
+      <arg value="8001"/>
+      <arg value="-d"/>
+      <arg value="../src/ws/FinkBrowser/LightCurveView"/>
+      </exec>
+    </target>
+    
+  <target name="start-ClassificationView"
+          depends="init"
+          description="Run local ClassificationView">
+    <echo>Go to http://localhost:8002</echo>
+    <exec executable="/usr/bin/python3">
+      <arg value="-m"/>
+      <arg value="http.server"/>
+      <arg value="8002"/>
+      <arg value="-d"/>
+      <arg value="../src/ws/FinkBrowser/ClassificationView"/>
+      </exec>
     </target>
     
   <!-- Start Groovy Gateway Server ==========================================-->
@@ -1414,18 +1414,25 @@
       </java>
     </target>
     
-  <target name="check-phoenix"
-          description="Check Phoenix using Groovy">
-    <echo>Check Phoenix using Groovy</echo>
-    <groovy>
-      <fileset file="../src/groovy/testPhoenix.groovy"/>
-      <classpath>
-        <path refid="classpath_phoenix.run"/>
-        <pathelement location="${groovy_sql_jar}"/>
-        </classpath>
-      </groovy>
+  <target name="check-fink-tasks"
+          description="Check Python Fink Tasks">
+    <echo>Check Python Fink Tasks</echo>
+    <echo>most_points.py --allow-insecure-es --object-type ss --lightcurves</echo>
+    <exec executable="../src/python/FinkTasks/src/fink_tasks/most_points.py">
+      <arg value="--allow-insecure-es"/>
+      <arg value="--object-type"/>
+      <arg value="ss"/>
+      <arg value="--lightcurves"/>
+      </exec>
+    <echo>object_neighbors.py 170028486134595648 --allow-insecure-graph --columns r:g_psfFluxMax,r:nDiaSources</echo>
+    <exec executable="../src/python/FinkTasks/src/fink_tasks/object_neighbors.py">
+      <arg value="170028486134595648"/>
+      <arg value="--allow-insecure-graph"/>
+      <arg value="--columns"/>
+      <arg value="r:g_psfFluxMax,r:nDiaSources"/>
+      </exec>
     </target>
-  
+      
   <!-- JavaDoc ==============================================================-->
 
   <target name="doc"
@@ -1464,7 +1471,7 @@
              use="true"
              private="true"
              additionalparam=" -linksource -breakiterator -keywords -author -version"
-             source="11"
+             source="17"
              Overview="../src/java/com/Lomikel/overview.html"
              windowtitle="Lomikel">
       <doclet name="nl.talsmasoftware.umldoclet.UMLDoclet" pathref="umlDoclet.classpath">
@@ -1481,7 +1488,6 @@
       <group title="HBaser"             packages="com.Lomikel.HBaser*"/>
       <group title="Januser"            packages="com.Lomikel.Januser*"/>
       <group title="ElasticSearcher"    packages="com.Lomikel.ElasticSearcher*"/>
-      <group title="Phoenixer"          packages="com.Lomikel.Phoenixer*"/>
       <group title="Livyser"            packages="com.Lomikel.Livyser*"/>
       <group title="Graph"              packages="com.Lomikel.Graph*"/>
       <group title="Utils"              packages="com.Lomikel.Utils*"/>

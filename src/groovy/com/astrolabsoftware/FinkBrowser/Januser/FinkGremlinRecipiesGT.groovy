@@ -3,7 +3,6 @@ package com.astrolabsoftware.FinkBrowser.Januser;
 import com.Lomikel.Januser.ModifyingGremlinClient;
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.GremlinRecipiesGT;
-import com.Lomikel.Phoenixer.PhoenixProxyClient;
 import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Utils.Metrics;
 import static com.Lomikel.Utils.Constants.π;
@@ -36,17 +35,22 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.outV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.constant;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.coalesce;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.label;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.identity;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.and;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.or;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.select;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.neq;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.eq;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.gte;
+import static org.apache.tinkerpop.gremlin.process.traversal.P.inside;
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.asc;
 
 // Janus Graph
 import org.janusgraph.core.SchemaViolationException;
+import org.janusgraph.core.attribute.Geoshape;
 import org.janusgraph.graphdb.vertices.StandardVertex;
 import org.janusgraph.graphdb.database.StandardJanusGraph;
 import static org.janusgraph.core.attribute.Geo.geoWithin;
@@ -65,8 +69,14 @@ import java.util.Map;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>FinkGremlinRecipiesG</code> provides various recipies to handle
-  * and modify Gremlin Graphs for Fink.
+/** Fink-specific traversal, analysis, and batch-deletion helpers mixed into
+  * {@link FinkGremlinRecipiesG}.
+  *
+  * <p>The trait uses the implementing recipe's traversal source through
+  * {@code g()}. The destructive {@link #drop_by_date(String, int, int)} method
+  * calls the recipe's {@code commit()} once per batch; it does not own or close
+  * the recipe's source or client. Generic resource-owning helpers are inherited
+  * from {@link GremlinRecipiesGT}.</p>
   * @opt attributes
   * @opt operations
   * @opt types
@@ -75,7 +85,18 @@ import org.apache.logging.log4j.LogManager;
 // TBD: use classifier.survey
 public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
 
-  /** TBD */
+  /** Build a spatial and Julian-date traversal over vertices with a
+    * {@code direction} Geoshape and {@code jd} property. The traversal is
+    * returned without consuming it or committing a transaction.
+    * @param ra    Right ascension in degrees; converted to longitude by
+    *              subtracting 180 degrees.
+    * @param dec   Declination in degrees, used as latitude.
+    * @param ang   Search radius in degrees, converted to kilometres using
+    *              the Earth's mean radius.
+    * @param jdmin Exclusive lower bound on {@code jd}.
+    * @param jdmax Exclusive upper bound on {@code jd}.
+    * @param limit Maximum number of matching vertices in the traversal.
+    * @return A lazy traversal of matching vertices. */
   def GraphTraversal geosearch(double ra,
                                double dec,
                                double ang,
@@ -85,12 +106,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def lat = dec;
     def lon = ra - 180;
     def dist = ang * 6371.0087714 * π / 180;
-    def nDir = g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).count().next();
-    def nJD  = g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).count().next();
-    if (limit < nJD) {
-      nJD = limit;
-      }
-    return g().V().has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).limit(nDir).has('jd', inside(jdmin, jdmax)).limit(nJD);
+    return g().V().
+               has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).
+               has('jd', inside(jdmin, jdmax)).
+               limit(limit);
     }
 
   /** Give JSON of other <em>object</em>s ordered
@@ -215,14 +234,14 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     return objectNeighborhood(args, oid0, classifier, null, null);
     }
 
-  /** The same method as {@link #objectNeighborhood(Map, String, String, ListMString>, List<String>},
+  /** The same method as {@link #objectNeighborhood(Map, String, String, Set, Set)},
     * appropriate for direct call from Java (instead of Groovy). */
   def Map<Map.Entry<String, Double>, Map<String, Double>> objectNeighborhood(String      oid0,
                                                                              String      classifier,
                                                                              Set<String> oidS,
                                                                              Set<String> classes0,
                                                                              Map         args) {
-    return objectNeighborhood(args, oid0, classifier, oidS, classes);
+    return objectNeighborhood(args, oid0, classifier, oidS, classes0);
     }
     
   /** Give {@link Map} of other <em>object</em>s ordered
@@ -230,12 +249,12 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * to weights to all (or selected) <em>OCol</em> classes.
     * @param oid0          The <em>objectId</em> of the <em>object</em>.
     * @param classifier    The classifier name to be used.
-    * @param oidS          A {@link List} of <em>object</em> objectIds to only avaluated.
-    *                      If <tt>null</tt>, all <em>object</em>s will be evaluated.
-    * @param classes0      A {@link List} of <em>OCol</em> classes to be
+    * @param oidS          A {@link Set} of <em>object</em> objectIds to evaluate exclusively.
+    *                      If <tt>null</tt> or empty, all <em>object</em>s will be evaluated.
+    * @param classes0      A {@link Set} of <em>OCol</em> classes to be
     *                      used in comparison.
     *                      All <em>OCol</em> classes of the specified
-    *                      <em>object</em> will be used if <tt>null</tt>.
+    *                      <em>object</em> will be used if <tt>null</tt> or empty.
     * @param nmax          The number of closest <em>object</em>s to give.
     *                      If less then 1, the relative distance cutoff
     *                      (the larger cutoff means more selective, 0 means no selection). 
@@ -260,120 +279,181 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def climit     = args.climit     ?: 0.0;
     def allClasses = args.allClasses ?: false;
     def cf = classifierWithFlavor(classifier);
-    if (g().V().has('lbl', 'object').has('objectId', oid0).count().next() == 0) {
+    // Find the source object once. The previous count()+next() sequence
+    // evaluated the same indexed lookup twice.
+    def object0T = g().V().has('lbl', 'object').has('objectId', oid0).limit(1);
+    if (!object0T.hasNext()) {
       log.info(oid0 + " has no registered neighborhood");
       return [:];
       }
-    if (classes0 == null || classes0.isEmpty()) {
-      classes0 = g().V().has('lbl', 'OCol'      ).
-                         has('classifier', cf[0]).
-                         has('flavor',     cf[1]).
-                         values('cls'           ).
-                         toSet();
-      }
-    def object0 = g().V().has('lbl',      'object').
-                          has('objectId', oid0    ).
-                          next();
+    def object0 = object0T.next();
+    def restrictClasses = classes0 != null && !classes0.isEmpty();
     def m0 = [:];
-    g().V(object0).inE().
-                   as('e').
-                   filter(and(outV().values('classifier').is(eq(cf[0])),
-                              outV().values('flavor'    ).is(eq(cf[1])),
-                              outV().values('cls'       ).is(within(classes0)))).                   
-                   project('cls', 'w').
-                   by(select('e').outV().values('cls')).
-                   by(select('e').values('weight')).
-                   each {it -> m0[it['cls']] = it['w']}
-    log.info('calculating object distances from ' + oid0 + m0 + " using " + args);
-    if (climit > 0.0) {
-      m0.entrySet().removeIf(entry -> entry.getValue() < climit)
+    def sourceMemberships = g().V(object0).inE('deepcontains').
+                                as('e').
+                                filter(and(outV().values('classifier').is(eq(cf[0])),
+                                           outV().values('flavor'    ).is(eq(cf[1]))));
+    if (restrictClasses) {
+      sourceMemberships = sourceMemberships.filter(outV().values('cls').is(within(classes0)));
       }
-    def classes
+    if (climit > 0.0) {
+      sourceMemberships = sourceMemberships.has('weight', gte(climit));
+      }
+    sourceMemberships.project('cls', 'w').
+                      by(select('e').outV().values('cls')).
+                      by(select('e').values('weight')).
+                      each {it -> m0[it['cls']] = it['w']};
+    def classes;
     if (allClasses) {
-      classes = classes0
+      if (restrictClasses) {
+        classes = classes0;
+        }
+      else {
+        classes = g().V().has('lbl',        'OCol').
+                          has('classifier', cf[0]).
+                          has('flavor',     cf[1]).
+                          values('cls').toSet();
+        }
       }
     else {
-      classes = [];
-      for (entry : m0.entrySet()) {
-        classes += [entry.getKey()];
-        }
+      classes = m0.keySet();
       log.info("\tsearching only in " + classes);
       }
-    def distances = [:]
-    def objects;
-    if (oidS) {
+    log.info('calculating object distances from ' + oid0 + m0 + " using " + args);
+    if (classes.isEmpty() && (oidS == null || oidS.isEmpty())) {
+      return [:];
+      }
+    // Fetch every candidate membership in one traversal. Previously the code
+    // materialised candidate vertices and then issued g().V(s).inE() once per
+    // object, creating tens of thousands of graph traversals for common LSST
+    // neighborhoods.
+    def memberships;
+    def candidates = [:];
+    if (oidS != null && !oidS.isEmpty()) {
       log.info("\tsearching only " + oidS);
-      objects = g().V().has('lbl',      'object').
-                        has('objectId', within(oidS));
+      // Preserve explicitly requested objects even when none of their selected
+      // memberships survive the class/weight filters: they have an empty
+      // vector and therefore maximum distance, as in the original API.
+      g().V().has('lbl',      'object').
+              has('objectId', within(oidS)).
+              has('objectId', neq(oid0)).
+              values('objectId').
+              each {candidateOid -> candidates[candidateOid] = [:];};
+      // For an explicitly supplied object set, start from the objectId mixed
+      // index instead of expanding every matching class membership first.
+      memberships = g().V().has('lbl',      'object').
+                            has('objectId', within(oidS)).
+                            has('objectId', neq(oid0)).
+                            as('candidate').
+                            inE('deepcontains').
+                            as('membership').
+                            filter(and(outV().values('classifier').is(eq(cf[0])),
+                                       outV().values('flavor'    ).is(eq(cf[1])),
+                                       outV().values('cls'       ).is(within(classes))));
       }
     else {
-      // NOTE: Janus-all.jar doesn't allow some complex operations
-      objects = g().V().has('lbl',        'OCol').
-                        has('classifier', cf[0]).
-                        has('flavor',     cf[1]).
-                        has('cls',        within(classes)).
-                        out().
-                        has('lbl', 'object').
-                        dedup()  
+      memberships = g().V().has('lbl',        'OCol').
+                            has('classifier', cf[0]).
+                            has('flavor',     cf[1]).
+                            has('cls',        within(classes)).
+                            outE('deepcontains').
+                            as('membership').
+                            inV().
+                            has('lbl', 'object').
+                            has('objectId', neq(oid0)).
+                            as('candidate');
       }
-    def distance
-    def n = 0
-    def t = System.currentTimeMillis()
-    objects.each {s -> 
-                  def oid = g().V(s).values('objectId').next();
-                  def m = [:];
-                  g().V(s).inE().
-                           as('e').
-                           filter(and(inV().values('objectId'   ).is(neq(oid0)),
-                                      outV().values('classifier').is(eq(cf[0])),
-                                      outV().values('flavor'    ).is(eq(cf[1])),
-                                      outV().values('cls'       ).is(within(classes)))).
-                           project('cls', 'w').
-                           by(select('e').outV().values('cls')).
-                           by(select('e').values('weight')).
-                           each {it -> m[it['cls']] = it['w']}
-                  if (climit > 0.0) {
-                    m.entrySet().removeIf(entry -> entry.getValue() < climit)
+    memberships.project('oid', 'cls', 'w').
+                by(select('candidate').values('objectId')).
+                by(select('membership').outV().values('cls')).
+                by(select('membership').values('weight')).
+                each {row ->
+                  if (!candidates.containsKey(row['oid'])) {
+                    candidates[row['oid']] = [:];
                     }
-                  def dist = Metrics.distance(m0, m, allClasses, metric)
-                  n++
-                  distance = Map.entry(oid, dist)
-                  distances[distance] = m
-                  }
-    t = System.currentTimeMillis() - t
-    return limitMapMap(distances, nmax)
+                  candidates[row['oid']][row['cls']] = row['w'];
+                  };
+    def distances = [:];
+    def distanceCache = [:];
+    def cacheDistances = ['JensenShannon', 'Euclidean', 'Cosine'].contains(metric);
+    candidates.each {oid, m ->
+      if (climit > 0.0) {
+        m.entrySet().removeIf(entry -> entry.getValue() < climit);
+        }
+      def dist;
+      // Classification vectors repeat frequently (for example thousands of
+      // objects can have the same one-hot or 50/50 memberships). Avoid
+      // recomputing an identical deterministic metric for every object.
+      if (cacheDistances && distanceCache.containsKey(m)) {
+        dist = distanceCache[m];
+        }
+      else {
+        dist = Metrics.distance(m0, m, allClasses, metric);
+        if (cacheDistances) {
+          distanceCache[m] = dist;
+          }
+        }
+      distances[Map.entry(oid, dist)] = m;
+      };
+    log.info('evaluated ' + candidates.size() + ' candidate objects with ' +
+             (cacheDistances ? distanceCache.size() : candidates.size()) +
+             ' distance calculations');
+    return limitMapMap(distances, nmax);
     }
-  
-  /** Drop all {@link Vertex} with specified <em>importDate</em>.
-    * @param importDate The <em>importDate</em> of {@link Vertex}es to drop.
-    *                   It's format should be like <tt>Mon Feb 14 05:51:20 UTC 2022</tt>.
-    * @param nCommit    The number of {Vertex}es to drop before each commit.
-    * @param tWait      The times (in <tt>s</tt>) to wait after each commit. */
+
+  /** Drop vertices with the given {@code importDate} in batches, along with
+    * vertices reachable by one or two outgoing hops from each selected batch.
+    * This traversal does not restrict those reachable vertices by date; use
+    * only when that deletion scope is intended. Each batch invokes the
+    * implementing recipe's {@code commit()} after its drop traversals.
+    * @param importDate Exact {@code importDate} property to select; for example,
+    *                   {@code Mon Feb 14 05:51:20 UTC 2022}.
+    * @param nCommit    Positive maximum number of selected vertices per batch.
+    * @param tWait      Non-negative seconds to wait after each commit. */
   def drop_by_date(String importDate,
                    int    nCommit,
                    int    tWait) {
-    def i = 0;
+    if (nCommit <= 0) {
+      throw new IllegalArgumentException('nCommit must be positive');
+      }
+    if (tWait < 0) {
+      throw new IllegalArgumentException('tWait must not be negative');
+      }
     def tot = 0;
     def nMax = g().V().has('importDate', importDate).count().next();
     log.info('' + nMax + ' vertexes to drop');
+    if (nMax == 0) {
+      return;
+      }
     def t0 = System.currentTimeMillis();
-    while(true) {
-      g().V().has('importDate', importDate).limit(nCommit).out().out().drop().iterate();
-      g().V().has('importDate', importDate).limit(nCommit).out().drop().iterate();
-      g().V().has('importDate', importDate).limit(nCommit).drop().iterate();
-      graph().traversal().tx().commit();
-      Thread.sleep(tWait)
-      tot = nCommit * ++i;
-      def dt = (System.currentTimeMillis() - t0) / 1000;
-      def per = 100 * tot / nMax;
+    while (true) {
+      def batch = g().V().has('importDate', importDate).limit(nCommit).id().toList();
+      if (batch.isEmpty()) {
+        break;
+        }
+      def ids = batch.toArray();
+      g().V(ids).out().out().drop().iterate();
+      g().V(ids).out().drop().iterate();
+      g().V(ids).drop().iterate();
+      commit();
+      tot += batch.size();
+      if (tWait > 0) {
+        Thread.sleep(tWait * 1000L);
+        }
+      def dt = Math.max(1.0, (System.currentTimeMillis() - t0) / 1000.0);
+      def per = Math.min(100.0, 100.0 * tot / nMax);
       def freq = tot / dt;
-      def rest = (nMax - tot) / freq / 60 /60;
+      def rest = freq == 0 ? 0 : Math.max(0.0, (nMax - tot) / freq / 3600.0);
       log.info(tot + ' = ' + per + '% at ' + freq + 'Hz, ' + rest + 'h to go');
       }
     }
     
-  /** Give status of importing from the <em>Import</em> {@link Vetex}es.
-    * @return The status of importing from the <em>Import</em> {@link Vetex}es. */
+  /** Report two status sections for vertices marked {@code lbl=Import}.
+    * The "Imported" section selects vertices with nonzero {@code nAlerts};
+    * the "Importing" section selects vertices without a {@code complete}
+    * property. These selections are independent and can overlap. Each section
+    * is ordered by {@code importSource}.
+    * @return Textual import status. */
   def String importStatus() {
     def txt = '';
     txt += 'Imported:\n';
@@ -407,17 +487,19 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       cf = classifierWithFlavor(classifier);
       }
     def classified = [];
-    g().V().has('lbl',      'object').
-            has('objectId', oid).
-            inE().
-            project('weight', 'classifier', 'flavor', 'class').
-            by(values('weight')).
-            by(outV().values('classifier')).
-            by(outV().values('flavor')).
-            by(outV().values('cls')).each {it -> if (classifier == null || (cf[0] == it.classifier && cf[1] == it.flavor)) {
-                                                   classified += it;
-                                                   }
-            }
+    def traversal = g().V().has('lbl',      'object').
+                            has('objectId', oid).
+                            inE('deepcontains');
+    if (classifier != null) {
+      traversal = traversal.filter(outV().values('classifier').limit(1).is(eq(cf[0]))).
+                            filter(outV().values('flavor').limit(1).is(eq(cf[1])));
+      }
+    traversal.project('weight', 'classifier', 'flavor', 'class').
+              by(values('weight')).
+              by(outV().values('classifier')).
+              by(outV().values('flavor')).
+              by(outV().values('cls')).
+              each {classified += it};
     return classified;
     }
    
@@ -443,17 +525,50 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                                  double  nmax  = 10,
                                                  boolean check = true) {                        
     def classified = classification(oid, srcClassifier);
-    def reclassified = [:];      
-    def w;
+    def reclassified = [:];
     def cf = classifierWithFlavor(srcClassifier);
-    classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
-                             w = reclassify(it.class, 'OCol', srcClassifier, dstClassifier);
-                             w.each {cls, intersection -> if (reclassified[cls] == null) {
-                                                            reclassified[cls] = 0;
-                                                            }
-                                                          reclassified[cls] += intersection * it.weight;
-                               }
-                      }
+    def srcClasses = classified.findAll {it -> it.classifier == cf[0] && it.flavor == cf[1]}.
+                                collect {it -> it.class}.
+                                toSet();
+    def dstCf = classifierWithFlavor(dstClassifier);
+    def correlations = [:];
+    if (!srcClasses.isEmpty()) {
+      g().V().has('lbl',        'OCol').
+              has('classifier', cf[0]).
+              has('flavor',     cf[1]).
+              has('cls',        within(srcClasses)).
+              inE('overlaps').
+              as('e').
+              filter(outV().has('lbl',        'OCol').
+                            has('classifier', dstCf[0]).
+                            has('flavor',     dstCf[1])).
+              project('src', 'dst', 'intersection').
+              by(inV().values('cls')).
+              by(outV().values('cls')).
+              by(select('e').values('intersection')).
+              each {row ->
+                if (correlations[row['src']] == null) {
+                  correlations[row['src']] = [:];
+                  }
+                def previous = correlations[row['src']][row['dst']];
+                if (previous == null || row['intersection'] > previous) {
+                  correlations[row['src']][row['dst']] = row['intersection'];
+                  }
+                };
+      correlations.each {src, weights -> correlations[src] = weights.sort{-it.value}};
+      }
+    classified.each {it ->
+      if (it.classifier == cf[0] && it.flavor == cf[1]) {
+        def weights = correlations[it.class];
+        if (weights != null) {
+          weights.each {cls, intersection ->
+            if (reclassified[cls] == null) {
+              reclassified[cls] = 0;
+              }
+            reclassified[cls] += intersection * it.weight;
+            }
+          }
+        }
       }
     double total = reclassified.values().sum();
     if (total != 0) {
@@ -462,6 +577,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (check) {
       def classifiedDst = classification(oid, dstClassifier);
       if (classifiedDst.isEmpty()) {
+        _lastQuality = 0.0
         log.warn('Cannot check quality')
         }
       else {
@@ -477,11 +593,10 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
       }
     reclassified = limitMap(reclassified, nmax);
     def reclassifiedA = [];
-    reclassified.each {it -> cf = classifierWithFlavor(dstClassifier);
-                             reclassifiedA += ['classifier':cf[0],
-                                               'flavor':cf[1],
-                                               'weight':it.getValue(),
-                                               'class':it.getKey()]}
+    reclassified.each {it -> reclassifiedA += ['classifier':dstCf[0],
+                                                'flavor':dstCf[1],
+                                                'weight':it.getValue(),
+                                                'class':it.getKey()]}
     return reclassifiedA;
     } 
     
@@ -502,7 +617,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             has('classifier', cf[0]).
             has('flavor',     cf[1]).
             has('cls',        cls).
-            out().
+            out('deepcontains').
             has('lbl', 'object').
             limit(sample).
             values('objectId').
@@ -540,7 +655,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             has('flavor',     cf[1]).
             group().
             by(values('cls')).
-            by(out().count()).
+            by(out('deepcontains').count()).
             unfold().each {clsMap[it.key] = it.value}                                  
     clsMap = clsMap.sort{-it.value}
     clsMap.take(nclasses).each {
@@ -589,9 +704,61 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def wMid;
     def cf = classifierWithFlavor(srcClassifier);
     def cg = classifierWithFlavor(midClassifier);
+    def bulkReclassify = {Collection<String> classes, sourceCf, destinationCf ->
+      def classifications = [:];
+      classes.each {cls -> classifications[cls] = [:]};
+      if (!classes.isEmpty()) {
+        def branches = classes.collect {cls ->
+          V().has('lbl',        'OCol').
+              has('classifier', sourceCf[0]).
+              has('flavor',     sourceCf[1]).
+              has('cls',        cls).
+              inE('overlaps').
+              as('e').
+              filter(outV().has('lbl',        'OCol').
+                            has('classifier', destinationCf[0]).
+                            has('flavor',     destinationCf[1])).
+              project('src', 'dst', 'intersection').
+              by(constant(cls)).
+              by(outV().values('cls')).
+              by(select('e').values('intersection'))
+          };
+        g().inject(0).
+            union(*(branches as GraphTraversal[])).
+            each {row ->
+              def classification = classifications[row['src']];
+              def previous = classification[row['dst']];
+              if (previous == null || row['intersection'] > previous) {
+                classification[row['dst']] = row['intersection'];
+                }
+              };
+        classifications.each {cls, classification ->
+          classifications[cls] = classification.sort{-it.value};
+          };
+        }
+      return classifications;
+      };
+    def sourceClasses = new LinkedHashSet<String>();
+    classified.each {it ->
+      if (it.classifier == cf[0] && it.flavor == cf[1]) {
+        sourceClasses.add(it.class);
+        }
+      }
+    def sourceToMid = bulkReclassify(sourceClasses, cf, cg);
+    def midClasses = new LinkedHashSet<String>();
+    classified.each {it ->
+      if (it.classifier == cf[0] && it.flavor == cf[1]) {
+        sourceToMid[it.class].each {clsMid, intersectionMid -> midClasses.add(clsMid)};
+        }
+      }
+    def midToDestination = [:];
+    if (!midClasses.isEmpty()) {
+      def ch = classifierWithFlavor(dstClassifier);
+      midToDestination = bulkReclassify(midClasses, cg, ch);
+      }
     classified.each {it -> if (it.classifier == cf[0] && it.flavor == cf[1]) {
-                             wMid = reclassify(it.class, 'OCol', srcClassifier, midClassifier);
-                             wMid.each {clsMid, intersectionMid -> w = reclassify(clsMid, 'OCol', midClassifier, dstClassifier);
+                             wMid = sourceToMid[it.class];
+                             wMid.each {clsMid, intersectionMid -> w = midToDestination[clsMid];
                                             w.each {cls, intersection -> if (reclassified[cls] == null) {
                                                                            reclassified[cls] = 0;
                                                                            }
@@ -778,10 +945,20 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     def classifier = args?.classifier;
     def overlaps = [:];
     def cf = classifierWithFlavor(classifier);
-    g().E().has('lbl', 'overlaps').
-            order().
-            by('intersection', asc).
-            project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
+    def traversal = g().E().has('lbl', 'overlaps').
+                        filter(label().is('overlaps')).
+                        order().
+                        by(coalesce(values('intersection'), constant(Double.POSITIVE_INFINITY)), asc).
+                        barrier();
+    if (lbl != null) {
+      traversal = traversal.filter(or(inV().has('lbl', lbl),
+                                      outV().has('lbl', lbl)));
+      }
+    if (classifier != null) {
+      traversal = traversal.filter(and(inV().has('classifier', cf[0]).has('flavor', cf[1]),
+                                       outV().has('classifier', cf[0]).has('flavor', cf[1])));
+      }
+    traversal.project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
             by(inV().values('lbl')).
             by(inV().values('classifier')).
             by(inV().values('flavor')).
@@ -792,18 +969,13 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
             by(outV().values('cls')).
             by(values('intersection')).
             each {v -> 
-                  if ((lbl        == null ||  v['xlbl'].equals(lbl) || v['ylbl'].equals(lbl)) &&
-                      (classifier == null || (v['xclassifier'].equals(cf[0]) &&
-                                              v['yclassifier'].equals(cf[0]) &&
-                                              v['xflavor'    ].equals(cf[1]) && 
-                                              v['yflavor'    ].equals(cf[1])))) {
-                    overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xflavor'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['yflavor'] + ':' + v['ycls']] = v['intersection'];
-                    }
+                  overlaps[v['xlbl'] + ':' + v['xclassifier'] + ':' + v['xflavor'] + ':' + v['xcls'] + ' * ' + v['ylbl'] + ':' + v['yclassifier'] + ':' + v['yflavor'] + ':' + v['ycls']] = v['intersection'];
                   };
     overlaps = overlaps.sort{-it.value};
     return overlaps;
     }
     
+
   /** Give classification from another {@link Classifier}.
     * Using accumulated data in graph.
     * @param cls           The class in the object classifier. 
@@ -816,34 +988,30 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                      String srcClassifier,
                                      String dstClassifier) {
     def classification = [:];
+    if (cls == null || lbl == null || srcClassifier == null || dstClassifier == null) {
+      return classification;
+      }
     def srcCf = classifierWithFlavor(srcClassifier);
     def dstCf = classifierWithFlavor(dstClassifier);
-    g().E().has('lbl', 'overlaps').
-            order().
-            by('intersection', asc).
-            project('xlbl', 'xclassifier', 'xflavor', 'xcls', 'ylbl', 'yclassifier', 'yflavor', 'ycls', 'intersection').
-            by(inV().values('lbl')).
-            by(inV().values('classifier')).
-            by(inV().values('flavor')).
-            by(inV().values('cls')).
-            by(outV().values('lbl')).
-            by(outV().values('classifier')).
-            by(outV().values('flavor')).
+    g().V().has('lbl',        lbl).
+            has('classifier', srcCf[0]).
+            has('flavor',     srcCf[1]).
+            has('cls',        cls).
+            inE('overlaps').
+            as('e').
+            filter(outV().has('lbl',        lbl).
+                          has('classifier', dstCf[0]).
+                          has('flavor',     dstCf[1])).
+            project('dst', 'intersection').
             by(outV().values('cls')).
-            by(values('intersection')).
-            each {v -> 
-                  if (v['xlbl'       ].equals(lbl     ) &&
-                      v['ylbl'       ].equals(lbl     ) &&
-                      v['xcls'       ].equals(cls     ) &&
-                      v['xclassifier'].equals(srcCf[0]) &&
-                      v['yclassifier'].equals(dstCf[0]) &&
-                      v['xflavor'    ].equals(srcCf[1]) &&
-                      v['yflavor'    ].equals(dstCf[1])) {
-                    classification[v['ycls']] = v['intersection'];
-                    }
-                  };
-    classification = classification.sort{-it.value};
-    return classification;
+            by(select('e').values('intersection')).
+            each {row ->
+              def previous = classification[row['dst']];
+              if (previous == null || row['intersection'] > previous) {
+                classification[row['dst']] = row['intersection'];
+                }
+              };
+    return classification.sort{-it.value};
     }
     
   /** Export all <em/>OCol</em>
@@ -852,8 +1020,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     * @param fn The full filename of the output <em>GraphML</em> file. */
   def exportOCol(String fn) {  
     g().V().has('lbl', 'OCol').
-            outE().
-            has('lbl', 'overlaps').
+            outE('overlaps').
             subgraph('x').
             cap('x').
             next().
@@ -868,10 +1035,16 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
     if (classifier == null) {
       return new String[] {null, ''};
       }
-    if (!classifier.contains('=')) {
+    if (classifier.isEmpty() || classifier.startsWith('=') ||
+        classifier.indexOf('=', classifier.indexOf('=') + 1) >= 0) {
+      throw new IllegalArgumentException("Malformed classifier: ${classifier}");
+      }
+    int separator = classifier.indexOf('=');
+    if (separator < 0) {
       return new String[]{classifier, ''};
       }
-    return classifier.split('=');
+    return new String[]{classifier.substring(0, separator),
+                        classifier.substring(separator + 1)};
     }
     
   def Random _random = new Random();

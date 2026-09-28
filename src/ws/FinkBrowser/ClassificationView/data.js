@@ -1,59 +1,133 @@
-async function fetchNeighborhood(params) {
-  const query = new URLSearchParams(params).toString();
-  const url = `/FinkBrowser/Neighborhood.jsp?${query}`;
-  try {
-    showSpinner(true, "green");
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Network error");
-    return await response.json();
-    }
-  catch (err) {
-    window.alert("Neighborhood search failed, using demo data");
-    console.warn("Neighborhood.jsp failed, using demo data:", err);
-    return {
-      objectId: "ZTF23abdlxeb",
-      objects: {
-        "ZTF19actbknb": {
-          distance: 0.0023,
-          classes: {"YSO_Candidate": 0.8571, "SN candidate": 0.1429}
-          },
-        "ZTF19actfogx": {
-          distance: 0.0363,
-          classes: {"Radio": 0.4707, "YSO_Candidate": 0.0608, "CataclyV*_Candidate": 0.1943, "CV*_Candidate": 0.2623}
-          }
-        },
-      objectClassification: {"YSO_Candidate": 0.8333, "SN candidate": 0.1667}
-      };
-    }
-  finally {
-    showSpinner(false);
-    }
+const GRAPH_ENDPOINTS = Object.freeze({
+  LSST: Object.freeze({
+    graphUrl: "http://134.158.243.144:24444",
+    allowInsecureGraph: true,
+  }),
+  ZTF: Object.freeze({
+    graphUrl: "http://157.136.253.253:24444",
+    allowInsecureGraph: true,
+  }),
+});
+
+let neighborhoodRequestSerial = 0;
+let activeNeighborhoodController = null;
+
+function selectedGraphOptions(survey) {
+  const endpoint = GRAPH_ENDPOINTS[survey];
+  if (!endpoint) {
+    throw new Error(`${survey} graph endpoint is not configured`);
   }
-  
-let neighborhoodRequest = 0;
+  return { ...endpoint };
+}
+
+function readNeighborhoodParameters(objectId = null) {
+  const inputId = objectId === null
+    ? document.getElementById("objectId").value
+    : objectId;
+  const trimmedId = String(inputId).trim();
+  const survey = surveyForObjectId(trimmedId);
+  if (!survey) throw new Error("Enter a ZTF object ID or a numeric LSST object ID");
+  // Inferred survey takes precedence over a stale manual selection, including
+  // recenter actions from a map or neighbor list.
+  syncSurveyFromId(trimmedId);
+
+  return {
+    survey,
+    objectId: trimmedId,
+    classifier: document.getElementById("classifier").value,
+    reclassifier: document.getElementById("reclassifier").value,
+    metric: document.getElementById("metric").value,
+    nmax: parseNeighborhoodLimit(document.getElementById("nmaxValue").value),
+  };
+}
+
+async function fetchNeighborhood(params, signal) {
+  const options = selectedGraphOptions(params.survey);
+  return LomikelGraph.objectNeighborhood2JSON(
+    params.objectId,
+    params.classifier,
+    {
+      reclassifier: params.reclassifier === "none" ? null : params.reclassifier,
+      nmax: params.nmax,
+      metric: params.metric,
+      climit: 0,
+      signal,
+      timeoutMs: 90_000,
+      ...options,
+    },
+  );
+}
+
+function setStatus(message, state) {
+  const status = document.getElementById("status");
+  status.textContent = message;
+  status.dataset.state = state;
+}
+
+function showLoadError(error) {
+  setStatus(`Load failed: ${error.message}`, "error");
+}
+
+function invalidateNeighborhoodLoad() {
+  neighborhoodRequestSerial += 1;
+  const controller = activeNeighborhoodController;
+  activeNeighborhoodController = null;
+  controller?.abort();
+  showSpinner(false);
+}
+
+function cancelNeighborhoodLoad() {
+  if (!activeNeighborhoodController) return;
+  invalidateNeighborhoodLoad();
+  setStatus("Graph request cancelled. The previous visualization was kept.", "idle");
+}
 
 async function loadNeighborhood(objectId = null) {
-  const request = ++neighborhoodRequest;
-  const input = document.getElementById("objectId");
-  if (objectId !== null) input.value = String(objectId);
-  const id = input.value.trim();
-  const survey = syncSurveyFromId(id);
-  if (!survey) {
-    window.alert("Enter a ZTF object ID (starting ZTF) or a numeric LSST object ID.");
+  let params;
+  try {
+    params = readNeighborhoodParameters(objectId);
+    selectedGraphOptions(params.survey);
+  } catch (error) {
+    showLoadError(error);
     return;
   }
-  const nmaxText = document.getElementById("nmaxValue").textContent;
-  const nmaxVal = parseFloat(nmaxText);
-  const params = {objectId: id,
-                  survey: survey,
-                  classifier: document.getElementById("classifier").value,
-                  reclassifier: document.getElementById("reclassifier").value,
-                  metric: document.getElementById("metric").value,
-                  nmax: nmaxVal
-                  };
-  const data = await fetchNeighborhood(params);
-  if (request !== neighborhoodRequest) return;
-  updateDetailsPanel(data, survey);
-  showObjectNeighborhood(data);
-  }
 
+  activeNeighborhoodController?.abort();
+  const controller = new AbortController();
+  activeNeighborhoodController = controller;
+  const requestSerial = ++neighborhoodRequestSerial;
+
+  document.getElementById("objectId").value = params.objectId;
+  setStatus(`Querying ${params.survey} for ${params.objectId}…`, "loading");
+  showSpinner(true, "green");
+
+  try {
+    const response = await fetchNeighborhood(params, controller.signal);
+    if (requestSerial !== neighborhoodRequestSerial) return;
+    const data = validateNeighborhoodData(response, params.objectId);
+    const layoutResult = await showObjectNeighborhood(data, params, requestSerial);
+    if (requestSerial !== neighborhoodRequestSerial) return;
+    updateDetailsPanel(data, params.survey);
+    const count = Object.keys(data.objects || {}).length;
+    if (layoutResult?.warning) {
+      setStatus(
+        `Loaded ${count} nearest objects; class overlaps were unavailable, so classes are evenly spaced.`,
+        "warning",
+      );
+    } else {
+      setStatus(`Loaded ${count} nearest objects from ${params.survey}.`, "ok");
+    }
+  } catch (error) {
+    if (requestSerial !== neighborhoodRequestSerial) return;
+    if (error.name === "AbortError") {
+      setStatus("Graph request cancelled. The previous visualization was kept.", "idle");
+    } else {
+      showLoadError(error);
+    }
+  } finally {
+    if (activeNeighborhoodController === controller) {
+      activeNeighborhoodController = null;
+      showSpinner(false);
+    }
+  }
+}

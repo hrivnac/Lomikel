@@ -4,7 +4,7 @@ import argparse
 import requests
 import matplotlib.pyplot as plt
 
-DEFAULT_ES_URL = "http://134.158.243.139:20200"
+DEFAULT_ES_URL = "http://134.158.243.139:24499"
 DEFAULT_INDEX = "ss_radec"
 DEFAULT_FIELD = "location"
 
@@ -24,7 +24,7 @@ def es_search(es_url, index, body, scroll=None):
     params = {}
     if scroll:
         params["scroll"] = scroll
-    r = requests.post(url, params=params, json=body)
+    r = requests.post(url, params=params, json=body, headers={"-u":"elastic:elastic"})
     r.raise_for_status()
     return r.json()
 

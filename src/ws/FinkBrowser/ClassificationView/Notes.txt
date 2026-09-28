@@ -1,0 +1,1 @@
+python3 -m http.server 8002 -d ~/work/Misc/Lomikel/src/ws/FinkBrowser/ClassificationView

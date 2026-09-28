@@ -11,9 +11,13 @@ import org.json.JSONArray;
 // Java
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -33,7 +37,11 @@ public class ESClient {
     * @param url The <em>ElasticSearch</em> server. */
   public ESClient(String url) {
     log.info("Connection to " + url);
-    _url = url;    
+    _url = url;
+    if (_auth == null) {
+      _auth = new HashMap<>();
+      _auth.put("Authorization", "Basic " + Base64.getEncoder().encodeToString(CREDENTIALS.getBytes(StandardCharsets.UTF_8)));
+      }
     }
     
   // Create index ==============================================================  
@@ -52,7 +60,7 @@ public class ESClient {
                                                                                     new JSONObject().put("type", fieldType))))
                                      .toString();
     log.info("Creating index " + jsonCmd);
-    String answer = _httpClient.putJSON(_url + "/" + idxName, jsonCmd, null, null);
+    String answer = _httpClient.putJSON(_url + "/" + idxName, jsonCmd, _auth, null);
     log.info(answer);
     }
   
@@ -206,8 +214,8 @@ public class ESClient {
                             .collect(Collectors.joining("\n")) + "\n";
     //log.info(jsonCmd);                        
     //log.info("Inserting " + idxName + "[" + command.size() + "]");
-    //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, null, null);
-    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", null, null);
+    //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, _auth, null);
+    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", _auth, null);
     JSONObject answerJson = new JSONObject(answer);
     if (answerJson.getBoolean("errors")) {
       throw new LomikelException("HTTP Post error");
@@ -396,7 +404,7 @@ public class ESClient {
     List<String> results = new ArrayList<>();
     log.info("Searching " + jsonCmd);
     try {
-      answer = _httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, null, null);
+      answer = _httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, _auth, null);
       JSONObject answerJ = new JSONObject(answer);
       JSONArray hitsJ = answerJ.getJSONObject("hits").getJSONArray("hits");
       for (Object o : hitsJ) {
@@ -560,7 +568,7 @@ public class ESClient {
                   "  },\n" +
                   "  \"upsert\": {}\n" +
                   "}";                            
-    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, null, null);
+    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, _auth, null);
     //JSONObject answerJson = new JSONObject(answer);
     //if (answerJson.getBoolean("errors")) {
     //  throw new LomikelException("HTTP Post error");
@@ -611,7 +619,7 @@ public class ESClient {
                     "  },\n" +
                     "  \"upsert\": {}\n" +
                     "}"; 
-    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, null, null);
+    String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, _auth, null);
     //JSONObject answerJson = new JSONObject(answer);
     //if (answerJson.getBoolean("errors")) {
     //  throw new LomikelException("HTTP Post error");
@@ -633,7 +641,7 @@ public class ESClient {
                                             new JSONObject().put("match_all",
                                                                  new JSONObject()))
                                        .toString();
-      answer = _httpClient.postJSON(_url + "/" + idxName + "/_count", jsonCmd, null, null);
+      answer = _httpClient.postJSON(_url + "/" + idxName + "/_count", jsonCmd, _auth, null);
       JSONObject answerJ = new JSONObject(answer);
       sz = answerJ.getInt("count");
       }
@@ -667,6 +675,11 @@ public class ESClient {
   private SmallHttpClient _httpClient = new SmallHttpClient();
   
   private int _size= 10;
+  
+  private Map<String, String> _auth;
+  
+  // TBD: it shoould not be hardwired here
+  private static String CREDENTIALS = "elastic:elastic";
    
   private ConcurrentMap<String, List<String>> _commands = new ConcurrentHashMap<>();
         

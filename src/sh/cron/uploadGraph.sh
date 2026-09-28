@@ -1,4 +1,5 @@
 #!/usr/bin/bash -l
+#deprecated
 Y=${1}
 M=${2}
 D=${3}

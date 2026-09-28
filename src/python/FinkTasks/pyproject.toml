@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fink-tasks"
+version = "0.3.2"
+description = "Reusable Python command-line tasks for Fink data services"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Julius Hrivnac"}]
+dependencies = ["matplotlib>=3.7"]
+
+[project.scripts]
+fink-object-neighbors = "fink_tasks.object_neighbors:main"
+fink-most-points = "fink_tasks.most_points:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

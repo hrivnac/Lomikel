@@ -5,7 +5,7 @@ import random
 import requests
 import matplotlib.pyplot as plt
 
-DEFAULT_ES_URL = "http://134.158.243.139:20200"
+DEFAULT_ES_URL = "http://134.158.243.139:24499"
 DEFAULT_INDEX = "dia_radec"
 DEFAULT_FIELD = "location"
 
@@ -58,9 +58,10 @@ def parse_point(point):
 def es_search(es_url, index, body, scroll = None):
     url = f"{es_url}/{index}/_search"
     params = {}
+    
     if scroll:
         params["scroll"] = scroll
-    r = requests.post(url, params=params, json=body)
+    r = requests.post(url, params=params, json=body, headers={"-u":"elastic:elastic"})
     r.raise_for_status()
     return r.json()
 

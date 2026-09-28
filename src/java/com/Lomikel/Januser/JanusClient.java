@@ -19,19 +19,21 @@ import java.io.IOException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/** <code>JanusClient</code> provides connection to Janus Graph.
+/** Owns an embedded, rollback-capable JanusGraph connection.
+  *
+  * <p>This is the mutation client for recipes that need a real transaction.
+  * It opens the graph from explicit HBase parameters or a JanusGraph
+  * properties file and owns both the traversal source and graph lifecycle.</p>
   * @opt attributes
   * @opt operations
   * @opt types
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
-public class JanusClient implements ModifyingGremlinClient {
+public class JanusClient implements TransactionalGremlinClient {
 
-  /** Extract implicite schema.
-    * @param args[0] The operation: <tt>extract,populate</tt>.
-    * @param args[1] The HBase hostname.
-    * @param args[2] The HBase port.
-    * @param args[3] The HBase table.
+  /** Extract the implicit schema.
+    * @param args The operation ({@code extract}), HBase hostname, HBase port,
+    *             and HBase table.
     * @throws Exception If fails. */ 
   public static void main(String[] args) throws Exception {
     Init.init("JanusClient");
@@ -51,6 +53,7 @@ public class JanusClient implements ModifyingGremlinClient {
        
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
+    * @param port     The HBase port.
     * @param table    The HBase table. */
   public JanusClient(String hostname,
                      int    port,
@@ -60,6 +63,7 @@ public class JanusClient implements ModifyingGremlinClient {
    
   /** Create with connection parameters.
     * @param hostname The HBase hostname.
+    * @param port     The HBase port.
     * @param table    The HBase table.
     * @param batch    Whether open graph for batch loading. */
   public JanusClient(String  hostname,
@@ -83,6 +87,7 @@ public class JanusClient implements ModifyingGremlinClient {
     
   /** Open graph with already set parameters. */
   public void open() {
+    _properties = null;
     log.info("Opening " + _table + "@" + _hostname);
     if (_batch) {
       log.info("\tas batch");
@@ -103,13 +108,11 @@ public class JanusClient implements ModifyingGremlinClient {
   public void open(String properties) {
     log.info("Opening " + properties);
     Properties p = new Properties();
-    try {
-      FileInputStream propStream = new FileInputStream(properties);
+    try (FileInputStream propStream = new FileInputStream(properties)) {
       p.load(propStream);
-      propStream.close();
       }
     catch (IOException e) {
-      log.error("Properties " + properties + " cannot be loaded", e);
+      throw new IllegalArgumentException("Properties " + properties + " cannot be loaded", e);
       }
     _hostname = p.getProperty("storage.hostname");
     _table    = p.getProperty("storage.hbase.table");
@@ -119,6 +122,7 @@ public class JanusClient implements ModifyingGremlinClient {
       }
     _graph = JanusGraphFactory.open(properties);
     _g = _graph.traversal();
+    _properties = properties;
     log.info("Connected");
     }
     
@@ -126,6 +130,12 @@ public class JanusClient implements ModifyingGremlinClient {
   public void commit() {
     _graph.tx().commit();
     log.debug("Commited");
+    }
+
+  @Override
+  public void rollback() {
+    _graph.tx().rollback();
+    log.debug("Rolled back");
     }
     
   @Override
@@ -138,7 +148,12 @@ public class JanusClient implements ModifyingGremlinClient {
   public void reopen() {
     commit();
     close();
-    open();
+    if (_properties == null) {
+      open();
+      }
+    else {
+      open(_properties);
+      }
     }
     
   @Override
@@ -164,18 +179,19 @@ public class JanusClient implements ModifyingGremlinClient {
     if (i == 0) {
       return false;
       }
-    if (modulus > -1 && i%modulus != 0) {
-      return false;
+    boolean report = modulus < 0 || (modulus > 0 && i%modulus == 0);
+    boolean commit = modulusCommit > 0 && i%modulusCommit == 0;
+    if (report) {
+      long dt = (System.currentTimeMillis() - _t) / 1000;
+      if (dt == 0) {
+        dt = 1;
+        }
+      log.info("" + i + " " + msg + " in " + dt + "s, freq = " + (i / dt) + "Hz");
       }
-    long dt = (System.currentTimeMillis() - _t) / 1000;
-    if (dt == 0) {
-      dt = 1;
+    if (commit) {
+      commit();
       }
-    log.info("" + i + " " + msg + " in " + dt + "s, freq = " + (i / dt) + "Hz");
-    if (modulusCommit > -1 && i%modulusCommit == 0) {
-	    commit();
-      }
-    return true;
+    return report || commit;
     }    
     
   private String _table;
@@ -185,8 +201,9 @@ public class JanusClient implements ModifyingGremlinClient {
   private int _port;
   
   private boolean _batch;
-    
-  private boolean _found;  
+
+  /** File-based configuration, or {@code null} for explicit HBase parameters. */
+  private String _properties;
     
   private JanusGraph _graph;
   

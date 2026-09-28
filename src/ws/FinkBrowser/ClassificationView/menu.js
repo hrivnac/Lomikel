@@ -1,39 +1,75 @@
 function makeDraggable(header, panel) {
-  let offsetX, offsetY, isDown = false;
-  header.addEventListener('mousedown', e => {isDown = true;
-                                             offsetX = e.clientX - panel.offsetLeft;
-                                             offsetY = e.clientY - panel.offsetTop;
-                                             });
-  window.addEventListener('mouseup', () => isDown = false);
-  window.addEventListener('mousemove', e => {if (!isDown) return;
-                                             panel.style.left = (e.clientX - offsetX) + 'px';
-                                             panel.style.top = (e.clientY - offsetY) + 'px';
-                                             });
-  }
-  
+  const state = {
+    x: 0,
+    y: 0,
+    animation: null,
+    activePointer: null,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0,
+    startRect: null,
+  };
+
+  const applyTranslation = (x, y) => {
+    state.animation?.cancel();
+    state.animation = panel.animate(
+      [{ transform: `translate(${x}px, ${y}px)` }],
+      { duration: 1, fill: "forwards" },
+    );
+    state.animation.finish();
+    state.x = x;
+    state.y = y;
+  };
+
+  const stopDragging = (event) => {
+    if (event.pointerId !== state.activePointer) return;
+    state.activePointer = null;
+  };
+
+  header.addEventListener("pointerdown", (event) => {
+    if (window.matchMedia("(max-width: 760px)").matches) return;
+    state.activePointer = event.pointerId;
+    state.startX = event.clientX;
+    state.startY = event.clientY;
+    state.originX = state.x;
+    state.originY = state.y;
+    state.startRect = panel.getBoundingClientRect();
+    header.setPointerCapture(event.pointerId);
+  });
+
+  header.addEventListener("pointermove", (event) => {
+    if (event.pointerId !== state.activePointer) return;
+    const parentRect = panel.offsetParent.getBoundingClientRect();
+    const rawLeft = state.startRect.left + event.clientX - state.startX;
+    const rawTop = state.startRect.top + event.clientY - state.startY;
+    const left = Math.min(
+      parentRect.right - state.startRect.width,
+      Math.max(parentRect.left, rawLeft),
+    );
+    const top = Math.min(
+      parentRect.bottom - state.startRect.height,
+      Math.max(parentRect.top, rawTop),
+    );
+    applyTranslation(
+      state.originX + left - state.startRect.left,
+      state.originY + top - state.startRect.top,
+    );
+  });
+
+  header.addEventListener("pointerup", stopDragging);
+  header.addEventListener("pointercancel", stopDragging);
+  header.addEventListener("lostpointercapture", stopDragging);
+}
+
 makeDraggable(document.getElementById("controls-header"), document.getElementById("controls"));
-makeDraggable(document.getElementById("list-header"),     document.getElementById("list"));
+makeDraggable(document.getElementById("list-header"), document.getElementById("list"));
 
-const nmaxSlider = document.getElementById("nmax");
+const controlsForm = document.getElementById("controlsForm");
+controlsForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (controlsForm.reportValidity()) loadNeighborhood();
+});
 
-function sliderToNmax(t) {
-  // t in [0,1]
-  if (t <= 0.5) {
-    // left half maps linearly to 0..1
-    return t * 2.0;
-    }
-  else {
-    // right half maps logarithmically to 1..20
-    const u = (t - 0.5) / 0.5; // 0..1
-    return Math.pow(20, u);   // 20^0..20^1 -> 1..20
-    }
-  }
-  
-nmaxSlider.oninput = () => {const t = parseFloat(nmaxSlider.value);
-                            let nmax = sliderToNmax(t);
-                            if (nmax > 1) nmax = Math.round(nmax); // integers in 1..20
-                            // format display
-                            const disp = (nmax > 1) ? String(nmax) : nmax.toFixed(2).replace(/\.?0+$/, '');
-                            document.getElementById("nmaxValue").textContent = disp;
-                            };
-nmaxSlider.dispatchEvent(new Event('input'));
+document.getElementById("cancelBtn").addEventListener("click", cancelNeighborhoodLoad);
+document.getElementById("resetBtn").addEventListener("click", () => window.resetZoom?.());

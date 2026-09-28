@@ -1,88 +1,104 @@
-const overlapCache = {};
+const overlapCache = new Map();
 
-async function getOverlapPositions(survey, classifier, classList, radius, centerX, centerY) {
-  let overlaps;
-  const cacheKey = `${survey}:${classifier}`;
-  try {
-    showSpinner(true, "blue");
-    if (overlapCache[cacheKey]) {
-      console.log(`Using cached overlaps for ${survey} ${classifier}`);
-      overlaps = overlapCache[cacheKey]
-      }
-    else {
-      console.log(`Fetching overlaps for ${survey} ${classifier}...`);
-      const url = `/FinkBrowser/Overlaps.jsp?survey=${survey}&classifier=${classifier}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch overlaps");
-      overlaps = await response.json();
-      if (!Array.isArray(overlaps) || overlaps.length === 0) {
-        throw new Error("No overlap data");
-        }
-      overlapCache[cacheKey] = overlaps;
-      }
-    // Filter and normalize overlaps
-    const links = [];
-    const overlapMap = {};
-    let maxOverlap = 0;
-    //
-    for (const item of overlaps) {
-      const c1 = item.first.class?.trim();
-      const c2 = item.second.class?.trim();
-      const val = parseFloat(item.overlap);
-      if (!c1 || !c2 || c1 === c2 || isNaN(val)) continue; // ignore invalid or self
-      if (!classList.includes(c1) || !classList.includes(c2)) continue; // keep only relevant classes
-      overlapMap[c1] = overlapMap[c1] || {};
-      overlapMap[c1][c2] = val;
-      links.push({ source: c1, target: c2, value: val });
-      if (val > maxOverlap) maxOverlap = val;
-      }
-    if (links.length === 0) throw new Error("No valid overlap links");
-    // Create nodes
-    const nodes = classList.map(c => ({id: c}));
-    // Define force simulation
-    const minDist = radius * 0.15;
-    const maxDist = radius * 1.2;
-    const simLinks = links.map(l => ({source: l.source,
-                                      target: l.target,
-                                      distance: minDist + (1 - l.value / maxOverlap) * (maxDist - minDist),
-                                      strength: 0.3 + 0.7 * (l.value / maxOverlap)
-                                      }));
-    const simulation = d3.forceSimulation(nodes)
-                         .force("link", d3.forceLink(simLinks)
-                                          .id(d => d.id)
-                                          .distance(d => d.distance)
-                                          .strength(d => d.strength))
-                         .force("charge", d3.forceManyBody().strength(-radius * 0.6))
-                         .force("center", d3.forceCenter(centerX, centerY))
-                         .stop();
-    // Run layout simulation
-    for (let i = 0; i < 300; i++) simulation.tick();    
-    // Normalize final positions onto a circular boundary
-    const positions = {};
-    nodes.forEach(n => {const angle = Math.atan2(n.y - centerY, n.x - centerX);           
-                        positions[n.id] = {angle: angle,
-                                           x: centerX + radius * Math.cos(angle),
-                                           y: centerY + radius * Math.sin(angle)
-                                           };
-                        });
-    return positions;
-    }
-  catch (err) {
-    window.alert("Overlap layout failed, using equidistant fallback");
-    console.warn("Overlap layout failed, using equidistant fallback:", err.message);
-    // fallback layout
-    const angleScale = d3.scaleLinear()
-                         .domain([0, classList.length])
-                         .range([0, 2 * Math.PI]);
-    const pos = {};
-    classList.forEach((c, i) => {const a = angleScale(i);
-                                 pos[c] = {x: centerX + radius * Math.cos(a),
-                                           y: centerY + radius * Math.sin(a)
-                                           };
-                                 });
-    return pos;
-    }
-  finally {
-    showSpinner(false);
+function equidistantPositions(classList, radius, centerX, centerY) {
+  const positions = {};
+  classList.forEach((name, index) => {
+    const angle = (2 * Math.PI * index) / Math.max(classList.length, 1);
+    positions[name] = {
+      angle,
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle),
+    };
+  });
+  return positions;
+}
+
+function normalizeOverlapLinks(overlaps, classList) {
+  const visibleClasses = new Set(classList);
+  const uniqueLinks = new Map();
+
+  for (const item of overlaps) {
+    const first = String(item?.first?.class || "").trim();
+    const second = String(item?.second?.class || "").trim();
+    const value = item?.overlap;
+    if (
+      !first ||
+      !second ||
+      first === second ||
+      typeof value !== "number" ||
+      !Number.isFinite(value) ||
+      value <= 0 ||
+      !visibleClasses.has(first) ||
+      !visibleClasses.has(second)
+    ) continue;
+
+    const [source, target] = first < second ? [first, second] : [second, first];
+    const key = `${source}\u0000${target}`;
+    const previous = uniqueLinks.get(key);
+    if (!previous || value > previous.value) {
+      uniqueLinks.set(key, { source, target, value });
     }
   }
+
+  const links = [...uniqueLinks.values()];
+  const maxOverlap = links.reduce(
+    (maximum, link) => Math.max(maximum, link.value),
+    0,
+  );
+  return { links, maxOverlap };
+}
+
+function loadOverlaps(survey, classifier, endpoint) {
+  const cacheKey = `${endpoint.graphUrl}|${survey}|${classifier}`;
+  let overlapPromise = overlapCache.get(cacheKey);
+  if (!overlapPromise) {
+    overlapPromise = LomikelGraph.overlaps2JSON(classifier, {
+      ...endpoint,
+      timeoutMs: 90_000,
+    }).then((overlaps) => {
+      if (!Array.isArray(overlaps)) throw new Error("overlap response is not an array");
+      return overlaps;
+    }).catch((error) => {
+      overlapCache.delete(cacheKey);
+      throw error;
+    });
+    overlapCache.set(cacheKey, overlapPromise);
+  }
+  return overlapPromise;
+}
+
+async function getOverlapPositions(survey, classifier, classList, radius, centerX, centerY) {
+  const endpoint = GRAPH_ENDPOINTS[survey];
+  if (!endpoint) throw new Error(`${survey} graph endpoint is not configured`);
+  const overlaps = await loadOverlaps(survey, classifier, endpoint);
+  const { links, maxOverlap } = normalizeOverlapLinks(overlaps, classList);
+  if (!links.length || !(maxOverlap > 0)) {
+    return equidistantPositions(classList, radius, centerX, centerY);
+  }
+
+  const nodes = classList.map((id) => ({ id }));
+  const simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links)
+      .id((node) => node.id)
+      .distance((link) => radius * (0.15 + 1 - link.value / maxOverlap))
+      .strength((link) => 0.3 + 0.7 * link.value / maxOverlap))
+    .force("charge", d3.forceManyBody().strength(-radius * 0.6))
+    .force("center", d3.forceCenter(centerX, centerY))
+    .stop();
+  for (let tick = 0; tick < 300; tick += 1) simulation.tick();
+
+  const positions = {};
+  for (const node of nodes) {
+    const angle = Math.atan2(node.y - centerY, node.x - centerX);
+    positions[node.id] = {
+      angle,
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle),
+    };
+  }
+  return positions;
+}
+
+if (typeof module === "object" && module.exports) {
+  module.exports = { normalizeOverlapLinks };
+}

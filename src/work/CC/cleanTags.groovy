@@ -12,8 +12,8 @@ import org.apache.logging.log4j.core.config.Configurator;
 Configurator.initialize(null, '../src/java/log4j2.xml');
 log = LogManager.getLogger(this.class);
 
-jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CC.properties");
+jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CCRW.properties");
 gr = new FinkGremlinRecipiesG(jc);
     
 log.info("Cleaning already processed NewTags");
-gr.dropV("NewTag", 1000, "processed", "true");
+gr.dropV("NewTag", 1000, "processed", true);

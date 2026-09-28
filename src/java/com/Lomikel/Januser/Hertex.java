@@ -52,10 +52,14 @@ public class Hertex extends Wertex {
     if (rowkey() != null) {
       String n = null;
       Map<String, Map<String, String>> results = _client.scan(rowkey(), n, "*", 0, 0, false, true);
-      if (!results.isEmpty()) {
-        property("hbase", true);
+      if (results.isEmpty()) {
+        return;
         }
       Map<String, String> allFields = results.get(rowkey());
+      if (allFields == null || allFields.isEmpty()) {
+        return;
+        }
+      property("hbase", true);
       Map<String, String> fields2fill;
       if (fields == null) {
         fields2fill = allFields;
@@ -99,7 +103,7 @@ public class Hertex extends Wertex {
       log.warn( "Cannot enhance");
       return vertex;
       }
-    if (vertex.property("lbl") == null) {
+    if (!vertex.property("lbl").isPresent()) {
       log.warn( "Cannot enhance, no label");
       return vertex;
       }
@@ -149,12 +153,16 @@ public class Hertex extends Wertex {
                                          String                 rowkey,
                                          GraphTraversalSource   g,
                                          String                 fields) {
-    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, rowkeyName(representant(lbl)), rowkey).toList();
+    String propertyName = rowkeyName(representant(lbl));
+    if (propertyName == null) {
+      throw new IllegalStateException("No row-key mapping configured for label " + lbl);
+      }
+    List<Vertex> vertexes = new GremlinRecipies(g).getOrCreate(lbl, propertyName, rowkey).toList();
     List<Vertex> newVertexes = new ArrayList<>();
     for (Vertex v : vertexes) {
       newVertexes.add(enhance(v, fields));
       }
-    return vertexes;
+    return newVertexes;
     }
     
   //@Override

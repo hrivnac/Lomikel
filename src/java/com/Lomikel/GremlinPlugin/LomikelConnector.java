@@ -2,7 +2,6 @@ package com.Lomikel.GremlinPlugin;
 
 import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.HBaser.HBaseClient;
-import com.Lomikel.Phoenixer.PhoenixProxyClient;
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies;
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 
@@ -31,7 +30,6 @@ public class LomikelConnector extends AbstractGremlinPlugin {
     super("Lomikel.connector",
           imports(new Class[]{GremlinRecipies.class,
                               FinkGremlinRecipies.class,
-                              PhoenixProxyClient.class,
                               HBaseClient.class,
                               FinkHBaseClient.class}),
           new LomikelConsoleCustomizer());
@@ -52,7 +50,6 @@ public class LomikelConnector extends AbstractGremlinPlugin {
     for (Class cl : classes) {
       builder.addClassImports(cl);
       }
-    //.addMethodImports(PhoenixProxyClient.class.getMethod("test"))
     return builder.create();
     }
 
