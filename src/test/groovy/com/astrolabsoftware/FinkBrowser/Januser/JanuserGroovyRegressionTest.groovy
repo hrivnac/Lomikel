@@ -11,6 +11,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.strategy.AbstractTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.strategy.verification.VerificationException
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategy.VerificationStrategy
 import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.structure.Edge
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
@@ -320,7 +321,33 @@ final class JanuserGroovyRegressionTest {
       graph.close()
       }
     assertClassificationMultiPropertyEquivalence()
+    assertOverlapsUsesIndexedLbl()
     println 'JanuserGroovyRegressionTest: OK'
+    }
+
+  private static void assertOverlapsUsesIndexedLbl() {
+    def graph = JanusGraphFactory.build().set('storage.backend', 'inmemory').
+                                  set('query.force-index', true).open()
+    try {
+      def management = graph.openManagement()
+      def lbl = management.makePropertyKey('lbl').dataType(String.class).make()
+      management.buildIndex('byLblE', Edge.class).addKey(lbl).buildCompositeIndex()
+      management.commit()
+      def source = graph.traversal()
+      def a = source.addV('OCol').property('lbl', 'OCol').
+                     property('classifier', 'TAG').property('flavor', '').property('cls', 'A').next()
+      def b = source.addV('OCol').property('lbl', 'OCol').
+                     property('classifier', 'TAG').property('flavor', '').property('cls', 'B').next()
+      a.addEdge('overlaps', b, 'lbl', 'overlaps', 'intersection', 2.0d)
+      a.addEdge('audit', b, 'lbl', 'overlaps', 'intersection', 9.0d)
+      source.tx().commit()
+      def recipes = new TestRecipes(source: source.withStrategies(new RejectHostLanguageFiltersStrategy()))
+      assert recipes.overlaps() == ['OCol:TAG::B * OCol:TAG::A': 2.0d] :
+             'overlap listing must use the edge lbl index and still reject a forged native label'
+      }
+    finally {
+      graph.close()
+      }
     }
 
   private static void assertClassificationMultiPropertyEquivalence() {
@@ -417,6 +444,18 @@ final class JanuserGroovyRegressionTest {
       }
     def createHBaseDataLinkClient(String hostname, String port) { hbaseClient }
     def openDataLinkGraph(String backend, String hostname, String port, String table) { targetGraph }
+    }
+
+  private static final class RejectHostLanguageFiltersStrategy
+      extends AbstractTraversalStrategy<VerificationStrategy>
+      implements VerificationStrategy {
+
+    @Override
+    void apply(Traversal.Admin<?, ?> traversal) {
+      if (traversal.steps.any { it.class.simpleName == 'LambdaFilterStep' }) {
+        throw new VerificationException('host-language filter cannot be sent to remote Gremlin', traversal)
+        }
+      }
     }
 
   private static final class RequireOverlapFilterBeforeProjectionStrategy

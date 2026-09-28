@@ -20,6 +20,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.repeat
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.values;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.count;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.addV;
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.label;
 import static org.apache.tinkerpop.gremlin.process.traversal.P.within;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -280,12 +281,12 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     //log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with attributes " + attributes + ", replace = " + replace);
     log.info("\tregistering " + objectId + " as " + classifier + " / " + cls + " with weight = " + weight + ", replace = " + replace);
     String importDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-    Vertex ocol = g().V().hasLabel("OCol").
-                          has("lbl",        "OCol"             ).
+    Vertex ocol = g().V().has("lbl",        "OCol"             ).
                           has("survey",     classifier.survey()).
                           has("classifier", classifier.name()  ).
                           has("flavor",     classifier.flavor()).
                           has("cls",        cls                ).
+                          filter(label().is("OCol")).
                           fold().
                           coalesce(unfold(), 
                                   addV("OCol").
@@ -299,9 +300,9 @@ public class FinkGremlinRecipies extends GremlinRecipies {
     Vertex s = classificationTransaction ? _classificationObjects.get().get(objectId) : null;
     boolean cacheObject = false;
     if (s == null) {
-      s = g().V().hasLabel("object").
-                  has("lbl",      "object").
+      s = g().V().has("lbl",      "object").
                   has("objectId", objectId).
+                  filter(label().is("object")).
                   fold().
                   coalesce(unfold(),
                            addV("object").
