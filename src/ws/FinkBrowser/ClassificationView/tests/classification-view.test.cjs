@@ -76,7 +76,7 @@ test("graph helper keeps exact request body and slash classifiers browser-safe",
     "utf8",
   );
   assert.match(graph, /Content-Type.*text\/plain;charset=UTF-8/);
-  assert.match(read("index.html"), /FEATURES=2025\/13-50/);
+  assert.match(read("classifiers.js"), /FEATURES=2025\/13-50/);
 });
 
 test("form reads the nmax input value rather than empty element text", () => {

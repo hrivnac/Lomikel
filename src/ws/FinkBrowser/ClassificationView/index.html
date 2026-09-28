@@ -62,25 +62,10 @@
         <input id="objectId" name="objectId" inputmode="text" autocomplete="off" spellcheck="false" required>
 
         <label for="classifier">Classifier</label>
-        <select id="classifier" name="classifier">
-          <option value="FINK">FINK</option>
-          <option value="XMATCH">XMATCH</option>
-          <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
-          <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
-          <option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option>
-          <option value="TAG">TAG</option>
-        </select>
+        <select id="classifier" name="classifier"></select>
 
         <label for="reclassifier">Re-classifier</label>
-        <select id="reclassifier" name="reclassifier">
-          <option value="none">None</option>
-          <option value="FINK">FINK</option>
-          <option value="XMATCH">XMATCH</option>
-          <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
-          <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
-          <option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option>
-          <option value="TAG">TAG</option>
-        </select>
+        <select id="reclassifier" name="reclassifier"></select>
 
         <label for="metric">Distance metric</label>
         <select id="metric" name="metric">
@@ -136,6 +121,7 @@
   <script src="list.js"></script>
   <script src="help.js"></script>
   <script src="spinner.js"></script>
+  <script src="classifiers.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

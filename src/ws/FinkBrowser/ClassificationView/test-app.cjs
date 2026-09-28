@@ -8,7 +8,21 @@ const path = require("node:path");
 const dir = __dirname;
 const html = fs.readFileSync(path.join(dir, "index.html"), "utf8");
 
-function harness({ query = "", graph = async (id) => ({ objectId: id, objects: {}, objectClassification: {} }), catalog = async () => [] } = {}) {
+test("classifier choices are a local script, with no JSP request or duplicate HTML options", async () => {
+  assert.match(html, /<script src="classifiers\.js"><\/script>[\s\S]*<script src="app\.js"><\/script>/);
+  const catalog = fs.readFileSync(path.join(dir, "classifiers.js"), "utf8");
+  assert.match(catalog, /FEATURES=2025\/13-50/);
+  assert.match(catalog, /FEATURES=2024\/13-60/);
+  assert.doesNotMatch(html, /<option value="(?:FINK|XMATCH|TAG|FEATURES=|LIGHTCURVES=)/);
+  const h = harness();
+  h.el("objectId").value = "170028526873870371";
+  h.el("objectId").fire("input");
+  await settle();
+  assert.deepEqual(h.requests, []);
+  assert.deepEqual(h.el("classifier").options.map((option) => option.value), ["FINK", "TAG"]);
+});
+
+function harness({ query = "", graph = async (id) => ({ objectId: id, objects: {}, objectClassification: {} }) } = {}) {
   const elements = new Map();
   const requests = [];
   const renders = [];
@@ -31,10 +45,10 @@ function harness({ query = "", graph = async (id) => ({ objectId: id, objects: {
     parseNeighborhoodLimit: (value) => Number(value),
     showObjectNeighborhood: async (data) => { renders.push(data); return {}; },
     updateDetailsPanel() {},
-    fetch: async (url) => { requests.push(url); return { ok: true, json: () => catalog(url) }; },
+    fetch: async (url) => { requests.push(url); throw new Error("Unexpected catalog request"); },
     LomikelGraph: { objectNeighborhood2JSON: graph },
   });
-  for (const file of ["data.js", "app.js"]) vm.runInContext(fs.readFileSync(path.join(dir, file), "utf8"), context, { filename: file });
+  for (const file of ["classifiers.js", "data.js", "app.js"]) vm.runInContext(fs.readFileSync(path.join(dir, file), "utf8"), context, { filename: file });
   return { el: (id) => elements.get(id), requests, renders, run: (code) => vm.runInContext(code, context) };
 }
 const settle = () => new Promise((resolve) => setImmediate(resolve));
@@ -54,20 +68,15 @@ test("startup defaults come only from app.js and do not start slow graph work", 
   assert.equal(calls, 0);
 });
 
-test("typed numeric ID changes survey and both classifier menus, preserving graph flavors", async () => {
-  const h = harness({ catalog: async () => [
-    { survey: "ZTF", classifier: "FEATURES", flavor: "2026/new" },
-    { survey: "LSST", classifier: "XMATCH" },
-  ] });
-  await settle();
-  assert.ok(h.el("classifier").options.some((option) => option.value === "FEATURES=2026/new"));
+test("typed numeric ID changes survey and both classifier menus from the local catalog", () => {
+  const h = harness();
+  assert.ok(h.el("classifier").options.some((option) => option.value === "FEATURES=2025/13-50"));
   assert.ok(h.el("classifier").options.some((option) => option.value === "LIGHTCURVES=Latent"));
   h.el("objectId").value = "170028526873870371";
   h.el("objectId").fire("input");
-  await settle();
   assert.equal(h.el("survey").value, "LSST");
-  assert.deepEqual(h.el("classifier").options.map((option) => option.value), ["FINK", "TAG", "XMATCH"]);
-  assert.deepEqual(h.el("reclassifier").options.map((option) => option.value), ["none", "FINK", "TAG", "XMATCH"]);
+  assert.deepEqual(h.el("classifier").options.map((option) => option.value), ["FINK", "TAG"]);
+  assert.deepEqual(h.el("reclassifier").options.map((option) => option.value), ["none", "FINK", "TAG"]);
 });
 
 test("URL object ID overrides conflicting survey and navigation infers survey", async () => {
@@ -85,27 +94,23 @@ test("URL object ID overrides conflicting survey and navigation infers survey", 
   assert.equal(calls[0].options.graphUrl, "http://157.136.253.253:24444");
 });
 
-test("late graph and catalog responses cannot overwrite the latest survey", async () => {
+test("late graph responses cannot overwrite the latest survey", async () => {
   const pending = new Map();
-  const catalogs = new Map();
   const h = harness({
     graph: (id) => new Promise((resolve) => pending.set(id, resolve)),
-    catalog: (url) => new Promise((resolve) => catalogs.set(new URL(url, "http://localhost").searchParams.get("survey"), resolve)),
   });
   const old = h.run("loadNeighborhood()");
   h.el("objectId").value = "170028526873870371";
   h.el("objectId").fire("input");
   const latest = h.run("loadNeighborhood()");
   await settle();
-  catalogs.get("LSST")([{ survey: "LSST", classifier: "TAG" }]);
   pending.get("170028526873870371")({ objectId: "170028526873870371", objects: {} });
   await latest;
-  catalogs.get("ZTF")([{ survey: "ZTF", classifier: "FEATURES", flavor: "old" }]);
   pending.get("ZTF17aackceb")({ objectId: "ZTF17aackceb", objects: {} });
   await old;
   await settle();
   assert.deepEqual(h.renders.map((data) => data.objectId), ["170028526873870371"]);
-  assert.equal(h.el("classifier").options.some((option) => option.value === "FEATURES=old"), false);
+  assert.deepEqual(h.el("classifier").options.map((option) => option.value), ["FINK", "TAG"]);
 });
 
 test("invalid ID is rejected before graph access", async () => {

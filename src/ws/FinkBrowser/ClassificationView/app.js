@@ -5,12 +5,6 @@ const DEFAULT_OBJECT_IDS = Object.freeze({
   LSST: "170028486134595648",
   ZTF: DEFAULTS.objectId,
 });
-const CLASSIFIERS = Object.freeze({
-  LSST: ["FINK", "TAG"],
-  ZTF: ["FINK", "XMATCH", "FEATURES=2025/13-50", "FEATURES=2024/13-60", "LIGHTCURVES=Latent", "TAG"],
-});
-let catalogRequest = 0;
-
 function surveyForObjectId(id) {
   const value = String(id).trim();
   if (/^ZTF/i.test(value)) return "ZTF";
@@ -29,30 +23,10 @@ function populateClassifierSelect(select, choices, fallback) {
   select.value = choices.includes(previous) ? previous : fallback;
 }
 
-function setClassifiers(survey, records = []) {
-  const fallback = CLASSIFIERS[survey];
-  const found = records.filter((row) => row &&
-    (row.survey === survey || row.survey === "ANY") &&
-    typeof row.classifier === "string")
-    .map((row) => row.flavor ? `${row.classifier}=${row.flavor}` : row.classifier)
-    .filter((value) => /^(?:FINK|XMATCH|TAG|FEATURES=[A-Za-z0-9._/-]+|LIGHTCURVES=[A-Za-z0-9._/-]+)$/.test(value));
-  const choices = [...fallback, ...[...new Set(found)].filter((value) => !fallback.includes(value)).sort()];
+function refreshClassifiers(survey) {
+  const choices = CLASSIFIERS[survey];
   populateClassifierSelect(document.getElementById("classifier"), choices, DEFAULTS.classifier);
   populateClassifierSelect(document.getElementById("reclassifier"), ["none", ...choices], DEFAULTS.reclassifier);
-}
-
-async function refreshClassifiers(survey) {
-  const request = ++catalogRequest;
-  setClassifiers(survey);
-  try {
-    const response = await fetch(`/FinkBrowser/Classifiers.jsp?survey=${encodeURIComponent(survey)}`);
-    if (!response.ok) throw new Error(`Classifier catalog: HTTP ${response.status}`);
-    const records = await response.json();
-    if (request === catalogRequest && surveyInput.value === survey)
-      setClassifiers(survey, Array.isArray(records) ? records : []);
-  } catch (error) {
-    if (request === catalogRequest) console.warn("Using classifier fallback catalog:", error);
-  }
 }
 
 const startupParameters = new URLSearchParams(window.location.search);
