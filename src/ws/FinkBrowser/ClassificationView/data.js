@@ -30,17 +30,30 @@ async function fetchNeighborhood(params) {
     }
   }
   
+let neighborhoodRequest = 0;
+
 async function loadNeighborhood(objectId = null) {
+  const request = ++neighborhoodRequest;
+  const input = document.getElementById("objectId");
+  if (objectId !== null) input.value = String(objectId);
+  const id = input.value.trim();
+  const survey = syncSurveyFromId(id);
+  if (!survey) {
+    window.alert("Enter a ZTF object ID (starting ZTF) or a numeric LSST object ID.");
+    return;
+  }
   const nmaxText = document.getElementById("nmaxValue").textContent;
   const nmaxVal = parseFloat(nmaxText);
-  const params = {objectId: objectId || document.getElementById("objectId").value,
+  const params = {objectId: id,
+                  survey: survey,
                   classifier: document.getElementById("classifier").value,
                   reclassifier: document.getElementById("reclassifier").value,
                   metric: document.getElementById("metric").value,
                   nmax: nmaxVal
                   };
   const data = await fetchNeighborhood(params);
-  updateDetailsPanel(data, document.getElementById("survey").value);
+  if (request !== neighborhoodRequest) return;
+  updateDetailsPanel(data, survey);
   showObjectNeighborhood(data);
   }
 

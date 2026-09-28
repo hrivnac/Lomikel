@@ -2,11 +2,12 @@ const overlapCache = {};
 
 async function getOverlapPositions(survey, classifier, classList, radius, centerX, centerY) {
   let overlaps;
+  const cacheKey = `${survey}:${classifier}`;
   try {
     showSpinner(true, "blue");
-    if (overlapCache[classifier]) { // BUG: cache doesn't handle survey
+    if (overlapCache[cacheKey]) {
       console.log(`Using cached overlaps for ${survey} ${classifier}`);
-      overlaps = overlapCache[classifier]
+      overlaps = overlapCache[cacheKey]
       }
     else {
       console.log(`Fetching overlaps for ${survey} ${classifier}...`);
@@ -14,10 +15,10 @@ async function getOverlapPositions(survey, classifier, classList, radius, center
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch overlaps");
       overlaps = await response.json();
-      overlapCache[classifier] = overlaps;
       if (!Array.isArray(overlaps) || overlaps.length === 0) {
         throw new Error("No overlap data");
         }
+      overlapCache[cacheKey] = overlaps;
       }
     // Filter and normalize overlaps
     const links = [];

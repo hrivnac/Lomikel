@@ -96,7 +96,7 @@ async function showObjectNeighborhood(data) {
              .text(obj.distance.toFixed(4))
              .style("font-size", "10px")
              .style("fill", "#666");
-    drawObject(container, id, pos, "blue", obj.classes, tooltip, hideTimeout, false. survey);
+    drawObject(container, id, pos, "blue", obj.classes, tooltip, hideTimeout, false, survey);
     }
   tooltip.on("mouseover", () => clearTimeout(hideTimeout))
          .on("mouseout", () => {hideTimeout = setTimeout(() => tooltip.style("display", "none"), 900);});

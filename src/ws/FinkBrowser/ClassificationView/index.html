@@ -17,14 +17,13 @@
         <p>Application shows classification-based neigborhood (i.e. other objects with similar classification)
            for any object of ZTF or LSST. User can choose:
            <ul>
-             <li><b>Object ID</b> of requested object from either ZTF or LSST.</li>
+             <li><b>Object ID</b> of requested object from either ZTF (starts with ZTF) or LSST (numeric). The survey is selected automatically.</li>
              <li><b>Classifier</b> used to classify objects.
                  <ul>
-                   <li><b>FINK</b> is based on the FINK classiofication.</li>
-                   <li><b>XMATCH</b> is based on other classifications aquired via FINK.</li>
-                   <li><b>FEATURES</b> uses classification based on PCA and clusterring of alerts physical properties.</li>
-                   <li><b>LIGHTCURVES</b> uses learned properties of objects light curves.</li>
-                   <li><b>TAG</b> is using user-supplied selections.</li>
+                   <li><b>FINK</b> is based on the FINK classification (ZTF and LSST).</li>
+                   <li><b>XMATCH</b> is based on other classifications acquired via FINK (ZTF only).</li>
+                   <li><b>FEATURES</b> uses PCA/clustering of alert properties, with 2025/13-50 and 2024/13-60 flavors (ZTF only).</li>
+                   <li><b>TAG</b> uses user-supplied selections (ZTF and LSST).</li>
                    </ul>
                </li>
              <li><b>Re-Classifier</b> can re-interpred classification by another Classifier. 
@@ -58,50 +57,33 @@
         <label>Survey:
           <select id="survey">
             <option value="ZTF">ZTF</option>
-            <option value="LSST"selected>LSST</option>
+            <option value="LSST">LSST</option>
             </select>
           </label>
         <br>  
         <label>Object ID:
-          <!--input type="text" id="objectId" value="ZTF20aalmymq"-->
-          <input type="text" id="objectId" value="170028526873870371">
+          <input type="text" id="objectId">
           </label>
         <br>  
         <label>Classifier:
-          <select id="classifier">
-            <option value="FINK" selected>FINK</option>
-            <option value="XMATCH"XMATCH</option>
-            <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
-            <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
-            <option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option>
-            <option value="TAG">TAG</option>
-            </select>
+          <select id="classifier"></select>
           </label>
         <br>  
         <label>Re-Classifier:
-          <select id="reclassifier">
-            <option value="none" selected>none</option>
-            <option value="FINK">FINK</option>
-            <option value="XMATCH">XMATCH</option>
-            <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
-            <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
-            <option value="LIGHTCURVES=Latent">LIGHTCURVES Latent</option>
-            <option value="TAG">TAG</option>
-            </select>
+          <select id="reclassifier"></select>
           </label>
         <br>  
         <label>Metric:
           <select id="metric">
-            <option value="JensenShannon" selected>JensenShannon</option>
+            <option value="JensenShannon">JensenShannon</option>
             <option value="Euclidean">Euclidean</option>
             <option value="Cosine">Cosine</option>
             </select>
           </label>
         <br>  
-        <!-- slider range remains 0..1 but initial value set to 0.25 so displayed nmax = 0.5 -->
         <label>nmax:
-          <input type="range" id="nmax" min="0" max="1" step="0.001" value="0.25">
-          <span id="nmaxValue">0.5</span>
+          <input type="range" id="nmax" min="0" max="1" step="0.001">
+          <span id="nmaxValue"></span>
           </label>
         <br>  
         <button id="showBtn">Show</button>
