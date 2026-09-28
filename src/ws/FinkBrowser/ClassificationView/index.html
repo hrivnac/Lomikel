@@ -54,16 +54,16 @@
       <form id="controlsForm" class="panel-body">
         <label for="survey">Survey</label>
         <select id="survey" name="survey">
-          <option value="LSST" selected>LSST</option>
+          <option value="LSST">LSST</option>
           <option value="ZTF">ZTF</option>
         </select>
 
         <label for="objectId">Object ID</label>
-        <input id="objectId" name="objectId" value="313985349745377418" inputmode="text" autocomplete="off" spellcheck="false" required>
+        <input id="objectId" name="objectId" inputmode="text" autocomplete="off" spellcheck="false" required>
 
         <label for="classifier">Classifier</label>
         <select id="classifier" name="classifier">
-          <option value="FINK" selected>FINK</option>
+          <option value="FINK">FINK</option>
           <option value="XMATCH">XMATCH</option>
           <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
           <option value="FEATURES=2024/13-60">FEATURES 2024/13-60</option>
@@ -73,7 +73,7 @@
 
         <label for="reclassifier">Re-classifier</label>
         <select id="reclassifier" name="reclassifier">
-          <option value="none" selected>None</option>
+          <option value="none">None</option>
           <option value="FINK">FINK</option>
           <option value="XMATCH">XMATCH</option>
           <option value="FEATURES=2025/13-50">FEATURES 2025/13-50</option>
@@ -84,13 +84,13 @@
 
         <label for="metric">Distance metric</label>
         <select id="metric" name="metric">
-          <option value="JensenShannon" selected>Jensen–Shannon</option>
+          <option value="JensenShannon">Jensen–Shannon</option>
           <option value="Euclidean">Euclidean</option>
           <option value="Cosine">Cosine</option>
         </select>
 
         <label for="nmaxValue">Neighbor limit</label>
-        <input type="number" id="nmaxValue" name="nmax" min="0" max="20" step="any" value="10" aria-describedby="nmax-help" required>
+        <input type="number" id="nmaxValue" name="nmax" min="0" max="20" step="any" aria-describedby="nmax-help" required>
         <small id="nmax-help">1–20: count · 0 &lt; cutoff &lt; 1: relative cutoff · 0: all (slow)</small>
 
         <button id="showBtn" class="primary-button" type="submit">Show neighborhood</button>

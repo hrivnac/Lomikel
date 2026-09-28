@@ -20,6 +20,8 @@ The configured LSST and ZTF endpoints currently use plaintext HTTP. A page serve
 
 Neighbor limits accept an integer count from 1 through 20, a relative cutoff strictly between 0 and 1, or 0 for all neighbors. The last mode can be slow. Before rendering, responses are checked for exact object IDs, finite non-negative graph distances and classification weights, matching focal IDs, and bounded object/class counts. Classification weights emitted as canonical decimal or scientific-notation strings by the current backend are normalized to numbers; other JSON types and malformed strings are rejected.
 
+Startup parameters live in `app.js`: the default is ZTF17aackceb, limit 20, and Jensen–Shannon metric. No graph request runs until the form is submitted. A `ZTF`-prefixed object ID selects ZTF; a numeric ID selects LSST, including when recentering. Classifier and re-classifier choices are survey-specific, with graph metadata from `/FinkBrowser/Classifiers.jsp` supplementing the built-in fallback choices when the JSP is available. The standalone local server does not execute JSP, so it uses the fallback catalog.
+
 ## Projection semantics
 
 The map is an approximate 2D projection, not an exact embedding:
@@ -47,4 +49,5 @@ Only distances from the selected alert are supplied by the neighborhood API. The
 ```sh
 node --test src/js/FinkTasks/tests/fink_graph.test.cjs
 node --test src/ws/FinkBrowser/ClassificationView/tests/*.test.cjs
+node --test src/ws/FinkBrowser/ClassificationView/test-app.cjs
 ```

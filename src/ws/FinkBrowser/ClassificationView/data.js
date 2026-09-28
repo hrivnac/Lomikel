@@ -25,10 +25,14 @@ function readNeighborhoodParameters(objectId = null) {
     ? document.getElementById("objectId").value
     : objectId;
   const trimmedId = String(inputId).trim();
-  if (!trimmedId) throw new Error("Enter an object ID");
+  const survey = surveyForObjectId(trimmedId);
+  if (!survey) throw new Error("Enter a ZTF object ID or a numeric LSST object ID");
+  // Inferred survey takes precedence over a stale manual selection, including
+  // recenter actions from a map or neighbor list.
+  syncSurveyFromId(trimmedId);
 
   return {
-    survey: document.getElementById("survey").value,
+    survey,
     objectId: trimmedId,
     classifier: document.getElementById("classifier").value,
     reclassifier: document.getElementById("reclassifier").value,

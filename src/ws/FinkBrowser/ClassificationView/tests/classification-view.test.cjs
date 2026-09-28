@@ -50,15 +50,16 @@ test("both LSST and ZTF graph endpoints are enabled under CSP", () => {
 test("survey selection provides verified sample object IDs without overwriting custom input", () => {
   const app = read("app.js");
   assert.match(app, /LSST: "170028486134595648"/);
-  assert.match(app, /ZTF: "ZTF17aackceb"/);
+  assert.match(app, /objectId: "ZTF17aackceb"/);
   assert.match(app, /surveyInput\.addEventListener\("change"/);
-  assert.match(app, /previousSurvey/);
+  assert.match(app, /surveyForObjectId/);
 });
 
 test("survey changes invalidate pending work and clear results from the old endpoint", () => {
   const app = read("app.js");
   const data = read("data.js");
-  assert.match(app, /surveyInput\.addEventListener\("change", \(\) => \{[\s\S]*invalidateNeighborhoodLoad\(\)[\s\S]*viz[\s\S]*replaceChildren\(\)[\s\S]*objectList/);
+  assert.match(app, /surveyInput\.addEventListener\("change", \(\) => \{\s*clearNeighborhood\(\)/);
+  assert.match(app, /function clearNeighborhood\(\) \{[\s\S]*invalidateNeighborhoodLoad\(\)[\s\S]*getElementById\("viz"\)\.replaceChildren\(\)[\s\S]*objectList/);
   assert.match(data, /function invalidateNeighborhoodLoad\(\) \{[\s\S]*neighborhoodRequestSerial \+= 1/);
 });
 
