@@ -67,7 +67,6 @@ try {
   while (client.scanPending() || client.size() > 0) {
     if (client.size() > 0) {
       client.poll().each {k, v -> for (Classifier classifier : classifiers) {
-                                    log.info("" + classifier + " -> " + k);
                                     try {
                                       gr.classifySource(classifier, v.get("i:objectId"));
                                       }
@@ -95,7 +94,8 @@ finally {
   
 classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', ''),
                                Classifier.instance('TAG',  'LSST', '')}
-gr.generateCorrelations(classifiers);
+//gr.generateCorrelations(classifiers);
 
 // BUG: why doesn't work in thread ?
+log.info(timer.info());
 NotifierURL.notifyExecution("importTags-ZTF", "Lomikel", Info.release(), timer.info("" + delay));
