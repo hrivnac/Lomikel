@@ -22,10 +22,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
 
 Configurator.initialize(null, "../src/java/log4j2.xml");
+log = LogManager.getLogger(this.class);
 
-int[] delays = new int[]{2, 1};
-
-Logger log = LogManager.getLogger(this.class);
+delays = new int[]{2, 1};
 
 public class PR extends ParquetReader {
 
@@ -96,8 +95,8 @@ public class PR extends ParquetReader {
     
   }
 
-ParquetReader reader = new PR("hdfs://ccmaster1:8020");
-String osizes = reader.sizes();
+reader = new PR("hdfs://ccmaster1:8020");
+osizes = reader.sizes();
 for (int delay : delays) {
   aday = LocalDate.now()
                   .minusDays(delay)
@@ -106,7 +105,10 @@ for (int delay : delays) {
   reader.processDir("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
-String psizes = reader.sizes();
+  
+psizes = reader.sizes();
 log.info("Original sizes: " + osizes);
 log.info("Final    sizes: " + psizes);
+
+// BUG: why doesn't work in thread ?
 NotifierURL.notifyExecution("fillES-radec-LSST", "Lomikel", Info.release(), "Original sizes: " + osizes + "\nFinal    sizes: " + psizes);

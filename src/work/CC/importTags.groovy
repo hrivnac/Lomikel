@@ -82,7 +82,6 @@ try {
       Thread.sleep(100);
       }
     }
-
   if (client.scanFailure() != null) {
     throw new IllegalStateException('LSST HBase scan failed', client.scanFailure());
     }
