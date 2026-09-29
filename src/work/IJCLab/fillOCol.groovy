@@ -91,7 +91,9 @@ finally {
   client.stop();
   client.close();
   }
-
+  
+classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', ''),
+                               Classifier.instance('TAG',  'LSST', '')}
 gr.generateCorrelations(classifiers);
 
 // BUG: why doesn't work in thread ?

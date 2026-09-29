@@ -62,7 +62,7 @@ try {
     Thread.sleep(100);
     }
   if (client.scanPending() && !client.scanning() && client.size() == 0) {
-    throw new IllegalStateException('ZTF HBase scan did not start before deadline');
+    throw new IllegalStateException('LSST HBase scan did not start before deadline');
     }
   while (client.scanPending() || client.size() > 0) {
     if (client.size() > 0) {
@@ -84,7 +84,7 @@ try {
     }
 
   if (client.scanFailure() != null) {
-    throw new IllegalStateException('NewTag HBase scan failed', client.scanFailure());
+    throw new IllegalStateException('LSST HBase scan failed', client.scanFailure());
     }
   gr.commit();
   }

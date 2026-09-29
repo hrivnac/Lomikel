@@ -1,18 +1,14 @@
 #!/usr/bin/bash -l
 set -eo pipefail
-NOW=$(date +"%Y%m%d%H%M%s")
-LOG=$(mktemp "${TMPDIR:-/tmp}/importTags-${NOW}-XXXXXXXX.log")
-LOCK_DIR="/tmp"
-mkdir -p -m 700 "${LOCK_DIR}"
-LOCK="${LOCK_DIR}/importTags.lock"
-
-# Keep the lock file: removing a flock file permits two different inodes/owners.
-exec 9>"${LOCK}"
-if ! flock -n 9; then
-  echo "Already importing tags with ${LOCK}" >&2
-  exit 75
+LOG=/tmp/importTags-${NOW}-XXXXXXXX.log
+LOCK=/tmp/importTags.lock 
+if [[ -e ${LOCK} ]]; then
+  echo "Already filling ES-radec with ${LOCK}"
+  exit
   fi
-  
+PID=$$
+echo ${PID} > ${LOCK}
+
 exec > >(tee -a "${LOG}") 2>&1 || exit 1
 cd ~/Lomikel/ant
 source ./setup.sh
