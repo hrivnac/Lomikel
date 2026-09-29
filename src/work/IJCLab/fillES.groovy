@@ -83,7 +83,6 @@ try {
   if (client.scanFailure() != null) {
     throw new IllegalStateException('LSST HBase scan failed', client.scanFailure());
     }
-  gr.commit();
   }
 finally {
   client.stop();
