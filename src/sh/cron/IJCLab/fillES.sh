@@ -3,7 +3,7 @@ NOW=`date +"%Y%m%d%H%M%s"`
 LOG=/tmp/fillES-${NOW}.log
 LOCK=/tmp/fillES.lock 
 if [[ -e ${LOCK} ]]; then
-  echo "Already filling ES-radec with ${LOCK}"
+  echo "Already filling ES with ${LOCK}"
   exit
   fi
 PID=$$

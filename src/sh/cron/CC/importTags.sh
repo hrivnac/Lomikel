@@ -3,7 +3,7 @@ set -eo pipefail
 LOG=/tmp/importTags-${NOW}-XXXXXXXX.log
 LOCK=/tmp/importTags.lock 
 if [[ -e ${LOCK} ]]; then
-  echo "Already filling ES-radec with ${LOCK}"
+  echo "Already importing Tags with ${LOCK}"
   exit
   fi
 PID=$$
