@@ -97,5 +97,4 @@ classifiers = new Classifier[]{Classifier.instance('FINK', 'LSST', ''),
 //gr.generateCorrelations(classifiers);
 
 // BUG: why doesn't work in thread ?
-log.info(timer.info());
-NotifierURL.notifyExecution("importTags-ZTF", "Lomikel", Info.release(), timer.info("" + delay));
+NotifierURL.notifyExecution("importTags-ZTF", "Lomikel", Info.release(), timer.info(""));

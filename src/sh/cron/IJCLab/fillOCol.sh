@@ -14,6 +14,7 @@ exec > >(tee -a "${LOG}") 2>&1 || exit 1
 cd ~/Lomikel/ant || exit 1
 source ./setup.sh || exit 1
 exec java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/IJCLab/fillOCol.groovy
+echo "xxxx"
 ll ${LOCK}
 /bin/rm -f ${LOCK} 
 ll ${LOCK}
