@@ -1,5 +1,6 @@
 #!/usr/bin/bash -l
 set -eo pipefail
+NOW=`date +"%Y%m%d%H%M%s"`
 LOG=/tmp/processTags-${NOW}-XXXXXXXX.log
 LOCK=/tmp/processTags.lock 
 if [[ -e ${LOCK} ]]; then
