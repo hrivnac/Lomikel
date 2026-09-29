@@ -67,6 +67,7 @@ try {
   while (client.scanPending() || client.size() > 0) {
     if (client.size() > 0) {
       client.poll().each {k, v -> for (Classifier classifier : classifiers) {
+                                    log.info("" + classifier + " -> " + k);
                                     try {
                                       gr.classifySource(classifier, v.get("i:objectId"));
                                       }

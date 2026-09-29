@@ -80,7 +80,7 @@ public class NotifierURL {
       conn.getInputStream();
       int rc = conn.getResponseCode();
       String msg = conn.getResponseMessage();
-      log.info(msg + " : " + rc);
+      log.debug(msg + " : " + rc);
       }
     catch (Exception e) {
       log.debug("Can not notify: " + message, e);
