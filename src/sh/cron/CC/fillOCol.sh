@@ -1,4 +1,5 @@
 #!/usr/bin/bash -l
+# Deprecated
 NOW=`date +"%Y%m%d%H%M%s"`
 LOG=/tmp/fillOCol-${NOW}.log
 LOCK=/tmp/fillOCol.lock 

@@ -1,3 +1,4 @@
+// Deprecated
 import com.Lomikel.Parquet.ParquetReader;
 import com.Lomikel.Januser.JanusClient;
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG;

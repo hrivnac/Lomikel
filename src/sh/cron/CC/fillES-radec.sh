@@ -1,7 +1,7 @@
 #!/usr/bin/bash -l
 set -eo pipefail
 NOW=`date +"%Y%m%d%H%M%s"`
-LOG=/tmp/fillES-radec-${NOW}-XXXXXXXX.log
+LOG=/tmp/fillES-radec-${NOW}.log
 LOCK=/tmp/fillES-radec.lock 
 if [[ -e ${LOCK} ]]; then
   echo "Already filling ES-radec with ${LOCK}"

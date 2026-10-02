@@ -1,7 +1,7 @@
 #!/usr/bin/bash -l
 set -eo pipefail
 NOW=`date +"%Y%m%d%H%M%s"`
-LOG=/tmp/fillES-${NOW}-XXXXXXXX.log
+LOG=/tmp/fillES-${NOW}.log
 LOCK=/tmp/fillES.lock 
 if [[ -e ${LOCK} ]]; then
   echo "Already filling ES with ${LOCK}"

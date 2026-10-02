@@ -1,7 +1,7 @@
 #!/usr/bin/bash -l
 set -eo pipefail
 NOW=`date +"%Y%m%d%H%M%s"`
-LOG=/tmp/fillOCol-${NOW}-XXXXXXXX.log
+LOG=/tmp/fillOCol-${NOW}.log
 LOCK=/tmp/fillOCol.lock 
 if [[ -e ${LOCK} ]]; then
   echo "Already filling OCol with ${LOCK}"

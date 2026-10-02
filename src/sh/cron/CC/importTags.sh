@@ -1,7 +1,7 @@
 #!/usr/bin/bash -l
 set -eo pipefail
 NOW=`date +"%Y%m%d%H%M%s"`
-LOG=/tmp/importTags-${NOW}-XXXXXXXX.log
+LOG=/tmp/importTags-${NOW}.log
 LOCK=/tmp/importTags.lock 
 if [[ -e ${LOCK} ]]; then
   echo "Already importing Tags with ${LOCK}"
