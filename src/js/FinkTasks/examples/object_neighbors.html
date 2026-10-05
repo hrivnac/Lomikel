@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fink object neighbors — example</title>
+  <style>
+    body { max-width: 52rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+    form { display: grid; gap: .8rem; }
+    label { display: grid; gap: .2rem; }
+    input, select, button { font: inherit; padding: .4rem; }
+    button { width: fit-content; cursor: pointer; }
+    pre { overflow: auto; padding: 1rem; background: #f3f4f6; border-radius: .4rem; }
+    .note { background: #fff8e7; padding: .8rem; border-left: .25rem solid #c68100; }
+  </style>
+</head>
+<body>
+  <h1>Fink object neighbors</h1>
+  <p>Calls the standalone <code>object_neighbors.js</code> module and shows its response as JSON.</p>
+  <p class="note">The default graph service is plaintext HTTP. HTTPS pages cannot call it (mixed content), and cross-origin requests also need CORS support. For a deployed page, use an HTTPS, CORS-enabled proxy and enter its graph URL below. The plaintext opt-in does not bypass browser security.</p>
+  <form id="query">
+    <label>LSST object ID <input name="objectId" value="170028486134595648" required></label>
+    <label>Number of neighbors (positive integer; 0 means all; fraction means cutoff)
+      <input name="results" type="number" min="0" step="any" value="5" required>
+    </label>
+    <label>Graph URL <input name="graphUrl" type="url" value="http://134.158.243.144:24445" required></label>
+    <label>Fink REST base URL <input name="apiUrl" type="url" value="https://api.lsst.fink-portal.org" required></label>
+    <label><input name="allowInsecureGraph" type="checkbox"> Allow remote plaintext HTTP graph access (only on non-HTTPS pages)</label>
+    <button type="submit">Find neighbors</button>
+  </form>
+  <p id="status" role="status" aria-live="polite">Ready.</p>
+  <pre id="output" aria-label="JSON result"></pre>
+  <script src="../object_neighbors.js"></script>
+  <script>
+    "use strict";
+    const form = document.getElementById("query");
+    const status = document.getElementById("status");
+    const output = document.getElementById("output");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const fields = new FormData(form);
+      const button = form.querySelector("button");
+      button.disabled = true;
+      status.textContent = "Loading…";
+      output.textContent = "";
+      try {
+        const data = await window.objectNeighbors(String(fields.get("objectId")).trim(), {
+          results: Number(fields.get("results")),
+          graphUrl: String(fields.get("graphUrl")).trim(),
+          apiUrl: String(fields.get("apiUrl")).trim(),
+          allowInsecureGraph: fields.has("allowInsecureGraph")
+        });
+        output.textContent = JSON.stringify(data, null, 2);
+        status.textContent = `Found ${data.returned} neighbors.`;
+      } catch (error) {
+        status.textContent = `Request failed: ${error.message}`;
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
