@@ -55,6 +55,19 @@ public proxy just to run these read-only queries.
 
 Run focused tests from this directory: `node --test tests/*.test.js`.
 
+### Minimal browser pages
+
+Open [`examples/object_neighbors.html`](examples/object_neighbors.html) or
+[`examples/most_points.html`](examples/most_points.html) from a static web
+server (for example, run `python3 -m http.server 8000` in this directory and
+visit `http://localhost:8000/examples/object_neighbors.html`). Both pages
+load their sibling module with a relative script URL, accept service URLs,
+and display returned JSON or an error. The SS light-curve option is available
+on the most-points page. The default remote HTTP endpoints may be blocked by
+browser mixed-content/CORS rules; configure HTTPS, CORS-enabled proxy URLs for
+a production site. The examples do not implement a proxy or change server
+permissions.
+
 ## Other graph helpers
 
 `fink_graph.js` provides two dependency-free asynchronous functions:
