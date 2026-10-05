@@ -57,16 +57,59 @@ Run focused tests from this directory: `node --test tests/*.test.js`.
 
 ### Minimal browser pages
 
-Open [`examples/object_neighbors.html`](examples/object_neighbors.html) or
-[`examples/most_points.html`](examples/most_points.html) from a static web
-server (for example, run `python3 -m http.server 8000` in this directory and
-visit `http://localhost:8000/examples/object_neighbors.html`). Both pages
-load their sibling module with a relative script URL, accept service URLs,
-and display returned JSON or an error. The SS light-curve option is available
-on the most-points page. The default remote HTTP endpoints may be blocked by
-browser mixed-content/CORS rules; configure HTTPS, CORS-enabled proxy URLs for
-a production site. The examples do not implement a proxy or change server
-permissions.
+For **the same arguments, defaults, and output as the original Python CLIs**,
+run the loopback-only example server from this directory:
+
+```bash
+python3 examples/serve.py
+# Open http://127.0.0.1:8766/examples/object_neighbors.html
+# Or   http://127.0.0.1:8766/examples/most_points.html
+```
+
+The two pages submit the form arguments to the local server, which runs the
+original `src/python/FinkTasks/src/fink_tasks/{object_neighbors,most_points}.py`
+scripts with an allowlisted argument vector (never a shell command). This is
+intentional: a static HTML page alone cannot invoke a Python process, write
+server-side output files, or bypass CORS/mixed-content restrictions on the
+default remote HTTP endpoints. The pages are **Python-backed CLI examples**,
+not replacements for the separate JavaScript library modules above. For
+browser-only deployment of those libraries, use your own protected HTTPS,
+CORS-enabled service endpoints.
+
+`object_neighbors.html` exposes object ID, classifier, distance metric,
+result count/cutoff, repeatable REST columns, table/JSON output, service URLs,
+timeout, and the explicit insecure-graph opt-in. The default Gremlin endpoint
+is the Python CLI's `:24444` (the independent JavaScript library uses `:24445`).
+`most_points.html` exposes SS/DIA/both, result count, SS light curves, output
+directory name, service URLs, timeout, and insecure-ES opt-in. The local server
+runs each request in an isolated temporary directory and exposes generated
+ranking/manifest JSON and optional SS JSON/PNG files as downloads while it is
+running; stopping it removes those files. `--output-dir` is confined to a safe
+single directory name inside that temporary run. PNG generation needs
+Matplotlib available to the Python executable running the server (for example,
+a virtual environment with `matplotlib>=3.7,<4`).
+
+The server binds only to `127.0.0.1`, rejects foreign Host/Origin values and
+unknown input fields, and does not expose a general-purpose HTTP proxy. **The
+trust boundary is the local machine:** any local process able to send loopback
+HTTP requests can invoke the Python scripts, including with custom API, Gremlin,
+and Elasticsearch service URLs. Host/Origin checks mitigate browser cross-site
+requests, not malicious local clients; do not expose or reverse-proxy this
+unauthenticated example server.
+
+One task runs at a time (additional jobs receive 429); result counts are capped
+at 100, while neighbors `0` (all) and fractional distance cutoffs remain valid.
+Each task has a 600-second wall limit, 256 KiB each for stdout/stderr, and a
+64 MiB run-directory allowance (up to 256 entries and 16 MiB per file).
+Downloads are capped at 16 MiB; only the latest 8 run directories remain until
+shutdown, when the temporary storage is removed. On POSIX the child interpreter
+also has a 4 GiB address-space and 16 MiB per-file limit. Windows has no native
+child memory/file-size limit in this example; directory use is polled and the
+child terminated on overage, so brief bursts can exceed the storage allowance.
+The Python scripts are trusted local code, not a sandbox for arbitrary programs.
+
+Run server tests from the repository root with
+`python3 -m unittest discover -s src/js/FinkTasks/examples -p 'test_serve.py'`.
 
 ## Other graph helpers
 
