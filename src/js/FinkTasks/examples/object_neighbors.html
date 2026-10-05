@@ -1,59 +1,67 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fink object neighbors — example</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fink object neighbors — Python task</title>
   <style>
-    body { max-width: 52rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
-    form { display: grid; gap: .8rem; }
-    label { display: grid; gap: .2rem; }
-    input, select, button { font: inherit; padding: .4rem; }
-    button { width: fit-content; cursor: pointer; }
-    pre { overflow: auto; padding: 1rem; background: #f3f4f6; border-radius: .4rem; }
-    .note { background: #fff8e7; padding: .8rem; border-left: .25rem solid #c68100; }
+    body { max-width: 54rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+    form { display: grid; gap: .75rem; } label { display: grid; gap: .2rem; }
+    input, select, textarea, button { font: inherit; padding: .4rem; }
+    .check { display: flex; gap: .5rem; align-items: center; } button { width: fit-content; cursor: pointer; }
+    pre { padding: 1rem; overflow: auto; background: #f3f4f6; white-space: pre-wrap; }
+    .note { padding: .8rem; background: #fff8e7; border-left: .25rem solid #c68100; }
   </style>
 </head>
 <body>
-  <h1>Fink object neighbors</h1>
-  <p>Calls the standalone <code>object_neighbors.js</code> module and shows its response as JSON.</p>
-  <p class="note">The default graph service is plaintext HTTP. HTTPS pages cannot call it (mixed content), and cross-origin requests also need CORS support. For a deployed page, use an HTTPS, CORS-enabled proxy and enter its graph URL below. The plaintext opt-in does not bypass browser security.</p>
-  <form id="query">
-    <label>LSST object ID <input name="objectId" value="170028486134595648" required></label>
-    <label>Number of neighbors (positive integer; 0 means all; fraction means cutoff)
-      <input name="results" type="number" min="0" step="any" value="5" required>
-    </label>
-    <label>Graph URL <input name="graphUrl" type="url" value="http://134.158.243.144:24445" required></label>
-    <label>Fink REST base URL <input name="apiUrl" type="url" value="https://api.lsst.fink-portal.org" required></label>
-    <label><input name="allowInsecureGraph" type="checkbox"> Allow remote plaintext HTTP graph access (only on non-HTTPS pages)</label>
-    <button type="submit">Find neighbors</button>
+  <h1>Find classifier neighbors</h1>
+  <p>This page runs the original <code>object_neighbors.py</code> task on the local example server. The fields correspond to its CLI arguments, with the same defaults.</p>
+  <p class="note">Start the local server with <code>python3 examples/serve.py</code> from <code>src/js/FinkTasks</code>, then open the URL it prints. It binds only to 127.0.0.1. Remote plaintext graph access needs explicit consent; prefer a protected HTTPS endpoint when available.</p>
+  <form id="task">
+    <label>object_id (required) <input name="objectId" value="170028486134595648" required></label>
+    <label>--classifier <input name="classifier" value="FINK" required></label>
+    <label>--distance <select name="distance"><option>JensenShannon</option><option>Euclidean</option><option>Cosine</option></select></label>
+    <label>-n / --results (0: all; fraction: distance-gap cutoff) <input name="results" type="number" min="0" step="any" value="10" required></label>
+    <label>--rest-columns / --columns (one repeatable value per line; commas accepted)
+      <textarea name="restColumns" rows="2" placeholder="r:g_psfFluxMax,r:nDiaSources"></textarea></label>
+    <label class="check"><input name="json" type="checkbox"> --json (otherwise table output)</label>
+    <label class="check"><input name="allowInsecureGraph" type="checkbox"> --allow-insecure-graph (required for default HTTP URL)</label>
+    <label>--graph-url <input name="graphUrl" type="url" value="http://134.158.243.144:24444" required></label>
+    <label>--api-url <input name="apiUrl" type="url" value="https://api.lsst.fink-portal.org" required></label>
+    <label>--timeout (seconds per HTTP request) <input name="timeout" type="number" min="0.001" max="300" step="any" value="180" required></label>
+    <button type="submit">Run object_neighbors.py</button>
   </form>
   <p id="status" role="status" aria-live="polite">Ready.</p>
-  <pre id="output" aria-label="JSON result"></pre>
-  <script src="../object_neighbors.js"></script>
+  <pre id="output" aria-label="Task output"></pre>
   <script>
     "use strict";
-    const form = document.getElementById("query");
+    const form = document.getElementById("task");
     const status = document.getElementById("status");
     const output = document.getElementById("output");
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", async event => {
       event.preventDefault();
       const fields = new FormData(form);
       const button = form.querySelector("button");
       button.disabled = true;
-      status.textContent = "Loading…";
+      status.textContent = "Running…";
       output.textContent = "";
       try {
-        const data = await window.objectNeighbors(String(fields.get("objectId")).trim(), {
+        const payload = {
+          objectId: String(fields.get("objectId")).trim(),
+          classifier: String(fields.get("classifier")).trim(),
+          distance: String(fields.get("distance")),
           results: Number(fields.get("results")),
+          restColumns: String(fields.get("restColumns")).split(/\r?\n/).map(s => s.trim()).filter(Boolean),
+          json: fields.has("json"), allowInsecureGraph: fields.has("allowInsecureGraph"),
           graphUrl: String(fields.get("graphUrl")).trim(),
-          apiUrl: String(fields.get("apiUrl")).trim(),
-          allowInsecureGraph: fields.has("allowInsecureGraph")
-        });
-        output.textContent = JSON.stringify(data, null, 2);
-        status.textContent = `Found ${data.returned} neighbors.`;
+          apiUrl: String(fields.get("apiUrl")).trim(), timeout: Number(fields.get("timeout"))
+        };
+        const response = await fetch("/run/object-neighbors", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)});
+        const result = await response.json();
+        if (!response.ok || !result.ok) throw new Error(result.error || result.stderr || "Task failed");
+        output.textContent = result.stdout;
+        status.textContent = "Completed.";
       } catch (error) {
-        status.textContent = `Request failed: ${error.message}`;
+        status.textContent = `Failed: ${error.message}`;
       } finally {
         button.disabled = false;
       }

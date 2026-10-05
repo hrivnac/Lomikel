@@ -1,72 +1,77 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fink most points — example</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fink most points — Python task</title>
   <style>
-    body { max-width: 52rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
-    form { display: grid; gap: .8rem; }
-    label { display: grid; gap: .2rem; }
+    body { max-width: 54rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+    form { display: grid; gap: .75rem; } label { display: grid; gap: .2rem; }
     input, select, button { font: inherit; padding: .4rem; }
-    label.check { display: flex; align-items: center; gap: .5rem; }
-    button { width: fit-content; cursor: pointer; }
-    pre { overflow: auto; padding: 1rem; background: #f3f4f6; border-radius: .4rem; }
-    .note { background: #fff8e7; padding: .8rem; border-left: .25rem solid #c68100; }
+    .check { display: flex; gap: .5rem; align-items: center; } button { width: fit-content; cursor: pointer; }
+    pre { padding: 1rem; overflow: auto; background: #f3f4f6; white-space: pre-wrap; }
+    .note { padding: .8rem; background: #fff8e7; border-left: .25rem solid #c68100; }
   </style>
 </head>
 <body>
-  <h1>Fink objects with most points</h1>
-  <p>Calls the standalone <code>most_points.js</code> module for Solar System and/or DIA rankings. Optionally include complete Solar System light-curve source data.</p>
-  <p class="note">The default Elasticsearch service is plaintext HTTP. HTTPS pages cannot call it (mixed content), and cross-origin POSTs need CORS support. For a deployed page, use an HTTPS, CORS-enabled proxy and enter its Elasticsearch URL below. The plaintext opt-in does not bypass browser security.</p>
-  <form id="query">
-    <label>Object type
-      <select name="objectType">
-        <option value="both">Both SS and DIA</option>
-        <option value="ss">Solar System (SS)</option>
-        <option value="dia">DIA</option>
-      </select>
-    </label>
-    <label>Number of objects per type <input name="results" type="number" min="1" step="1" value="5" required></label>
-    <label class="check"><input name="lightcurves" type="checkbox"> Include all-band SS light curves (larger response)</label>
-    <label>Elasticsearch base URL <input name="esUrl" type="url" value="http://134.158.243.139:24499" required></label>
-    <label>Fink REST base URL <input name="apiUrl" type="url" value="https://api.lsst.fink-portal.org" required></label>
-    <label class="check"><input name="allowInsecureEs" type="checkbox"> Allow remote plaintext HTTP Elasticsearch access (only on non-HTTPS pages)</label>
-    <button type="submit">Get ranking</button>
+  <h1>Find objects with the most points</h1>
+  <p>This page runs the original <code>most_points.py</code> task on the local example server. The fields correspond to its CLI arguments, with the same defaults. Generated JSON and optional PNG files appear as downloads.</p>
+  <p class="note">Start <code>python3 examples/serve.py</code> from <code>src/js/FinkTasks</code>. The server binds to 127.0.0.1, keeps artifacts only while it runs, and stores <code>--output-dir</code> inside a temporary per-run directory. Light-curve PNGs need Matplotlib in the server's Python environment. Remote HTTP Elasticsearch access requires explicit consent.</p>
+  <form id="task">
+    <label>--object-type <select name="objectType"><option value="both">both (SS and DIA)</option><option value="ss">ss</option><option value="dia">dia</option></select></label>
+    <label>-n / --results (per type) <input name="results" type="number" min="1" step="1" value="10" required></label>
+    <label class="check"><input name="lightcurves" type="checkbox"> --lightcurves / --ss-lightcurves (SS JSON + PNG)</label>
+    <label>--output-dir (name inside this run's temporary directory)
+      <input name="outputDir" value="fink-most-points-output" pattern="[A-Za-z0-9_.-]+" required></label>
+    <label class="check"><input name="allowInsecureEs" type="checkbox"> --allow-insecure-es (required for default HTTP URL)</label>
+    <label>--es-url <input name="esUrl" type="url" value="http://134.158.243.139:24499" required></label>
+    <label>--api-url <input name="apiUrl" type="url" value="https://api.lsst.fink-portal.org" required></label>
+    <label>--timeout (seconds per HTTP request) <input name="timeout" type="number" min="0.001" max="300" step="any" value="180" required></label>
+    <button type="submit">Run most_points.py</button>
   </form>
   <p id="status" role="status" aria-live="polite">Ready.</p>
-  <pre id="output" aria-label="JSON result"></pre>
-  <script src="../most_points.js"></script>
+  <pre id="output" aria-label="Task output"></pre>
+  <ul id="artifacts" aria-label="Download generated artifacts"></ul>
   <script>
     "use strict";
-    const form = document.getElementById("query");
+    const form = document.getElementById("task");
     const status = document.getElementById("status");
     const output = document.getElementById("output");
+    const artifacts = document.getElementById("artifacts");
     const lightcurves = form.elements.lightcurves;
     form.elements.objectType.addEventListener("change", () => {
       lightcurves.disabled = form.elements.objectType.value === "dia";
       if (lightcurves.disabled) lightcurves.checked = false;
     });
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", async event => {
       event.preventDefault();
       const fields = new FormData(form);
       const button = form.querySelector("button");
       button.disabled = true;
-      status.textContent = "Loading…";
+      status.textContent = "Running…";
       output.textContent = "";
+      artifacts.replaceChildren();
       try {
-        const data = await window.LomikelMostPoints.mostPoints({
-          objectType: String(fields.get("objectType")),
-          results: Number(fields.get("results")),
-          lightcurves: fields.has("lightcurves"),
-          esUrl: String(fields.get("esUrl")).trim(),
-          apiUrl: String(fields.get("apiUrl")).trim(),
-          allowInsecureEs: fields.has("allowInsecureEs")
-        });
-        output.textContent = JSON.stringify(data, null, 2);
-        status.textContent = "Ranking loaded.";
+        const payload = {
+          objectType: String(fields.get("objectType")), results: Number(fields.get("results")),
+          lightcurves: fields.has("lightcurves"), outputDir: String(fields.get("outputDir")).trim(),
+          allowInsecureEs: fields.has("allowInsecureEs"), esUrl: String(fields.get("esUrl")).trim(),
+          apiUrl: String(fields.get("apiUrl")).trim(), timeout: Number(fields.get("timeout"))
+        };
+        const response = await fetch("/run/most-points", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)});
+        const result = await response.json();
+        if (!response.ok || !result.ok) throw new Error(result.error || result.stderr || "Task failed");
+        output.textContent = result.stdout;
+        for (const file of result.artifacts) {
+          const item = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = file.url;
+          link.textContent = file.name;
+          item.append(link);
+          artifacts.append(item);
+        }
+        status.textContent = `Completed; ${result.artifacts.length} files available.`;
       } catch (error) {
-        status.textContent = `Request failed: ${error.message}`;
+        status.textContent = `Failed: ${error.message}`;
       } finally {
         button.disabled = false;
       }
