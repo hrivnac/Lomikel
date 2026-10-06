@@ -89,6 +89,25 @@ class Flash {
     }
   }
 
+// Static markers follow current survey snapshots, not the ten-second flash timer.
+class LoadedAlertMarker {
+  constructor(alert) {
+    this.alert = alert;
+    this.color = classes[alert.class] || "255,255,255";
+    this.spikes = alert.survey === "LSST" ? 10 : 5;
+    this.radius = 7;
+    }
+
+  draw() {
+    this.pos = raDecToXY(this.alert.ra, this.alert.dec);
+    this.positions = getWrappedScreenPositions(this.pos, this.radius);
+    for (const position of this.positions) {
+      drawStar(position.x, position.y, this.radius, this.color, 0.9, 0, this.spikes, false);
+      }
+    return true;
+    }
+  }
+
 // Recent alerts provide a keyboard-accessible equivalent to canvas markers.
 const recentAlerts = [];
 function addRecentAlert(alert) {
@@ -113,34 +132,72 @@ function createAlertLink(alert, label) {
 
 function renderRecentAlerts() {
   const list = document.getElementById('recentAlerts');
-  const items = recentAlerts.map(({alert}) => {
+  const focused = document.activeElement;
+  const focusedUrl = focused?.tagName === 'A' && list.contains(focused) ? focused.href : null;
+  let replacementFocus = null;
+  const visible = showAllAlerts ? loadedAlertMarkers.map(marker => ({alert: marker.alert})) : recentAlerts;
+  document.getElementById('recentAlertsHeading').textContent = showAllAlerts ? 'All loaded alerts' : 'Recent alerts';
+  const items = visible.map(({alert}) => {
     const item = document.createElement('li');
     const link = createAlertLink(alert, `${alert.survey} ${alert.objectId}`);
-    if (link) item.append(link);
+    if (link) {
+      item.append(link);
+      if (focusedUrl === link.href) replacementFocus = link;
+      }
     const details = document.createElement('span');
     details.textContent = ` — ${alert.class}`;
     item.append(details);
     return item;
     });
+  if (items.length === 0) {
+    const empty = document.createElement('li');
+    empty.textContent = 'Waiting for alerts…';
+    items.push(empty);
+    }
   list.replaceChildren(...items);
+  replacementFocus?.focus();
   }
 
 // Alerts
 const randInt = (a, b) => Math.floor(a + Math.random() * (b - a + 1));
 let flashes = [];
+let showAllAlerts = false;
+let loadedAlertMarkers = [];
+let loadedPoolReference = null;
+let loadedBounds = null;
+
+function alertFromRow(pick) {
+  const survey = pick['v:survey'];
+  if (survey !== "LSST" && survey !== "ZTF") return null;
+  const rawRa = survey === "LSST" ? pick['r:ra'] : pick['i:ra'];
+  const rawDec = survey === "LSST" ? pick['r:dec'] : pick['i:dec'];
+  const alert = {
+    survey, ra: Number(rawRa), dec: Number(rawDec),
+    class: pick['v:classification'],
+    objectId: survey === "LSST" ? pick['r:diaObjectId'] : pick['i:objectId'],
+    jd: survey === "LSST" ? pick['r:midpointMjdTai'] : pick['i:jd']
+    };
+  return rawRa != null && rawDec != null && String(rawRa).trim() !== '' &&
+    String(rawDec).trim() !== '' && Number.isFinite(alert.ra) &&
+    Number.isFinite(alert.dec) && alert.objectId != null && alert.objectId !== '' ? alert : null;
+  }
+
+function getVisibleAlerts() {
+  if (!showAllAlerts) return flashes;
+  if (loadedPoolReference !== alertsPool) {
+    loadedPoolReference = alertsPool;
+    loadedAlertMarkers = alertsPool.map(alertFromRow).filter(Boolean).map(alert => new LoadedAlertMarker(alert));
+    loadedBounds = getBoundingBox(loadedAlertMarkers);
+    renderRecentAlerts();
+    }
+  return loadedAlertMarkers;
+  }
+
 function generateAlert() {
-  if (alertsPool.length > 0) {
+  if (!showAllAlerts && alertsPool.length > 0) {
     const pick = alertsPool[randInt(0, alertsPool.length - 1)];
-    const survey = pick['v:survey'];
-    const alert = {
-      survey,
-      ra: Number((survey === "LSST") ? pick['r:ra'] : pick['i:ra']),
-      dec: Number((survey === "LSST") ? pick['r:dec'] : pick['i:dec']),
-      class: pick['v:classification'],
-      objectId: (survey === "LSST") ? pick['r:diaObjectId'] : pick['i:objectId'],
-      jd: (survey === "LSST") ? pick['r:midpointMjdTai'] : pick['i:jd']
-      };
-    if (Number.isFinite(alert.ra) && Number.isFinite(alert.dec) && alert.objectId !== undefined) {
+    const alert = alertFromRow(pick);
+    if (alert) {
       flashes.push(new Flash(alert));
       addRecentAlert(alert);
       }
@@ -169,7 +226,8 @@ function updateCamera() {
     camera.targetZoom = 1;
     return;
     }
-  const box = getBoundingBox(flashes);
+  const visible = getVisibleAlerts();
+  const box = showAllAlerts ? loadedBounds : getBoundingBox(visible);
   if (!box) return;
   camera.targetCenter.ra = box.raCenter;
   camera.targetCenter.dec = (box.minDec + box.maxDec) / 2;
@@ -194,14 +252,14 @@ function smoothCamera() {
   camera.currentCenter.ra = interpolateRa(camera.currentCenter.ra, camera.targetCenter.ra, amount);
   camera.currentCenter.dec = lerp(camera.currentCenter.dec, camera.targetCenter.dec, amount);
   const smoothZoom = lerp(camera.currentZoom, camera.targetZoom, amount);
-  const visibleZoom = getMaxZoomToKeepAlertsVisible(flashes, camera.currentCenter.ra);
+  const visibleZoom = getMaxZoomToKeepAlertsVisible(getVisibleAlerts(), camera.currentCenter.ra);
   camera.currentZoom = Math.min(smoothZoom, visibleZoom);
   }
 
 // Overview Map
 function drawOverview() {
   octx.clearRect(0, 0, overview.width, overview.height);
-  for (const flash of flashes) {
+  for (const flash of getVisibleAlerts()) {
     const ox = ((360 - normalizeRa(flash.alert.ra)) % 360) / 360 * overview.width;
     const oy = overview.height - ((flash.alert.dec + 90) / 180) * overview.height;
     octx.beginPath();
@@ -235,8 +293,9 @@ function findFlashAt(clientX, clientY) {
   const bounds = canvas.getBoundingClientRect();
   const x = (clientX - bounds.left) * canvas.width / bounds.width;
   const y = (clientY - bounds.top) * canvas.height / bounds.height;
-  for (let i = flashes.length - 1; i >= 0; i--) {
-    const flash = flashes[i];
+  const visible = getVisibleAlerts();
+  for (let i = visible.length - 1; i >= 0; i--) {
+    const flash = visible[i];
     const positions = flash.positions || (flash.pos ? [flash.pos] : []);
     for (const position of positions) {
       const dx = position.x - x;
@@ -299,6 +358,7 @@ tooltip.addEventListener('pointerleave', hideTooltip);
 // Controls
 const dynamicButton = document.getElementById('btnDynamic');
 const wholeButton = document.getElementById('btnWhole');
+const allAlertsButton = document.getElementById('btnAllAlerts');
 function setCameraMode(mode) {
   camera.mode = mode === "whole" ? "whole" : "dynamic";
   dynamicButton.setAttribute("aria-pressed", String(camera.mode === "dynamic"));
@@ -306,6 +366,15 @@ function setCameraMode(mode) {
   }
 dynamicButton.addEventListener('click', () => setCameraMode("dynamic"));
 wholeButton.addEventListener('click', () => setCameraMode("whole"));
+allAlertsButton.setAttribute('aria-pressed', 'false');
+allAlertsButton.addEventListener('click', () => {
+  showAllAlerts = !showAllAlerts;
+  allAlertsButton.setAttribute('aria-pressed', String(showAllAlerts));
+  document.getElementById('recentAlertsPanel').setAttribute('data-all-alerts', String(showAllAlerts));
+  hideTooltip();
+  if (showAllAlerts) getVisibleAlerts();
+  else renderRecentAlerts();
+  });
 setCameraMode("dynamic");
 
 const helpButton = document.getElementById('helpButton');
@@ -332,8 +401,13 @@ function animate() {
   drawEcliptic();
   drawEclipticMonths();
   drawGalacticPlane();
-  flashes = flashes.filter(flash => flash.draw());
-  updateLegend();
+  if (showAllAlerts) {
+    // Do not paint duplicate animation flashes over persistent markers.
+    flashes = flashes.filter(flash => Date.now() - flash.startTime < 10000);
+    for (const marker of getVisibleAlerts()) marker.draw();
+    }
+  else flashes = flashes.filter(flash => flash.draw());
+  updateLegend(getVisibleAlerts());
   drawOverview();
   requestAnimationFrame(animate);
   }
