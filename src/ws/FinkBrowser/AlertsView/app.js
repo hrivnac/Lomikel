@@ -259,7 +259,7 @@ function smoothCamera() {
 // Overview Map
 function drawOverview() {
   octx.clearRect(0, 0, overview.width, overview.height);
-  for (const flash of getVisibleAlerts()) {
+  for (const flash of [...getVisibleAlerts(), ...ssVisibleMarkers]) {
     const ox = ((360 - normalizeRa(flash.alert.ra)) % 360) / 360 * overview.width;
     const oy = overview.height - ((flash.alert.dec + 90) / 180) * overview.height;
     octx.beginPath();
@@ -304,6 +304,13 @@ function findFlashAt(clientX, clientY) {
       if (dx * dx + dy * dy <= radius * radius) return flash;
       }
     }
+  for (let i = ssVisibleMarkers.length - 1; i >= 0; i--) {
+    const marker = ssVisibleMarkers[i];
+    if (marker.positions.some(position =>
+      (position.x - x) ** 2 + (position.y - y) ** 2 <= (marker.radius + 8) ** 2)) {
+      return marker;
+      }
+    }
   return null;
   }
 
@@ -313,7 +320,7 @@ function showAlertTooltip(flash, clientX, clientY) {
   heading.textContent = String(alert.objectId);
   const metadata = document.createElement('span');
   metadata.textContent = `${alert.survey} · ${alert.class} · ${alert.jd}`;
-  const link = createAlertLink(alert, "View on Fink");
+  const link = alert.class === 'LSST SS source' ? null : createAlertLink(alert, "View on Fink");
   tooltip.replaceChildren(heading, metadata, ...(link ? [link] : []));
   tooltip.style.display = 'flex';
   const box = tooltip.getBoundingClientRect();
@@ -359,6 +366,7 @@ tooltip.addEventListener('pointerleave', hideTooltip);
 const dynamicButton = document.getElementById('btnDynamic');
 const wholeButton = document.getElementById('btnWhole');
 const allAlertsButton = document.getElementById('btnAllAlerts');
+const ssTrajectoryButton = document.getElementById('btnSsTrajectory');
 function setCameraMode(mode) {
   camera.mode = mode === "whole" ? "whole" : "dynamic";
   dynamicButton.setAttribute("aria-pressed", String(camera.mode === "dynamic"));
@@ -374,6 +382,19 @@ allAlertsButton.addEventListener('click', () => {
   hideTooltip();
   if (showAllAlerts) getVisibleAlerts();
   renderRecentAlerts();
+  });
+ssTrajectoryButton.disabled = true;
+initialRefreshPromise.then(() => {
+  ssTrajectoryButton.disabled = !latestAlertsAvailable;
+  ssTrajectoryButton.title = latestAlertsAvailable
+    ? 'Load recent LSST Solar System trajectories from Elasticsearch'
+    : 'Available only in the FinkBrowser WAR';
+  });
+ssTrajectoryButton.addEventListener('click', () => {
+  if (ssTrajectoryButton.disabled) return;
+  if (ssTrajectoryEnabled) stopSsTrajectoryLoad();
+  else startSsTrajectoryLoad();
+  ssTrajectoryButton.setAttribute('aria-pressed', String(ssTrajectoryEnabled));
   });
 setCameraMode("dynamic");
 
@@ -407,7 +428,8 @@ function animate() {
     for (const marker of getVisibleAlerts()) marker.draw();
     }
   else flashes = flashes.filter(flash => flash.draw());
-  updateLegend(getVisibleAlerts());
+  drawSsTrajectories(getVisibleAlerts());
+  updateLegend([...getVisibleAlerts(), ...ssVisibleMarkers]);
   drawOverview();
   requestAnimationFrame(animate);
   }

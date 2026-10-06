@@ -17,7 +17,8 @@ const classesLSSTTags = {
   "sn_near_galaxy_candidate": "255,127,255"
   };
 const classesLSSTLatest = {
-  "LSST DIA source": "255,127,127"
+  "LSST DIA source": "255,127,127",
+  "LSST SS source": "255,200,80"
   };
 const classesLSST = {...classesLSSTTags, ...classesLSSTLatest};
 const classes = {...classesZTF, ...classesLSST};

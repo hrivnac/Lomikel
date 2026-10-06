@@ -279,7 +279,7 @@ test("legend DOM is rebuilt only when the active classes change", () => {
   assert.equal(legend.children.length, 2);
 });
 
-function loadAppForInteraction({withUtils = false} = {}) {
+function loadAppForInteraction({withUtils = false, war = false} = {}) {
   const noop = () => {};
   const listeners = new Map();
   const timers = new Map();
@@ -320,6 +320,7 @@ function loadAppForInteraction({withUtils = false} = {}) {
   const elements = new Map([
     ["sky", makeElement()], ["overview", makeElement()], ["tooltip", makeElement()],
     ["btnDynamic", makeElement()], ["btnWhole", makeElement()], ["btnAllAlerts", makeElement()],
+    ["btnSsTrajectory", makeElement()], ["ssTrajectoryStatus", makeElement()],
     ["helpButton", makeElement()], ["logo-help", makeElement()],
     ["recentAlerts", makeElement()], ["viewInfo", makeElement()],
   ]);
@@ -328,7 +329,15 @@ function loadAppForInteraction({withUtils = false} = {}) {
   elements.get("overview").width = 200;
   elements.get("overview").height = 100;
   const context = {
-    Math, Date, URLSearchParams,
+    Math, Date, URLSearchParams, AbortController,
+    latestAlertsAvailable: war,
+    initialRefreshPromise: Promise.resolve(),
+    nAlerts: 3,
+    fetchCalls: [],
+    fetch(url) {
+      context.fetchCalls.push(url);
+      return Promise.resolve({ok: true, json: async () => ({ids: []})});
+    },
     alertsPool: [], classes: {},
     clearTimeout: id => timers.delete(id),
     document: {
@@ -339,6 +348,7 @@ function loadAppForInteraction({withUtils = false} = {}) {
     },
     drawConstellationLabels: noop, drawConstellations: noop, drawEcliptic: noop,
     drawEclipticMonths: noop, drawGalacticPlane: noop, drawOverview: noop,
+    drawSsTrajectories: noop, ssVisibleMarkers: [],
     drawStar: noop, drawStars: noop, getCircularRaBounds: () => ({center: 0, span: 0}),
     interpolateRa: (a, b) => b, normalizeRa: value => value,
     signedRaDelta: (ra, center) => ((ra - center + 540) % 360) - 180,
@@ -361,6 +371,7 @@ function loadAppForInteraction({withUtils = false} = {}) {
   if (withUtils) {
     vm.runInContext(fs.readFileSync(path.join(alertsView, "utils.js"), "utf8"), context, {filename: "utils.js"});
   }
+  vm.runInContext(fs.readFileSync(path.join(alertsView, "trajectory.js"), "utf8"), context, {filename: "trajectory.js"});
   vm.runInContext(fs.readFileSync(path.join(alertsView, "app.js"), "utf8"), context, {filename: "app.js"});
   const runTimersAtDelay = delay => {
     const due = [...timers.entries()].filter(([, timer]) => timer.delay === delay);
@@ -381,6 +392,28 @@ test("view and help controls expose their state to keyboard and assistive techno
   vm.runInContext("toggleHelp();", context);
   assert.equal(elements.get("logo-help").hidden, false);
   assert.equal(elements.get("helpButton").getAttribute("aria-expanded"), "true");
+});
+
+test("SS trajectory is WAR-only, on-demand, and independent of sky controls", async () => {
+  const staticPage = loadAppForInteraction();
+  await Promise.resolve();
+  assert.equal(staticPage.elements.get("btnSsTrajectory").disabled, true);
+  staticPage.elements.get("btnSsTrajectory").emit("click");
+  assert.deepEqual(staticPage.context.fetchCalls, []);
+
+  const serverPage = loadAppForInteraction({war: true});
+  await Promise.resolve();
+  const {context, elements} = serverPage;
+  assert.equal(elements.get("btnSsTrajectory").disabled, false);
+  assert.deepEqual(context.fetchCalls, []);
+  elements.get("btnSsTrajectory").emit("click");
+  await Promise.resolve();
+  assert.equal(context.fetchCalls[0], "SSTrajectory.jsp?list=1&n=3");
+  assert.equal(elements.get("btnSsTrajectory").getAttribute("aria-pressed"), "true");
+  assert.equal(elements.get("btnDynamic").getAttribute("aria-pressed"), "true");
+  assert.equal(elements.get("btnAllAlerts").getAttribute("aria-pressed"), "false");
+  elements.get("btnSsTrajectory").emit("click");
+  assert.equal(elements.get("btnSsTrajectory").getAttribute("aria-pressed"), "false");
 });
 
 test("All alerts is an independent toggle alongside both camera modes", () => {

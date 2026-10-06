@@ -17,6 +17,7 @@
         <button id="btnDynamic" type="button" aria-pressed="true">Follow alerts</button>
         <button id="btnWhole" type="button" aria-pressed="false">Whole sky</button>
         <button id="btnAllAlerts" type="button" aria-pressed="false">All alerts</button>
+        <button id="btnSsTrajectory" type="button" aria-pressed="false" disabled title="Available only in the FinkBrowser WAR">SS trajectory</button>
       </nav>
 
       <section id="legend" aria-label="Active alert classifications"></section>
@@ -32,6 +33,7 @@
             <li><strong>Follow alerts</strong> moves the view toward currently animated alerts.</li>
             <li><strong>Whole sky</strong> shows the complete celestial sphere.</li>
             <li><strong>All alerts</strong> toggles persistent markers for every currently loaded alert. Whole sky and Follow alerts work in either mode.</li>
+            <li><strong>SS trajectory</strong> (WAR only) discovers up to the requested number of multi-point LSST Solar System objects in Elasticsearch, then obtains complete observation-level positions and MJDs via the Fink resolver and SSO API. Its most recent dated source uses the regular-size star; older sources use smaller stars and same-colour time-ordered lines. ES stores times and coordinates in separate arrays, which cannot safely be paired on their own. Switch it off to stop loading and hide the tracks.</li>
             <li>Five-pointed markers are ZTF alerts; ten-pointed markers are LSST alerts.</li>
             <li>Point to or tap a marker for details. Keyboard users can open the same objects from the alert list, which shows all loaded alerts when All alerts is on.</li>
             <li>When server mode is available, a zero look-back window loads the latest ZTF classifications and LSST DIA alerts. Standalone mode requires a positive time window and never accesses Elasticsearch.</li>
@@ -55,6 +57,7 @@
         </button>
         <div id="statusPanel" role="status" aria-live="polite" aria-label="Survey status"></div>
         <div id="runtimeModeInfo" role="status">Detecting server capabilities…</div>
+        <div id="ssTrajectoryStatus" role="status" aria-live="polite"></div>
         <output id="viewInfo" aria-label="Current sky coordinates"></output>
       </section>
 
@@ -93,6 +96,7 @@
     <script src="update.js"></script>
     <script src="data.js"></script>
     <script src="settings.js"></script>
+    <script src="trajectory.js"></script>
     <script src="drawing.js"></script>
     <script src="app.js"></script>
   </body>

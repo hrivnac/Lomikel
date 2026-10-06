@@ -187,6 +187,76 @@ function drawConstellationLabels() {
   catch(e){}
   }
   
+// Historical SS stars share the class colour; the latest dated source is full size.
+let ssVisibleMarkers = [];
+function drawSsTrajectorySegment(first, second, color) {
+  const from = raDecToXY(first.ra, first.dec);
+  const to = raDecToXY(second.ra, second.dec);
+  const period = canvas.width * camera.currentZoom;
+  if (!(period > 0)) return;
+  const nearestX = to.x - Math.round((to.x - from.x) / period) * period;
+  ctx.save();
+  ctx.strokeStyle = `rgba(${color},0.8)`;
+  ctx.lineWidth = 1.5;
+  for (const shift of [-period, 0, period]) {
+    if (Math.max(from.x, nearestX) + shift < 0 ||
+        Math.min(from.x, nearestX) + shift > canvas.width) continue;
+    ctx.beginPath();
+    ctx.moveTo(from.x + shift, from.y);
+    ctx.lineTo(nearestX + shift, to.y);
+    ctx.stroke();
+    }
+  ctx.restore();
+  }
+
+function matchesSsSource(marker, point) {
+  if (marker.alert.survey !== 'LSST') return false;
+  const sourceId = marker.alert.sourceId;
+  if (sourceId != null && sourceId !== '') return String(sourceId) === point.sourceId;
+  const mjd = Number(marker.alert.jd);
+  return marker.alert.jd != null && marker.alert.jd !== '' &&
+    Number.isFinite(mjd) && Math.abs(mjd - point.mjd) < 0.000001 &&
+    Math.abs(signedRaDelta(marker.alert.ra, point.ra)) < 0.000001 &&
+    Math.abs(marker.alert.dec - point.dec) < 0.000001;
+  }
+
+function drawSsTrajectories(primaryMarkers) {
+  ssVisibleMarkers = [];
+  if (!ssTrajectoryEnabled) return;
+  const fallbackColor = classes['LSST SS source'] || '255,200,80';
+  for (const trajectory of ssTrajectories.values()) {
+    const matchingAlert = primaryMarkers.find(marker =>
+      trajectory.points.some(point => matchesSsSource(marker, point)));
+    const color = matchingAlert?.color || fallbackColor;
+    const points = trajectory.points;
+    const lastAtPosition = new Map();
+    const positionKey = point => `${point.ra.toFixed(7)}:${point.dec.toFixed(7)}`;
+    for (let i = 0; i < points.length; i++) lastAtPosition.set(positionKey(points[i]), i);
+    for (let i = 1; i < points.length; i++) {
+      drawSsTrajectorySegment(points[i - 1], points[i], color);
+      }
+    for (let i = 0; i < points.length; i++) {
+      const point = points[i];
+      if (lastAtPosition.get(positionKey(point)) !== i) continue;
+      // Prefer an already visible alert for this exact source/observation.
+      const current = primaryMarkers.some(marker => matchesSsSource(marker, point));
+      if (current) continue;
+      const marker = {
+        alert: {survey: 'LSST', objectId: trajectory.objectId,
+          class: 'LSST SS source', ra: point.ra, dec: point.dec,
+          jd: `MJD ${point.mjd} · source ${point.sourceId}`},
+        color, radius: i === points.length - 1 ? 7 : 4
+        };
+      marker.pos = raDecToXY(point.ra, point.dec);
+      marker.positions = getWrappedScreenPositions(marker.pos, marker.radius);
+      for (const position of marker.positions) {
+        drawStar(position.x, position.y, marker.radius, color, 0.85, 0, 10, false);
+        }
+      ssVisibleMarkers.push(marker);
+      }
+    }
+  }
+
 // Update Legend
 let legendSignature = null;
 function updateLegend(activeFlashes = flashes) {
