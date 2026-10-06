@@ -436,7 +436,7 @@ test("All alerts is an independent toggle alongside both camera modes", () => {
   assert.equal(vm.runInContext("showAllAlerts", context), false);
 });
 
-test("All alerts lists visible historical SS sources once and removes them when SS is hidden", () => {
+test("All alerts lists only the latest SS source even when its marker overlaps a DIA alert", () => {
   const {context, elements} = loadAppForInteraction({withUtils: true, war: true});
   context.alertsPool = [{
     "v:survey": "LSST", "r:diaObjectId": "0", "r:midpointMjdTai": 20,
@@ -448,17 +448,29 @@ test("All alerts lists visible historical SS sources once and removes them when 
     {sourceId: "new-source", mjd: 20, ra: 101, dec: 0},
   ]};
   vm.runInContext('ssTrajectories.set(trajectory.objectId, trajectory); ssTrajectoryEnabled = true; renderRecentAlerts()', context);
-  const rows = () => elements.get("recentAlerts").children.map(item => item.children.map(child => child.textContent));
-  assert.equal(rows().length, 2);
-  assert.match(rows()[0].join(" "), /21164706692739143.*old-source/);
-  assert.match(rows()[1].join(" "), /LSST 0/);
-  assert.match(rows()[0].join(" "), /MJD 10/);
+  const rows = () => elements.get("recentAlerts").children.map(item => item.children.map(child => child.textContent).join(""));
+  assert.deepEqual(rows(), ["LSST 21164706692739143 — SS", "LSST 0 — DIA"]);
   assert.equal(elements.get("recentAlerts").children[0].children.some(child => child.tagName === "A"), false);
-  assert.equal(elements.get("recentAlerts").children[0].className, "ss-trajectory-item");
-  const css = fs.readFileSync(path.join(alertsView, "style.css"), "utf8");
-  assert.match(css, /#recentAlerts li\.ss-trajectory-item\s*\{[^}]*white-space:\s*normal/);
   vm.runInContext('stopSsTrajectoryLoad()', context);
-  assert.equal(rows().length, 1);
+  assert.deepEqual(rows(), ["LSST 0 — DIA"]);
+});
+
+test("list preserves ZTF and future LSST class names, while SS tooltips retain each MJD", () => {
+  const {context, elements} = loadAppForInteraction({withUtils: true});
+  context.alertsPool = [
+    {"v:survey": "ZTF", "i:objectId": "ZTF-one", "i:jd": 1, "i:ra": 20, "i:dec": 0, "v:classification": "SN candidate"},
+    {"v:survey": "LSST", "r:diaObjectId": "LSST-two", "r:midpointMjdTai": 2, "r:ra": 21, "r:dec": 0, "v:classification": "future_lsst_class"},
+  ];
+  elements.get("btnAllAlerts").emit("click");
+  const rows = elements.get("recentAlerts").children.map(item => item.children.map(child => child.textContent).join(""));
+  assert.deepEqual(rows, ["ZTF ZTF-one — SN candidate", "LSST LSST-two — future_lsst_class"]);
+  const drawing = fs.readFileSync(path.join(alertsView, "drawing.js"), "utf8");
+  assert.match(drawing, /jd: `MJD \$\{point\.mjd\} · source \$\{point\.sourceId\}`/);
+  for (const mjd of [10, 20]) {
+    context.ssAlert = {survey: "LSST", objectId: "123", class: "LSST SS source", jd: `MJD ${mjd} · source source-${mjd}`};
+    vm.runInContext('showAlertTooltip({alert: ssAlert}, 10, 20)', context);
+    assert.match(elements.get("tooltip").children[1].textContent, new RegExp(`MJD ${mjd} · source source-${mjd}`));
+  }
 });
 
 test("All alerts grows as SS object responses arrive", async () => {
@@ -479,14 +491,14 @@ test("All alerts grows as SS object responses arrive", async () => {
   const pending = vm.runInContext('startSsTrajectoryLoad()', context);
   for (let i = 0; i < 20 && !releaseSecond; i++) await new Promise(resolve => setImmediate(resolve));
   assert.equal(typeof releaseSecond, 'function');
-  const rows = () => elements.get('recentAlerts').children.map(item => item.children.map(child => child.textContent).join(' '));
+  const rows = () => elements.get('recentAlerts').children.map(item => item.children.map(child => child.textContent).join(''));
   assert.equal(rows().length, 1);
-  assert.match(rows()[0], /SS 123/);
+  assert.match(rows()[0], /LSST 123 — SS/);
   releaseSecond();
   await pending;
   assert.equal(rows().length, 2);
-  assert.match(rows()[0], /SS 456/);
-  assert.match(rows()[1], /SS 123/);
+  assert.match(rows()[0], /LSST 456 — SS/);
+  assert.match(rows()[1], /LSST 123 — SS/);
 });
 
 test("all-alert markers persist, refresh with the loaded pool, and remain interactive", () => {
