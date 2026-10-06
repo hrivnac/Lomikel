@@ -136,16 +136,41 @@ function renderRecentAlerts() {
   const focusedUrl = focused?.tagName === 'A' && list.contains(focused) ? focused.href : null;
   let replacementFocus = null;
   const visible = showAllAlerts ? loadedAlertMarkers.map(marker => ({alert: marker.alert})) : recentAlerts;
+  if (showAllAlerts) {
+    const ssItems = [];
+    for (const {trajectory, points} of getVisibleSsTrajectories(loadedAlertMarkers)) {
+      for (const {point} of points) {
+        ssItems.push({alert: {
+          survey: 'LSST', objectId: trajectory.objectId, sourceId: point.sourceId,
+          class: 'LSST SS source', jd: point.mjd, isSsTrajectory: true
+          }});
+        }
+      }
+    ssItems.sort((a, b) => b.alert.jd - a.alert.jd);
+    visible.unshift(...ssItems);
+    }
   document.getElementById('recentAlertsHeading').textContent = showAllAlerts ? 'All loaded alerts' : 'Recent alerts';
   const items = visible.map(({alert}) => {
     const item = document.createElement('li');
-    const link = createAlertLink(alert, `${alert.survey} ${alert.objectId}`);
+    if (alert.isSsTrajectory) item.className = 'ss-trajectory-item';
+    const label = alert.isSsTrajectory
+      ? `LSST SS ${alert.objectId} · source ${alert.sourceId}`
+      : `${alert.survey} ${alert.objectId}`;
+    // An SS ID is not a DIA object ID; don't create a misleading DIA portal link.
+    const link = alert.isSsTrajectory ? null : createAlertLink(alert, label);
     if (link) {
       item.append(link);
       if (focusedUrl === link.href) replacementFocus = link;
       }
+    else if (alert.isSsTrajectory) {
+      const name = document.createElement('span');
+      name.textContent = label;
+      item.append(name);
+      }
     const details = document.createElement('span');
-    details.textContent = ` — ${alert.class}`;
+    details.textContent = alert.isSsTrajectory
+      ? ` — ${alert.class} · MJD ${alert.jd}`
+      : ` — ${alert.class}`;
     item.append(details);
     return item;
     });

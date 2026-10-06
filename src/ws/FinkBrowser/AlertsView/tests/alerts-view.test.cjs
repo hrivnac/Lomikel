@@ -436,6 +436,59 @@ test("All alerts is an independent toggle alongside both camera modes", () => {
   assert.equal(vm.runInContext("showAllAlerts", context), false);
 });
 
+test("All alerts lists visible historical SS sources once and removes them when SS is hidden", () => {
+  const {context, elements} = loadAppForInteraction({withUtils: true, war: true});
+  context.alertsPool = [{
+    "v:survey": "LSST", "r:diaObjectId": "0", "r:midpointMjdTai": 20,
+    "r:ra": 101, "r:dec": 0, "v:classification": "LSST DIA source",
+  }];
+  elements.get("btnAllAlerts").emit("click");
+  context.trajectory = {objectId: "21164706692739143", points: [
+    {sourceId: "old-source", mjd: 10, ra: 100, dec: 0},
+    {sourceId: "new-source", mjd: 20, ra: 101, dec: 0},
+  ]};
+  vm.runInContext('ssTrajectories.set(trajectory.objectId, trajectory); ssTrajectoryEnabled = true; renderRecentAlerts()', context);
+  const rows = () => elements.get("recentAlerts").children.map(item => item.children.map(child => child.textContent));
+  assert.equal(rows().length, 2);
+  assert.match(rows()[0].join(" "), /21164706692739143.*old-source/);
+  assert.match(rows()[1].join(" "), /LSST 0/);
+  assert.match(rows()[0].join(" "), /MJD 10/);
+  assert.equal(elements.get("recentAlerts").children[0].children.some(child => child.tagName === "A"), false);
+  assert.equal(elements.get("recentAlerts").children[0].className, "ss-trajectory-item");
+  const css = fs.readFileSync(path.join(alertsView, "style.css"), "utf8");
+  assert.match(css, /#recentAlerts li\.ss-trajectory-item\s*\{[^}]*white-space:\s*normal/);
+  vm.runInContext('stopSsTrajectoryLoad()', context);
+  assert.equal(rows().length, 1);
+});
+
+test("All alerts grows as SS object responses arrive", async () => {
+  const {context, elements} = loadAppForInteraction({withUtils: true, war: true});
+  let releaseSecond;
+  context.fetch = async url => {
+    if (url.includes('list=1')) return {ok: true, json: async () => ({ids: ['123', '456']})};
+    if (url.includes('id=123')) return {ok: true, json: async () => ({objectId: '123', sources: [
+      {sourceId: '1', mjd: 10, ra: 100, dec: 0},
+    ]})};
+    return new Promise(resolve => {
+      releaseSecond = () => resolve({ok: true, json: async () => ({objectId: '456', sources: [
+        {sourceId: '2', mjd: 11, ra: 101, dec: 0},
+      ]})});
+    });
+  };
+  elements.get('btnAllAlerts').emit('click');
+  const pending = vm.runInContext('startSsTrajectoryLoad()', context);
+  for (let i = 0; i < 20 && !releaseSecond; i++) await new Promise(resolve => setImmediate(resolve));
+  assert.equal(typeof releaseSecond, 'function');
+  const rows = () => elements.get('recentAlerts').children.map(item => item.children.map(child => child.textContent).join(' '));
+  assert.equal(rows().length, 1);
+  assert.match(rows()[0], /SS 123/);
+  releaseSecond();
+  await pending;
+  assert.equal(rows().length, 2);
+  assert.match(rows()[0], /SS 456/);
+  assert.match(rows()[1], /SS 123/);
+});
+
 test("all-alert markers persist, refresh with the loaded pool, and remain interactive", () => {
   const {context, elements} = loadAppForInteraction({withUtils: true});
   const rows = [

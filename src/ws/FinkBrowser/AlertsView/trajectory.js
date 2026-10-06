@@ -34,6 +34,35 @@ function normalizeSsTrajectory(payload) {
           points};
   }
 
+function matchesSsSource(marker, point) {
+  if (marker.alert.survey !== 'LSST') return false;
+  const sourceId = marker.alert.sourceId;
+  if (sourceId != null && sourceId !== '') return String(sourceId) === point.sourceId;
+  const mjd = Number(marker.alert.jd);
+  return marker.alert.jd != null && marker.alert.jd !== '' &&
+    Number.isFinite(mjd) && Math.abs(mjd - point.mjd) < 0.000001 &&
+    Math.abs(signedRaDelta(marker.alert.ra, point.ra)) < 0.000001 &&
+    Math.abs(marker.alert.dec - point.dec) < 0.000001;
+  }
+
+// Use one visibility rule for canvas markers and the All loaded alerts list.
+function getVisibleSsTrajectories(primaryMarkers) {
+  if (!ssTrajectoryEnabled) return [];
+  const fallbackColor = classes['LSST SS source'] || '255,200,80';
+  return [...ssTrajectories.values()].map(trajectory => {
+    const matchingAlert = primaryMarkers.find(marker =>
+      trajectory.points.some(point => matchesSsSource(marker, point)));
+    const lastAtPosition = new Map();
+    const positionKey = point => `${point.ra.toFixed(7)}:${point.dec.toFixed(7)}`;
+    trajectory.points.forEach((point, index) => lastAtPosition.set(positionKey(point), index));
+    const points = trajectory.points.flatMap((point, index) =>
+      lastAtPosition.get(positionKey(point)) === index &&
+      !primaryMarkers.some(marker => matchesSsSource(marker, point))
+        ? [{point, index}] : []);
+    return {trajectory, color: matchingAlert?.color || fallbackColor, points};
+    });
+  }
+
 function updateSsTrajectoryStatus(message) {
   const status = document.getElementById('ssTrajectoryStatus');
   if (status) {
@@ -54,6 +83,7 @@ async function startSsTrajectoryLoad() {
   if (ssTrajectoryController) return;
   ssTrajectoryEnabled = true;
   ssTrajectories.clear();
+  if (typeof showAllAlerts !== 'undefined' && showAllAlerts) renderRecentAlerts();
   const generation = ++ssTrajectoryGeneration;
   const controller = new AbortController();
   ssTrajectoryController = controller;
@@ -76,6 +106,7 @@ async function startSsTrajectoryLoad() {
         if (trajectory.points.length) {
           ssTrajectories.set(id, trajectory);
           loaded++;
+          if (typeof showAllAlerts !== 'undefined' && showAllAlerts) renderRecentAlerts();
           }
         }
       catch (error) {
@@ -103,5 +134,6 @@ function stopSsTrajectoryLoad() {
   ssTrajectoryController?.abort();
   ssTrajectoryController = null;
   ssTrajectories.clear();
+  if (typeof showAllAlerts !== 'undefined' && showAllAlerts) renderRecentAlerts();
   updateSsTrajectoryStatus('SS trajectories hidden');
   }

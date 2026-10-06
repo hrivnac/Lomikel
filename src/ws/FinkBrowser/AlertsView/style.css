@@ -201,6 +201,11 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   white-space: nowrap;
   }
 
+#recentAlerts li.ss-trajectory-item {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  }
+
 #recentAlerts a,
 #tooltip a {
   color: #70bdff;
