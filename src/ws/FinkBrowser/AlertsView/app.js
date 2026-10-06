@@ -136,16 +136,14 @@ function renderRecentAlerts() {
   const focusedUrl = focused?.tagName === 'A' && list.contains(focused) ? focused.href : null;
   let replacementFocus = null;
   const visible = showAllAlerts ? loadedAlertMarkers.map(marker => ({alert: marker.alert})) : recentAlerts;
-  if (showAllAlerts) {
-    const ssItems = [];
-    for (const {trajectory, points} of getVisibleSsTrajectories(loadedAlertMarkers)) {
-      for (const {point} of points) {
-        ssItems.push({alert: {
-          survey: 'LSST', objectId: trajectory.objectId, sourceId: point.sourceId,
-          class: 'LSST SS source', jd: point.mjd, isSsTrajectory: true
-          }});
-        }
-      }
+  if (showAllAlerts && ssTrajectoryEnabled) {
+    const ssItems = [...ssTrajectories.values()]
+      .filter(trajectory => trajectory.points.length > 0)
+      .map(trajectory => ({alert: {
+        survey: 'LSST', objectId: trajectory.objectId,
+        class: 'LSST SS source', jd: trajectory.points[trajectory.points.length - 1].mjd,
+        isSsTrajectory: true
+        }}));
     ssItems.sort((a, b) => b.alert.jd - a.alert.jd);
     visible.unshift(...ssItems);
     }
@@ -153,9 +151,7 @@ function renderRecentAlerts() {
   const items = visible.map(({alert}) => {
     const item = document.createElement('li');
     if (alert.isSsTrajectory) item.className = 'ss-trajectory-item';
-    const label = alert.isSsTrajectory
-      ? `LSST SS ${alert.objectId} · source ${alert.sourceId}`
-      : `${alert.survey} ${alert.objectId}`;
+    const label = `${alert.survey} ${alert.objectId}`;
     // An SS ID is not a DIA object ID; don't create a misleading DIA portal link.
     const link = alert.isSsTrajectory ? null : createAlertLink(alert, label);
     if (link) {
@@ -168,9 +164,10 @@ function renderRecentAlerts() {
       item.append(name);
       }
     const details = document.createElement('span');
-    details.textContent = alert.isSsTrajectory
-      ? ` — ${alert.class} · MJD ${alert.jd}`
-      : ` — ${alert.class}`;
+    const classification = alert.survey === 'LSST' && alert.class === 'LSST DIA source' ? 'DIA'
+      : alert.survey === 'LSST' && alert.class === 'LSST SS source' ? 'SS'
+      : alert.class;
+    details.textContent = ` — ${classification}`;
     item.append(details);
     return item;
     });
