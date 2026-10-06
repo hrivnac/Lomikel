@@ -373,7 +373,7 @@ allAlertsButton.addEventListener('click', () => {
   document.getElementById('recentAlertsPanel').setAttribute('data-all-alerts', String(showAllAlerts));
   hideTooltip();
   if (showAllAlerts) getVisibleAlerts();
-  else renderRecentAlerts();
+  renderRecentAlerts();
   });
 setCameraMode("dynamic");
 

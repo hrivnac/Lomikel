@@ -439,6 +439,17 @@ test("all-alert markers persist, refresh with the loaded pool, and remain intera
   assert.deepEqual(Array.from(vm.runInContext("getVisibleAlerts().map(marker => marker.alert.objectId)", context)), ["LSST-two"]);
   elements.get("btnAllAlerts").emit("click");
   assert.equal(vm.runInContext("getVisibleAlerts() === flashes", context), true);
+  // A cached pool must restore the full list when toggled on again.
+  vm.runInContext('addRecentAlert(alertFromRow(alertsPool[0]))', context);
+  assert.equal(elements.get("recentAlerts").children.length, 1);
+  context.alertsPool = rows.slice(0, 2);
+  elements.get("btnAllAlerts").emit("click");
+  assert.equal(elements.get("recentAlerts").children.length, 2);
+  elements.get("btnAllAlerts").emit("click");
+  assert.equal(elements.get("recentAlerts").children.length, 1);
+  elements.get("btnAllAlerts").emit("click");
+  assert.equal(elements.get("recentAlerts").children.length, 2);
+  assert.equal(elements.get("btnAllAlerts").getAttribute("aria-pressed"), "true");
 });
 
 test("all-alert follow bounds are cached until refresh and a focused link survives refresh", () => {
