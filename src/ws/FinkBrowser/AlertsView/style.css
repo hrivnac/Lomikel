@@ -161,6 +161,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   top: 92px;
   left: 10px;
   width: min(330px, calc(100vw - 20px));
+  max-height: min(40vh, 320px);
+  overflow-y: auto;
   padding: 7px 10px;
   font-size: 12px;
   }
@@ -371,7 +373,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
     font-size: 11px;
     }
 
-  #recentAlertsPanel li:nth-child(n+4) {
+  #recentAlertsPanel:not([data-all-alerts="true"]) li:nth-child(n+4) {
     display: none;
     }
 
@@ -402,6 +404,16 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   .params-grid {
     grid-template-columns: 1fr;
     gap: 5px;
+    }
+  }
+
+@media (max-width: 400px) {
+  #controls {
+    top: 85px;
+    }
+
+  #legend, #recentAlertsPanel {
+    top: 143px;
     }
   }
 

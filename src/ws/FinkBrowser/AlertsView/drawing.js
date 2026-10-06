@@ -189,9 +189,9 @@ function drawConstellationLabels() {
   
 // Update Legend
 let legendSignature = null;
-function updateLegend() {
+function updateLegend(activeFlashes = flashes) {
   const legend = document.getElementById('legend');
-  const activeClasses = [...new Set(flashes.map(flash => flash.alert.class))].sort();
+  const activeClasses = [...new Set(activeFlashes.map(flash => flash.alert.class))].sort();
   const signature = activeClasses.join("\u0000");
   if (signature === legendSignature) return;
   legendSignature = signature;

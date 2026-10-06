@@ -284,7 +284,9 @@ function loadAppForInteraction({withUtils = false} = {}) {
   const listeners = new Map();
   const timers = new Map();
   let nextTimerId = 1;
-  const makeElement = () => ({
+  const makeElement = (tagName = 'div') => ({
+    tagName: tagName.toUpperCase(),
+    children: [],
     hidden: true,
     style: {},
     attributes: new Map(),
@@ -293,7 +295,14 @@ function loadAppForInteraction({withUtils = false} = {}) {
       this.eventListeners.set(type, handler);
       listeners.set(type, handler);
     },
-    append: noop,
+    append(...nodes) {
+      for (const node of nodes) { node.parentElement = this; this.children.push(node); }
+    },
+    contains(node) {
+      for (let current = node; current; current = current.parentElement) if (current === this) return true;
+      return false;
+    },
+    focus() { context.document.activeElement = this; },
     emit(type, event = {}) { this.eventListeners.get(type)?.(event); },
     getAttribute(name) { return this.attributes.get(name) ?? null; },
     getBoundingClientRect: () => ({left: 0, top: 0, width: 1200, height: 600}),
@@ -302,12 +311,15 @@ function loadAppForInteraction({withUtils = false} = {}) {
       fillText: noop, lineTo: noop, moveTo: noop, restore: noop, save: noop,
       stroke: noop, strokeRect: noop,
     }),
-    replaceChildren: noop,
+    replaceChildren(...nodes) {
+      this.children = [];
+      this.append(...nodes);
+    },
     setAttribute(name, value) { this.attributes.set(name, String(value)); },
   });
   const elements = new Map([
     ["sky", makeElement()], ["overview", makeElement()], ["tooltip", makeElement()],
-    ["btnDynamic", makeElement()], ["btnWhole", makeElement()],
+    ["btnDynamic", makeElement()], ["btnWhole", makeElement()], ["btnAllAlerts", makeElement()],
     ["helpButton", makeElement()], ["logo-help", makeElement()],
     ["recentAlerts", makeElement()], ["viewInfo", makeElement()],
   ]);
@@ -369,6 +381,95 @@ test("view and help controls expose their state to keyboard and assistive techno
   vm.runInContext("toggleHelp();", context);
   assert.equal(elements.get("logo-help").hidden, false);
   assert.equal(elements.get("helpButton").getAttribute("aria-expanded"), "true");
+});
+
+test("All alerts is an independent toggle alongside both camera modes", () => {
+  const html = fs.readFileSync(path.join(alertsView, "index.html"), "utf8");
+  assert.match(html, /id="btnAllAlerts"[^>]+aria-pressed="false"[^>]*>All alerts<\/button>/);
+  const {context, elements} = loadAppForInteraction();
+  const all = elements.get("btnAllAlerts");
+  assert.equal(all.getAttribute("aria-pressed"), "false");
+  all.emit("click");
+  assert.equal(all.getAttribute("aria-pressed"), "true");
+  elements.get("btnWhole").emit("click");
+  assert.equal(elements.get("btnWhole").getAttribute("aria-pressed"), "true");
+  assert.equal(all.getAttribute("aria-pressed"), "true");
+  elements.get("btnDynamic").emit("click");
+  assert.equal(elements.get("btnDynamic").getAttribute("aria-pressed"), "true");
+  assert.equal(all.getAttribute("aria-pressed"), "true");
+  all.emit("click");
+  assert.equal(all.getAttribute("aria-pressed"), "false");
+  assert.equal(elements.get("btnDynamic").getAttribute("aria-pressed"), "true");
+  assert.equal(vm.runInContext("showAllAlerts", context), false);
+});
+
+test("all-alert markers persist, refresh with the loaded pool, and remain interactive", () => {
+  const {context, elements} = loadAppForInteraction({withUtils: true});
+  const rows = [
+    {"v:survey": "ZTF", "i:ra": 359, "i:dec": 10, "i:objectId": "ZTF-one", "i:jd": 1, "v:classification": "SN candidate"},
+    {"v:survey": "LSST", "r:ra": 1, "r:dec": -10, "r:diaObjectId": "LSST-two", "r:midpointMjdTai": 2, "v:classification": "LSST DIA source"},
+    {"v:survey": "ZTF", "i:ra": "invalid", "i:dec": 0, "i:objectId": "bad"},
+    {"v:survey": "ZTF", "i:ra": "  ", "i:dec": 0, "i:objectId": "blank"},
+  ];
+  context.alertsPool = rows;
+  elements.get("btnAllAlerts").emit("click");
+  const result = vm.runInContext(`(() => {
+    const markers = getVisibleAlerts();
+    camera.mode = "dynamic";
+    updateCamera();
+    const follow = {...camera.targetCenter, zoom: camera.targetZoom};
+    camera.mode = "whole";
+    updateCamera();
+    const whole = {...camera.targetCenter, zoom: camera.targetZoom};
+    markers.forEach(marker => marker.draw());
+    const first = markers[0];
+    first.startTime = Date.now() - 60000;
+    first.draw();
+    return {ids: markers.map(marker => marker.alert.objectId), follow, whole,
+      interactive: findFlashAt(first.pos.x, first.pos.y) === first,
+      persisted: first.positions.length > 0};
+  })()`, context);
+  assert.deepEqual(Array.from(result.ids), ["ZTF-one", "LSST-two"]);
+  assert.equal(result.follow.ra, 0);
+  assert.equal(result.whole.ra, 180);
+  assert.equal(result.whole.zoom, 1);
+  assert.equal(result.interactive, true);
+  assert.equal(result.persisted, true);
+  context.alertsPool = [rows[1]];
+  assert.deepEqual(Array.from(vm.runInContext("getVisibleAlerts().map(marker => marker.alert.objectId)", context)), ["LSST-two"]);
+  elements.get("btnAllAlerts").emit("click");
+  assert.equal(vm.runInContext("getVisibleAlerts() === flashes", context), true);
+  // A cached pool must restore the full list when toggled on again.
+  vm.runInContext('addRecentAlert(alertFromRow(alertsPool[0]))', context);
+  assert.equal(elements.get("recentAlerts").children.length, 1);
+  context.alertsPool = rows.slice(0, 2);
+  elements.get("btnAllAlerts").emit("click");
+  assert.equal(elements.get("recentAlerts").children.length, 2);
+  elements.get("btnAllAlerts").emit("click");
+  assert.equal(elements.get("recentAlerts").children.length, 1);
+  elements.get("btnAllAlerts").emit("click");
+  assert.equal(elements.get("recentAlerts").children.length, 2);
+  assert.equal(elements.get("btnAllAlerts").getAttribute("aria-pressed"), "true");
+});
+
+test("all-alert follow bounds are cached until refresh and a focused link survives refresh", () => {
+  const {context, elements} = loadAppForInteraction({withUtils: true});
+  const row = {"v:survey": "ZTF", "i:ra": 12, "i:dec": 5, "i:objectId": "ZTF-focus", "i:jd": 1, "v:classification": "SN candidate"};
+  const row2 = {...row, "i:ra": 14, "i:objectId": "ZTF-new"};
+  let calculations = 0;
+  context.getCircularRaBounds = () => { calculations++; return {center: 12, span: 2}; };
+  context.alertsPool = [row];
+  elements.get("btnAllAlerts").emit("click");
+  const firstLink = elements.get("recentAlerts").children[0].children[0];
+  firstLink.focus();
+  vm.runInContext('updateCamera(); updateCamera();', context);
+  assert.equal(calculations, 1);
+  context.alertsPool = [row, row2];
+  vm.runInContext('updateCamera();', context);
+  assert.equal(calculations, 2);
+  assert.notEqual(context.document.activeElement, firstLink);
+  assert.equal(context.document.activeElement.href, firstLink.href);
+  assert.equal(elements.get("recentAlerts").children.some(item => item.children.includes(context.document.activeElement)), true);
 });
 
 test("camera zooms out before crossing the RA seam so all active alerts stay visible", () => {

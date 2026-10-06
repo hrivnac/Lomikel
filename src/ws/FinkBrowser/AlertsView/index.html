@@ -16,6 +16,7 @@
       <nav id="controls" aria-label="Sky view">
         <button id="btnDynamic" type="button" aria-pressed="true">Follow alerts</button>
         <button id="btnWhole" type="button" aria-pressed="false">Whole sky</button>
+        <button id="btnAllAlerts" type="button" aria-pressed="false">All alerts</button>
       </nav>
 
       <section id="legend" aria-label="Active alert classifications"></section>
@@ -30,8 +31,9 @@
           <ul>
             <li><strong>Follow alerts</strong> moves the view toward currently animated alerts.</li>
             <li><strong>Whole sky</strong> shows the complete celestial sphere.</li>
+            <li><strong>All alerts</strong> toggles persistent markers for every currently loaded alert. Whole sky and Follow alerts work in either mode.</li>
             <li>Five-pointed markers are ZTF alerts; ten-pointed markers are LSST alerts.</li>
-            <li>Point to or tap a marker for details. Keyboard users can open the same objects from Recent alerts.</li>
+            <li>Point to or tap a marker for details. Keyboard users can open the same objects from the alert list, which shows all loaded alerts when All alerts is on.</li>
             <li>When server mode is available, a zero look-back window loads the latest ZTF classifications and LSST DIA alerts. Standalone mode requires a positive time window and never accesses Elasticsearch.</li>
             <li>Select the underlined parameter readout at lower left to change the refresh period, look-back window, alerts per class, or limiting star magnitude.</li>
             <li>The same settings remain available as URL parameters:<br><code>fetchPeriod=10&amp;fetchStart=48&amp;nAlerts=10&amp;magMax=6&amp;fetchLSST=false</code></li>
