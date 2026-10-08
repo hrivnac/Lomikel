@@ -216,29 +216,71 @@ public class ESClient {
     //log.info("Inserting " + idxName + "[" + command.size() + "]");
     //String answer = _httpClient.postJSON(_url + "/" + idxName + "/_doc" , jsonCmd, _auth, null);
     String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_bulk" , jsonCmd + "\n", _auth, null);
-    JSONObject answerJson = new JSONObject(answer);
-    if (answerJson.getBoolean("errors")) {
-      throw new LomikelException("HTTP Post error");
+    JSONObject answerJson;
+    try {
+      answerJson = new JSONObject(answer);
+      answerJson.getBoolean("errors");
+      answerJson.getJSONArray("items");
       }
-    log.info("Imported: " + answerJson.getJSONArray("items").length() + " of " + idxName);
+    catch (RuntimeException e) {
+      throw new LomikelException("Invalid bulk response for " + idxName + ": " + answer, e);
+      }
+    JSONArray items = answerJson.getJSONArray("items");
+    if (items.length() != command.size() / 2) {
+      throw new LomikelException("Incomplete bulk response for " + idxName +
+                                 ": expected " + (command.size() / 2) +
+                                 " items, got " + items.length());
+      }
+    List<String> failures = new ArrayList<>();
+    for (int i = 0; i < items.length(); i++) {
+      try {
+        JSONObject expected = new JSONObject(command.get(i * 2));
+        String action = expected.keys().next();
+        String id = expected.getJSONObject(action).getString("_id");
+        JSONObject operation = items.getJSONObject(i);
+        if (operation.length() != 1 || !operation.has(action)) {
+          failures.add("item " + i + " expected " + action + " _id=" + id +
+                       " but got " + operation);
+          continue;
+          }
+        JSONObject item = operation.getJSONObject(action);
+        Object statusValue = item.opt("status");
+        if (!(statusValue instanceof Number) ||
+            ((Number) statusValue).intValue() != ((Number) statusValue).doubleValue() ||
+            !id.equals(item.optString("_id", null)) ||
+            item.has("error") || ((Number) statusValue).intValue() < 200 ||
+            ((Number) statusValue).intValue() >= 300) {
+          failures.add("item " + i + " " + action + " expected _id=" + id +
+                       " got _id=" + item.optString("_id", "?") +
+                       " status=" + statusValue + " error=" + item.opt("error"));
+          }
+        }
+      catch (RuntimeException e) {
+        throw new LomikelException("Invalid bulk item " + i + " for " + idxName +
+                                   ": " + items.opt(i), e);
+        }
+      }
+    if (answerJson.getBoolean("errors") || !failures.isEmpty()) {
+      throw new LomikelException("Bulk failure for " + idxName + ": " + failures);
+      }
+    log.info("Imported: " + items.length() + " of " + idxName);
     _commands.remove(idxName);
     }
     
-  /** Commit all new values into index. */
-  public void commit() {
-    _commands.forEach((k, v) -> {
-      try {
-        commit(k);
-        }
-      catch (LomikelException e) {
-        log.error("Cannot commit " + k, e);
-        }});
+  /** Commit all new values into index.
+    * @throws LomikelException If an index fails. */
+  public void commit() throws LomikelException {
+    for (String idxName : new ArrayList<>(_commands.keySet())) {
+      commit(idxName);
+      }
     }
     
   /** Commit all new values into index.
-    * @param n The number of retries (of each value) before failing. */
-  public void commitWithRetry(int n) {
-    _commands.forEach((k, v) -> {
+    * @param n Number of attempts.
+    * @throws LomikelException If all attempts fail. */
+  public void commitWithRetry(int n) throws LomikelException {
+    if (n <= 0) throw new IllegalArgumentException("Attempts must be positive: " + n);
+    for (String k : new ArrayList<>(_commands.keySet())) {
       int m = n;
       while (m > 0) {
         try {
@@ -248,13 +290,14 @@ public class ESClient {
         catch (LomikelException e) {
           m--;
           if (m == 0) {
-            log.error("Cannot commit " + k, e);
+            throw new LomikelException("Cannot commit " + k + " after " + n + " attempts: " + e.getMessage(), e);
             }
           else {
             log.warn("Retrying commit, m = " + m);
             }
           }
-        }});
+        }
+      }
     }
 
   // Search ====================================================================  
@@ -400,20 +443,24 @@ public class ESClient {
     * @throws LomikelException If anything goes wrong. */
   private List<String> search(String idxName,
                               String jsonCmd) throws LomikelException {
-    String answer = "no answer";
     List<String> results = new ArrayList<>();
     log.info("Searching " + jsonCmd);
+    String answer;
     try {
       answer = _httpClient.postJSON(_url + "/" + idxName + "/_search", jsonCmd, _auth, null);
+      }
+    catch (LomikelException e) {
+      throw new LomikelException("Search failed for " + idxName, e);
+      }
+    try {
       JSONObject answerJ = new JSONObject(answer);
       JSONArray hitsJ = answerJ.getJSONObject("hits").getJSONArray("hits");
       for (Object o : hitsJ) {
         results.add(((JSONObject)o).getString("_id"));
         }
       }
-    catch (Exception e) {
-      log.error("No results found", e);
-      log.info("Elastic search answer:\t" + answer);
+    catch (RuntimeException e) {
+      throw new LomikelException("Invalid search response for " + idxName + ": " + answer, e);
       }
     log.info("" + results.size() + " results found");
     return results;
@@ -488,12 +535,14 @@ public class ESClient {
     * @param  idxValue   The index value.
     * @param  fieldValue The indexed field value to be added to array
     *                    (if not yet present).
-    * @param n The number of retries (of each value) before failing. */
+    * @param n Number of attempts.
+    * @throws LomikelException If all attempts fail. */
   public void updateDoubleArrayWithRetry(String idxName,
                                          String fieldName,
                                          String idxValue,
                                          double fieldValue,
-                                         int    n) {
+                                         int    n) throws LomikelException {
+    if (n <= 0) throw new IllegalArgumentException("Attempts must be positive: " + n);
     int m = n;
     while (m > 0) {
       try {
@@ -503,7 +552,7 @@ public class ESClient {
       catch (LomikelException e) {
         m--;
         if (m == 0) {
-          log.error("Cannot update " + idxName + "/" + fieldName + " = " + idxValue + "/" + fieldValue, e);
+          throw new LomikelException("Cannot update " + idxName + "/" + fieldName + " = " + idxValue + "/" + fieldValue, e);
           }
         else {
           log.warn("Retrying update, m = " + m);
@@ -520,13 +569,15 @@ public class ESClient {
     *                    (if not yet present).
     * @param  dec        The indexed dec value to be added to array
     *                    (if not yet present).
-    * @param n The number of retries (of each value) before failing. */
+    * @param n Number of attempts.
+    * @throws LomikelException If all attempts fail. */
   public void updateGeoPointArrayWithRetry(String idxName,
                                            String fieldName,
                                            String idxValue,
                                            double ra,
                                            double dec,
-                                           int    n) {
+                                           int    n) throws LomikelException {
+    if (n <= 0) throw new IllegalArgumentException("Attempts must be positive: " + n);
     int m = n;
     while (m > 0) {
       try {
@@ -536,7 +587,7 @@ public class ESClient {
       catch (LomikelException e) {
         m--;
         if (m == 0) {
-          log.error("Cannot update " + idxName + "/" + fieldName + " = " + idxValue + "/" + ra + "-" + dec, e);
+          throw new LomikelException("Cannot update " + idxName + "/" + fieldName + " = " + idxValue + "/" + ra + "-" + dec, e);
           }
         else {
           log.warn("Retrying update, m = " + m);
@@ -569,10 +620,7 @@ public class ESClient {
                   "  \"upsert\": {}\n" +
                   "}";                            
     String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, _auth, null);
-    //JSONObject answerJson = new JSONObject(answer);
-    //if (answerJson.getBoolean("errors")) {
-    //  throw new LomikelException("HTTP Post error");
-    //  }
+    checkUpdateResponse(idxName, idxValue, answer);
     }
     
   /** Update values in geo_point array index.
@@ -620,36 +668,51 @@ public class ESClient {
                     "  \"upsert\": {}\n" +
                     "}"; 
     String answer = _httpClient.postNDJSON(_url + "/" + idxName + "/_update/" + idxValue, script, _auth, null);
-    //JSONObject answerJson = new JSONObject(answer);
-    //if (answerJson.getBoolean("errors")) {
-    //  throw new LomikelException("HTTP Post error");
-    //  }
+    checkUpdateResponse(idxName, idxValue, answer);
     }    
     
+  /** Reject an Elasticsearch update error even when the HTTP status is 200. */
+  private void checkUpdateResponse(String idxName, String idxValue, String answer) throws LomikelException {
+    JSONObject response;
+    try {
+      response = new JSONObject(answer);
+      }
+    catch (RuntimeException e) {
+      throw new LomikelException("Invalid update response for " + idxName + "/" + idxValue + ": " + answer, e);
+      }
+    if (response.has("error")) {
+      throw new LomikelException("Update failed for " + idxName + "/" + idxValue + ": " + response.get("error"));
+      }
+    String result = response.optString("result", "");
+    if (!result.equals("updated") && !result.equals("created") && !result.equals("noop")) {
+      throw new LomikelException("Invalid update result for " + idxName + "/" + idxValue + ": " + result);
+      }
+    }
+
   // Info ======================================================================
-  
+
   /** Give the size of the index.
     * @param  idxName The index name.
     * @return         The size of the index.
     * @throws LomikelException If anything goes wrong. */
   public int size(String idxName) throws LomikelException {
-    int sz = 0;
-    String answer = "";
+    String answer;
+    String jsonCmd = new JSONObject().put("query",
+                                          new JSONObject().put("match_all",
+                                                               new JSONObject()))
+                                     .toString();
     try {
-      Object match_all = null;
-      String jsonCmd = new JSONObject().put("query",
-                                            new JSONObject().put("match_all",
-                                                                 new JSONObject()))
-                                       .toString();
       answer = _httpClient.postJSON(_url + "/" + idxName + "/_count", jsonCmd, _auth, null);
-      JSONObject answerJ = new JSONObject(answer);
-      sz = answerJ.getInt("count");
       }
-    catch (Exception e) {
-      log.error("size not found", e);
-      log.info("Elastic search answer:\t" + answer);
+    catch (LomikelException e) {
+      throw new LomikelException("Count failed for " + idxName, e);
       }
-    return sz;
+    try {
+      return new JSONObject(answer).getInt("count");
+      }
+    catch (RuntimeException e) {
+      throw new LomikelException("Invalid count response for " + idxName + ": " + answer, e);
+      }
     }
     
   // ===========================================================================
