@@ -1,5 +1,5 @@
 ---
-name: fink
+name: fink-public
 description: Query Fink REST, Elasticsearch, JanusGraph, and Lomikel.
 version: 1.0.0
 author: Julius Hrivnac (hrivnac), Hermes Agent
