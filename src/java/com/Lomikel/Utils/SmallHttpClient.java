@@ -3,7 +3,6 @@ package com.Lomikel.Utils;
 // Apache
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
@@ -13,12 +12,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.ContentType;
-import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
@@ -32,7 +30,6 @@ import org.apache.http.impl.client.HttpClients;
 // Java
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -40,7 +37,6 @@ import java.security.KeyStoreException;
 import java.security.KeyManagementException;
 import java.util.zip.GZIPInputStream;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.List;
 import java.util.ArrayList;
 import javax.net.ssl.SSLContext;
@@ -85,14 +81,6 @@ public class SmallHttpClient {
   public static String get(String              question,
                            Map<String, String> headers) throws LomikelException {
     String answer = "";
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }    
     HttpGet get = new HttpGet(question);
     get.addHeader("Accept-Encoding", "gzip");
     if (headers != null) {
@@ -100,23 +88,24 @@ public class SmallHttpClient {
         get.addHeader(entry.getKey(), entry.getValue());
         }
       }
-    try {
-      HttpResponse response = client.execute(get);
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(get)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Call to " + question + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         }
       else {
         answer = getResponseBody(response);   
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Call to " + question + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      get.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answer;
     }
     
@@ -138,14 +127,6 @@ public class SmallHttpClient {
   public static String delete(String              question,
                               Map<String, String> headers) throws LomikelException {
     String answer = "";
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }    
     HttpDelete delete = new HttpDelete(question);
     delete.addHeader("Accept-Encoding", "gzip");
     if (headers != null) {
@@ -153,23 +134,24 @@ public class SmallHttpClient {
         delete.addHeader(entry.getKey(), entry.getValue());
         }
       }
-    try {
-      HttpResponse response = client.execute(delete);
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(delete)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Call to " + question + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         }
       else {
         answer = getResponseBody(response);   
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Call to " + question + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      delete.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answer;
     }
        
@@ -195,14 +177,6 @@ public class SmallHttpClient {
                             Map<String, String> params,
                             Map<String, String> headers) throws LomikelException {
     String answer = "";
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }    
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
     if (headers != null) {
@@ -220,23 +194,24 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
-    try {
-      HttpResponse response = client.execute(post);
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(post)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Post to " + url + " " + params + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         }
       else {
         answer = getResponseBody(response);   
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Post to " + url + " " + params + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      post.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answer;
     }
     
@@ -252,14 +227,7 @@ public class SmallHttpClient {
                                 Map<String, String> headers,
                                 String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }
+
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
     post.addHeader("Content-Type", "application/json");
@@ -269,18 +237,13 @@ public class SmallHttpClient {
         post.addHeader(entry.getKey(), entry.getValue());
         }
       }
-    try {
-      post.setEntity(new StringEntity(json));
-      }
-    catch (UnsupportedEncodingException e) {
-      log.warn("Cannot encode nameValuePairs", e);
-      }      
-    try {
-      HttpResponse response = client.execute(post);
+    post.setEntity(new StringEntity(json, "UTF-8"));
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(post)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         }
       else {
         if (header != null) {
@@ -299,12 +262,13 @@ public class SmallHttpClient {
           }
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Post to " + url + " " + json + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      post.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answerB.toString();
     }
     
@@ -320,14 +284,7 @@ public class SmallHttpClient {
                                   Map<String, String> headers,
                                   String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }
+
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
     post.addHeader("Content-Type", "application/x-ndjson");
@@ -338,12 +295,12 @@ public class SmallHttpClient {
         }
       }
     post.setEntity(new StringEntity(json, ContentType.create("application/x-ndjson", "UTF-8")));
-    try {
-      HttpResponse response = client.execute(post);
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(post)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         } 
       else {
         if (header != null) {
@@ -362,12 +319,13 @@ public class SmallHttpClient {
           }
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Post to " + url + " " + json + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      post.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answerB.toString();
     }
     
@@ -383,14 +341,6 @@ public class SmallHttpClient {
                                Map<String, String> headers,
                                String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }    
     HttpPost post = new HttpPost(url);
     post.addHeader("Accept-Encoding", "gzip");
     post.addHeader("Content-Type", "text/xml");
@@ -406,12 +356,12 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
-    try {
-      HttpResponse response = client.execute(post);
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(post)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Post to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         }
       else {
         if (header != null) {
@@ -430,12 +380,13 @@ public class SmallHttpClient {
           }
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Post to " + url + " " + json + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      post.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answerB.toString();
     }
     
@@ -461,14 +412,6 @@ public class SmallHttpClient {
                            Map<String, String> params,
                            Map<String, String> headers) throws LomikelException {
     String answer = "";
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }    
     HttpPut put = new HttpPut(url);
     put.addHeader("Accept-Encoding", "gzip");
     if (headers != null) {
@@ -486,23 +429,24 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
-    try {
-      HttpResponse response = client.execute(put);
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(put)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Put to " + url + " " + params + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         }
       else {
         answer = getResponseBody(response);   
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Put to " + url + " " + params + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      put.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answer;
     }
     
@@ -518,14 +462,6 @@ public class SmallHttpClient {
                                Map<String, String> headers,
                                String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }    
     HttpPut put = new HttpPut(url);
     put.addHeader("Accept-Encoding", "gzip");
     put.addHeader("Content-Type", "application/json");
@@ -535,18 +471,13 @@ public class SmallHttpClient {
         put.addHeader(entry.getKey(), entry.getValue());
         }
       }
-    try {
-      put.setEntity(new StringEntity(json));
-      }
-    catch (UnsupportedEncodingException e) {
-      log.warn("Cannot encode nameValuePairs", e);
-      }      
-    try {
-      HttpResponse response = client.execute(put);
+    put.setEntity(new StringEntity(json, "UTF-8"));
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(put)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Put to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         }
       else {
         if (header != null) {
@@ -565,12 +496,13 @@ public class SmallHttpClient {
           }
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Put to " + url + " " + json + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      put.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answerB.toString();
     }
     
@@ -586,14 +518,6 @@ public class SmallHttpClient {
                               Map<String, String> headers,
                               String              header) throws LomikelException {
     StringBuffer answerB = new StringBuffer("");
-    //DefaultHttpClient client = new DefaultHttpClient();
-    CloseableHttpClient client = null;
-    try {
-      client = getSecureHttpsClient();
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new LomikelException("Cannot get http client", e);
-      }    
     HttpPut put = new HttpPut(url);
     put.addHeader("Accept-Encoding", "gzip");
     put.addHeader("Content-Type", "text/xml");
@@ -609,12 +533,12 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
-    try {
-      HttpResponse response = client.execute(put);
+    try (CloseableHttpClient client = getSecureHttpsClient();
+         CloseableHttpResponse response = client.execute(put)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-        throw new LomikelException("Put to " + url + " " + json + " failed: " + statusLine.getReasonPhrase());
+      if (!isSuccess(statusCode)) {
+        throw new LomikelException("HTTP request failed with status " + statusCode);
         }
       else {
         if (header != null) {
@@ -633,22 +557,30 @@ public class SmallHttpClient {
           }
         }
       }
-    catch (Exception e) {
-      throw new LomikelException("Put to " + url + " " + json + " failed", e);
+    catch (LomikelException e) {
+      throw e;
       }
-    finally {
-      put.releaseConnection();
-      }  
+    catch (Exception e) {
+      // Untrusted exception messages may contain request data or response text.
+      throw new LomikelException("HTTP request failed");
+      }
     return answerB.toString();
     }
   
   // ---------------------------------------------------------------------------
+
+  private static boolean isSuccess(int statusCode) {
+    return statusCode >= 200 && statusCode < 300;
+    }
 
   /** Get Response Body. Perform GZIP uncompression if neccessary.
     * @param  response The {@link HttpResponse}.
     * @return          The content of the response.
     * @throws IOException If anything goes wrong. */
   public static String getResponseBody(HttpResponse response) throws IOException {
+    if (response.getEntity() == null) {
+      return "";
+      }
     InputStreamReader isr = null;
     Header[] contentEncoding = response.getHeaders("Content-Encoding");
     if (contentEncoding.length == 1) {
@@ -664,14 +596,14 @@ public class SmallHttpClient {
       log.debug("Not Gzipped content");
       isr = new InputStreamReader(response.getEntity().getContent());
       }
-    BufferedReader reader = new BufferedReader(isr);
-    StringBuffer buffer = new StringBuffer();
-    String dataLine = null;
-    while ((dataLine = reader.readLine()) != null) {
-      buffer.append(dataLine + "\n");
+    try (BufferedReader reader = new BufferedReader(isr)) {
+      StringBuffer buffer = new StringBuffer();
+      String dataLine = null;
+      while ((dataLine = reader.readLine()) != null) {
+        buffer.append(dataLine + "\n");
+        }
+      return buffer.toString();
       }
-    reader.close();
-    return buffer.toString();
     }
     
   /** Give secure HTTP client (http or https).
