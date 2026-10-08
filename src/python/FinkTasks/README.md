@@ -172,21 +172,63 @@ A **loopback-only** Streamable HTTP proof of concept uses the same tools:
 ```
 
 **Do not expose or reverse-proxy this endpoint to untrusted users.** The
-prototype deliberately implements no HTTP authentication and no additional
+prototype deliberately implements no HTTP authentication and no scientific
 query policy or result-count restriction. It refuses a non-loopback bind.
-`mcp_server.Hooks.authorize()` and `Hooks.check_query()` are no-op extension
-points invoked before work; a later remote deployment also needs transport-
-level authentication (for example an MCP token verifier), HTTPS, an explicit
-CC/IJCLab route, and a deliberate policy. The existing FinkTasks CLI argument
+Workers own CLI spawn, nonblocking dual-pipe reads, and kill/reap in a
+bounded background-thread operation, shared by both tools and capped at four
+active slots per server (`--max-workers`, range 1–32). The event loop remains
+responsive during spawn; this prototype uses Linux `waitid(WNOWAIT)` to keep
+an exited leader's process-group ID reserved until cleanup (Linux is tested). At most 16
+additional calls may wait (`--max-queue`, range 0–1024); excess calls fail
+immediately with `worker queue full` rather than joining an unbounded wait.
+Admitted calls waiting for a worker time out after `--queue-timeout` seconds
+(default 30). Worker and admission permits are released after cleanup, not
+merely when a timed-out caller returns. Each running CLI has its own
+`--worker-timeout` (default 600 seconds), measured from the start of spawn
+(after queue admission). A timeout returns to the caller promptly and requests
+cleanup; if spawn is still blocked, its slot stays occupied until Popen returns
+and the process group can be killed and the direct child reaped. Ranking
+artifacts live in a worker-thread-owned temporary directory, removed only
+after process cleanup and JSON reading, even when the caller timed out or was
+repeatedly cancelled. Cancellation while spawn is blocked waits for that
+cleanup and can therefore take longer than the timeout, potentially
+indefinitely for a genuinely hung OS spawn.
+At most `--max-workers` such spawn threads can be outstanding per server;
+`asyncio.run` joins its default executor at shutdown, so a timed-out worker
+cannot lose ownership of a late Popen result when pending asyncio tasks are
+cancelled. There is no hard wall-clock bound on an uninterruptible Popen or
+shutdown while it remains blocked. Cancellation after spawn likewise tears
+down the group, including ordinary
+pipe-holding descendants after the leader exits. The supervisor deliberately
+keeps the direct child unreaped (including when it is a zombie) until pipe
+collection completes or the group is signaled; the unreaped PID prevents the
+numeric PGID from being recycled before signaling. A `/proc/PID` directory FD
+**does not** pin a PID and is not used. Descendants that create a new process
+group/session or close inherited pipes can escape cleanup; a service crash,
+uninterruptible process or concurrent external reaper can also defeat this
+best-effort lifecycle. Do not deploy this as a hostile-process sandbox. The
+CLI's own `--timeout` remains the backend
+request timeout (default 180 seconds). Standard output and standard error each have
+a 1 MiB byte limit (`--max-output-bytes`, range 1–16777216); each JSON ranking
+artifact has the same per-file size limit, checked after the CLI writes it
+(not a hard disk-write quota). Exceeding a limit fails the call;
+nonzero exits report bounded stderr, not stdout. These are resource bounds,
+not result-count limits: neighbour `results=0` and fractional cutoffs retain
+the existing scientific semantics but may fail if they exceed these bounds.
+The limits are per server process, not a distributed quota or rate limit.
+This loopback prototype is **not yet a public deployment**. For the planned
+IJCLab gateway, authentication is explicitly deferred pending discussion with
+the Fink team; this code does not add it, and the no-op hooks do not supply it.
+Public unauthenticated access carries abuse and resource-exhaustion risk and
+requires a separately reviewed exposure boundary, HTTPS ingress, confirmed
+CC/IJCLab routes, and operational workload/isolation policy before rollout.
+`mcp_server.Hooks.authorize()` and `Hooks.check_query()` remain no-op extension
+points for future decisions. The existing FinkTasks CLI argument
 validation and transport opt-ins still apply. In particular, neighbors
-`results=0` may be expensive. MCP calls are offloaded so a slow CLI does not
-block other MCP requests; cancellation of an offloaded call does **not** yet
-terminate the underlying CLI, which remains bounded by `--worker-timeout`.
-A hosted service should add cancellable worker-process management before
-accepting untrusted clients. This version does not expose raw Gremlin/ES
-DSL or the `most_points` PNG/light-curve artifact mode; those are separate
-future tool designs. Tests use local fake services and do not prove live
-CC/IJCLab connectivity.
+`results=0` may be expensive. No raw Gremlin/ES DSL or the `most_points`
+PNG/light-curve artifact mode is exposed; those are separate future tool
+designs. Tests use local fake services and do not prove live CC/IJCLab
+connectivity.
 
 ## Test
 
