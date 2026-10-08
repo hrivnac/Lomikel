@@ -12,9 +12,13 @@ license = {text = "MIT"}
 authors = [{name = "Julius Hrivnac"}]
 dependencies = ["matplotlib>=3.7"]
 
+[project.optional-dependencies]
+mcp = ["mcp>=1.30,<2"]
+
 [project.scripts]
 fink-object-neighbors = "fink_tasks.object_neighbors:main"
 fink-most-points = "fink_tasks.most_points:main"
+fink-mcp = "fink_tasks.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
