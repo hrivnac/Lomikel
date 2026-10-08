@@ -125,6 +125,25 @@ public class ParquetReader {
       log.error("Failed to process " + dirFn, e);
       }
     }
+
+  /** Traverse a directory without hiding listing or file failures.
+    * Unlike processDir, a missing or non-directory path is an error. */
+  public void processDirStrict(String dirFn,
+                               String fileExt) throws IOException, LomikelException {
+    Path path = new Path(dirFn);
+    if (!_fs.isDirectory(path)) {
+      throw new FileNotFoundException("Not a directory: " + dirFn);
+      }
+    for (FileStatus status : _fs.listStatus(path)) {
+      Path child = status.getPath();
+      if (status.isDirectory()) {
+        processDirStrict(child.toString(), fileExt);
+        }
+      else if (child.getName().endsWith("." + fileExt)) {
+        processFile(child);
+        }
+      }
+    }
     
   /** Process <em>Parquet</em> file .
      * @param path         The data file.
@@ -133,22 +152,33 @@ public class ParquetReader {
     log.info("Loading file " + path);
     ParquetMetadata readFooter = ParquetFileReader.readFooter(_conf, path, ParquetMetadataConverter.NO_FILTER);
     MessageType schema = readFooter.getFileMetaData().getSchema();
-    ParquetFileReader r = new ParquetFileReader(_conf, path, readFooter);
-    PageReadStore pages = null;
-    Map<String, Set<String>> props = new TreeMap<>();
-    while (null != (pages = r.readNextRowGroup())) {
-      final long rows = pages.getRowCount();
-      log.info("Reading " + rows + " rows");      
-      final MessageColumnIO columnIO = new ColumnIOFactory().getColumnIO(schema);
-      final RecordReader<Group> recordReader = columnIO.getRecordReader(pages, new GroupRecordConverter(schema));
-      String sTemp = "";
-      Group g;
-      int i = 0;
-      while ((g = recordReader.read()) != null && ++i < rows) {
-        processGroup(g, null);
+    try (ParquetFileReader r = new ParquetFileReader(_conf, path, readFooter)) {
+      PageReadStore pages;
+      while (null != (pages = r.readNextRowGroup())) {
+        final long rows = pages.getRowCount();
+        log.info("Reading " + rows + " rows");
+        final MessageColumnIO columnIO = new ColumnIOFactory().getColumnIO(schema);
+        final RecordReader<Group> recordReader = columnIO.getRecordReader(pages, new GroupRecordConverter(schema));
+        for (long i = 0; i < rows; i++) {
+          Group g = recordReader.read();
+          if (g == null) {
+            throw new IOException("Unexpected end of row group in " + path + " at row " + i + " of " + rows);
+            }
+          beginRecord();
+          processGroup(g, null);
+          endRecord();
+          }
         }
       }
     } 
+
+  /** Called once before each top-level record, never for nested groups. */
+  protected void beginRecord() {
+    }
+
+  /** Called once after all nested groups of a top-level record. */
+  protected void endRecord() {
+    }
     
   /** Process {@link Group}. Runs recursively.
     * May be overriden.
