@@ -13,6 +13,9 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.entity.StringEntity;
@@ -24,7 +27,7 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClients;
 
 // Java
@@ -39,6 +42,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import org.apache.http.config.Registry;
 
@@ -88,8 +92,7 @@ public class SmallHttpClient {
         get.addHeader(entry.getKey(), entry.getValue());
         }
       }
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(get)) {
+    try (CloseableHttpResponse response = execute(get)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -134,8 +137,7 @@ public class SmallHttpClient {
         delete.addHeader(entry.getKey(), entry.getValue());
         }
       }
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(delete)) {
+    try (CloseableHttpResponse response = execute(delete)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -194,8 +196,7 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(post)) {
+    try (CloseableHttpResponse response = execute(post)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -238,8 +239,7 @@ public class SmallHttpClient {
         }
       }
     post.setEntity(new StringEntity(json, "UTF-8"));
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(post)) {
+    try (CloseableHttpResponse response = execute(post)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -295,8 +295,7 @@ public class SmallHttpClient {
         }
       }
     post.setEntity(new StringEntity(json, ContentType.create("application/x-ndjson", "UTF-8")));
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(post)) {
+    try (CloseableHttpResponse response = execute(post)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -356,8 +355,7 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(post)) {
+    try (CloseableHttpResponse response = execute(post)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -429,8 +427,7 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(put)) {
+    try (CloseableHttpResponse response = execute(put)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -472,8 +469,7 @@ public class SmallHttpClient {
         }
       }
     put.setEntity(new StringEntity(json, "UTF-8"));
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(put)) {
+    try (CloseableHttpResponse response = execute(put)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -533,8 +529,7 @@ public class SmallHttpClient {
     catch (UnsupportedEncodingException e) {
       log.warn("Cannot encode nameValuePairs", e);
       }      
-    try (CloseableHttpClient client = getSecureHttpsClient();
-         CloseableHttpResponse response = client.execute(put)) {
+    try (CloseableHttpResponse response = execute(put)) {
       StatusLine statusLine = response.getStatusLine();
       int statusCode = statusLine.getStatusCode();
       if (!isSuccess(statusCode)) {
@@ -573,6 +568,18 @@ public class SmallHttpClient {
     return statusCode >= 200 && statusCode < 300;
     }
 
+  /** Isolate cookies/auth context per call while reusing only transport connections. */
+  private static CloseableHttpResponse execute(HttpRequestBase request) throws IOException {
+    HttpClientContext context = HttpClientContext.create();
+    context.setCookieStore(new BasicCookieStore());
+    try {
+      return getSecureHttpsClient().execute(request, context);
+      }
+    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+      throw new IOException("Cannot create HTTP client", e);
+      }
+    }
+
   /** Get Response Body. Perform GZIP uncompression if neccessary.
     * @param  response The {@link HttpResponse}.
     * @return          The content of the response.
@@ -606,12 +613,38 @@ public class SmallHttpClient {
       }
     }
     
-  /** Give secure HTTP client (http or https).
-    * @return The secure HTTP client (http or https).
-    * @throws NoSuchAlgorithmException
-    * @throws KeyStoreException
-    * @throws KeyManagementException */
+  /** JVM-owned transport: callers close responses, not this shared client. */
+  private static volatile CloseableHttpClient sharedClient;
+
+  /** Initialize once without turning checked TLS setup failures into JVM Errors. */
   private static CloseableHttpClient getSecureHttpsClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    CloseableHttpClient client = sharedClient;
+    if (client == null) {
+      synchronized (SmallHttpClient.class) {
+        client = sharedClient;
+        if (client == null) {
+          client = buildSecureHttpsClient();
+          final CloseableHttpClient toClose = client;
+          // Only the JVM owns shutdown: there is no explicit close racing callers.
+          try {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+              try { toClose.close(); }
+              catch (IOException e) { /* JVM is shutting down. */ }
+            }, "small-http-client-shutdown"));
+            }
+          catch (RuntimeException e) {
+            try { client.close(); }
+            catch (IOException ignored) { /* Preserve the registration failure. */ }
+            throw e;
+            }
+          sharedClient = client;
+          }
+        }
+      }
+    return client;
+    }
+
+  private static CloseableHttpClient buildSecureHttpsClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
     TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
     SSLContext sslContext = SSLContexts.custom()
                                        .loadTrustMaterial(null, acceptingTrustStrategy)
@@ -621,7 +654,10 @@ public class SmallHttpClient {
                                                                              .register("https", sslsf)
                                                                              .register("http", new PlainConnectionSocketFactory())
                                                                              .build();
-    BasicHttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);   
+    PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry, null, null, null, 5, TimeUnit.MINUTES);
+    connectionManager.setMaxTotal(16);
+    connectionManager.setDefaultMaxPerRoute(8);
+    connectionManager.setValidateAfterInactivity(1000);
     RequestConfig config = RequestConfig.custom()
                                         .setConnectTimeout(          _timeout * 1000)
                                         .setConnectionRequestTimeout(_timeout * 1000)
@@ -631,6 +667,8 @@ public class SmallHttpClient {
                                                 .setDefaultRequestConfig(config)
                                                 .setSSLSocketFactory(sslsf)
                                                 .setConnectionManager(connectionManager)
+                                                .evictExpiredConnections()
+                                                .evictIdleConnections(30, TimeUnit.SECONDS)
                                                 .build();
     return httpClient;
     }
