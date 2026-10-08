@@ -141,6 +141,53 @@ manifest.json                        artifact inventory and run parameters
 
 The public Elasticsearch read endpoint is remote plaintext HTTP, so using the default requires explicit `--allow-insecure-es`. The script sends anonymous read-only `_search` requests and never attaches credentials.
 
+## MCP prototype (local only)
+
+Install the optional server dependency in a virtual environment:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[mcp]'
+.venv/bin/fink-mcp --help
+```
+
+An MCP-capable agent can launch `.venv/bin/fink-mcp` as a **stdio** server.
+It exposes `object_neighbors` (JanusGraph + Fink REST ranking) and
+`most_points` (Elasticsearch MJD/RA-Dec ranking) as structured read-only
+LSST tools. Backends are configured at server startup, never through tool
+arguments. With the documented public plaintext backend endpoints, opt in
+explicitly with `--allow-insecure-graph` and/or `--allow-insecure-es`; use
+protected loopback tunnels or HTTPS backends when available. For example:
+
+```bash
+.venv/bin/fink-mcp --allow-insecure-graph --allow-insecure-es
+```
+
+A **loopback-only** Streamable HTTP proof of concept uses the same tools:
+
+```bash
+.venv/bin/fink-mcp --transport streamable-http --host 127.0.0.1 --port 8768 \
+  --allow-insecure-graph --allow-insecure-es
+# Local MCP endpoint: http://127.0.0.1:8768/mcp
+```
+
+**Do not expose or reverse-proxy this endpoint to untrusted users.** The
+prototype deliberately implements no HTTP authentication and no additional
+query policy or result-count restriction. It refuses a non-loopback bind.
+`mcp_server.Hooks.authorize()` and `Hooks.check_query()` are no-op extension
+points invoked before work; a later remote deployment also needs transport-
+level authentication (for example an MCP token verifier), HTTPS, an explicit
+CC/IJCLab route, and a deliberate policy. The existing FinkTasks CLI argument
+validation and transport opt-ins still apply. In particular, neighbors
+`results=0` may be expensive. MCP calls are offloaded so a slow CLI does not
+block other MCP requests; cancellation of an offloaded call does **not** yet
+terminate the underlying CLI, which remains bounded by `--worker-timeout`.
+A hosted service should add cancellable worker-process management before
+accepting untrusted clients. This version does not expose raw Gremlin/ES
+DSL or the `most_points` PNG/light-curve artifact mode; those are separate
+future tool designs. Tests use local fake services and do not prove live
+CC/IJCLab connectivity.
+
 ## Test
 
 ```bash
