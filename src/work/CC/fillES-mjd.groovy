@@ -38,6 +38,11 @@ public class PR extends ParquetReader {
     }
 
   @Override
+  protected void beginRecord() {
+    props().clear();
+    }
+
+  @Override
   protected void addToSet(String name,
                           String value) {
     if (name.equals("diaSource.midpointMjdTai") ||
@@ -56,7 +61,7 @@ public class PR extends ParquetReader {
     }
 
   @Override
-  public void endGroup() {
+  protected void endRecord() {
     if (props().containsKey("diaObject.diaObjectId") || props().containsKey("ssSource.ssObjectId")) {
       double mjd = new Double(props().get("diaSource.midpointMjdTai").iterator().next());
       String key;
@@ -96,7 +101,7 @@ for (int delay : delays) {
                   .minusDays(delay)
                   .format(DateTimeFormatter
                   .ofPattern("'year='yyyy'/month='MM'/day='dd"));
-  reader.processDir("/user/fink/archive/science/" + aday, "parquet");
+  reader.processDirStrict("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
   
