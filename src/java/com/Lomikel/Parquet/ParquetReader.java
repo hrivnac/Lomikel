@@ -126,6 +126,17 @@ public class ParquetReader {
       }
     }
 
+  /** Process a selected day if present; existing trees retain strict failure handling.
+    * Only the requested root may be absent. Missing nested paths still fail. */
+  public void processOptionalDirStrict(String dirFn,
+                                       String fileExt) throws IOException, LomikelException {
+    if (!_fs.exists(new Path(dirFn))) {
+      log.warn("Skipping absent directory " + dirFn);
+      return;
+      }
+    processDirStrict(dirFn, fileExt);
+    }
+
   /** Traverse a directory without hiding listing or file failures.
     * Unlike processDir, a missing or non-directory path is an error. */
   public void processDirStrict(String dirFn,

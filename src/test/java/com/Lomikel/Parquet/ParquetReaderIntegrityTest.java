@@ -67,8 +67,14 @@ public class ParquetReaderIntegrityTest {
     java.nio.file.Path dir = Files.createTempDirectory("parquet-strict-");
     Reader reader = new Reader();
     try { reader.processDirStrict(dir.resolve("missing").toString(), "parquet");
-      throw new AssertionError("missing directory accepted");
+      throw new AssertionError("strict traversal accepted a missing directory");
     } catch (IOException expected) { /* fail closed */ }
+    reader.processOptionalDirStrict(dir.resolve("missing").toString(), "parquet");
+    check(reader.ids.isEmpty(), "missing optional day processed data");
+    java.nio.file.Path notDirectory = Files.writeString(dir.resolve("not-a-directory"), "x");
+    try { reader.processOptionalDirStrict(notDirectory.toString(), "parquet");
+      throw new AssertionError("existing file accepted as optional directory");
+    } catch (IOException expected) { /* only absence is optional */ }
     java.nio.file.Path nested = Files.createDirectory(dir.resolve("nested"));
     file(nested, "ok.parquet", "ok");
     reader.processDirStrict(dir.toString(), "parquet");
@@ -79,6 +85,9 @@ public class ParquetReaderIntegrityTest {
       throw new AssertionError("corrupt file accepted");
     } catch (IOException | RuntimeException expected) { /* fail closed */ }
     check(reader.ids.size() <= prior + 1, "continued past a read failure");
+    try { reader.processOptionalDirStrict(dir.toString(), "parquet");
+      throw new AssertionError("optional traversal hid a corrupt existing file");
+    } catch (IOException | RuntimeException expected) { /* existing data remains strict */ }
   }
   public static void main(String[] args) throws Exception {
     rows();

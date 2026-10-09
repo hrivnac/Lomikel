@@ -107,7 +107,7 @@ for (int delay : delays) {
                   .minusDays(delay)
                   .format(DateTimeFormatter
                   .ofPattern("'year='yyyy'/month='MM'/day='dd"));
-  reader.processDirStrict("/user/fink/archive/science/" + aday, "parquet");
+  reader.processOptionalDirStrict("/user/fink/archive/science/" + aday, "parquet");
   reader.cleanup();
   }
   
