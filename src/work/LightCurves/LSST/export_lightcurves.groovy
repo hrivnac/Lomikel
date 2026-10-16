@@ -4,6 +4,7 @@ import groovy.json.JsonOutput
 
 class ExportLightcurves {
   static final String COLUMNS = 'r:diaObjectId,r:ssObjectId,r:diaSourceId,r:midpointMjdTai,r:band,r:psfFlux,r:psfFluxErr'
+  static final String ID_COLUMNS = 'r:diaObjectId,r:ssObjectId'
   static final List BANDS = ['u','g','r','i','z','y']
   Closure searchMapFactory = { Map values -> Class.forName('com.Lomikel.DB.SearchMap').getConstructor(Map).newInstance(values) }
 
@@ -27,21 +28,46 @@ class ExportLightcurves {
     result
   }
 
+  static boolean discovery(Map opts) { opts.containsKey('candidate-prefix') }
+
+  static void validateDiscovery(Map opts) {
+    if (!(opts.kind in ['dia','ss']) || !opts.table || !opts.schema || opts.containsKey('prefixes'))
+      throw new IllegalArgumentException('Discovery requires kind, table, schema and no explicit prefixes')
+    String candidate = opts.'candidate-prefix'?.toString()
+    if (!(candidate ==~ /[0-9]{2}/))
+      throw new IllegalArgumentException('candidate-prefix must be a two-digit broad row-key prefix')
+    int rows = positive(opts.'candidate-rows','candidate-rows')
+    int minimum = positive(opts.'min-points','min-points')
+    int objects = positive(opts.'max-objects','max-objects')
+    int points = positive(opts.'max-points','max-points')
+    if (rows > 5000 || objects > 100 || points > 512 || minimum < 3 || minimum > points)
+      throw new IllegalArgumentException('Discovery bounds: candidate-rows <= 5000, max-objects <= 100, 3 <= min-points <= max-points <= 512')
+  }
+
   static Map parseArgs(String[] argv) {
     Map opts = [:]
-    Set allowed = ['host','port','table','schema','kind','prefixes','max-objects','max-points','output'] as Set
+    Set allowed = ['host','port','table','schema','kind','prefixes','candidate-prefix','candidate-rows','min-points','max-objects','max-points','output'] as Set
     for (int i=0; i<argv.length; i+=2) {
       if (i+1 >= argv.length || !argv[i].startsWith('--') || !(argv[i].substring(2) in allowed) ||
           opts.containsKey(argv[i].substring(2)) || !argv[i+1])
         throw new IllegalArgumentException('Invalid option; use --name value')
       opts[argv[i].substring(2)] = argv[i+1]
     }
-    prefixes(opts)
+    if (discovery(opts)) validateDiscovery(opts)
+    else {
+      if (opts.containsKey('candidate-rows') || opts.containsKey('min-points'))
+        throw new IllegalArgumentException('Discovery options require candidate-prefix')
+      prefixes(opts)
+    }
     int port = positive(opts.port,'port')
     if (!opts.host || !opts.output || port > 65535) throw new IllegalArgumentException('Require host, port and output')
     opts.port = port
     opts.'max-objects' = positive(opts.'max-objects','max-objects')
     opts.'max-points' = positive(opts.'max-points','max-points')
+    if (discovery(opts)) {
+      opts.'candidate-rows' = positive(opts.'candidate-rows','candidate-rows')
+      opts.'min-points' = positive(opts.'min-points','min-points')
+    }
     opts
   }
 
@@ -82,15 +108,76 @@ class ExportLightcurves {
     [kind:opts.kind,object_id:objectId,object_key:prefix,table:opts.table,schema:opts.schema,complete:true,sources:values]
   }
 
+  List<Map> discover(def client, Map opts) {
+    int rowLimit = positive(opts.'candidate-rows','candidate-rows')
+    client.setLimit(rowLimit + 1)
+    client.setSearchLimit(rowLimit + 1)
+    Map sampled = client.scan(null,searchMapFactory(['key:key':opts.'candidate-prefix']),ID_COLUMNS,0L,0L,false,false)
+    if (sampled == null || sampled.size() > rowLimit + 1)
+      throw new IllegalStateException('Candidate scan returned invalid or over-limit result')
+    String field = opts.kind == 'dia' ? 'r:diaObjectId' : 'r:ssObjectId'
+    String pattern = opts.kind == 'dia' ? /([0-9]{3}_[0-9]+_).+/ : /([0-9]{2}_[A-Za-z0-9]+_).+/
+    Map<String,String> candidates = [:]
+    Map skipped = [malformed:0,duplicate:0,invalid:0,capped:0,short:0]
+    sampled.entrySet().take(rowLimit).each { entry ->
+      def matcher = (entry.key instanceof String && entry.key.startsWith(opts.'candidate-prefix')) ?
+        (entry.key =~ pattern) : null
+      String id = entry.value instanceof Map ? entry.value[field]?.toString() : null
+      if (matcher == null || !matcher.matches() || !(id ==~ /[0-9]+/) ||
+          (opts.kind == 'dia' && matcher.group(1).split('_')[1] != id)) {
+        skipped.malformed++
+      } else {
+        String prefix = matcher.group(1)
+        if (!candidates.containsKey(prefix) && candidates.size() < 100) candidates[prefix] = id
+      }
+    }
+    List<Map> valid = []
+    int cap = positive(opts.'max-points','max-points') + 1
+    candidates.each { prefix, id ->
+      client.setLimit(cap)
+      client.setSearchLimit(cap)
+      // Scanner errors must propagate: only validation failures are skippable.
+      Map rows = client.scan(null,searchMapFactory(['key:key':prefix]),COLUMNS,0L,0L,false,false)
+      try {
+        if (rows != null && rows.size() > positive(opts.'max-points','max-points')) {
+          skipped.capped++
+        } else {
+          Map record = objectFromRows(rows,opts,prefix)
+          if (record.object_id != id) throw new IllegalStateException('Candidate identity changed')
+          double span = Double.parseDouble(record.sources.last().mjd) - Double.parseDouble(record.sources.first().mjd)
+          if (!Double.isFinite(span) || span <= 0d) throw new IllegalStateException('Object has no finite time span')
+          if (record.sources.size() < positive(opts.'min-points','min-points')) skipped.short++
+          else valid << record
+        }
+      } catch (IllegalArgumentException | IllegalStateException ex) {
+        skipped.invalid++
+      }
+    }
+    valid.sort { a,b -> (b.sources.size() <=> a.sources.size()) ?: (a.object_id <=> b.object_id) ?: (a.object_key <=> b.object_key) }
+    Set ids = [] as Set
+    List<Map> distinct = []
+    valid.each { record ->
+      if (ids.add(record.object_id)) distinct << record
+      else skipped.duplicate++
+    }
+    System.err.println("Discovery: sampled=${sampled.size()} row(s), prefixes=${candidates.size()}, valid=${distinct.size()}, skipped=${skipped}, candidateCap=${candidates.size() == 100}, rowCap=${sampled.size() > rowLimit}")
+    int wanted = positive(opts.'max-objects','max-objects')
+    if (distinct.size() < wanted) throw new IllegalStateException("Discovery found ${distinct.size()} complete distinct objects; requested ${wanted}; no output published")
+    distinct.take(wanted)
+  }
+
   void exportObjects(def client, Map opts, Writer output) {
-    List<String> requested = prefixes(opts)
+    boolean automatic = discovery(opts)
+    if (automatic) validateDiscovery(opts)
+    List<String> requested = automatic ? [] : prefixes(opts)
     StringWriter staged = new StringWriter()
     try {
       client.connect(opts.table.toString(),opts.schema.toString())
       if (client.schema() == null) throw new IllegalArgumentException('Requested schema unavailable')
       int cap = positive(opts.'max-points','max-points') + 1
       Set ids = [] as Set
-      requested.each { prefix ->
+      if (automatic) discover(client,opts).each { record -> staged.write(JsonOutput.toJson(record) + '\n') }
+      else requested.each { prefix ->
         client.setLimit(cap)
         client.setSearchLimit(cap)
         Map rows = client.scan(null,searchMapFactory(['key:key':prefix]),COLUMNS,0L,0L,false,false)
@@ -126,6 +213,7 @@ class ExportLightcurves {
   static String[] argvFromBinding(Binding binding) {
     List<String> args = []
     [host:'host',port:'port',table:'table',schema:'schema',kind:'kind',prefixes:'prefixes',
+     candidatePrefix:'candidate-prefix',candidateRows:'candidate-rows',minPoints:'min-points',
      maxObjects:'max-objects',maxPoints:'max-points',output:'output'].each { name,flag ->
       if (binding.hasVariable(name) && binding.getVariable(name) != null)
         args.addAll(["--${flag}",binding.getVariable(name).toString()])

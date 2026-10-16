@@ -6,7 +6,7 @@ This is an **exploratory, unlabeled** counterpart to `src/work/Clusters/LSST/`: 
 
 Both scripts read individual HBase rows from `rubin.diaSource_static` (DIA) or `rubin.diaSource_sso` (SS), schema `schema_5.0rc0_8.52.0`. A row's `r:band`, `r:midpointMjdTai`, `r:psfFlux`, and `r:psfFluxErr` are projected, as well as the canonical `r:diaObjectId` or `r:ssObjectId` and source ID `r:diaSourceId`. The row key's middle component is **not** assumed to equal the SS object ID. The `psfFlux` series is used consistently across both types; science-image flux is not mixed with difference-image PSF flux. Negative but finite flux is retained. Invalid or missing flux, error, band, or identity causes the requested object export to fail rather than silently dropping observations.
 
-Provide **verified full object-key prefixes** ending in `_`, for example `000_170028485649105000_` (DIA) or `00_K00A00G_` (SS). These are specific observed examples, not generic discovery patterns. Broad prefixes such as `00` and substring object-ID scans are prohibited. At most 100 explicit prefixes and 512 observations per object are allowed per run. The exporter projects only required columns, sets client result and search limits to `maxPoints+1`, rejects capped/mismatched results, handles scanner I/O failures strictly, closes the client and atomically publishes output. A prefix scan is **prefix-complete at the time of that read**, not proven globally complete across unknown alternative keys, ingestion lag, or future observations. The JSON field `complete: true` means the bounded prefix was not truncated; do not interpret it as a permanent complete light curve.
+Provide **verified full object-key prefixes** ending in `_`, for example `000_170028485649105000_` (DIA) or `00_K00A00G_` (SS). These are specific observed examples. Explicit-prefix mode still rejects broad `prefixes='00'` and substring object-ID scans. Alternatively use **automatic bounded discovery** with `candidatePrefix='00'`, `candidateRows` (at most 5000), `minPoints` (at least 3 and at most `maxPoints`) and `maxObjects` (the exact desired output count, at most 100). The discovery scan projects only DIA/SS identity columns, sets both scanner limits to `candidateRows+1`, takes at most that many returned rows and at most the first 100 distinct full object prefixes, then scans each complete object with the normal `maxPoints+1` limits and validation. It ranks eligible distinct canonical IDs by valid source count descending, with object ID as deterministic tie-break, and publishes **nothing** unless the requested count is met. Validation failures (short, malformed, capped, duplicate canonical IDs) are counted on stderr; scanner I/O failures abort rather than skip. Only a bounded lexicographic sample under the supplied prefix is considered: this is *not* an unbiased or global top-N search, and a broader prefix may yield insufficient distinct objects within the row cap. Try a different two-digit candidate prefix or adjust bounded limits; do not use unbounded scans. At most 100 objects and 512 observations per object are allowed per run. The exporter projects only required columns, rejects capped/mismatched object results, handles scanner I/O failures strictly, closes the client and atomically publishes output. A prefix scan is **prefix-complete at the time of that read**, not proven globally complete across unknown alternative keys, ingestion lag, or future observations. The JSON field `complete: true` means the bounded prefix was not truncated; do not interpret it as a permanent complete light curve.
 
 Each JSONL record has `kind`, canonical numeric-string `object_id`, `object_key` (requested prefix), `table`, `schema`, `complete: true`, and `sources` sorted by MJD/source ID. Both trainer and classifier require numeric-string source IDs; DIA keys have the form `DDD_OBJECTID_` (three digits, then the matching numeric object ID) and SS keys `DD_ALIAS_` (two digits, then an alphanumeric alias), with an underscore terminator. Each source retains string `row_key`, `source_id`, `mjd`, `flux`, `flux_err`, and one of the six literal bands `u,g,r,i,z,y`. A missing band contributes no invented observations. The trainer rejects duplicate objects/sources, mixed schemas, nonfinite values, nonpositive errors, fewer than three observations, zero time span, and more than 512 sources per object. It fits one model per kind, never pools DIA and SS.
 
@@ -23,6 +23,27 @@ java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
   -s ../src/work/LightCurves/LSST/export_lightcurves.groovy \
   -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_sso',schema='schema_5.0rc0_8.52.0',kind='ss',prefixes='00_K00A00G_',maxObjects=1,maxPoints=512,output='/disk2/agent/lc-ss.jsonl'"
 ```
+
+For a bounded attempt to obtain at least 12 distinct eligible objects **in each file** (the command fails without replacing an existing file if fewer than 12 qualify), run from `ant/` after building the HBase JAR:
+
+```bash
+java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
+  -s ../src/work/LightCurves/LSST/export_lightcurves.groovy \
+  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_static',schema='schema_5.0rc0_8.52.0',kind='dia',candidatePrefix='00',candidateRows=5000,minPoints=3,maxObjects=12,maxPoints=512,output='/disk2/agent/lc-dia.jsonl'"
+java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
+  -s ../src/work/LightCurves/LSST/export_lightcurves.groovy \
+  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_sso',schema='schema_5.0rc0_8.52.0',kind='ss',candidatePrefix='00',candidateRows=5000,minPoints=3,maxObjects=12,maxPoints=512,output='/disk2/agent/lc-ss.jsonl'"
+python3 - <<'PY'
+import json
+for kind in ('dia', 'ss'):
+    records = [json.loads(line) for line in open(f'/disk2/agent/lc-{kind}.jsonl')]
+    ids = [record['object_id'] for record in records]
+    assert len(ids) >= 12 and len(ids) == len(set(ids)), (kind, len(ids), len(set(ids)))
+    print(kind, len(ids), 'distinct objects')
+PY
+```
+
+The example commands are **not evidence that the live database contains 12 eligible objects in that sample**; if they fail, choose another two-digit prefix and rerun, or gather disjoint bounded exports. Twelve per kind may still be inadequate for a 10-cluster training split; count actual post-holdout training objects before choosing clusters. Neither command performs graph writes.
 
 For training, collect a representative set of **distinct objects** of each kind, using bounded exports with disjoint prefixes, and combine the JSONL files. **The following is a template, not runnable from just the two example exports:** ten clusters require substantially more than ten suitable objects of *each* kind after the training/validation split. Do not train on just these two example objects. Python requires NumPy and scikit-learn:
 
