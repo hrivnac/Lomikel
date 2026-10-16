@@ -14,6 +14,7 @@ class FakeSearchMap { Map values; Map map() { values } }
 class FakeClient {
   Map rows = [:]
   List calls = []
+  List scanBounds = []
   int limit, searchLimit
   boolean closed = false
   def schema() { new Object() }
@@ -22,6 +23,7 @@ class FakeClient {
   void setSearchLimit(int n) { searchLimit = n }
   Map scan(String key, Object search, String columns, long a, long b, boolean c, boolean d) {
     calls << ['scan',key,search,columns,a,b,c,d]
+    scanBounds << [limit,searchLimit]
     rows.findAll { k,v -> k.startsWith(search.map()['key:key']) }
   }
   void close() { closed = true }
@@ -181,6 +183,78 @@ println 'PASS anchor inference bounded and anchor verified'
 assert Export.argvFromBinding(new Binding([cli:1,prefixes:prefix,maxObjects:1,maxPoints:3])).toList().containsAll(['--prefixes',prefix,'--max-points','3'])
 assert Classify.argvFromBinding(new Binding([cli:1,rowKey:anchor,maxPoints:3])).toList().containsAll(['--row-key',anchor,'--max-points','3'])
 println 'PASS GCLI bindings'
+
+// Discovery samples bounded rows, then validates complete object prefixes before ranking.
+def autoOpts = [kind:'dia',table:'t',schema:'s','candidate-prefix':'00','candidate-rows':20,
+  'min-points':3,'max-objects':2,'max-points':4]
+def p1 = '000_111_', p2 = '000_222_', p3 = '000_333_'
+def autoRows = [(p1+'1'):cells('111','11','r','1','1'),(p1+'2'):cells('111','12','r','2','1'),
+  (p1+'3'):cells('111','13','r','3','1'),(p2+'1'):cells('222','21','r','1','1'),
+  (p2+'2'):cells('222','22','r','2','1'),(p2+'3'):cells('222','23','r','3','1'),
+  (p2+'4'):cells('222','24','r','4','1'),(p3+'1'):cells('333','31','r','1','1')]
+def autoClient = new FakeClient(rows:autoRows)
+def autoOut = new StringWriter()
+exporter.exportObjects(autoClient,autoOpts,autoOut)
+def autoRecords = autoOut.toString().readLines().collect { new JsonSlurper().parseText(it) }
+assert autoRecords*.object_id == ['222','111']
+assert autoRecords*.sources*.size() == [4,3]
+assert autoClient.calls.findAll { it[0] == 'scan' }*.getAt(2)*.map() == [
+  ['key:key':'00'],['key:key':p1],['key:key':p2],['key:key':p3]]
+assert autoClient.calls[1][3] == 'r:diaObjectId,r:ssObjectId'
+assert autoClient.scanBounds == [[21,21],[5,5],[5,5],[5,5]]
+assert autoClient.closed
+println 'PASS bounded discovery ranks complete objects'
+
+assert Export.parseArgs(['--host','h','--port','2183','--table','t','--schema','s','--kind','dia',
+  '--candidate-prefix','00','--candidate-rows','5000','--min-points','3',
+  '--max-objects','12','--max-points','512','--output','x'] as String[]).'candidate-rows' == 5000
+assert Export.argvFromBinding(new Binding([cli:1,candidatePrefix:'00',candidateRows:5000,minPoints:3])).toList().containsAll(['--candidate-prefix','00','--candidate-rows','5000','--min-points','3'])
+rejects { Export.parseArgs(['--host','h','--port','2183','--table','t','--schema','s','--kind','dia',
+  '--candidate-prefix','00','--candidate-rows','5001','--min-points','3','--max-objects','12','--max-points','512','--output','x'] as String[]) }
+rejects { Export.parseArgs(['--host','h','--port','2183','--table','t','--schema','s','--kind','dia',
+  '--candidate-prefix','00','--candidate-rows','20','--min-points','2','--max-objects','1','--max-points','4','--output','x'] as String[]) }
+rejects { exporter.exportObjects(new FakeClient(rows:autoRows.collectEntries { key, sourceCells ->
+  [(key):sourceCells + ['r:midpointMjdTai':'1']] }),autoOpts, new StringWriter()) }
+rejects { exporter.exportObjects(new FakeClient(),autoOpts + ['min-points':5],new StringWriter()) }
+println 'PASS discovery CLI bounds and insufficient candidates'
+
+def ssAuto = [kind:'ss',table:'sso',schema:'s','candidate-prefix':'00','candidate-rows':20,
+  'min-points':3,'max-objects':2,'max-points':4]
+def ssRows = [:]
+['00_A_':3,'00_B_':4,'00_C_':3].each { key, count ->
+  (1..count).each { j ->
+    String id = key == '00_C_' ? '456' : '123'
+    ssRows[key+j] = ['r:ssObjectId':id,'r:diaSourceId':(100 + ssRows.size()).toString(),
+      'r:band':'r','r:midpointMjdTai':j.toString(),'r:psfFlux':'1','r:psfFluxErr':'1']
+  }
+}
+def ssAutoOut = new StringWriter()
+exporter.exportObjects(new FakeClient(rows:ssRows),ssAuto,ssAutoOut)
+assert ssAutoOut.toString().readLines().collect { new JsonSlurper().parseText(it).object_id } == ['123','456']
+assert new JsonSlurper().parseText(ssAutoOut.toString().readLines()[0]).object_key == '00_B_'
+println 'PASS SS discovery deduplicates canonical cell IDs rather than aliases'
+
+def tooFew = new StringWriter(); tooFew.write('old\n')
+def failureClient = new FakeClient() {
+  Map scan(String key, Object search, String columns, long a, long b, boolean c, boolean d) {
+    if (search.map()['key:key'] == '000_222_') throw new IllegalStateException('HBase scan failed')
+    super.scan(key,search,columns,a,b,c,d)
+  }
+}
+failureClient.rows = autoRows
+rejects { exporter.exportObjects(failureClient,autoOpts,tooFew) }
+assert tooFew.toString() == 'old\n' && failureClient.closed
+rejects { exporter.exportObjects(new FakeClient(rows:[(p1+'1'):autoRows[p1+'1']]),autoOpts,tooFew) }
+assert tooFew.toString() == 'old\n'
+println 'PASS discovery scan errors and insufficient objects leave output untouched'
+def capped = new FakeClient(rows:autoRows + [(p1+'4'):cells('111','14','r','4','1'),
+  (p1+'5'):cells('111','15','r','5','1')])
+rejects { exporter.exportObjects(capped,autoOpts,tooFew) }
+assert tooFew.toString() == 'old\n' && capped.closed
+// A fake client returning more rows than the configured candidate cap is rejected.
+rejects { exporter.exportObjects(new FakeClient(rows:autoRows),autoOpts + ['candidate-rows':1],tooFew) }
+assert tooFew.toString() == 'old\n'
+println 'PASS capped objects and candidate scanner bound never produce partial output'
 assert Classify.parseArgs(['--model','m.json','--row-json','o.json'] as String[]).'row-json' == 'o.json'
 assert Classify.parseArgs(['--model','m.json','--row-key',anchor,'--host','localhost','--port','2183',
   '--table','rubin.diaSource_static','--schema','schema_5.0rc0_8.52.0','--kind','dia','--max-points','3'] as String[]).'max-points' == '3'
