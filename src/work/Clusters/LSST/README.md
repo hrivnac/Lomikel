@@ -16,18 +16,18 @@ From Lomikel's `ant/` directory after sourcing its setup (it defines `version`):
 source setup.sh
 java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
   -s ../src/work/Clusters/LSST/export_alerts.groovy \
-  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_static',schema='schema_5.0rc0_8.52.0',kind='dia',prefix='KNOWN_NARROW_PREFIX',limit=100,output='/disk2/agent/lsst-dia.jsonl'"
+  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_static',schema='schema_5.0rc0_8.52.0',kind='dia',prefix='KNOWN_NARROW_PREFIX',limit=100,output='../run/agent/lsst-dia.jsonl'"
 java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
   -s ../src/work/Clusters/LSST/export_alerts.groovy \
-  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_sso',schema='schema_5.0rc0_8.52.0',kind='ss',prefix='KNOWN_NARROW_PREFIX',limit=100,output='/disk2/agent/lsst-ss.jsonl'"
+  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_sso',schema='schema_5.0rc0_8.52.0',kind='ss',prefix='KNOWN_NARROW_PREFIX',limit=100,output='../run/agent/lsst-ss.jsonl'"
 ```
 
-Replace `KNOWN_NARROW_PREFIX` with one you have established safely; alternatively pass `keys='KEY1,KEY2'` and a limit at least as large as the key list. Put large inputs and model directories on `/disk2`. Combine DIA and SS JSONL without changing their `kind` or provenance fields, then fit one model per kind:
+Replace `KNOWN_NARROW_PREFIX` with one you have established safely; alternatively pass `keys='KEY1,KEY2'` and a limit at least as large as the key list. Put large inputs and model directories on `../run`. Combine DIA and SS JSONL without changing their `kind` or provenance fields, then fit one model per kind:
 
 ```bash
-cat /disk2/agent/lsst-dia.jsonl /disk2/agent/lsst-ss.jsonl > /disk2/agent/lsst-both.jsonl
+cat ../run/agent/lsst-dia.jsonl ../run/agent/lsst-ss.jsonl > ../run/agent/lsst-both.jsonl
 python3 ../src/work/Clusters/LSST/train_clusters.py \
-  --input /disk2/agent/lsst-both.jsonl --output-dir /disk2/agent/lsst-models \
+  --input ../run/agent/lsst-both.jsonl --output-dir ../run/agent/lsst-models \
   --kind both --clusters 10 --components 0.95 --seed 42 --max-rows 100000
 ```
 
@@ -38,7 +38,7 @@ For an **exact new HBase row** (read-only, projected to the model's feature colu
 ```bash
 java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
   -s ../src/work/Clusters/LSST/classify_alert.groovy \
-  -o "model='/disk2/agent/lsst-models/dia.json',host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_static',schema='schema_5.0rc0_8.52.0',kind='dia',rowKey='EXACT_ROW_KEY'"
+  -o "model='../run/agent/lsst-models/dia.json',host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_static',schema='schema_5.0rc0_8.52.0',kind='dia',rowKey='EXACT_ROW_KEY'"
 ```
 
 Use the SS model and table for an SS row. The classifier refuses mismatched `kind`, table or schema when the model has provenance. For an already exported single row in a JSON file, `groovy classify_alert.groovy --model /path/dia.json --row-json /path/single-row.json` uses identical projection logic without HBase. Output contains `kind`, `row_key`, `class_id` (zero-based), PCA-space Euclidean `distance`, and `outlier`.
