@@ -1,0 +1,65 @@
+# LSST six-band light-curve neural-network clusters (DIA and SS)
+
+This is an **exploratory, unlabeled** counterpart to `src/work/Clusters/LSST/`: Groovy exports one object's HBase observations, Python trains a masked neural autoencoder separately for DIA and SS, K-means identifies centers in the encoder's latent space, and Groovy assigns a new object to the nearest center. The `class_id` is a zero-based **data-driven cluster ID**, not an astrophysical class or a probability. The returned `outlier` compares distance with the 99th-percentile radius of that center in the training set. No JanusGraph writes are performed. The model format and `model_id` are intended to identify a *future*, separately reviewed graph classification schema.
+
+## Data contract and scope
+
+Both scripts read individual HBase rows from `rubin.diaSource_static` (DIA) or `rubin.diaSource_sso` (SS), schema `schema_5.0rc0_8.52.0`. A row's `r:band`, `r:midpointMjdTai`, `r:psfFlux`, and `r:psfFluxErr` are projected, as well as the canonical `r:diaObjectId` or `r:ssObjectId` and source ID `r:diaSourceId`. The row key's middle component is **not** assumed to equal the SS object ID. The `psfFlux` series is used consistently across both types; science-image flux is not mixed with difference-image PSF flux. Negative but finite flux is retained. Invalid or missing flux, error, band, or identity causes the requested object export to fail rather than silently dropping observations.
+
+Provide **verified full object-key prefixes** ending in `_`, for example `000_170028485649105000_` (DIA) or `00_K00A00G_` (SS). These are specific observed examples, not generic discovery patterns. Broad prefixes such as `00` and substring object-ID scans are prohibited. At most 100 explicit prefixes and 512 observations per object are allowed per run. The exporter projects only required columns, sets client result and search limits to `maxPoints+1`, rejects capped/mismatched results, handles scanner I/O failures strictly, closes the client and atomically publishes output. A prefix scan is **prefix-complete at the time of that read**, not proven globally complete across unknown alternative keys, ingestion lag, or future observations. The JSON field `complete: true` means the bounded prefix was not truncated; do not interpret it as a permanent complete light curve.
+
+Each JSONL record has `kind`, canonical numeric-string `object_id`, `object_key` (requested prefix), `table`, `schema`, `complete: true`, and `sources` sorted by MJD/source ID. Both trainer and classifier require numeric-string source IDs; DIA keys have the form `DDD_OBJECTID_` (three digits, then the matching numeric object ID) and SS keys `DD_ALIAS_` (two digits, then an alphanumeric alias), with an underscore terminator. Each source retains string `row_key`, `source_id`, `mjd`, `flux`, `flux_err`, and one of the six literal bands `u,g,r,i,z,y`. A missing band contributes no invented observations. The trainer rejects duplicate objects/sources, mixed schemas, nonfinite values, nonpositive errors, fewer than three observations, zero time span, and more than 512 sources per object. It fits one model per kind, never pools DIA and SS.
+
+## Running from Lomikel `ant/`
+
+Build Lomikel from current source first. An older executable JAR without the protected `HBaseClient.handleScanIOException` hook fails explicitly when compiling these scripts. In the current source tree, source `setup.sh` to obtain `version`, then export known objects using the HBase-enabled executable JAR:
+
+```bash
+source setup.sh
+java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
+  -s ../src/work/LightCurves/LSST/export_lightcurves.groovy \
+  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_static',schema='schema_5.0rc0_8.52.0',kind='dia',prefixes='000_170028485649105000_',maxObjects=1,maxPoints=512,output='/disk2/agent/lc-dia.jsonl'"
+java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
+  -s ../src/work/LightCurves/LSST/export_lightcurves.groovy \
+  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_sso',schema='schema_5.0rc0_8.52.0',kind='ss',prefixes='00_K00A00G_',maxObjects=1,maxPoints=512,output='/disk2/agent/lc-ss.jsonl'"
+```
+
+For training, collect a representative set of **distinct objects** of each kind, using bounded exports with disjoint prefixes, and combine the JSONL files. **The following is a template, not runnable from just the two example exports:** ten clusters require substantially more than ten suitable objects of *each* kind after the training/validation split. Do not train on just these two example objects. Python requires NumPy and scikit-learn:
+
+```bash
+cat /disk2/agent/lc-dia.jsonl /disk2/agent/lc-ss.jsonl > /disk2/agent/lc-both.jsonl
+python3 ../src/work/LightCurves/LSST/train_lightcurves.py \
+  --input /disk2/agent/lc-both.jsonl --output-dir /disk2/agent/lc-models \
+  --kind both --clusters 10 --embedding 8 --bins 16 --epochs 100 \
+  --seed 42 --max-objects 100000
+```
+
+For each object, the trainer divides elapsed time by the observed duration and maps observations to fixed bins. For each of six bands and each bin it stores mean `asinh(flux / object_scale)`, mean `log1p(error / object_scale)`, and a presence mask; missing bins stay masked. It appends log-duration and log-flux-scale features. Mean/std normalization is fit **only on training objects**. A masked-reconstruction autoencoder (`tanh` encoder, linear decoder) learns the embedding, using a separate held-out validation-object split for epoch selection. K-means and 99th-percentile distance radii are fit **only on training embeddings**. `dia.json` and `ss.json` serialize encoder parameters, preprocessing, centers/radii, counts, losses, HBase provenance and an immutable hash-based `model_id`. The six-band order and bin layout are versioned in the model. The digest detects accidental parameter changes under the same ID; it is **not** an authenticity signature—someone who can replace the model can recompute its ID. Only load models from a trusted location. This network ignores flux in unobserved bins but does **not** yet use uncertainty-weighted reconstruction loss; `flux_err` is an input feature.
+
+Classify from a single exported **object** JSON record, without HBase:
+
+```bash
+/opt/groovy-4.0.9/bin/groovy ../src/work/LightCurves/LSST/classify_lightcurve.groovy \
+  --model /disk2/agent/lc-models/dia.json --row-json /disk2/agent/one-dia-object.json
+```
+
+Or use an **exact existing row key** as the anchor to read that object's verified prefix, bounded again. The classifier recomputes the whole object's features; it does not classify that alert in isolation:
+
+```bash
+java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
+  -s ../src/work/LightCurves/LSST/classify_lightcurve.groovy \
+  -o "model='/disk2/agent/lc-models/dia.json',host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_static',schema='schema_5.0rc0_8.52.0',kind='dia',rowKey='000_170028485649105000_61090.04758412875',maxPoints=512"
+```
+
+For SS, change model, kind, table and anchor key accordingly. Output fields are `kind`, `object_id`, `class_id`, `distance`, `outlier`, `model_id`, `bands_present`, and `source_count`. The classifier checks kind/table/schema provenance and exact anchor membership. It never writes to HBase or JanusGraph. A later graph integration should use a separate light-curve classifier namespace plus the immutable model ID as flavor, and should explicitly decide how to handle sparse data and outliers. Do not interpret its Euclidean distance as a graph membership weight.
+
+## Verification and scientific limitations
+
+Run from the repository root:
+
+```bash
+python3 -m pytest --import-mode=importlib src/test/lsst_lightcurves/test_train.py src/test/lsst_alert_clusters/test_train.py -q
+groovy src/test/lsst_lightcurves/test_groovy.groovy
+```
+
+`--import-mode=importlib` avoids the two independent `test_train.py` modules colliding in one pytest run. The bounded integration smoke exported **one real object of each kind** (148 DIA observations across `g,i,r,z`; eight SS observations across `r,i,z`) and checked Python-versus-Groovy numerical inference and exact-key HBase lookup using models trained primarily on **synthetic fixtures**. That demonstrates plumbing, not a meaningful astrophysical model. A production scientific study must establish complete/selectable object coverage, representative object sampling (not first sorted keys), temporally honest cutoffs, unseen-object validation, cluster stability across seeds and windows, uncertainty/cadence sensitivity, and any post-hoc association with independent labels. Do not add graph classifications based on smoke-test models.
