@@ -1,0 +1,28 @@
+: 1764175042:0;mv /home/hrivnac/Screenshot_20251029_152734.png /home/hrivnac/Screenshot_20251125_140920.png /home/hrivnac/Screenshot_20251125_141254.png /home/hrivnac/Screenshot_20251125_141443.png /home/hrivnac/Screenshot_20251125_141740.png ./
+: 1764175043:0;ls
+: 1764175049:0;cd
+: 1772982757:0;ls
+: 1772982758:0;gqview
+: 1772982792:0;mv /home/hrivnac/tmp/Screenshot_20260210_153346.png /home/hrivnac/tmp/peak-linear.png /home/hrivnac/tmp/peak-original.png /home/hrivnac/tmp/periodic-circle.png /home/hrivnac/tmp/periodic-original.png ./
+: 1772982794:0;gqview
+: 1772983309:0;git add ClassificationView-1.png ClassificationView-2.png ClassificationView-3.png ClassificationView-4.png ClassificationView-5.png LightCurveView-peak-linear.png LightCurveView-peak-original.png LightCurveView-periodic-circle.png LightCurveView-periodic-original.png OverlapsGraph-1.png
+: 1772983320:0;git add -f ClassificationView-1.png ClassificationView-2.png ClassificationView-3.png ClassificationView-4.png ClassificationView-5.png LightCurveView-peak-linear.png LightCurveView-peak-original.png LightCurveView-periodic-circle.png LightCurveView-periodic-original.png OverlapsGraph-1.png
+: 1772983327:0;git commit -m "..." -a
+: 1772983333:0;git push
+: 1773049861:0;popd
+: 1781079627:0;gqview
+: 1781079716:0;cp ~/Desktop/TRAVEL/CHEP/presentation/*png ./
+: 1781079764:0;mv ~/LSST-graph.png ./OverlapsGraph-2.png
+: 1781079766:0;ls
+: 1781079783:0;mv Screenshot_20260512_112945.png ClassificationView-6.png
+: 1781079792:0;mv Screenshot_20260512_113626.png ClassificationView-7.png
+: 1781079794:0;gqview
+: 1781079853:0;cp OverlapsGraph-* ~/tmp
+: 1781079905:0;popd
+: 1781079947:0;git commit -m "..." -a
+: 1781079951:0;ls
+: 1781079967:0;git add ClassificationView-6.png ClassificationView-7.png OverlapsGraph-2.png
+: 1781079969:0;git add ClassificationView-6.png ClassificationView-7.png OverlapsGraph-2.png -f
+: 1781079972:0;popd
+: 1781167136:0;ls
+: 1781167138:0;gqview
