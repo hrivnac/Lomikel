@@ -49,7 +49,7 @@ timer.start();
 client.startScan(null,
                  null,
                  null,
-                 now - 90000000 * delay,
+                 (delay == 0) ? 0 : now - 90000000 * delay,
                  now,
                  true,
                  false);
