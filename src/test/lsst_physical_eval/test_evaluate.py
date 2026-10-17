@@ -69,7 +69,7 @@ def launch(tmp_path, mode="pca", rows=None, maps=None, labels=None, *flags, extr
            "--labels", str(snapshot), "--output-dir", str(out), "--kind", "dia",
            "--clusters", "2", "--seed", "17", "--holdout", "0.3"]
     if mode == "pca":
-        cmd += ["--row-map", str(mapping), "--components", "2"]
+        cmd += ["--row-map", str(mapping), "--components", "2", "--pca-label-policy", "object"]
     else:
         cmd += ["--bins", "2", "--embedding", "2", "--epochs", "3"]
     result = subprocess.run(cmd + list(flags) + list(extra_flags), text=True, capture_output=True)
@@ -266,7 +266,7 @@ def test_nonfinite_multilabel_weight_sum_fails_before_output(tmp_path):
 
 def test_sparse_edge_instances_do_not_limit_intentional_object_propagation(tmp_path):
     labels = [dict(label(i), instances=[60000.0, 60001.0]) for i in range(10)]
-    result, out = launch(tmp_path, labels=labels)
+    result, out = launch(tmp_path, labels=labels, extra_flags=["--pca-label-policy", "object"])
     assert result.returncode == 0, result.stderr
     report = json.loads((out / "dia.report.json").read_text())
     assert report["counts"]["matched_heldout_alerts"] == report["counts"]["heldout_alerts"]
@@ -274,7 +274,7 @@ def test_sparse_edge_instances_do_not_limit_intentional_object_propagation(tmp_p
 
 def test_native_graph_snapshot_propagates_tags_and_preserves_edge_metadata(tmp_path):
     labels = [graph_label(i) for i in range(10)]
-    result, out = launch(tmp_path, labels=labels)
+    result, out = launch(tmp_path, labels=labels, extra_flags=["--pca-label-policy", "object"])
     assert result.returncode == 0, result.stderr
     report = json.loads((out / "dia.report.json").read_text())
     model = (out / "dia.model.json").read_text()
@@ -285,6 +285,96 @@ def test_native_graph_snapshot_propagates_tags_and_preserves_edge_metadata(tmp_p
     assert report["heldout_label_snapshot"][0]["classes"][0]["edge_id"].startswith("edge-")
     assert report["heldout_label_snapshot"][0]["provenance"]["scope"]["flavor"] == ""
     assert "rubin.tag_A" not in model and "edge-" not in model
+
+
+@pytest.mark.parametrize("flag", [["--pca-label-policy", "object"], ["--pca-label-policy=object"], ["--pca-label-p", "object"]])
+def test_pca_label_policy_is_not_accepted_for_lc(tmp_path, flag):
+    result, out = launch(tmp_path, mode="lc", extra_flags=flag)
+    assert result.returncode != 0 and "pca" in result.stderr.lower()
+    assert not out.exists()
+
+
+def test_instance_policy_trains_only_registered_rows_and_reports_sampled_coverage(tmp_path):
+    rows = [alert(i, j=j) for i in range(10) for j in range(2)]
+    maps = [{"kind": "dia", "row_key": r["row_key"],
+             "object_id": str(9007199254740993 + i), "source_id": str(1000 + i*2+j),
+             "mjd": str(60000+i+j*.01)}
+            for i in range(10) for j, r in enumerate(rows[2*i:2*i+2])]
+    labels = [graph_label(i, [{**graph_label(i)["classes"][0],
+                               "instances": [60000+i+5e-7, 70000], "weights": [0.25, 0.5]}])
+              for i in range(10)]
+    result, out = launch(tmp_path, rows=rows, maps=maps, labels=labels,
+                         extra_flags=["--pca-label-policy", "instance"])
+    assert result.returncode == 0, result.stderr
+    report = json.loads((out / "dia.report.json").read_text())
+    model = json.loads((out / "dia.model.json").read_text())
+    assert report["pca_label_policy"] == "instance"
+    assert model["n_rows"] == report["counts"]["train_objects"]
+    assert report["counts"]["heldout_alerts"] == report["counts"]["heldout_objects"]
+    assert report["counts"]["heldout_candidate_source_rows"] == 2 * report["counts"]["heldout_objects"]
+    assert report["counts"]["unmatched_heldout_source_rows"] == report["counts"]["heldout_objects"]
+    assert report["counts"]["input_source_rows"] == 20
+    assert report["counts"]["matched_input_source_rows"] == 10
+    assert report["counts"]["missing_graph_instances"] == 10
+    assert all(p["matched_tag_count"] == 1 for p in report["predictions"])
+
+
+@pytest.mark.parametrize("change,needle", [
+    (lambda m, l: m[1].update(mjd=m[0]["mjd"]), "ambiguous"),
+    (lambda m, l: m[2].update(source_id=m[0]["source_id"]), "duplicate source_id"),
+    (lambda m, l: l[0]["classes"][0].update(weights=None), "weights"),
+    (lambda m, l: l[0]["classes"][0].update(instances=[60000.0, 60000.0000005],
+                                              weights=[1, 1]), "multiple"),
+    (lambda m, l: m[0].update(source_id="not-decimal"), "source_id"),
+])
+def test_instance_policy_rejects_ambiguous_or_invalid_source_identity(tmp_path, change, needle):
+    rows = [alert(i, j=j) for i in range(10) for j in range(2)]
+    maps = [{"kind": "dia", "row_key": r["row_key"],
+             "object_id": str(9007199254740993+i), "source_id": str(1000+i*2+j),
+             "mjd": str(60000+i+j*.01)}
+            for i in range(10) for j, r in enumerate(rows[2*i:2*i+2])]
+    labels = [graph_label(i, [{**graph_label(i)["classes"][0],
+                               "instances": [60000+i], "weights": [1]}]) for i in range(10)]
+    change(maps, labels)
+    result, out = launch(tmp_path, rows=rows, maps=maps, labels=labels,
+                         extra_flags=["--pca-label-policy", "instance"])
+    assert result.returncode != 0 and needle in result.stderr.lower()
+    assert not out.exists()
+
+
+def test_flat_pca_requires_explicit_object_policy(tmp_path):
+    result, out = launch(tmp_path, extra_flags=["--pca-label-policy", "instance"])
+    assert result.returncode != 0 and "--pca-label-policy object" in result.stderr
+    assert not out.exists()
+
+
+def test_instance_multilabel_uses_instance_weights_without_changing_feature_model(tmp_path):
+    rows = [alert(i) for i in range(10)]
+    maps = [{"kind": "dia", "row_key": r["row_key"],
+             "object_id": str(9007199254740993+i), "source_id": str(1000+i),
+             "mjd": str(60000+i)} for i, r in enumerate(rows)]
+    output = []
+    for name, second_weight in (("a", 3), ("b", 1)):
+        dest = tmp_path / name; dest.mkdir()
+        labels = []
+        for i in range(10):
+            first = {**graph_label(i)["classes"][0], "instances": [60000+i], "weights": [1]}
+            second = {**first, "cls": "rubin.tag_B", "edge_id": f"edge-b-{i}",
+                      "ocol_id": f"ocol-b-{i}", "weights": [second_weight]}
+            labels.append(graph_label(i, [first, second]))
+        result, out = launch(dest, rows=rows, maps=maps, labels=labels,
+                             extra_flags=["--pca-label-policy", "instance"])
+        assert result.returncode == 0, result.stderr
+        report = json.loads((out / "dia.report.json").read_text())
+        masses = {cls: sum(x["mass"] for x in report["associations"]["alert_weighted"]
+                           if x["cls"] == cls) for cls in ("rubin.tag_A", "rubin.tag_B")}
+        output.append(((out / "dia.model.json").read_bytes(), report["predictions"], masses,
+                       report["counts"]["matched_input_source_rows"]))
+    assert output[0][0] == output[1][0] and output[0][1] == output[1][1]
+    assert output[0][3] == output[1][3] == 10
+    assert sum(output[0][2].values()) == pytest.approx(3)
+    assert output[0][2]["rubin.tag_B"] == pytest.approx(2.25)
+    assert output[1][2]["rubin.tag_B"] == pytest.approx(1.5)
 
 @pytest.mark.parametrize("change,needle", [
     (lambda r: r.update(format="other"), "format"),
