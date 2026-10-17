@@ -76,6 +76,38 @@ java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
 
 For SS, change model, kind, table and anchor key accordingly. Output fields are `kind`, `object_id`, `class_id`, `distance`, `outlier`, `model_id`, `bands_present`, and `source_count`. The classifier checks kind/table/schema provenance and exact anchor membership. It never writes to HBase or JanusGraph. A later graph integration should use a separate light-curve classifier namespace plus the immutable model ID as flavor, and should explicitly decide how to handle sparse data and outliers. Do not interpret its Euclidean distance as a graph membership weight.
 
+## Held-out graph-tag association (object-level, read-only)
+
+For an adequate **distinct-object** light-curve export, use the bounded discovery workflow above. From `ant/`, create a canonical known-ID list and export native graph labels separately; do not append tags to the light-curve JSONL:
+
+```bash
+python3 - <<'PY'
+import json
+from pathlib import Path
+rows = Path('../run/agent/lc-dia.jsonl')
+ids = sorted({json.loads(line)['object_id'] for line in rows.open(encoding='utf-8')})
+assert ids and all(isinstance(oid, str) and oid.isdecimal() for oid in ids)
+Path('../run/agent/lc-dia-object-ids.txt').write_text('\n'.join(ids) + '\n', encoding='utf-8')
+print(len(ids), 'distinct canonical IDs')
+PY
+python3 ../src/work/Clusters/LSST/export_graph_labels.py \
+  --input ../run/agent/lc-dia-object-ids.txt \
+  --output ../run/agent/lc-dia-graph-labels.jsonl \
+  --endpoint https://GRAPH_HOST:GRAPH_PORT \
+  --classifier FINK --survey LSST --flavor '' \
+  --max-objects 10000 --batch-size 50
+python3 ../src/work/Clusters/LSST/evaluate_physical.py \
+  --mode lc --kind dia --input ../run/agent/lc-dia.jsonl \
+  --labels ../run/agent/lc-dia-graph-labels.jsonl \
+  --output-dir ../run/agent/lc-dia-evaluation \
+  --clusters 3 --embedding 8 --bins 16 --epochs 100 \
+  --seed 42 --holdout 0.2 --cohort labeled
+```
+
+Replace the graph endpoint with a trusted reachable service. The default is loopback `http://127.0.0.1:24444`; remote HTTP requires both `--endpoint http://GRAPH_HOST:GRAPH_PORT --allow-insecure-http`, explicitly accepting network-tamperable plaintext. Prefer HTTPS or a protected loopback tunnel; redirects (including HTTPS-to-HTTP) are refused. Choose a fresh output directory. The **one-object** example above is not enough: evaluation needs at least three distinct objects, and enough post-holdout training objects for the cluster count plus internal validation. For SS, use `lc-ss.jsonl`, an SS known-ID list and `--kind ss`. `--kind both` requires combined distinct-object input and graph IDs that resolve unambiguously to a single kind. The graph export has no kind field; IDs shared by DIA and SS are ambiguous. The native graph snapshot requires classifier `FINK`, survey `LSST`, flavor `''`, and exactly one record per input canonical object (an empty `classes` list is valid); missing records fail closed. The default `--cohort labeled` splits and trains only objects bearing classes, withholding the actual classes and edge metadata from fitting; `--cohort all` includes unlabeled objects as a separate exploratory mode. Classes/edge metadata are retained in the held-out report but never passed to model fitting. Association is object-weighted; edge instance MJDs are metadata, not a filter on object tags. These tags are broker associations, **not ground-truth physical classifications**. The graph exporter covers only supplied known IDs in nontransactional batches, not every graph object or a globally consistent snapshot; the bounded HBase sample is likewise not representative by default. Neither step writes to graph or HBase.
+
+Run `python3 -m pytest --import-mode=importlib ../src/test/lsst_physical_eval/test_evaluate.py ../src/test/lsst_graph_labels/test_export_graph_labels.py -q` from `ant/` with NumPy, scikit-learn and pytest available.
+
 ## Verification and scientific limitations
 
 Run from the repository root:
