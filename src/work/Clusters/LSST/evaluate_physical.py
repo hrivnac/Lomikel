@@ -6,11 +6,9 @@ PCA row-map records require kind,row_key,object_id;
 object_id must be the canonical graph object.objectId, never an SS row-key alias.
 Tags accept flattened records (kind,object_id,classifier,survey,flavor,cls,weight)
 or native export_graph_labels.py known-ID JSONL with nested classes.
-By explicit evaluation assumption, an OCol object tag is propagated to EVERY
-exported alert of that canonical object, even when its OCol edge instances
-enumerate fewer MJD observations. Weight is a positive relative tag weight,
-normalized per alert (or LC object). These are FINK tag associations, NOT
-physical truth.
+PCA defaults to source-specific graph edge instance matching; explicit object
+policy restores legacy propagation. LC remains object-level. These are FINK
+tag associations, NOT physical truth.
 """
 import argparse
 import csv
@@ -75,7 +73,7 @@ def clean_inputs(mode, input_path, map_path, label_path, max_rows, requested_kin
             if item["kind"] == "dia" and re.fullmatch(r"[0-9]{3}_[0-9]+_.+", item["row_key"]):
                 if item["row_key"].split("_")[1] != oid:
                     raise ValueError("DIA row key and canonical object ID disagree")
-            mapping[key] = oid
+            mapping[key] = item
     elif map_path is not None:
         raise ValueError("--row-map is PCA-only")
     objects = defaultdict(list)
@@ -93,7 +91,7 @@ def clean_inputs(mode, input_path, map_path, label_path, max_rows, requested_kin
             seen_rows.add(key)
             if key not in mapping:
                 raise ValueError("missing exact alert mapping")
-            oid = mapping[key]
+            oid = mapping[key]["object_id"]
         else:
             if set(row) - {"kind", "object_id", "object_key", "table", "schema", "complete", "sources"}:
                 raise ValueError("LC JSONL has unexpected field (possible label leakage)")
@@ -223,6 +221,74 @@ def add_label(labels, seen, kind, oid, label, weight):
     labels[kind, oid].append({"label": label, "weight": float(weight)})
 
 
+def instance_matches(objects, mapping, snapshots):
+    """Join bounded feature rows to registered edge instances, never to object tags."""
+    matched = {}
+    missing = defaultdict(int)
+    occurrences = defaultdict(int)
+    seen_source_ids = set()
+    for (kind, oid), rows in objects.items():
+        source_rows = []
+        for row in rows:
+            item = mapping[kind, row["row_key"]]
+            if set(item) != {"kind", "row_key", "object_id", "source_id", "mjd"}:
+                raise ValueError("instance policy requires exact source_id and mjd identity sidecar")
+            sid = identity(item["source_id"], "mapping source_id")
+            if (kind, sid) in seen_source_ids:
+                raise ValueError("duplicate source_id across HBase objects or rows")
+            seen_source_ids.add((kind, sid))
+            try:
+                mjd = float(item["mjd"])
+            except (ValueError, TypeError, OverflowError) as exc:
+                raise ValueError("invalid mapping mjd") from exc
+            if not isinstance(item["mjd"], str) or not math.isfinite(mjd) or mjd <= 0:
+                raise ValueError("invalid mapping mjd")
+            # DIA row keys produced by HBase carry the canonical object and MJD.
+            parts = row["row_key"].split("_")
+            if kind == "dia" and len(parts) == 3 and re.fullmatch(r"[0-9]{3}", parts[0]):
+                try:
+                    suffix_mjd = float(parts[2])
+                except ValueError as exc:
+                    raise ValueError("DIA row key MJD disagrees with identity sidecar") from exc
+                if parts[1] != oid or not math.isfinite(suffix_mjd) or abs(suffix_mjd - mjd) > 1e-6:
+                    raise ValueError("DIA row key and identity sidecar disagree")
+            if any(other_sid == sid for _, other_sid, _ in source_rows):
+                raise ValueError("duplicate HBase source_id within object")
+            if any(abs(other_mjd - mjd) <= 1e-6 for other_mjd, _, _ in source_rows):
+                raise ValueError("ambiguous duplicate HBase MJDs")
+            source_rows.append((mjd, sid, row))
+        snapshot = snapshots.get((kind, oid))
+        if not snapshot:
+            continue
+        for cls in snapshot["classes"]:
+            instances, weights = cls["instances"], cls["weights"]
+            if instances is None:
+                raise ValueError("graph class missing instances for instance policy")
+            if weights is None:
+                raise ValueError("graph class missing per-instance weights for instance policy")
+            if any(w <= 0 for w in weights):
+                raise ValueError("instance weights must be positive")
+            for index, instance in enumerate(instances):
+                if instance <= 0:
+                    raise ValueError("graph instance MJD must be positive")
+                occurrences[kind] += 1
+                hits = [row for mjd, _, row in source_rows if abs(mjd - instance) <= 1e-6]
+                if len(hits) > 1:
+                    raise ValueError("ambiguous graph instance matches multiple source rows")
+                if not hits:
+                    missing[kind] += 1
+                    continue
+                key = (kind, hits[0]["row_key"])
+                if any(tag["label"]["cls"] == cls["cls"] for tag in matched.get(key, [])):
+                    raise ValueError("multiple graph instances match one source row and class")
+                matched.setdefault(key, []).append({"label": {**GRAPH_SCOPE, "cls": cls["cls"]},
+                                                      "weight": float(weights[index])})
+    for tags in matched.values():
+        if not math.isfinite(sum(t["weight"] for t in tags)):
+            raise ValueError("nonfinite source label weight")
+    return matched, missing, occurrences
+
+
 def split_ids(ids, fraction, seed):
     import hashlib
     ordered = sorted(ids, key=lambda oid: (hashlib.sha256(f"{seed}:{oid}".encode()).digest(), oid))
@@ -328,14 +394,25 @@ def contingency(entries):
     return sorted(cells, key=lambda c: (c["class_id"], *(c[k] for k in KEYS)))
 
 
-def evaluate(kind, mode, objects, labels, mapping, origin, args, snapshots=None):
+def evaluate(kind, mode, objects, labels, mapping, origin, args, snapshots=None, source_tags=None, missing=None, occurrences=None):
+    source_tags = source_tags or {}
+    missing = missing or {}
+    occurrences = occurrences or {}
     input_ids = sorted(oid for k, oid in objects if k == kind)
-    labeled_ids = {oid for oid in input_ids if labels.get((kind, oid))}
+    specific = mode == "pca" and args.pca_label_policy == "instance"
+    def applicable(oid, row):
+        return (source_tags.get((kind, row["row_key"]), []) if specific
+                else labels.get((kind, oid), []))
+    labeled_ids = {oid for oid in input_ids if any(applicable(oid, r) for r in objects[kind, oid])}
     ids = [oid for oid in input_ids if args.cohort == "all" or oid in labeled_ids]
     if len(ids) < 3:
         raise ValueError(f"{kind}: need >=3 distinct objects in {args.cohort} cohort")
     train_ids, test_ids = split_ids(ids, args.holdout, args.seed)
-    train = [row for oid in train_ids for row in objects[kind, oid]]
+    train = [row for oid in train_ids for row in objects[kind, oid]
+             if not specific or args.cohort == "all" or applicable(oid, row)]
+    if specific and args.cohort == "all":
+        # All cohort retains unmatched objects, but does not fit on unregistered sources.
+        train = [row for row in train if source_tags.get((kind, row["row_key"]))]
     if mode == "pca":
         # Use exactly the existing trainer measurement parsing and fit_kind routine.
         parsed = []
@@ -362,16 +439,18 @@ def evaluate(kind, mode, objects, labels, mapping, origin, args, snapshots=None)
     for oid in test_ids:
         matched = []
         for row in objects[kind, oid]:
+            if specific and args.cohort == "labeled" and not applicable(oid, row):
+                continue
             result = nearest(model, row, mode)
             result.update(kind=kind, object_id=oid)
             if mode == "pca":
                 result["row_key"] = row["row_key"]
-            applicable = labels.get((kind, oid), [])
-            result["matched_tag_count"] = len(applicable)
+            tags = applicable(oid, row)
+            result["matched_tag_count"] = len(tags)
             predictions.append(result)
-            if applicable:
-                matched.append((result["class_id"], applicable))
-                alert_entries.append((result["class_id"], applicable, 1.0))
+            if tags:
+                matched.append((result["class_id"], tags))
+                alert_entries.append((result["class_id"], tags, 1.0))
         if matched:
             matched_objects.add(oid)
             for cluster, tags in matched:
@@ -387,9 +466,23 @@ def evaluate(kind, mode, objects, labels, mapping, origin, args, snapshots=None)
               "unlabeled_heldout_objects": len(test_ids) - len(matched_objects),
               "matched_heldout_alerts" if mode == "pca" else "labeled_heldout_curves": len(alert_entries),
               "outlier_rows": sum(p["outlier"] for p in predictions)}
+    if mode == "pca":
+        heldout_candidates = sum(len(objects[kind, oid]) for oid in test_ids)
+        counts.update(heldout_candidate_source_rows=heldout_candidates,
+                      unmatched_heldout_source_rows=heldout_candidates - len(alert_entries),
+                      input_source_rows=sum(len(objects[kind, oid]) for oid in input_ids),
+                      matched_input_source_rows=sum(bool(source_tags.get((kind, r["row_key"])))
+                                                    for oid in input_ids for r in objects[kind, oid]) if specific else
+                                                sum(len(objects[kind, oid]) for oid in labeled_ids),
+                      graph_instance_occurrences=occurrences.get(kind, 0) if specific else 0,
+                      missing_graph_instances=missing.get(kind, 0) if specific else 0)
+        counts["unmatched_input_source_rows"] = counts["input_source_rows"] - counts["matched_input_source_rows"]
     return model, {"mode": mode, "kind": kind, "cohort": args.cohort,
-                   "interpretation": "association with object-level FINK tags; not physical truth",
-                   "matching": {"pca": "canonical object_id; OCol object tag deliberately propagated to every exported alert (edge instances do not limit coverage)"
+                   "pca_label_policy": args.pca_label_policy if mode == "pca" else None,
+                   "interpretation": ("association with source-specific FINK tag instances; not physical truth"
+                                      if specific else "association with object-level FINK tags; not physical truth"),
+                   "matching": {"pca": ("canonical object_id plus a unique HBase identity-sidecar MJD within 1e-6 day; source_id is validated but absent from graph" if specific else
+                                           "canonical object_id; OCol object tag deliberately propagated to every exported alert (edge instances do not limit coverage)")
                                 if mode == "pca" else "canonical object_id"},
                    "seed": args.seed, "holdout_fraction": args.holdout, "counts": counts,
                    "train_object_ids": train_ids, "heldout_object_ids": test_ids,
@@ -401,7 +494,7 @@ def evaluate(kind, mode, objects, labels, mapping, origin, args, snapshots=None)
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--mode", choices=("pca", "lc"), required=True)
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--row-map", type=Path)
@@ -412,6 +505,8 @@ def main(argv=None):
                         help="select classified objects before split/fit (default: labeled); all retains unlabeled objects")
     parser.add_argument("--label-format", choices=("auto", "native", "flat"), default="auto",
                         help="empty legacy snapshots require explicit flat; empty native/auto fail closed")
+    parser.add_argument("--pca-label-policy", choices=("instance", "object"), default="instance",
+                        help="instance (default) joins graph MJDs to HBase source identity; object explicitly propagates tags")
     parser.add_argument("--clusters", type=pca.positive_int, required=True)
     parser.add_argument("--components", type=pca.components_arg, default=.95)
     parser.add_argument("--bins", type=pca.positive_int, default=16)
@@ -421,6 +516,9 @@ def main(argv=None):
     parser.add_argument("--holdout", type=float, default=.2)
     parser.add_argument("--max-rows", type=pca.positive_int, default=100000)
     args = parser.parse_args(argv)
+    if args.mode == "lc" and any(token == "--pca-label-policy" or token.startswith("--pca-label-policy=")
+                                 for token in (sys.argv[1:] if argv is None else argv)):
+        parser.error("--pca-label-policy is PCA-only")
     if (not math.isfinite(args.holdout) or not 0 < args.holdout < 1 or
             args.max_rows > 100000 or args.bins > 512 or args.embedding > 512 or args.epochs > 10000):
         parser.error("invalid holdout or training bound")
@@ -430,9 +528,14 @@ def main(argv=None):
         objects, labels, mapping, origins, snapshots = clean_inputs(
             args.mode, args.input, args.row_map, args.labels, args.max_rows, args.kind,
             args.label_format)
+        if args.mode == "pca" and args.pca_label_policy == "instance" and not snapshots:
+            raise ValueError("flat snapshots require --pca-label-policy object")
+        source_tags, missing, occurrences = (instance_matches(objects, mapping, snapshots)
+                                             if args.mode == "pca" and args.pca_label_policy == "instance"
+                                             else ({}, {}, {}))
         kinds = ("dia", "ss") if args.kind == "both" else (args.kind,)
         results = {kind: evaluate(kind, args.mode, objects, labels, mapping,
-                                  origins.get(kind), args, snapshots) for kind in kinds}
+                                  origins.get(kind), args, snapshots, source_tags, missing, occurrences) for kind in kinds}
         args.output_dir.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix=".lsst-eval-", dir=args.output_dir.parent) as stage:
             stage = Path(stage)
