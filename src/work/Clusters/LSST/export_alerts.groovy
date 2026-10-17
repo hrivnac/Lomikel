@@ -49,7 +49,7 @@ class ExportAlerts {
       throw new IllegalArgumentException('Number of keys must not exceed limit')
   }
 
-  void exportRows(def client, Map opts, Writer output) {
+  Map exportRows(def client, Map opts, Writer output) {
     validate(opts)
     try {
       client.connect(opts.table.toString(), opts.schema.toString())
@@ -87,6 +87,7 @@ class ExportAlerts {
           schema:opts.schema, cells:clean]) + '\n')
       }
       output.flush()
+      return [alertRows:rows.size()]
     } finally { client.close() }
   }
 
@@ -125,13 +126,19 @@ class ExportAlerts {
     }
   }
 
+  static void runExport(def client, Map opts, ExportAlerts exporter) {
+    Map stats
+    File file = new File(opts.output.toString())
+    writeAtomic(file) { Writer writer -> stats = exporter.exportRows(client, opts, writer) }
+    println "Exported kind=${opts.kind} alert_rows=${stats.alertRows} output=${opts.output} mode=${opts.prefix == null ? 'keys' : 'prefix'}"
+  }
+
   static void main(String[] argv) {
     Map opts = parseArgs(argv)
     Class base = Class.forName('com.Lomikel.HBaser.HBaseClient')
     def client = strictClientClass(base).getConstructor(String, int.class)
       .newInstance(opts.host.toString(), opts.port as int)
-    File file = new File(opts.output.toString())
-    writeAtomic(file) { Writer writer -> new ExportAlerts().exportRows(client, opts, writer) }
+    runExport(client, opts, new ExportAlerts())
   }
 }
 

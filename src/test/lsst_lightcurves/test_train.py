@@ -44,6 +44,47 @@ def load_module():
     return module
 
 
+def test_success_summary_reports_each_written_model(tmp_path):
+    rows = [object_row(kind, i) for kind in ("dia", "ss") for i in range(8)]
+    result, out = run(tmp_path, rows)
+    assert result.returncode == 0, result.stderr
+    lines = result.stdout.splitlines()
+    assert len(lines) == 2
+    for kind, line in zip(("dia", "ss"), lines):
+        model = json.loads((out / f"{kind}.json").read_text())
+        assert line == (f"{kind}: {model['n_train'] + model['n_val']} objects "
+                        f"({model['n_train']} train, {model['n_val']} val), "
+                        f"{len(model['centers'])} clusters, embedding {len(model['encoder_bias'])}, "
+                        f"{model['bins']} bins, best epoch {model['best_epoch']}, "
+                        f"val loss {model['val_loss']:.6g}, output {out / f'{kind}.json'}")
+
+
+def test_no_success_summary_when_requested_kind_cannot_train(tmp_path):
+    result, out = run(tmp_path, [object_row("dia", i) for i in range(8)])
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert not (out / "dia.json").exists()
+
+
+def test_no_success_summary_when_second_model_write_fails(tmp_path, monkeypatch, capsys):
+    rows = [object_row(kind, i) for kind in ("dia", "ss") for i in range(8)]
+    source = tmp_path / "objects.jsonl"
+    source.write_text("".join(json.dumps(row) + "\n" for row in rows))
+    trainer = load_module()
+    write_text = Path.write_text
+
+    def fail_second(path, *args, **kwargs):
+        if path.name == "ss.json":
+            raise OSError("simulated write failure")
+        return write_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "write_text", fail_second)
+    with pytest.raises(SystemExit):
+        trainer.main(["--input", str(source), "--output-dir", str(tmp_path / "models"),
+                      "--clusters", "2", "--embedding", "3", "--bins", "4", "--epochs", "12"])
+    assert capsys.readouterr().out == ""
+
+
 def test_independent_models_and_standalone_embedding(tmp_path):
     rows = [object_row(kind, i) for kind in ("dia", "ss") for i in range(9)]
     result, out = run(tmp_path, rows)

@@ -315,6 +315,12 @@ def main(argv=None):
                 json.dumps(model, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
+    for kind, model in models.items():
+        print(f"{kind}: {model['n_train'] + model['n_val']} objects "
+              f"({model['n_train']} train, {model['n_val']} val), "
+              f"{len(model['centers'])} clusters, embedding {len(model['encoder_bias'])}, "
+              f"{model['bins']} bins, best epoch {model['best_epoch']}, "
+              f"val loss {model['val_loss']:.6g}, output {args.output_dir / f'{kind}.json'}")
 
 
 if __name__ == "__main__":
