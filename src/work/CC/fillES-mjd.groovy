@@ -24,7 +24,13 @@ import org.apache.logging.log4j.core.config.Configurator;
 Configurator.initialize(null, "../src/java/log4j2.xml");
 log = LogManager.getLogger(this.class);
 
-delays = new int[]{2, 1};
+try {
+  delay
+  }  
+catch (MissingPropertyException e) {
+  delay = 2
+  }
+
 
 public class PR extends ParquetReader {
 
@@ -96,7 +102,10 @@ public class PR extends ParquetReader {
 
 reader = new PR("hdfs://ccmaster1:8020");
 osizes = reader.sizes();
-for (int delay : delays) {
+if (delay == 0) {
+  reader.processOptionalDirStrict("/user/fink/archive/scienc/", "parquet");
+  }
+else {
   aday = LocalDate.now()
                   .minusDays(delay)
                   .format(DateTimeFormatter

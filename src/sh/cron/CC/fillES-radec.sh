@@ -13,5 +13,6 @@ echo ${PID} > ${LOCK}
 exec > >(tee -a "${LOG}") 2>&1 || exit 1
 cd ~/Lomikel/ant
 source ./setup.sh
-java --add-opens=java.base/java.lang=ALL-UNNAMED -jar ~/Lomikel/lib/Lomikel-All-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/fillES-radec.groovy
+java --add-opens=java.base/java.lang=ALL-UNNAMED -jar ~/Lomikel/lib/Lomikel-All-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/fillES-radec.groovy -o "delay=1"
+java --add-opens=java.base/java.lang=ALL-UNNAMED -jar ~/Lomikel/lib/Lomikel-All-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/fillES-radec.groovy -o "delay=2"
 /bin/rm -f ${LOCK} 
