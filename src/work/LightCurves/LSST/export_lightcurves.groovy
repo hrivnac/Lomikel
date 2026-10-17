@@ -108,7 +108,7 @@ class ExportLightcurves {
     [kind:opts.kind,object_id:objectId,object_key:prefix,table:opts.table,schema:opts.schema,complete:true,sources:values]
   }
 
-  List<Map> discover(def client, Map opts) {
+  List<Map> discover(def client, Map opts, Map stats = [:]) {
     int rowLimit = positive(opts.'candidate-rows','candidate-rows')
     client.setLimit(rowLimit + 1)
     client.setSearchLimit(rowLimit + 1)
@@ -163,10 +163,12 @@ class ExportLightcurves {
     System.err.println("Discovery: sampled=${sampled.size()} row(s), prefixes=${candidates.size()}, valid=${distinct.size()}, skipped=${skipped}, candidateCap=${candidates.size() == 100}, rowCap=${sampled.size() > rowLimit}")
     int wanted = positive(opts.'max-objects','max-objects')
     if (distinct.size() < wanted) throw new IllegalStateException("Discovery found ${distinct.size()} complete distinct objects; requested ${wanted}; no output published")
+    stats.putAll([sampledRows:sampled.size(),candidateRows:rowLimit,
+      candidatePrefixes:candidates.size(),rowCap:sampled.size() > rowLimit])
     distinct.take(wanted)
   }
 
-  void exportObjects(def client, Map opts, Writer output) {
+  Map exportObjects(def client, Map opts, Writer output) {
     boolean automatic = discovery(opts)
     if (automatic) validateDiscovery(opts)
     List<String> requested = automatic ? [] : prefixes(opts)
@@ -176,7 +178,13 @@ class ExportLightcurves {
       if (client.schema() == null) throw new IllegalArgumentException('Requested schema unavailable')
       int cap = positive(opts.'max-points','max-points') + 1
       Set ids = [] as Set
-      if (automatic) discover(client,opts).each { record -> staged.write(JsonOutput.toJson(record) + '\n') }
+      int objects = 0, points = 0
+      Map discoveryStats = [:]
+      if (automatic) discover(client,opts,discoveryStats).each { record ->
+        staged.write(JsonOutput.toJson(record) + '\n')
+        objects++
+        points += record.sources.size()
+      }
       else requested.each { prefix ->
         client.setLimit(cap)
         client.setSearchLimit(cap)
@@ -184,9 +192,12 @@ class ExportLightcurves {
         Map record = objectFromRows(rows,opts,prefix)
         if (!ids.add(record.object_id)) throw new IllegalStateException('Duplicate canonical object')
         staged.write(JsonOutput.toJson(record) + '\n')
+        objects++
+        points += record.sources.size()
       }
       output.write(staged.toString())
       output.flush()
+      return [objects:objects,points:points] + discoveryStats
     } finally { client.close() }
   }
 
@@ -221,11 +232,18 @@ class ExportLightcurves {
     args as String[]
   }
 
+  static void runExport(def client, Map opts, ExportLightcurves exporter) {
+    Map stats
+    writeAtomic(new File(opts.output.toString())) { Writer out -> stats = exporter.exportObjects(client,opts,out) }
+    String sample = discovery(opts) ? " sampled_rows=${stats.sampledRows} candidate_rows=${stats.candidateRows} candidate_prefixes=${stats.candidatePrefixes} row_cap=${stats.rowCap}" : ''
+    println "Exported kind=${opts.kind} lc_objects=${stats.objects} total_points=${stats.points} output=${opts.output} mode=${discovery(opts) ? 'discovery' : 'explicit'}${sample}"
+  }
+
   static void main(String[] argv) {
     Map opts = parseArgs(argv)
     Class base = Class.forName('com.Lomikel.HBaser.HBaseClient')
     def client = strictClientClass(base).getConstructor(String,int.class).newInstance(opts.host,opts.port as int)
-    writeAtomic(new File(opts.output.toString())) { Writer out -> new ExportLightcurves().exportObjects(client,opts,out) }
+    runExport(client,opts,new ExportLightcurves())
   }
 }
 

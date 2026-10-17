@@ -55,6 +55,30 @@ assert client.calls[1][1] == null && client.calls[1][2].map() == ['key:key':pref
 assert client.calls[1][3] == 'r:diaObjectId,r:ssObjectId,r:diaSourceId,r:midpointMjdTai,r:band,r:psfFlux,r:psfFluxErr'
 println 'PASS DIA bounded object export'
 
+// CLI stdout is emitted only after atomic publication, with actual point totals.
+def summaryDir = java.nio.file.Files.createTempDirectory(new File('.').toPath(), '.lsst-lc-summary-').toFile()
+try {
+  def target = new File(summaryDir,'out.jsonl')
+  def opts = [kind:'dia',table:'t',schema:'s',prefixes:prefix,'max-objects':1,'max-points':3,output:target.path]
+  def stdout = new ByteArrayOutputStream()
+  def previous = System.out
+  try {
+    System.setOut(new PrintStream(stdout,true,'UTF-8'))
+    Export.runExport(new FakeClient(rows:client.rows),opts,exporter)
+  } finally { System.setOut(previous) }
+  assert target.readLines().size() == 1
+  assert stdout.toString('UTF-8').trim() == "Exported kind=dia lc_objects=1 total_points=3 output=${target.path} mode=explicit"
+  assert exporter.exportObjects(new FakeClient(rows:client.rows),opts,new StringWriter()) == [objects:1,points:3]
+  target.text = 'previous\n'
+  stdout.reset()
+  try {
+    System.setOut(new PrintStream(stdout,true,'UTF-8'))
+    rejects { Export.runExport(new FakeClient(),opts,exporter) }
+  } finally { System.setOut(previous) }
+  assert stdout.toString('UTF-8') == '' && target.text == 'previous\n'
+} finally { summaryDir.listFiles().each { it.delete() }; summaryDir.delete() }
+println 'PASS success-only explicit LC summary and returned stats'
+
 rejects { exporter.exportObjects(new FakeClient(rows:client.rows),[kind:'dia',table:'t',schema:'s',prefixes:'000_','max-objects':1,'max-points':3],new StringWriter()) }
 rejects { exporter.exportObjects(new FakeClient(rows:client.rows),[kind:'dia',table:'t',schema:'s',prefixes:prefix,'max-objects':1,'max-points':2],new StringWriter()) }
 rejects { exporter.exportObjects(new FakeClient(rows:client.rows + [(prefix+'61091'):cells('other','new','u','61091','1')]),[kind:'dia',table:'t',schema:'s',prefixes:prefix,'max-objects':1,'max-points':4],new StringWriter()) }
@@ -204,6 +228,24 @@ assert autoClient.calls[1][3] == 'r:diaObjectId,r:ssObjectId'
 assert autoClient.scanBounds == [[21,21],[5,5],[5,5],[5,5]]
 assert autoClient.closed
 println 'PASS bounded discovery ranks complete objects'
+
+// Discovery summary distinguishes bounded sample from the published object count.
+summaryDir = java.nio.file.Files.createTempDirectory(new File('.').toPath(), '.lsst-discovery-summary-').toFile()
+try {
+  def target = new File(summaryDir,'out.jsonl')
+  def opts = autoOpts + [output:target.path]
+  def stdout = new ByteArrayOutputStream()
+  def previous = System.out
+  try {
+    System.setOut(new PrintStream(stdout,true,'UTF-8'))
+    Export.runExport(new FakeClient(rows:autoRows),opts,exporter)
+  } finally { System.setOut(previous) }
+  assert target.readLines().size() == 2
+  assert stdout.toString('UTF-8').trim() == "Exported kind=dia lc_objects=2 total_points=7 output=${target.path} mode=discovery sampled_rows=8 candidate_rows=20 candidate_prefixes=3 row_cap=false"
+  assert exporter.exportObjects(new FakeClient(rows:autoRows),autoOpts,new StringWriter()) ==
+    [objects:2,points:7,sampledRows:8,candidateRows:20,candidatePrefixes:3,rowCap:false]
+} finally { summaryDir.listFiles().each { it.delete() }; summaryDir.delete() }
+println 'PASS discovery summary describes bounded sample'
 
 assert Export.parseArgs(['--host','h','--port','2183','--table','t','--schema','s','--kind','dia',
   '--candidate-prefix','00','--candidate-rows','5000','--min-points','3',

@@ -55,6 +55,8 @@ python3 ../src/work/LightCurves/LSST/train_lightcurves.py \
   --seed 42 --max-objects 100000
 ```
 
+Successful exports report the number of object curves and source observations written; the trainer reports one line per fitted kind with its object counts, model dimensions and output path. These summaries appear on the console, not in the JSONL records or model fields.
+
 For each object, the trainer divides elapsed time by the observed duration and maps observations to fixed bins. For each of six bands and each bin it stores mean `asinh(flux / object_scale)`, mean `log1p(error / object_scale)`, and a presence mask; missing bins stay masked. It appends log-duration and log-flux-scale features. Mean/std normalization is fit **only on training objects**. A masked-reconstruction autoencoder (`tanh` encoder, linear decoder) learns the embedding, using a separate held-out validation-object split for epoch selection. K-means and 99th-percentile distance radii are fit **only on training embeddings**. `dia.json` and `ss.json` serialize encoder parameters, preprocessing, centers/radii, counts, losses, HBase provenance and an immutable hash-based `model_id`. The six-band order and bin layout are versioned in the model. The digest detects accidental parameter changes under the same ID; it is **not** an authenticity signature—someone who can replace the model can recompute its ID. Only load models from a trusted location. This network ignores flux in unobserved bins but does **not** yet use uncertainty-weighted reconstruction loss; `flux_err` is an input feature.
 
 Classify from a single exported **object** JSON record, without HBase:

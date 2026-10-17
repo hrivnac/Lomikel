@@ -1,9 +1,12 @@
 """Offline contract tests for the LSST alert-level trainer (synthetic rows only)."""
+import importlib.util
 import json
 import math
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 TRAINER = Path(__file__).resolve().parents[2] / "work/Clusters/LSST/train_clusters.py"
 
@@ -21,6 +24,50 @@ def run_train(tmp_path, rows, *options):
                              "--output-dir", str(dest), *options],
                             text=True, capture_output=True)
     return result, dest
+
+
+def test_success_summary_reports_each_written_model(tmp_path):
+    rows = [row(kind, i, psfFlux=i + 1, ixx=i * i + 1)
+            for kind in ("dia", "ss") for i in range(8)]
+    result, dest = run_train(tmp_path, rows, "--clusters", "2", "--components", "2")
+    assert result.returncode == 0, result.stderr
+    lines = result.stdout.splitlines()
+    assert len(lines) == 2
+    for kind, line in zip(("dia", "ss"), lines):
+        model = json.loads((dest / f"{kind}.json").read_text())
+        assert line == (f"{kind}: {model['n_rows']} alerts, {len(model['centers'])} clusters, "
+                        f"{len(model['components'])} PCA components, {len(model['features'])} features, "
+                        f"explained variance {sum(model['explained_variance_ratio']):.1%}, "
+                        f"output {dest / f'{kind}.json'}")
+
+
+def test_no_success_summary_when_requested_kind_cannot_train(tmp_path):
+    rows = [row("dia", i, psfFlux=i + 1) for i in range(8)]
+    result, dest = run_train(tmp_path, rows, "--clusters", "2")
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert not (dest / "dia.json").exists()
+
+
+def test_no_success_summary_when_second_model_write_fails(tmp_path, monkeypatch, capsys):
+    rows = [row(kind, i, psfFlux=i + 1) for kind in ("dia", "ss") for i in range(8)]
+    source = tmp_path / "alerts.jsonl"
+    source.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    spec = importlib.util.spec_from_file_location("alert_trainer_for_summary", TRAINER)
+    trainer = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(trainer)
+    write_text = Path.write_text
+
+    def fail_second(path, *args, **kwargs):
+        if path.name == "ss.json":
+            raise OSError("simulated write failure")
+        return write_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "write_text", fail_second)
+    with pytest.raises(SystemExit):
+        trainer.main(["--input", str(source), "--output-dir", str(tmp_path / "models"),
+                      "--clusters", "2"])
+    assert capsys.readouterr().out == ""
 
 
 def test_trains_independent_models_and_excludes_leakage(tmp_path):

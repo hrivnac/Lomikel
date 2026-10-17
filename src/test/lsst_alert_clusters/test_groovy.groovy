@@ -87,6 +87,37 @@ assert client.calls[1][4..7] == [0L, 0L, false, false]
 assert new JsonSlurper().parseText(out.toString().trim()) == [kind:'dia',row_key:'dia-1',table:'alerts',schema:'s1',cells:['r:psfFlux':'2.5','r:ixx':'3']]
 println 'PASS exporter bounded numeric projection and JSONL'
 
+// The CLI reports actual export stats only after replacing the destination.
+def summaryDir = java.nio.file.Files.createTempDirectory(new File('.').toPath(), '.lsst-summary-test-').toFile()
+try {
+  def target = new File(summaryDir, 'alerts.jsonl')
+  def opts = [kind:'dia',table:'alerts',schema:'s1',prefix:'dia-',limit:2,output:target.path]
+  def console = new ByteArrayOutputStream()
+  def original = System.out
+  try {
+    System.setOut(new PrintStream(console, true, 'UTF-8'))
+    ExportAlerts.runExport(new FakeClient(schema:schema, rows:client.rows), opts, exporter)
+  } finally { System.setOut(original) }
+  assert target.readLines().size() == 1
+  assert console.toString('UTF-8').trim() == "Exported kind=dia alert_rows=1 output=${target.path} mode=prefix"
+  assert exporter.exportRows(new FakeClient(schema:schema,rows:client.rows),opts,new StringWriter()) == [alertRows:1]
+  def keysOpts = opts + [prefix:null,keys:'dia-1']
+  console.reset()
+  try {
+    System.setOut(new PrintStream(console, true, 'UTF-8'))
+    ExportAlerts.runExport(new FakeClient(schema:schema,rows:client.rows), keysOpts, exporter)
+  } finally { System.setOut(original) }
+  assert console.toString('UTF-8').trim() == "Exported kind=dia alert_rows=1 output=${target.path} mode=keys"
+  target.text = 'previous\n'
+  console.reset()
+  try {
+    System.setOut(new PrintStream(console, true, 'UTF-8'))
+    failsState { ExportAlerts.runExport(new FakeClient(schema:schema,rows:[:]), opts, exporter) }
+  } finally { System.setOut(original) }
+  assert console.toString('UTF-8') == '' && target.text == 'previous\n'
+} finally { summaryDir.listFiles().each { it.delete() }; summaryDir.delete() }
+println 'PASS success-only alert CLI summary and returned stats'
+
 fails { exporter.exportRows(new FakeClient(schema:schema), [kind:'dia',table:'t',schema:'s',limit:1], new StringWriter()) }
 println 'PASS exporter rejects unbounded request'
 

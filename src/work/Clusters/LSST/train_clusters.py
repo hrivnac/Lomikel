@@ -198,6 +198,11 @@ def main(argv=None):
                 json.dumps(model, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
+    for kind, model in models.items():
+        print(f"{kind}: {model['n_rows']} alerts, {len(model['centers'])} clusters, "
+              f"{len(model['components'])} PCA components, {len(model['features'])} features, "
+              f"explained variance {sum(model['explained_variance_ratio']):.1%}, "
+              f"output {args.output_dir / f'{kind}.json'}")
 
 
 if __name__ == "__main__":
