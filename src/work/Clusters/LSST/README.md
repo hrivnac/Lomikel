@@ -43,6 +43,43 @@ java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
 
 Use the SS model and table for an SS row. The classifier refuses mismatched `kind`, table or schema when the model has provenance. For an already exported single row in a JSON file, `groovy classify_alert.groovy --model /path/dia.json --row-json /path/single-row.json` uses identical projection logic without HBase. Output contains `kind`, `row_key`, `class_id` (zero-based), PCA-space Euclidean `distance`, and `outlier`.
 
+## Held-out association against read-only graph tag snapshots
+
+From `ant/`, first export feature-only alerts with `export_alerts.groovy` as above, then produce a **separate exact row-to-canonical-object mapping** for the same rows. The map must contain exactly one `kind,row_key,object_id` record for every alert (including SS, whose row-key alias is *not* its canonical ID). For DIA data at `../run/agent/lsst-dia.jsonl`:
+
+```bash
+java -jar "../lib/Lomikel-HBase-${version}.exe.jar" -b -q \
+  -s ../src/work/Clusters/LSST/export_alert_identity.groovy \
+  -o "host='cchbase1.in2p3.fr',port=2183,table='rubin.diaSource_static',schema='schema_5.0rc0_8.52.0',kind='dia',input='../run/agent/lsst-dia.jsonl',output='../run/agent/lsst-dia-identity.jsonl',maxRows=10000,batchSize=50"
+python3 - <<'PY'
+import json
+from pathlib import Path
+p = Path('../run/agent/lsst-dia-identity.jsonl')
+ids = sorted({json.loads(line)['object_id'] for line in p.open(encoding='utf-8')})
+assert ids and all(isinstance(oid, str) and oid.isdecimal() for oid in ids)
+Path('../run/agent/lsst-dia-object-ids.txt').write_text('\n'.join(ids) + '\n', encoding='utf-8')
+print(len(ids), 'distinct canonical IDs')
+PY
+python3 ../src/work/Clusters/LSST/export_graph_labels.py \
+  --input ../run/agent/lsst-dia-object-ids.txt \
+  --output ../run/agent/lsst-dia-graph-labels.jsonl \
+  --endpoint https://GRAPH_HOST:GRAPH_PORT \
+  --classifier FINK --survey LSST --flavor '' \
+  --max-objects 10000 --batch-size 50
+python3 ../src/work/Clusters/LSST/evaluate_physical.py \
+  --mode pca --kind dia --input ../run/agent/lsst-dia.jsonl \
+  --row-map ../run/agent/lsst-dia-identity.jsonl \
+  --labels ../run/agent/lsst-dia-graph-labels.jsonl \
+  --output-dir ../run/agent/lsst-dia-evaluation \
+  --clusters 3 --components 0.95 --seed 42 --holdout 0.2 --cohort labeled
+```
+
+Replace the graph endpoint with a trusted reachable service. The default is loopback `http://127.0.0.1:24444`; remote HTTP is refused unless you explicitly pass both `--endpoint http://GRAPH_HOST:GRAPH_PORT --allow-insecure-http`. That flag permits plaintext responses vulnerable to network tampering: prefer HTTPS or a protected loopback tunnel. Redirects are refused, including HTTPS-to-HTTP redirects. Outputs must be fresh paths. Ensure at least three distinct canonical objects and enough *training* rows after object holdout for the selected cluster count and PCA dimensions; `--clusters 3` is illustrative, not a scientifically justified choice. Use `--kind ss` and corresponding SS exports for SS; for `--kind both`, concatenate disjoint DIA/SS feature and mapping files, and only use native graph labels when each canonical object ID occurs under exactly one input kind. The graph snapshot has no `kind`, so an ambiguous ID in both kinds is rejected. Do not train on or merge the nested labels into the feature JSONL: splitting is by canonical object and all model fitting precedes held-out label association.
+
+The evaluator consumes the native `lomikel-lsst-ocol-known-ids-v1` JSONL directly (also accepts legacy flattened labels), requires the FINK/LSST/empty-flavor scope, validates identity and positive finite weights, and preserves graph provenance and edge `instances`, `weights`, IDs and labels in `dia.report.json`'s `heldout_label_snapshot` (never in the model). For native snapshots it requires exactly one graph record for **every** input object, even when `classes` is empty; missing coverage fails before fitting. The default `--cohort labeled` excludes objects without graph classes **before** the object-grouped holdout split, fitting on measurement features only. `--cohort all` is an explicitly different, sparse-label exploration; the report counts excluded and unlabeled objects. Object OCol tags intentionally apply to **every exported alert** of that canonical object; sparse edge instance MJDs do not limit alert coverage. The report includes held-out coverage, predictions, object- and alert-weighted contingency tables and a CSV. Weights split unit mass among an object's tags. These are broker tag associations, **not independent physical truth or a calibrated accuracy estimate**. The graph exporter fetches only the supplied *known IDs*, includes missing/unlabeled objects, and reads in nontransactional batches: this cannot establish all-object coverage, a representative sample, or a consistent global graph snapshot. No graph or HBase writes occur in this evaluation workflow.
+
+Offline tests from `ant/`: `python3 -m pytest --import-mode=importlib ../src/test/lsst_physical_eval/test_evaluate.py ../src/test/lsst_graph_labels/test_export_graph_labels.py -q` with NumPy, scikit-learn and pytest installed.
+
 ## Verification and limitations
 
 Offline tests: `python3 -m pytest src/test/lsst_alert_clusters/test_train.py -q` and `groovy src/test/lsst_alert_clusters/test_groovy.groovy` from the repository root. The integration smoke used *only 25 rows per kind*, a narrow prefix, three clusters, and compared Groovy JSON-row inference with exact-key live HBase inference for one training row per kind. This checks plumbing and numerical agreement, **not predictive validity**, sample representativeness, optimal K, separation, stability, or astrophysical interpretation. Before using classes operationally, design a representative time/object-stratified training sample, hold out objects/time spans, evaluate cluster stability and meaningful associations, and calibrate outlier behavior. Model files from the smoke are deliberately kept outside the repository.
