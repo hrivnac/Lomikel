@@ -11,7 +11,7 @@
 <%! static Logger log = LogManager.getLogger(org.apache.jsp.d3.correlogram_jsp.class); %>
 
 <link href="correlogram.css" rel="stylesheet" type="text/css"/>
-<link href="venn.css" rel="stylesheet" type="text/css"/>
+<link href="venn.css?v=vertical-2" rel="stylesheet" type="text/css"/>
 <script src="../d3-v6.0.0/d3.js" type="text/javascript"></script>
 
 <script src="../venn-v.0.2.14/venn.js" type="text/javascript"></script>
@@ -24,7 +24,7 @@
   
 <script src="actions.js"     type="text/javascript"></script>
 <script src="correlogram.js" type="text/javascript"></script>
-<script src="venn.js"        type="text/javascript"></script>
+<script src="venn.js?v=vertical-2" type="text/javascript"></script>
   
 <script type="text/javascript">
   showCorrelogram(<%=tdata%>);

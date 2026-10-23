@@ -100,9 +100,20 @@ class WebserviceShellTest(unittest.TestCase):
         popup = (ROOT / 'src/ws/d3/vennPopup.jsp').read_text()
         standalone = (ROOT / 'src/ws/d3/venn.jsp').read_text()
         css = (ROOT / 'src/ws/d3/venn.css').read_text()
+        correlogram = (ROOT / 'src/ws/d3/correlogram.jsp').read_text()
+        # JSP fragments can refresh while the browser reuses an older static renderer.
+        # All entry points must request the same explicitly versioned assets.
+        for page in (jsp, standalone, correlogram):
+            self.assertIn('venn.js?v=vertical-2', page)
+            self.assertIn('venn.css?v=vertical-2', page)
+        self.assertIn('venn.css?v=vertical-2', popup)
         self.assertIn('class="venn-view"', jsp)
         self.assertIn('class="venn-view"', popup)
         self.assertIn('class="venn-view"', standalone)
+        for page, target in ((jsp, 'venntext'), (standalone, 'venntext'),
+                             (popup, 'vennPopupTxt')):
+            self.assertLess(page.index('class="venn-diagram"'), page.index('id="' + target + '"'),
+                            'diagram should come before the table when a narrow pane stacks cards')
         self.assertIn('JSONObject.quote(m1)', standalone)
         self.assertIn('JSONObject.quote(m2)', standalone)
         self.assertIn('request.getContextPath() %>/d3/venn.js', standalone)
