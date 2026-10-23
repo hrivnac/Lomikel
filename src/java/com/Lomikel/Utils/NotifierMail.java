@@ -24,6 +24,10 @@ import org.apache.logging.log4j.LogManager;
 // TBD: refactor
 public class NotifierMail {
 
+  /** Package-private transport seam for offline tests; production sends normally. */
+  interface Sender { void send(Message message) throws MessagingException; }
+  static Sender sender = Transport::send;
+
   /** Set special <em>manager</em> email.
     * @param manager The <em>manager</em> email. */
   public static void setManager(String manager) {
@@ -85,7 +89,7 @@ public class NotifierMail {
   public static void postHTMLMail(String recipients,
                                   String subject, 
                                   String message) throws MessagingException {
-    postMail(recipients.split(","), subject, message);
+    postHTMLMail(recipients.split(","), subject, message);
     }
 
   /** Sent E-mail.
@@ -117,16 +121,15 @@ public class NotifierMail {
                               String   from,
                               String   smtp,
                               String   format) throws MessagingException {
-    boolean debug = false;
     if (smtp == null || smtp.equals("")) return;
 
-    // Set the host smtp address
+    // Each call keeps its own host and bounded network operations.
     Properties props = new Properties();
     props.put("mail.smtp.host", smtp);
-
-    // Create some properties and get the default Session
-    Session session = Session.getDefaultInstance(props, null);
-    session.setDebug(debug);
+    props.put("mail.smtp.connectiontimeout", "10000");
+    props.put("mail.smtp.timeout", "10000");
+    props.put("mail.smtp.writetimeout", "10000");
+    Session session = Session.getInstance(props, null);
 
     // Create a message
     Message msg = new MimeMessage(session);
@@ -151,7 +154,7 @@ public class NotifierMail {
     msg.setContent(message, format);
 
     // Send the mail
-    Transport.send(msg);
+    sender.send(msg);
     
     }
     
