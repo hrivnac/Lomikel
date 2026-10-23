@@ -46,9 +46,9 @@ public class Init {
     * @param appName The application name.
     * @param ws      If initialise to run in a Web Service.
     * @param quiet   If no outupt is required. */
-  public static void init(String  appName,
-                          boolean ws,
-                          boolean quiet) {
+  public static synchronized void init(String  appName,
+                                       boolean ws,
+                                       boolean quiet) {
     if (_initialised) {
       log.debug("Lomikel already initialised");
       return;
