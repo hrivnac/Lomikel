@@ -23,7 +23,7 @@
 
 <%! static Logger log = LogManager.getLogger(Venn_jsp.class); %>
 
-<link href="d3/venn.css" rel="stylesheet" type="text/css"/>
+<link href="d3/venn.css?v=vertical-2" rel="stylesheet" type="text/css"/>
 <script src="d3-v6.0.0/d3.js"       type="text/javascript"></script>
 <script src="venn-v.0.2.14/venn.js" type="text/javascript"></script>
 
@@ -32,14 +32,14 @@
   %>
   
 <section class="venn-view" aria-label="Overlap analysis">
-  <div id="venntext"></div>
   <figure class="venn-diagram">
     <div id="venn"></div>
     <figcaption>Area represents the number of objects. The overlap is shared by both sets.</figcaption>
   </figure>
+  <div id="venntext"></div>
 </section>
   
-<script src="d3/venn.js" type="text/javascript"></script>
+<script src="d3/venn.js?v=vertical-2" type="text/javascript"></script>
   
 <script type="text/javascript">
   id = "<%=id%>";
