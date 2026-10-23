@@ -2,6 +2,14 @@ function storeData(fn, dataS) {
   return "FITSView.jsp?fn=" + fn + "&data=" + encodeURIComponent(dataS);
   }
 
+// Object IDs identify the survey; portal pages are not REST API endpoints.
+function finkPortalUrl(objectId) {
+  if (objectId == null) return '';
+  var oid = String(objectId).trim();
+  var portal = oid.startsWith('ZTF') ? 'ztf' : /^[0-9]/.test(oid) ? 'lsst' : '';
+  return portal ? 'https://' + portal + '.fink-portal.org/' + encodeURIComponent(oid) : '';
+  }
+
 stylesheet.nodes.AstroLabNet = {
   properties:{},
   graphics: {
@@ -106,7 +114,7 @@ stylesheet.nodes.object = {
   actions:[                                                                 
     {name:"Show",        url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"                    }, target:"result"  },
     {name:"Table",       url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"                   }, target:"table"   },
-    {name:"Fink Portal", url:{gremlin:"values('objectId').toList()[0].replaceFirst(\"^\", \"https://api.ztf.fink-portal.org/\")"}, target:"external"}    
+    {name:"Fink Portal", url:{js:"finkPortalUrl(eMap.get('objectId'))"}, target:"external"}
     ]
   }
 stylesheet.nodes.PCA = {
