@@ -17,26 +17,27 @@ import java.util.LinkedList;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class MapUtil {
     
-  /** Sort {@link Map} based on its values.
+  /** Sort {@link Map} based on its values in ascending order, with nulls first.
+    * Equal values retain their input iteration order.
     * @param  map The {@link Map} to be sorted.
     * @return The sorted {@link Map}. */
   public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
     return sortByValue(map, false);
     }
     
-  /** Sort {@link Map} based on its values.
+  /** Sort {@link Map} based on its values; nulls sort first in ascending order
+    * and last in reverse order. Equal values retain their input iteration order.
     * @param  map The {@link Map} to be sorted.
-    * @param  reverse Whether to sort in reverse ordder.
+    * @param  reverse Whether to sort in reverse order.
     * @return The sorted {@link Map}. */
   public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map,
                                                                            boolean   reverse) {
     List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+    Comparator<V> values = Comparator.nullsFirst(Comparator.naturalOrder());
     Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
       public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-        if (reverse) {
-          return (o2.getValue()).compareTo(o1.getValue());
-          }
-        return (o1.getValue()).compareTo(o2.getValue());
+        return reverse ? values.compare(o2.getValue(), o1.getValue())
+                       : values.compare(o1.getValue(), o2.getValue());
         }
       });
     Map<K, V> result = new LinkedHashMap<>();
