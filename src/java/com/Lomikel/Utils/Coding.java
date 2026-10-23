@@ -2,12 +2,12 @@ package com.Lomikel.Utils;
 
 // Java
 import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import java.io.Serializable;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
-import java.io.IOException;
 import java.io.IOException;
 import java.lang.ClassNotFoundException;
 
@@ -27,14 +27,14 @@ public class Coding {
     * @param s The string.
     * @return The encoded string. */
   public static String encode(String s) {
-    return Base64.getEncoder().encodeToString(s.getBytes());
+    return Base64.getEncoder().encodeToString(s.getBytes(StandardCharsets.UTF_8));
     }
     
   /** Decode REST string.
     * @param s The encoded string.
     * @return The decoded string. */
   public static String decode(String s) {
-    return new String(Base64.getDecoder().decode(s));
+    return new String(Base64.getDecoder().decode(s), StandardCharsets.UTF_8);
     }
 
   /** Encode {@link Object}.
@@ -53,11 +53,16 @@ public class Coding {
     * @param s The encoded {@link String}.
     * @return  The decoded {@link Object}. */
   public static Serializable deserialize(String s) throws IOException, ClassNotFoundException {
-    byte[] data = Base64.getDecoder().decode(s);
-    ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-    Serializable o = (Serializable)(ois.readObject());
-    ois.close();
-    return o;
+    byte[] data;
+    try {
+      data = Base64.getDecoder().decode(s);
+      }
+    catch (IllegalArgumentException e) {
+      throw new IOException("Invalid Base64 serialized object", e);
+      }
+    try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data))) {
+      return (Serializable)ois.readObject();
+      }
     }
     
    /** Split compactified array of keys.
@@ -67,7 +72,7 @@ public class Coding {
     try {
       return (String[])deserialize(compactKey);
       }
-    catch (IOException | ClassNotFoundException e) {
+    catch (IOException | ClassNotFoundException | ClassCastException e) {
       log.error("Cannot split", e);
       return null;
       }
