@@ -33,9 +33,10 @@
 </head>
 <body class="workspace">
   <div class="workspace-frame">
-    <header class="workspace-header">
-      <div class="workspace-brand"><span class="brand-mark" aria-hidden="true">◈</span>
-        <div><strong>@NAME@</strong><span>Graph exploration workspace</span></div>
+    <header id="mini" class="workspace-header">
+      <div class="workspace-brand">
+        <img class="workspace-logo" src="images/LomikelOverlap.png" alt="" aria-hidden="true">
+        <a class="workspace-brand-link" href="@HOME@" target="RESULT" rel="noopener">@NAME@</a>
       </div>
       <div class="workspace-guide" aria-hidden="true">
         <span class="guide-left">Explore graph</span><span class="guide-arrow">→</span>
@@ -43,9 +44,17 @@
       </div>
       <div class="workspace-tools">
         <span class="resize-hint"><i class="fas fa-arrows-alt" aria-hidden="true"></i> Drag dividers to resize</span>
+        <button type="button" id="version-button" aria-haspopup="dialog" aria-controls="version-dialog">Version</button>
+        <button type="button" id="reset-workspace" title="Clear graph, results and feedback">Reset workspace</button>
         <button type="button" id="restore-layout" title="Restore the default panel sizes without resetting data">Reset layout</button>
       </div>
     </header>
+    <dialog id="version-dialog" class="version-dialog" aria-labelledby="version-title">
+      <h2 id="version-title">@NAME@</h2>
+      <p>Version <strong>@VERSION@</strong></p>
+      <p class="version-build">Built @BUILD@</p>
+      <form method="dialog"><button type="submit">Close</button></form>
+    </dialog>
     <main id="layout" aria-label="Graph exploration panels"></main>
     <footer class="workspace-footer"><span class="status-dot" aria-hidden="true"></span>
       <span>Workspace preview</span><span class="footer-separator">·</span>
