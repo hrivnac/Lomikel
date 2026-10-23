@@ -1,6 +1,7 @@
 package com.Lomikel.Utils;
 
 // XML
+import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Source;
@@ -69,16 +70,21 @@ public class XSLTProcessor {
                         String xmlString,
                         String xsltString) throws LomikelException {
     try {
-      xmlString = xmlString.substring(xmlString.indexOf("<?xml"));
+      int declaration = xmlString.indexOf("<?xml");
+      if (declaration >= 0) {
+        xmlString = xmlString.substring(declaration);
+        }
       Transformer transformer = transformer(xsltString);
       Source xml = new StreamSource(new StringReader(xmlString));
       File file = new File(fileName.replaceAll("/", "_"));
-      Result result = new StreamResult(new FileWriter(file));
-      transformer.transform(xml, result);
+      try (FileWriter writer = new FileWriter(file)) {
+        Result result = new StreamResult(writer);
+        transformer.transform(xml, result);
+        }
       return file;
       }
     catch (Exception e) {
-      throw new LomikelException("Can't process XML fragment:\n\n" + xmlString, e);
+      throw new LomikelException("Can't process XML fragment", e);
       }
     }
 
@@ -91,8 +97,11 @@ public class XSLTProcessor {
     * @throws LomikelException if transformation can't be performed. */
   public String transform(String xmlString,
                           String xsltString) throws LomikelException {
-    xmlString = xmlString.substring(xmlString.indexOf("<?xml"));
     try {
+      int declaration = xmlString.indexOf("<?xml");
+      if (declaration >= 0) {
+        xmlString = xmlString.substring(declaration);
+        }
       Transformer transformer = transformer(xsltString);
       Source xml = new StreamSource(new StringReader(xmlString));
       StringWriter string = new StringWriter();
@@ -105,7 +114,7 @@ public class XSLTProcessor {
         throw (LomikelException)e;
         }
       else {
-        throw new LomikelException("Can't process XML fragment:\n\n" + xmlString, e);
+        throw new LomikelException("Can't process XML fragment", e);
         }
       }
     }
@@ -117,14 +126,19 @@ public class XSLTProcessor {
   private Transformer transformer(String xsltString) throws LomikelException {
     try {
       TransformerFactory factory = TransformerFactory.newInstance();
-      Transformer transformer = factory.newTransformer(new StreamSource(new StringReader(xsltString)));
+      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+      factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+      Transformer transformer = xsltString == null
+                              ? factory.newTransformer()
+                              : factory.newTransformer(new StreamSource(new StringReader(xsltString)));
       for (String parameter : _parameters.keySet()) {
         transformer.setParameter(parameter, _parameters.get(parameter));
         }
       return transformer;
       }
     catch (Exception e) {
-      throw new LomikelException("Can't create Transformer:\n\n" + e.toString() + "\n\n" + xsltString, e);
+      throw new LomikelException("Can't create Transformer", e);
       }
     }
 
