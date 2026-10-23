@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="webservice/workspace.css">
   <link rel="stylesheet" href="webservice/panels.css">
+  <link rel="stylesheet" href="webservice/graph.css">
 </head>
 <body class="workspace">
   <div class="workspace-frame">
@@ -88,7 +89,11 @@
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
       var pane = document.getElementById('feedback');
-      if (pane) pane.innerHTML += txt + '<br/>';
+      if (!pane) return;
+      pane.appendChild(document.createTextNode(txt));
+      pane.appendChild(document.createElement('br'));
+      var scroller = pane.parentElement || pane;
+      scroller.scrollTop = scroller.scrollHeight;
     };
     var helpButton = '<button onClick="w2popup.load({url:\'Help-Top.html\', showMax:true})" style="position:absolute;top:0;right:0"><img src="images/Help.png" width="10"/></button>';
     window.commands = function (info, actions) {

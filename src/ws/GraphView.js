@@ -16,6 +16,16 @@ var data = {
 var container = document.getElementById('vis');
 var network;
 var gr = 'g';
+var graphViewToken = {cancelled:false};
+
+// Release vis physics/listeners before the workspace replaces its graph pane.
+function disposeGraphView() {
+  graphViewToken.cancelled = true;
+  if (network) network.destroy();
+  network = null;
+  clusters.length = 0;
+  lastClusterZoomLevel = 0;
+  }
 
 var helpButton  = "<button onClick=\"w2popup.load({url:'Help-Top.html', showMax: true})\" style=\"position:absolute; top:0; right:0\">";
     helpButton += "<img src=\"images/Help.png\" width=\"10\"/>";
@@ -23,9 +33,17 @@ var helpButton  = "<button onClick=\"w2popup.load({url:'Help-Top.html', showMax:
 
 // Initial Gremlin call
 async function bootstrap(button, level = 0) {
-  while (!container && !document.getElementById('gremlin_server') || !document.getElementById('bootstrap_command')) {
+  // Capture the pane identity: a reset may replace these IDs while we wait.
+  var token = graphViewToken;
+  while (!(container = document.getElementById('vis')) ||
+         !document.getElementById('gremlin_server') ||
+         !document.getElementById('bootstrap_command') ||
+         !document.getElementById('bootstrap_graph') ||
+         !document.getElementById('add2graph')) {
+    if (token.cancelled) return;
     await sleep(1000);
     }
+  if (token.cancelled) return;
   var server  =  document.getElementById('gremlin_server').value;
   var command =  document.getElementById('bootstrap_command').value;
   gr = command.split('.')[0];
@@ -38,7 +56,8 @@ async function bootstrap(button, level = 0) {
     }
   callGremlinGraph(command,
                    server,
-                   level);
+                   level,
+                   token);
   showTab('graph');
   }
   
@@ -48,38 +67,55 @@ function gcall(command, level = 0) {
   bootstrap('text', level);
   }
  
+// Append graph activity as text, not executable markup from commands or results.
+function feedbackLine(message) {
+  var pane = document.getElementById('feedback');
+  if (!pane) return;
+  pane.appendChild(document.createTextNode(message));
+  pane.appendChild(document.createElement('br'));
+  var scrollPane = pane.parentElement || pane;
+  scrollPane.scrollTop = scrollPane.scrollHeight;
+  }
+
 // Send request to Gremlin server giving JSON graph
 // TBD: use POST
 // TBD: check rc
-async function callGremlinGraph(request, newServer, level = 0) {
+async function callGremlinGraph(request, newServer, level = 0, token = graphViewToken) {
+  if (token.cancelled) return;
   if (newServer == null) {
     newServer = server;
     }
   server = newServer;
   var select;
   while (!document.getElementById('select')) { // TBD: do better
+    if (token.cancelled) return;
     await new Promise(r => setTimeout(r, 1000));
     }
+  if (token.cancelled) return;
   select = document.getElementById('select').value.trim();
   if (select !== "") {
     request += "." + select;
     }
-  var [host, port] = server.split("//")[1].split(":");
-  document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
+  feedbackLine('Sending Gremlin request to ' + server + ': ' + request);
   var http = new XMLHttpRequest();
   http.onload = function() {
-    if (http.readyState === 4 && http.status === 200) {
+    if (http.readyState !== 4) return;
+    if (http.status !== 200) {
+      feedbackLine('Graph request failed (HTTP ' + http.status + ')');
+      return;
+      }
+    try {
       show(parseGraph(http.responseText));
       expandNodes(level);
       }
+    catch (error) {
+      feedbackLine('Graph response could not be displayed: ' + error.message);
+      }
     };
-  if (server.includes("?")) {
-    http.open("GET", server + '&gremlin=' + request, false);
-    }
-  else {
-    http.open("GET", server + '?gremlin=' + request, false);
-    }
-  http.send(); 
+  http.onerror = function () { feedbackLine('Graph request failed (network error)'); };
+  http.open("GET", server + (server.includes("?") ? '&' : '?') + 'gremlin=' + encodeURIComponent(request), false);
+  try { http.send(); }
+  catch (error) { feedbackLine('Graph request failed: ' + error.message); }
   }  
   
 // Send request to Gremlin server giving JSON values
@@ -90,23 +126,27 @@ function callGremlinValues(request, newServer) {
     newServer = server;
     }
   server = newServer;
-  var [host, port] = server.split("//")[1].split(":");
-  document.getElementById("feedback").innerHTML += "Sending Gremlin request to " + server + ": " + request + "<br/>";
+  feedbackLine('Sending Gremlin request to ' + server + ': ' + request);
   var http = new XMLHttpRequest();
-  if (server.includes("?")) {
-    http.open("GET", server + '&gremlin=' + encodeURIComponent(request), false);
+  http.open("GET", server + (server.includes("?") ? '&' : '?') + 'gremlin=' + encodeURIComponent(request), false);
+  try {
+    http.send();
+    if (http.status !== 200) {
+      feedbackLine('Value request failed (HTTP ' + http.status + ')');
+      return '';
+      }
+    return parseValues(http.responseText);
     }
-  else {
-    http.open("GET", server + '?gremlin=' + request, false);
+  catch (error) {
+    feedbackLine('Value response could not be read: ' + error.message);
+    return '';
     }
-  http.send();
-  return parseValues(http.responseText)
   }
   
 // Parse Graphson graph
 function parseGraph(graphson) {
   var g = JSON.parse(graphson).result.data['@value'];
-  document.getElementById("feedback").innerHTML += "Showing " + g.length + " new elements<br/>";
+  feedbackLine('Showing ' + g.length + ' new elements');
   var label;
   var id;
   var properties;
@@ -285,7 +325,8 @@ function show(graph) {
             actions += " - ";
             }
           }
-        if (!findObjectByKey(edges, 'id', id) && !findObjectByKey(edges, 'from', inVid, 'to', outVid)) {
+        // Parallel relations may share endpoints; only a repeated relation ID is a duplicate.
+        if (!findObjectByKey(edges, 'id', id)) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {
             color = 'grey';
             edges.push({id:id, from:outVid, to:inVid, value:value, color:{color:color, highlight:color, hover:color, inherit:false}, arrows:arrows, label:label, title:(title + "<br/>" + subtitle), actions:actions});
@@ -297,16 +338,29 @@ function show(graph) {
         }
       }
     }
+  var previousView = null;
+  if (network) {
+    if ((graph == null || document.getElementById('add2graph').checked) &&
+        typeof network.getScale === 'function' && typeof network.getViewPosition === 'function') {
+      previousView = {scale:network.getScale(), position:network.getViewPosition()};
+      }
+    network.destroy();
+    }
+  container = document.getElementById('vis');
+  clusters.length = 0;
+  lastClusterZoomLevel = previousView ? previousView.scale : 0;
   network = new vis.Network(container, data, options4Graph);
   if (graph != null && document.getElementById('clusterize').checked === true) {
-    clusterByGroups();   
+    clusterByGroups(false);
     }
+  if (previousView) network.moveTo(previousView);
   network.once('initRedraw', function() {
     if (lastClusterZoomLevel === 0) {
       lastClusterZoomLevel = network.getScale();
       }
     });
   network.on('zoom', function (params) {
+    if (!document.getElementById('zoom').checked) return;
     if (params.direction == '-') {
        if (params.scale < lastClusterZoomLevel * clusterFactor) {
          makeClusters(params.scale);
@@ -351,26 +405,61 @@ function show(graph) {
         expand(selectedNode.id);
         }
       }
+    else if (params.edges.length == 1) {
+      expandEdge(params.edges[0]);
+      }
     });
   }
   
-// Expand all Nodes by one level
+// Expand each discovered vertex once per request, without chasing a growing array.
 function expandNodes(level = 1) {
-  if (level > 0) {
-    for (var i = 0; i < nodes.length; i++) {
-      expand(nodes[i].id);
+  var visited = new Set();
+  var frontier = nodes.map(function (node) { return node.id; });
+  for (var depth = 0; depth < level && frontier.length; depth++) {
+    for (var i = 0; i < frontier.length; i++) {
+      visited.add(frontier[i]);
+      expand(frontier[i]);
       }
-    expandNodes(level - 1);
+    frontier = nodes.map(function (node) { return node.id; }).filter(function (id) {
+      return !visited.has(id);
+      });
     }
   }
 
-// Expand one more level
-function expand(id) {
-  //document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
+// Expand both endpoints of a selected edge using the same direction menu.
+function expandEdge(id) {
+  var edge = findObjectByKey(edges, 'id', id);
+  if (!edge) return;
+  if (!document.getElementById('expandTo').checked && !document.getElementById('expandFrom').checked) {
+    feedbackLine('Select Children or Parents in Graph tools before expanding.');
+    return;
+    }
+  selectedEdge = edge;
   if (document.getElementById('removeOld').checked) {
+    var endpoints = new Set([edge.from, edge.to]);
+    for (var i = nodes.length - 1; i >= 0; i--) {
+      if (!endpoints.has(nodes[i].id)) nodes.splice(i, 1);
+      }
+    for (var j = edges.length - 1; j >= 0; j--) {
+      if (edges[j].id !== id) edges.splice(j, 1);
+      }
+    }
+  expand(edge.from, true);
+  if (edge.to !== edge.from) expand(edge.to, true);
+  }
+
+// Expand one more level
+function expand(id, preserveExisting = false) {
+  if (!document.getElementById('expandTo').checked && !document.getElementById('expandFrom').checked) {
+    feedbackLine('Select Children or Parents in Graph tools before expanding.');
+    return;
+    }
+  if (document.getElementById('removeOld').checked && !preserveExisting) {
+    var vertex = findObjectByKey(nodes, 'id', id);
+    if (!vertex) return;
     nodes.length = 0;
-    //edges.length = 0;
-    nodes.push(selectedNode);
+    edges.length = 0;
+    nodes.push(vertex);
     }
   if (document.getElementById('expandTo').checked) {
     callGremlinGraph(gr + ".V(" + id + ").out()");
@@ -406,6 +495,9 @@ function describeEdge(id) {
 // Remove selected node
 function removeNode(id, type) {
   removeObjectByKey(nodes, 'id', id);
+  for (var i = edges.length - 1; i >= 0; i--) {
+    if (edges[i].from === id || edges[i].to === id) edges.splice(i, 1);
+    }
   show(null, null);
   }
   
@@ -420,17 +512,19 @@ function applyFilter() {
   var filter = document.getElementById('filter').value.trim();
   if (filter) {
     filterObjectByKey(nodes, 'label', filter);
+    var visible = new Set(nodes.map(function (node) { return node.id; }));
+    for (var i = edges.length - 1; i >= 0; i--) {
+      if (!visible.has(edges[i].from) || !visible.has(edges[i].to)) edges.splice(i, 1);
+      }
     show(null, null);
     }
   }
   
 // Cluser by Groups
-function clusterByGroups() {
-  network.setData(data);
-  var clusterOptionsByData;
-  for (var i = 0; i < groups.length; i++) {
-    clusterGroup(groups[i]);
-    }
+function clusterByGroups(resetData = true) {
+  if (resetData) network.setData(data);
+  var uniqueGroups = new Set(groups);
+  uniqueGroups.forEach(function (group) { clusterGroup(group); });
   }
     
 // Cluser Group
@@ -489,7 +583,7 @@ function fillEdges() {
     }
   for (var i = 0; i < nodes.length; i++) {
     var selectedNode = nodes[i];
-    document.getElementById("feedback").innerHTML += "Expanding " + selectedNode.label + "<br/>";
+    feedbackLine('Expanding ' + selectedNode.label);
     if (document.getElementById('expandTo').checked) {
        callGremlinGraph(gr + ".V(" + selectedNode.id + ").outE().filter(inV().hasId(within(" + visibleIds + ")))");
       }

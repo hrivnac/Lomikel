@@ -2,8 +2,12 @@ async function loadPane(pane, url, iframe, height) {
   while (!document.getElementById(pane)) {
     await sleep(1000);
     }
-  if (document.getElementById("feedback")) {
-    document.getElementById("feedback").innerHTML += "Loading " + pane + " : " + url + "<br/>"
+  var feedbackPane = document.getElementById('feedback');
+  if (feedbackPane) {
+    feedbackPane.appendChild(document.createTextNode('Loading ' + pane + ' : ' + url));
+    feedbackPane.appendChild(document.createElement('br'));
+    var scroller = feedbackPane.parentElement || feedbackPane;
+    scroller.scrollTop = scroller.scrollHeight;
     }
   url = encodeURI(url);
   if (!height) {

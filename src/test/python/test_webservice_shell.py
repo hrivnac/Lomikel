@@ -15,7 +15,7 @@ class WebserviceShellTest(unittest.TestCase):
         js = (SOURCE / "workspace.js").read_text()
         for name in ("layout", "layoutLeft", "layoutMain"):
             self.assertIn("name: '" + name + "'", js)
-        for name in ("webservice/Top.jsp", "GraphView.jsp", "Tabs.jsp", "Feedback.jsp"):
+        for name in ("webservice/Top.jsp", "webservice/GraphView.jsp", "Tabs.jsp", "Feedback.jsp"):
             self.assertTrue("'" + name + "'" in js, name)
         for name in ("resultTab", "tableTab", "imageTab", "plotTab", "skyviewTab"):
             self.assertIn("id: '" + name + "'", js)
@@ -43,6 +43,9 @@ class WebserviceShellTest(unittest.TestCase):
         self.assertIn('id="mini"', header)  # GraphView.jsp still requires #mini.
         self.assertIn('id="reset-workspace"', header)
         self.assertIn("loadPane('top', 'webservice/Top.jsp')", js)
+        self.assertIn('window.disposeGraphView()', js)
+        self.assertIn("pane.appendChild(document.createTextNode(txt))", header)
+        self.assertNotIn("pane.innerHTML += txt", header)
         self.assertIn('id="top"', top)
         self.assertIn('id="commands"', top)
         for name in ("gremlin_server", "bootstrap_graph", "bootstrap_command", "add2graph"):
@@ -74,6 +77,24 @@ class WebserviceShellTest(unittest.TestCase):
         self.assertTrue('showModal()' in js or 'showModal()' in jsp)
         self.assertTrue('.version-dialog' in css)
 
+    def test_preview_graph_menu_preserves_interaction_contract(self):
+        self.assertTrue((SOURCE / "GraphView.jsp").is_file(), "preview graph fragment missing")
+        graph = (SOURCE / "GraphView.jsp").read_text()
+        js = (SOURCE / "workspace.js").read_text()
+        for token in ('id="graph"', 'id="manip"', 'id="vis"', 'id="select"', 'id="filter"',
+                      'id="expandTo"', 'id="expandFrom"', 'id="removeOld"', 'id="zoom"',
+                      'id="clusterize"', 'id="stabilize"', 'id="glayout"', 'id="physics"'):
+            self.assertIn(token, graph)
+        for call in ('clusterByGroups()', 'clusterByHubsize()', 'clusterExpand()', 'fillEdges()',
+                     'switchLayout()', 'switchPhysics()', 'applyFilter()'):
+            self.assertIn(call, graph)
+        self.assertIn('<details', graph)
+        self.assertIn('GraphView.css', graph)  # Legacy context action icon classes remain visible.
+        self.assertIn('webservice/GraphView.jsp', js)
+        self.assertIn('webservice/graph.css', (SOURCE / "index.jsp").read_text())
+        self.assertIn('#layout_layoutMain_panel_bottom .w2ui-panel-content', (SOURCE / "graph.css").read_text())
+        self.assertNotIn('2.16', graph)  # No viewport-derived magic canvas height.
+
     @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
     def test_preview_war_has_substituted_panel_fragments(self):
         with ZipFile(WAR) as archive:
@@ -94,7 +115,8 @@ class WebserviceShellTest(unittest.TestCase):
         with ZipFile(WAR) as archive:
             names = set(archive.namelist())
             for name in ("index.jsp", "webservice/index.jsp", "webservice/workspace.js",
-                         "webservice/workspace.css", "Top.jsp", "GraphView.jsp",
+                         "webservice/workspace.css", "webservice/GraphView.jsp", "webservice/graph.css",
+                         "Top.jsp", "GraphView.jsp", "GraphView.js",
                          "Tabs.jsp", "Feedback.jsp", "WEB-INF/web.xml"):
                 self.assertIn(name, names)
             root = archive.read("index.jsp").decode()

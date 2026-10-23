@@ -45,9 +45,10 @@
 
   // Preserve the legacy reset contract after moving panel 01 into the header.
   window.reset = function () {
+    if (typeof window.disposeGraphView === 'function') window.disposeGraphView();
     loadPane('feedback', 'Feedback.jsp');
     loadPane('top', 'webservice/Top.jsp');
-    loadPane('graph', 'GraphView.jsp');
+    loadPane('graph', 'webservice/GraphView.jsp');
     loadPane('image', 'Image.jsp');
     loadPane('plot', 'Plot.jsp');
     loadPane('result', 'Result.jsp');
@@ -102,7 +103,7 @@
     w2ui.layout.html('left', w2ui.layoutLeft);
     w2ui.layout.html('main', w2ui.layoutMain);
     w2ui.layoutLeft.load('main', 'webservice/Top.jsp');
-    w2ui.layoutLeft.load('bottom', 'GraphView.jsp');
+    w2ui.layoutLeft.load('bottom', 'webservice/GraphView.jsp');
     w2ui.layoutMain.load('main', 'Tabs.jsp');
     w2ui.layoutMain.load('bottom', 'Feedback.jsp');
     document.getElementById('restore-layout').addEventListener('click', resetLayout);

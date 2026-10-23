@@ -1,0 +1,37 @@
+/* Graph controls apply only to the opt-in workspace. */
+body.workspace #graph.ws-graph { gap:8px; }
+body.workspace .ws-graph-tools { flex:none; min-width:0; border:1px solid #b8d7c7;
+  border-radius:8px; background:#f6fcf8; color:#244a38; }
+body.workspace .ws-graph-tools summary { cursor:pointer; padding:7px 11px; font-weight:700;
+  background:#e7f4eb; border-radius:7px; }
+body.workspace .ws-graph-tools summary span { font-weight:400; color:#537461; margin-left:8px; }
+body.workspace .ws-graph-controls { position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px; padding:8px; }
+body.workspace .ws-graph-controls fieldset { min-width:0; margin:0; padding:4px 7px 6px;
+  border:1px solid #cce2d2; border-radius:6px; background:white; }
+body.workspace .ws-graph-controls legend { width:auto; margin:0; padding:0 3px;
+  font-size:11px; font-weight:700; color:#2c6b4d; }
+body.workspace .ws-graph-controls label { display:block; margin:1px 0; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
+body.workspace .ws-graph-controls input[type=checkbox] { vertical-align:middle; margin-right:3px; }
+body.workspace .ws-graph-controls .ws-graph-field { margin-top:5px; font-size:11px; font-weight:600; }
+body.workspace .ws-graph-controls input[type=text] { width:100%; box-sizing:border-box; min-width:0;
+  height:27px; padding:3px 5px; }
+body.workspace .ws-graph-input { display:flex; gap:4px; }
+body.workspace .ws-graph-buttons { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+body.workspace .ws-graph-controls button { padding:3px 6px; border:1px solid #9bc5aa;
+  border-radius:5px; background:#ecf7ef; color:#245b3f; cursor:pointer; }
+body.workspace .ws-graph-controls button:hover { background:#d7ecdd; }
+body.workspace .ws-graph-controls button:focus-visible,
+body.workspace .ws-graph-tools summary:focus-visible,
+body.workspace .ws-graph-controls input:focus-visible { outline:2px solid #26775b; outline-offset:2px; }
+body.workspace .ws-graph-controls .ws-graph-help { position:absolute; right:10px; top:-28px;
+  width:22px; height:22px; padding:0; border-radius:50%; }
+body.workspace #vis { border:1px solid #c5d9d0; border-radius:7px; background:#fff; }
+body.workspace .ws-graph-tools[open] ~ #vis { min-height:140px; }
+body.workspace #layout_layoutMain_panel_bottom .w2ui-panel-content { overflow-y:auto; }
+body.workspace #feedback { color:#264c6f; overflow-wrap:anywhere; line-height:1.5; }
+@media(max-width:1100px) {
+  body.workspace .ws-graph-controls { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body.workspace .ws-graph-tools summary span { display:none; }
+}
