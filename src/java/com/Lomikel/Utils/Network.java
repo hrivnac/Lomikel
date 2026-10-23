@@ -2,6 +2,7 @@ package com.Lomikel.Utils;
 
 // Java
 import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.MalformedURLException;
 
@@ -32,7 +33,8 @@ public class Network {
     if (url == null) {
       return false;
       }
-    return checkPort(url.getHost(), url.getPort());
+    int port = url.getPort();
+    return checkPort(url.getHost(), port == -1 ? url.getDefaultPort() : port);
     }
   
   /** Check server availability..
@@ -41,9 +43,8 @@ public class Network {
     * @return     Whether server can be reached. */
   public static boolean checkPort(String host,
                                   int    port) {
-    Socket s = null;
-    try {
-      new Socket(host, port).close();
+    try (Socket socket = new Socket()) {
+      socket.connect(new InetSocketAddress(host, port), 1000);
       return true;
       }
     catch (Exception e) {
