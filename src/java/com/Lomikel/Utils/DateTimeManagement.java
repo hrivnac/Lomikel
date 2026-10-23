@@ -95,6 +95,10 @@ public class DateTimeManagement {
 
   /** Parse the entire input without calendar rollover; never substitute current time for bad input. */
   private static Date parseDate(String timeS, String format) {
+    // The HBaseTable input uses YYYY for a calendar year, not a week-year.
+    if (format.equals("dd/MM/YYYY HH:mm")) {
+      format = "dd/MM/yyyy HH:mm";
+      }
     DateFormat formatter = new SimpleDateFormat(format);
     formatter.setLenient(false);
     ParsePosition position = new ParsePosition(0);
@@ -140,6 +144,13 @@ public class DateTimeManagement {
       }
     else {
       date = new Date(timestamp);
+      }
+    // These two legacy callers request nanoseconds although timestamps are milliseconds.
+    if (format.equals("yyyy MM dd HH:mm:ss.nnnnnnnnn")) {
+      format = "yyyy MM dd HH:mm:ss.SSS'000000'";
+      }
+    else if (format.equals("HH:mm:ss.nnnnnnnnn dd/MM/yyyy ")) {
+      format = "HH:mm:ss.SSS'000000' dd/MM/yyyy ";
       }
     DateFormat formatter = new SimpleDateFormat(format);
     return formatter.format(date);

@@ -18,6 +18,37 @@ public class DateTimeManagementTest {
           "valid custom Julian date rejected");
   }
 
+  private static void callerNanosecondFormats() {
+    check("1970 01 02 00:00:00.123000000".equals(
+          DateTimeManagement.time2String(86_400_123L, "yyyy MM dd HH:mm:ss.nnnnnnnnn")),
+          "HBaseColumnsProcessor nine-digit fraction must extend milliseconds");
+    check("00:00:00.123000000 02/01/1970 ".equals(
+          DateTimeManagement.time2String(86_400_123L, "HH:mm:ss.nnnnnnnnn dd/MM/yyyy ")),
+          "PropertiesProcessor nine-digit fraction must extend milliseconds");
+  }
+
+  private static void callerCalendarYear() {
+    check(DateTimeManagement.string2time("23/10/2026 12:34", "dd/MM/YYYY HH:mm")
+          == 1_792_758_840_000L, "HBaseTable week-year must parse as calendar year");
+    for (String input : new String[]{"31/02/2026 12:34", "23/10/2026 12:34suffix"}) {
+      try {
+        DateTimeManagement.string2time(input, "dd/MM/YYYY HH:mm");
+        throw new AssertionError("Invalid HBaseTable time accepted: " + input);
+      } catch (IllegalArgumentException expected) {
+        check(expected.getMessage().contains(input), "error must identify HBaseTable input");
+      }
+    }
+  }
+
+  private static void unsupportedPatternIsNotRewritten() {
+    try {
+      DateTimeManagement.time2String(86_400_123L, "yyyy-MM-dd nnnnnnnnn");
+      throw new AssertionError("unsupported n pattern must not be silently rewritten");
+    } catch (IllegalArgumentException expected) {
+      check(expected.getMessage().contains("n"), "unsupported pattern must remain invalid");
+    }
+  }
+
   private static void invalidTime() {
     for (String input : new String[]{"not-a-date", "2024-02-30", "2024-02-29suffix"}) {
       try {
@@ -65,6 +96,9 @@ public class DateTimeManagementTest {
       TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
       Locale.setDefault(Locale.US);
       customFormat();
+      callerNanosecondFormats();
+      callerCalendarYear();
+      unsupportedPatternIsNotRewritten();
       invalidTime();
       invalidJulianDate();
       millisecondsAndLegacyDefaults();
