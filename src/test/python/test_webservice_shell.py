@@ -15,7 +15,7 @@ class WebserviceShellTest(unittest.TestCase):
         js = (SOURCE / "workspace.js").read_text()
         for name in ("layout", "layoutLeft", "layoutMain"):
             self.assertIn("name: '" + name + "'", js)
-        for name in ("webservice/TopMini.jsp", "webservice/Top.jsp", "GraphView.jsp", "Tabs.jsp", "Feedback.jsp"):
+        for name in ("webservice/Top.jsp", "GraphView.jsp", "Tabs.jsp", "Feedback.jsp"):
             self.assertTrue("'" + name + "'" in js, name)
         for name in ("resultTab", "tableTab", "imageTab", "plotTab", "skyviewTab"):
             self.assertIn("id: '" + name + "'", js)
@@ -37,11 +37,12 @@ class WebserviceShellTest(unittest.TestCase):
         self.assertIn("#layout_layoutMain_panel_bottom .w2ui-panel-title", css)
 
     def test_preview_panels_keep_existing_action_contract(self):
-        mini = (SOURCE / "TopMini.jsp").read_text()
+        header = (SOURCE / "index.jsp").read_text()
         top = (SOURCE / "Top.jsp").read_text()
-        self.assertIn('id="mini"', mini)
-        self.assertIn('onclick="reset()"', mini)
-        self.assertIn('webservice/Top.jsp', mini)  # Reset reloads the preview, not the legacy form.
+        js = (SOURCE / "workspace.js").read_text()
+        self.assertIn('id="mini"', header)  # GraphView.jsp still requires #mini.
+        self.assertIn('id="reset-workspace"', header)
+        self.assertIn("loadPane('top', 'webservice/Top.jsp')", js)
         self.assertIn('id="top"', top)
         self.assertIn('id="commands"', top)
         for name in ("gremlin_server", "bootstrap_graph", "bootstrap_command", "add2graph"):
@@ -50,28 +51,43 @@ class WebserviceShellTest(unittest.TestCase):
         self.assertIn("bootstrap('text')", top)
         self.assertIn('../Servers.jsp', top)
         self.assertIn('../Graphs.jsp', top)
-        js = (SOURCE / "workspace.js").read_text()
-        self.assertIn("w2ui.layoutLeft.load('top', 'webservice/TopMini.jsp')", js)
         self.assertIn("w2ui.layoutLeft.load('main', 'webservice/Top.jsp')", js)
-        self.assertIn('webservice/panels.css', (SOURCE / "index.jsp").read_text())
+        self.assertIn('webservice/panels.css', header)
         build = (ROOT / "ant/build.xml").read_text()
-        self.assertIn('tofile="../build/webservice/TopMini.jsp"', build)
         self.assertIn('tofile="../build/webservice/Top.jsp"', build)
         self.assertIn('file="../build/webservice/Top.jsp"', build)
-        self.assertIn('file="../build/webservice/TopMini.jsp"', build)
+        self.assertNotIn('src/webservice/TopMini.jsp', build)
+
+    def test_header_replaces_panel_01_and_halves_control_panels(self):
+        jsp = (SOURCE / "index.jsp").read_text()
+        js = (SOURCE / "workspace.js").read_text()
+        css = (SOURCE / "workspace.css").read_text()
+        for snippet in ('id="mini"', 'src="images/LomikelOverlap.png"', 'href="@HOME@"',
+                        'id="version-dialog"', 'id="version-button"', 'id="reset-workspace"'):
+            self.assertTrue(snippet in jsp, snippet)
+        for token in ('@VERSION@', '@BUILD@'):
+            self.assertTrue(token in jsp, token)
+        self.assertTrue('window.reset = function' in js)
+        self.assertTrue("load('top'," not in js)
+        self.assertTrue("size: '78%'" in js)
+        self.assertTrue("size: '10%'" in js)
+        self.assertTrue('showModal()' in js or 'showModal()' in jsp)
+        self.assertTrue('.version-dialog' in css)
 
     @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
     def test_preview_war_has_substituted_panel_fragments(self):
         with ZipFile(WAR) as archive:
             names = archive.namelist()
-            for path in ("webservice/TopMini.jsp", "webservice/Top.jsp", "webservice/panels.css"):
+            for path in ("webservice/Top.jsp", "webservice/panels.css", "webservice/index.jsp"):
                 self.assertEqual(names.count(path), 1, path)
-            mini = archive.read("webservice/TopMini.jsp").decode()
+            self.assertNotIn("webservice/TopMini.jsp", names)
+            preview = archive.read("webservice/index.jsp").decode()
             top = archive.read("webservice/Top.jsp").decode()
-            for token in ("@VERSION@", "@BUILD@", "@NAME@", "@LOGO@", "@HOME@"):
-                self.assertNotIn(token, mini)
+            for token in ("@VERSION@", "@BUILD@", "@NAME@", "@HOME@"):
+                self.assertNotIn(token, preview)
             self.assertNotIn("@BOOT@", top)
-            self.assertIn("webservice/Top.jsp", mini)
+            self.assertIn("Fink Graph Browser", preview)
+            self.assertIn("images/LomikelOverlap.png", names)
 
     @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
     def test_built_war_contains_both_shells_and_dependencies(self):

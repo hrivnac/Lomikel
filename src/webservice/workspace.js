@@ -38,15 +38,24 @@
     var main = window.w2ui.layoutMain;
     if (!outer || !left || !main) return;
     outer.sizeTo('left', '48%');
-    left.sizeTo('top', '12%');
-    left.sizeTo('bottom', '45%');
-    main.sizeTo('bottom', '20%');
+    left.sizeTo('bottom', '78%');
+    main.sizeTo('bottom', '10%');
     window.setTimeout(queueGraphResize, 100);
   }
 
+  // Preserve the legacy reset contract after moving panel 01 into the header.
+  window.reset = function () {
+    loadPane('feedback', 'Feedback.jsp');
+    loadPane('top', 'webservice/Top.jsp');
+    loadPane('graph', 'GraphView.jsp');
+    loadPane('image', 'Image.jsp');
+    loadPane('plot', 'Plot.jsp');
+    loadPane('result', 'Result.jsp');
+    showTab('graph');
+  };
+
   $(function () {
     var leftStyle = 'background-color:#e8f5ed;';
-    var leftTopStyle = 'background-color:#d1eadb;';
     var rightStyle = 'background-color:#edf4fb;';
     var rightBottomStyle = 'background-color:#dceafa;';
     $('#layout').w2layout({
@@ -60,11 +69,9 @@
     $().w2layout({
       name: 'layoutLeft',
       panels: [
-        { type: 'top', title: '01  /  Workspace', size: '12%', minSize: 85,
-          resizable: true, overflow: 'auto', style: leftTopStyle },
-        { type: 'main', title: '02  /  Connection & actions', minSize: 135,
+        { type: 'main', title: '02  /  Connection & actions', minSize: 90,
           resizable: true, overflow: 'auto', style: leftStyle },
-        { type: 'bottom', title: '03  /  Graph', size: '45%', minSize: 210,
+        { type: 'bottom', title: '03  /  Graph', size: '78%', minSize: 210,
           resizable: true, overflow: 'auto', style: leftStyle }
       ],
       onResize: queueGraphResize
@@ -87,19 +94,23 @@
             onClick: function (event) { showTab(event.target.replace('Tab', '')); }
           }
         },
-        { type: 'bottom', title: '05  /  Activity & commands', size: '20%', minSize: 110,
+        { type: 'bottom', title: '05  /  Activity & commands', size: '10%', minSize: 55,
           resizable: true, overflow: 'auto', style: rightBottomStyle }
       ],
       onResize: queueGraphResize
     });
     w2ui.layout.html('left', w2ui.layoutLeft);
     w2ui.layout.html('main', w2ui.layoutMain);
-    w2ui.layoutLeft.load('top', 'webservice/TopMini.jsp');
     w2ui.layoutLeft.load('main', 'webservice/Top.jsp');
     w2ui.layoutLeft.load('bottom', 'GraphView.jsp');
     w2ui.layoutMain.load('main', 'Tabs.jsp');
     w2ui.layoutMain.load('bottom', 'Feedback.jsp');
     document.getElementById('restore-layout').addEventListener('click', resetLayout);
+    document.getElementById('reset-workspace').addEventListener('click', window.reset);
+    var versionDialog = document.getElementById('version-dialog');
+    document.getElementById('version-button').addEventListener('click', function () {
+      versionDialog.showModal();
+    });
     if (window.MutationObserver) {
       new MutationObserver(watchGraph).observe(document.getElementById('layout'), {
         childList: true, subtree: true

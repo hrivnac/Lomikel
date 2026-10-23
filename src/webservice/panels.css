@@ -1,22 +1,7 @@
-/* Preview-only details for panels 01 and 02. Other panes keep their legacy UI. */
-#layout #layout_layoutLeft_panel_top .w2ui-panel-content { padding:6px 10px !important; }
-#layout .ws-mini { display:flex; align-items:center; gap:11px; min-width:0; min-height:0; }
-#layout .ws-mini-logo { width:38px; height:38px; flex:none; object-fit:contain; background:#fff;
-  border:1px solid #a8d2b6; border-radius:9px; padding:3px; }
-#layout .ws-mini-details { min-width:0; flex:1 1 auto; display:flex; flex-direction:column; justify-content:center; }
-#layout .ws-mini-name { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  color:#185d43; font-weight:700; text-decoration:none; line-height:1.3; }
-#layout .ws-mini-name:hover { text-decoration:underline; }
-#layout .ws-mini-meta { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  font-size:10px; line-height:1.35; color:#527669; }
-#layout .ws-mini-build { font-size:10px; }
-#layout .ws-mini-actions { flex:none; display:flex; align-items:center; gap:7px; }
-#layout .ws-mini-help, #layout .ws-panel-help { border:1px solid #a8cbb4; border-radius:7px;
+/* Preview-only details for panel 02. Other panes keep their legacy UI. */
+#layout .ws-panel-help { border:1px solid #a8cbb4; border-radius:7px;
   background:#f8fffa; color:#2c6d50; width:31px; height:31px; padding:0; cursor:pointer; }
-#layout .ws-mini-reset { border:1px solid #c89191; border-radius:7px; color:#923d3d;
-  background:#fffafa; padding:6px 9px; font-weight:700; white-space:nowrap; cursor:pointer; }
-#layout .ws-mini-reset:hover, #layout .ws-mini-reset:focus-visible { background:#ffe9e7; }
-#layout .ws-mini-help:hover, #layout .ws-panel-help:hover { background:#e6f3e9; }
+#layout .ws-panel-help:hover { background:#e6f3e9; }
 #layout .ws-top { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));
   gap:12px; align-items:start; min-width:0; }
 #layout .ws-connection, #layout .ws-context { min-width:0; background:#fafffb;
@@ -50,7 +35,7 @@
   background:#fff; border:1px dashed #b7d9c2; border-radius:6px; padding:8px; }
 #layout .ws-commands hr { margin:8px 0; }
 #layout .ws-commands button { margin:2px; }
-#layout .ws-mini button:focus-visible, #layout .ws-top button:focus-visible,
+#layout .ws-top button:focus-visible,
 #layout .ws-top select:focus-visible, #layout .ws-top input:focus-visible { outline:2px solid #287c62; outline-offset:2px; }
 @media(max-width:1100px) {
   #layout .ws-connection, #layout .ws-context { padding:8px; }
