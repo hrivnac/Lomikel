@@ -43,12 +43,8 @@ public class LomikelException extends Exception {
     * @param e The {@link Exception}.
     * @return  The stack trace as a String. */
   public static String stackTrace2String(Exception e) {
-    Throwable t = e;
-    StringWriter sw = new StringWriter(); 
-    while (t != null) {
-      t.printStackTrace(new PrintWriter(sw));
-      t = t.getCause();
-      }
+    StringWriter sw = new StringWriter();
+    e.printStackTrace(new PrintWriter(sw));
     return sw.toString();
     }
 
