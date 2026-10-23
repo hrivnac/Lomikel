@@ -90,10 +90,10 @@ public class Interval implements Comparable<Interval> {
   /** Add minimal and maximal value after key, if key contanins hash symbol
     * (which means, that it represents a sequence of keys). */
   private void expandHash() {
-    if (lo.substring(lo.length() - 1, lo.length()).equals("#")) {
+    if (lo.endsWith("#")) {
       lo = lo + "000000000";
       }
-    if (hi.substring(hi.length() - 1, hi.length()).equals("#")) {
+    if (hi.endsWith("#")) {
       hi = hi + Integer.MAX_VALUE;
       }
     }
@@ -139,7 +139,7 @@ public class Interval implements Comparable<Interval> {
     * @param other The other interval.
     * @return      Whether two intervals overlap. */
   public boolean overlaps(Interval other) {
-    if (hi.compareTo(other.lo) <= 0 || lo.compareTo(other.hi) >= 0) {
+    if (hi.compareTo(other.lo) < 0 || lo.compareTo(other.hi) > 0) {
       return false;
       }
     return true;
@@ -151,7 +151,8 @@ public class Interval implements Comparable<Interval> {
     *               don't overlap. */  
   public Interval union(Interval other) {
     if (overlaps(other)) {
-      return new Interval(min(this, other).lo, max(this, other).hi);
+      return new Interval(lo.compareTo(other.lo) <= 0 ? lo : other.lo,
+                          hi.compareTo(other.hi) >= 0 ? hi : other.hi);
       }
     return null;
     }
@@ -162,7 +163,8 @@ public class Interval implements Comparable<Interval> {
     *               don't overlap. */  
   public Interval intersection(Interval other) {
     if (overlaps(other)) {
-      return new Interval(min(this, other).hi, max(this, other).lo);
+      return new Interval(lo.compareTo(other.lo) >= 0 ? lo : other.lo,
+                          hi.compareTo(other.hi) <= 0 ? hi : other.hi);
       }
     return null;
     }
