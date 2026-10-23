@@ -23,10 +23,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.HeaderElement;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClients;
 
@@ -35,15 +32,11 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.KeyStoreException;
-import java.security.KeyManagementException;
 import java.util.zip.GZIPInputStream;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-import javax.net.ssl.SSLContext;
 import org.apache.http.config.Registry;
 
 // Log4J
@@ -572,12 +565,7 @@ public class SmallHttpClient {
   private static CloseableHttpResponse execute(HttpRequestBase request) throws IOException {
     HttpClientContext context = HttpClientContext.create();
     context.setCookieStore(new BasicCookieStore());
-    try {
-      return getSecureHttpsClient().execute(request, context);
-      }
-    catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-      throw new IOException("Cannot create HTTP client", e);
-      }
+    return getSecureHttpsClient().execute(request, context);
     }
 
   /** Get Response Body. Perform GZIP uncompression if neccessary.
@@ -616,8 +604,8 @@ public class SmallHttpClient {
   /** JVM-owned transport: callers close responses, not this shared client. */
   private static volatile CloseableHttpClient sharedClient;
 
-  /** Initialize once without turning checked TLS setup failures into JVM Errors. */
-  private static CloseableHttpClient getSecureHttpsClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+  /** Initialize once using the JVM's normal certificate and hostname checks. */
+  private static CloseableHttpClient getSecureHttpsClient() {
     CloseableHttpClient client = sharedClient;
     if (client == null) {
       synchronized (SmallHttpClient.class) {
@@ -644,12 +632,8 @@ public class SmallHttpClient {
     return client;
     }
 
-  private static CloseableHttpClient buildSecureHttpsClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-    TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-    SSLContext sslContext = SSLContexts.custom()
-                                       .loadTrustMaterial(null, acceptingTrustStrategy)
-                                       .build();
-    SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);   
+  private static CloseableHttpClient buildSecureHttpsClient() {
+    SSLConnectionSocketFactory sslsf = SSLConnectionSocketFactory.getSocketFactory();
     Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
                                                                              .register("https", sslsf)
                                                                              .register("http", new PlainConnectionSocketFactory())
