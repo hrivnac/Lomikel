@@ -1,7 +1,5 @@
 package com.Lomikel.HBaser;
 
-import static com.Lomikel.Utils.Constants.π;
-
 // Math3
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -68,7 +66,7 @@ public class HBaseEvaluatorFunctions {
     Vector3D v0 = new Vector3D(Math.toRadians(ra0), Math.toRadians(dec0));
     Vector3D v  = new Vector3D(Math.toRadians(ra ), Math.toRadians(dec ));
     double d = Vector3D.angle(v0, v);
-    return d < delta * π / 180.0;
+    return d < delta * Math.PI / 180.0;
     }
       
   /** Logging . */

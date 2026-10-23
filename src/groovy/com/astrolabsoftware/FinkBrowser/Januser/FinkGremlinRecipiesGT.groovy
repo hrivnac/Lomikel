@@ -5,7 +5,6 @@ import com.Lomikel.Januser.GremlinRecipies;
 import com.Lomikel.Januser.GremlinRecipiesGT;
 import com.Lomikel.HBaser.HBaseClient;
 import com.Lomikel.Utils.Metrics;
-import static com.Lomikel.Utils.Constants.π;
 
 import com.astrolabsoftware.FinkBrowser.HBaser.FinkHBaseClient;
 import com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipies;
@@ -105,7 +104,7 @@ public trait FinkGremlinRecipiesGT extends GremlinRecipiesGT {
                                int    limit) {
     def lat = dec;
     def lon = ra - 180;
-    def dist = ang * 6371.0087714 * π / 180;
+    def dist = ang * 6371.0087714 * Math.PI / 180;
     return g().V().
                has('direction', geoWithin(Geoshape.circle(lat, lon, dist))).
                has('jd', inside(jdmin, jdmax)).
