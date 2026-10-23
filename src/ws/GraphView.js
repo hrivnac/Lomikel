@@ -284,7 +284,7 @@ function show(graph) {
                 actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "<sup><small>&#8599;</small></sup></a>";
                 }
               else {
-                actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
+                actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\"); return false;'>" + actionsArray[k].name + "</a>";
                 }
               actions += " - ";
               }
@@ -320,7 +320,7 @@ function show(graph) {
               actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "<sup><small>&#8599;</small></sup></a>";
               }
             else {
-              actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\")'>" + actionsArray[k].name + "</a>";
+              actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\"); return false;'>" + actionsArray[k].name + "</a>";
               }
             actions += " - ";
             }

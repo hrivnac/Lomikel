@@ -111,6 +111,13 @@ class WebserviceShellTest(unittest.TestCase):
             self.assertIn("images/LomikelOverlap.png", names)
 
     @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
+    def test_built_war_contains_selected_action_fixes(self):
+        with ZipFile(WAR) as archive:
+            for path, source in (("GraphView.js", ROOT / "src/ws/GraphView.js"),
+                                 ("Stylesheet.js", ROOT / "src/ws/FinkBrowser/Stylesheet.js")):
+                self.assertEqual(archive.read(path), source.read_bytes(), path)
+
+    @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
     def test_built_war_contains_both_shells_and_dependencies(self):
         with ZipFile(WAR) as archive:
             names = set(archive.namelist())
