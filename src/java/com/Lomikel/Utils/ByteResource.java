@@ -4,7 +4,9 @@ package com.Lomikel.Utils;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 
 /** <code>ByteResource</code> gives Resource as Byte Stream.
   * @opt attributes
@@ -13,44 +15,45 @@ import java.io.ByteArrayOutputStream;
   * @opt visibility
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class ByteResource {
-  
+
   /** Create.
-    * @param resource The resource path. */    
+    * @param resource The resource path. */
   public ByteResource(String resource) {
-    InputStream is  = Info.class.getClassLoader().getResourceAsStream(resource);
-    try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      int reads = is.read();      
-      while(reads != -1){
-        baos.write(reads);
-        reads = is.read();
-        }   
+    InputStream input = ByteResource.class.getClassLoader().getResourceAsStream(resource);
+    if (input == null) {
+      throw new IllegalArgumentException("Resource " + resource + " cannot be found !");
+      }
+    try (InputStream is = input;
+         ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      byte[] buffer = new byte[8192];
+      int count;
+      while ((count = is.read(buffer)) != -1) {
+        baos.write(buffer, 0, count);
+        }
       _content = baos.toByteArray();
       }
     catch (IOException e) {
-      System.err.println("Resource " + resource + " cannot be read !\n" + e);
-      return;
+      // Construction fails before toFile can write an incomplete resource.
+      throw new UncheckedIOException("Resource " + resource + " cannot be read !", e);
       }
     }
 
   /** Write resource to a file.
-    * @param fn The name of the file to write the resoirce to. */
+    * @param fn The name of the file to write the resource to. */
   public void toFile(String fn) {
-    try {
-      FileOutputStream fos = new FileOutputStream(fn);
+    try (FileOutputStream fos = new FileOutputStream(fn)) {
       fos.write(_content);
-      fos.close();
       }
     catch (IOException e) {
       System.err.println("Cannot write to file " + fn + " !\n" + e);
       }
     }
-    
-  /** Show the content. */
+
+  /** Show the content using the platform default charset, as before. */
   public String toString() {
-    return new String(_content);
+    return new String(_content, Charset.defaultCharset());
     }
-     
-  private byte[] _content; 
-                                                
+
+  private final byte[] _content;
+
   }
