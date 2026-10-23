@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="webservice/workspace.css">
+  <link rel="stylesheet" href="webservice/panels.css">
 </head>
 <body class="workspace">
   <div class="workspace-frame">

@@ -39,7 +39,7 @@
     if (!outer || !left || !main) return;
     outer.sizeTo('left', '48%');
     left.sizeTo('top', '12%');
-    left.sizeTo('bottom', '55%');
+    left.sizeTo('bottom', '45%');
     main.sizeTo('bottom', '20%');
     window.setTimeout(queueGraphResize, 100);
   }
@@ -64,7 +64,7 @@
           resizable: true, overflow: 'auto', style: leftTopStyle },
         { type: 'main', title: '02  /  Connection & actions', minSize: 135,
           resizable: true, overflow: 'auto', style: leftStyle },
-        { type: 'bottom', title: '03  /  Graph', size: '55%', minSize: 210,
+        { type: 'bottom', title: '03  /  Graph', size: '45%', minSize: 210,
           resizable: true, overflow: 'auto', style: leftStyle }
       ],
       onResize: queueGraphResize
@@ -94,8 +94,8 @@
     });
     w2ui.layout.html('left', w2ui.layoutLeft);
     w2ui.layout.html('main', w2ui.layoutMain);
-    w2ui.layoutLeft.load('top', 'TopMini.jsp');
-    w2ui.layoutLeft.load('main', 'Top.jsp');
+    w2ui.layoutLeft.load('top', 'webservice/TopMini.jsp');
+    w2ui.layoutLeft.load('main', 'webservice/Top.jsp');
     w2ui.layoutLeft.load('bottom', 'GraphView.jsp');
     w2ui.layoutMain.load('main', 'Tabs.jsp');
     w2ui.layoutMain.load('bottom', 'Feedback.jsp');
