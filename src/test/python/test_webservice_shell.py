@@ -95,6 +95,24 @@ class WebserviceShellTest(unittest.TestCase):
         self.assertIn('#layout_layoutMain_panel_bottom .w2ui-panel-content', (SOURCE / "graph.css").read_text())
         self.assertNotIn('2.16', graph)  # No viewport-derived magic canvas height.
 
+    def test_venn_view_uses_responsive_panels(self):
+        jsp = (ROOT / 'src/ws/Venn.jsp').read_text()
+        popup = (ROOT / 'src/ws/d3/vennPopup.jsp').read_text()
+        standalone = (ROOT / 'src/ws/d3/venn.jsp').read_text()
+        css = (ROOT / 'src/ws/d3/venn.css').read_text()
+        self.assertIn('class="venn-view"', jsp)
+        self.assertIn('class="venn-view"', popup)
+        self.assertIn('class="venn-view"', standalone)
+        self.assertIn('JSONObject.quote(m1)', standalone)
+        self.assertIn('JSONObject.quote(m2)', standalone)
+        self.assertIn('request.getContextPath() %>/d3/venn.js', standalone)
+        self.assertIn('request.getContextPath() %>/d3/venn.css', standalone)
+        self.assertIn('id="venntext"', jsp)
+        self.assertIn('id="vennPopupTxt"', popup)
+        self.assertIn('.venn-stats', css)
+        self.assertIn('.venn-contained .venn-area text.label', css)
+        self.assertIn('grid-template-columns', css)
+
     @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
     def test_preview_war_has_substituted_panel_fragments(self):
         with ZipFile(WAR) as archive:
@@ -109,6 +127,14 @@ class WebserviceShellTest(unittest.TestCase):
             self.assertNotIn("@BOOT@", top)
             self.assertIn("Fink Graph Browser", preview)
             self.assertIn("images/LomikelOverlap.png", names)
+
+    @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
+    def test_built_war_contains_venn_view(self):
+        with ZipFile(WAR) as archive:
+            for relative in ("Venn.jsp", "d3/venn.jsp", "d3/vennPopup.jsp",
+                             "d3/venn.js", "d3/venn.css"):
+                self.assertEqual(archive.read(relative), (ROOT / 'src/ws' / relative).read_bytes(),
+                                 relative)
 
     @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
     def test_built_war_contains_selected_action_fixes(self):

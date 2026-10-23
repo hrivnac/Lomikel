@@ -31,17 +31,13 @@
   String id = request.getParameter("id");
   %>
   
-<table>
-  <tr>
-    <td width="40%">
-      <div id="venntext">
-        </div>
-      </td>
-    <td>   
-      <div id="venn"></div>
-      </td>
-    </tr>
-  </table>
+<section class="venn-view" aria-label="Overlap analysis">
+  <div id="venntext"></div>
+  <figure class="venn-diagram">
+    <div id="venn"></div>
+    <figcaption>Area represents the number of objects. The overlap is shared by both sets.</figcaption>
+  </figure>
+</section>
   
 <script src="d3/venn.js" type="text/javascript"></script>
   
