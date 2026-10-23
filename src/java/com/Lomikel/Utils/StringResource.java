@@ -1,12 +1,14 @@
 package com.Lomikel.Utils;
 
 // Java
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -36,16 +38,17 @@ public class StringResource {
                         Class cl) throws LomikelException {
     try {
       InputStream       is  = cl.getClassLoader().getResourceAsStream(resource);
-      InputStreamReader isr = new InputStreamReader(is);
-      BufferedReader    br  = new BufferedReader(isr);
-      StringBuffer buffer = new StringBuffer();
-      while (br.ready()) {
-        buffer.append(br.readLine() + "\n");
+      if (is == null) {
+        throw new LomikelException("Resource " + resource + " not found !");
         }
-      br.close();
-      isr.close();
-      is.close();
-      _content = buffer.toString();
+      try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+        StringBuilder buffer = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+          buffer.append(line).append("\n");
+          }
+        _content = buffer.toString();
+        }
       }
     catch (IOException e) {
       throw new LomikelException("Resource " + resource + " cannot be read !", e);
@@ -56,13 +59,10 @@ public class StringResource {
     * @param fn The filename to write the content 
     * @throws LomikelException If resource can't be read. */      
   public void toFile(String fn) throws LomikelException {
-    try {
-      FileWriter fstream = new FileWriter(fn);
-      BufferedWriter out = new BufferedWriter(fstream);
+    try (BufferedWriter out = Files.newBufferedWriter(Paths.get(fn), StandardCharsets.UTF_8)) {
       out.write(_content);
-      out.close();
       }
-    catch (Exception e){
+    catch (Exception e) {
       throw new LomikelException("Cannot write into file " + fn + " !", e);
       }
     }
