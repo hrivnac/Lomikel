@@ -5,14 +5,15 @@
 
 <%@ page import="org.apache.logging.log4j.Logger" %>
 <%@ page import="org.apache.logging.log4j.LogManager" %>
+<%@ page import="org.json.JSONObject" %>
 
 <%@ page errorPage="ExceptionHandler.jsp" %>
 
 <%! static Logger log = LogManager.getLogger(org.apache.jsp.d3.venn_jsp.class); %>
 
-<link href="d3/venn.css" rel="stylesheet" type="text/css"/>
-<script src="d3-v6.0.0/d3.js"       type="text/javascript"></script>
-<script src="venn-v.0.2.14/venn.js" type="text/javascript"></script>
+<link href="<%=request.getContextPath() %>/d3/venn.css" rel="stylesheet" type="text/css"/>
+<script src="<%=request.getContextPath() %>/d3-v6.0.0/d3.js"       type="text/javascript"></script>
+<script src="<%=request.getContextPath() %>/venn-v.0.2.14/venn.js" type="text/javascript"></script>
 
 <%
   long   n1  = Long.valueOf(request.getParameter("n1"));
@@ -20,28 +21,26 @@
   long   n12 = Long.valueOf(request.getParameter("n12"));
   String m1  =              request.getParameter("m1");
   String m2  =              request.getParameter("m2");
+  if (m1 == null) m1 = "A";
+  if (m2 == null) m2 = "B";
   if (m1.equals(m2)) {
     m1 = m1 + "_IN";
     m2 = m2 + "_OUT";
     }
   %>
   
-<table>
-  <tr>
-    <td width="40%">
-      <div id="venntext">
-        </div>
-      </td>
-    <td>   
-      <div id="venn"></div>
-      </td>
-    </tr>
-  </table>
+<section class="venn-view" aria-label="Overlap analysis">
+  <div id="venntext"></div>
+  <figure class="venn-diagram">
+    <div id="venn"></div>
+    <figcaption>Area represents the number of objects. The overlap is shared by both sets.</figcaption>
+  </figure>
+</section>
   
-<script src="d3/venn.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath() %>/d3/venn.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-  info = showVenn(<%=n1%>, <%=n2%>, <%=n12%>, <%=m1%>, <%=m2%>);
+  info = showVenn(<%=n1%>, <%=n2%>, <%=n12%>, <%=JSONObject.quote(m1).replace("<", "\\u003c")%>, <%=JSONObject.quote(m2).replace("<", "\\u003c")%>);
   document.getElementById("venntext").innerHTML = info;
   </script>
 

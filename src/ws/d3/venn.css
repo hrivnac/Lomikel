@@ -1,3 +1,68 @@
-ul {
-  list-style-type: none;
-  }
+.venn-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  align-items: start;
+  gap: 18px;
+  padding: 18px;
+  color: #243449;
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.venn-summary,
+.venn-diagram {
+  min-width: 0;
+  margin: 0;
+  padding: 18px;
+  border: 1px solid #dbe5ef;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(25, 56, 89, .06);
+}
+.venn-eyebrow {
+  color: #365b82;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.venn-legend {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 20px;
+}
+.venn-legend-item { display: flex; align-items: flex-start; gap: 10px; overflow-wrap: anywhere; }
+.venn-swatch {
+  display: inline-flex;
+  flex: 0 0 26px;
+  justify-content: center;
+  align-items: center;
+  height: 26px;
+  border-radius: 7px;
+  color: #fff;
+  font-weight: 700;
+}
+.venn-swatch-a { background: #1f77b4; }
+.venn-swatch-b { background: #d66b0b; }
+.venn-stats { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.venn-stats caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+.venn-stats th, .venn-stats td { padding: 8px 7px; border-bottom: 1px solid #e8eef5; }
+.venn-stats thead th { color: #506982; font-size: .75rem; text-transform: uppercase; }
+.venn-stats th:first-child { text-align: left; }
+.venn-stats th:not(:first-child), .venn-stats td { text-align: right; }
+.venn-stats tbody tr:last-child { background: #edf5fc; font-weight: 700; }
+.venn-stats tbody tr:last-child th, .venn-stats tbody tr:last-child td { border-bottom: none; }
+.venn-diagram { text-align: center; background: #f8fbff; }
+.venn-diagram svg { display: block; width: min(100%, 340px); height: auto; margin: 0 auto; }
+.venn-diagram .venn-area path { stroke: #fff; stroke-width: 2px; }
+.venn-diagram .venn-area text.label { font-weight: 700; }
+.venn-contained .venn-area text.label { display: none; } /* The legend distinguishes coincident/contained sets. */
+.venn-relationship { margin: -6px 0 14px; color: #365b82; font-size: .83rem; }
+.venn-diagram figcaption { max-width: 36ch; margin: 4px auto 0; color: #5c7188; font-size: .8rem; }
+.venn-empty { padding: 18px; color: #6a3942; }
