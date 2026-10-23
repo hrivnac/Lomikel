@@ -853,6 +853,8 @@
       -->
     <echo>Creating FinkBrowser.war</echo>
  		<copy file="../src/ws/index.jsp"                         tofile="../build/index.jsp"             overwrite="true"/>
+		<!-- Opt-in workspace preview; the existing root index.jsp stays unchanged. -->
+		<copy file="../src/webservice/index.jsp"                tofile="../build/webservice/index.jsp"  overwrite="true"/>
  		<copy file="../src/ws/FinkBrowser/Apps.html"             tofile="../build/FinkBrowser/Apps.html" overwrite="true"/>
  		<copy file="../src/ws/Top.jsp"                           tofile="../build/Top.jsp"               overwrite="true"/>
  		<copy file="../src/ws/TopMini.jsp"                       tofile="../build/TopMini.jsp"           overwrite="true"/>
@@ -860,6 +862,8 @@
  		<copy file="../src/ws/FinkBrowser/Graphs-${target}.jsp"  tofile="../build/Graphs.jsp"            overwrite="true"/>
     <replace file="../build/index.jsp"   token="@NAME@"              value="${Finkbrowsername}"/>
     <replace file="../build/index.jsp"   token="@ICON@"              value="${Finkbrowsericon}"/>
+    <replace file="../build/webservice/index.jsp" token="@NAME@"     value="${Finkbrowsername}"/>
+    <replace file="../build/webservice/index.jsp" token="@ICON@"     value="${Finkbrowsericon}"/>
     <replace file="../build/FinkBrowser/Apps.html" token="@VERSION@" value="${version}"/>
     <replace file="../build/FinkBrowser/Apps.html" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
     <replace file="../build/Top.jsp"     token="@VERSION@"           value="${version}"/>
@@ -875,6 +879,13 @@
     <replace file="../build/TopMini.jsp" token="@HOME@"              value="${Finkbrowserurl}"/>
     <replace file="../build/TopMini.jsp" token="@BOOT@"              value="${Finkbootgremlin}"/>
     <war destfile="../lib/FinkBrowser.war" webxml="../src/ws/web.xml">
+      <zipfileset dir="../src/webservice" prefix="webservice">
+        <exclude name="index.jsp"/>
+        <exclude name="README.md"/>
+        </zipfileset>
+      <zipfileset dir="../build/webservice" prefix="webservice">
+        <include name="index.jsp"/>
+        </zipfileset>
       <fileset dir="../src/ws/FinkBrowser">
         <include name="**/*"/>
         <exclude name="Apps.html"/>

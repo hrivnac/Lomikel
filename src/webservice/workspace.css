@@ -1,0 +1,54 @@
+/* Shell-only skin: legacy pane content, identifiers and handlers are unchanged. */
+:root { --ink:#172b41; --muted:#587087; --line:#c9d8e0; --green:#228365; --blue:#3b75af; }
+html, body.workspace { margin:0; height:100%; min-height:440px; background:#e8eff2; color:var(--ink); }
+body.workspace { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:13px; }
+.workspace-frame { min-width:820px; min-height:440px; height:100vh; display:flex; flex-direction:column; }
+.workspace-header { height:66px; box-sizing:border-box; flex:none; display:flex; align-items:center; gap:20px;
+  padding:0 20px; background:#fff; border-bottom:1px solid var(--line); box-shadow:0 2px 8px #18324a12; z-index:2; }
+.workspace-brand { display:flex; align-items:center; gap:12px; white-space:nowrap; }
+.brand-mark { width:36px; height:36px; display:grid; place-items:center; border-radius:11px;
+  background:linear-gradient(135deg,#21845f,#3b75af); color:white; font-size:23px; }
+.workspace-brand strong { display:block; font-size:16px; letter-spacing:.01em; line-height:1.25; }
+.workspace-brand span:not(.brand-mark) { display:block; font-size:11px; color:var(--muted); }
+.workspace-guide { display:flex; align-items:center; gap:10px; margin:auto; font-size:12px; font-weight:600; white-space:nowrap; }
+.guide-left { color:var(--green); } .guide-right { color:var(--blue); }
+.guide-arrow { color:#8ba0b1; font-size:18px; }
+.workspace-tools { display:flex; align-items:center; gap:14px; white-space:nowrap; }
+.resize-hint { color:var(--muted); font-size:11px; }
+#restore-layout { border:1px solid #adc1ce; border-radius:7px; background:white; color:var(--ink);
+  padding:7px 10px; font-weight:600; cursor:pointer; }
+#restore-layout:hover, #restore-layout:focus-visible { background:#e9f4fb; border-color:#4e8bb7; outline-offset:2px; }
+#layout { flex:1 1 auto; min-height:0; width:100%; position:relative; }
+.workspace-footer { flex:none; min-height:29px; display:flex; align-items:center; gap:8px; padding:0 17px;
+  box-sizing:border-box; background:#f9fbfd; color:var(--muted); border-top:1px solid var(--line); font-size:11px; }
+.status-dot { width:7px; height:7px; border-radius:50%; background:var(--green); }
+.footer-separator { opacity:.65; }
+/* w2ui keeps its native resize handles, content lifecycle, tabs and public layout objects. */
+#layout .w2ui-panel { box-sizing:border-box; }
+#layout .w2ui-panel-title { height:32px; line-height:32px; padding:0 12px; box-sizing:border-box;
+  background:#f3f8f7; color:#1d604e; border-bottom:1px solid #c1ddcf;
+  font-size:11px; font-weight:700; letter-spacing:.065em; text-transform:uppercase; }
+#layout #layout_layoutMain_panel_main .w2ui-panel-title,
+#layout #layout_layoutMain_panel_bottom .w2ui-panel-title { background:#edf4fc; color:#356994; border-bottom-color:#c9d9ed; }
+#layout .w2ui-panel-content { padding:10px 12px !important; box-sizing:border-box; }
+#layout .w2ui-panel-content, #layout .w2ui-panel-content * { font-size:13px; }
+#layout .w2ui-panel-content h1 { font-size:19px; }
+#layout .w2ui-panel-content h2 { font-size:16px; }
+#layout .w2ui-panel-content h3 { font-size:14px; }
+#layout .w2ui-panel-content button, #layout .w2ui-panel-content input[type=button],
+#layout .w2ui-panel-content input[type=submit] { border-radius:5px; cursor:pointer; }
+#layout .w2ui-panel-content input[type=text], #layout .w2ui-panel-content select {
+  max-width:100%; border-radius:4px; border:1px solid #aabdc6; background:#fff; }
+#layout .w2ui-splitter { background:#dce6e8; border-color:#b7c9d0; }
+#layout .w2ui-splitter:hover { background:#83b5ca; }
+#layout .w2ui-tabs { background:#edf4fb; border-color:#c9d9ed; }
+#layout .w2ui-tabs .w2ui-tab { color:#365c79; background:#e0ebf7; border:1px solid #c9d9ed;
+  border-radius:6px 6px 0 0; margin-right:3px; }
+#layout .w2ui-tabs .w2ui-tab.active { background:#fff; color:#225887; border-bottom-color:#fff; font-weight:700; }
+/* The old GraphView.jsp sets #vis to a one-time viewport-derived pixel height. Its
+   parent pane now owns that height so the canvas follows pane and window resizes. */
+#graph { display:flex; flex-direction:column; min-height:100%; height:100%; }
+#manip { flex:none; }
+#vis { flex:1 1 auto; min-height:190px; height:auto !important; box-sizing:border-box; }
+@media(max-width:1100px) { .workspace-guide, .resize-hint { display:none; } }
+@media(max-height:630px) { .workspace-header { height:52px; } .workspace-footer { display:none; } }
