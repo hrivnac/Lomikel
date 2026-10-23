@@ -7,11 +7,7 @@ import java.util.Date;
 import java.util.Calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
-
-// Log4J
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import java.text.ParsePosition;
 
 /** <code>DateTimeManagement</code> manipulates date and time.
   * @opt attributes
@@ -51,67 +47,63 @@ public class DateTimeManagement {
     
  /** Give {@link String} time as Julian date using the default format.
    * @param timeS  The {@link String} time.
-   * @param format The date format. <tt>null</tt> or empty will use the default format.
    * @return       The Julian date (incl. fraction of a day). */
  public static double string2julianDate(String timeS) {
    return string2julianDate(timeS, null);
    }
   
  /** Give {@link String} time (up to <tt>s</tt>) as Julian date.
-   * @param timeS  The {@link String} time.
+   * @param timeS  The {@link String} time; null or blank means current time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
-   * @return       The Julian date (incl. fraction of a days). */
+   * @return       The Julian date (incl. fraction of a day).
+   * @throws IllegalArgumentException if nonempty time cannot be parsed in full. */
  public static double string2julianDate(String timeS,
                                         String format) {
    if (format == null || format.trim().equals("")) {
      format = FORMAT;
      }
-   DateFormat formatter = new SimpleDateFormat(format);
-   Date date = new Date();
-   try {
-     if (timeS != null && !timeS.trim().equals("")) {       
-       date = formatter.parse(timeS);
-       }
-     }
-   catch (ParseException e) {
-     log.error("Cannot parse time " + timeS + " as " + format + ", using current time");
-     }
+   Date date = timeS == null || timeS.trim().equals("")
+             ? new Date() : parseDate(timeS, format);
    Calendar calendar = Calendar.getInstance();
    calendar.setTime(date);
    return DateConverter.toJulianDate(calendar);
    }
     
     
- /** Give {@link String} time in <tt>ns</tt> using the default format.
+ /** Give {@link String} time in <tt>ms</tt> using the default format.
    * @param timeS  The {@link String} time.
-   * @param format The date format. <tt>null</tt> or empty will use the default format.
-   * @return       The time in <tt>ns</tt>. */
+   * @return       The time in milliseconds since the Unix epoch. */
  public static long string2time(String timeS) {
    return string2time(timeS, null);
    }
      
- /** Give {@link String} time in <tt>ns</tt>.
-   * @param timeS  The {@link String} time.
+ /** Give {@link String} time in milliseconds.
+   * @param timeS  The {@link String} time; null or blank means current time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
-   * @return       The time in <tt>ns</tt>. */
+   * @return       The time in milliseconds since the Unix epoch.
+   * @throws IllegalArgumentException if nonempty time cannot be parsed in full. */
  public static long string2time(String timeS,
                                 String format) {
    if (format == null || format.trim().equals("")) {
      format = FORMAT;
      }
-   DateFormat formatter = new SimpleDateFormat(format);
-   long time = System.currentTimeMillis();;
-   try {
-     if (timeS != null && !timeS.trim().equals("")) {       
-       Date timeD = formatter.parse(timeS);
-       time = timeD.getTime();
-       }
+   if (timeS == null || timeS.trim().equals("")) {
+     return System.currentTimeMillis();
      }
-   catch (ParseException e) {
-     log.error("Cannot parse time " + timeS + " as " + format + ", using current time");
-     }
-   return time;
+   return parseDate(timeS, format).getTime();
    }
+
+  /** Parse the entire input without calendar rollover; never substitute current time for bad input. */
+  private static Date parseDate(String timeS, String format) {
+    DateFormat formatter = new SimpleDateFormat(format);
+    formatter.setLenient(false);
+    ParsePosition position = new ParsePosition(0);
+    Date date = formatter.parse(timeS, position);
+    if (date == null || position.getIndex() != timeS.length()) {
+      throw new IllegalArgumentException("Cannot parse time " + timeS + " as " + format);
+      }
+    return date;
+    }
     
   /** Give the current time in human readable form.
     * @param format    The date format. <tt>null</tt> or empty will use the default format.
@@ -120,26 +112,26 @@ public class DateTimeManagement {
     return time2String(0, format);
     }
     
-  /** Give the time in human readable form using the default forma.
-    * @param timestamp The timestamp in ms.
+  /** Give the time in human readable form using the default format.
+    * @param time The timestamp in ms; zero means current time.
     * @return          The time derived from timestamp. */
   public static String time2String(long time) {
     return time2String(time, null);
     }
     
-  /** Give the current time in human readable form using the default forma.
+  /** Give the current time in human readable form using the default format.
      * @return          The current time derived from timestamp. */
   public static String time2String() {
     return time2String(0, null);
     }
    
   /** Give the time in human readable form.
-    * @param timestamp The timestamp in ms.
+    * @param timestamp The timestamp in ms; zero means current time.
     * @param format    The time format. <tt>null</tt> or empty will use the default format.
     * @return          The time derived from timestamp. */
   public static String time2String(long   timestamp,
                                    String format) {
-   if (format == null || !format.trim().equals("")) {
+   if (format == null || format.trim().equals("")) {
      format = FORMAT;
      }
     Date date;
@@ -157,8 +149,5 @@ public class DateTimeManagement {
   //private static String FORMAT = "yyyy MM dd HH:mm:ss.nnnnnnnnn";
   //private static String FORMAT = "yyyy MM dd HH:mm:ss.mm";
   //private static String FORMAT = "yyyy MM dd HH:mm:ss";
-  
-  /** Logging . */
-  private static Logger log = LogManager.getLogger(DateTimeManagement.class);
   
   }
