@@ -30,13 +30,16 @@ public class DateTimeManagementTest {
   private static void callerCalendarYear() {
     check(DateTimeManagement.string2time("23/10/2026 12:34", "dd/MM/YYYY HH:mm")
           == 1_792_758_840_000L, "HBaseTable week-year must parse as calendar year");
-    for (String input : new String[]{"31/02/2026 12:34", "23/10/2026 12:34suffix"}) {
-      try {
-        DateTimeManagement.string2time(input, "dd/MM/YYYY HH:mm");
-        throw new AssertionError("Invalid HBaseTable time accepted: " + input);
-      } catch (IllegalArgumentException expected) {
-        check(expected.getMessage().contains(input), "error must identify HBaseTable input");
-      }
+  }
+
+  // HBaseTable.jsp passes start/stop directly to string2time without validation or a catch.
+  // Caller-level validation and user-facing feedback remain separate future work.
+  private static void badJspInputFallsBackWithoutUncheckedException() {
+    for (String input : new String[]{"not-a-date", "31/02/2026 12:34", "23/10/2026 12:34suffix"}) {
+      long before = System.currentTimeMillis();
+      long value = DateTimeManagement.string2time(input, "dd/MM/YYYY HH:mm");
+      check(value >= before && value <= System.currentTimeMillis(),
+            "invalid HBaseTable start/stop must fall back to current time: " + input);
     }
   }
 
@@ -51,23 +54,23 @@ public class DateTimeManagementTest {
 
   private static void invalidTime() {
     for (String input : new String[]{"not-a-date", "2024-02-30", "2024-02-29suffix"}) {
-      try {
-        DateTimeManagement.string2time(input, "yyyy-MM-dd");
-        throw new AssertionError("Invalid time accepted: " + input);
-      } catch (IllegalArgumentException expected) {
-        check(expected.getMessage().contains(input), "error must identify the input");
-      }
+      long before = System.currentTimeMillis();
+      long value = DateTimeManagement.string2time(input, "yyyy-MM-dd");
+      check(value >= before && value <= System.currentTimeMillis(),
+            "invalid custom-format time must fall back to now: " + input);
     }
+    long before = System.currentTimeMillis();
+    long value = DateTimeManagement.string2time("not-a-date");
+    check(value >= before && value <= System.currentTimeMillis(),
+          "invalid default-format time must fall back to now");
   }
 
   private static void invalidJulianDate() {
     for (String input : new String[]{"not-a-date", "2024-02-30", "2024-02-29suffix"}) {
-      try {
-        DateTimeManagement.string2julianDate(input, "yyyy-MM-dd");
-        throw new AssertionError("Invalid Julian input accepted: " + input);
-      } catch (IllegalArgumentException expected) {
-        check(expected.getMessage().contains(input), "error must identify the input");
-      }
+      double before = DateTimeManagement.julianDate();
+      double value = DateTimeManagement.string2julianDate(input, "yyyy-MM-dd");
+      check(value >= before && value <= DateTimeManagement.julianDate(),
+            "invalid custom-format Julian date must fall back to now: " + input);
     }
   }
 
@@ -98,6 +101,7 @@ public class DateTimeManagementTest {
       customFormat();
       callerNanosecondFormats();
       callerCalendarYear();
+      badJspInputFallsBackWithoutUncheckedException();
       unsupportedPatternIsNotRewritten();
       invalidTime();
       invalidJulianDate();

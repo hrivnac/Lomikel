@@ -55,15 +55,18 @@ public class DateTimeManagement {
  /** Give {@link String} time (up to <tt>s</tt>) as Julian date.
    * @param timeS  The {@link String} time; null or blank means current time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
-   * @return       The Julian date (incl. fraction of a day).
-   * @throws IllegalArgumentException if nonempty time cannot be parsed in full. */
+   * @return       The Julian date (incl. fraction of a day); invalid input uses current time.
+   *               Callers must validate input separately to report errors to users. */
  public static double string2julianDate(String timeS,
                                         String format) {
    if (format == null || format.trim().equals("")) {
      format = FORMAT;
      }
    Date date = timeS == null || timeS.trim().equals("")
-             ? new Date() : parseDate(timeS, format);
+             ? null : parseDate(timeS, format);
+   if (date == null) {
+     date = new Date();
+     }
    Calendar calendar = Calendar.getInstance();
    calendar.setTime(date);
    return DateConverter.toJulianDate(calendar);
@@ -80,8 +83,8 @@ public class DateTimeManagement {
  /** Give {@link String} time in milliseconds.
    * @param timeS  The {@link String} time; null or blank means current time.
    * @param format The date format. <tt>null</tt> or empty will use the default format.
-   * @return       The time in milliseconds since the Unix epoch.
-   * @throws IllegalArgumentException if nonempty time cannot be parsed in full. */
+   * @return       The time in milliseconds since the Unix epoch; invalid input uses current time.
+   *               Callers must validate input separately to report errors to users. */
  public static long string2time(String timeS,
                                 String format) {
    if (format == null || format.trim().equals("")) {
@@ -90,10 +93,11 @@ public class DateTimeManagement {
    if (timeS == null || timeS.trim().equals("")) {
      return System.currentTimeMillis();
      }
-   return parseDate(timeS, format).getTime();
+   Date date = parseDate(timeS, format);
+   return date == null ? System.currentTimeMillis() : date.getTime();
    }
 
-  /** Parse the entire input without calendar rollover; never substitute current time for bad input. */
+  /** Parse the entire input without calendar rollover; return null for invalid date text. */
   private static Date parseDate(String timeS, String format) {
     // The HBaseTable input uses YYYY for a calendar year, not a week-year.
     if (format.equals("dd/MM/YYYY HH:mm")) {
@@ -103,10 +107,7 @@ public class DateTimeManagement {
     formatter.setLenient(false);
     ParsePosition position = new ParsePosition(0);
     Date date = formatter.parse(timeS, position);
-    if (date == null || position.getIndex() != timeS.length()) {
-      throw new IllegalArgumentException("Cannot parse time " + timeS + " as " + format);
-      }
-    return date;
+    return date != null && position.getIndex() == timeS.length() ? date : null;
     }
     
   /** Give the current time in human readable form.
