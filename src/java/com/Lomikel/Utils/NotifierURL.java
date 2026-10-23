@@ -4,6 +4,12 @@ package com.Lomikel.Utils;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.RejectedExecutionException;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -13,6 +19,24 @@ import org.apache.logging.log4j.LogManager;
   * to reqister call.
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class NotifierURL {
+
+  /** Package-private offline seam; production uses the URL's ordinary connection. */
+  @FunctionalInterface
+  interface ConnectionFactory {
+    HttpURLConnection open(URL url) throws IOException;
+    }
+
+  static volatile ConnectionFactory connectionFactory = url -> (HttpURLConnection)url.openConnection();
+
+  /** One daemon worker and a finite backlog; telemetry must never hold up callers or shutdown. */
+  private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0L,
+                                                                            TimeUnit.MILLISECONDS,
+                                                                            new ArrayBlockingQueue<>(64),
+                                                                            task -> {
+                                                                              Thread thread = new Thread(task, "NotifierURL-worker");
+                                                                              thread.setDaemon(true);
+                                                                              return thread;
+                                                                              });
 
   /** Connect to monitorring Web page.
     * Non-blocking.
@@ -50,13 +74,12 @@ public class NotifierURL {
                             String source,
                             String release,
                             String text) {
-    Thread thread = new Thread() {
-      @Override
-      public void run() {
-        notifyExecution(message, source, release, text);
-        }
-      };
-    thread.start();
+    try {
+      executor.execute(() -> notifyExecution(message, source, release, text));
+      }
+    catch (RejectedExecutionException e) {
+      log.debug("Notification queue full; dropping notification");
+      }
     }
     
   /** Connect to monitorring Web page.
@@ -75,12 +98,30 @@ public class NotifierURL {
         urlS += "&text=" + URLEncoder.encode(text, "UTF-8");
         }
       URL url = new URL(urlS);
-      HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-      conn.setRequestMethod("GET");
-      conn.getInputStream();
-      int rc = conn.getResponseCode();
-      String msg = conn.getResponseMessage();
-      log.debug(msg + " : " + rc);
+      HttpURLConnection conn = connectionFactory.open(url);
+      try {
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
+        conn.setRequestMethod("GET");
+        InputStream stream = conn.getInputStream();
+        try {
+          int rc = conn.getResponseCode();
+          String msg = conn.getResponseMessage();
+          log.debug(msg + " : " + rc);
+          }
+        finally {
+          stream.close();
+          }
+        }
+      finally {
+        try {
+          InputStream error = conn.getErrorStream();
+          if (error != null) error.close();
+          }
+        finally {
+          conn.disconnect();
+          }
+        }
       }
     catch (Exception e) {
       log.debug("Can not notify: " + message, e);
