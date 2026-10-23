@@ -19,6 +19,9 @@ public class Timer {
   public Timer(String msg,
                int    modulus,
                int    commitF) {
+    if (modulus == 0 || commitF == 0) {
+      throw new IllegalArgumentException("Timer frequencies must be positive or disabled (negative)");
+      }
     _msg     = msg;
     _modulus = modulus;
     _commitF = commitF;
