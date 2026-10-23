@@ -3,10 +3,11 @@ package com.Lomikel.Utils;
 // Java
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 // Log4J
 import org.apache.logging.log4j.Logger;
@@ -28,24 +29,20 @@ public class StringFile {
     }
     
   /** Create.
+    * Reads UTF-8 text. CR, LF, and CRLF line endings become LF; each line
+    * receives a trailing LF, including an unterminated final line.
+    * An empty file stays empty. Resources are closed even if reading fails.
     * @param file The file.
     * @throws LomikelException If file can't be read. */      
   public StringFile(File file) throws LomikelException {
     if (file.exists()) {
-      FileInputStream     fis = null;
-      BufferedInputStream bis = null;
-      DataInputStream     dis = null;
-      StringBuffer buffer = new StringBuffer();
-      try {
-        fis = new FileInputStream(file);
-        bis = new BufferedInputStream(fis);
-        dis = new DataInputStream(bis);
-        while (dis.available() != 0) {
-          buffer.append(dis.readLine() + "\n");
+      StringBuilder buffer = new StringBuilder();
+      try (BufferedReader reader = new BufferedReader(
+             new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          buffer.append(line).append('\n');
           }
-        fis.close();
-        bis.close();
-        dis.close();
         _content = buffer.toString();
         }
       catch (FileNotFoundException e) {
