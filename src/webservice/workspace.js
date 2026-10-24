@@ -131,9 +131,9 @@
     $().w2layout({
       name: 'layoutLeft',
       panels: [
-        { type: 'main', title: '02  /  Connection & actions', minSize: 90,
+        { type: 'main', title: '02  /  Connection & actions <button type="button" class="ws-title-help" data-ws-help="Top" aria-label="Connection and actions help" title="Connection and actions help">?</button>', minSize: 90,
           resizable: true, overflow: 'auto', style: leftStyle },
-        { type: 'bottom', title: '03  /  Graph', size: '78%', minSize: 210,
+        { type: 'bottom', title: '03  /  Graph <button type="button" class="ws-title-help" data-ws-help="GraphView" aria-label="Graph help" title="Graph help">?</button>', size: '78%', minSize: 210,
           resizable: true, overflow: 'auto', style: leftStyle }
       ],
       onResize: queueGraphResize
@@ -141,7 +141,7 @@
     $().w2layout({
       name: 'layoutMain',
       panels: [
-        { type: 'main', title: '04  /  Analysis', minSize: 220,
+        { type: 'main', title: '04  /  Analysis <button type="button" class="ws-title-help" data-ws-help="Result" aria-label="Results help" title="Results help">?</button>', minSize: 220,
           resizable: true, overflow: 'auto', style: rightStyle,
           tabs: {
             name: 'tabs',
@@ -153,10 +153,13 @@
               { id: 'plotTab', caption: 'Plot', tooltip: 'Plot view' },
               { id: 'skyviewTab', caption: 'SkyView', tooltip: 'SkyView view' }
             ],
-            onClick: function (event) { showTab(event.target.replace('Tab', '')); }
+            onClick: function (event) {
+              showTab(event.target.replace('Tab', ''));
+              if (typeof window.wsSetAnalysisHelp === 'function') window.wsSetAnalysisHelp(event.target);
+            }
           }
         },
-        { type: 'bottom', title: '05  /  Activity & commands', size: '10%', minSize: 55,
+        { type: 'bottom', title: '05  /  Activity & commands <button type="button" class="ws-title-help" data-ws-help="Feedback" aria-label="Activity help" title="Activity help">?</button>', size: '10%', minSize: 55,
           resizable: true, overflow: 'auto', style: rightBottomStyle }
       ],
       onResize: queueGraphResize
@@ -167,6 +170,7 @@
     w2ui.layoutLeft.load('bottom', 'webservice/GraphView.jsp');
     w2ui.layoutMain.load('main', 'Tabs.jsp');
     w2ui.layoutMain.load('bottom', 'Feedback.jsp');
+    if (typeof window.wsInstallHelp === 'function') window.wsInstallHelp();
     document.getElementById('restore-layout').addEventListener('click', resetLayout);
     document.getElementById('reset-workspace').addEventListener('click', window.reset);
     var versionDialog = document.getElementById('version-dialog');

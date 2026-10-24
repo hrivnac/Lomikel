@@ -1,0 +1,30 @@
+/* All question marks share one position and style in the opt-in workspace. */
+body.workspace #layout .w2ui-panel-title { position:relative; padding-right:46px; }
+body.workspace #layout .w2ui-panel-title .ws-title-help {
+  position:absolute; top:3px; right:9px; z-index:5; display:grid; place-items:center;
+  width:26px; height:26px; padding:0; border:1px solid #94b6af; border-radius:50%;
+  background:#fff; color:#216c5c; font:700 16px/1 system-ui,sans-serif;
+  box-shadow:0 1px 3px #18324a1b; cursor:pointer; text-transform:none; letter-spacing:0;
+}
+body.workspace #layout .w2ui-panel-title .ws-title-help:hover {
+  border-color:#18755c; background:#e5f5ed; color:#145744; box-shadow:0 2px 6px #18324a29;
+}
+body.workspace #layout .w2ui-panel-title .ws-title-help:focus-visible {
+  outline:2px solid #185d92; outline-offset:2px;
+}
+/* Original fragment buttons sit inside replaceable pane content, and can vanish on
+   pane loads. The persistent title buttons above replace them in this preview. */
+body.workspace #layout .w2ui-panel-content button[onclick*="Help-"] { display:none !important; }
+.w2ui-popup .ws-help-document { padding:20px 26px 24px; font:14px/1.65 system-ui,sans-serif;
+  color:#243c4a; background:#fff; }
+.w2ui-popup .ws-help-document h2 { margin:0 0 12px; font-size:18px; color:#185e4a; }
+.w2ui-popup .ws-help-document h3 { margin:17px 0 5px; font-size:14px; color:#245e79; }
+.w2ui-popup .ws-help-document p { margin:0 0 11px; }
+.w2ui-popup .ws-help-document ul { margin:5px 0 12px; padding-left:23px; }
+.w2ui-popup .ws-help-document li { margin:4px 0; }
+.w2ui-popup .ws-help-document code { color:#185e4a; background:#eef7f1;
+  border-radius:4px; padding:1px 4px; }
+.w2ui-popup .ws-help-document .ws-help-note { padding:10px 13px; border-left:3px solid #5ba889;
+  background:#f1f9f4; border-radius:0 6px 6px 0; }
+.w2ui-popup:has(.ws-help-document) .w2ui-popup-title { background:#eaf4ef; color:#195b47; font-weight:700; }
+.w2ui-popup:has(.ws-help-document) .w2ui-popup-buttons { background:#f5faf7; }
