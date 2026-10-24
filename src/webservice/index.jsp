@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="webservice/workspace.css">
   <link rel="stylesheet" href="webservice/panels.css">
-  <link rel="stylesheet" href="webservice/graph.css">
+  <link rel="stylesheet" href="webservice/graph.css?v=skyview-1">
   <link rel="stylesheet" href="webservice/help.css?v=1">
 </head>
 <body class="workspace">
@@ -86,7 +86,7 @@
     window.width = window.innerWidth;
     window.visheight = 360;
   </script>
-  <script src="webservice/workspace.js?v=panel-help-1"></script>
+  <script src="webservice/workspace.js?v=skyview-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
