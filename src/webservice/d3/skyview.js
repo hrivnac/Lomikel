@@ -15,6 +15,13 @@
     return Math.max(140, Math.floor(Math.min(width - 34, (height - 8) * 2)));
   }
   root.skyFitWidth = fitWidth;
+  function mapSize(canvas) {
+    // Celestial projects into CSS-sized coordinates, then scales the backing
+    // bitmap by devicePixelRatio. The backing width is not a hit-test width.
+    var scale = root.devicePixelRatio || 1;
+    return {width: parseFloat(canvas.style.width) || canvas.width / scale,
+      height: parseFloat(canvas.style.height) || canvas.height / scale};
+  }
 
   function render(values, requested, missing) {
     var points = prepare(values);
@@ -23,6 +30,14 @@
     var count = new Set(points.map(function (point) { return point.objectId; })).size;
     summary.textContent = count + ' of ' + requested + ' objects plotted (' + points.length +
       ' sky position' + (points.length === 1 ? '' : 's') + '). ' + missing + ' without coordinates.';
+    var legend = document.getElementById('sky-legend');
+    ['ZTF', 'LSST'].forEach(function (survey) {
+      if (!points.some(function (point) { return /^ZTF/.test(point.objectId) === (survey === 'ZTF'); })) return;
+      var key = document.createElement('span');
+      key.className = 'sky-legend-' + survey.toLowerCase();
+      key.textContent = survey;
+      legend.appendChild(key);
+    });
     var settings = document.getElementById('sky-settings-toggle');
     if (!points.length) {
       settings.hidden = true;
@@ -57,6 +72,35 @@
         geometry:{type:'Point',coordinates:[point.ra,point.dec]}};
     });
     var collection = {type:'FeatureCollection',features:features};
+    var hitPoints = [];
+    var tooltip = document.createElement('div');
+    tooltip.className = 'sky-hover';
+    tooltip.hidden = true;
+    stage.appendChild(tooltip);
+    function hideTooltip() { tooltip.hidden = true; }
+    function installHover() {
+      var canvas = stage.querySelector('canvas');
+      if (!canvas) return;
+      canvas.addEventListener('pointermove', function (event) {
+        var rect = canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return hideTooltip();
+        var size = mapSize(canvas);
+        var x = (event.clientX - rect.left) * size.width / rect.width;
+        var y = (event.clientY - rect.top) * size.height / rect.height;
+        var nearest = null, distance = Infinity;
+        hitPoints.forEach(function (point) {
+          var d = Math.hypot(point.x - x, point.y - y);
+          if (d < distance) { nearest = point; distance = d; }
+        });
+        if (!nearest || distance > 8 * size.width / rect.width) return hideTooltip();
+        tooltip.textContent = nearest.objectId;
+        var stageRect = stage.getBoundingClientRect();
+        tooltip.style.left = (rect.left - stageRect.left + nearest.x * rect.width / size.width) + 'px';
+        tooltip.style.top = (rect.top - stageRect.top + nearest.y * rect.height / size.height - 10) + 'px';
+        tooltip.hidden = false;
+      });
+      canvas.addEventListener('pointerleave', hideTooltip);
+    }
     Celestial.add({type:'point',
       callback: function (error) {
         if (error) { summary.textContent += ' Background sky data could not be loaded.'; return; }
@@ -64,8 +108,10 @@
         Celestial.container.selectAll('.sky-objects').data(transformed.features).enter()
           .append('path').attr('class','sky-objects');
         Celestial.redraw();
+        installHover();
       },
       redraw: function () {
+        hitPoints = [];
         Celestial.container.selectAll('.sky-objects').each(function (point) {
           if (!Celestial.clip(point.geometry.coordinates)) return;
           var xy = Celestial.mapProjection(point.geometry.coordinates);
@@ -75,6 +121,23 @@
           Celestial.context.arc(xy[0],xy[1],4,0,2*Math.PI);
           Celestial.context.closePath();
           Celestial.context.stroke(); Celestial.context.fill();
+          hitPoints.push({x:xy[0],y:xy[1],objectId:point.properties.objectId});
+          Celestial.context.save();
+          Celestial.context.font = '9px system-ui, sans-serif';
+          Celestial.context.textAlign = 'left';
+          Celestial.context.textBaseline = 'middle';
+          Celestial.context.lineWidth = 2.5;
+          Celestial.context.strokeStyle = '#fff';
+          Celestial.context.fillStyle = point.properties.color;
+          var canvasSize = mapSize(Celestial.context.canvas);
+          var textWidth = Celestial.context.measureText(point.properties.objectId).width;
+          var labelX = xy[0] + 7;
+          if (labelX + textWidth > canvasSize.width - 4) labelX = xy[0] - textWidth - 7;
+          labelX = Math.max(4, labelX);
+          var labelY = Math.max(7, Math.min(canvasSize.height - 7, xy[1] - 7));
+          Celestial.context.strokeText(point.properties.objectId, labelX, labelY);
+          Celestial.context.fillText(point.properties.objectId, labelX, labelY);
+          Celestial.context.restore();
         });
       }
     });
