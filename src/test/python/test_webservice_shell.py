@@ -124,6 +124,36 @@ class WebserviceShellTest(unittest.TestCase):
         self.assertIn('.venn-contained .venn-area text.label', css)
         self.assertIn('grid-template-columns', css)
 
+    def test_graph_tables_keep_plot_controls(self):
+        for name in ('Nodes.jsp', 'Edges.jsp'):
+            page = (ROOT / 'src/ws' / name).read_text()
+            self.assertIn('TableView.js?v=table-1', page)
+            self.assertIn('Nodes.css?v=table-1', page)
+            self.assertIn('plotTableDetailFormatter(index, row)', page)
+            self.assertIn('plotTableFieldName(', page)
+            self.assertIn('data-detail-formatter=\'detailFormatter\'', page)
+        edge = (ROOT / 'src/ws/Edges.jsp').read_text()
+        self.assertIn('showCorrelogram("from", "to", "sizeIn", "sizeOut")', edge)
+
+    @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
+    def test_built_war_contains_table_scatter(self):
+        with ZipFile(WAR) as archive:
+            for relative in ('TableView.js', 'LoadPane.js', 'Nodes.css', 'Nodes.jsp', 'Edges.jsp',
+                             'd3/scatterplot.js', 'd3/scatterplot.css', 'd3/scatterplot.jsp',
+                             'd3/actions.js', 'd3/skyview.jsp', 'd3/correlogram.jsp'):
+                self.assertEqual(archive.read(relative), (ROOT / 'src/ws' / relative).read_bytes(), relative)
+
+    def test_plot_actions_refresh_in_all_views(self):
+        for name in ('scatterplot.jsp', 'skyview.jsp', 'correlogram.jsp'):
+            page = (ROOT / 'src/ws/d3' / name).read_text()
+            self.assertIn('actions.js?v=table-1', page, name)
+
+    def test_scatter_view_uses_quoted_labels_and_fresh_assets(self):
+        scatter = (ROOT / 'src/ws/d3/scatterplot.jsp').read_text()
+        for token in ('scatterplot.js?v=table-1', 'scatterplot.css?v=table-1',
+                      'JSONObject.quote(name)', 'JSONObject.quote(x)', 'JSONObject.quote(y)'):
+            self.assertIn(token, scatter)
+
     @unittest.skipUnless(WAR.exists(), "Build locally with ant war first")
     def test_preview_war_has_substituted_panel_fragments(self):
         with ZipFile(WAR) as archive:
