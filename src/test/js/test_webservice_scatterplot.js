@@ -19,6 +19,10 @@ assert.equal(context.scatterPlotInfoLines({x:3,y:7,z:null,g:'Class A',k:'',raw:{
 assert.equal(context.scatterPlotInfoLines({x:2,y:7,z:null,g:'',k:'sizeOut=7',raw:{xField:'fluxErr',yField:'sizeOut'}},true,
   'fluxErr flux','sizeOut','','').join('\n'), 'sizeOut - 7\nfluxErr - 2');
 const js = fs.readFileSync(path.join(base, 'scatterplot.js'), 'utf8');
+assert.notEqual(context.scatterPlotSeriesDash('fluxErr',['fluxErr','flux']),
+  context.scatterPlotSeriesDash('flux',['fluxErr','flux']),
+  'two time series remain visually distinct even with the same s color');
+assert.match(js, /stroke-dasharray/);
 const css = fs.readFileSync(path.join(base, 'scatterplot.css'), 'utf8');
 assert.doesNotMatch(js, /append\('div'\)\.attr\('class', 'scatter-legend'\)/);
 assert.doesNotMatch(css, /\.scatter-legend/);
