@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="webservice/workspace.css">
   <link rel="stylesheet" href="webservice/panels.css">
   <link rel="stylesheet" href="webservice/graph.css">
+  <link rel="stylesheet" href="webservice/help.css?v=1">
 </head>
 <body class="workspace">
   <div class="workspace-frame">
@@ -78,13 +79,14 @@
   <script src="Sleep.js"></script>
   <script src="LoadPane.js"></script>
   <script src="Help.js"></script>
+  <script src="webservice/help.js?v=1"></script>
   <script>
     // Legacy GraphView.jsp reads the global viewport height while creating #vis.
     window.height = window.innerHeight;
     window.width = window.innerWidth;
     window.visheight = 360;
   </script>
-  <script src="webservice/workspace.js?v=correlogram-1"></script>
+  <script src="webservice/workspace.js?v=panel-help-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
@@ -95,10 +97,9 @@
       var scroller = pane.parentElement || pane;
       scroller.scrollTop = scroller.scrollHeight;
     };
-    var helpButton = '<button onClick="w2popup.load({url:\'Help-Top.html\', showMax:true})" style="position:absolute;top:0;right:0"><img src="images/Help.png" width="10"/></button>';
     window.commands = function (info, actions) {
       var pane = document.getElementById('commands');
-      if (pane) pane.innerHTML = info + helpButton + '<hr/>' + actions;
+      if (pane) pane.innerHTML = info + '<hr/>' + actions;
     };
     $.getScript('profiles/<%= p %>.js');
   </script>
