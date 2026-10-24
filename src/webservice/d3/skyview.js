@@ -9,6 +9,12 @@
     });
   }
   root.skyPrepare = prepare;
+  function fitWidth(width, height) {
+    // The Aitoff canvas is about twice as wide as it is high. Reserve room for
+    // its border and fit both dimensions rather than clipping the bottom.
+    return Math.max(140, Math.floor(Math.min(width - 34, (height - 8) * 2)));
+  }
+  root.skyFitWidth = fitWidth;
 
   function render(values, requested, missing) {
     var points = prepare(values);
@@ -17,7 +23,17 @@
     var count = new Set(points.map(function (point) { return point.objectId; })).size;
     summary.textContent = count + ' of ' + requested + ' graph objects plotted (' + points.length +
       ' sky position' + (points.length === 1 ? '' : 's') + '). ' + missing + ' without coordinates.';
-    if (!points.length) { list.textContent = 'No coordinates were found for objects in this graph.'; return; }
+    var settings = document.getElementById('sky-settings-toggle');
+    if (!points.length) {
+      settings.hidden = true;
+      list.textContent = 'No coordinates were found for objects in this graph.';
+      return;
+    }
+    settings.addEventListener('click', function () {
+      var expanded = document.body.classList.toggle('sky-settings-open');
+      settings.setAttribute('aria-expanded', String(expanded));
+      resizeMap();
+    });
     var fragment = document.createDocumentFragment();
     points.forEach(function (point) {
       var row = document.createElement('div');
@@ -27,13 +43,15 @@
     });
     list.appendChild(fragment);
     var config = {
-      form: true, formFields: {download: true},
+      form: true, controls: true, formFields: {download:true},
       datapath: '../../d3-celestial-0.7.32/data/',
       projection: 'aitoff', transform: 'galactic',
       background: {fill:'#fff', stroke:'#607584', opacity:1, width:1},
       stars: {colors:false, names:false, propername:false, style:{fill:'#bcc8d2',opacity:1},limit:6,size:3},
       dsos: {show:false}, mw: {style:{fill:'#996',opacity:.08}}
     };
+    var stage = document.getElementById('celestial-map');
+    config.width = fitWidth(stage.clientWidth, stage.clientHeight);
     var features = points.map(function (point) {
       return {type:'Feature', properties:{objectId:point.objectId, color:/^ZTF/.test(point.objectId)?'#df6e35':'#266cac'},
         geometry:{type:'Point',coordinates:[point.ra,point.dec]}};
@@ -61,6 +79,20 @@
       }
     });
     Celestial.display(config);
+    var lastWidth = config.width;
+    function resizeMap() {
+      var width = fitWidth(stage.clientWidth, stage.clientHeight);
+      if (width === lastWidth) return;
+      lastWidth = width;
+      Celestial.resize({width:width});
+    }
+    if (root.ResizeObserver) {
+      root.skyResizeObserver = new root.ResizeObserver(resizeMap);
+      root.skyResizeObserver.observe(stage);
+      if (root.frameElement) root.skyResizeObserver.observe(root.frameElement);
+    }
+    document.getElementById('sky-coordinates').addEventListener('toggle', resizeMap);
+    root.addEventListener('resize', resizeMap);
   }
   root.skyRender = render;
   var element = document.getElementById('sky-points');
