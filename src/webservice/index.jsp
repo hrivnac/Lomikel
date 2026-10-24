@@ -84,7 +84,7 @@
     window.width = window.innerWidth;
     window.visheight = 360;
   </script>
-  <script src="webservice/workspace.js"></script>
+  <script src="webservice/workspace.js?v=scatter-details-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
