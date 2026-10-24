@@ -19,6 +19,7 @@ for (const name of names) {
 const skyHelp = fs.readFileSync(path.join(root, 'Help-SkyView.html'), 'utf8');
 assert.match(skyHelp, /<strong>Sky<\/strong>.*<code>ra<\/code>.*<code>dec<\/code>/);
 assert.match(skyHelp, /<strong>SkyView<\/strong>.*graph.*object/i);
+assert.match(skyHelp, /Map settings.*Plotted object coordinates/);
 assert.doesNotMatch(skyHelp, /SkyView action/);
 assert.match(shell, /data-ws-help="Top"/);
 assert.match(shell, /data-ws-help="GraphView"/);

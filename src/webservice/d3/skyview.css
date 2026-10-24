@@ -1,6 +1,35 @@
-* {box-sizing:border-box} body {margin:0;padding:12px 16px;font:13px/1.45 system-ui,sans-serif;color:#223b4d;background:#f8fbff}
-header {display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 14px} h1 {font-size:17px;color:#255e88;margin:0} header p {margin:0;color:#4a6479}
-#celestial-map {max-width:100%;overflow:auto;border:1px solid #ccdae5;background:white;border-radius:8px;margin-top:10px}
-#celestial-form {margin:10px 0} section {border:1px solid #d4e2ec;background:white;border-radius:8px;margin:10px 0;padding:9px 12px}
-section h2 {font-size:13px;margin:0 0 6px;color:#286785} #sky-list {max-height:190px;overflow:auto}
+* {box-sizing:border-box}
+html,body {height:100%;width:100%;margin:0}
+body {display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:8px 10px;
+  font:13px/1.4 system-ui,sans-serif;color:#223b4d;background:#f8fbff}
+header {flex:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
+h1 {font-size:15px;color:#255e88;margin:0} header p {margin:0;color:#4a6479}
+#sky-settings-toggle {margin-left:auto;padding:3px 8px;border:1px solid #a8c4d7;
+  border-radius:5px;background:white;color:#286785;cursor:pointer}
+#sky-settings-toggle:focus-visible {outline:2px solid #286785;outline-offset:2px}
+/* Celestial's vendored stylesheet forces a 720px minimum; this map must fit its iframe. */
+#celestial-map {flex:1 1 auto;min-width:0!important;min-height:0;width:100%!important;
+  height:auto!important;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  border:1px solid #ccdae5;background:white;border-radius:8px;margin:6px 0 0}
+#celestial-map canvas {max-width:100%;max-height:100%;height:auto!important}
+#celestial-form {flex:none;display:block;max-width:100%;margin:4px 0;font-size:12px}
+#celestial-form form {margin:0}
+#celestial-form .ctrl {width:100%}
+#celestial-form .col:not(#download) {display:none!important}
+.sky-settings-open #celestial-form {position:absolute;z-index:5;top:48px;right:10px;bottom:36px;
+  width:min(440px,calc(100% - 20px));max-width:calc(100% - 20px);max-height:calc(100% - 84px);
+  margin:0;padding:7px;overflow:auto;border:1px solid #b9d0df;border-radius:8px;
+  box-shadow:0 8px 24px #17345033;background:#fff}
+.sky-settings-open #celestial-form .col:not(#download) {display:block!important}
+#celestial-form #download {border:0;margin:0;padding:0;display:flex!important;align-items:center;justify-content:center;gap:8px}
+#celestial-form #download label {display:none}
+#celestial-form #download input#download-png,
+#celestial-form #download input#download-svg {margin:0;font-size:12px}
+
+#sky-coordinates {flex:none;border:1px solid #d4e2ec;background:white;border-radius:8px;
+  margin:2px 0;padding:3px 9px;max-height:38%;overflow:auto}
+#sky-coordinates summary {font-weight:600;color:#286785;cursor:pointer}
+#sky-coordinates summary:focus-visible {outline:2px solid #286785;outline-offset:2px}
+#sky-list {max-height:180px;overflow:auto}
 .sky-coordinate {padding:3px 1px;border-bottom:1px solid #eff3f6;overflow-wrap:anywhere}
+@media(max-height:320px) { body {overflow:auto} #celestial-map {min-height:140px} }

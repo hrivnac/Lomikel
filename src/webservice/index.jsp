@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="webservice/workspace.css">
   <link rel="stylesheet" href="webservice/panels.css">
-  <link rel="stylesheet" href="webservice/graph.css?v=skyview-1">
+  <link rel="stylesheet" href="webservice/graph.css?v=skyview-2">
   <link rel="stylesheet" href="webservice/help.css?v=1">
 </head>
 <body class="workspace">
