@@ -7,6 +7,11 @@
   var oldShow = window.show;
   var oldDispose = window.disposeGraphView;
   var MAX_OBJECTS = 500;
+  function cancel() {
+    sequence++;
+    if (activeRequest) activeRequest.abort();
+    activeRequest = null;
+  }
 
   function getIds() {
     var distinct = new Set();
@@ -31,8 +36,7 @@
     return result;
   };
   window.disposeGraphView = function () {
-    sequence++;
-    if (activeRequest) activeRequest.abort();
+    cancel();
     objectIds.clear();
     return oldDispose.apply(this, arguments);
   };
@@ -49,7 +53,7 @@
     // the activity log and URL through the generic loadPane helper.
     var frame = document.createElement('iframe');
     frame.name = 'skyGraphFrame';
-    frame.title = 'Sky map of objects in the graph';
+    frame.title = 'Sky map of objects';
     frame.width = '100%';
     frame.height = '100%';
     document.getElementById('skyview').replaceChildren(frame);
@@ -71,13 +75,13 @@
     showTab('skyview');
     w2ui.layoutMain.panels[0].tabs.click('skyviewTab');
   }
-  async function open() {
+  async function openIds(objectIdsToPlot, source) {
     var current = ++sequence;
     if (activeRequest) activeRequest.abort();
-    var ids = getIds();
-    if (!ids.length) { showStatus('No object vertices are in the current graph.'); return; }
+    var ids = Array.from(new Set(objectIdsToPlot));
+    if (!ids.length) { showStatus('No objects are in the current ' + source + '.'); return; }
     if (ids.length > MAX_OBJECTS) {
-      showStatus('The graph has more than ' + MAX_OBJECTS + ' objects. Reduce the graph before plotting all objects.');
+      showStatus('The ' + source + ' has more than ' + MAX_OBJECTS + ' objects. Reduce it before plotting all objects.');
       return;
     }
     showStatus('Looking up sky positions for ' + ids.length + ' objects…');
@@ -106,5 +110,8 @@
       if (activeRequest === controller) activeRequest = null;
     }
   }
-  window.skyGraphState = {getIds: getIds, open: open};
+  function open() { return openIds(getIds(), 'graph'); }
+  window.skyGraphState = {getIds: getIds, open: open, cancel: cancel, openIds: function (ids) {
+    return openIds(ids, 'table');
+  }};
 })();

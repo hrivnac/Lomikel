@@ -15,7 +15,7 @@ assert.match(graph, /iframe\[name="skyGraphFrame"\]\s*\{[^}]*height:\s*100%/);
 assert.match(css, /#celestial-map\s*\{[^}]*min-width:\s*0/);
 assert.match(css, /body\s*\{[^}]*display:\s*flex/);
 assert.match(jsp, /skyview\.css\?v=skyview-2/);
-assert.match(jsp, /skyview\.js\?v=skyview-2/);
+assert.match(jsp, /skyview\.js\?v=skyview-3/);
 assert.match(code, /formFields:\s*\{download:\s*true\}/);
 assert.match(code, /controls:\s*true/);
 assert.match(jsp, /<% if \(errorMessage == null\) \{ %><button type="button" id="sky-settings-toggle"/);

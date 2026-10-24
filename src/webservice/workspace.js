@@ -50,6 +50,20 @@
     if (pane === 'skyview' && url === 'webservice/d3/skyview.jsp' && window.skyGraphState) {
       return window.skyGraphState.open();
     }
+    // Nodes.jsp's Sky button builds a coordinate-only URL. Object tables have
+    // objectId, not ra/dec; use their actual rows with the same lookup and
+    // POST renderer as the graph action. Other table types keep the old route.
+    if (pane === 'skyview' && /^d3\/skyview\.jsp\?/.test(url) && window.skyGraphState) {
+      var rows = window.tdata;
+      if (Array.isArray(rows) && rows.length && rows.every(function (row) {
+        return row && window.plotTableScalar(row.lbl) === 'object';
+      })) {
+        return window.skyGraphState.openIds(rows.map(function (row) {
+          return row.objectId == null ? '' : String(window.plotTableScalar(row.objectId)).trim();
+        }).filter(Boolean));
+      }
+    }
+    if (pane === 'skyview' && window.skyGraphState) window.skyGraphState.cancel();
     if (pane === 'plot' && iframe && encoded && /^d3\/scatterplot\.jsp\?/.test(url)) {
       try {
         var query = new URL(url, document.baseURI).searchParams;

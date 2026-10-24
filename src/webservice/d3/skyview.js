@@ -1,4 +1,4 @@
-/* Opt-in graph-wide SkyView, keeping object IDs as text and positions as numbers. */
+/* Opt-in object SkyView, keeping object IDs as text and positions as numbers. */
 (function (root) {
   'use strict';
   function prepare(values) {
@@ -21,12 +21,12 @@
     var summary = document.getElementById('sky-summary');
     var list = document.getElementById('sky-list');
     var count = new Set(points.map(function (point) { return point.objectId; })).size;
-    summary.textContent = count + ' of ' + requested + ' graph objects plotted (' + points.length +
+    summary.textContent = count + ' of ' + requested + ' objects plotted (' + points.length +
       ' sky position' + (points.length === 1 ? '' : 's') + '). ' + missing + ' without coordinates.';
     var settings = document.getElementById('sky-settings-toggle');
     if (!points.length) {
       settings.hidden = true;
-      list.textContent = 'No coordinates were found for objects in this graph.';
+      list.textContent = 'No coordinates were found for these objects.';
       return;
     }
     settings.addEventListener('click', function () {
