@@ -81,6 +81,26 @@
         // Malformed legacy payloads should keep their original route and error handling.
       }
     }
+    if (pane === 'plot' && iframe && /^d3\/correlogram\.jsp\?/.test(url)) {
+      var corrData = [];
+      var invalidCorr = false;
+      try {
+        var corrQuery = new URL(url, document.baseURI).searchParams;
+        var parsedCorr = JSON.parse(corrQuery.get('tdata'));
+        if (Array.isArray(parsedCorr) && parsedCorr.every(function (item) {
+          return item && typeof item === 'object' && 'x' in item && 'y' in item && 'value' in item && 'info' in item;
+        })) corrData = parsedCorr;
+        else invalidCorr = true;
+      } catch (error) {
+        invalidCorr = true;
+      }
+      // Never fall back to the legacy JSP: it embeds raw tdata in an inline script.
+      var safeQuery = new URLSearchParams();
+      safeQuery.set('tdata', JSON.stringify(corrData));
+      if (invalidCorr) safeQuery.set('invalid', '1');
+      url = 'webservice/d3/correlogram.jsp?' + safeQuery.toString();
+      encoded = true;
+    }
     return legacyLoadPane.call(this, pane, url, iframe, height, encoded);
   };
 
