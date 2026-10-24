@@ -1,0 +1,6 @@
+* {box-sizing:border-box} body {margin:0;padding:12px 16px;font:13px/1.45 system-ui,sans-serif;color:#223b4d;background:#f8fbff}
+header {display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 14px} h1 {font-size:17px;color:#255e88;margin:0} header p {margin:0;color:#4a6479}
+#celestial-map {max-width:100%;overflow:auto;border:1px solid #ccdae5;background:white;border-radius:8px;margin-top:10px}
+#celestial-form {margin:10px 0} section {border:1px solid #d4e2ec;background:white;border-radius:8px;margin:10px 0;padding:9px 12px}
+section h2 {font-size:13px;margin:0 0 6px;color:#286785} #sky-list {max-height:190px;overflow:auto}
+.sky-coordinate {padding:3px 1px;border-bottom:1px solid #eff3f6;overflow-wrap:anywhere}

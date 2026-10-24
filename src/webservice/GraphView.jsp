@@ -39,4 +39,6 @@
 </div>
 <script type="text/javascript" src="StylesheetDefault.js"></script>
 <script type="text/javascript" src="Stylesheet.js"></script>
+<script type="text/javascript" src="webservice/Stylesheet.js?v=skyview-1"></script>
 <script type="text/javascript" src="GraphView.js"></script>
+<script type="text/javascript" src="webservice/skyview-graph.js?v=skyview-1"></script>

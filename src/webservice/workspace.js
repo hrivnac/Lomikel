@@ -47,6 +47,9 @@
   // Only encoded graph-table Scatter requests have the JSON point contract.
   // Evolution and HBase use older payloads and remain on the legacy renderer.
   window.loadPane = function (pane, url, iframe, height, encoded) {
+    if (pane === 'skyview' && url === 'webservice/d3/skyview.jsp' && window.skyGraphState) {
+      return window.skyGraphState.open();
+    }
     if (pane === 'plot' && iframe && encoded && /^d3\/scatterplot\.jsp\?/.test(url)) {
       try {
         var query = new URL(url, document.baseURI).searchParams;
@@ -113,6 +116,8 @@
     loadPane('image', 'Image.jsp');
     loadPane('plot', 'Plot.jsp');
     loadPane('result', 'Result.jsp');
+    var skyview = document.getElementById('skyview');
+    if (skyview) skyview.replaceChildren();
     showTab('graph');
   };
 
