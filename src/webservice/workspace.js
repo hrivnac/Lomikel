@@ -43,6 +43,47 @@
     window.setTimeout(queueGraphResize, 100);
   }
 
+  var legacyLoadPane = window.loadPane;
+  // Only encoded graph-table Scatter requests have the JSON point contract.
+  // Evolution and HBase use older payloads and remain on the legacy renderer.
+  window.loadPane = function (pane, url, iframe, height, encoded) {
+    if (pane === 'plot' && iframe && encoded && /^d3\/scatterplot\.jsp\?/.test(url)) {
+      try {
+        var query = new URL(url, document.baseURI).searchParams;
+        if (query.has('tdata')) {
+          var points = JSON.parse(query.get('tdata'));
+          var rows = window.tdata;
+          var xs = (query.get('x') || '').trim().split(/\s+/);
+          var ys = (query.get('y') || '').trim().split(/\s+/);
+          if (Array.isArray(points) && Array.isArray(rows) && xs[0] && ys[0]) {
+            var pairs = [];
+            rows.forEach(function (row) {
+              xs.forEach(function (x) {
+                ys.forEach(function (y) {
+                  if (row[x] == null || row[y] == null || row[x] === '' || row[y] === '') return;
+                  pairs.push({x: x, y: y, xValue: window.plotTableScalar(row[x]),
+                              yValue: window.plotTableScalar(row[y])});
+                });
+              });
+            });
+            if (pairs.length === points.length) points.forEach(function (point, index) {
+              var pair = pairs[index];
+              if (String(point.x) === String(pair.xValue) && String(point.y) === String(pair.yValue)) {
+                point.xField = pair.x;
+                point.yField = pair.y;
+              }
+            });
+          }
+          query.set('tdata', JSON.stringify(points));
+          url = 'webservice/d3/scatterplot.jsp?' + query.toString();
+        }
+      } catch (error) {
+        // Malformed legacy payloads should keep their original route and error handling.
+      }
+    }
+    return legacyLoadPane.call(this, pane, url, iframe, height, encoded);
+  };
+
   // Preserve the legacy reset contract after moving panel 01 into the header.
   window.reset = function () {
     if (typeof window.disposeGraphView === 'function') window.disposeGraphView();

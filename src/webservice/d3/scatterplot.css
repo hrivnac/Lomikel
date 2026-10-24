@@ -1,0 +1,51 @@
+#scatter_area {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #dbe5ef;
+  border-radius: 12px;
+  background: #fff;
+  color: #243449;
+  font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.scatter-header { display: flex; flex-direction: column; gap: 2px; padding: 0 6px 10px; }
+.scatter-header strong { font-size: 16px; overflow-wrap: anywhere; }
+.scatter-header span { font-size: 12px; color: #506982; overflow-wrap: anywhere; }
+.scatterplot {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  height: auto;
+  margin: 0 auto;
+  background: #fff;
+}
+.scatter-grid line { stroke: #e9eff5; stroke-dasharray: 3 4; }
+.scatter-grid path { display: none; }
+.scatter-axis { color: #7a8ca1; font-size: 11px; }
+.scatter-axis-title { fill: #365b82; font-size: 13px; font-weight: 650; }
+.scatter-point { stroke: #fff; stroke-width: 1.5px; fill-opacity: .78; cursor: pointer; }
+.scatter-point:hover, .scatter-point:focus-visible {
+  fill-opacity: 1;
+  stroke: #243449;
+  stroke-width: 2px;
+  outline: none;
+}
+.scatter-tip {
+  position: absolute;
+  z-index: 2;
+  max-width: min(280px, 85%);
+  padding: 8px 10px;
+  border: 1px solid #b9cde0;
+  border-radius: 7px;
+  background: #f8fbff;
+  box-shadow: 0 5px 18px rgba(23, 47, 74, .16);
+  color: #243449;
+  opacity: 0;
+  pointer-events: none;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  transition: opacity .12s ease;
+}
+.scatter-tip.is-visible { opacity: 1; }
+.scatter-empty { margin: 8px 6px; color: #506982; }
