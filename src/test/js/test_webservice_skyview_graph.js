@@ -9,7 +9,7 @@ const graphCode = fs.readFileSync(path.join(root, 'skyview-graph.js'), 'utf8');
 const workspaceCode = fs.readFileSync(path.join(root, 'workspace.js'), 'utf8');
 const graphPage = fs.readFileSync(path.join(root, 'GraphView.jsp'), 'utf8');
 assert.match(graphPage, /webservice\/Stylesheet\.js\?v=skyview-1/);
-assert.match(graphPage, /webservice\/skyview-graph\.js\?v=skyview-1/);
+assert.match(graphPage, /webservice\/skyview-graph\.js\?v=skyview-2/);
 assert.match(workspaceCode, /skyGraphState\.open\(\)/);
 const style = {nodes:{object:{actions:[{name:'Table',url:'Nodes.jsp',target:'table'}]}}};
 vm.runInNewContext(stylesheetCode, {stylesheet:style});
