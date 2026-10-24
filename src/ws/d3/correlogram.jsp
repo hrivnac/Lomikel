@@ -22,7 +22,7 @@
   String tdata = request.getParameter("tdata");
   %>
   
-<script src="actions.js"     type="text/javascript"></script>
+<script src="actions.js?v=table-1" type="text/javascript"></script>
 <script src="correlogram.js" type="text/javascript"></script>
 <script src="venn.js?v=vertical-2" type="text/javascript"></script>
   

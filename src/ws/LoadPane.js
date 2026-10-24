@@ -1,4 +1,4 @@
-async function loadPane(pane, url, iframe, height) {
+async function loadPane(pane, url, iframe, height, encoded) {
   while (!document.getElementById(pane)) {
     await sleep(1000);
     }
@@ -9,7 +9,8 @@ async function loadPane(pane, url, iframe, height) {
     var scroller = feedbackPane.parentElement || feedbackPane;
     scroller.scrollTop = scroller.scrollHeight;
     }
-  url = encodeURI(url);
+  // Plot URLs built with encodeURIComponent are already safe for iframe POST.
+  if (!encoded) url = encodeURI(url);
   if (!height) {
     height = "100%";
     }

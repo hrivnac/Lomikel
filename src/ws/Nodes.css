@@ -1,5 +1,9 @@
 .x, .y, .z, .s, .k {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
   }
 
 input[type="checkbox"][name^="x1_"] + label {
@@ -95,4 +99,63 @@ input[type="checkbox"][name^="k1_"]:checked + label {
   border: 1px solid white;
   color: white;
   background-color: brown;
-  } 
+  }
+
+/* The original x/y/z/s/k palette remains the plotting control vocabulary. */
+.plot-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 8px 0 12px;
+  padding: 12px 14px;
+  border: 1px solid #dbe5ef;
+  border-radius: 10px;
+  background: #f7faff;
+  color: #243449;
+}
+.plot-table-intro { display: flex; flex-direction: column; line-height: 1.4; }
+.plot-table-intro strong { font-size: 15px; }
+.plot-table-intro span { color: #506982; font-size: 12px; }
+.plot-table-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.plot-table-actions button {
+  position: static;
+  min-height: 30px;
+  padding: 4px 9px;
+  border: 1px solid #bacce0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.plot-table-actions button:hover { border-color: #365b82; }
+.plot-table-grid { width: 100%; font-variant-numeric: tabular-nums; }
+.plot-table-grid thead th { white-space: nowrap; color: #294966; }
+.plot-table-grid tbody td { vertical-align: top; overflow-wrap: anywhere; }
+.plot-table-grid tbody tr:not(.detail-view):hover { background: #edf5fc; }
+.plot-table-grid .detail-view > td { padding: 10px; background: #f8fbff; }
+.plot-properties { display: grid; gap: 6px; }
+.plot-property {
+  display: grid;
+  grid-template-columns: 118px minmax(100px, .7fr) minmax(0, 1.5fr);
+  align-items: start;
+  gap: 10px;
+  padding: 7px 9px;
+  border: 1px solid #e1e9f1;
+  border-radius: 6px;
+  background: #fff;
+}
+.plot-roles { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.plot-roles label {
+  flex: 0 0 auto;
+  min-width: 18px;
+  height: 22px;
+  line-height: 20px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.plot-roles input:focus-visible + label { outline: 2px solid #1f4e85; outline-offset: 2px; }
+.plot-field-name { font-weight: 650; color: #365b82; overflow-wrap: anywhere; }
+.plot-field-value { color: #243449; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .plot-property { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+}

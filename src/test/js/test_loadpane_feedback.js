@@ -21,5 +21,20 @@ async function testPaneLoadLogsTextNotMarkup() {
   assert.equal(events[0].text, 'Loading top : Top.jsp?name=<img onerror=alert(1)>');
 }
 
-testPaneLoadLogsTextNotMarkup().then(()=>console.log('LoadPane feedback test passed'),
+async function testEncodedPlotURLIsNotEncodedTwice() {
+  const pane = {innerHTML:''};
+  const calls = [];
+  const ctx = vm.createContext({
+    document:{getElementById:id=>({plot:pane})[id]||null},
+    $:()=>({}), sleep:async()=>{}, console, encodeURI,
+    showTab:()=>{}, w2ui:{layoutMain:{panels:[{tabs:{click:()=>{}}}]}}
+  });
+  vm.runInContext(source, ctx);
+  ctx.postUrlToIframe = url=>calls.push(url);
+  await ctx.loadPane('plot', 'd3/scatterplot.jsp?tdata=%5B%7B%22x%22%3A0%7D%5D', true, 400, true);
+  assert.equal(calls[0], 'd3/scatterplot.jsp?tdata=%5B%7B%22x%22%3A0%7D%5D');
+}
+
+testPaneLoadLogsTextNotMarkup().then(testEncodedPlotURLIsNotEncodedTwice)
+  .then(()=>console.log('LoadPane feedback and encoded URL tests passed'),
   error=>{console.error(error);process.exitCode=1});

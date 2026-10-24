@@ -21,7 +21,8 @@
 
 <!--%@ page errorPage="ExceptionHandler.jsp" %-->
 
-<link href="Nodes.css" rel="stylesheet" type="text/css"/>
+<link href="Nodes.css?v=table-1" rel="stylesheet" type="text/css"/>
+<script src="TableView.js?v=table-1" type="text/javascript"></script>
 
 <%! static Logger log = LogManager.getLogger(Nodes_jsp.class); %>
 
@@ -110,20 +111,23 @@
   var header = "<tr>";
   for (var i = 0; i < columns.length; i++) {
     var column = columns[i];
-    header += "<th data-field='" + column + "' data-sortable='true' data-visible='true' ><b><u>" + column + "</u></b></th>";
+    header += "<th data-field='" + plotTableEscape(column) + "' data-sortable='true' data-visible='true'>" + plotTableEscape(column) + "</th>";
     }
   header += "</tr>";
   </script>
   
-<div id="toolbar">
-  <button onClick="w2popup.load({url:'Help-Nodes.html', showMax: true})" style="position:absolute; right:0">
+<div id="toolbar" class="plot-table-toolbar">
+  <div class="plot-table-intro"><strong>Vertices table</strong><span>Expand a row to choose x / y / z / s / k for a plot.</span></div>
+  <div class="plot-table-actions">
+  <button onClick="w2popup.load({url:'Help-Nodes.html', showMax: true})" title="Table help" aria-label="Table help">
     <img src="images/Help.png" width="10"/>
     </button>
   <button onclick="showScatter('evolution')" style="background-color:#ddddff" title="time dependence of multiple variables">Evolution Plot</button>    
   <button onclick="showScatter('scatter')"   style="background-color:#ddddff" title="scatter plot of multiple variables"   >Scatter Plot</button>    
   <button onclick="showSky()"                style="background-color:#ddddff" title="sky view"                             >Sky View</button>    
   </div>
-<table id='tbl'
+  </div>
+<table id='tbl' class='plot-table-grid'
        data-sortable='true'
        data-search='true'
        data-show-search-button='true'
@@ -153,23 +157,12 @@
   thead.innerHTML = header;
   $(function() { 
     $table.bootstrapTable({data: tdata})
-    $table.bootstrapTable('refreshOptions', {classes: 'table table-bordered table-hover table-striped table-sm'})
+    $table.bootstrapTable('refreshOptions', {classes: 'table table-bordered table-hover table-striped table-sm plot-table-grid'})
     $table.bootstrapTable('refreshOptions', {theadClasses: 'thead-light'})
     $table.bootstrapTable('refreshOptions', {sortable: 'true'})
       })
   function detailFormatter(index, row) {
-    var html = []
-    $.each(row, function (key, value) {
-      html.push(histSelector(key) + '<b>' + key + ':</b> ' + value + '<br/>');
-      })
-    return html.join('')
-    }
-  function histSelector(column) {
-    return "<input type='checkbox' name='x1_" + column + "' class='x' id='x1_" + column + "'></input><label for='x1_" + column + "' title='var x'   >x</label>&nbsp;" +
-           "<input type='checkbox' name='y1_" + column + "' class='y' id='y1_" + column + "'></input><label for='y1_" + column + "' title='var y'   >y</label>&nbsp;" +
-           "<input type='checkbox' name='z1_" + column + "' class='z' id='z1_" + column + "'></input><label for='z1_" + column + "' title='var z'   >z</label>&nbsp;" +
-           "<input type='checkbox' name='s1_" + column + "' class='s' id='s1_" + column + "'></input><label for='s1_" + column + "' title='selector'>s</label>&nbsp;" +
-           "<input type='checkbox' name='k1_" + column + "' class='k' id='k1_" + column + "'></input><label for='k1_" + column + "' title='info'    >k</label>&nbsp;";
+    return plotTableDetailFormatter(index, row);
     }
   function showScatter(kind) {
     var x = "";
@@ -184,36 +177,36 @@
     var ks = document.getElementsByClassName('k');
     for (i = 0; i < xs.length; i++) {
       if (xs[i].checked) {
-         if (!x.includes(xs[i].id.substring(3))) { 
-           x += xs[i].id.substring(3) + " ";
+         if (!plotTableHasField(x, plotTableFieldName(xs[i]))) {
+           x += plotTableFieldName(xs[i]) + " ";
            }
          }
       }
     for (i = 0; i < ys.length; i++) {
       if (ys[i].checked) {
-        if (!y.includes(ys[i].id.substring(3))) { 
-          y += ys[i].id.substring(3) + " ";
+        if (!plotTableHasField(y, plotTableFieldName(ys[i]))) {
+          y += plotTableFieldName(ys[i]) + " ";
           }
         }
       }
     for (i = 0; i < zs.length; i++) {
       if (zs[i].checked) {
-        if (!z.includes(zs[i].id.substring(3))) { 
-          z = zs[i].id.substring(3);
+        if (!plotTableHasField(z, plotTableFieldName(zs[i]))) {
+          z = plotTableFieldName(zs[i]);
           break;
           }
         }
       }
     for (i = 0; i < ss.length; i++) {
       if (ss[i].checked) {
-        s = ss[i].id.substring(3);
+        s = plotTableFieldName(ss[i]);
         break;
         }
       }
     for (i = 0; i < ks.length; i++) {
       if (ks[i].checked) {
-        if (!k.includes(ks[i].id.substring(3))) { 
-          k += ks[i].id.substring(3) + " ";
+        if (!plotTableHasField(k, plotTableFieldName(ks[i]))) {
+          k += plotTableFieldName(ks[i]) + " ";
           }
         }
       }
@@ -272,47 +265,9 @@
         window.alert("x and y - axis should be selected");
         return;
         }
-      x = x.trim();
-      y = y.trim();
-      params = "name=" + tit + "&url=&x=" + x + "&y=" + y + "&z=" + z + "&s=" + s + "&tdata=[";
-      first = true;
-      for (i = 0; i < tdata.length; i++) {
-        for (xx of x.split(" ")) {    
-          for (yy of y.split(" ")) { 
-            if (tdata[i][xx] && tdata[i][yy]) {
-              if (!first) {
-                params += ",";
-                }
-              else {
-                first = false;
-                }
-              params += "{\"x\":\"" + tdata[i][xx] + "\",\"y\":\"" + tdata[i][yy] + "\"";
-              //params += ",\"g\":\"" + xx + "/" + yy + "\"";
-              if (z != "" && tdata[i][z]) {
-                params += ",\"z\":\"" + tdata[i][z] + "\"";
-                }
-              g = xx + "/" + yy;
-              if (s != "" && tdata[i][s]) {
-                g = tdata[i][s] + "/" + g;
-                }
-              params += ",\"g\":\"" + g + "\"";
-              c = ""
-              if (k != "") {
-                for (kk of k.split(" ")) { 
-                  if (tdata[i][kk]) {
-                    c += kk + "=" + tdata[i][kk] + " "; 
-                    }
-                  }
-                params += ",\"k\":\"" + c + "\"";
-                }
-              params += "}";
-              }
-            }
-          }
-        }
-      params += "]";
-      }  
-    loadPane("plot", "d3/scatterplot.jsp?" + params, true, 400 * 1.2);
+      params = plotTableScatterURL(tit, x.trim(), y.trim(), z, s, k, tdata);
+      }
+    loadPane("plot", (kind == "scatter" ? params : "d3/scatterplot.jsp?" + params), true, 400 * 1.2, kind == "scatter");
     }
   function showSky() {
     var z = "";
@@ -323,22 +278,22 @@
     var ks = document.getElementsByClassName('k');
     for (i = 0; i < zs.length; i++) {
       if (zs[i].checked) {
-        if (!z.includes(zs[i].id.substring(3))) { 
-          z = zs[i].id.substring(3);
+        if (!plotTableHasField(z, plotTableFieldName(zs[i]))) {
+          z = plotTableFieldName(zs[i]);
           break;
           }
         }
       }
     for (i = 0; i < ss.length; i++) {
       if (ss[i].checked) {
-        s = ss[i].id.substring(3);
+        s = plotTableFieldName(ss[i]);
         break;
         }
       }
     for (i = 0; i < ks.length; i++) {
       if (ks[i].checked) {
-        if (!k.includes(ks[i].id.substring(3))) { 
-          k += ks[i].id.substring(3) + " ";
+        if (!plotTableHasField(k, plotTableFieldName(ks[i]))) {
+          k += plotTableFieldName(ks[i]) + " ";
           }
         }
       }

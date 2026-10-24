@@ -32,7 +32,7 @@
   %>
 <%@include file="../PropertiesProcessor.jsp"%>
   
-<script src="actions.js" type="text/javascript"></script>
+<script src="actions.js?v=table-1" type="text/javascript"></script>
 <script src="skyview.js" type="text/javascript"></script>
   
 <script type="text/javascript">

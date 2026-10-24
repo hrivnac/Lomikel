@@ -4,6 +4,8 @@
 <!-- @author Julius.Hrivnac@cern.ch -->
 
 <%@ page import="com.Lomikel.WebService.PropertiesProcessor" %>
+<%@ page import="org.json.JSONArray" %>
+<%@ page import="org.json.JSONObject" %>
 
 <%@ page import="org.apache.logging.log4j.Logger" %>
 <%@ page import="org.apache.logging.log4j.LogManager" %>
@@ -14,7 +16,7 @@
 
 <jsp:useBean id="repository" class="com.Lomikel.WebService.StringRepository" scope="session"/>
    
-<link href="scatterplot.css" rel="stylesheet" type="text/css"/>
+<link href="scatterplot.css?v=table-1" rel="stylesheet" type="text/css"/>
 <script src="../d3-v6.0.0/d3.js" type="text/javascript"></script>
  
 <div id="scatter_area"></div>
@@ -27,26 +29,33 @@
   String z     = request.getParameter("z");
   String s     = request.getParameter("s");
   String tdata = request.getParameter("tdata");
+  if (name == null) name = "";
+  if (url == null) url = "";
+  if (x == null) x = "";
+  if (y == null) y = "";
+  if (z == null) z = "";
+  if (s == null) s = "";
   %>
 <%@include file="../PropertiesProcessor.jsp"%>
 <%
-  String[] dd;
-  String ts;
-  String[] tdatas = tdata.split(",");
-  for (int i = 0; i < tdatas.length; i++) { // TBD: should use JSON
-    dd = tdatas[i].split(":");
-    if (dd[0].equals("\"t\"")) {
-      ts = dd[1].replaceAll("\"", "");
-      ts = pp.getTimestamp(ts);
-      tdatas[i] = "\"t\":\"" + ts + "\"";
+  JSONArray points = new JSONArray(tdata == null ? "[]" : tdata);
+  for (int i = 0; i < points.length(); i++) {
+    JSONObject point = points.getJSONObject(i);
+    if (point.has("t") && !point.isNull("t")) {
+      point.put("t", pp.getTimestamp(point.get("t").toString()));
       }
     }
-  tdata = String.join(",", tdatas);
   %>
   
-<script src="actions.js"     type="text/javascript"></script>
-<script src="scatterplot.js" type="text/javascript"></script>
+<script src="actions.js?v=table-1" type="text/javascript"></script>
+<script src="scatterplot.js?v=table-1" type="text/javascript"></script>
   
 <script type="text/javascript">
-  showScatterPlot(<%=tdata%>, "<%=name%>", "<%=x%>", "<%=y%>", "<%=z%>", "<%=s%>", "<%=url%>");
+  showScatterPlot(<%=points.toString().replace("<", "\\u003c")%>,
+                  <%=JSONObject.quote(name).replace("<", "\\u003c")%>,
+                  <%=JSONObject.quote(x).replace("<", "\\u003c")%>,
+                  <%=JSONObject.quote(y).replace("<", "\\u003c")%>,
+                  <%=JSONObject.quote(z).replace("<", "\\u003c")%>,
+                  <%=JSONObject.quote(s).replace("<", "\\u003c")%>,
+                  <%=JSONObject.quote(url).replace("<", "\\u003c")%>);
   </script>
