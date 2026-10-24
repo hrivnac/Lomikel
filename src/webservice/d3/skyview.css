@@ -4,13 +4,22 @@ body {display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:8p
   font:13px/1.4 system-ui,sans-serif;color:#223b4d;background:#f8fbff}
 header {flex:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
 h1 {font-size:15px;color:#255e88;margin:0} header p {margin:0;color:#4a6479}
+#sky-legend {display:inline-flex;gap:9px;font-size:11px}
+#sky-legend span::before {content:'';display:inline-block;width:8px;height:8px;margin-right:4px;border-radius:50%;border:1px solid #173450}
+.sky-legend-ztf::before {background:#df6e35}
+.sky-legend-lsst::before {background:#266cac}
 #sky-settings-toggle {margin-left:auto;padding:3px 8px;border:1px solid #a8c4d7;
   border-radius:5px;background:white;color:#286785;cursor:pointer}
 #sky-settings-toggle:focus-visible {outline:2px solid #286785;outline-offset:2px}
 /* Celestial's vendored stylesheet forces a 720px minimum; this map must fit its iframe. */
 #celestial-map {flex:1 1 auto;min-width:0!important;min-height:0;width:100%!important;
   height:auto!important;display:flex;align-items:center;justify-content:center;overflow:hidden;
-  border:1px solid #ccdae5;background:white;border-radius:8px;margin:6px 0 0}
+  position:relative;border:1px solid #ccdae5;background:white;border-radius:8px;margin:6px 0 0}
+#celestial-map .sky-hover {position:absolute;z-index:3;pointer-events:none;max-width:min(240px,80%);
+  padding:3px 7px;border:1px solid #b6cad8;border-radius:5px;background:#fffdf6;
+  box-shadow:0 2px 8px #17345033;color:#173450;font:11px/1.3 system-ui,sans-serif;
+  overflow-wrap:anywhere;transform:translate(-50%,-100%)}
+#celestial-map .sky-hover[hidden] {display:none}
 #celestial-map canvas {max-width:100%;max-height:100%;height:auto!important}
 #celestial-form {flex:none;display:block;max-width:100%;margin:4px 0;font-size:12px}
 #celestial-form form {margin:0}
