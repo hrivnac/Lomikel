@@ -35,5 +35,5 @@ assert.equal(new URL(calls[4][1],'http://localhost/FinkBrowser/').searchParams.g
 assert.equal(calls[4][4],true);
 assert.doesNotMatch(calls[4][1], /<img|<\/script>/);
 assert.match(fs.readFileSync(path.join(base,'index.jsp'),'utf8'), /webservice\/workspace\.js\?v=[\w-]+/);
-assert.match(fs.readFileSync(path.join(base,'d3/scatterplot.jsp'),'utf8'), /scatterplot\.js\?v=details-1/);
+assert.match(fs.readFileSync(path.join(base,'d3/scatterplot.jsp'),'utf8'), /scatterplot\.js\?v=evolution-1/);
 console.log('Webservice-only scatter routing tests passed');

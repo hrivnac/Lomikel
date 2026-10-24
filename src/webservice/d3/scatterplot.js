@@ -47,17 +47,27 @@ function scatterPlotInfoLines(p, hasX, xS, yS, zS, sS) {
   return Array.from(fields, function (pair) { return pair[0] + ' - ' + pair[1]; });
 }
 
+function scatterPlotSeriesDash(field, fields) {
+  var index = fields.indexOf(field);
+  return index <= 0 ? '' : ['3 2', '1 2', '5 2 1 2'][(index - 1) % 3];
+}
 function showScatterPlot(data, name, xS, yS, zS, sS, url) {
   var root = d3.select('#scatter_area');
   root.selectAll('*').remove();
   var hasX = Boolean(xS);
   var points = scatterPlotPrepare(data, hasX);
+  var series = hasX ? [] : Array.from(new Set(points.map(function (p) {
+    return p.raw.yField || yS;
+  })));
   var title = name || (hasX ? 'Scatter plot' : 'Evolution plot');
   var header = root.append('div').attr('class', 'scatter-header');
   header.append('strong').text(title);
   header.append('span').text(points.length + ' point' + (points.length === 1 ? '' : 's') +
     ' · ' + (hasX ? xS : 'Time') + ' vs ' + (yS || 'Value') +
     (zS ? ' · Size: ' + zS : '') + (sS ? ' · Color: ' + sS : ''));
+  if (series.length > 1) header.append('span').text('Series: ' + series.map(function (field, index) {
+    return field + (index ? ' (dashed)' : ' (solid)');
+  }).join(' · '));
   if (!points.length) {
     root.append('p').attr('class', 'scatter-empty').attr('role', 'status')
       .text('No valid points for these coordinates. Select numeric x and y properties.');
@@ -113,6 +123,9 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
     .attr('cy', function (p) { return y(p.y); })
     .attr('r', function (p) { return p.z === null ? 6 : radius(p.z); })
     .attr('fill', function (p) { return p.g ? color(p.g) : '#3778ae'; })
+    .attr('stroke', series.length > 1 ? '#1f2937' : 'none')
+    .attr('stroke-width', series.length > 1 ? 2 : 0)
+    .attr('stroke-dasharray', function (p) { return scatterPlotSeriesDash(p.raw.yField || yS, series); })
     .attr('tabindex', 0).attr('role', 'button')
     .attr('aria-label', info)
     .on('mouseover focus', showTip)

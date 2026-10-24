@@ -45,7 +45,8 @@
 
   var legacyLoadPane = window.loadPane;
   // Only encoded graph-table Scatter requests have the JSON point contract.
-  // Evolution and HBase use older payloads and remain on the legacy renderer.
+  // Graph-table Evolution is reconstructed from its rows and checked controls;
+  // HBase and other legacy plot routes keep their original handling.
   window.loadPane = function (pane, url, iframe, height, encoded) {
     if (pane === 'skyview' && url === 'webservice/d3/skyview.jsp' && window.skyGraphState) {
       return window.skyGraphState.open();
@@ -64,6 +65,14 @@
       }
     }
     if (pane === 'skyview' && window.skyGraphState) window.skyGraphState.cancel();
+    if (pane === 'plot' && iframe && !encoded && /^d3\/scatterplot\.jsp\?/.test(url) &&
+        typeof window.wsTableEvolutionURL === 'function' && document.getElementById('tbl')) {
+      var evolutionQuery = new URL(url, document.baseURI).searchParams;
+      if (!evolutionQuery.get('x')) {
+        var evolutionURL = window.wsTableEvolutionURL(url, window.tdata);
+        if (evolutionURL) { url = evolutionURL; encoded = true; }
+      }
+    }
     if (pane === 'plot' && iframe && encoded && /^d3\/scatterplot\.jsp\?/.test(url)) {
       try {
         var query = new URL(url, document.baseURI).searchParams;

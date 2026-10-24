@@ -34,14 +34,14 @@
   JSONArray points = new JSONArray(tdata == null ? "[]" : tdata);
   for (int i = 0; i < points.length(); i++) {
     JSONObject point = points.getJSONObject(i);
-    if (point.has("t") && !point.isNull("t")) {
+    if (point.has("t") && !point.isNull("t") && !"ms".equals(request.getParameter("timeUnit"))) {
       point.put("t", pp.getTimestamp(point.get("t").toString()));
       }
     }
   %>
 
 <script src="../../d3/actions.js?v=table-1" type="text/javascript"></script>
-<script src="scatterplot.js?v=details-1" type="text/javascript"></script>
+<script src="scatterplot.js?v=evolution-1" type="text/javascript"></script>
 
 <script type="text/javascript">
   showScatterPlot(<%=points.toString().replace("<", "\\u003c")%>,
