@@ -1,0 +1,21 @@
+#corr_area { position: relative; box-sizing: border-box; width: 100%; padding: 12px;
+  border: 1px solid #dbe5ef; border-radius: 12px; background: #fff;
+  color: #243449; font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.corr-intro { margin: 0 4px 12px; color: #506982; }
+.correlogram { display: block; width: 100%; max-width: 920px; height: auto; margin: auto; }
+.corr-cell rect { fill: #f8fbff; stroke: #d5e0eb; stroke-width: 1; }
+.corr-diagonal rect { fill: #eaf1fa; }
+.corr-cell:focus-visible rect, .corr-cell:hover rect { stroke: #365b82; stroke-width: 2; }
+.corr-cell { cursor: help; outline: none; }
+.corr-upper:has(.corr-circle[r]:not([r="0"])) { cursor: pointer; }
+.corr-name { fill: #273e57; font-weight: 600; text-anchor: middle; }
+.corr-number { fill: #264869; font-size: 10px; text-anchor: middle; }
+.corr-sizes { fill: #58748e; font-size: 9px; }
+.corr-circle { opacity: .88; stroke: #fff; stroke-width: 1.2; }
+.corr-scale text { fill: #526a82; font-size: 9px; text-anchor: start; }
+.corr-tooltip { position: absolute; z-index: 5; max-width: min(280px, 85%);
+  padding: 8px 10px; border: 1px solid #b9cde0; border-radius: 7px;
+  background: #f8fbff; box-shadow: 0 5px 18px rgba(23,47,74,.16);
+  color: #243449; white-space: pre-line; overflow-wrap: anywhere;
+  opacity: 0; pointer-events: none; }
+.corr-tooltip.is-visible { opacity: 1; }

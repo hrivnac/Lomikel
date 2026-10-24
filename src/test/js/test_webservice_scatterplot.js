@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const base = path.join(__dirname, '../d3');
+const base = path.join(__dirname, '../../webservice/d3');
 const context = vm.createContext({d3:{timeFormat:()=>date=>date.toISOString()}});
 vm.runInContext(fs.readFileSync(path.join(base, 'scatterplot.js'), 'utf8'), context);
 const p = {x:2, y:7, z:7, g:'Class A',
