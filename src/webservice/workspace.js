@@ -48,6 +48,14 @@
   // Graph-table Evolution is reconstructed from its rows and checked controls;
   // HBase and other legacy plot routes keep their original handling.
   window.loadPane = function (pane, url, iframe, height, encoded) {
+    if (pane === 'image' && url === 'webservice/cutouts' && window.cutoutsGraphState) {
+      return window.cutoutsGraphState.open();
+    }
+    if (pane === 'image' && window.cutoutsGraphState) {
+      window.cutoutsGraphState.cancel();
+      var imagePane = document.getElementById('image');
+      if (imagePane) imagePane.classList.remove('ws-cutouts');
+    }
     if (pane === 'skyview' && url === 'webservice/d3/skyview.jsp' && window.skyGraphState) {
       return window.skyGraphState.open();
     }
@@ -132,11 +140,14 @@
 
   // Preserve the legacy reset contract after moving panel 01 into the header.
   window.reset = function () {
+    if (window.cutoutsGraphState) window.cutoutsGraphState.cancel();
     if (typeof window.disposeGraphView === 'function') window.disposeGraphView();
     loadPane('feedback', 'Feedback.jsp');
     loadPane('top', 'webservice/Top.jsp');
     loadPane('graph', 'webservice/GraphView.jsp');
-    loadPane('image', 'Image.jsp');
+    // Image.jsp is part of the initial Tabs.jsp. Restore its placeholder
+    // synchronously to avoid an older load overwriting a new contact sheet.
+    if (window.cutoutsGraphState) window.cutoutsGraphState.clear();
     loadPane('plot', 'Plot.jsp');
     loadPane('result', 'Result.jsp');
     var skyview = document.getElementById('skyview');

@@ -31,10 +31,13 @@
   <link rel="stylesheet" href="webservice/workspace.css">
   <link rel="stylesheet" href="webservice/panels.css">
   <link rel="stylesheet" href="webservice/graph.css?v=skyview-2">
+  <link rel="stylesheet" href="webservice/cutouts.css?v=cutouts-1">
   <link rel="stylesheet" href="webservice/help.css?v=1">
 </head>
 <body class="workspace">
   <div class="workspace-frame">
+    <!-- Immutable reset source: FITS/image actions may have replaced #image. -->
+    <template id="ws-image-placeholder"><button onclick="w2popup.load({url:'Help-Image.html', showMax:true})" style="position:absolute;top:0;right:0"><img src="images/Help.png" width="10" alt="Help"></button><center><h1>Images go here.</h1></center><center><img src="images/LomikelOverlap.png" width="60%" alt=""></center></template>
     <header id="mini" class="workspace-header">
       <div class="workspace-brand">
         <img class="workspace-logo" src="images/LomikelOverlap.png" alt="" aria-hidden="true">
@@ -87,7 +90,7 @@
     window.visheight = 360;
   </script>
   <script src="webservice/evolution-table.js?v=evolution-1"></script>
-  <script src="webservice/workspace.js?v=panels-1"></script>
+  <script src="webservice/workspace.js?v=cutouts-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
