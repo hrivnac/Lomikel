@@ -48,6 +48,10 @@
   // Graph-table Evolution is reconstructed from its rows and checked controls;
   // HBase and other legacy plot routes keep their original handling.
   window.loadPane = function (pane, url, iframe, height, encoded) {
+    if (pane === 'plot' && url === 'webservice/lightcurve' && window.lightcurveGraphState) {
+      return window.lightcurveGraphState.open();
+    }
+    if (pane === 'plot' && window.lightcurveGraphState) window.lightcurveGraphState.cancel();
     if (pane === 'image' && url === 'webservice/cutouts' && window.cutoutsGraphState) {
       return window.cutoutsGraphState.open();
     }
@@ -140,6 +144,7 @@
 
   // Preserve the legacy reset contract after moving panel 01 into the header.
   window.reset = function () {
+    if (window.lightcurveGraphState) window.lightcurveGraphState.cancel();
     if (window.cutoutsGraphState) window.cutoutsGraphState.cancel();
     if (typeof window.disposeGraphView === 'function') window.disposeGraphView();
     loadPane('feedback', 'Feedback.jsp');
