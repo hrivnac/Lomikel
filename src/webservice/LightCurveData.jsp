@@ -45,7 +45,7 @@
     URL endpoint = new URL(ztf ? "https://api.ztf.fink-portal.org/api/v1/objects" :
       "https://api.lsst.fink-portal.org/api/v1/sources");
     String columns = ztf ? "i:objectId,i:candid,i:jd,i:fid,i:magpsf,i:sigmapsf" :
-      "r:diaObjectId,r:diaSourceId,r:midpointMjdTai,r:band,r:psfFlux,r:psfFluxErr";
+      "r:diaObjectId,r:diaSourceId,r:midpointMjdTai,r:band,r:scienceFlux,r:scienceFluxErr";
     byte[] body = new JSONObject().put(ztf ? "objectId" : "diaObjectId", objectId)
       .put("columns", columns).put("output-format", "json").toString().getBytes(StandardCharsets.UTF_8);
     HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
@@ -89,8 +89,9 @@
         uncertainty = finiteLightCurveNumber(source, "i:sigmapsf");
       } else {
         band = source.optString("r:band", "");
-        double flux = finiteLightCurveNumber(source, "r:psfFlux");
-        double error = finiteLightCurveNumber(source, "r:psfFluxErr");
+        // Forced photometry on the science image, not difference-image PSF flux.
+        double flux = finiteLightCurveNumber(source, "r:scienceFlux");
+        double error = finiteLightCurveNumber(source, "r:scienceFluxErr");
         magnitude = flux > 0 ? 31.4 - 2.5 * Math.log10(flux) : Double.NaN;
         uncertainty = flux > 0 ? (2.5 / Math.log(10)) * error / flux : Double.NaN;
       }

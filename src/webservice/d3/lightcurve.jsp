@@ -35,11 +35,11 @@
 </head><body>
 <main id="lightcurve-view"><h1>Object light curve</h1><p id="lightcurve-status" role="status"><%=objectId.isEmpty() ? "Invalid object request." : "Loading observations…"%></p>
 <div id="lightcurve-legend" aria-label="Available photometric bands"></div>
-<div id="lightcurve-chart" role="region" aria-label="Light curve magnitude versus Modified Julian Date"></div>
+<div id="lightcurve-chart" role="region" aria-label="Light curve magnitude versus calendar date"></div>
 <p id="lightcurve-note"></p></main>
 <% if (!objectId.isEmpty()) { %>
 <script src="../../d3-v6.0.0/d3.js"></script>
-<script src="lightcurve.js?v=lightcurve-fit-1"></script>
+<script src="lightcurve.js?v=science-date-1"></script>
 <script>window.lightCurveLoad(<%=safeId%>);</script>
 <% } %>
 </body></html>

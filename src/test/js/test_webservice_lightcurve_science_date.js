@@ -1,0 +1,27 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const root=path.resolve(__dirname,'../../webservice');
+const proxy=fs.readFileSync(path.join(root,'LightCurveData.jsp'),'utf8');
+const renderer=fs.readFileSync(path.join(root,'d3/lightcurve.js'),'utf8');
+const view=fs.readFileSync(path.join(root,'d3/lightcurve.jsp'),'utf8');
+const ctx={window:{addEventListener(){}},Number,Set};
+vm.runInNewContext(renderer,ctx);
+assert.match(proxy,/r:scienceFlux,r:scienceFluxErr/);
+assert.match(proxy,/finiteLightCurveNumber\(source, "r:scienceFlux"\)/);
+assert.match(proxy,/finiteLightCurveNumber\(source, "r:scienceFluxErr"\)/);
+assert.doesNotMatch(proxy,/"r:psfFlux"/,'do not silently plot difference-image flux as science magnitude');
+assert.equal(ctx.window.lightCurveDate(40587).toISOString(),'1970-01-01T00:00:00.000Z');
+assert.equal(ctx.window.lightCurveDate(60000).toISOString(),'2023-02-25T00:00:00.000Z');
+assert.equal(ctx.window.lightCurveDate(60000.5).toISOString(),'2023-02-25T12:00:00.000Z');
+assert.throws(()=>ctx.window.lightCurvePrepare({survey:'ZTF',objectId:'ZTF21aaxtctv',totalRows:1,excluded:0,
+  points:[{sourceId:'123',band:'g',mjd:1e100,magnitude:20,magnitudeError:.1}]},'ZTF21aaxtctv'),/point/);
+assert.match(renderer,/scaleUtc\(/);
+assert.match(renderer,/%Y-%m-%d %H:%M/);
+assert.match(renderer,/axisBottom\(x\)\.ticks/);
+assert.match(renderer,/Science magnitude/);
+assert.match(renderer,/TAI/);
+assert.match(view,/lightcurve\.js\?v=science-date-/);
+console.log('LSST science-image AB magnitude and survey-labeled calendar dates');
