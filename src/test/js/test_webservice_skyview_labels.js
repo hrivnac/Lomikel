@@ -24,11 +24,13 @@ const elements={'sky-summary':summary,'sky-list':list,'sky-settings-toggle':sett
 const document={getElementById:id=>elements[id]||null,createElement:el,
  createDocumentFragment:()=>el('fragment'),body:{classList:{toggle:()=>false}}};
 let features=[], layer;
+const aitoff=([ra])=>ra===10?[2,80]:ra===20?[390,80]:[200,198];
+let activeProjection=aitoff;
 const selection={data(items){features=items;return this},enter(){return this},append(){return this},
  attr(){return this},each(fn){features.forEach(p=>fn.call({},p));return this}};
 const Celestial={container:{selectAll:()=>selection},add:item=>layer=item,
   getData:collection=>collection,display(){layer.callback(null)},redraw(){layer.redraw()},
-  clip:()=>true,mapProjection:([ra])=>ra===10?[2,80]:ra===20?[390,80]:[200,198],
+  clip:()=>true,mapProjection:aitoff,map:{projection:()=>activeProjection},
   setStyle:style=>draws.push({style}),resize(){},context:{
    beginPath(){},arc(x,y){draws.push({arc:[x,y]})},closePath(){},stroke(){},fill(){},
    canvas:canvas,measureText:text=>({width:text.length*5}),
@@ -60,6 +62,18 @@ events.pointermove({clientX:330,clientY:170});
 assert.equal(popup.hidden,true,'tooltip hides away from points');
 events.pointerleave();
 assert.equal(popup.hidden,true);
+activeProjection=([ra])=>ra===10?[45,70]:ra===20?[280,90]:[170,160];
+draws.length=0;
+Celestial.redraw(); // Celestial replaces its internal projection on switching to Mercator
+assert.deepEqual(draws.filter(d=>d.arc).map(d=>d.arc),[[45,70],[280,90],[170,160]],
+  'point positions follow the active Mercator projection, not the original Aitoff reference');
+events.pointermove({clientX:53.75,clientY:92.5});
+assert.equal(popup.textContent,'ZTF21aaxtctv','hover targets follow the projected points');
+activeProjection=([ra])=>ra===10?[80,70]:ra===20?[260,90]:[150,160];
+draws.length=0;
+Celestial.redraw(); // panning after the projection switch
+assert.deepEqual(draws.filter(d=>d.arc)[0].arc,[80,70],
+  'point positions follow the panned sky in the new projection');
 assert.match(fs.readFileSync(path.join(root,'skyview.css'),'utf8'),/\.sky-hover\s*\{/);
-assert.match(fs.readFileSync(path.join(root,'skyview.jsp'),'utf8'),/skyview\.js\?v=skyview-4/);
+assert.match(fs.readFileSync(path.join(root,'skyview.jsp'),'utf8'),/skyview\.js\?v=skyview-5/);
 console.log('SkyView draws IDs, distinct survey colors and point hover tooltips');

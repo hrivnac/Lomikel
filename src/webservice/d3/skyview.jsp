@@ -63,5 +63,5 @@
 <script src="../../d3-celestial-0.7.32/lib/d3.min.js"></script>
 <script src="../../d3-celestial-0.7.32/lib/d3.geo.projection.min.js"></script>
 <script src="../../d3-celestial-0.7.32/celestial.min.js"></script>
-<% if (errorMessage == null) { %><script src="skyview.js?v=skyview-4"></script><% } %>
+<% if (errorMessage == null) { %><script src="skyview.js?v=skyview-5"></script><% } %>
 </body></html>

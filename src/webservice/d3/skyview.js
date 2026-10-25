@@ -112,9 +112,12 @@
       },
       redraw: function () {
         hitPoints = [];
+        // Celestial replaces its internal projection when changing map types;
+        // the exported mapProjection keeps referring to the original Aitoff.
+        var projection = Celestial.map.projection();
         Celestial.container.selectAll('.sky-objects').each(function (point) {
           if (!Celestial.clip(point.geometry.coordinates)) return;
-          var xy = Celestial.mapProjection(point.geometry.coordinates);
+          var xy = projection(point.geometry.coordinates);
           if (!xy || !Number.isFinite(xy[0]) || !Number.isFinite(xy[1])) return;
           Celestial.setStyle({stroke:'#173450',fill:point.properties.color});
           Celestial.context.beginPath();
