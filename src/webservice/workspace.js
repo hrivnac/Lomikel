@@ -51,11 +51,11 @@
   window.loadPane = function (pane, url, iframe, height, encoded) {
     var plotPane = pane === 'plot' && document.getElementById && document.getElementById('plot');
     if (plotPane) plotPane.classList.remove('ws-correlogram');
-    if (pane === 'plot' && url === 'webservice/lightcurve' && window.lightcurveGraphState) {
+    if (pane === 'plot' && url === 'lightcurve' && window.lightcurveGraphState) {
       return window.lightcurveGraphState.open();
     }
     if (pane === 'plot' && window.lightcurveGraphState) window.lightcurveGraphState.cancel();
-    if (pane === 'image' && url === 'webservice/cutouts' && window.cutoutsGraphState) {
+    if (pane === 'image' && url === 'cutouts' && window.cutoutsGraphState) {
       return window.cutoutsGraphState.open();
     }
     if (pane === 'image' && window.cutoutsGraphState) {
@@ -63,7 +63,7 @@
       var imagePane = document.getElementById('image');
       if (imagePane) imagePane.classList.remove('ws-cutouts');
     }
-    if (pane === 'skyview' && url === 'webservice/d3/skyview.jsp' && window.skyGraphState) {
+    if (pane === 'skyview' && url === 'd3/skyview.jsp' && window.skyGraphState) {
       return window.skyGraphState.open();
     }
     // Nodes.jsp's Sky button builds a coordinate-only URL. Object tables have
@@ -116,7 +116,7 @@
             });
           }
           query.set('tdata', JSON.stringify(points));
-          url = 'webservice/d3/scatterplot.jsp?' + query.toString();
+          url = 'd3/scatterplot.jsp?' + query.toString();
         }
       } catch (error) {
         // Malformed legacy payloads should keep their original route and error handling.
@@ -139,7 +139,7 @@
       var safeQuery = new URLSearchParams();
       safeQuery.set('tdata', JSON.stringify(corrData));
       if (invalidCorr) safeQuery.set('invalid', '1');
-      url = 'webservice/d3/correlogram.jsp?' + safeQuery.toString();
+      url = 'd3/correlogram.jsp?' + safeQuery.toString();
       encoded = true;
       if (plotPane) plotPane.classList.add('ws-correlogram');
       height = '100%';
@@ -153,8 +153,8 @@
     if (window.cutoutsGraphState) window.cutoutsGraphState.cancel();
     if (typeof window.disposeGraphView === 'function') window.disposeGraphView();
     loadPane('feedback', 'Feedback.jsp');
-    loadPane('top', 'webservice/Top.jsp');
-    loadPane('graph', 'webservice/GraphView.jsp');
+    loadPane('top', 'Top.jsp');
+    loadPane('graph', 'GraphView.jsp');
     // Image.jsp is part of the initial Tabs.jsp. Restore its placeholder
     // synchronously to avoid an older load overwriting a new contact sheet.
     if (window.cutoutsGraphState) window.cutoutsGraphState.clear();
@@ -215,8 +215,8 @@
     });
     w2ui.layout.html('left', w2ui.layoutLeft);
     w2ui.layout.html('main', w2ui.layoutMain);
-    w2ui.layoutLeft.load('main', 'webservice/Top.jsp');
-    w2ui.layoutLeft.load('bottom', 'webservice/GraphView.jsp');
+    w2ui.layoutLeft.load('main', 'Top.jsp');
+    w2ui.layoutLeft.load('bottom', 'GraphView.jsp');
     w2ui.layoutMain.load('main', 'Tabs.jsp');
     w2ui.layoutMain.load('bottom', 'Feedback.jsp');
     if (typeof window.wsInstallHelp === 'function') window.wsInstallHelp();

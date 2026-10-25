@@ -15,6 +15,6 @@ assert.match(renderer,/ResizeObserver/);
 assert.match(read('workspace.js'),/lightcurveGraphState\.resize\(\)/);
 assert.match(read('lightcurve-graph.js'),/lightCurveResize/);
 assert.match(read('GraphView.jsp'),/lightcurve-graph\.js\?v=lightcurve-fit-/);
-assert.match(read('index.jsp'),/webservice\/graph\.css\?v=corr-fit-/);
+assert.match(read('index.jsp'),/graph\.css\?v=corr-fit-/);
 assert.match(read('d3/lightcurve.jsp'),/lightcurve\.(?:css|js)\?v=lightcurve-fit-/);
 console.log('LightCurve uses the full Plot pane and redraws on resize');

@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const root = path.join(__dirname, '../../ws/d3');
+const root = path.join(__dirname, '../../webservice/d3');
 const ctx = vm.createContext({});
 vm.runInContext(fs.readFileSync(path.join(root, 'scatterplot.js'), 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(root, 'actions.js'), 'utf8'), ctx);

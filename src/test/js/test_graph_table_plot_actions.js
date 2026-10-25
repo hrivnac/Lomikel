@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const root = path.join(__dirname, '../../ws');
+const root = path.join(__dirname, '../../webservice');
 for (const page of ['Nodes.jsp', 'Edges.jsp']) {
   const source = fs.readFileSync(path.join(root, page), 'utf8');
   const script = source.match(/<script>\s*var \$table[\s\S]*?<\/script>/)?.[0]

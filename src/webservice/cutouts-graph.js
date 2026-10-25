@@ -62,7 +62,7 @@
     var controller = new AbortController();
     requests.push(controller);
     try {
-      var response = await fetch('webservice/CutoutSource.jsp', {
+      var response = await fetch('CutoutSource.jsp', {
         method: 'POST', credentials: 'same-origin', signal: controller.signal,
         headers: {'Content-Type': 'application/json'}, body: JSON.stringify({diaObjectId: id})
       });

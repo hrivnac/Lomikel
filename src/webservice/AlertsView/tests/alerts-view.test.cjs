@@ -1010,7 +1010,7 @@ test("same-origin LSST latest endpoint uses fixed read-only Elasticsearch indexe
 });
 
 test("local AlertsView target runs the JSP-capable FinkBrowser WAR", () => {
-  const build = fs.readFileSync(path.resolve(alertsView, "../../../..", "ant/build.xml"), "utf8");
+  const build = fs.readFileSync(path.resolve(alertsView, "../../..", "ant/build.xml"), "utf8");
   const target = build.match(/<target name="start-AlertsView"[\s\S]*?<\/target>/)?.[0] || "";
 
   assert.match(target, /depends="war"/);

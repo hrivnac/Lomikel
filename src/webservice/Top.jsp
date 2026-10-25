@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page errorPage="../ExceptionHandler.jsp" %>
+<%@ page errorPage="ExceptionHandler.jsp" %>
 <!-- Workspace preview: connection and context actions; legacy IDs and handlers remain. -->
 <div id="top" class="ws-top" title="graph connection and selected-element actions">
   <section class="ws-connection" aria-label="Graph connection">
@@ -10,14 +10,14 @@
     <div class="ws-server-row">
       <label for="gremlin_server">Graph server</label>
       <select name="gremlin_server" id="gremlin_server" title="database server url">
-        <%@ include file="../Servers.jsp" %>
+        <%@ include file="Servers.jsp" %>
       </select>
     </div>
     <div class="ws-action-row">
       <label for="bootstrap_graph">Initial graph</label>
       <div class="ws-input-action">
         <select name="bootstrap_graph" id="bootstrap_graph" title="bootstrap gremlin graph">
-          <%@ include file="../Graphs.jsp" %>
+          <%@ include file="Graphs.jsp" %>
         </select>
         <button type="button" class="ws-primary-action" onclick="bootstrap('selection')" title="Search for graph nodes">Search</button>
       </div>

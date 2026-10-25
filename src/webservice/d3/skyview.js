@@ -59,7 +59,7 @@
     list.appendChild(fragment);
     var config = {
       form: true, controls: true, formFields: {download:true},
-      datapath: '../../d3-celestial-0.7.32/data/',
+      datapath: '../d3-celestial-0.7.32/data/',
       projection: 'aitoff', transform: 'galactic',
       background: {fill:'#fff', stroke:'#607584', opacity:1, width:1},
       stars: {colors:false, names:false, propername:false, style:{fill:'#bcc8d2',opacity:1},limit:6,size:3},

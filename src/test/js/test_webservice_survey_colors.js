@@ -4,8 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '../../webservice');
-const original = path.resolve(root, '../ws/FinkBrowser/images/Star.png');
-const stylesheet = fs.readFileSync(path.join(root, 'Stylesheet.js'), 'utf8');
+const original = path.resolve(root, 'images/Star.png');
+const stylesheet = fs.readFileSync(path.join(root, 'SurveyStylesheet.js'), 'utf8');
 const style = {nodes:{object:{graphics:{shape:'image',image:'Star.png'},actions:[]}}};
 const context = {stylesheet:style};
 vm.runInNewContext(stylesheet, context);
@@ -17,10 +17,11 @@ for (const [objectId, name] of [
 ]) {
   context.eMap = new Map([['objectId',objectId]]);
   const value = vm.runInNewContext(selection.js,context);
-  assert.equal(value, name === 'Star.png' ? name : '../webservice/images/'+name);
+  assert.equal(value, name, 'GraphView.js supplies the images/ prefix');
+  assert.equal('images/' + value, 'images/' + name);
 }
 assert.match(fs.readFileSync(path.join(root, 'GraphView.jsp'), 'utf8'),
-  /webservice\/Stylesheet\.js\?v=survey-colors-/);
+  /Stylesheet\.js\?v=survey-colors-/);
 function chunks(file) {
   const data=fs.readFileSync(file);
   assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a');

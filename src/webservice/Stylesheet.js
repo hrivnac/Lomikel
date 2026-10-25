@@ -1,34 +1,375 @@
-/* Preview-only Fink object action; the root Stylesheet.js remains unchanged. */
-function finkSurveyStarImage(objectId) {
-  if (objectId == null) return 'Star.png';
-  var id = String(objectId).trim();
-  if (/^ZTF[A-Za-z0-9_-]{1,80}$/.test(id)) return '../webservice/images/Star-ZTF.png';
-  if (/^[0-9]{1,24}$/.test(id)) return '../webservice/images/Star-LSST.png';
-  return 'Star.png';
-}
-// GraphView.js evaluates graphics.image for each vertex, then prefixes images/.
-if (stylesheet.nodes.object && stylesheet.nodes.object.graphics) {
-  stylesheet.nodes.object.graphics.image = {js:"finkSurveyStarImage(eMap.get('objectId'))"};
-}
-if (stylesheet.nodes.object && !stylesheet.nodes.object.actions.some(function (action) { return action.name === 'SkyView'; })) {
-  var skyActions = stylesheet.nodes.object.actions;
-  var skyTableIndex = skyActions.findIndex(function (action) { return action.name === 'Table'; });
-  skyActions.splice(skyTableIndex + 1, 0, {
-    name: 'SkyView', url: 'webservice/d3/skyview.jsp', target: 'skyview'
-  });
-}
-if (stylesheet.nodes.object && !stylesheet.nodes.object.actions.some(function (action) { return action.name === 'Cutouts'; })) {
-  var cutoutActions = stylesheet.nodes.object.actions;
-  var cutoutSkyIndex = cutoutActions.findIndex(function (action) { return action.name === 'SkyView'; });
-  cutoutActions.splice(cutoutSkyIndex + 1, 0, {
-    name: 'Cutouts', url: 'webservice/cutouts', target: 'image'
-  });
-}
-if (stylesheet.nodes.object && !stylesheet.nodes.object.actions.some(function (action) { return action.name === 'LightCurve'; })) {
-  var lightCurveActions = stylesheet.nodes.object.actions;
-  var lightCurveShowIndex = lightCurveActions.findIndex(function (action) { return action.name === 'Show'; });
-  // Use a static sentinel; never embed object IDs in the legacy inline action URL.
-  lightCurveActions.splice(lightCurveShowIndex + 1, 0, {
-    name: 'LightCurve', url: 'webservice/lightcurve', target: 'plot'
-  });
-}
+function storeData(fn, dataS) {
+  return "FITSView.jsp?fn=" + fn + "&data=" + encodeURIComponent(dataS);
+  }
+
+// Object IDs identify the survey; portal pages are not REST API endpoints.
+function finkPortalUrl(objectId) {
+  if (objectId == null) return '';
+  var oid = String(objectId).trim();
+  var portal = oid.startsWith('ZTF') ? 'ztf' : /^[0-9]/.test(oid) ? 'lsst' : '';
+  return portal ? 'https://' + portal + '.fink-portal.org/' + encodeURIComponent(oid) : '';
+  }
+
+stylesheet.nodes.AstroLabNet = {
+  properties:{},
+  graphics: {
+    label:"AstroLabNet",
+    title:"AstroLabNet",
+    subtitle:" ",
+    group:" ",
+    shape:"image",
+    image:"AstroLab.png",
+    borderRadius:"0",
+    borderWidth:"1",
+    borderDashes:[1,0],
+    value:"0"
+    },
+  actions:[
+    {name:"Fink Data Explorer Home",  url:"https://cern.ch/hrivnac/Activities/Packages/FinkBrowser",                target:"external"},
+    {name:"Show",                     url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"  }
+    ]
+  }
+stylesheet.nodes.site = {
+  properties:{gremlin:"valueMap('lbl', 'Livy', 'Spark', 'Spark History', 'Ganglia', 'Hadoop', 'HBase', 'Prometheus', 'Mesos', 'Grafana', 'Zeppelin', 'Tomcat', 'HBase_ZTF_Season1', 'HBase_Test_Tiny_3').toList()[0]"},
+  graphics: {
+    label:"title",
+    title:"title",
+    subtitle:" ",
+    group:" ",
+    shape:"image",
+    image:{js:"title.replace('site:', '') + '.png'"},
+    borderRadius:"0",
+    borderWidth:"1",
+    borderDashes:[1,0],
+    value:"0"
+    },
+  actions:[
+    {name:"Livy",               url:"Livy"         , target:"external"},
+    {name:"Spark",              url:"Spark"        , target:"external"},
+    {name:"Spark History",      url:"Spark History", target:"external"},
+    {name:"Ganglia",            url:"Ganglia"      , target:"external"},
+    {name:"Hadoop",             url:"Hadoop"       , target:"external"},
+    {name:"HBase",              url:"HBase"        , target:"external"},
+    {name:"Prometheus",         url:"Prometheus"   , target:"external"},
+    {name:"Mesos",              url:"Mesos"        , target:"external"},
+    {name:"Grafana",            url:"Grafana"      , target:"external"},
+    {name:"Zeppelin",           url:"Zeppelin"     , target:"external"},
+    {name:"Tomcat",             url:"Tomcat"       , target:"external"}
+    ]
+  }
+stylesheet.nodes.datalink = {
+  properties:{gremlin:"valueMap('name', 'technology').toList()[0]"},
+  graphics: {
+    label:"name",
+    title:"name",
+    subtitle:"technology",
+    group:" ",
+    shape:"dot",
+    image:"",
+    borderRadius:"0",
+    borderWidth:"1",
+    borderDashes:[1,0],
+    value:"0"
+    },
+  actions:[
+    {name:"Link",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"DataLink.jsp?id=\")"    }, target:"result"  },
+    {name:"Fits",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"DataLinkFits.jsp?id=\")"}, target:"result"  },
+    {name:"Show",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"        }, target:"result"  },
+    {name:"Table",   url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"       }, target:"table"   }
+    ]
+  }
+stylesheet.nodes.alert = {
+  properties:{gremlin:"valueMap('lbl', 'jd').toList()[0]"},
+  graphics: {
+    label:"jd",
+    title:"jd",
+    subtitle:" ",
+    group:{gremlin:"values('objectId').toList()[0]"},
+    shape:"image",
+    image:"Alert.png",
+    borderRadius:"0",
+    borderWidth:"2",
+    borderDashes:[1,1],
+    value:"0.1"
+    },
+  actions:[
+    {name:"Show",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")" }, target:"result"  },
+    {name:"Table",   url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
+    ]
+  }
+stylesheet.nodes.object = {
+  properties:{gremlin:"valueMap('lbl').toList()[0]"},
+  graphics: {
+    label:"objectId",
+    title:"objectId",
+    subtitle:" ",
+    group:{gremlin:"values('objectId').toList()[0]"},
+    shape:"image",
+    image:"Star.png",
+    borderRadius:"0",
+    borderWidth:"2",
+    borderDashes:[1,1],
+    value:"0.1"
+    },
+  actions:[
+    {name:"Show",        url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"                    }, target:"result"  },
+    {name:"Table",       url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"                   }, target:"table"   },
+    {name:"Fink Portal", url:{js:"finkPortalUrl(eMap.get('objectId'))"}, target:"external"}
+    ]
+  }
+stylesheet.nodes.PCA = {
+  properties:{gremlin:"valueMap('lbl').toList()[0]"},
+  graphics: {
+    label:"lbl",
+    title:"lbl",
+    subtitle:" ",
+    group:{gremlin:"values('objectId').toList()[0]"},
+    shape:"box",
+    image:"",
+    borderRadius:"0",
+    borderWidth:"2",
+    borderDashes:[1,1],
+    value:"0"
+    },
+  actions:[
+    {name:"Show",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")" }, target:"result"  },
+    {name:"Table",   url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
+    ]
+  }
+stylesheet.nodes.candidate = {
+  properties:{gremlin:"valueMap('candid').toList()[0]"},
+  graphics: {
+    label:"candid",
+    title:"candid",
+    subtitle:" ",
+    group:{gremlin:"in().has('lbl', 'alert').values('objectId').toList()[0]"},
+    shape:"dot",
+    image:"",
+    borderRadius:"0",
+    borderWidth:"3",
+    borderDashes:[1,0],
+    value:"0"
+    },
+  actions:[
+    {name:"Show",     url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},       target:"result" },
+    {name:"Table",    url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"},      target:"table"  }
+    ]
+  }
+stylesheet.nodes.prv_candidates = {
+  properties:{},
+  graphics: {
+    label:"prv_candidates",
+    title:"prv_candidates",
+    subtitle:" ",
+    group:{gremlin:"in().has('lbl','alert').values('objectId').toList()[0]"},
+    shape:"dot",
+    image:"",
+    borderRadius:"0",
+    borderWidth:"3",
+    borderDashes:[1,1],
+    value:{gremlin:"out().count().join().toString()"}
+    },
+  actions:[
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"},
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table" }
+    ]
+  }
+stylesheet.nodes.prv_candidate = {
+  properties:{gremlin:"valueMap('jd').toList()[0]"},
+  graphics: {
+    label:"jd",
+    title:"jd",
+    subtitle:" ",
+    group:{gremlin:"in().in().has('lbl','alert').values('objectId').toList()[0]"},
+    shape:"dot",
+    image:"",
+    borderRadius:"0",
+    borderWidth:"1",
+    borderDashes:[1,1],
+    value:"0"
+    },
+  actions:[
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"},
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table" }
+    ]
+  }
+stylesheet.nodes.cutout = {
+  properties:{},
+  graphics: {
+    label:"cutout",
+    title:"cutout",
+    subtitle:" ",
+    group:{gremlin:"in().has('lbl', 'alert').values('objectId').toList()[0]"},
+    shape:"triangle",
+    image:"",
+    borderRadius:"0",
+    borderWidth:"3",
+    borderDashes:[1,0],
+    value:{gremlin:"both().count().join().toString()"}
+    },
+  actions:[
+    {name:"Show",       url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")" }, target:"result"  },
+    {name:"Table",      url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"   }
+    ]
+  }
+stylesheet.nodes.OCol = {
+  properties:{gremlin:"valueMap('cls', 'classifier', 'flavor').toList()[0]"},
+  graphics: {
+    label:"cls",
+    title:"classifier",
+    subtitle:"flavor",
+    group:" ",
+    shape:"image",
+    image:"StarsSources.png",
+    borderRadius:"0",
+    borderWidth:"1",
+    borderDashes:[1,0],
+    value:{gremlin:"both().count().join().toString()"}
+    },
+  actions:[
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"},  target:"result"},
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Nodes.jsp?id=\")"}, target:"table"}
+    ]
+  }
+stylesheet.nodes.Imports = {
+  properties:" ",
+  graphics: {
+    label:" ",
+    title:" ",
+    subtitle:" ",
+    group:" ",
+    shape:"dot",
+    image:"",
+    borderRadius:"0",
+    borderWidth:"2",
+    borderDashes:[1,0],
+    value:{gremlin:"both().count().join().toString()"}
+    },
+  actions:[
+    {name:"Show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"}
+    ]
+  }
+stylesheet.nodes.Import = {
+  properties:{gremlin:"valueMap('importDate', 'importSource').toList()[0]"},
+  graphics: {
+    label:"importSource",
+    title:"importSource",
+    subtitle:"importDate",
+    group:" ",
+    shape:"dot",
+    image:"",
+    borderRadius:"0",
+    borderWidth:"1",
+    borderDashes:[1,0],
+    value:"0"
+    },
+  actions:[
+    {name:"Show", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Node.jsp?id=\")"}, target:"result"}
+    ]
+  }
+stylesheet.edges.has = {
+  properties:{},
+  graphics: {
+    label:" ",
+    title:" ",
+    subtitle:" ",
+    arrows:{to:{enabled:true, type:"vee"}},
+    value:"0.1",
+    group:" "
+    },
+  actions: [
+     {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},   target:"result"  },
+     {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
+    ]
+  }
+stylesheet.edges.holds = {
+  properties:{},
+  graphics: {
+    label:" ",
+    title:" ",
+    subtitle:" ",
+    arrows:{to:{enabled:true, type:"vee"}},
+    value:"0.1",
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},   target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
+    ]
+  }
+stylesheet.edges.sends = {
+  properties:{},
+  graphics: {
+    label:" ",
+    title:" ",
+    subtitle:" ",
+    arrows:{to:{enabled:true, type:"vee"}},
+    value:"1.0",
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},   target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
+    ]
+  }
+stylesheet.edges.collects = {
+  properties:{},
+  graphics: {
+    label:" ",
+    title:" ",
+    subtitle:" ",
+    arrows:{to:{enabled:true, type:"vee"}},
+    value:"1.0",
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},   target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
+    ]
+  }
+stylesheet.edges.contains = {
+  properties:{},
+  graphics: {
+    label:" ",
+    title:" ",
+    subtitle:" ",
+    arrows:{to:{enabled:true, type:"vee"}},
+    value:"1.0",
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},   target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
+    ]
+  }
+stylesheet.edges.deepcontains = {
+  properties:{gremlin:"valueMap('weight').toList()[0]"},
+  graphics: {
+    label:" ",
+    title:" ",
+    subtitle:" ",
+    arrows:{to:{enabled:true, type:"vee"}},
+    value:"weight",
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},   target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},  target:"table"   }
+    ]
+  }
+stylesheet.edges.overlaps = {
+  properties:{gremlin:"valueMap('sizeIn', 'sizeOut', 'intersection').toList()[0]"},
+  graphics: {
+    label:" ",
+    title:"intersection",
+    subtitle:" ",
+    arrows:" ",
+    value:"intersection",
+    group:" "
+    },
+  actions: [
+    {name:"Show",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edge.jsp?id=\")"},      target:"result"  },
+    {name:"Table", url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Edges.jsp?id=\")"},     target:"table"   },
+    {name:"Venn",  url:{gremlin:"id().next().toString().replaceFirst(\"^\", \"Venn.jsp?id=\")"},      target:"plot"    }
+    ]
+  }

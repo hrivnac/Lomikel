@@ -796,157 +796,57 @@
         
   <!-- WAR ==================================================================-->
 
-  <target name="war"
-          depends="exe"
-          description="Create WAR">
-          <!--
-    <echo>Creating Lomikel.war</echo>
- 		<copy file="../src/ws/index.jsp"             tofile="../build/index.jsp"   overwrite="true"/>
- 		<copy file="../src/ws/Top.jsp"               tofile="../build/Top.jsp"     overwrite="true"/>
- 		<copy file="../src/ws/TopMini.jsp"           tofile="../build/TopMini.jsp" overwrite="true"/>
- 		<copy file="../src/ws/Servers-${target}.jsp" tofile="../build/Servers.jsp" overwrite="true"/>
- 		<copy file="../src/ws/Graphs-${target}.jsp"  tofile="../build/Graphs.jsp"  overwrite="true"/>
-    <replace file="../build/index.jsp"   token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/index.jsp"   token="@ICON@"    value="${browsericon}"/>
-    <replace file="../build/Top.jsp"     token="@VERSION@" value="${version}"/>
-    <replace file="../build/Top.jsp"     token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/Top.jsp"     token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/Top.jsp"     token="@LOGO@"    value="${browserlogo}"/>
-    <replace file="../build/Top.jsp"     token="@HOME@"    value="${browserurl}"/>
-    <replace file="../build/Top.jsp"     token="@BOOT@"    value="${bootgremlin}"/>
-    <replace file="../build/TopMini.jsp" token="@VERSION@" value="${version}"/>
-    <replace file="../build/TopMini.jsp" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/TopMini.jsp" token="@NAME@"    value="${browsername}"/>
-    <replace file="../build/TopMini.jsp" token="@LOGO@"    value="${browserlogo}"/>
-    <replace file="../build/TopMini.jsp" token="@HOME@"    value="${browserurl}"/>
-    <replace file="../build/TopMini.jsp" token="@BOOT@"    value="${bootgremlin}"/>
-    <war destfile="../lib/Lomikel.war" webxml="../src/ws/web.xml">
-      <fileset dir="../src/ws">
-	    	<include name="**/*"/>
-        </fileset>
-      <fileset dir="../extlib/ws">
-	    	<include name="**/*"/>
-	    	<exclude name="js9-3.0-src/**/*"/>
-	    	<exclude name="vis-network-8.3.2-src/**/*"/>
-	    	<exclude name="vis-timeline-7.3.9-src/**/*"/>
-        </fileset>
-      <fileset dir="../build">
-        <include name="index.jsp"/>
-        <include name="Top.jsp"/>
-        <include name="TopMini.jsp"/>
-        <include name="Graphs.jsp"/>
-        <include name="Servers.jsp"/>
-        </fileset>
-      <classes dir="../src/ws">
-        <include name="log4j.xml"/>
-        </classes>
-      <lib file="../lib/Lomikel-Janus-${version}.exe.jar"/>
-      <lib file="../lib/Lomikel-Janus-${version}.jar"/>
-      <lib file="../lib/Lomikel-${version}.jar"/>
-      <lib file="../lib/Lomikel-ext-${version}.jar"/>
-      <manifest>
-        <attribute name="Created-By" value="${user.name}"/>
-        <attribute name="AppName"    value="Lomikel"/>
-        <attribute name="AppVersion" value="${version} ${TSTAMP}"/>
-        </manifest>
-      </war>
-      -->
+  <target name="war" depends="exe" description="Create FinkBrowser WAR from src/webservice">
     <echo>Creating FinkBrowser.war</echo>
- 		<copy file="../src/ws/index.jsp"                         tofile="../build/index.jsp"             overwrite="true"/>
-		<!-- Opt-in workspace preview; the existing root index.jsp stays unchanged. -->
-		<copy file="../src/webservice/index.jsp"                tofile="../build/webservice/index.jsp"  overwrite="true"/>
-		<copy file="../src/webservice/Top.jsp"                  tofile="../build/webservice/Top.jsp"     overwrite="true"/>
- 		<copy file="../src/ws/FinkBrowser/Apps.html"             tofile="../build/FinkBrowser/Apps.html" overwrite="true"/>
- 		<copy file="../src/ws/Top.jsp"                           tofile="../build/Top.jsp"               overwrite="true"/>
- 		<copy file="../src/ws/TopMini.jsp"                       tofile="../build/TopMini.jsp"           overwrite="true"/>
- 		<copy file="../src/ws/FinkBrowser/Servers-${target}.jsp" tofile="../build/Servers.jsp"           overwrite="true"/>
- 		<copy file="../src/ws/FinkBrowser/Graphs-${target}.jsp"  tofile="../build/Graphs.jsp"            overwrite="true"/>
-    <replace file="../build/index.jsp"   token="@NAME@"              value="${Finkbrowsername}"/>
-    <replace file="../build/index.jsp"   token="@ICON@"              value="${Finkbrowsericon}"/>
-    <replace file="../build/webservice/index.jsp" token="@NAME@"     value="${Finkbrowsername}"/>
-    <replace file="../build/webservice/index.jsp" token="@ICON@"     value="${Finkbrowsericon}"/>
-    <replace file="../build/webservice/index.jsp" token="@HOME@"     value="${Finkbrowserurl}"/>
-    <replace file="../build/webservice/index.jsp" token="@VERSION@"  value="${version}"/>
-    <replace file="../build/webservice/index.jsp" token="@BUILD@"    value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/webservice/Top.jsp"     token="@BOOT@"    value="${Finkbootgremlin}"/>
-    <replace file="../build/FinkBrowser/Apps.html" token="@VERSION@" value="${version}"/>
-    <replace file="../build/FinkBrowser/Apps.html" token="@BUILD@"   value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/Top.jsp"     token="@VERSION@"           value="${version}"/>
-    <replace file="../build/Top.jsp"     token="@BUILD@"             value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/Top.jsp"     token="@NAME@"              value="${Finkbrowsername}"/>
-    <replace file="../build/Top.jsp"     token="@LOGO@"              value="${Finkbrowserlogo}"/>
-    <replace file="../build/Top.jsp"     token="@HOME@"              value="${Finkbrowserurl}"/>
-    <replace file="../build/Top.jsp"     token="@BOOT@"              value="${Finkbootgremlin}"/>
-    <replace file="../build/TopMini.jsp" token="@VERSION@"           value="${version}"/>
-    <replace file="../build/TopMini.jsp" token="@BUILD@"             value="${TSTAMP} by ${user.name} for ${target}"/>
-    <replace file="../build/TopMini.jsp" token="@NAME@"              value="${Finkbrowsername}"/>
-    <replace file="../build/TopMini.jsp" token="@LOGO@"              value="${Finkbrowserlogo}"/>
-    <replace file="../build/TopMini.jsp" token="@HOME@"              value="${Finkbrowserurl}"/>
-    <replace file="../build/TopMini.jsp" token="@BOOT@"              value="${Finkbootgremlin}"/>
-    <war destfile="../lib/FinkBrowser.war" webxml="../src/ws/web.xml">
-      <zipfileset dir="../src/webservice" prefix="webservice">
+    <copy file="../src/webservice/index.jsp" tofile="../build/index.jsp" overwrite="true"/>
+    <copy file="../src/webservice/Top.jsp" tofile="../build/Top.jsp" overwrite="true"/>
+    <copy file="../src/webservice/Apps.html" tofile="../build/Apps.html" overwrite="true"/>
+    <copy file="../src/webservice/Servers-${target}.jsp" tofile="../build/Servers.jsp" overwrite="true"/>
+    <copy file="../src/webservice/Graphs-${target}.jsp" tofile="../build/Graphs.jsp" overwrite="true"/>
+    <replace file="../build/index.jsp" token="@NAME@" value="${Finkbrowsername}"/>
+    <replace file="../build/index.jsp" token="@ICON@" value="${Finkbrowsericon}"/>
+    <replace file="../build/index.jsp" token="@HOME@" value="${Finkbrowserurl}"/>
+    <replace file="../build/index.jsp" token="@VERSION@" value="${version}"/>
+    <replace file="../build/index.jsp" token="@BUILD@" value="${TSTAMP} by ${user.name} for ${target}"/>
+    <replace file="../build/Top.jsp" token="@BOOT@" value="${Finkbootgremlin}"/>
+    <replace file="../build/Apps.html" token="@VERSION@" value="${version}"/>
+    <replace file="../build/Apps.html" token="@BUILD@" value="${TSTAMP} by ${user.name} for ${target}"/>
+    <war destfile="../lib/FinkBrowser.war" webxml="../src/webservice/web.xml">
+      <fileset dir="../src/webservice">
+        <include name="**/*"/>
         <exclude name="index.jsp"/>
         <exclude name="Top.jsp"/>
-        <exclude name="README.md"/>
-        </zipfileset>
-      <zipfileset dir="../build/webservice" prefix="webservice">
-        <include name="index.jsp"/>
-        <include name="Top.jsp"/>
-        </zipfileset>
-      <fileset dir="../src/ws/FinkBrowser">
-        <include name="**/*"/>
         <exclude name="Apps.html"/>
-	    	<exclude name="LightCurveView/sn_lightcurves/**/*"/>
-        </fileset>
-      <fileset dir="../build/FinkBrowser">
-        <include name="Apps.html"/>
-        </fileset>
-      <fileset dir="../src/ws">
-        <include name="**/*"/>
-        <exclude name="Stylesheet.js"/>
-        <exclude name="Options.js"/>
-        <exclude name="Init.jsp"/>
-        <exclude name="Servers*.jsp"/>
-        <exclude name="Graphs*.jsp"/>
-        <exclude name="Result.jsp"/>
-        <exclude name="Plot.jsp"/>
-        <exclude name="Table.jsp"/>
-        <exclude name="SkyView.jsp"/>
-        <exclude name="Params.jsp"/>
-        <exclude name="PropertiesProcessor.jsp"/>
-        <exclude name="Image.jsp"/>
-        <exclude name="HBaseClient.jsp"/>
-        <exclude name="profiles/*"/>
-        <exclude name="styles/*"/>
-        <exclude name="FinkBrowser/*"/>
-        </fileset>
+        <exclude name="Servers-*.jsp"/>
+        <exclude name="Graphs-*.jsp"/>
+        <exclude name="web.xml"/>
+        <exclude name="**/tests/**"/>
+        <exclude name="**/*.cjs"/>
+        <exclude name="**/*.md"/>
+        <exclude name="**/Notes.txt"/>
+        <exclude name="**/*.py"/>
+        <exclude name="LightCurveView/sn_lightcurves/**"/>
+      </fileset>
       <fileset dir="../extlib/ws">
-	    	<include name="**/*"/>
-	    	<exclude name="js9-3.0-src/**/*"/>
-	    	<exclude name="vis-network-8.3.2-src/**/*"/>
-	    	<exclude name="vis-timeline-7.3.9-src/**/*"/>
-        </fileset>
+        <include name="**/*"/>
+        <exclude name="js9-3.0-src/**/*"/>
+        <exclude name="vis-network-8.3.2-src/**/*"/>
+        <exclude name="vis-timeline-7.3.9-src/**/*"/>
+      </fileset>
       <fileset dir="../build">
         <include name="index.jsp"/>
         <include name="Top.jsp"/>
-        <include name="TopMini.jsp"/>
+        <include name="Apps.html"/>
         <include name="Graphs.jsp"/>
         <include name="Servers.jsp"/>
-        </fileset>
-      <classes dir="../src/ws/FinkBrowser">
+      </fileset>
+      <classes dir="../src/webservice">
         <include name="d3/actions.js"/>
-       </classes>
+      </classes>
       <lib file="../lib/Lomikel-Janus-${version}.exe.jar"/>
       <lib file="../lib/Lomikel-Janus-${version}.jar"/>
       <lib file="../lib/Lomikel-${version}.jar"/>
       <lib file="../lib/Lomikel-ext-${version}.jar"/>
-      <lib file="${orgjson_jar}"/>
-      <lib file="${javaxmail_jar}"/>
-      <lib file="${hbasecommon_jar}"/>
-      <lib file="${hbaseclient_ja}"/>
-      <lib file="${hadoopcommon_jar}"/>
-      <lib file="${groovysh_jar}"/>
-      <lib file="${healpix_jar}"/>
       <manifest>
         <attribute name="Created-By" value="${user.name}"/>
         <attribute name="AppName"    value="FinkBrowser"/>
@@ -970,16 +870,10 @@
     <exec executable="/usr/bin/sudo">
       <arg line="chmod 777 ${server_dir}"/>
       </exec>
-    <exec executable="/usr/bin/sudo">
-      <arg line="/bin/rm -f ${server_dir}/${user.name}-Lomikel.war"/>
-      </exec>
-    <exec executable="/usr/bin/sudo">
+<exec executable="/usr/bin/sudo">
       <arg line="/bin/rm -f ${server_dir}/${user.name}-FinkBrowser.war"/>
       </exec>
-    <exec executable="/usr/bin/sudo">
-      <arg line="cp ../lib/Lomikel.war ${server_dir}/${user.name}-Lomikel.war"/>
-      </exec>
-    <exec executable="/usr/bin/sudo">
+<exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/FinkBrowser.war ${server_dir}/${user.name}-FinkBrowser.war"/>
       </exec>
     </target>
@@ -989,23 +883,16 @@
     <exec executable="/usr/bin/ssh">
       <arg line="root@${hostname} 'chmod 777 ${server_dir}'"/>
       </exec>
-    <exec executable="/usr/bin/ssh">
-      <arg line="root@${hostname} '/bin/rm -f ${server_dir}/${user.name}-Lomikel.war'"/>
-      </exec>
-    <exec executable="/usr/bin/ssh">
+<exec executable="/usr/bin/ssh">
       <arg line="root@${hostname} '/bin/rm -f ${server_dir}/${user.name}-FinkBrowser.war'"/>
       </exec>
-    <copy file="../lib/Lomikel.war"
-          tofile="${server_dir}/${user.name}-Lomikel.war"/>
-    <copy file="../lib/FinkBrowser.war"
+<copy file="../lib/FinkBrowser.war"
           tofile="${server_dir}/${user.name}-FinkBrowser.war"/>
     </target>
     
   <target name="deploy-pure"
            if="${cp}">
-    <copy file="../lib/Lomikel.war"
-          tofile="${server_dir}/${user.name}-Lomikel.war"/>
-    <copy file="../lib/FinkBrowser.war"
+<copy file="../lib/FinkBrowser.war"
           tofile="${server_dir}/${user.name}-FinkBrowser.war"/>
     </target>
   
@@ -1022,16 +909,10 @@
     <exec executable="/usr/bin/sudo">
       <arg line="chmod 777 ${server_dir}"/>
       </exec>
-    <exec executable="/usr/bin/sudo">
-      <arg line="/bin/rm -f ${server_dir}/Lomikel.war"/>
-      </exec>
-    <exec executable="/usr/bin/sudo">
+<exec executable="/usr/bin/sudo">
       <arg line="/bin/rm -f ${server_dir}/FinkBrowser.war"/>
       </exec>
-    <exec executable="/usr/bin/sudo">
-      <arg line="cp ../lib/Lomikel.war ${server_dir}/Lomikel.war"/>
-      </exec>
-    <exec executable="/usr/bin/sudo">
+<exec executable="/usr/bin/sudo">
       <arg line="cp ../lib/FinkBrowser.war ${server_dir}/FinkBrowser.war"/>
       </exec>
     </target>
@@ -1041,23 +922,16 @@
     <exec executable="/usr/bin/ssh">
       <arg line="root@${hostname} 'chmod 777 ${server_dir}'"/>
       </exec>
-    <exec executable="/usr/bin/ssh">
-      <arg line="root@${hostname} '/bin/rm -f ${server_dir}/Lomikel.war'"/>
-      </exec>
-    <exec executable="/usr/bin/ssh">
+<exec executable="/usr/bin/ssh">
       <arg line="root@${hostname} '/bin/rm -f ${server_dir}/FinkBrowser.war'"/>
       </exec>
-    <copy file="../lib/Lomikel.war"
-          tofile="${server_dir}/Lomikel.war"/>
-    <copy file="../lib/FinkBrowser.war"
+<copy file="../lib/FinkBrowser.war"
           tofile="${server_dir}/FinkBrowser.war"/>
     </target>
     
   <target name="deploy-prod-pure"
           if="${cp}">
-    <copy file="../lib/Lomikel.war"
-          tofile="${server_dir}/Lomikel.war"/>
-    <copy file="../lib/FinkBrowser.war"
+<copy file="../lib/FinkBrowser.war"
           tofile="${server_dir}/FinkBrowser.war"/>
     </target>
  
@@ -1314,29 +1188,10 @@
 
   <!-- Run ==================================================================-->
 
-  <target name="start-Lomikel"
-          depends="init"
-          description="Run local Lomikel Server">
-    <echo>Go to http://localhost:${jetty_port}/Lomikel</echo>
-    <java jar="${jetty_runner}" fork="true">
-      <arg value="--path"/>
-      <arg value="/Lomikel"/>
-      <arg value="--port"/>
-      <arg value="${jetty_port}"/>
-      <arg value="--stop-port"/>
-      <arg value="${jetty_port_stop}"/>
-      <arg value="--log"/>
-      <arg value="LomikelServer.log"/>
-      <arg value="--out"/>
-      <arg value="LomikelServer.out"/>
-      <arg value="../lib/Lomikel.war"/>
-      </java>
-    </target>
-        
   <target name="start-FinkBrowser"
-          depends="init"
+          depends="war"
           description="Run local FinkBrowser server">
-    <echo>Go to http://localhost:${jetty_port}/FinkBrowser</echo>
+    <echo>Go to http://localhost:${jetty_port}/FinkBrowser/index.jsp</echo>
     <java jar="${jetty_runner}" fork="true">
       <arg value="--path"/>
       <arg value="/FinkBrowser"/>
@@ -1355,16 +1210,16 @@
     </target>
     
   <target name="start-AlertsView"
-          depends="init"
+          depends="war"
           description="Run local AlertsView">
-    <echo>Go to http://localhost:8000</echo>
-    <exec executable="/usr/bin/python3">
-      <arg value="-m"/>
-      <arg value="http.server"/>
-      <arg value="8000"/>
-      <arg value="-d"/>
-      <arg value="../src/ws/FinkBrowser/AlertsView"/>
-      </exec>
+    <echo>Go to http://localhost:${jetty_port}/FinkBrowser/AlertsView/index.html</echo>
+    <java jar="${jetty_runner}" fork="true">
+      <arg value="--path"/>
+      <arg value="/FinkBrowser"/>
+      <arg value="--port"/>
+      <arg value="${jetty_port}"/>
+      <arg value="../lib/FinkBrowser.war"/>
+      </java>
     </target>
     
   <target name="start-LightCurveView"
@@ -1376,7 +1231,7 @@
       <arg value="http.server"/>
       <arg value="8001"/>
       <arg value="-d"/>
-      <arg value="../src/ws/FinkBrowser/LightCurveView"/>
+      <arg value="../src/webservice/LightCurveView"/>
       </exec>
     </target>
     
@@ -1389,7 +1244,7 @@
       <arg value="http.server"/>
       <arg value="8002"/>
       <arg value="-d"/>
-      <arg value="../src/ws/FinkBrowser/ClassificationView"/>
+      <arg value="../src/webservice/ClassificationView"/>
       </exec>
     </target>
     

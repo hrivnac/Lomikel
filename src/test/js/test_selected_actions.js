@@ -4,9 +4,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const root = path.join(__dirname, '../../ws');
+const root = path.join(__dirname, '../../webservice');
 const graph = fs.readFileSync(path.join(root, 'GraphView.js'), 'utf8');
-const fink = fs.readFileSync(path.join(root, 'FinkBrowser/Stylesheet.js'), 'utf8');
+const fink = fs.readFileSync(path.join(root, 'Stylesheet.js'), 'utf8');
 
 function fixture() {
   const controls = Object.fromEntries(['vis', 'filter', 'add2graph', 'clusterize', 'zoom', 'stabilize',

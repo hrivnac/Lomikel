@@ -64,7 +64,7 @@
     var form = document.createElement('form');
     form.hidden = true;
     form.method = 'POST';
-    form.action = new URL('webservice/d3/skyview.jsp', document.baseURI).pathname;
+    form.action = new URL('d3/skyview.jsp', document.baseURI).pathname;
     form.target = frame.name;
     [['points', JSON.stringify(points)], ['requested', String(requested)],
      ['missing', String(missing)]].forEach(function (pair) {
@@ -92,7 +92,7 @@
     var controller = new AbortController();
     activeRequest = controller;
     try {
-      var response = await fetch('webservice/SkyPositions.jsp', {
+      var response = await fetch('SkyPositions.jsp', {
         method: 'POST', credentials: 'same-origin', signal: controller.signal,
         headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ids: ids})
       });

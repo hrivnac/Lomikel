@@ -7,7 +7,7 @@
 <%@ page import="org.apache.logging.log4j.LogManager" %>
 <%@ page import="org.json.JSONObject" %>
 
-<%@ page errorPage="ExceptionHandler.jsp" %>
+<%@ page errorPage="../ExceptionHandler.jsp" %>
 
 <%! static Logger log = LogManager.getLogger(org.apache.jsp.d3.venn_jsp.class); %>
 

@@ -28,8 +28,8 @@ assert.match(shell, /data-ws-help="Feedback"/);
 for (const name of ['Result', 'Table', 'Image', 'Plot', 'SkyView']) {
   assert.match(shell, new RegExp(`(?:${name.toLowerCase()}Tab.*?${name}|${name}.*?${name.toLowerCase()}Tab)`));
 }
-assert.match(index, /webservice\/help\.js/);
-assert.match(index, /webservice\/help\.css/);
+assert.match(index, /help\.js/);
+assert.match(index, /help\.css/);
 const button = {
   attrs: {'data-ws-help': 'Result'},
   getAttribute(key) { return this.attrs[key]; },
@@ -57,7 +57,7 @@ for (const [tab, name] of Object.entries({result: 'Result', table: 'Table', imag
   assert.equal(button.attrs['data-ws-help'], name);
   let stopped = false;
   listener({target: {closest: () => button}, preventDefault() {}, stopPropagation() { stopped = true; }});
-  assert.equal(popup.url, `webservice/Help-${name}.html`);
+  assert.equal(popup.url, `Help-${name}.html`);
   assert.equal(stopped, true);
   focused = false;
   const event = {phase: 'before'};

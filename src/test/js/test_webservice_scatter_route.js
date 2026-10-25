@@ -21,19 +21,19 @@ window.loadPane('plot','d3/correlogram.jsp?tdata=[{"x":"Class.A","y":"Class.B","
 window.loadPane('result','d3/scatterplot.jsp?name=X',false);
 window.loadPane('plot','d3/scatterplot.jsp?name=Legacy',true,480,false);
 window.loadPane('plot','d3/correlogram.jsp?tdata=[{"x":"A\"}</script><img src=x onerror=alert(1)>"}]',true,480);
-assert.match(calls[0][1], /^webservice\/d3\/scatterplot\.jsp\?/);
+assert.match(calls[0][1], /^d3\/scatterplot\.jsp\?/);
 assert.deepEqual(JSON.parse(new URL(calls[0][1],'http://localhost/FinkBrowser/').searchParams.get('tdata'))
   .map(p=>[p.xField,p.yField]),[['fluxErr','sizeOut'],['flux','sizeOut']]);
 assert.equal(calls[0][4],true);
-assert.match(calls[1][1], /^webservice\/d3\/correlogram\.jsp\?/);
+assert.match(calls[1][1], /^d3\/correlogram\.jsp\?/);
 assert.equal(calls[1][4], true);
 assert.equal(JSON.parse(new URL(calls[1][1],'http://localhost/FinkBrowser/').searchParams.get('tdata'))[0].value,'12');
 assert.equal(calls[2][1], 'd3/scatterplot.jsp?name=X');
 assert.equal(calls[3][1], 'd3/scatterplot.jsp?name=Legacy');
-assert.match(calls[4][1], /^webservice\/d3\/correlogram\.jsp\?/);
+assert.match(calls[4][1], /^d3\/correlogram\.jsp\?/);
 assert.equal(new URL(calls[4][1],'http://localhost/FinkBrowser/').searchParams.get('tdata'),'[]');
 assert.equal(calls[4][4],true);
 assert.doesNotMatch(calls[4][1], /<img|<\/script>/);
-assert.match(fs.readFileSync(path.join(base,'index.jsp'),'utf8'), /webservice\/workspace\.js\?v=[\w-]+/);
+assert.match(fs.readFileSync(path.join(base,'index.jsp'),'utf8'), /workspace\.js\?v=[\w-]+/);
 assert.match(fs.readFileSync(path.join(base,'d3/scatterplot.jsp'),'utf8'), /scatterplot\.js\?v=evolution-1/);
 console.log('Webservice-only scatter routing tests passed');

@@ -17,7 +17,7 @@ const context = {window, document: {getElementById: id => id === 'skyview' ? sky
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../../webservice/workspace.js'), 'utf8'), context);
 window.reset();
 assert.equal(sky.innerHTML, '', 'reset must remove the stale map iframe');
-assert.deepEqual(calls, ['cancel cutouts', 'dispose', ['feedback', 'Feedback.jsp'], ['top', 'webservice/Top.jsp'],
-  ['graph', 'webservice/GraphView.jsp'], 'restore image', ['plot', 'Plot.jsp'],
+assert.deepEqual(calls, ['cancel cutouts', 'dispose', ['feedback', 'Feedback.jsp'], ['top', 'Top.jsp'],
+  ['graph', 'GraphView.jsp'], 'restore image', ['plot', 'Plot.jsp'],
   ['result', 'Result.jsp'], 'clear skyview', ['tab', 'graph']]);
 console.log('SkyView reset clears stale pane and preserves legacy actions');

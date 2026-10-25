@@ -4,11 +4,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const code = fs.readFileSync(path.join(__dirname, '../../ws/d3/scatterplot.js'), 'utf8');
-const css = fs.readFileSync(path.join(__dirname, '../../ws/d3/scatterplot.css'), 'utf8');
+const code = fs.readFileSync(path.join(__dirname, '../../webservice/d3/scatterplot.js'), 'utf8');
+const css = fs.readFileSync(path.join(__dirname, '../../webservice/d3/scatterplot.css'), 'utf8');
 assert.match(css, /\.scatterplot\s*\{[^}]*width:\s*100%/);
 assert.match(css, /\.scatter-tip/);
-assert.match(css, /\.scatter-legend/);
+assert.doesNotMatch(css, /\.scatter-legend/);
 const context = vm.createContext({});
 vm.runInContext(code, context);
 

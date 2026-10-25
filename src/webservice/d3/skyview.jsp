@@ -52,7 +52,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Objects · SkyView</title>
-<link rel="stylesheet" href="../../d3-celestial-0.7.32/celestial.css">
+<link rel="stylesheet" href="../d3-celestial-0.7.32/celestial.css">
 <link rel="stylesheet" href="skyview.css?v=skyview-3">
 </head><body>
 <header><h1>Objects on the sky</h1><p id="sky-summary" role="status"><%=errorMessage == null ? "" : errorMessage%></p><span id="sky-legend" aria-label="Object colors"></span><% if (errorMessage == null) { %><button type="button" id="sky-settings-toggle" aria-controls="celestial-form" aria-expanded="false">Map settings</button><% } %></header>
@@ -60,8 +60,8 @@
 <details id="sky-coordinates"><summary>Plotted object coordinates</summary><div id="sky-list"></div></details>
 <script type="application/json" id="sky-points"><%=safeJson%></script>
 <script>window.skyRequested = <%=requested%>; window.skyMissing = <%=missing%>;</script>
-<script src="../../d3-celestial-0.7.32/lib/d3.min.js"></script>
-<script src="../../d3-celestial-0.7.32/lib/d3.geo.projection.min.js"></script>
-<script src="../../d3-celestial-0.7.32/celestial.min.js"></script>
+<script src="../d3-celestial-0.7.32/lib/d3.min.js"></script>
+<script src="../d3-celestial-0.7.32/lib/d3.geo.projection.min.js"></script>
+<script src="../d3-celestial-0.7.32/celestial.min.js"></script>
 <% if (errorMessage == null) { %><script src="skyview.js?v=skyview-5"></script><% } %>
 </body></html>

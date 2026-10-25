@@ -1,22 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page errorPage="../ExceptionHandler.jsp" %>
+<%@ page errorPage="ExceptionHandler.jsp" %>
 <jsp:useBean id="profile" class="com.Lomikel.WebService.Profile" scope="session"/>
 <jsp:useBean id="style" class="com.Lomikel.WebService.Style" scope="session"/>
 <%
-  // This opt-in shell reuses the existing root-level JSPs and application session.
+  // The default shell shares the existing graph JSPs and application session.
   String p = request.getParameter("profile");
   if (p == null || !p.matches("[A-Za-z0-9_-]+")) p = "null";
   profile.setProfile(p);
   String s = request.getParameter("style");
   style.setStyle(s);
 %>
-<%@ include file="../Init.jsp" %>
+<%@ include file="Init.jsp" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>@NAME@ — workspace preview</title>
+  <title>@NAME@</title>
   <!-- All existing fragment, script and image URLs resolve at the WAR root. -->
   <base href="<%= request.getContextPath() %>/">
   <link rel="icon" type="image" href="@ICON@">
@@ -28,11 +28,11 @@
   <link rel="stylesheet" href="jquery-ui-1.12.1/jquery-ui.min.css">
   <link rel="stylesheet" href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css">
   <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="webservice/workspace.css?v=standalone-apps-1">
-  <link rel="stylesheet" href="webservice/panels.css">
-  <link rel="stylesheet" href="webservice/graph.css?v=corr-fit-1">
-  <link rel="stylesheet" href="webservice/cutouts.css?v=survey-colors-1">
-  <link rel="stylesheet" href="webservice/help.css?v=1">
+  <link rel="stylesheet" href="workspace.css?v=standalone-apps-1">
+  <link rel="stylesheet" href="panels.css">
+  <link rel="stylesheet" href="graph.css?v=corr-fit-1">
+  <link rel="stylesheet" href="cutouts.css?v=survey-colors-1">
+  <link rel="stylesheet" href="help.css?v=1">
 </head>
 <body class="workspace">
   <div class="workspace-frame">
@@ -43,9 +43,9 @@
         <img class="workspace-logo" src="images/LomikelOverlap.png" alt="" aria-hidden="true">
         <a class="workspace-brand-link" href="@HOME@" target="RESULT" rel="noopener">@NAME@</a>
         <nav class="workspace-app-links" aria-label="Standalone applications">
-          <a href="AlertsView/index.html" target="_blank" rel="noopener noreferrer" title="Alerts View" aria-label="Alerts View (opens in a new tab)"><img src="webservice/icons/alerts.svg" alt="" aria-hidden="true"></a>
-          <a href="LightCurveView/index.html" target="_blank" rel="noopener noreferrer" title="LSST Light Curve Visualizer" aria-label="LSST Light Curve Visualizer (opens in a new tab)"><img src="webservice/icons/light-curve.svg" alt="" aria-hidden="true"></a>
-          <a href="ClassificationView/index.html" target="_blank" rel="noopener noreferrer" title="Classification Neighborhood" aria-label="Classification Neighborhood (opens in a new tab)"><img src="webservice/icons/classification.svg" alt="" aria-hidden="true"></a>
+          <a href="AlertsView/index.html" target="_blank" rel="noopener noreferrer" title="Alerts View" aria-label="Alerts View (opens in a new tab)"><img src="icons/alerts.svg" alt="" aria-hidden="true"></a>
+          <a href="LightCurveView/index.html" target="_blank" rel="noopener noreferrer" title="LSST Light Curve Visualizer" aria-label="LSST Light Curve Visualizer (opens in a new tab)"><img src="icons/light-curve.svg" alt="" aria-hidden="true"></a>
+          <a href="ClassificationView/index.html" target="_blank" rel="noopener noreferrer" title="Classification Neighborhood" aria-label="Classification Neighborhood (opens in a new tab)"><img src="icons/classification.svg" alt="" aria-hidden="true"></a>
         </nav>
       </div>
       <div class="workspace-guide" aria-hidden="true">
@@ -67,7 +67,7 @@
     </dialog>
     <main id="layout" aria-label="Graph exploration panels"></main>
     <footer class="workspace-footer"><span class="status-dot" aria-hidden="true"></span>
-      <span>Workspace preview</span><span class="footer-separator">·</span>
+      <span>FinkBrowser workspace</span><span class="footer-separator">·</span>
       <span>Graph, analysis and feedback retain the existing application actions.</span>
     </footer>
   </div>
@@ -87,15 +87,15 @@
   <script src="Sleep.js"></script>
   <script src="LoadPane.js"></script>
   <script src="Help.js"></script>
-  <script src="webservice/help.js?v=1"></script>
+  <script src="help.js?v=1"></script>
   <script>
     // Legacy GraphView.jsp reads the global viewport height while creating #vis.
     window.height = window.innerHeight;
     window.width = window.innerWidth;
     window.visheight = 360;
   </script>
-  <script src="webservice/evolution-table.js?v=evolution-1"></script>
-  <script src="webservice/workspace.js?v=corr-fit-1"></script>
+  <script src="evolution-table.js?v=evolution-1"></script>
+  <script src="workspace.js?v=corr-fit-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
