@@ -1,4 +1,15 @@
 /* Preview-only Fink object action; the root Stylesheet.js remains unchanged. */
+function finkSurveyStarImage(objectId) {
+  if (objectId == null) return 'Star.png';
+  var id = String(objectId).trim();
+  if (/^ZTF[A-Za-z0-9_-]{1,80}$/.test(id)) return '../webservice/images/Star-ZTF.png';
+  if (/^[0-9]{1,24}$/.test(id)) return '../webservice/images/Star-LSST.png';
+  return 'Star.png';
+}
+// GraphView.js evaluates graphics.image for each vertex, then prefixes images/.
+if (stylesheet.nodes.object && stylesheet.nodes.object.graphics) {
+  stylesheet.nodes.object.graphics.image = {js:"finkSurveyStarImage(eMap.get('objectId'))"};
+}
 if (stylesheet.nodes.object && !stylesheet.nodes.object.actions.some(function (action) { return action.name === 'SkyView'; })) {
   var skyActions = stylesheet.nodes.object.actions;
   var skyTableIndex = skyActions.findIndex(function (action) { return action.name === 'Table'; });

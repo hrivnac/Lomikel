@@ -50,7 +50,7 @@
   }
   function row(pane, id) {
     var container = document.createElement('section');
-    container.className = 'ws-cutout-row';
+    container.className = 'ws-cutout-row ws-cutout-' + (id.startsWith('ZTF') ? 'ztf' : 'lsst');
     var heading = document.createElement('h3');
     heading.textContent = id;
     container.appendChild(heading);

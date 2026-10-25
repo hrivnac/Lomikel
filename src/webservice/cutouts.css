@@ -4,6 +4,10 @@
 .ws-cutout-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 1050px; margin: 0 0 16px; padding: 10px; background: #fff; border: 1px solid #cddce8; border-radius: 6px; }
 .ws-cutout-row h3 { grid-column: 1 / -1; margin: 0; font-size: 1rem; overflow-wrap: anywhere; }
 .ws-cutout-cell { min-width: 0; background: #f3f7fa; padding: 6px; text-align: center; }
+.ws-cutout-row.ws-cutout-ztf .ws-cutout-cell { background: #df6e35; color: #1b2937; }
+.ws-cutout-row.ws-cutout-lsst .ws-cutout-cell { background: #266cac; color: #fff; }
+.ws-cutout-row.ws-cutout-ztf .ws-cutout-error { color: #1b2937; }
+.ws-cutout-row.ws-cutout-lsst .ws-cutout-error { color: #fff; }
 .ws-cutout-cell strong { display: block; margin-bottom: 5px; font-size: .85rem; }
 .ws-cutout-cell img { display: block; width: 100%; height: auto; max-height: 240px; object-fit: contain; image-rendering: pixelated; }
 .ws-cutout-error { display: block; padding: 20px 3px; color: #8b3535; font-size: .85rem; }
