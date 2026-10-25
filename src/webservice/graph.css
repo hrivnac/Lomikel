@@ -34,6 +34,9 @@ body.workspace #feedback { color:#264c6f; overflow-wrap:anywhere; line-height:1.
 /* Fill the whole Analysis pane, not the iframe's intrinsic 360px height. */
 body.workspace #skyview { height:100%; min-height:0; }
 body.workspace #skyview iframe[name="skyGraphFrame"] { border:0; display:block; width:100%; height:100%; min-height:0; }
+/* The Plot placeholder otherwise has intrinsic height, so a 100% iframe is only 150px tall. */
+body.workspace #plot.ws-lightcurve { height:100%; min-height:0; }
+body.workspace #plot.ws-lightcurve iframe[name^="wsLightCurve-"] { border:0; display:block; width:100%; height:100%; min-height:0; }
 @media(max-width:1100px) {
   body.workspace .ws-graph-controls { grid-template-columns:repeat(2,minmax(0,1fr)); }
   body.workspace .ws-graph-tools summary span { display:none; }
