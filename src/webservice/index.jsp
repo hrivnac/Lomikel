@@ -90,7 +90,7 @@
     window.visheight = 360;
   </script>
   <script src="webservice/evolution-table.js?v=evolution-1"></script>
-  <script src="webservice/workspace.js?v=cutouts-1"></script>
+  <script src="webservice/workspace.js?v=lightcurve-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {

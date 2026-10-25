@@ -13,3 +13,11 @@ if (stylesheet.nodes.object && !stylesheet.nodes.object.actions.some(function (a
     name: 'Cutouts', url: 'webservice/cutouts', target: 'image'
   });
 }
+if (stylesheet.nodes.object && !stylesheet.nodes.object.actions.some(function (action) { return action.name === 'LightCurve'; })) {
+  var lightCurveActions = stylesheet.nodes.object.actions;
+  var lightCurveShowIndex = lightCurveActions.findIndex(function (action) { return action.name === 'Show'; });
+  // Use a static sentinel; never embed object IDs in the legacy inline action URL.
+  lightCurveActions.splice(lightCurveShowIndex + 1, 0, {
+    name: 'LightCurve', url: 'webservice/lightcurve', target: 'plot'
+  });
+}

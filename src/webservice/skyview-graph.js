@@ -22,6 +22,10 @@
     });
     return Array.from(distinct);
   }
+  function getId(vertexId) {
+    return window.nodes.some(function (node) { return node.id === vertexId; }) ?
+      objectIds.get(vertexId) || null : null;
+  }
   window.show = function (graph) {
     if (Array.isArray(graph)) graph.forEach(function (item) {
       if (item.type !== 'vertex') return;
@@ -111,7 +115,7 @@
     }
   }
   function open() { return openIds(getIds(), 'graph'); }
-  window.skyGraphState = {getIds: getIds, open: open, cancel: cancel, openIds: function (ids) {
+  window.skyGraphState = {getIds: getIds, getId: getId, open: open, cancel: cancel, openIds: function (ids) {
     return openIds(ids, 'table');
   }};
 })();

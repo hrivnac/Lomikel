@@ -1,0 +1,17 @@
+* { box-sizing:border-box; }
+html,body { margin:0; min-height:100%; background:#f8fbff; color:#182b3c; font:14px/1.45 system-ui,sans-serif; }
+#lightcurve-view { padding:12px 16px 20px; max-width:100%; }
+h1 { margin:0 0 4px; font-size:1.2rem; }
+#lightcurve-status,#lightcurve-note { margin:4px 0 8px; }
+#lightcurve-note { font-size:.83rem; color:#425568; }
+#lightcurve-legend { display:flex; flex-wrap:wrap; gap:5px; margin:6px 0; }
+.lightcurve-band { border-left:4px solid; padding:2px 7px; background:#eaf1f9; border-radius:3px; }
+#lightcurve-chart { position:relative; width:100%; min-width:0; }
+#lightcurve-chart svg { display:block; max-width:100%; background:#fff; border:1px solid #d5e0e9; }
+.lightcurve-line { fill:none; stroke-width:1.4; opacity:.7; }
+.lightcurve-error { stroke-width:1; opacity:.55; }
+.lightcurve-point { stroke:white; stroke-width:1; cursor:crosshair; }
+.lightcurve-point:focus { stroke:#182b3c; stroke-width:2; outline:none; }
+.lightcurve-tooltip { position:absolute; z-index:1; max-width:220px; padding:6px 8px; color:#182b3c; background:#fff; border:1px solid #8ca4b7; border-radius:4px; box-shadow:0 2px 8px #314c6340; pointer-events:none; font-size:.78rem; }
+.lightcurve-tooltip[hidden] { display:none; }
+@media (max-width:480px) { #lightcurve-view { padding:8px; } }
