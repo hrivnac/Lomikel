@@ -42,4 +42,5 @@
 <script type="text/javascript" src="webservice/Stylesheet.js?v=cutouts-1"></script>
 <script type="text/javascript" src="GraphView.js"></script>
 <script type="text/javascript" src="webservice/skyview-graph.js?v=skyview-2"></script>
+<script type="text/javascript" src="webservice/graph-table-origin.js?v=mixed-table-3"></script>
 <script type="text/javascript" src="webservice/cutouts-graph.js?v=cutouts-1"></script>
