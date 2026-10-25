@@ -4,6 +4,9 @@
   var colors = {u:'#8c54a1',g:'#27834c',r:'#c94e46',i:'#d08125',z:'#874356',y:'#55748a'};
   var sequence = 0;
   var controller;
+  var currentData;
+  var resizeTimer;
+  var lastWidth = 0, lastHeight = 0;
   function prepare(data, expectedId) {
     if (!data || data.objectId !== expectedId || !/^(?:ZTF[A-Za-z0-9_-]{1,80}|[0-9]{1,24})$/.test(expectedId) ||
         (data.survey !== 'ZTF' && data.survey !== 'LSST') ||
@@ -49,8 +52,11 @@
       area.textContent = data.totalRows ? 'No observations have a usable magnitude.' : 'No observations found for this object.';
       return;
     }
-    var width = Math.max(360, area.clientWidth || 720);
-    var height = Math.max(290, Math.min(520, Math.round((root.innerHeight || 560)*.69)));
+    // The frame and flex chart now follow the Plot panel; use its actual space
+    // instead of a viewport-derived fixed minimum that forces an inner scrollbar.
+    var width = Math.max(280, area.clientWidth || 720);
+    var height = Math.max(130, area.clientHeight || 290);
+    lastWidth = width; lastHeight = height;
     var margin = {top:20,right:28,bottom:55,left:68};
     var innerWidth = width-margin.left-margin.right, innerHeight = height-margin.top-margin.bottom;
     var mjd = d3.extent(data.points,function (p) { return p.mjd; });
@@ -64,7 +70,7 @@
       .attr('width','100%').attr('height',height).attr('preserveAspectRatio','xMinYMin meet')
       .attr('aria-label','Magnitude by time for '+data.objectId);
     var plot = svg.append('g').attr('transform','translate('+margin.left+','+margin.top+')');
-    plot.append('g').attr('transform','translate(0,'+innerHeight+')').call(d3.axisBottom(x).ticks(6));
+    plot.append('g').attr('transform','translate(0,'+innerHeight+')').call(d3.axisBottom(x).ticks(width < 450 ? 4 : 6));
     plot.append('g').call(d3.axisLeft(y).ticks(6));
     svg.append('text').attr('x',margin.left+innerWidth/2).attr('y',height-8)
       .attr('text-anchor','middle').text('Modified Julian Date (MJD)');
@@ -105,7 +111,26 @@
         .on('focus',show).on('blur',hide);
     });
   }
-  root.lightCurveRender = function (payload, expectedId) { chart(prepare(payload,expectedId)); };
+  root.lightCurveRender = function (payload, expectedId) {
+    var prepared = prepare(payload,expectedId);
+    chart(prepared);
+    currentData = prepared;
+  };
+  root.lightCurveResize = function () {
+    if (!currentData || !currentData.points.length) return;
+    var area = document.getElementById('lightcurve-chart');
+    if (Math.abs(Math.max(280,area.clientWidth)-lastWidth) < 2 &&
+        Math.abs(Math.max(130,area.clientHeight)-lastHeight) < 2) return;
+    chart(currentData);
+  };
+  function queueResize() {
+    root.clearTimeout(resizeTimer);
+    resizeTimer = root.setTimeout(root.lightCurveResize, 80);
+  }
+  root.addEventListener('resize',queueResize);
+  // An iframe can change size when the w2ui divider moves without a reliable
+  // inner-window resize event. Observe the actual flex chart dimensions too.
+  if (root.ResizeObserver) new root.ResizeObserver(queueResize).observe(document.getElementById('lightcurve-chart'));
   root.lightCurveLoad = async function (objectId) {
     var current = ++sequence;
     if (controller) controller.abort();

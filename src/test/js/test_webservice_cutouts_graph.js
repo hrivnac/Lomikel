@@ -18,7 +18,7 @@ assert.match(workspaceCode, /cutoutsGraphState\.open\(\)/);
 assert.match(workspaceCode, /cutoutsGraphState\.cancel\(\)/);
 assert.match(workspaceCode, /cutoutsGraphState\.clear\(\)/);
 assert.doesNotMatch(workspaceCode, /loadPane\('image', 'Image\.jsp'\)/);
-assert.match(fs.readFileSync(path.join(root, 'index.jsp'), 'utf8'), /workspace\.js\?v=lightcurve-1/);
+assert.match(fs.readFileSync(path.join(root, 'index.jsp'), 'utf8'), /workspace\.js\?v=lightcurve-fit-1/);
 assert.match(fs.readFileSync(path.join(root, 'index.jsp'), 'utf8'), /<template id="ws-image-placeholder">/);
 const server = fs.readFileSync(path.join(root, 'CutoutSource.jsp'), 'utf8');
 assert.match(server, /api\/v1\/sources/);

@@ -12,6 +12,7 @@
     scheduled = true;
     window.setTimeout(function () {
       scheduled = false;
+      if (window.lightcurveGraphState) window.lightcurveGraphState.resize();
       var vis = document.getElementById('vis');
       if (!vis) return;
       window.visheight = Math.round(vis.getBoundingClientRect().height);

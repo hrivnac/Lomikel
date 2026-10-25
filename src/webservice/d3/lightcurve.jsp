@@ -31,7 +31,7 @@
 %>
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Object light curve</title>
-<link rel="stylesheet" href="lightcurve.css?v=lightcurve-1">
+<link rel="stylesheet" href="lightcurve.css?v=lightcurve-fit-1">
 </head><body>
 <main id="lightcurve-view"><h1>Object light curve</h1><p id="lightcurve-status" role="status"><%=objectId.isEmpty() ? "Invalid object request." : "Loading observations…"%></p>
 <div id="lightcurve-legend" aria-label="Available photometric bands"></div>
@@ -39,7 +39,7 @@
 <p id="lightcurve-note"></p></main>
 <% if (!objectId.isEmpty()) { %>
 <script src="../../d3-v6.0.0/d3.js"></script>
-<script src="lightcurve.js?v=lightcurve-2"></script>
+<script src="lightcurve.js?v=lightcurve-fit-1"></script>
 <script>window.lightCurveLoad(<%=safeId%>);</script>
 <% } %>
 </body></html>

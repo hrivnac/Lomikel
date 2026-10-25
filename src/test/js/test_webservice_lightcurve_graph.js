@@ -17,7 +17,9 @@ assert.match(text('workspace.js'),/lightcurveGraphState\.open\(\)/);
 assert.match(text('workspace.js'),/lightcurveGraphState\.cancel\(\)/);
 assert.match(text('index.jsp'),/workspace\.js\?v=lightcurve-/);
 const posts=[];
-function node(tag){return {tag,children:[],style:{},appendChild(child){this.children.push(child);return child},
+function node(tag){const classes=new Set();return {tag,children:[],style:{},
+ classList:{add:name=>classes.add(name),remove:name=>classes.delete(name),contains:name=>classes.has(name)},
+ appendChild(child){this.children.push(child);return child},
  replaceChildren(...items){this.children=items},submit(){posts.push(this)},remove(){this.removed=true}}}
 const pane=node('div'),body=node('body'),events=[],handlers=[];
 const commands={contains:element=>element===link};
@@ -33,6 +35,7 @@ body.appendChild=function(child){this.children.push(child);return child};
 vm.runInNewContext(text('lightcurve-graph.js'),ctx);
 ctx.window.lightcurveGraphState.open();
 assert.deepEqual(events,['plot','plotTab']);
+assert.equal(pane.classList.contains('ws-lightcurve'),true);
 assert.equal(pane.children.length,1);
 let frame=pane.children[0];
 assert.equal(frame.tag,'iframe');
@@ -48,6 +51,7 @@ ctx.window.selectedNode={id:2,title:'stale action'};
 ctx.window.lightcurveGraphState.open();
 assert.equal(posts.length,2,'stale selected node cannot query a new object');
 ctx.window.lightcurveGraphState.cancel();
+assert.equal(pane.classList.contains('ws-lightcurve'),false);
 // Real graph commands use href="#" under a WAR-root <base>. If the legacy
 // inline onclick is blocked or throws, the browser otherwise leaves the preview.
 ctx.window.selectedNode=first;
