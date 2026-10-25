@@ -71,10 +71,7 @@ test("application renders errors instead of fabricating demo science", () => {
 });
 
 test("graph helper keeps exact request body and slash classifiers browser-safe", () => {
-  const graph = fs.readFileSync(
-    path.resolve(root, "../../../js/FinkTasks/fink_graph.js"),
-    "utf8",
-  );
+  const graph = read("fink_graph.js");
   assert.match(graph, /Content-Type.*text\/plain;charset=UTF-8/);
   assert.match(read("classifiers.js"), /FEATURES=2025\/13-50/);
 });

@@ -7,10 +7,10 @@
 <%@ page import="org.json.JSONArray" %>
 <%@ page import="org.json.JSONObject" %>
 
-<%@ page errorPage="../../ExceptionHandler.jsp" %>
+<%@ page errorPage="../ExceptionHandler.jsp" %>
 
 <link href="scatterplot.css?v=details-1" rel="stylesheet" type="text/css"/>
-<script src="../../d3-v6.0.0/d3.js" type="text/javascript"></script>
+<script src="../d3-v6.0.0/d3.js" type="text/javascript"></script>
 
 <div id="scatter_area"></div>
 
@@ -29,7 +29,7 @@
   if (z == null) z = "";
   if (s == null) s = "";
   %>
-<%@include file="../../PropertiesProcessor.jsp"%>
+<%@include file="../PropertiesProcessor.jsp"%>
 <%
   JSONArray points = new JSONArray(tdata == null ? "[]" : tdata);
   for (int i = 0; i < points.length(); i++) {
@@ -40,7 +40,7 @@
     }
   %>
 
-<script src="../../d3/actions.js?v=table-1" type="text/javascript"></script>
+<script src="../d3/actions.js?v=table-1" type="text/javascript"></script>
 <script src="scatterplot.js?v=evolution-1" type="text/javascript"></script>
 
 <script type="text/javascript">

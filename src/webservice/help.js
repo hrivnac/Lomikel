@@ -26,7 +26,7 @@
       event.stopPropagation();
       var name = button.getAttribute('data-ws-help');
       if (Object.prototype.hasOwnProperty.call(allowed, name)) {
-        w2popup.load({url: 'webservice/Help-' + name + '.html', showMax: true,
+        w2popup.load({url: 'Help-' + name + '.html', showMax: true,
           onOpen: function (popupEvent) {
             // w2ui calls onOpen only in the before phase. onComplete runs after
             // the template has been installed and the opening animation finishes.

@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 const base=path.resolve(__dirname,'../../webservice');
-const legacy=fs.readFileSync(path.resolve(__dirname,'../../ws/Nodes.jsp'),'utf8');
+const legacy=fs.readFileSync(path.resolve(__dirname,'../../webservice/Nodes.jsp'),'utf8');
 assert.match(legacy,/onclick="showScatter\('evolution'\)"/);
 const calls=[];
 const checked={x:['fluxErr'],y:['flux'],z:['weight'],s:['band'],k:['objectId']};
@@ -22,7 +22,7 @@ function parseLast(){const call=calls.at(-1);return {call,query:new URL(call[1],
 // Both x and y selections must each become their own time series, including zero.
 win.loadPane('plot','d3/scatterplot.jsp?name=Import%20Data&url=&x=&y=fluxErr%20flux&tdata=[]',true,480,false);
 let {call,query}=parseLast();
-assert.match(call[1],/^webservice\/d3\/scatterplot\.jsp\?/);
+assert.match(call[1],/^d3\/scatterplot\.jsp\?/);
 assert.equal(call[4],true,'encoded URL is not double encoded');
 assert.equal(query.get('x'),'','use time axis rather than field x');
 assert.equal(query.get('timeUnit'),'ms');

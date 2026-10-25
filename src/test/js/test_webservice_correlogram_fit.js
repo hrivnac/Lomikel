@@ -14,7 +14,7 @@ vm.runInNewContext(fs.readFileSync(path.join(root,'workspace.js'),'utf8'),
 const data=encodeURIComponent(JSON.stringify([{x:'Class.A',y:'Class.B',value:12,info:'50/60'}]));
 window.loadPane('plot','d3/correlogram.jsp?tdata='+data,true,480,true);
 assert.equal(classes.has('ws-correlogram'),true,'only the routed Correlogram fills the Plot pane');
-assert.match(calls.at(-1)[1],/^webservice\/d3\/correlogram\.jsp\?/);
+assert.match(calls.at(-1)[1],/^d3\/correlogram\.jsp\?/);
 assert.equal(calls.at(-1)[3],'100%','do not retain the legacy fixed 480px iframe');
 window.loadPane('plot','d3/scatterplot.jsp?name=ordinary',true,480);
 assert.equal(classes.has('ws-correlogram'),false,'other Plot routes retain their sizing');

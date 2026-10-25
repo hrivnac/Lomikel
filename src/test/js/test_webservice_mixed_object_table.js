@@ -3,10 +3,10 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
-const root=path.resolve(__dirname,'../..');
-const jsp=fs.readFileSync(path.join(root,'ws/Nodes.jsp'),'utf8');
+const root=path.resolve(__dirname,'../../webservice');
+const jsp=fs.readFileSync(path.join(root,'Nodes.jsp'),'utf8');
 const tableScript=jsp.match(/<script type="text\/javascript">([\s\S]*?)<\/script>/)[1];
-const originCode=()=>fs.readFileSync(path.join(root,'webservice/graph-table-origin.js'),'utf8');
+const originCode=()=>fs.readFileSync(path.join(root,'graph-table-origin.js'),'utf8');
 const ztf={type:'vertex',label:'object',id:1,element:[{key:'objectId',value:'ZTF17aabgsqa'}]};
 const lsst={type:'vertex',label:'object',id:2,element:[{key:'objectId',value:'313761043604045880'}]};
 function fixture(useOrigin,graph){
@@ -84,6 +84,6 @@ assert.throws(()=>pendingEndpoint.ctx.show([lsst]),/Conflicting vertex ID|Confli
 assert.equal(pendingEndpoint.ctx.nodes.length,1,'rejection preserves the existing vertex list');
 assert.equal(pendingEndpoint.ctx.edges.length,1,'rejection preserves the existing edge list');
 assert.equal(pendingEndpoint.ctx.graphTableServerForVertex(2),null,'rejection does not assign vertex origin');
-const graphPage=fs.readFileSync(path.join(root,'webservice/GraphView.jsp'),'utf8');
-assert.match(graphPage,/webservice\/graph-table-origin\.js\?v=/);
+const graphPage=fs.readFileSync(path.join(root,'GraphView.jsp'),'utf8');
+assert.match(graphPage,/graph-table-origin\.js\?v=/);
 console.log('mixed ZTF/LSST object table routes each graph vertex to its own Gremlin server');

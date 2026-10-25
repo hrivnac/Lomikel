@@ -44,7 +44,7 @@
     var form = document.createElement('form');
     form.method = 'POST';
     form.hidden = true;
-    form.action = new URL('webservice/d3/lightcurve.jsp', document.baseURI).pathname;
+    form.action = new URL('d3/lightcurve.jsp', document.baseURI).pathname;
     form.target = frame.name;
     var field = document.createElement('input');
     field.name = 'objectId';

@@ -51,6 +51,6 @@
      ['timeUnit', 'ms'], ['tdata', JSON.stringify(points)]].forEach(function (pair) {
       output.set(pair[0], pair[1]);
     });
-    return 'webservice/d3/scatterplot.jsp?' + output.toString();
+    return 'd3/scatterplot.jsp?' + output.toString();
   };
 })();

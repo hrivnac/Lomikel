@@ -116,7 +116,7 @@ function showCorrelogram(rows, invalidInput) {
   function openVenn(d) {
     if (!d.data.valid) return;
     var opened = corrGetPopup(function () {
-      return window.open('../../d3/vennPopup.jsp','correlogram-venn',
+      return window.open('vennPopup.jsp','correlogram-venn',
         'height=720,width=900,resizable=yes,scrollbars=yes');
     });
     var popup = opened.window;

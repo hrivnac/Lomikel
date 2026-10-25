@@ -12,12 +12,12 @@ for (const [route,label,icon] of [
   ['LightCurveView','LSST Light Curve Visualizer','light-curve'],
   ['ClassificationView','Classification Neighborhood','classification']
 ]) {
-  assert.ok(fs.existsSync(path.resolve(root,'../ws/FinkBrowser',route,'index.html')),
+  assert.ok(fs.existsSync(path.resolve(root,'.',route,'index.html')),
     'destination exists in the packaged legacy tree');
   const expected='<a href="'+route+'/index.html" target="_blank" rel="noopener noreferrer" title="'+label+'" aria-label="'+label+' (opens in a new tab)">';
   assert.ok(page.includes(expected),route+' uses a relative, safely opened new tab with a tooltip');
   const svg=fs.readFileSync(path.join(root,'icons',icon+'.svg'),'utf8');
-  assert.match(page,new RegExp('src="webservice/icons/'+icon+'\\.svg"'));
+  assert.match(page,new RegExp('src="icons/'+icon+'\\.svg"'));
   assert.match(svg,/<svg[^>]*viewBox="0 0 32 32"/);
   assert.match(svg,new RegExp('<title>'+label+'</title>'));
   assert.doesNotMatch(svg,/<script|onload=|href="https?:/i);

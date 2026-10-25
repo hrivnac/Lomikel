@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '../../webservice');
-const oldNodes = fs.readFileSync(path.resolve(__dirname, '../../ws/Nodes.jsp'), 'utf8');
+const oldNodes = fs.readFileSync(path.resolve(__dirname, '../../webservice/Nodes.jsp'), 'utf8');
 const workspace = fs.readFileSync(path.join(root, 'workspace.js'), 'utf8');
 const graph = fs.readFileSync(path.join(root, 'skyview-graph.js'), 'utf8');
 assert.match(oldNodes, /onclick="showSky\(\)"/);
@@ -34,7 +34,7 @@ async function run() {
  assert.equal(calls.some(c=>c[0]==='skyview'),false,'do not load the old coordinate JSP');
  requests[0].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:0,dec:0}],missing:['123456']})});
  await action;
- assert.equal(posted.at(-1).action,'/FinkBrowser/webservice/d3/skyview.jsp');
+ assert.equal(posted.at(-1).action,'/FinkBrowser/d3/skyview.jsp');
  assert.equal(posted.at(-1).children.find(x=>x.name==='requested').value,'2');
  assert.equal(posted.at(-1).children.find(x=>x.name==='missing').value,'1');
  // A second Table request supersedes the first.

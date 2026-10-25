@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const source = fs.readFileSync(path.join(__dirname, '../../ws/GraphView.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '../../webservice/GraphView.js'), 'utf8');
 
 function graphContext() {
   const controls = Object.fromEntries(['vis', 'gremlin_server', 'bootstrap_command', 'bootstrap_graph',

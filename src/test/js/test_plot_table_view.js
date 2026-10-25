@@ -4,8 +4,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const code = fs.readFileSync(path.join(__dirname, '../../ws/TableView.js'), 'utf8');
-const css = fs.readFileSync(path.join(__dirname, '../../ws/Nodes.css'), 'utf8');
+const code = fs.readFileSync(path.join(__dirname, '../../webservice/TableView.js'), 'utf8');
+const css = fs.readFileSync(path.join(__dirname, '../../webservice/Nodes.css'), 'utf8');
 assert.match(css, /\.plot-properties/);
 for (const color of ['lightblue', 'lightgreen', 'lightpink', 'yellow', 'darkblue', 'darkgreen', 'darkred', 'brown']) {
   assert.ok(css.includes(color), `preserve existing selector color ${color}`);

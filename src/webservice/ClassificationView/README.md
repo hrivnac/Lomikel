@@ -4,7 +4,7 @@ ClassificationView is a standalone browser application for exploring one Fink al
 
 ## Run locally
 
-Serve the repository root over HTTP so the symlinked D3 and graph-helper assets remain available:
+Serve the repository root over HTTP; this application's D3 and graph-helper assets are regular files in the same directory:
 
 ```sh
 python3 -m http.server 8768 --bind 127.0.0.1
@@ -13,7 +13,7 @@ python3 -m http.server 8768 --bind 127.0.0.1
 Then open:
 
 ```text
-http://127.0.0.1:8768/src/ws/FinkBrowser/ClassificationView/index.html
+http://127.0.0.1:8768/src/webservice/ClassificationView/index.html
 ```
 
 The configured LSST and ZTF endpoints currently use plaintext HTTP. A page served over HTTPS cannot call them because browsers block mixed content. Plaintext graph use is explicitly opted into in `data.js`. The ZTF service may additionally require firewall or SSH-tunnel access from the client network.
@@ -22,7 +22,7 @@ Neighbor limits accept an integer count from 1 through 20, a relative cutoff str
 
 Startup parameters live in `app.js`: the default is ZTF17aackceb, limit 20, and Jensen–Shannon metric. No graph request runs until the form is submitted. A `ZTF`-prefixed object ID selects ZTF; a numeric ID selects LSST, including when recentering. Classifier and re-classifier choices are survey-specific and defined only in `classifiers.js` next to this page; edit the arrays there when the available classifier/flavor sets change. The page does not call `Classifiers.jsp` and can be served by any static web server or embedded with its local scripts/assets. `Classifiers.jsp` is retained separately for other applications. Live graph queries still require browser access to the configured graph endpoints (including their CORS and mixed-content restrictions).
 
-To embed the application in another page, serve this directory on a static web server and use an iframe pointing to its `index.html`; no JSP container is needed. The repository stores `d3.min.js` and `fink_graph.js` here as symlinks to shared assets, so when deploying only this directory, copy the resolved asset files alongside the other scripts rather than copying dangling symlinks. Keep the configured graph origins reachable from the viewer's browser.
+To embed the application in another page, serve this directory on a static web server and use an iframe pointing to its `index.html`; no JSP container is needed. The local `d3.min.js` and `fink_graph.js` are regular files, so this directory can be deployed without resolving symlinks. Within the built WAR, the page is `/FinkBrowser/ClassificationView/index.html`. Keep the configured graph origins reachable from the viewer's browser.
 
 ## Projection semantics
 
@@ -50,6 +50,6 @@ Only distances from the selected alert are supplied by the neighborhood API. The
 
 ```sh
 node --test src/js/FinkTasks/tests/fink_graph.test.cjs
-node --test src/ws/FinkBrowser/ClassificationView/tests/*.test.cjs
-node --test src/ws/FinkBrowser/ClassificationView/test-app.cjs
+node --test src/webservice/ClassificationView/tests/*.test.cjs
+node --test src/webservice/ClassificationView/test-app.cjs
 ```
