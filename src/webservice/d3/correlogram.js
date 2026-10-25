@@ -55,6 +55,13 @@ function corrTooltipPoint(event, container) {
   return [box.left - root.left + box.width / 2, box.top - root.top + box.height / 2];
 }
 
+function corrTooltipPosition(at, container, tip) {
+  return {
+    left: Math.max(4, Math.min(at[0] + 12, container.clientWidth - tip.offsetWidth - 4)),
+    top: Math.max(4, Math.min(at[1] - 20, container.clientHeight - tip.offsetHeight - 4))
+  };
+}
+
 function corrEmptyMessage(invalidInput) {
   return invalidInput ? 'Cannot display malformed correlogram data.' : 'No class pairs to display.';
 }
@@ -100,8 +107,10 @@ function showCorrelogram(rows, invalidInput) {
   }
   function showTip(event,d) {
     var at = corrTooltipPoint(event,root.node());
-    tooltip.text(fullText(d)).style('left',Math.min(at[0]+12,Math.max(6,root.node().clientWidth-245))+'px')
-      .style('top',Math.max(4,at[1]-20)+'px').classed('is-visible',true);
+    tooltip.text(fullText(d));
+    var position = corrTooltipPosition(at, root.node(), tooltip.node());
+    tooltip.style('left',position.left+'px').style('top',position.top+'px')
+      .classed('is-visible',true);
   }
   function hideTip() { tooltip.classed('is-visible',false); }
   function openVenn(d) {

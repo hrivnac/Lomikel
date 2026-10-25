@@ -49,6 +49,8 @@
   // Graph-table Evolution is reconstructed from its rows and checked controls;
   // HBase and other legacy plot routes keep their original handling.
   window.loadPane = function (pane, url, iframe, height, encoded) {
+    var plotPane = pane === 'plot' && document.getElementById && document.getElementById('plot');
+    if (plotPane) plotPane.classList.remove('ws-correlogram');
     if (pane === 'plot' && url === 'webservice/lightcurve' && window.lightcurveGraphState) {
       return window.lightcurveGraphState.open();
     }
@@ -139,6 +141,8 @@
       if (invalidCorr) safeQuery.set('invalid', '1');
       url = 'webservice/d3/correlogram.jsp?' + safeQuery.toString();
       encoded = true;
+      if (plotPane) plotPane.classList.add('ws-correlogram');
+      height = '100%';
     }
     return legacyLoadPane.call(this, pane, url, iframe, height, encoded);
   };
