@@ -49,4 +49,25 @@
     return previousDispose.apply(this, arguments);
   };
   window.lightcurveGraphState = {open:open, cancel:cancel};
+  // GraphView.js renders href="#" action links under a WAR-root <base>. If an
+  // inline onclick is blocked or throws, its default link navigation abandons
+  // the preview. Handle this one preview action before the legacy inline code.
+  // GraphView.jsp can be reloaded, so install the delegated listener only once.
+  if (!window.wsLightCurveClickInstalled) {
+    window.wsLightCurveClickInstalled = true;
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest && event.target.closest('a');
+      var commands = document.getElementById('commands');
+      if (!link || !commands || !commands.contains(link) ||
+          link.getAttribute('href') !== '#' || link.textContent.trim() !== 'LightCurve') return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      try { window.lightcurveGraphState.open(); }
+      catch (error) {
+        var pane = document.getElementById('plot');
+        if (pane) pane.textContent = 'Could not open the light curve. Check the browser console.';
+        console.error('LightCurve action failed', error);
+      }
+    }, true);
+  }
 })();
