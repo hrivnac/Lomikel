@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="webservice/workspace.css?v=standalone-apps-1">
   <link rel="stylesheet" href="webservice/panels.css">
-  <link rel="stylesheet" href="webservice/graph.css?v=lightcurve-fit-1">
+  <link rel="stylesheet" href="webservice/graph.css?v=corr-fit-1">
   <link rel="stylesheet" href="webservice/cutouts.css?v=survey-colors-1">
   <link rel="stylesheet" href="webservice/help.css?v=1">
 </head>
@@ -95,7 +95,7 @@
     window.visheight = 360;
   </script>
   <script src="webservice/evolution-table.js?v=evolution-1"></script>
-  <script src="webservice/workspace.js?v=lightcurve-fit-1"></script>
+  <script src="webservice/workspace.js?v=corr-fit-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {

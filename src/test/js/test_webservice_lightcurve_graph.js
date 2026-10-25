@@ -15,7 +15,7 @@ assert.equal(actions[0].url,'webservice/lightcurve');
 assert.match(text('GraphView.jsp'),/webservice\/lightcurve-graph\.js\?v=/);
 assert.match(text('workspace.js'),/lightcurveGraphState\.open\(\)/);
 assert.match(text('workspace.js'),/lightcurveGraphState\.cancel\(\)/);
-assert.match(text('index.jsp'),/workspace\.js\?v=lightcurve-/);
+assert.match(text('index.jsp'),/workspace\.js\?v=corr-fit-/);
 const posts=[];
 function node(tag){const classes=new Set();return {tag,children:[],style:{},
  classList:{add:name=>classes.add(name),remove:name=>classes.delete(name),contains:name=>classes.has(name)},

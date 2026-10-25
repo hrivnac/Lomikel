@@ -1,0 +1,42 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const root=path.resolve(__dirname,'../../webservice');
+const classes=new Set();
+const pane={classList:{add:name=>classes.add(name),remove:name=>classes.delete(name),contains:name=>classes.has(name)}};
+const calls=[];
+const window={loadPane:(...args)=>{calls.push(args);return 'loaded'},lightcurveGraphState:{cancel(){}}};
+const document={baseURI:'http://localhost/FinkBrowser/',getElementById:id=>id==='plot'?pane:null};
+vm.runInNewContext(fs.readFileSync(path.join(root,'workspace.js'),'utf8'),
+  {window,document,$(){},URL,URLSearchParams});
+const data=encodeURIComponent(JSON.stringify([{x:'Class.A',y:'Class.B',value:12,info:'50/60'}]));
+window.loadPane('plot','d3/correlogram.jsp?tdata='+data,true,480,true);
+assert.equal(classes.has('ws-correlogram'),true,'only the routed Correlogram fills the Plot pane');
+assert.match(calls.at(-1)[1],/^webservice\/d3\/correlogram\.jsp\?/);
+assert.equal(calls.at(-1)[3],'100%','do not retain the legacy fixed 480px iframe');
+window.loadPane('plot','d3/scatterplot.jsp?name=ordinary',true,480);
+assert.equal(classes.has('ws-correlogram'),false,'other Plot routes retain their sizing');
+window.loadPane('plot','d3/correlogram.jsp?tdata='+data,true,480,true);
+window.loadPane('plot','Plot.jsp');
+assert.equal(classes.has('ws-correlogram'),false,'Reset clears Correlogram-only sizing');
+const host=fs.readFileSync(path.join(root,'graph.css'),'utf8');
+const css=fs.readFileSync(path.join(root,'d3/correlogram.css'),'utf8');
+const jsp=fs.readFileSync(path.join(root,'d3/correlogram.jsp'),'utf8');
+const renderer={};
+vm.runInNewContext(fs.readFileSync(path.join(root,'d3/correlogram.js'),'utf8'),renderer);
+const bottomRight=renderer.corrTooltipPosition([290,285],{clientWidth:300,clientHeight:300},
+  {offsetWidth:115,offsetHeight:95});
+assert.equal(bottomRight.left,181,'tooltip stays inside the clipped panel at right');
+assert.equal(bottomRight.top,201,'tooltip stays inside the clipped panel at bottom');
+const topLeft=renderer.corrTooltipPosition([0,0],{clientWidth:300,clientHeight:300},
+  {offsetWidth:115,offsetHeight:95});
+assert.equal(topLeft.left,12);
+assert.equal(topLeft.top,4);
+assert.match(host,/body\.workspace #plot\.ws-correlogram\s*\{[^}]*height:\s*100%/);
+assert.match(host,/body\.workspace #plot\.ws-correlogram iframe\[name="dynamicFrame"\]\s*\{[^}]*height:\s*100%/);
+assert.match(css,/#corr_area\s*\{[^}]*height:\s*100%[^}]*display:\s*flex/s);
+assert.match(css,/\.correlogram\s*\{[^}]*flex:\s*1/);
+assert.match(jsp,/correlogram\.css\?v=corr-fit-/);
+console.log('Correlogram scoped full-Plot fit, route switching and reset passed');
