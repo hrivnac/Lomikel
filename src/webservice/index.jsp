@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="jquery-ui-1.12.1/jquery-ui.min.css">
   <link rel="stylesheet" href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css">
   <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="webservice/workspace.css">
+  <link rel="stylesheet" href="webservice/workspace.css?v=standalone-apps-1">
   <link rel="stylesheet" href="webservice/panels.css">
   <link rel="stylesheet" href="webservice/graph.css?v=lightcurve-fit-1">
   <link rel="stylesheet" href="webservice/cutouts.css?v=survey-colors-1">
@@ -42,6 +42,11 @@
       <div class="workspace-brand">
         <img class="workspace-logo" src="images/LomikelOverlap.png" alt="" aria-hidden="true">
         <a class="workspace-brand-link" href="@HOME@" target="RESULT" rel="noopener">@NAME@</a>
+        <nav class="workspace-app-links" aria-label="Standalone applications">
+          <a href="AlertsView/index.html" target="_blank" rel="noopener noreferrer" title="Alerts View" aria-label="Alerts View (opens in a new tab)"><img src="webservice/icons/alerts.svg" alt="" aria-hidden="true"></a>
+          <a href="LightCurveView/index.html" target="_blank" rel="noopener noreferrer" title="LSST Light Curve Visualizer" aria-label="LSST Light Curve Visualizer (opens in a new tab)"><img src="webservice/icons/light-curve.svg" alt="" aria-hidden="true"></a>
+          <a href="ClassificationView/index.html" target="_blank" rel="noopener noreferrer" title="Classification Neighborhood" aria-label="Classification Neighborhood (opens in a new tab)"><img src="webservice/icons/classification.svg" alt="" aria-hidden="true"></a>
+        </nav>
       </div>
       <div class="workspace-guide" aria-hidden="true">
         <span class="guide-left">Explore graph</span><span class="guide-arrow">→</span>
