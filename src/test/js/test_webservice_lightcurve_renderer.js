@@ -22,6 +22,6 @@ assert.throws(()=>ctx.window.lightCurvePrepare({...lsst,points:[{...lsst.points[
 assert.throws(()=>ctx.window.lightCurvePrepare({...ztf,totalRows:10001},ztf.objectId),/count|limit/);
 assert.deepEqual(Array.from(ctx.window.lightCurvePrepare({...ztf,points:[],totalRows:0},ztf.objectId).bands),[]);
 const jsp=fs.readFileSync(path.resolve(__dirname,'../../webservice/d3/lightcurve.jsp'),'utf8');
-assert.match(jsp,/lightcurve\.js\?v=lightcurve-/);
+assert.match(jsp,/lightcurve\.js\?v=science-date-/);
 assert.match(jsp,/d3-v6\.0\.0\/d3\.js/);
 console.log('LightCurve payload validation, six-band availability and exact IDs passed');
