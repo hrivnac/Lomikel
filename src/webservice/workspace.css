@@ -10,6 +10,12 @@ body.workspace { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font
 .workspace-brand-link { color:#185d43; font-size:16px; font-weight:700; text-decoration:none; }
 .workspace-brand-link:hover { text-decoration:underline; }
 .workspace-brand-link:focus-visible { outline:2px solid var(--green); outline-offset:3px; }
+.workspace-app-links { display:flex; align-items:center; gap:5px; margin-left:4px; }
+.workspace-app-links a { display:grid; place-items:center; width:30px; height:30px; flex:none;
+  border:1px solid #c9d8e0; border-radius:7px; background:#f5f9fb; }
+.workspace-app-links a:hover { border-color:#6391ac; background:#e5f2f8; }
+.workspace-app-links a:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.workspace-app-links img { display:block; width:22px; height:22px; }
 .workspace-guide { display:flex; align-items:center; gap:10px; margin:auto; font-size:12px; font-weight:600; white-space:nowrap; }
 .guide-left { color:var(--green); } .guide-right { color:var(--blue); }
 .guide-arrow { color:#8ba0b1; font-size:18px; }
