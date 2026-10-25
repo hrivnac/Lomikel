@@ -5,6 +5,13 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '../../webservice');
 const styleCode = fs.readFileSync(path.join(root, 'Stylesheet.js'), 'utf8');
+const cutoutStyle = fs.readFileSync(path.join(root, 'cutouts.css'), 'utf8');
+const skyStyle = fs.readFileSync(path.join(root, 'd3/skyview.css'), 'utf8');
+for (const survey of ['ztf','lsst']) {
+ const skyColor=skyStyle.match(new RegExp('\\.sky-legend-'+survey+'::before \\{background:(#[0-9a-f]+)\\}'))?.[1];
+ assert.ok(skyColor, 'SkyView has a color for '+survey);
+ assert.match(cutoutStyle,new RegExp('\\.ws-cutout-'+survey+' \\.ws-cutout-cell \\{[^}]*background:\\s*'+skyColor));
+}
 const style = {nodes: {object: {actions: [{name:'Table',target:'table'}]}}};
 vm.runInNewContext(styleCode, {stylesheet:style});
 vm.runInNewContext(styleCode, {stylesheet:style});
@@ -53,6 +60,7 @@ async function run(){
  assert.equal(pending[0].opts.method,'POST');
  assert.deepEqual(JSON.parse(pending[0].opts.body),{diaObjectId:'313761043604045880'});
  const ztf=pane.children[1];
+ assert.equal(ztf.className,'ws-cutout-row ws-cutout-ztf');
  assert.equal(ztf.children[0].textContent,'ZTF21aaxtctv');
  assert.deepEqual(cells(ztf).map(c=>c.children[0].textContent),['Science','Template','Difference']);
  assert.deepEqual(cells(ztf).map(c=>new URL(c.children[1].src).searchParams.get('kind')),['Science','Template','Difference']);
@@ -60,6 +68,7 @@ async function run(){
  pending[0].resolve({ok:true,json:async()=>({diaSourceId:'170054933726363745'})});
  await task;
  const lsst=pane.children[2];
+ assert.equal(lsst.className,'ws-cutout-row ws-cutout-lsst');
  assert.deepEqual(cells(lsst).map(c=>new URL(c.children[1].src).searchParams.get('diaSourceId')),
    ['170054933726363745','170054933726363745','170054933726363745']);
  const previous=pane.children;

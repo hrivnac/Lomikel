@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="webservice/workspace.css">
   <link rel="stylesheet" href="webservice/panels.css">
   <link rel="stylesheet" href="webservice/graph.css?v=lightcurve-fit-1">
-  <link rel="stylesheet" href="webservice/cutouts.css?v=cutouts-1">
+  <link rel="stylesheet" href="webservice/cutouts.css?v=survey-colors-1">
   <link rel="stylesheet" href="webservice/help.css?v=1">
 </head>
 <body class="workspace">
