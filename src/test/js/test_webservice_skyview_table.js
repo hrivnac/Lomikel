@@ -32,7 +32,7 @@ async function run() {
  assert.equal(requests.length,1,'Table object rows use the shared coordinate lookup');
  assert.deepEqual(JSON.parse(requests[0].options.body).ids,['ZTF_A','123456']);
  assert.equal(calls.some(c=>c[0]==='skyview'),false,'do not load the old coordinate JSP');
- requests[0].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:0,dec:0}],missing:['123456']})});
+ requests[0].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:0,dec:0}],missing:['123456'],ssObjectIds:[]})});
  await action;
  assert.equal(posted.at(-1).action,'/FinkBrowser/d3/skyview.jsp');
  assert.equal(posted.at(-1).children.find(x=>x.name==='requested').value,'2');
@@ -41,7 +41,7 @@ async function run() {
  win.tdata=[{lbl:'object',objectId:'ZTF_B'}];
  const pendingTable=win.loadPane('skyview','d3/skyview.jsp?name=ZTF_B&tdata=[]',true);
  assert.equal(requests.length,2);
- requests[1].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_B',ra:20,dec:2}],missing:[]})});
+ requests[1].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_B',ra:20,dec:2}],missing:[],ssObjectIds:[]})});
  await pendingTable;
  assert.equal(posted.length,2);
  // Switching to the coordinate route must cancel an older object request,
@@ -53,14 +53,14 @@ async function run() {
  win.loadPane('skyview','d3/skyview.jsp?name=alert&tdata=[]',true);
  assert.equal(calls.at(-1)[0],'skyview','non-object coordinate route remains unchanged');
  assert.equal(requests[2].options.signal.aborted,true,'legacy route invalidates pending object lookup');
- requests[2].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:1,dec:1}],missing:[]})});
+ requests[2].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:1,dec:1}],missing:[],ssObjectIds:[]})});
  await objectRequest;
  assert.equal(posted.length,2,'stale object map cannot overwrite coordinate map');
  win.tdata=[{lbl:'object',objectId:'ZTF_A'}];
  win.loadPane('skyview','d3/skyview.jsp?name=object&tdata=[]',true);
  assert.equal(requests.length,4);
  win.disposeGraphView();
- requests[3].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:1,dec:1}],missing:[]})});
+ requests[3].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:1,dec:1}],missing:[],ssObjectIds:[]})});
  await new Promise(resolve=>setImmediate(resolve));
  assert.equal(posted.length,2,'reset cancels pending Table requests');
  win.show([{type:'vertex',label:'object',id:7,element:[{key:'objectId',value:'ZTF_A'}]}]);
@@ -70,8 +70,8 @@ async function run() {
  const nextTable=win.loadPane('skyview','d3/skyview.jsp?name=ZTF_B&tdata=[]',true);
  assert.equal(requests.length,6);
  assert.equal(requests[4].options.signal.aborted,true,'table supersedes graph lookup');
- requests[4].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:0,dec:0}],missing:[]})});
- requests[5].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_B',ra:2,dec:3}],missing:[]})});
+ requests[4].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_A',ra:0,dec:0}],missing:[],ssObjectIds:[]})});
+ requests[5].resolve({ok:true,json:async()=>({points:[{objectId:'ZTF_B',ra:2,dec:3}],missing:[],ssObjectIds:[]})});
  await Promise.all([graphRequest,nextTable]);
  assert.equal(posted.length,3,'only latest table map submits');
  console.log('Table object SkyView routes through shared map and preserves coordinate route');

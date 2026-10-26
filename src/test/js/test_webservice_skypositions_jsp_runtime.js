@@ -33,8 +33,8 @@ ${declaration}
   static void execute(Request request, Response response, PrintWriter out) throws Exception {
 ${body}
   }
-  static JSONObject run(String id, int expectedStatus) throws Exception {
-    Request request = new Request(new JSONObject().put("ids", new JSONArray().put("ZTFabc").put(id)).toString());
+  static JSONObject runIds(JSONArray ids, int expectedStatus) throws Exception {
+    Request request = new Request(new JSONObject().put("ids", ids).toString());
     Response response = new Response();
     StringWriter writer = new StringWriter();
     PrintWriter out = new PrintWriter(writer);
@@ -42,6 +42,9 @@ ${body}
     out.flush();
     if (response.status != expectedStatus) throw new AssertionError("Unexpected HTTP " + response.status + ": " + writer);
     return new JSONObject(writer.toString());
+  }
+  static JSONObject run(String id, int expectedStatus) throws Exception {
+    return runIds(new JSONArray().put("ZTFabc").put(id), expectedStatus);
   }
   static void check(boolean value, String description) {
     if (!value) throw new AssertionError(description);
@@ -58,9 +61,20 @@ ${body}
       for (Object raw : new JSONObject(sent).getJSONArray("docs")) {
         String id = ((JSONObject)raw).getString("_id");
         JSONObject row = new JSONObject().put("_id", id);
-        if (index.equals("/radec/_mget") || index.equals("/ss_radec/_mget") || id.equals("2"))
-          row.put("found", true).put("_source", new JSONObject().put("location",
-            new JSONObject().put("lon", 0).put("lat", 10)));
+        if (index.equals("/radec/_mget") ||
+            (index.equals("/ss_radec/_mget") &&
+              (id.equals("1") || id.equals("2") || id.equals("4") || id.equals("5"))) ||
+            (index.equals("/dia_radec/_mget") &&
+              (id.equals("2") || id.equals("4") || id.equals("5") || id.equals("6")))) {
+          Object location = new JSONObject().put("lon", id.equals("4") && index.equals("/ss_radec/_mget") ? 200 : 0)
+            .put("lat", index.equals("/ss_radec/_mget") ? 20 : 10);
+          if (id.equals("5") && index.equals("/dia_radec/_mget")) {
+            JSONArray oversized = new JSONArray();
+            for (int p=0;p<4001;p++) oversized.put(location);
+            location = oversized;
+          }
+          row.put("found", true).put("_source", new JSONObject().put("location", location));
+        }
         docs.put(row);
       }
       boolean fail = sent.contains("\\\"_id\\\":\\\"3\\\"");
@@ -74,22 +88,62 @@ ${body}
     try {
       JSONObject first = run("1", 200);
       JSONArray logged = first.getJSONArray("esRequests");
-      check(logged.length() == 3, "solar fallback must be represented");
+      check(logged.length() == 2, "solar lookup must be represented");
       for (int i = 0; i < logged.length(); i++) {
         check(logged.getJSONObject(i).getString("path").equals(paths.get(i)), "wrong index path");
         check(logged.getJSONObject(i).getString("body").equals(bodies.get(i)), "body differs from bytes executed");
         check(!logged.getJSONObject(i).toString().contains("127.0.0.1"), "private host leaked");
       }
-      check(new JSONObject(bodies.get(2)).getJSONArray("docs").getJSONObject(0).getString("_id").equals("1"),
-        "solar fallback includes non-missing IDs");
+      check(logged.getJSONObject(1).getString("path").equals("/ss_radec/_mget") &&
+        new JSONObject(bodies.get(1)).getJSONArray("docs").getJSONObject(0).getString("_id").equals("1"),
+        "SS detection queries the requested numeric ID first");
       JSONObject second = run("2", 200);
-      check(second.getJSONArray("esRequests").length() == 2, "unneeded solar fallback logged");
-      check(paths.size() == 5, "logging triggered additional requests");
+      check(second.getJSONArray("esRequests").length() == 2, "SS detection must avoid DIA collision request");
+      check(second.getJSONArray("ssObjectIds").length() == 1 &&
+        second.getJSONArray("ssObjectIds").getString(0).equals("2"), "collision ID must be SS");
+      int collisionPoints = 0;
+      for (Object raw : second.getJSONArray("points"))
+        if (((JSONObject)raw).getString("objectId").equals("2")) {
+          collisionPoints++;
+          check(((JSONObject)raw).getDouble("dec") == 20, "SS coordinate must take precedence");
+        }
+      check(collisionPoints == 1, "collision cannot duplicate DIA and SS point");
+      check(paths.size() == 4, "logging triggered additional requests");
+      JSONObject malformed = run("4", 200);
+      check(malformed.getJSONArray("ssObjectIds").toString().contains("\\\"4\\\"") &&
+        !malformed.getJSONArray("missing").toString().contains("\\\"4\\\""),
+        "found SS with bad coordinates must not be misidentified as DIA");
+      check(malformed.getJSONArray("points").length() == 1, "malformed SS cannot inherit colliding DIA positions");
+      JSONObject hugeCollision = run("5", 200);
+      check(hugeCollision.getJSONArray("points").length() == 2,
+        "discarded DIA collision points must not trip the retained-point cap");
+      JSONObject ordinaryDia = run("6", 200);
+      check(ordinaryDia.getJSONArray("ssObjectIds").length() == 0 &&
+        ordinaryDia.getJSONArray("points").length() == 2 &&
+        ordinaryDia.getJSONArray("esRequests").length() == 3 &&
+        ordinaryDia.getJSONArray("esRequests").getJSONObject(2).getString("path").equals("/dia_radec/_mget"),
+        "ordinary numeric DIA requires a not-found SS lookup followed by DIA lookup");
+      int firstMixed = paths.size();
+      JSONObject mixed = runIds(new JSONArray().put("ZTFabc").put("2").put("6"), 200);
+      check(mixed.getJSONArray("points").length() == 3 &&
+        mixed.getJSONArray("ssObjectIds").length() == 1 &&
+        mixed.getJSONArray("ssObjectIds").getString(0).equals("2"),
+        "mixed ZTF/SS/DIA returns one position each");
+      JSONArray mixedRequests = mixed.getJSONArray("esRequests");
+      check(mixedRequests.length() == 3 &&
+        new JSONObject(mixedRequests.getJSONObject(2).getString("body"))
+          .getJSONArray("docs").length() == 1 &&
+        new JSONObject(mixedRequests.getJSONObject(2).getString("body"))
+          .getJSONArray("docs").getJSONObject(0).getString("_id").equals("6"),
+        "mixed DIA request excludes the identified SS ID");
+      for (int i=0;i<mixedRequests.length();i++)
+        check(mixedRequests.getJSONObject(i).getString("body").equals(bodies.get(firstMixed+i)),
+          "mixed request log must match the executed bytes");
       JSONObject failed = run("3", 502);
       check(failed.getJSONArray("esRequests").length() == 2, "failed ES lookup loses executed requests");
-      check(failed.getJSONArray("esRequests").getJSONObject(1).getString("body").equals(bodies.get(6)),
+      check(failed.getJSONArray("esRequests").getJSONObject(1).getString("body").equals(bodies.get(bodies.size()-1)),
         "failed upstream body differs from bytes executed");
-      System.out.println("SkyPositions JSP: executed index/body metadata and conditional fallback passed");
+      System.out.println("SkyPositions JSP: SS-first identity, retained point cap and index/body metadata passed");
     } finally { server.stop(0); }
   }
 }`;

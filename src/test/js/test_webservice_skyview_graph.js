@@ -53,7 +53,7 @@ async function test() {
    {path:'/radec/_mget',body:JSON.stringify({docs:[{_id:'ZTF_TEST',_source:['location']}]})},
    {path:'/dia_radec/_mget',body:JSON.stringify({docs:[{_id:'123456',_source:['location']}]})},
    {path:'/ss_radec/_mget',body:JSON.stringify({docs:[{_id:'123456',_source:['location']}]})}];
- pending[0].resolve({ok:true,json:async()=>({points:[{objectId:'123456',ra:0,dec:0},{objectId:'ZTF_TEST',ra:180,dec:22}],missing:[],esRequests:executed})});
+ pending[0].resolve({ok:true,json:async()=>({points:[{objectId:'123456',ra:0,dec:0},{objectId:'ZTF_TEST',ra:180,dec:22}],missing:[],ssObjectIds:[],esRequests:executed})});
  await request;
  assert.deepEqual(queries,[
    {target:'ES',query:executed[0].path+' '+executed[0].body},
@@ -65,11 +65,11 @@ async function test() {
  assert.equal(points[0].ra,0);
  assert.equal(posted.at(-1).children.find(x=>x.name==='requested').value,'2');
  const noFallback=ctx.window.skyGraphState.open();
- pending[1].resolve({ok:true,json:async()=>({points:[],missing:['123456','ZTF_TEST'],esRequests:executed.slice(0,2)})});
+ pending[1].resolve({ok:true,json:async()=>({points:[],missing:['123456','ZTF_TEST'],ssObjectIds:[],esRequests:executed.slice(0,2)})});
  await noFallback;
  assert.equal(queries.length,5,'do not invent a conditional ss_radec call');
  const malformed=ctx.window.skyGraphState.open();
- pending[2].resolve({ok:true,json:async()=>({points:[],missing:[],esRequests:[{path:'https://private.example/key',body:'secret'}]})});
+ pending[2].resolve({ok:true,json:async()=>({points:[],missing:[],ssObjectIds:[],esRequests:[{path:'https://private.example/key',body:'secret'}]})});
  await malformed;
  assert.equal(queries.length,5,'untrusted response metadata cannot leak into the activity pane');
  assert.equal(posted.length,3,'invalid activity metadata must not break the plotting response');
@@ -77,7 +77,7 @@ async function test() {
  const large=ctx.window.skyGraphState.openIds(largeIds);
  const largeBody=JSON.stringify({docs:largeIds.map(_id=>({_id,_source:['location']}))});
  assert.ok(largeBody.length > 48000,'exercise a valid large _mget body');
- pending[3].resolve({ok:true,json:async()=>({points:[],missing:largeIds,
+ pending[3].resolve({ok:true,json:async()=>({points:[],missing:largeIds,ssObjectIds:[],
    esRequests:[{path:'/radec/_mget',body:largeBody}]})});
  await large;
  assert.equal(queries.at(-1).query,'/radec/_mget '+largeBody,'large actual body remains inspectable');
@@ -91,10 +91,45 @@ async function test() {
  const stale = ctx.window.skyGraphState.open();
  assert.equal(pending.length,6);
  ctx.window.disposeGraphView();
- pending[5].resolve({ok:true,json:async()=>({points:[{objectId:'123456',ra:1,dec:2}],missing:[],esRequests:executed})});
+ pending[5].resolve({ok:true,json:async()=>({points:[{objectId:'123456',ra:1,dec:2}],missing:[],ssObjectIds:[],esRequests:executed})});
  await stale;
  assert.equal(posted.length,4,'reset must suppress stale plot');
  assert.equal(queries.length,7,'reset must suppress stale activity');
+ const solar=ctx.window.skyGraphState.openIds(['123456']);
+ pending[6].resolve({ok:true,json:async()=>({points:[{objectId:'123456',ra:1,dec:2}],missing:[],
+   ssObjectIds:['123456'],esRequests:executed.slice(1)})});
+ for(let i=0;i<10 && pending.length<8;i++) await new Promise(setImmediate);
+ assert.equal(pending[7].url,'AlertsView/SSTrajectory.jsp?id=123456');
+ assert.equal(posted.length,4,'wait for the full paired source history before drawing');
+ const resolver={path:'/api/v1/resolver',body:JSON.stringify({resolver:'ssodnet',name_or_id:'123456',reverse:true,nmax:10,'output-format':'json'})};
+ const sso={path:'/api/v1/sso',body:JSON.stringify({n_or_d:'K25AB1',columns:'r:diaSourceId,r:ssObjectId,r:midpointMjdTai,r:ra,r:dec','output-format':'json'})};
+ const historyEs=[{path:'/ss_mjd/_mget',body:JSON.stringify({ids:['123456']})},
+   {path:'/ss_radec/_mget',body:JSON.stringify({ids:['123456']})}];
+ pending[7].resolve({ok:true,json:async()=>({objectId:'123456',esCoverageComplete:true,
+   sources:[{sourceId:'90071992547409930',mjd:61003,ra:1,dec:0},
+     {sourceId:'90071992547409929',mjd:61002,ra:359,dec:0}],finkRequests:[resolver,sso],esRequests:historyEs})});
+ await solar;
+ assert.equal(posted.length,5);
+ assert.deepEqual(JSON.parse(posted.at(-1).children.find(x=>x.name==='points').value),[],
+   'sparse ES positions are replaced by complete source rows');
+ const trajectories=JSON.parse(posted.at(-1).children.find(x=>x.name==='trajectories').value);
+ assert.deepEqual(trajectories,[{objectId:'123456',sources:[
+   {sourceId:'90071992547409929',mjd:61002,ra:359,dec:0},
+   {sourceId:'90071992547409930',mjd:61003,ra:1,dec:0}]}]);
+ assert.deepEqual(queries.slice(-4).map(q=>q.query),[
+   ...historyEs.map(x=>x.path+' '+x.body),
+   'https://api.lsst.fink-portal.org'+resolver.path+' '+resolver.body,
+   'https://api.lsst.fink-portal.org'+sso.path+' '+sso.body]);
+ const late=ctx.window.skyGraphState.openIds(['123456']);
+ pending[8].resolve({ok:true,json:async()=>({points:[{objectId:'123456',ra:1,dec:2}],missing:[],
+   ssObjectIds:['123456'],esRequests:executed.slice(1)})});
+ for(let i=0;i<10 && pending.length<10;i++) await new Promise(setImmediate);
+ assert.equal(pending.length,10);
+ ctx.window.skyGraphState.cancel();
+ pending[9].resolve({ok:true,json:async()=>({objectId:'123456',esCoverageComplete:true,
+   sources:[{sourceId:'3',mjd:61004,ra:2,dec:0}],finkRequests:[resolver,sso]})});
+ await late;
+ assert.equal(posted.length,5,'reset after ES but before Fink must not plot stale trajectory');
  console.log('webservice SkyView graph snapshots, route, and reset race passed');
 }
 test().catch(e=>{console.error(e); process.exitCode=1});
