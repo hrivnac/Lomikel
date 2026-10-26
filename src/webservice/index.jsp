@@ -66,10 +66,10 @@
       <form method="dialog"><button type="submit">Close</button></form>
     </dialog>
     <main id="layout" aria-label="Graph exploration panels"></main>
-    <footer class="workspace-footer"><span class="status-dot" aria-hidden="true"></span>
+    <!--footer class="workspace-footer"><span class="status-dot" aria-hidden="true"></span>
       <span>FinkBrowser workspace</span><span class="footer-separator">·</span>
       <span>Graph, analysis and feedback retain the existing application actions.</span>
-    </footer>
+    </footer-->
   </div>
   <script src="vis-network-8.3.2/standalone/umd/vis-network.min.js"></script>
   <script src="vis-timeline-7.3.9/standalone/umd/vis-timeline-graph2d.min.js"></script>
