@@ -24,7 +24,8 @@
     }
     return bytes.toByteArray();
   }
-  private static JSONArray mget(String survey, String index, ArrayList<String> ids) throws Exception {
+  private static JSONArray mget(String survey, String index, ArrayList<String> ids,
+                                JSONArray esRequests) throws Exception {
     if (ids.isEmpty()) return new JSONArray();
     JSONArray docs = new JSONArray();
     for (String id : ids) docs.put(new JSONObject().put("_id", id)
@@ -41,6 +42,9 @@
     connection.setFixedLengthStreamingMode(body.length);
     try {
       try (OutputStream output = connection.getOutputStream()) { output.write(body); }
+      // Record only the index path and the exact bytes sent, never the ES host.
+      esRequests.put(new JSONObject().put("path", "/" + index + "/_mget")
+        .put("body", new String(body, StandardCharsets.UTF_8)));
       int status = connection.getResponseCode();
       if (status < 200 || status >= 300) throw new IOException("Elasticsearch HTTP " + status);
       try (InputStream input = connection.getInputStream()) {
@@ -82,6 +86,7 @@
     out.print(new JSONObject().put("error", "POST required"));
     return;
   }
+  JSONArray esRequests = new JSONArray();
   try {
     String text;
     try (InputStream input = request.getInputStream()) {
@@ -105,19 +110,22 @@
     }
     JSONArray points = new JSONArray();
     LinkedHashSet<String> found = new LinkedHashSet<String>();
-    addPositions(mget("ztf", "radec", ztf), requested, found, points);
-    addPositions(mget("lsst", "dia_radec", lsst), requested, found, points);
+    addPositions(mget("ztf", "radec", ztf, esRequests), requested, found, points);
+    addPositions(mget("lsst", "dia_radec", lsst, esRequests), requested, found, points);
     ArrayList<String> solar = new ArrayList<String>();
     for (String id : lsst) if (!found.contains(id)) solar.add(id);
-    addPositions(mget("lsst", "ss_radec", solar), requested, found, points);
+    addPositions(mget("lsst", "ss_radec", solar, esRequests), requested, found, points);
     JSONArray missing = new JSONArray();
     for (String id : requested) if (!found.contains(id)) missing.put(id);
-    out.print(new JSONObject().put("points", points).put("missing", missing).toString());
+    out.print(new JSONObject().put("points", points).put("missing", missing)
+      .put("esRequests", esRequests).toString());
   } catch (IllegalArgumentException error) {
     response.setStatus(400);
-    out.print(new JSONObject().put("error", error.getMessage()).toString());
+    out.print(new JSONObject().put("error", error.getMessage())
+      .put("esRequests", esRequests).toString());
   } catch (Exception error) {
     response.setStatus(502);
-    out.print(new JSONObject().put("error", "Sky coordinate lookup failed").toString());
+    out.print(new JSONObject().put("error", "Sky coordinate lookup failed")
+      .put("esRequests", esRequests).toString());
   }
 %>

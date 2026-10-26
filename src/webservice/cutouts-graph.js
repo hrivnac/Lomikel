@@ -36,7 +36,9 @@
     query.set(sourceId ? 'diaSourceId' : 'objectId', sourceId || objectId);
     query.set('kind', kind);
     var image = document.createElement('img');
-    image.src = 'https://api.' + (sourceId ? 'lsst' : 'ztf') + '.fink-portal.org/api/v1/cutouts?' + query.toString();
+    var url = 'https://api.' + (sourceId ? 'lsst' : 'ztf') + '.fink-portal.org/api/v1/cutouts?' + query.toString();
+    if (typeof window.activityLogQuery === 'function') window.activityLogQuery('Fink', url);
+    image.src = url;
     image.alt = kind + ' cutout of ' + objectId;
     image.loading = 'lazy';
     image.onerror = function () {
@@ -61,6 +63,10 @@
   async function source(id, container, current) {
     var controller = new AbortController();
     requests.push(controller);
+    if (typeof window.activityLogQuery === 'function') {
+      window.activityLogQuery('Fink', 'https://api.lsst.fink-portal.org/api/v1/sources ' +
+        JSON.stringify({diaObjectId: id, columns: 'r:diaSourceId', 'output-format': 'json'}));
+    }
     try {
       var response = await fetch('CutoutSource.jsp', {
         method: 'POST', credentials: 'same-origin', signal: controller.signal,

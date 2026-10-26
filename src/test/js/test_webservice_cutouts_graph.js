@@ -42,10 +42,12 @@ pane.classList={remove() {}};
 const placeholder={innerHTML:pane.innerHTML};
 const pending=[];
 const events=[];
+const queries=[];
 const ctx={window:{skyGraphState:{getIds:()=>['ZTF21aaxtctv','313761043604045880','ZTF21aaxtctv']}},
  document:{getElementById:id=>id==='image'?pane:id==='ws-image-placeholder'?placeholder:null,createElement:element},
  showTab:name=>events.push(name),w2ui:{layoutMain:{panels:[{tabs:{click:name=>events.push(name)}}]}},
  fetch:(url,opts)=>new Promise(resolve=>pending.push({url,opts,resolve})),URL,URLSearchParams,JSON,Set,AbortController};
+ctx.window.activityLogQuery=(target,query)=>queries.push({target,query});
 vm.runInNewContext(fs.readFileSync(path.join(root, 'cutouts-graph.js'),'utf8'),ctx);
 const cells = row => row.children.filter(child=>child.tag==='div');
 async function run(){
@@ -59,6 +61,10 @@ async function run(){
  assert.equal(pending.length,1);
  assert.equal(pending[0].opts.method,'POST');
  assert.deepEqual(JSON.parse(pending[0].opts.body),{diaObjectId:'313761043604045880'});
+ assert.equal(queries.length,4,'three ZTF cutouts and one LSST source lookup');
+ assert.ok(queries.every(entry=>entry.target==='Fink'));
+ assert.equal(queries.at(-1).query,'https://api.lsst.fink-portal.org/api/v1/sources '+JSON.stringify({diaObjectId:'313761043604045880',columns:'r:diaSourceId','output-format':'json'}));
+ assert.match(server,/\.put\("columns", "r:diaSourceId"\)\.put\("output-format", "json"\)/);
  const ztf=pane.children[1];
  assert.equal(ztf.className,'ws-cutout-row ws-cutout-ztf');
  assert.equal(ztf.children[0].textContent,'ZTF21aaxtctv');
@@ -67,6 +73,8 @@ async function run(){
  assert.equal(new URL(cells(ztf)[0].children[1].src).searchParams.get('objectId'),'ZTF21aaxtctv');
  pending[0].resolve({ok:true,json:async()=>({diaSourceId:'170054933726363745'})});
  await task;
+ assert.equal(queries.length,7,'LSST source yields three cutout image requests');
+ assert.ok(queries.slice(4).every(entry=>/api\/v1\/cutouts.*diaSourceId=170054933726363745/.test(entry.query)));
  const lsst=pane.children[2];
  assert.equal(lsst.className,'ws-cutout-row ws-cutout-lsst');
  assert.deepEqual(cells(lsst).map(c=>new URL(c.children[1].src).searchParams.get('diaSourceId')),

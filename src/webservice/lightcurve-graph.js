@@ -34,6 +34,14 @@
       pane.textContent = 'Select a live ZTF or LSST object to plot its light curve.';
       return;
     }
+    if (typeof window.activityLogQuery === 'function') {
+      var columns = id.startsWith('ZTF') ? 'i:objectId,i:candid,i:jd,i:fid,i:magpsf,i:sigmapsf' :
+        'r:diaObjectId,r:diaSourceId,r:midpointMjdTai,r:band,r:scienceFlux,r:scienceFluxErr';
+      window.activityLogQuery('Fink', 'https://api.' + (id.startsWith('ZTF') ? 'ztf' : 'lsst') +
+        '.fink-portal.org/api/v1/' + (id.startsWith('ZTF') ? 'objects' : 'sources') +
+        ' ' + JSON.stringify({[id.startsWith('ZTF') ? 'objectId' : 'diaObjectId']: id,
+          columns: columns, 'output-format': 'json'}));
+    }
     pane.classList.add('ws-lightcurve');
     frame = document.createElement('iframe');
     frame.name = 'wsLightCurve-' + sequence;

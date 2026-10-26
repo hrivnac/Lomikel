@@ -4,11 +4,15 @@ async function loadPane(pane, url, iframe, height, encoded) {
     }
   var feedbackPane = document.getElementById('feedback');
   if (feedbackPane) {
-    feedbackPane.appendChild(document.createTextNode('Loading ' + pane + ' : ' + url));
-    feedbackPane.appendChild(document.createElement('br'));
-    var scroller = feedbackPane.parentElement || feedbackPane;
-    scroller.scrollTop = scroller.scrollHeight;
+    if (typeof window !== 'undefined' && typeof window.activityLogMessage === 'function') {
+      window.activityLogMessage('Loading ' + pane + ' : ' + url);
+    } else {
+      feedbackPane.appendChild(document.createTextNode('Loading ' + pane + ' : ' + url));
+      feedbackPane.appendChild(document.createElement('br'));
+      var scroller = feedbackPane.parentElement || feedbackPane;
+      scroller.scrollTop = scroller.scrollHeight;
     }
+  }
   // Plot URLs built with encodeURIComponent are already safe for iframe POST.
   if (!encoded) url = encodeURI(url);
   if (!height) {

@@ -30,7 +30,19 @@ body.workspace .ws-graph-controls .ws-graph-help { position:absolute; right:10px
 body.workspace #vis { border:1px solid #c5d9d0; border-radius:7px; background:#fff; }
 body.workspace .ws-graph-tools[open] ~ #vis { min-height:140px; }
 body.workspace #layout_layoutMain_panel_bottom .w2ui-panel-content { overflow-y:auto; }
-body.workspace #feedback { color:#264c6f; overflow-wrap:anywhere; line-height:1.5; }
+body.workspace #feedback { color:#264c6f; font-size:11px; line-height:1.3; min-width:0; padding-right:26px; }
+body.workspace #feedback .activity-entry { white-space:nowrap; min-width:0; }
+body.workspace #feedback .activity-entry summary { display:flex; align-items:baseline; gap:6px;
+  min-width:0; cursor:pointer; list-style:none; overflow:hidden; }
+body.workspace #feedback .activity-entry summary::-webkit-details-marker { display:none; }
+body.workspace #feedback .activity-entry summary::before { content:'▸'; flex:none; }
+body.workspace #feedback .activity-entry[open] summary::before { content:'▾'; }
+body.workspace #feedback .activity-target { font-weight:700; flex:none; color:#124a70; }
+body.workspace #feedback .activity-preview { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+body.workspace #feedback .activity-query { white-space:pre-wrap; overflow-wrap:anywhere;
+  margin:2px 0 4px 14px; font:inherit; }
+body.workspace #feedback .activity-message:not(details) { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+body.workspace #feedback .activity-entry summary:focus-visible { outline:2px solid #26775b; }
 /* Fill the whole Analysis pane, not the iframe's intrinsic 360px height. */
 body.workspace #skyview { height:100%; min-height:0; }
 body.workspace #skyview iframe[name="skyGraphFrame"] { border:0; display:block; width:100%; height:100%; min-height:0; }

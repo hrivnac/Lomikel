@@ -69,12 +69,21 @@ function gcall(command, level = 0) {
  
 // Append graph activity as text, not executable markup from commands or results.
 function feedbackLine(message) {
+  if (typeof window.activityLogMessage === 'function') {
+    window.activityLogMessage(message);
+    return;
+    }
   var pane = document.getElementById('feedback');
   if (!pane) return;
   pane.appendChild(document.createTextNode(message));
   pane.appendChild(document.createElement('br'));
   var scrollPane = pane.parentElement || pane;
   scrollPane.scrollTop = scrollPane.scrollHeight;
+  }
+
+function graphQuery(request, server) {
+  if (typeof window.activityLogQuery === 'function') window.activityLogQuery('JG', request);
+  else feedbackLine('Sending Gremlin request to ' + server + ': ' + request);
   }
 
 // Send request to Gremlin server giving JSON graph
@@ -96,7 +105,7 @@ async function callGremlinGraph(request, newServer, level = 0, token = graphView
   if (select !== "") {
     request += "." + select;
     }
-  feedbackLine('Sending Gremlin request to ' + server + ': ' + request);
+  graphQuery(request, server);
   var http = new XMLHttpRequest();
   http.onload = function() {
     if (http.readyState !== 4) return;
@@ -126,7 +135,7 @@ function callGremlinValues(request, newServer) {
     newServer = server;
     }
   server = newServer;
-  feedbackLine('Sending Gremlin request to ' + server + ': ' + request);
+  graphQuery(request, server);
   var http = new XMLHttpRequest();
   http.open("GET", server + (server.includes("?") ? '&' : '?') + 'gremlin=' + encodeURIComponent(request), false);
   try {
