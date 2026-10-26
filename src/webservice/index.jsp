@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="workspace.css?v=standalone-apps-1">
   <link rel="stylesheet" href="panels.css">
-  <link rel="stylesheet" href="graph.css?v=corr-fit-1">
+  <link rel="stylesheet" href="graph.css?v=query-activity-1">
   <link rel="stylesheet" href="cutouts.css?v=survey-colors-1">
   <link rel="stylesheet" href="help.css?v=1">
 </head>
@@ -85,7 +85,8 @@
   <script src="Options.js"></script>
   <script src="Tabs.js"></script>
   <script src="Sleep.js"></script>
-  <script src="LoadPane.js"></script>
+  <script src="activity.js?v=query-activity-1"></script>
+  <script src="LoadPane.js?v=query-activity-1"></script>
   <script src="Help.js"></script>
   <script src="help.js?v=1"></script>
   <script>
@@ -99,12 +100,7 @@
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
-      var pane = document.getElementById('feedback');
-      if (!pane) return;
-      pane.appendChild(document.createTextNode(txt));
-      pane.appendChild(document.createElement('br'));
-      var scroller = pane.parentElement || pane;
-      scroller.scrollTop = scroller.scrollHeight;
+      window.activityLogMessage(txt);
     };
     window.commands = function (info, actions) {
       var pane = document.getElementById('commands');

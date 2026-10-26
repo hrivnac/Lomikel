@@ -79,6 +79,26 @@
     showTab('skyview');
     w2ui.layoutMain.panels[0].tabs.click('skyviewTab');
   }
+  function logExecuted(requests, ids) {
+    if (typeof window.activityLogQuery !== 'function' || !Array.isArray(requests) || requests.length > 3) return;
+    var allowed = new Set(ids);
+    var entries = [];
+    try {
+      requests.forEach(function (request) {
+        if (!request || !['/radec/_mget', '/dia_radec/_mget', '/ss_radec/_mget'].includes(request.path) ||
+            typeof request.body !== 'string' || request.body.length > 100000) throw new Error('invalid activity');
+        var body = JSON.parse(request.body);
+        if (!body || Object.keys(body).length !== 1 || !Array.isArray(body.docs) ||
+            !body.docs.length || body.docs.length > 500 || !body.docs.every(function (doc) {
+              return doc && Object.keys(doc).length === 2 && typeof doc._id === 'string' &&
+                allowed.has(doc._id) && (request.path === '/radec/_mget') === doc._id.startsWith('ZTF') &&
+                Array.isArray(doc._source) && doc._source.length === 1 && doc._source[0] === 'location';
+            })) throw new Error('invalid activity');
+        entries.push(request.path + ' ' + request.body);
+      });
+    } catch (error) { return; } // Untrusted metadata must not change plotting or reveal arbitrary fields.
+    entries.forEach(function (entry) { window.activityLogQuery('ES', entry); });
+  }
   async function openIds(objectIdsToPlot, source) {
     var current = ++sequence;
     if (activeRequest) activeRequest.abort();
@@ -96,9 +116,17 @@
         method: 'POST', credentials: 'same-origin', signal: controller.signal,
         headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ids: ids})
       });
-      if (!response.ok) throw new Error('coordinate lookup failed (HTTP ' + response.status + ')');
+      if (!response.ok) {
+        // A proxy failure may still contain requests that reached Elasticsearch.
+        try {
+          var failed = await response.json();
+          if (current === sequence && !controller.signal.aborted) logExecuted(failed.esRequests, ids);
+        } catch (_error) { /* Keep the original HTTP error for non-JSON responses. */ }
+        throw new Error('coordinate lookup failed (HTTP ' + response.status + ')');
+      }
       var payload = await response.json();
       if (current !== sequence || controller.signal.aborted) return;
+      logExecuted(payload && payload.esRequests, ids);
       if (!payload || !Array.isArray(payload.points) || !Array.isArray(payload.missing)) {
         throw new Error('invalid coordinate response');
       }

@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '../../webservice/LoadPane.js'), 'utf8');
+const activity = fs.readFileSync(path.join(__dirname, '../../webservice/activity.js'), 'utf8');
 
 async function testPaneLoadLogsTextNotMarkup() {
   const events = [];
@@ -11,14 +12,18 @@ async function testPaneLoadLogsTextNotMarkup() {
   const pane = {innerHTML:''};
   const ctx = vm.createContext({
     document:{getElementById:id=>({feedback,top:pane})[id]||null,
-      createTextNode:text=>({type:'text',text}), createElement:tag=>({type:tag})},
+      createTextNode:text=>({type:'text',text}), createElement:tag=>({type:tag,children:[],
+        appendChild(child){this.children.push(child)}})},
     $:()=>({load:()=>{}}), sleep:async()=>{}, console, encodeURI
   });
+  ctx.window = ctx;
+  vm.runInContext(activity, ctx);
   vm.runInContext(source, ctx);
   await ctx.loadPane('top', 'Top.jsp?name=<img onerror=alert(1)>');
   assert.equal(feedback.innerHTML, '');
-  assert.deepEqual(events.map(e=>e.type), ['text','br']);
-  assert.equal(events[0].text, 'Loading top : Top.jsp?name=<img onerror=alert(1)>');
+  assert.deepEqual(events.map(e=>e.type), ['details']);
+  assert.equal(events[0].children[1].textContent, 'Loading top : Top.jsp?name=<img onerror=alert(1)>');
+  assert.equal(events[0].className, 'activity-entry activity-message');
 }
 
 async function testEncodedPlotURLIsNotEncodedTwice() {

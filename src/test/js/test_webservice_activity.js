@@ -1,0 +1,53 @@
+'use strict';
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const root = path.resolve(__dirname, '../../webservice');
+const read = file => fs.existsSync(path.join(root, file)) ? fs.readFileSync(path.join(root, file), 'utf8') : '';
+function element(tag) {
+  return {tag, children: [], className: '', textContent: '', title: '', open: false,
+    appendChild(node) {this.children.push(node); return node;}};
+}
+const pane = element('div');
+pane.parentElement = {scrollTop:0, scrollHeight:200};
+const context = vm.createContext({document:{getElementById:id=>id==='feedback'?pane:null,
+  createElement:element,createTextNode:text=>({tag:'#text',textContent:text})}});
+context.window=context;
+vm.runInContext(read('activity.js'),context);
+assert.equal(typeof context.activityLogQuery,'function','shared query activity API must be loaded');
+const gremlin='g.V().has("query", "<img src=x onerror=alert(1)>")\n.limit(10)';
+context.activityLogQuery('JG',gremlin);
+assert.equal(pane.children.length,1,'one query creates one entry');
+const details=pane.children[0];
+assert.equal(details.tag,'details');
+assert.equal(details.open,false,'query is collapsed by default');
+assert.equal(details.children[0].tag,'summary');
+assert.equal(details.children[0].children[0].textContent,'JG');
+assert.equal(details.children[1].textContent,gremlin,'complete query stays readable on expansion');
+assert.ok(details.children[0].children[1].textContent.length < gremlin.length,'summary is compact');
+assert.equal(pane.parentElement.scrollTop,200,'activity follows new entries');
+context.activityLogQuery('ES','dia_radec/_mget {"ids":["123"]}');
+context.activityLogQuery('Fink','/api/v1/sources {"diaObjectId":"123"}');
+assert.deepEqual(pane.children.slice(1).map(row=>row.children[0].children[0].textContent),['ES','Fink']);
+context.activityLogMessage('Graph request failed (HTTP 503)');
+assert.equal(pane.children.at(-1).tag,'div');
+assert.equal(pane.children.at(-1).textContent,'Graph request failed (HTTP 503)');
+const longMessage='Could not load '+ '<img src=x onerror=alert(1)> '.repeat(20)+'\nHTTP 503';
+context.activityLogMessage(longMessage);
+const message=pane.children.at(-1);
+assert.equal(message.tag,'details','long ordinary messages need a disclosure like queries');
+assert.equal(message.open,false);
+assert.equal(message.children[1].textContent,longMessage,'expansion retains every original character safely');
+assert.ok(message.children[0].textContent.length < longMessage.length);
+assert.match(read('graph.css'),/#feedback\s*\{[^}]*font-size:\s*(?:11px|0\.7\drem)/s);
+assert.match(read('graph.css'),/\.activity-entry\s*\{[^}]*white-space:\s*nowrap/s);
+assert.match(read('index.jsp'), /<script src="activity\.js\?v=/);
+assert.doesNotMatch(read('Feedback.jsp'), /<br\s*\/?\s*>|font-size:\s*15px/);
+vm.runInContext(read('GraphView.js'),context);
+context.XMLHttpRequest = class {open() {} send() {this.status=503;}};
+context.callGremlinValues('g.V().count()', '//graph-host');
+assert.equal(pane.children.at(-2).children[0].children[0].textContent,'JG');
+assert.equal(pane.children.at(-2).children[1].textContent,'g.V().count()');
+assert.match(pane.children.at(-1).textContent,/HTTP 503/);
+console.log('compact, collapsed and safe query activity entries passed');

@@ -31,7 +31,9 @@ class WebserviceShellTest(unittest.TestCase):
         self.assertIn('id="vis"', graph)
         self.assertIn('graph-table-origin.js', graph)
         self.assertIn('SurveyStylesheet.js', graph)
-        self.assertIn('pane.appendChild(document.createTextNode(txt))', jsp)
+        self.assertIn('window.activityLogMessage(txt)', jsp)
+        self.assertIn('activity.js?v=query-activity-1', jsp)
+        self.assertIn('content.textContent = String(query)', (SOURCE / 'activity.js').read_text())
         self.assertIn('class="workspace"', jsp)
         self.assertIn('request.getContextPath() %>/', jsp)
         self.assertIn('"Init.jsp"', jsp)
@@ -85,7 +87,7 @@ class WebserviceShellTest(unittest.TestCase):
             self.assertEqual(len(names), len(set(names)), 'WAR entries must be unique')
             for name in ('index.jsp', 'Top.jsp', 'Graphs.jsp', 'Servers.jsp',
                          'GraphView.jsp', 'Tabs.jsp', 'Feedback.jsp', 'WEB-INF/web.xml',
-                         'GraphView.js', 'Stylesheet.js', 'SurveyStylesheet.js',
+                         'GraphView.js', 'activity.js', 'Stylesheet.js', 'SurveyStylesheet.js',
                          'TableView.js', 'LoadPane.js', 'Nodes.jsp', 'Edges.jsp',
                          'Venn.jsp', 'd3/venn.jsp', 'd3/vennPopup.jsp',
                          'd3/actions.js', 'd3/correlogram.jsp', 'd3/scatterplot.jsp',
