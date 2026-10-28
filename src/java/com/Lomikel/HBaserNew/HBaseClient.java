@@ -249,6 +249,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   @Override
   public void close() {
     log.debug("Closing");
+    closeResultScanner();
     if (_table != null) {
       try {
         _table.close();
@@ -348,6 +349,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     if (stop == 0) {
       stop = System.currentTimeMillis();
       }
+    closeResultScanner();
     Map<String, Map<String, String>> results = new TreeMap<>();
     Map<String, String> result;
     String[] fc;
@@ -534,14 +536,14 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         }
       if (limit0 > 0) {
         scan.setLimit(limit0);
-        if (schema() != null) {
-          scan.setMaxResultSize(limit0 * schema().size());
-          }
+        // setMaxResultSize is measured in bytes, not rows or column count;
+        // leave HBase's configured byte budget unchanged.
         }
       // Reversed
       scan.setReversed(isReversed());
       log.debug("scan = " + scan);
       // Results
+      boolean scannerCompleted = false;
       try {
         _rs = table().getScanner(scan);
         int i = 0;
@@ -556,10 +558,14 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
             i++;
             }
           }
+        scannerCompleted = true;
         }
       catch (IOException e) {
         log.error("Cannot search", e);
         handleScanIOException(e);
+        }
+      finally {
+        if (!scannerCompleted) closeResultScanner();
         }
       }
     log.debug(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
@@ -569,6 +575,23 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
   /** Preserve synchronous partial-result behavior; asynchronous clients may fail the scan. */
   protected void handleScanIOException(IOException failure) {
     // The synchronous scan API historically returns any rows already read.
+    }
+
+  /** Scan without retaining the raw ResultScanner after the returned rows are built.
+    * Use scan() instead when the caller needs resultScanner() afterwards. */
+  public Map<String, Map<String, String>> scanAndClose(String key,
+                                                       SearchMap searchMap,
+                                                       String filter,
+                                                       long start,
+                                                       long stop,
+                                                       boolean ifkey,
+                                                       boolean iftime) {
+    try {
+      return scan(key, searchMap, filter, start, stop, ifkey, iftime);
+      }
+    finally {
+      closeResultScanner();
+      }
     }
 
   @Override
@@ -598,6 +621,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     if (stop == 0) {
       stop = time;
       }
+    closeResultScanner();
     Map<String, Map<String, Map<Long, String>>> results = new TreeMap<>();
     Map<String, Map<Long, String>> result;
     String[] fc;
@@ -783,14 +807,14 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
         }
       if (limit0 > 0) {
         scan.setLimit(limit0);
-        if (schema() != null) {
-          scan.setMaxResultSize(limit0 * schema().size());
-          }
+        // setMaxResultSize is measured in bytes, not rows or column count;
+        // leave HBase's configured byte budget unchanged.
         }
       // Reversed
       scan.setReversed(isReversed());
       log.debug("scan = " + scan);
       // Results
+      boolean scannerCompleted = false;
       try {
         _rs = table().getScanner(scan);
         int i = 0;
@@ -804,13 +828,33 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
             i++;
             }
           }
+        scannerCompleted = true;
         }
       catch (IOException e) {
         log.error("Cannot search", e);
         }
+      finally {
+        if (!scannerCompleted) closeResultScanner();
+        }
       }
     log.debug(results.size() + " results found in " + (System.currentTimeMillis() - time) + "ms");
     return results;
+    }
+
+  /** Multiversion scan that releases the raw scanner before returning rows. */
+  public Map<String, Map<String, Map<Long, String>>> scan3DAndClose(String key,
+                                                                     SearchMap searchMap,
+                                                                     String filter,
+                                                                     long start,
+                                                                     long stop,
+                                                                     boolean ifkey,
+                                                                     boolean iftime) {
+    try {
+      return scan3D(key, searchMap, filter, start, stop, ifkey, iftime);
+      }
+    finally {
+      closeResultScanner();
+      }
     }
 
   /** Add {@link Result} into result {@link Map}.
@@ -1282,7 +1326,7 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     String value;
     String[] w;
     for (String v : values) {
-      w = v.split(":");
+      w = v.split(":", 3); // family:column:value; preserve colons in the value
       value = w[2];
       if (schema() != null) {
         put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), schema().encode(w[0] +  ":" +  w[1], value).bytes());
@@ -1296,10 +1340,13 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
 
   /** Add rows into table in a batch.
     * @param rows   The {@link Map} rowkey -&gt; (family:column -&gt; value).
-    *               Use schema if defined.
+    *               Use schema if defined. Submitted in bounded chunks of 1000 rows;
+    *               a later IOException may follow earlier committed chunks.
     * @throws IOException If anything goes wrong. */
   public void put(Map<String, Map<String, String>> rows) throws IOException {
-    List<Put> puts = new ArrayList<Put>();
+    final int batchSize = 1000;
+    List<Put> puts = new ArrayList<>(batchSize);
+    HBaseSchema encodingSchema = schema();
     String key;
     Put put;
     String[] w;
@@ -1310,16 +1357,20 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
       for (Map.Entry<String, String> cell : row.getValue().entrySet()) {
         w = cell.getKey().split(":");
         value  = cell.getValue();
-        if (schema() != null) {
-          put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), schema().encode(w[0] +  ":" +  w[1], value).bytes());
+        if (encodingSchema != null) {
+          put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), encodingSchema.encode(w[0] +  ":" +  w[1], value).bytes());
           }
         else {
           put.addColumn(Bytes.toBytes(w[0]), Bytes.toBytes(w[1]), Bytes.toBytes(value));
           }
         }
       puts.add(put);
+      if (puts.size() == batchSize) {
+        table().put(puts);
+        puts = new ArrayList<>(batchSize);
+        }
       }
-    table().put(puts);
+    if (!puts.isEmpty()) table().put(puts);
     }
 
   // Aux -----------------------------------------------------------------------
@@ -1467,6 +1518,16 @@ public class HBaseClient extends Client<Table, HBaseSchema> {
     *         after <tt>limit</tt> results already been read. */
   public ResultScanner resultScanner() {
     return _rs;
+    }
+
+  /** Release the borrowed scanner without closing the HBase table.
+    * Scan results remain usable until this call, the next scan, or close(). */
+  public void closeResultScanner() {
+    ResultScanner scanner = _rs;
+    _rs = null;
+    if (scanner != null) {
+      scanner.close();
+      }
     }
 
   /** Give attached {@link HBaseEvaluator}.
