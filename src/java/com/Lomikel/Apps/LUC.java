@@ -24,7 +24,7 @@ public class LUC {
     * @param args The arguments. */
   public static void main(String[] args) {
     System.out.println(doit(args));
-    if (cli().batch()) {
+    if (cli() != null && cli().batch()) {
       System.exit(0);
       }
     }
@@ -33,7 +33,10 @@ public class LUC {
     * @param args The arguments. */
   public static String doit(String[] args) {
     Init.init("LUC");
-    CLI.parseArgs(args, "java -jar Lomikel.exe.jar");
+    _cli = null;
+    if (CLI.parseArgs(args, "java -jar Lomikel.exe.jar") == null) {
+      return "";
+      }
     if (CLI.api().equals("groovy") ) {
       log.info("Starting Lomikel Universal Client in Groovy");
       _cli = new GCLI(null,
