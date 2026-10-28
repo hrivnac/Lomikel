@@ -11,9 +11,11 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,45 +36,69 @@ import org.apache.logging.log4j.LogManager;
 // TBD: timeout
 public class RemoteGroovyServer {
 
-  /** Start the server on defaulr port and with default security. */
+  /** Start only on loopback with an operator-supplied secret. */
   public static void main(String[] args) throws Exception {
-    HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);   
-    server.createContext("/eval", RemoteGroovyServer::handleEval);    
-    server.setExecutor(null);
+    HttpServer server = createServer(PORT, System.getenv("LOMIKEL_GROOVY_TOKEN"));
     server.start();    
     log.info("Remote Groovy JSR-223 server started");
     log.info("POST Groovy scripts to: http://localhost:" + PORT + "/eval");
     }
 
-  private static void handleEval(HttpExchange exchange) throws IOException {
-    try {
-      doHandleEval(exchange);
+  /** Construct an unstarted server; zero selects an ephemeral port for tests. */
+  static HttpServer createServer(int port, String token) throws IOException {
+    if (token == null || token.length() < 16) {
+      throw new IllegalArgumentException("LOMIKEL_GROOVY_TOKEN must contain at least 16 characters");
       }
-    catch (Throwable t) {
-      t.printStackTrace();
-      String response = "Fatal server error:\n" + t + "\n";    
+    HttpServer server = HttpServer.create(
+      new InetSocketAddress(InetAddress.getByName("127.0.0.1"), port), 0);
+    server.createContext("/eval", exchange -> handleEval(exchange, token));
+    server.setExecutor(null);
+    return server;
+    }
+
+  private static void handleEval(HttpExchange exchange, String token) throws IOException {
+    try {
+      doHandleEval(exchange, token);
+      }
+    catch (Exception e) {
+      log.error("Groovy request failed", e);
       try {
-        send(exchange, 500, response);
+        send(exchange, 500, "Internal server error\n");
         }
-      catch (Throwable sendError) {
-        sendError.printStackTrace();
+      catch (IOException sendError) {
+        log.warn("Could not send failure response", sendError);
         }
+      }
+    finally {
+      exchange.close();
       }
     }
 
-  private static void doHandleEval(HttpExchange exchange) throws Exception {
+  private static void doHandleEval(HttpExchange exchange, String token) throws Exception {
     if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
       send(exchange, 405, "Use POST\n");
       return;
       }
     String auth = exchange.getRequestHeaders().getFirst("X-Auth-Token");
-    if (!TOKEN.equals(auth)) {
+    if (auth == null || !MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8),
+                                               auth.getBytes(StandardCharsets.UTF_8))) {
       send(exchange, 401, "Unauthorized\n");
       return;
       }
-    String script = new String(exchange.getRequestBody().readAllBytes(),
-                               StandardCharsets.UTF_8);
-    Map<String, List<String>> params = parseQuery(exchange.getRequestURI().getRawQuery());
+    byte[] body = exchange.getRequestBody().readNBytes(MAX_SCRIPT_BYTES + 1);
+    if (body.length > MAX_SCRIPT_BYTES) {
+      send(exchange, 413, "Script too large\n");
+      return;
+      }
+    String script = new String(body, StandardCharsets.UTF_8);
+    Map<String, List<String>> params;
+    try {
+      params = parseQuery(exchange.getRequestURI().getRawQuery());
+      }
+    catch (IllegalArgumentException e) {
+      send(exchange, 400, "Invalid query\n");
+      return;
+      }
     Object result = runGroovyScript(script, params);
     send(exchange, 200, String.valueOf(result) + "\n");
     }
@@ -137,8 +163,7 @@ public class RemoteGroovyServer {
     }
   
   private static final int PORT = 44444;
-
-  private static final String TOKEN = "secret";
+  private static final int MAX_SCRIPT_BYTES = 65536;
 
   private static final ScriptEngineManager SCRIPT_ENGINE_MANAGER = new ScriptEngineManager();
   
