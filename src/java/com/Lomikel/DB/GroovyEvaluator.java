@@ -6,6 +6,7 @@ import com.Lomikel.Utils.StringResource;
 // Groovy
 import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
+import groovy.lang.MissingPropertyException;
 
 // Java
 import java.util.Set;
@@ -83,15 +84,23 @@ public class GroovyEvaluator {
                      String              type) throws LomikelException {
     if (values != null) {
       for (String variable : _variables) {
-        if (values.containsKey(variable)) {
+        if (values.containsKey(variable) && values.get(variable) != null) {
           setVariable(variable, values.get(variable));
+          }
+        else {
+          // Row bindings must not carry values over from a previous result.
+          _sharedData.getVariables().remove(varName(variable));
           }
         }
       }
     String cmd = type + " result = " + formula + ";\nreturn result\n";
-    Object o =_shell.evaluate(cmd);
-    String result = o.toString();
-    return result;
+    try {
+      Object o = _shell.evaluate(cmd);
+      return o.toString();
+      }
+    catch (MissingPropertyException e) {
+      throw new LomikelException("Cannot evaluate formula with missing variable", e);
+      }
     }
           
   /** Declare variable. Set to <tt>0</tt>.

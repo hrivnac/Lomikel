@@ -160,7 +160,15 @@ public abstract class Schema<T> {
     * @return            The column value casted to its proper type. */
   public Object castColumn(String columnName,
                            String columnValue) {
-    switch (type(columnName)) {
+    // A missing cell stays missing, including for numeric schema columns.
+    if (columnValue == null) {
+      return null;
+      }
+    String columnType = type(columnName);
+    if (columnType == null) {
+      return columnValue;
+      }
+    switch (columnType) {
       case "float":
         return Float.valueOf(columnValue);
       case "double":
