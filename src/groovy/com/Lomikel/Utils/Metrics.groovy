@@ -36,6 +36,7 @@ public class Metrics {
     keys.addAll(mx.keySet())
     double sum0 = m0.values().sum()
     double sumx = mx.values().sum()
+    if (allClasses && (sum0 == 0.0 || sumx == 0.0)) return 1.0
     Map<String, Double> p = [:]
     Map<String, Double> q = [:]
     if (allClasses) { // normalise
@@ -47,12 +48,14 @@ public class Metrics {
                       q[k] = mx.getOrDefault(k, 0.0)}
       if (Math.abs(1.0 - sum0) > 0.000001) {
         def newkey = 'others0'
+        while (keys.contains(newkey)) newkey += '_'
         keys.add(newkey)
         p[newkey] = 1.0 - sum0;
         q[newkey] = 0.0;
         }
       if (Math.abs(1.0 - sumx) > 0.000001) {
         def newkey = 'othersx'
+        while (keys.contains(newkey)) newkey += '_'
         keys.add(newkey)
         p[newkey] = 0.0;
         q[newkey] = 1.0 - sumx;
@@ -82,21 +85,17 @@ public class Metrics {
   def static double distanceJensenShannon(Map<String, Double> p,
                                           Map<String, Double> q,
                                           Set<String>         keys) {
-    Map<String, Double> m = [:]
-    keys.each {if (!p.containsKey(it)) {p[it] = 0.0}
-               if (!q.containsKey(it)) {q[it] = 0.0}}
-    keys.each {k -> m[k] = 0.5 * (p[k] + q[k])}
-    def kl = {Map<String, Double> a, Map<String, Double> b ->
-               double klDiv = 0.0
-               a.each {k, v ->
-                 if (v > 0 && b[k] > 0) {
-                   klDiv += v * Math.log(v / b[k])
-                   }
-                 }
-               return klDiv
-               }
-  double jsd = 0.5 * kl(p, m) + 0.5 * kl(q, m)
-  return Math.sqrt(jsd)
+    // Iterate the common support once: no temporary mean map, input mutation,
+    // or per-call KL closure in the hot candidate-ranking path.
+    double jsd = 0.0
+    keys.each {k ->
+      double pv = p.getOrDefault(k, 0.0)
+      double qv = q.getOrDefault(k, 0.0)
+      double mean = 0.5 * (pv + qv)
+      if (pv > 0 && mean > 0) jsd += 0.5 * pv * Math.log(pv / mean)
+      if (qv > 0 && mean > 0) jsd += 0.5 * qv * Math.log(qv / mean)
+      }
+    return Math.sqrt(jsd)
   }                             
     
   /** Give Euclidean distance (metric) between two {@link Map}s.
