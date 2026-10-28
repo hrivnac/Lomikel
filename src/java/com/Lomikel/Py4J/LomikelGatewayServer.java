@@ -36,16 +36,9 @@ import org.apache.logging.log4j.LogManager;
   * @author <a href="mailto:Julius.Hrivnac@cern.ch">J.Hrivnac</a> */
 public class LomikelGatewayServer {
 
-  /** Start the server. */
+  /** Start the loopback-only server; remote clients can use an SSH tunnel. */
   public static void main(String[] args) throws UnknownHostException {
-    GatewayServer gatewayServer = new GatewayServer(new LomikelGatewayServer(),
-                                                    GatewayServer.DEFAULT_PORT,
-                                                    GatewayServer.DEFAULT_PYTHON_PORT,
-                                                    InetAddress.getByName("0.0.0.0"),
-                                                    InetAddress.getByName("127.0.0.1"),
-                                                    0,
-                                                    0,
-                                                    null);
+    GatewayServer gatewayServer = createGatewayServer(GatewayServer.DEFAULT_PORT);
     gatewayServer.start();
     log.info("Gateway Server Started at port " + GatewayServer.DEFAULT_PORT);
     try {
@@ -54,6 +47,20 @@ public class LomikelGatewayServer {
     catch (Exception e) {
       System.err.println(e);
       }
+    }
+
+  /** Construct an unstarted gateway for a specific port (zero for tests). */
+  static GatewayServer createGatewayServer(int port) throws UnknownHostException {
+    // The documented Python client uses IPv4 even on IPv6-preferred JVMs.
+    InetAddress loopback = InetAddress.getByName("127.0.0.1");
+    return new GatewayServer(new LomikelGatewayServer(),
+                             port,
+                             GatewayServer.DEFAULT_PYTHON_PORT,
+                             loopback,
+                             loopback,
+                             0,
+                             0,
+                             null);
     }
   
   /** Logging . */
