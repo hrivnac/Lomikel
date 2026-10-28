@@ -28,12 +28,13 @@ ${declaration}
     }; }
   }
   static class Response { int status = 200; void setStatus(int status) { this.status = status; } }
-  static class Result { int status, count, requested, read; String error; }
+  static class Result { int status, count, trajectoryCount, requested, read; String error; }
   static Result run(Request request) throws Exception {
     Response response = new Response();
 ${body}
     Result result = new Result();
     result.status = response.status; result.count = points.length();
+    result.trajectoryCount = trajectories.length();
     result.requested = requested; result.read = request.read; result.error = errorMessage;
     return result;
   }
@@ -44,6 +45,19 @@ ${body}
     String form = "points=" + URLEncoder.encode(points.toString(), "UTF-8") + "&requested=500&missing=0";
     Result valid = run(new Request(form, -1));
     check(valid.status == 200 && valid.count == 4000 && valid.requested == 500, "4000 point POST rejected");
+    JSONArray trajectories = new JSONArray().put(new JSONObject().put("objectId", "123")
+      .put("sources", new JSONArray().put(new JSONObject()
+        .put("sourceId", "90071992547409929").put("mjd", 61002).put("ra", 359).put("dec", 0))
+        .put(new JSONObject().put("sourceId", "90071992547409930")
+          .put("mjd", 61003).put("ra", 1).put("dec", 0))));
+    String trajectoryForm = "points=%5B%5D&trajectories=" + URLEncoder.encode(trajectories.toString(), "UTF-8")
+      + "&requested=1&missing=0";
+    Result trajectory = run(new Request(trajectoryForm, -1));
+    check(trajectory.status == 200 && trajectory.trajectoryCount == 1, "paired SS history not accepted");
+    String oversizedHistory = "points=" + URLEncoder.encode(points.toString(), "UTF-8")
+      + "&trajectories=" + URLEncoder.encode(trajectories.toString(), "UTF-8") + "&requested=500&missing=0";
+    Result excess = run(new Request(oversizedHistory, -1));
+    check(excess.status == 400 && excess.trajectoryCount == 0, "aggregate positions exceeded 4000 silently");
     String huge = "points=" + "x".repeat(MAX_REQUEST_BYTES + 100);
     Result known = run(new Request(huge, huge.length()));
     check(known.status == 413 && known.read == 0 && "Request too large".equals(known.error), "known length not rejected early");

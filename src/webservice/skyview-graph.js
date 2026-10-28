@@ -7,6 +7,8 @@
   var oldShow = window.show;
   var oldDispose = window.disposeGraphView;
   var MAX_OBJECTS = 500;
+  var MAX_SS_OBJECTS = 20; // A history fetch makes several bounded upstream calls.
+  var MAX_POINTS = 4000;
   function cancel() {
     sequence++;
     if (activeRequest) activeRequest.abort();
@@ -51,7 +53,7 @@
     showTab('skyview');
     w2ui.layoutMain.panels[0].tabs.click('skyviewTab');
   }
-  function plot(points, requested, missing) {
+  function plot(points, requested, missing, trajectories) {
     // A private frame name avoids the legacy shared dynamicFrame used by Plot.
     // Submit data in the POST body instead of putting thousands of positions in
     // the activity log and URL through the generic loadPane helper.
@@ -66,7 +68,7 @@
     form.method = 'POST';
     form.action = new URL('d3/skyview.jsp', document.baseURI).pathname;
     form.target = frame.name;
-    [['points', JSON.stringify(points)], ['requested', String(requested)],
+    [['points', JSON.stringify(points)], ['trajectories', JSON.stringify(trajectories)], ['requested', String(requested)],
      ['missing', String(missing)]].forEach(function (pair) {
       var field = document.createElement('input');
       field.name = pair[0];
@@ -98,6 +100,64 @@
       });
     } catch (error) { return; } // Untrusted metadata must not change plotting or reveal arbitrary fields.
     entries.forEach(function (entry) { window.activityLogQuery('ES', entry); });
+  }
+  function logHistoryEs(requests, id) {
+    if (typeof window.activityLogQuery !== 'function' || !Array.isArray(requests) || requests.length > 2) return;
+    var entries = [];
+    try {
+      requests.forEach(function (request) {
+        if (!request || !['/ss_mjd/_mget','/ss_radec/_mget'].includes(request.path) ||
+            typeof request.body !== 'string' || request.body.length > 512) throw new Error('invalid activity');
+        var body = JSON.parse(request.body);
+        if (!body || Object.keys(body).length !== 1 || !Array.isArray(body.ids) ||
+            body.ids.length !== 1 || body.ids[0] !== id) throw new Error('invalid activity');
+        entries.push(request.path + ' ' + request.body);
+      });
+    } catch (error) { return; }
+    entries.forEach(function (entry) { window.activityLogQuery('ES', entry); });
+  }
+  function logFink(requests, id) {
+    if (typeof window.activityLogQuery !== 'function' || !Array.isArray(requests) || requests.length > 2) return;
+    var entries = [];
+    try {
+      requests.forEach(function (request) {
+        if (!request || !['/api/v1/resolver', '/api/v1/sso'].includes(request.path) ||
+            typeof request.body !== 'string' || request.body.length > 1024) throw new Error('invalid activity');
+        var body = JSON.parse(request.body);
+        if (!body || body['output-format'] !== 'json' ||
+            (request.path === '/api/v1/resolver' &&
+              (body.name_or_id !== id || body.resolver !== 'ssodnet' ||
+               body.reverse !== true || body.nmax !== 10 ||
+               Object.keys(body).some(function (key) {
+                 return !['resolver','name_or_id','reverse','nmax','output-format'].includes(key);
+               }))) ||
+            (request.path === '/api/v1/sso' &&
+              (typeof body.n_or_d !== 'string' || !/^[^\u0000-\u001f\u007f]{1,128}$/.test(body.n_or_d) ||
+               body.columns !== 'r:diaSourceId,r:ssObjectId,r:midpointMjdTai,r:ra,r:dec' ||
+               Object.keys(body).some(function (key) {
+                 return !['n_or_d','columns','output-format'].includes(key);
+               })))) throw new Error('invalid activity');
+        entries.push('https://api.lsst.fink-portal.org' + request.path + ' ' + request.body);
+      });
+    } catch (error) { return; }
+    entries.forEach(function (entry) { window.activityLogQuery('Fink', entry); });
+  }
+  function normalizeTrajectory(payload, id) {
+    if (!payload || payload.objectId !== id || payload.esCoverageComplete !== true ||
+        !Array.isArray(payload.sources) || !payload.sources.length ||
+        payload.sources.length > MAX_POINTS) throw new Error('SS source history could not be verified');
+    var seen = new Set();
+    var sources = payload.sources.map(function (source) {
+      if (!source || typeof source.sourceId !== 'string' || !/^\d{1,64}$/.test(source.sourceId) ||
+          seen.has(source.sourceId) || !Number.isFinite(source.mjd) || source.mjd <= 0 ||
+          !Number.isFinite(source.ra) || source.ra < 0 || source.ra > 360 ||
+          !Number.isFinite(source.dec) || source.dec < -90 || source.dec > 90)
+        throw new Error('Invalid SS source history');
+      seen.add(source.sourceId);
+      return {sourceId:source.sourceId, mjd:source.mjd, ra:source.ra % 360, dec:source.dec};
+    });
+    sources.sort(function (a, b) { return a.mjd - b.mjd || a.sourceId.localeCompare(b.sourceId); });
+    return {objectId:id, sources:sources};
   }
   async function openIds(objectIdsToPlot, source) {
     var current = ++sequence;
@@ -135,7 +195,41 @@
         return p && wanted.has(p.objectId) && Number.isFinite(p.ra) && p.ra >= 0 && p.ra < 360 &&
                Number.isFinite(p.dec) && p.dec >= -90 && p.dec <= 90;
       })) throw new Error('invalid sky coordinates');
-      plot(payload.points, ids.length, payload.missing.length);
+      var ssIds = payload.ssObjectIds;
+      if (!Array.isArray(ssIds) || new Set(ssIds).size !== ssIds.length ||
+          !ssIds.every(function (id) { return typeof id === 'string' && /^\d{1,24}$/.test(id) && wanted.has(id); }))
+        throw new Error('invalid Solar System object list');
+      if (ssIds.length > MAX_SS_OBJECTS)
+        throw new Error('More than ' + MAX_SS_OBJECTS + ' SS objects; reduce the graph or table to show complete trajectories.');
+      var next = 0, trajectories = [];
+      var workers = Array.from({length:Math.min(3, ssIds.length)}, async function () {
+        while (next < ssIds.length) {
+          var id = ssIds[next++];
+          var answer = await fetch('AlertsView/SSTrajectory.jsp?id=' + encodeURIComponent(id),
+            {credentials:'same-origin', cache:'no-store', signal:controller.signal});
+          var history = await answer.json();
+          if (current !== sequence || controller.signal.aborted) return;
+          logHistoryEs(history && history.esRequests, id);
+          logFink(history && history.finkRequests, id);
+          if (!answer.ok) throw new Error('SS source history unavailable (HTTP ' + answer.status + ')');
+          trajectories.push(normalizeTrajectory(history, id));
+        }
+      });
+      try { await Promise.all(workers); }
+      catch (error) {
+        if (current === sequence && !controller.signal.aborted) {
+          controller.abort();
+          showStatus('SkyView: ' + error.message);
+        }
+        return;
+      }
+      if (current !== sequence || controller.signal.aborted) return;
+      trajectories.sort(function (a,b) { return ssIds.indexOf(a.objectId) - ssIds.indexOf(b.objectId); });
+      var ssSet = new Set(ssIds);
+      var staticPoints = payload.points.filter(function (p) { return !ssSet.has(p.objectId); });
+      var total = staticPoints.length + trajectories.reduce(function (n,t) { return n + t.sources.length; }, 0);
+      if (total > MAX_POINTS) throw new Error('Too many positions for the complete SkyView map');
+      plot(staticPoints, ids.length, payload.missing.length, trajectories);
     } catch (error) {
       if (current === sequence && !controller.signal.aborted) showStatus('SkyView: ' + error.message);
     } finally {

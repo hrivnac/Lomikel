@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="org.json.JSONArray" %>
+<%@ page import="org.json.JSONArray,org.json.JSONObject" %>
 <%@ page import="java.io.ByteArrayOutputStream,java.io.InputStream,java.io.IOException" %>
 <%@ page import="java.net.URLDecoder" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
-<%@ page import="java.util.HashMap,java.util.Map" %>
+<%@ page import="java.util.HashMap,java.util.HashSet,java.util.Map,java.util.Set" %>
 <%!
   private static final int MAX_REQUEST_BYTES = 1048576;
   private static byte[] readBounded(InputStream input) throws IOException {
@@ -19,6 +19,7 @@
 %>
 <%
   JSONArray points = new JSONArray();
+  JSONArray trajectories = new JSONArray();
   int requested = 0, missing = 0;
   String errorMessage = null;
   try {
@@ -36,16 +37,44 @@
     }
     points = new JSONArray(fields.get("points"));
     if (points.length() > 4000) throw new IllegalArgumentException("Too many positions");
+    if (fields.containsKey("trajectories")) trajectories = new JSONArray(fields.get("trajectories"));
+    if (trajectories.length() > 20) throw new IllegalArgumentException("Too many SS objects");
+    Set<String> ssObjects = new HashSet<String>();
+    int count = points.length();
+    for (int i = 0; i < trajectories.length(); i++) {
+      JSONObject trajectory = trajectories.getJSONObject(i);
+      String objectId = trajectory.getString("objectId");
+      if (!objectId.matches("[0-9]{1,24}") || !ssObjects.add(objectId))
+        throw new IllegalArgumentException("Invalid SS object ID");
+      JSONArray sources = trajectory.getJSONArray("sources");
+      if (sources.length() == 0 || sources.length() > 4000 - count)
+        throw new IllegalArgumentException("Too many SS sources");
+      count += sources.length();
+      Set<String> sourceIds = new HashSet<String>();
+      for (int j = 0; j < sources.length(); j++) {
+        JSONObject source = sources.getJSONObject(j);
+        String sourceId = source.getString("sourceId");
+        double mjd = source.getDouble("mjd"), ra = source.getDouble("ra"), dec = source.getDouble("dec");
+        if (!sourceId.matches("[0-9]{1,64}") || !sourceIds.add(sourceId) ||
+            !Double.isFinite(mjd) || mjd <= 0 || !Double.isFinite(ra) || ra < 0 || ra >= 360 ||
+            !Double.isFinite(dec) || dec < -90 || dec > 90)
+          throw new IllegalArgumentException("Invalid SS source");
+      }
+    }
     requested = Integer.parseInt(fields.get("requested"));
     missing = Integer.parseInt(fields.get("missing"));
     if (requested < 0 || requested > 500 || missing < 0 || missing > requested) throw new IllegalArgumentException("Invalid counts");
   } catch (Exception error) {
     points = new JSONArray();
+    trajectories = new JSONArray();
     requested = missing = 0;
     errorMessage = "Request too large".equals(error.getMessage()) ? "Request too large" : "Invalid SkyView request";
     response.setStatus("Request too large".equals(errorMessage) ? 413 : 400);
   }
   String safeJson = points.toString().replace("<", "\\u003c")
+    .replace(">", "\\u003e").replace("&", "\\u0026")
+    .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029");
+  String safeTrajectories = trajectories.toString().replace("<", "\\u003c")
     .replace(">", "\\u003e").replace("&", "\\u0026")
     .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029");
 %>
@@ -59,9 +88,10 @@
 <div id="celestial-map"></div><div id="celestial-form"></div>
 <details id="sky-coordinates"><summary>Plotted object coordinates</summary><div id="sky-list"></div></details>
 <script type="application/json" id="sky-points"><%=safeJson%></script>
+<script type="application/json" id="sky-trajectories"><%=safeTrajectories%></script>
 <script>window.skyRequested = <%=requested%>; window.skyMissing = <%=missing%>;</script>
 <script src="../d3-celestial-0.7.32/lib/d3.min.js"></script>
 <script src="../d3-celestial-0.7.32/lib/d3.geo.projection.min.js"></script>
 <script src="../d3-celestial-0.7.32/celestial.min.js"></script>
-<% if (errorMessage == null) { %><script src="skyview.js?v=skyview-5"></script><% } %>
+<% if (errorMessage == null) { %><script src="skyview.js?v=ss-trajectory-1"></script><% } %>
 </body></html>

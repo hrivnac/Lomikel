@@ -110,15 +110,22 @@
     }
     JSONArray points = new JSONArray();
     LinkedHashSet<String> found = new LinkedHashSet<String>();
+    LinkedHashSet<String> ssIdentified = new LinkedHashSet<String>();
     addPositions(mget("ztf", "radec", ztf, esRequests), requested, found, points);
-    addPositions(mget("lsst", "dia_radec", lsst, esRequests), requested, found, points);
-    ArrayList<String> solar = new ArrayList<String>();
-    for (String id : lsst) if (!found.contains(id)) solar.add(id);
-    addPositions(mget("lsst", "ss_radec", solar, esRequests), requested, found, points);
+    JSONArray solarDocs = mget("lsst", "ss_radec", lsst, esRequests);
+    for (int i = 0; i < solarDocs.length(); i++) {
+      JSONObject doc = solarDocs.optJSONObject(i);
+      if (doc != null && doc.optBoolean("found") && requested.contains(doc.optString("_id", "")))
+        ssIdentified.add(doc.getString("_id"));
+    }
+    addPositions(solarDocs, requested, found, points);
+    ArrayList<String> stationary = new ArrayList<String>();
+    for (String id : lsst) if (!ssIdentified.contains(id)) stationary.add(id);
+    addPositions(mget("lsst", "dia_radec", stationary, esRequests), requested, found, points);
     JSONArray missing = new JSONArray();
-    for (String id : requested) if (!found.contains(id)) missing.put(id);
+    for (String id : requested) if (!found.contains(id) && !ssIdentified.contains(id)) missing.put(id);
     out.print(new JSONObject().put("points", points).put("missing", missing)
-      .put("esRequests", esRequests).toString());
+      .put("ssObjectIds", new JSONArray(ssIdentified)).put("esRequests", esRequests).toString());
   } catch (IllegalArgumentException error) {
     response.setStatus(400);
     out.print(new JSONObject().put("error", error.getMessage())

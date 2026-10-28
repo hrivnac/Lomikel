@@ -19,6 +19,6 @@ assert.match(endpoint, /setInstanceFollowRedirects\(false\)/);
 assert.match(endpoint, /Cache-Control/);
 assert.doesNotMatch(endpoint, /request\.getParameter\("(?:url|host|index)"\)/);
 const page = fs.readFileSync(path.join(root,'d3/skyview.jsp'),'utf8');
-assert.match(page,/skyview\.js\?v=skyview-5/);
+assert.match(page,/skyview\.js\?v=ss-trajectory-1/);
 assert.match(page,/\\u003c/);
 console.log('SkyView proxy and renderer packaging contracts passed');
