@@ -206,27 +206,7 @@ public abstract class Client<T, S extends Schema> {
               ", filter: " + filter +
               ", interval: " + start + " ms - " + stop + " ms" +
               ", id/time: " + ifkey + "/" + iftime);
-    Map<String, String> searchM = new TreeMap<>();
-    if (search != null && !search.trim().equals("")) {
-      String[] ss;
-      String k;
-      String v;
-      for (String s : search.trim().split(",")) {
-        ss = s.trim().split(":");
-        if (ss.length == 4) {
-          k = ss[0] + ":" + ss[1] + ":" + ss[3];
-          }
-        else {
-          k = ss[0] + ":" + ss[1];
-          }
-        v = ss[2];
-        if (searchM.containsKey(k)) {
-          v = searchM.get(k) + "," + v;
-          }
-        searchM.put(k, v);
-        }
-      }
-    return scan(key, searchM, filter, start, stop, ifkey, iftime);
+    return scan(key, parseSearch(search), filter, start, stop, ifkey, iftime);
     }
     
   /** Get row(s) with all cell versions.
@@ -269,27 +249,31 @@ public abstract class Client<T, S extends Schema> {
               ", filter: "   + filter +
               ", interval: " + start + " ms - " + stop + " ms" +
               ", id/time: "  + ifkey + "/" + iftime);
-    Map<String, String> searchM = new TreeMap<>();
-    if (search != null && !search.trim().equals("")) {
-      String[] ss;
-      String k;
-      String v;
-      for (String s : search.trim().split(",")) {
-        ss = s.trim().split(":");
-        if (ss.length == 4) {
-          k = ss[0] + ":" + ss[1] + ":" + ss[3];
-          }
-        else {
-          k = ss[0] + ":" + ss[1];
-          }
-        v = ss[2];
-        if (searchM.containsKey(k)) {
-          v = searchM.get(k) + "," + v;
-          }
-        searchM.put(k, v);
-        }
+    return scan3D(key, parseSearch(search), filter, start, stop, ifkey, iftime);
+    }
+
+  /** Parse the shared string-search syntax before handing it to either scan mode. */
+  private static Map<String, String> parseSearch(String search) {
+    Map<String, String> terms = new TreeMap<>();
+    if (search == null || search.trim().isEmpty()) {
+      return terms;
       }
-    return scan3D(key, searchM, filter, start, stop, ifkey, iftime);
+    for (String term : search.trim().split(",", -1)) {
+      String[] parts = term.trim().split(":", -1);
+      if ((parts.length != 3 && parts.length != 4) ||
+          parts[0].isEmpty() || parts[1].isEmpty() || parts[2].isEmpty() ||
+          (parts.length == 4 && parts[3].isEmpty())) {
+        throw new IllegalArgumentException("Invalid search term syntax");
+        }
+      String column = parts[0] + ":" + parts[1] +
+                      (parts.length == 4 ? ":" + parts[3] : "");
+      String value = parts[2];
+      if (terms.containsKey(column)) {
+        value = terms.get(column) + "," + value;
+        }
+      terms.put(column, value);
+      }
+    return terms;
     }
     
   /** Get row(s) with latest cell version.
