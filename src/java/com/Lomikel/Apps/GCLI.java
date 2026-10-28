@@ -72,7 +72,7 @@ public class GCLI extends CLI {
     // Set additional arguments
     if (arguments() != null) {
       for (Map.Entry<String, String> arg : arguments().entrySet()) {
-        shell().evaluate(arg.getKey() + "=" + arg.getValue());
+        evaluate(arg.getKey() + "=" + arg.getValue());
         }
       }
     // Source init.groovy
@@ -133,7 +133,7 @@ public class GCLI extends CLI {
         sr = new StringResource(scriptSrc());
         if (sr.content() != null) {
           log.info("Sourcing " + scriptSrc());
-          result += shell().evaluate(scriptArgs() + sr.content());
+          result += evaluate((scriptArgs() == null ? "" : scriptArgs()) + sr.content());
           }
         }
       catch (LomikelException e) {

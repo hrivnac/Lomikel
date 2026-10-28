@@ -11,6 +11,9 @@ import org.apache.commons.cli.CommandLine;
 import org.python.util.PythonInterpreter; 
 import org.python.core.*; 
 
+// Java
+import java.util.Map;
+
 // Log4J
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +51,9 @@ public class PYCLI extends CLI {
     // Set global reference and imports
     _interpreter.set("cli", this);
     log.info("cli set");
+    for (Map.Entry<String, String> arg : arguments().entrySet()) {
+      _interpreter.exec(arg.getKey() + "=" + arg.getValue());
+      }
     StringFile     sf;
     StringResource sr;     
     // Source init.py
@@ -55,7 +61,7 @@ public class PYCLI extends CLI {
       sf = new StringFile("init.py");
       if (sf.content() != null) {
         log.info("Sourcing init.py");
-        result += _interpreter.eval(sf.content());
+        result += executeScript(sf.content());
         }
       }
     catch (LomikelException e) {
@@ -66,9 +72,9 @@ public class PYCLI extends CLI {
     if (profile() != null) {
       try {
         sr = new StringResource(profile() + ".py");
-        if (sr.content() != null) { 
-          log.info("Loading profile: " + profile());  
-          result += _interpreter.eval(sr.content());
+        if (sr.content() != null) {
+          log.info("Loading profile: " + profile());
+          result += executeScript(sr.content());
           }
         }
       catch (LomikelException e) {
@@ -81,7 +87,7 @@ public class PYCLI extends CLI {
       sf = new StringFile(".state.py");
       if (sf.content() != null) {
         log.debug("Sourcing .state.groovy");
-        result += _interpreter.eval(sf.content());
+        result += executeScript(sf.content());
         }
       }
     catch (LomikelException e) {
@@ -109,7 +115,8 @@ public class PYCLI extends CLI {
         sr = new StringResource(scriptSrc());
         if (sr.content() != null) {
           log.info("Sourcing " + scriptSrc());
-          result += interpreter().eval(scriptArgs() + sr.content());
+          String prefix = scriptArgs();
+          result += executeScript((prefix == null || prefix.isEmpty() ? "" : prefix + "\n") + sr.content());
           }
         }
       catch (LomikelException e) {
@@ -117,8 +124,21 @@ public class PYCLI extends CLI {
         log.debug("Cannot read or proces " + scriptSrc(), e);
         }
       }
-    // BUG: args not supported
     return result;
+    }
+
+  /** Evaluate expressions with their historic result, execute statement scripts. */
+  private String executeScript(String source) {
+    PyCode expression;
+    try {
+      expression = Py.compile_flags(source, "<Lomikel script>", CompileMode.eval, Py.getCompilerFlags());
+      }
+    catch (PyException error) {
+      if (!error.match(Py.SyntaxError)) throw error;
+      _interpreter.exec(source);
+      return "";
+      }
+    return String.valueOf(_interpreter.eval(expression));
     }
 
   /** Parse the cli arguments.

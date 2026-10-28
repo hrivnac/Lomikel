@@ -83,8 +83,31 @@ public abstract class CLI {
                                    .hasArg()
                                    .withArgName("language")
                                    .create("a"));
+    // Parsing is a new invocation, not an overlay of the previous command.
+    _quiet = false;
+    _gui = false;
+    _batch = false;
+    _web = false;
+    _notebook = false;
+    _source = null;
+    _api = "groovy";
+    _arguments.clear();
     try {
       CommandLine cline = parser.parse(options, args );
+      if (cline.hasOption("help")) {
+        new HelpFormatter().printHelp(helpMsg, options);
+        return null;
+        }
+      Map<String, String> parsedArguments = new HashMap<>();
+      if (cline.hasOption("args")) {
+        for (String arg : cline.getOptionValue("args").split(",", -1)) {
+          String[] arg0 = arg.split("=", 2);
+          if (arg0.length != 2 || arg0[0].isEmpty()) {
+            throw new ParseException("Expected name=value in --args");
+            }
+          parsedArguments.put(arg0[0], arg0[1]);
+          }
+        }
       if (cline.hasOption("quiet")) {
         _quiet = true;
         }
@@ -104,13 +127,7 @@ public abstract class CLI {
       if (cline.hasOption("source")) {
         _source = cline.getOptionValue("source");
         }
-      if (cline.hasOption("args")) {
-        String[] arg0;
-        for (String arg : cline.getOptionValue("args").split(",")) {
-          arg0 = arg.split("=");
-          _arguments.put(arg0[0], arg0[1]);
-          }
-        }
+      _arguments.putAll(parsedArguments);
       if (cline.hasOption("api")) {
         _api = cline.getOptionValue("api");
         }
@@ -128,10 +145,6 @@ public abstract class CLI {
             _api = "groovy"; // the default
             break;
           }
-        }
-      if (cline.hasOption("help")) {
-        new HelpFormatter().printHelp(helpMsg, options);
-        return null;
         }
       return cline;
       }
