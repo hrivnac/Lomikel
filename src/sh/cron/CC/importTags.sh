@@ -18,10 +18,7 @@ for T in rubin.tag_extragalactic_svom \
          rubin.tag_fast_transient_gvom \
          rubin.tag_most_likely_sn \
          rubin.tag_remove_unlikely_transients \
-         rubin.tag_uniform_sample; do
-  java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/importTags.groovy -o "cls='${T}',delay=0"
-  done
-for T in rubin.tag_early_snia_candidate \
+         rubin.tag_uniform_sample \
          rubin.tag_extragalactic_lt20mag_candidate \
          rubin.tag_extragalactic_new_candidate \
          rubin.tag_good_quality \
