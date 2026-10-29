@@ -19,7 +19,9 @@ assert.equal(style.nodes.object.actions.filter(a => a.name === 'Cutouts').length
 assert.equal(style.nodes.object.actions.find(a => a.name === 'Cutouts').target, 'image');
 assert.match(style.nodes.object.actions.find(a => a.name === 'Cutouts').url, /cutouts/);
 const graphPage = fs.readFileSync(path.join(root, 'GraphView.jsp'), 'utf8');
-assert.match(graphPage, /cutouts-graph\.js\?v=/);
+assert.match(graphPage, /cutouts-graph\.js\?v=ss-cutouts-1/);
+assert.match(fs.readFileSync(path.join(root,'GraphViewNew.jsp'),'utf8'),
+  /cutouts-graph\.js\?v=ss-cutouts-1/);
 const workspaceCode = fs.readFileSync(path.join(root, 'workspace.js'), 'utf8');
 assert.match(workspaceCode, /cutoutsGraphState\.open\(\)/);
 assert.match(workspaceCode, /cutoutsGraphState\.cancel\(\)/);
@@ -60,10 +62,9 @@ async function run(){
  assert.equal(pane.children.length,3); // heading + two unique object rows
  assert.equal(pending.length,1);
  assert.equal(pending[0].opts.method,'POST');
- assert.deepEqual(JSON.parse(pending[0].opts.body),{diaObjectId:'313761043604045880'});
- assert.equal(queries.length,4,'three ZTF cutouts and one LSST source lookup');
+ assert.deepEqual(JSON.parse(pending[0].opts.body),{objectId:'313761043604045880'});
+ assert.equal(queries.length,3,'do not claim a Fink query before the server executes it');
  assert.ok(queries.every(entry=>entry.target==='Fink'));
- assert.equal(queries.at(-1).query,'https://api.lsst.fink-portal.org/api/v1/sources '+JSON.stringify({diaObjectId:'313761043604045880',columns:'r:diaSourceId','output-format':'json'}));
  assert.match(server,/\.put\("columns", "r:diaSourceId"\)\.put\("output-format", "json"\)/);
  const ztf=pane.children[1];
  assert.equal(ztf.className,'ws-cutout-row ws-cutout-ztf');
@@ -71,10 +72,14 @@ async function run(){
  assert.deepEqual(cells(ztf).map(c=>c.children[0].textContent),['Science','Template','Difference']);
  assert.deepEqual(cells(ztf).map(c=>new URL(c.children[1].src).searchParams.get('kind')),['Science','Template','Difference']);
  assert.equal(new URL(cells(ztf)[0].children[1].src).searchParams.get('objectId'),'ZTF21aaxtctv');
- pending[0].resolve({ok:true,json:async()=>({diaSourceId:'170054933726363745'})});
+ const diaBody=JSON.stringify({diaObjectId:'313761043604045880',columns:'r:diaSourceId','output-format':'json'});
+ pending[0].resolve({ok:true,json:async()=>({diaSourceId:'170054933726363745',
+   esRequests:[{path:'/ss_radec/_mget',body:JSON.stringify({docs:[{_id:'313761043604045880',_source:false}]})}],
+   finkRequests:[{path:'/api/v1/sources',body:diaBody}]})});
  await task;
- assert.equal(queries.length,7,'LSST source yields three cutout image requests');
- assert.ok(queries.slice(4).every(entry=>/api\/v1\/cutouts.*diaSourceId=170054933726363745/.test(entry.query)));
+ assert.equal(queries.length,8,'identity, executed DIA lookup and three cutout image requests');
+ assert.ok(queries.some(entry=>entry.query==='https://api.lsst.fink-portal.org/api/v1/sources '+diaBody));
+ assert.ok(queries.slice(-3).every(entry=>/api\/v1\/cutouts.*diaSourceId=170054933726363745/.test(entry.query)));
  const lsst=pane.children[2];
  assert.equal(lsst.className,'ws-cutout-row ws-cutout-lsst');
  assert.deepEqual(cells(lsst).map(c=>new URL(c.children[1].src).searchParams.get('diaSourceId')),
@@ -94,6 +99,31 @@ async function run(){
  await ctx.window.cutoutsGraphState.open();
  assert.equal(pending.length,2,'bounded graph must not request 93 images');
  assert.match(pane.textContent,/more than 30 objects/);
+ ctx.window.skyGraphState.getIds=()=>['21163615905265241'];
+ task=ctx.window.cutoutsGraphState.open();
+ assert.deepEqual(JSON.parse(pending[2].opts.body),{objectId:'21163615905265241'},
+   'an SS graph vertex must not be submitted as a DIA object');
+ const ssFink=[{path:'/api/v1/resolver',body:JSON.stringify({resolver:'ssodnet',
+   name_or_id:'21163615905265241',reverse:true,nmax:10,'output-format':'json'})},
+   {path:'/api/v1/sso',body:JSON.stringify({n_or_d:'K02P26Y',
+     columns:'r:diaSourceId,r:ssObjectId,r:midpointMjdTai','output-format':'json'})}];
+ pending[2].resolve({ok:true,json:async()=>({diaSourceId:'800000000000000001',
+   esRequests:[{path:'/ss_radec/_mget',body:JSON.stringify({docs:[{_id:'21163615905265241',_source:false}]})}],
+   finkRequests:ssFink})});
+ await task;
+ assert.deepEqual(cells(pane.children[1]).map(c=>new URL(c.children[1].src).searchParams.get('diaSourceId')),
+   ['800000000000000001','800000000000000001','800000000000000001']);
+ assert.ok(queries.some(entry=>entry.query.includes('/api/v1/sso')),
+   'activity records the executed SSO query, not a guessed DIA query');
+ const beforeHostile=queries.length;
+ task=ctx.window.cutoutsGraphState.open();
+ pending[3].resolve({ok:true,json:async()=>({diaSourceId:'800000000000000001',
+   esRequests:[{path:'/other/_mget',body:'secret'}],
+   finkRequests:[{path:'/api/v1/sso?token=not-for-activity',body:'secret'}]})});
+ await task;
+ assert.equal(queries.length,beforeHostile+3,'untrusted metadata must not be logged as queries');
+ assert.ok(queries.slice(beforeHostile).every(entry=>entry.query.includes('/api/v1/cutouts?')),
+   'invalid query metadata cannot hide the valid cutout action');
  console.log('webservice Cutouts graph matrix, routing, bounds and cancellation passed');
 }
 run().catch(e=>{console.error(e);process.exitCode=1});

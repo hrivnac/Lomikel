@@ -60,21 +60,53 @@
     pane.appendChild(container);
     return container;
   }
+  function logExecuted(data, id) {
+    if (typeof window.activityLogQuery !== 'function' || !data ||
+        !Array.isArray(data.esRequests) || !Array.isArray(data.finkRequests) ||
+        data.esRequests.length !== 1 || data.finkRequests.length > 2) return;
+    var entries = [];
+    try {
+      var es = data.esRequests[0];
+      if (!es || es.path !== '/ss_radec/_mget' || typeof es.body !== 'string' || es.body.length > 512)
+        throw new Error('invalid ES activity');
+      var probe = JSON.parse(es.body);
+      if (!probe || Object.keys(probe).length !== 1 || !Array.isArray(probe.docs) ||
+          probe.docs.length !== 1 || Object.keys(probe.docs[0]).length !== 2 ||
+          probe.docs[0]._id !== id || probe.docs[0]._source !== false)
+        throw new Error('invalid ES probe');
+      entries.push(['ES', es.path + ' ' + es.body]);
+      data.finkRequests.forEach(function (entry) {
+        if (!entry || !['/api/v1/sources','/api/v1/resolver','/api/v1/sso'].includes(entry.path) ||
+            typeof entry.body !== 'string' || entry.body.length > 1024)
+          throw new Error('invalid Fink activity');
+        var body = JSON.parse(entry.body);
+        if (!body || body['output-format'] !== 'json' ||
+            (entry.path === '/api/v1/sources' &&
+              (body.diaObjectId !== id || body.columns !== 'r:diaSourceId')) ||
+            (entry.path === '/api/v1/resolver' &&
+              (body.name_or_id !== id || body.resolver !== 'ssodnet' ||
+               body.reverse !== true || body.nmax !== 10)) ||
+            (entry.path === '/api/v1/sso' &&
+              (typeof body.n_or_d !== 'string' || !/^[^\u0000-\u001f\u007f]{1,128}$/.test(body.n_or_d) ||
+               body.columns !== 'r:diaSourceId,r:ssObjectId,r:midpointMjdTai')))
+          throw new Error('invalid Fink query');
+        entries.push(['Fink', 'https://api.lsst.fink-portal.org' + entry.path + ' ' + entry.body]);
+      });
+    } catch (_error) { return; }
+    entries.forEach(function (entry) { window.activityLogQuery(entry[0], entry[1]); });
+  }
   async function source(id, container, current) {
     var controller = new AbortController();
     requests.push(controller);
-    if (typeof window.activityLogQuery === 'function') {
-      window.activityLogQuery('Fink', 'https://api.lsst.fink-portal.org/api/v1/sources ' +
-        JSON.stringify({diaObjectId: id, columns: 'r:diaSourceId', 'output-format': 'json'}));
-    }
     try {
       var response = await fetch('CutoutSource.jsp', {
         method: 'POST', credentials: 'same-origin', signal: controller.signal,
-        headers: {'Content-Type': 'application/json'}, body: JSON.stringify({diaObjectId: id})
+        headers: {'Content-Type': 'application/json'}, body: JSON.stringify({objectId: id})
       });
-      if (!response.ok) throw new Error('HTTP ' + response.status);
       var data = await response.json();
       if (generation !== current || controller.signal.aborted) return;
+      logExecuted(data, id);
+      if (!response.ok) throw new Error('HTTP ' + response.status);
       if (!data || !/^[0-9]{1,24}$/.test(data.diaSourceId || '')) throw new Error('no recent source');
       kinds.forEach(function (kind, index) { stamp(container.children[index + 1], id, data.diaSourceId, kind); });
     } catch (error) {

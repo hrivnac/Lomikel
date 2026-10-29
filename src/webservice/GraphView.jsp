@@ -44,4 +44,4 @@
 <script type="text/javascript" src="skyview-graph.js?v=longss-history-1"></script>
 <script type="text/javascript" src="lightcurve-graph.js?v=query-activity-1"></script>
 <script type="text/javascript" src="graph-table-origin.js?v=mixed-table-3"></script>
-<script type="text/javascript" src="cutouts-graph.js?v=query-activity-1"></script>
+<script type="text/javascript" src="cutouts-graph.js?v=ss-cutouts-1"></script>
