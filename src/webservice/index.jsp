@@ -9,6 +9,7 @@
   profile.setProfile(p);
   String s = request.getParameter("style");
   style.setStyle(s);
+  boolean graphViewNew = "new".equals(request.getParameter("graphview"));
 %>
 <%@ include file="Init.jsp" %>
 <!DOCTYPE html>
@@ -96,6 +97,7 @@
     window.visheight = 360;
   </script>
   <script src="evolution-table.js?v=evolution-1"></script>
+  <script>window.graphViewVariant = <%= graphViewNew ? "'new'" : "'legacy'" %>;</script>
   <script src="workspace.js?v=corr-fit-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
