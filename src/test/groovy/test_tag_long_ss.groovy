@@ -5,6 +5,8 @@ import java.net.InetSocketAddress
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 File script = new File('src/work/CC/tagLongSS.groovy')
+assert script.text.contains("new JanusClient('/opt/janusgraph-1/conf/gremlin-server/CCRW.properties')") :
+  'production graph mutations must use the existing writable CC configuration'
 def requests = []
 def response = [
   timed_out:false, _shards:[total:2,successful:2,failed:0],

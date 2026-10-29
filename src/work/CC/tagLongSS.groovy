@@ -75,7 +75,7 @@ try {
     def gr
     if (binding.hasVariable('graphFactory')) gr = binding.getVariable('graphFactory').call()
     else {
-      jc = new JanusClient('/opt/janusgraph-1/conf/gremlin-server/CC.properties')
+      jc = new JanusClient('/opt/janusgraph-1/conf/gremlin-server/CCRW.properties')
       gr = new FinkGremlinRecipiesG(jc)
     }
     def classifier = Classifier.instance('TAG', 'LSST', '')
