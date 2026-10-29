@@ -79,17 +79,38 @@ public class ParquetImporter extends JanusClient {
                                                      Integer.valueOf(args[2]),
                                                      Integer.valueOf(args[3]),
                                                                      args[4]);
-      importer.timerStart();
-      importer.process(args[1]);
-      importer.commit();
-      importer.close();
+      importAndClose(importer, args[1]);
       }
-    catch (LomikelException e) {
+    catch (IOException | LomikelException e) {
       log.fatal("Cannot import " + args[1] + " into " + args[0], e);
       System.exit(-1);
       }
     }
   
+  /** Commit only a completed scan; always close the graph. A rollback cannot
+    * undo batches that a previous progress-timer commit has already persisted. */
+  static void importAndClose(ParquetImporter importer, String path) throws IOException, LomikelException {
+    Exception failure = null;
+    try {
+      importer.timerStart();
+      importer.process(path);
+      importer.commit();
+      }
+    catch (IOException | LomikelException | RuntimeException e) {
+      failure = e;
+      try { importer.rollback(); }
+      catch (RuntimeException rollbackError) { e.addSuppressed(rollbackError); }
+      throw e;
+      }
+    finally {
+      try { importer.close(); }
+      catch (RuntimeException closeError) {
+        if (failure == null) { throw closeError; }
+        failure.addSuppressed(closeError);
+        }
+      }
+    }
+
   /** Create with JanusGraph properties file.
     * @param properties  The file with the complete Janusgraph properties.
     * @param reportLimit The number of events to use for progress report (-1 means no report until the end).
@@ -143,11 +164,11 @@ public class ParquetImporter extends JanusClient {
         }
       else if (p.getName().endsWith("." + fileExt)) {
         try {
-          process(dirFN + "/" + p.getName());
+          process(p.toString());
           i++;
           }
-        catch (IOException | LomikelException e) {
-          log.error("Failed to process " + p, e);
+        catch (LomikelException e) {
+          throw new IOException("Failed to process " + p, e);
           }
         }
       else {
@@ -173,28 +194,34 @@ public class ParquetImporter extends JanusClient {
       return;
       }
     else if (!_fs.isFile(path)) {
-      log.error("Not a file/directory: " + fn);
-      return;
+      throw new FileNotFoundException("Not a file/directory: " + fn);
       }
     ParquetMetadata readFooter = ParquetFileReader.readFooter(_conf, path, ParquetMetadataConverter.NO_FILTER);
     MessageType schema = readFooter.getFileMetaData().getSchema();
-    ParquetFileReader r = new ParquetFileReader(_conf, path, readFooter);
-    PageReadStore pages = null;
-    while (null != (pages = r.readNextRowGroup())) {
-      final long rows = pages.getRowCount();
-      log.info("Reading " + rows + " rows");      
-      final MessageColumnIO columnIO = new ColumnIOFactory().getColumnIO(schema);
-      final RecordReader<Group> recordReader = columnIO.getRecordReader(pages, new GroupRecordConverter(schema));
-      String sTemp = "";
-      Group g;
-      int i = 0;
-      while ((g = recordReader.read()) != null && ++i < rows) { // BUG?: i++ ?
-        processGroup(g, "alert");
-        timer("alerts processed", ++_n, _reportLimit, _commitLimit);      
+    try (ParquetFileReader r = new ParquetFileReader(_conf, path, readFooter)) {
+      PageReadStore pages;
+      while (null != (pages = r.readNextRowGroup())) {
+        final long rows = pages.getRowCount();
+        log.info("Reading " + rows + " rows");
+        final MessageColumnIO columnIO = new ColumnIOFactory().getColumnIO(schema);
+        final RecordReader<Group> recordReader = columnIO.getRecordReader(pages, new GroupRecordConverter(schema));
+        for (long i = 0; i < rows; i++) {
+          Group row = recordReader.read();
+          if (row == null) {
+            throw new IOException("Unexpected end of row group in " + path + " at row " + i + " of " + rows);
+            }
+          processRow(row);
+          timer("alerts processed", ++_n, _reportLimit, _commitLimit);
+          }
         }
       }
     }   
     
+  /** Import one complete Parquet record; overridable for offline verification. */
+  protected void processRow(Group row) {
+    processGroup(row, "alert");
+    }
+
   /** Process {@link Group} and create contained {@link Vertex}es with the
     * specified label. Runs recursively.
     * @param g   The {@link Group} to process.
