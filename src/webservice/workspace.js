@@ -45,6 +45,9 @@
   }
 
   var legacyLoadPane = window.loadPane;
+  function graphViewPage() {
+    return window.graphViewVariant === 'new' ? 'GraphViewNew.jsp' : 'GraphView.jsp';
+  }
   // Only encoded graph-table Scatter requests have the JSON point contract.
   // Graph-table Evolution is reconstructed from its rows and checked controls;
   // HBase and other legacy plot routes keep their original handling.
@@ -154,7 +157,7 @@
     if (typeof window.disposeGraphView === 'function') window.disposeGraphView();
     loadPane('feedback', 'Feedback.jsp');
     loadPane('top', 'Top.jsp');
-    loadPane('graph', 'GraphView.jsp');
+    loadPane('graph', graphViewPage());
     // Image.jsp is part of the initial Tabs.jsp. Restore its placeholder
     // synchronously to avoid an older load overwriting a new contact sheet.
     if (window.cutoutsGraphState) window.cutoutsGraphState.clear();
@@ -216,7 +219,7 @@
     w2ui.layout.html('left', w2ui.layoutLeft);
     w2ui.layout.html('main', w2ui.layoutMain);
     w2ui.layoutLeft.load('main', 'Top.jsp');
-    w2ui.layoutLeft.load('bottom', 'GraphView.jsp');
+    w2ui.layoutLeft.load('bottom', graphViewPage());
     w2ui.layoutMain.load('main', 'Tabs.jsp');
     w2ui.layoutMain.load('bottom', 'Feedback.jsp');
     if (typeof window.wsInstallHelp === 'function') window.wsInstallHelp();
