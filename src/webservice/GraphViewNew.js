@@ -682,22 +682,39 @@ function clusterExpand() {
 // Fill Edges
 function fillEdges() {
   if (!network) return;
-  var visibleIds = nodes.map(function (node) { return graphVertexLiteral(node.id); });
-  if (visibleIds.includes(null)) {
-    feedbackLine('Cannot request edges for vertices with unsupported IDs.');
-    return;
-  }
-  for (var i = 0; i < nodes.length; i++) {
-    var selectedNode = nodes[i];
-    var literal = visibleIds[i];
-    feedbackLine('Expanding ' + selectedNode.label);
-    if (document.getElementById('expandTo').checked) {
-       callGremlinGraph(gr + ".V(" + literal + ").outE().filter(inV().hasId(within(" + visibleIds + ")))");
+  var selectedServer = server;
+  var originOf = typeof window.graphTableServerForVertex === 'function' ?
+    window.graphTableServerForVertex : null;
+  var snapshot = nodes.slice();
+  var visibleIds = new Map();
+  var entries = [];
+  // All endpoints of one relation must belong to the same source graph.
+  // Resolve every origin before issuing any request, so an unknown ID cannot
+  // silently be looked up on the last selected server in a mixed graph.
+  for (var i = 0; i < snapshot.length; i++) {
+    var literal = graphVertexLiteral(snapshot[i].id);
+    var source = originOf ? originOf(snapshot[i].id) : selectedServer;
+    if (literal === null || !source) {
+      feedbackLine('Cannot request edges for vertices with unknown origin or unsupported IDs.');
+      return;
       }
-    if (document.getElementById('expandFrom').checked) {
-       callGremlinGraph(gr + ".V(" + literal + ").inE().filter(outV().hasId(within(" + visibleIds + ")))");
-      }
+    if (!visibleIds.has(source)) visibleIds.set(source, []);
+    visibleIds.get(source).push(literal);
+    entries.push({node:snapshot[i], literal:literal, source:source});
     }
+  try {
+    entries.forEach(function (entry) {
+      var sameGraphIds = visibleIds.get(entry.source).join(',');
+      feedbackLine('Expanding ' + entry.node.label);
+      if (document.getElementById('expandTo').checked) {
+        callGremlinGraph(gr + ".V(" + entry.literal + ").outE().filter(inV().hasId(within(" + sameGraphIds + ")))", entry.source);
+        }
+      if (document.getElementById('expandFrom').checked) {
+        callGremlinGraph(gr + ".V(" + entry.literal + ").inE().filter(outV().hasId(within(" + sameGraphIds + ")))", entry.source);
+        }
+      });
+    }
+  finally { server = selectedServer; }
   }
 
 // Cluster by Zoom

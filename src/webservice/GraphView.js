@@ -586,20 +586,39 @@ function clusterExpand() {
 
 // Fill Edges
 function fillEdges() {
-  visibleIds = [];
-  for (var i = 0; i < nodes.length; i++) {
-    visibleIds.push(nodes[i].id);
-    }
-  for (var i = 0; i < nodes.length; i++) {
-    var selectedNode = nodes[i];
-    feedbackLine('Expanding ' + selectedNode.label);
-    if (document.getElementById('expandTo').checked) {
-       callGremlinGraph(gr + ".V(" + selectedNode.id + ").outE().filter(inV().hasId(within(" + visibleIds + ")))");
+  if (!network) return;
+  var selectedServer = server;
+  var originOf = typeof window.graphTableServerForVertex === 'function' ?
+    window.graphTableServerForVertex : null;
+  var snapshot = nodes.slice();
+  var visibleIds = new Map();
+  var entries = [];
+  for (var i = 0; i < snapshot.length; i++) {
+    var id = snapshot[i].id;
+    var literal = typeof id === 'number' && Number.isSafeInteger(id) ? String(id) :
+      (typeof id === 'string' && /^[A-Za-z0-9_-]+$/.test(id) ? "'" + id + "'" : null);
+    var source = originOf ? originOf(id) : selectedServer;
+    if (literal === null || !source) {
+      feedbackLine('Cannot request edges for vertices with unknown origin or unsupported IDs.');
+      return;
       }
-    if (document.getElementById('expandFrom').checked) {
-       callGremlinGraph(gr + ".V(" + selectedNode.id + ").inE().filter(outV().hasId(within(" + visibleIds + ")))");
-      }
+    if (!visibleIds.has(source)) visibleIds.set(source, []);
+    visibleIds.get(source).push(literal);
+    entries.push({node:snapshot[i], literal:literal, source:source});
     }
+  try {
+    entries.forEach(function (entry) {
+      var sameGraphIds = visibleIds.get(entry.source).join(',');
+      feedbackLine('Expanding ' + entry.node.label);
+      if (document.getElementById('expandTo').checked) {
+        callGremlinGraph(gr + ".V(" + entry.literal + ").outE().filter(inV().hasId(within(" + sameGraphIds + ")))", entry.source);
+        }
+      if (document.getElementById('expandFrom').checked) {
+        callGremlinGraph(gr + ".V(" + entry.literal + ").inE().filter(outV().hasId(within(" + sameGraphIds + ")))", entry.source);
+        }
+      });
+    }
+  finally { server = selectedServer; }
   }
   
 // Cluster by Zoom
