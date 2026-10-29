@@ -5,7 +5,8 @@
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.util.HashMap,java.util.HashSet,java.util.Map,java.util.Set" %>
 <%!
-  private static final int MAX_REQUEST_BYTES = 1048576;
+  private static final int MAX_REQUEST_BYTES = 4194304;
+  private static final int MAX_POINTS = 12000;
   private static byte[] readBounded(InputStream input) throws IOException {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     byte[] chunk = new byte[4096];
@@ -36,7 +37,7 @@
         URLDecoder.decode(pair.substring(equals + 1), "UTF-8"));
     }
     points = new JSONArray(fields.get("points"));
-    if (points.length() > 4000) throw new IllegalArgumentException("Too many positions");
+    if (points.length() > MAX_POINTS) throw new IllegalArgumentException("Too many positions");
     if (fields.containsKey("trajectories")) trajectories = new JSONArray(fields.get("trajectories"));
     if (trajectories.length() > 20) throw new IllegalArgumentException("Too many SS objects");
     Set<String> ssObjects = new HashSet<String>();
@@ -47,7 +48,7 @@
       if (!objectId.matches("[0-9]{1,24}") || !ssObjects.add(objectId))
         throw new IllegalArgumentException("Invalid SS object ID");
       JSONArray sources = trajectory.getJSONArray("sources");
-      if (sources.length() == 0 || sources.length() > 4000 - count)
+      if (sources.length() == 0 || sources.length() > MAX_POINTS - count)
         throw new IllegalArgumentException("Too many SS sources");
       count += sources.length();
       Set<String> sourceIds = new HashSet<String>();
@@ -93,5 +94,5 @@
 <script src="../d3-celestial-0.7.32/lib/d3.min.js"></script>
 <script src="../d3-celestial-0.7.32/lib/d3.geo.projection.min.js"></script>
 <script src="../d3-celestial-0.7.32/celestial.min.js"></script>
-<% if (errorMessage == null) { %><script src="skyview.js?v=ss-trajectory-1"></script><% } %>
+<% if (errorMessage == null) { %><script src="skyview.js?v=longss-history-1"></script><% } %>
 </body></html>

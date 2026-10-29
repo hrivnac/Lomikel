@@ -9,7 +9,9 @@ const graphCode = fs.readFileSync(path.join(root, 'skyview-graph.js'), 'utf8');
 const workspaceCode = fs.readFileSync(path.join(root, 'workspace.js'), 'utf8');
 const graphPage = fs.readFileSync(path.join(root, 'GraphView.jsp'), 'utf8');
 assert.match(graphPage, /Stylesheet\.js\?v=survey-colors-/);
-assert.match(graphPage, /skyview-graph\.js\?v=query-activity-1/);
+assert.match(graphPage, /skyview-graph\.js\?v=longss-history-1/);
+assert.match(fs.readFileSync(path.join(root,'GraphViewNew.jsp'),'utf8'),
+  /skyview-graph\.js\?v=longss-history-1/);
 assert.match(workspaceCode, /skyGraphState\.open\(\)/);
 const style = {nodes:{object:{actions:[{name:'Table',url:'Nodes.jsp',target:'table'}]}}};
 vm.runInNewContext(stylesheetCode, {stylesheet:style});
@@ -52,7 +54,7 @@ async function test() {
  const executed=[
    {path:'/radec/_mget',body:JSON.stringify({docs:[{_id:'ZTF_TEST',_source:['location']}]})},
    {path:'/dia_radec/_mget',body:JSON.stringify({docs:[{_id:'123456',_source:['location']}]})},
-   {path:'/ss_radec/_mget',body:JSON.stringify({docs:[{_id:'123456',_source:['location']}]})}];
+   {path:'/ss_radec/_mget',body:JSON.stringify({docs:[{_id:'123456',_source:false}]})}];
  pending[0].resolve({ok:true,json:async()=>({points:[{objectId:'123456',ra:0,dec:0},{objectId:'ZTF_TEST',ra:180,dec:22}],missing:[],ssObjectIds:[],esRequests:executed})});
  await request;
  assert.deepEqual(queries,[
@@ -105,7 +107,7 @@ async function test() {
  const sso={path:'/api/v1/sso',body:JSON.stringify({n_or_d:'K25AB1',columns:'r:diaSourceId,r:ssObjectId,r:midpointMjdTai,r:ra,r:dec','output-format':'json'})};
  const historyEs=[{path:'/ss_mjd/_mget',body:JSON.stringify({ids:['123456']})},
    {path:'/ss_radec/_mget',body:JSON.stringify({ids:['123456']})}];
- pending[7].resolve({ok:true,json:async()=>({objectId:'123456',esCoverageComplete:true,
+ pending[7].resolve({ok:true,json:async()=>({objectId:'123456',esCoverageComplete:true,esMjdAvailable:false,
    sources:[{sourceId:'90071992547409930',mjd:61003,ra:1,dec:0},
      {sourceId:'90071992547409929',mjd:61002,ra:359,dec:0}],finkRequests:[resolver,sso],esRequests:historyEs})});
  await solar;
@@ -115,7 +117,7 @@ async function test() {
  const trajectories=JSON.parse(posted.at(-1).children.find(x=>x.name==='trajectories').value);
  assert.deepEqual(trajectories,[{objectId:'123456',sources:[
    {sourceId:'90071992547409929',mjd:61002,ra:359,dec:0},
-   {sourceId:'90071992547409930',mjd:61003,ra:1,dec:0}]}]);
+   {sourceId:'90071992547409930',mjd:61003,ra:1,dec:0}],esMjdAvailable:false}]);
  assert.deepEqual(queries.slice(-4).map(q=>q.query),[
    ...historyEs.map(x=>x.path+' '+x.body),
    'https://api.lsst.fink-portal.org'+resolver.path+' '+resolver.body,
@@ -130,6 +132,23 @@ async function test() {
    sources:[{sourceId:'3',mjd:61004,ra:2,dec:0}],finkRequests:[resolver,sso]})});
  await late;
  assert.equal(posted.length,5,'reset after ES but before Fink must not plot stale trajectory');
+ const longIds=Array.from({length:10},(_,i)=>String(21163615905265241n+BigInt(i)));
+ const longMap=ctx.window.skyGraphState.openIds(longIds);
+ pending[10].resolve({ok:true,json:async()=>({points:[],missing:[],ssObjectIds:longIds,esRequests:[]})});
+ let nextHistory=11;
+ for(let i=0;i<longIds.length;i++) {
+   for(let spin=0;spin<30 && pending.length<=nextHistory;spin++) await new Promise(setImmediate);
+   assert.equal(pending[nextHistory].url,'AlertsView/SSTrajectory.jsp?id='+longIds[i]);
+   const id=longIds[i];
+   pending[nextHistory++].resolve({ok:true,json:async()=>({objectId:id,esCoverageComplete:true,
+     sources:Array.from({length:800},(_,j)=>({sourceId:String(300000000000000000n+BigInt(i*800+j)),
+       mjd:61000+j/10000,ra:j/100,dec:20})),finkRequests:[],esRequests:[]})});
+   await new Promise(setImmediate);
+ }
+ await longMap;
+ assert.equal(posted.length,6,'ten complete SS histories must reach the map');
+ assert.equal(JSON.parse(posted.at(-1).children.find(x=>x.name==='trajectories').value)
+   .reduce((n,t)=>n+t.sources.length,0),8000,'no SS observation may be silently dropped');
  console.log('webservice SkyView graph snapshots, route, and reset race passed');
 }
 test().catch(e=>{console.error(e); process.exitCode=1});

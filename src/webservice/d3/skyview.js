@@ -25,7 +25,9 @@
         return {sourceId:source.sourceId,mjd:source.mjd,ra:source.ra,dec:source.dec};
       });
       sources.sort(function (a,b) { return a.mjd - b.mjd || a.sourceId.localeCompare(b.sourceId); });
-      return {objectId:track.objectId,sources:sources};
+      var result = {objectId:track.objectId,sources:sources};
+      if (track.esMjdAvailable === false) result.esMjdAvailable = false;
+      return result;
     });
   }
   root.skyPrepareTrajectories = prepareTrajectories;
@@ -56,6 +58,10 @@
       ' sky position' + (total === 1 ? '' : 's') +
       (trajectories.length ? ', ' + trajectories.length + ' trajector' + (trajectories.length === 1 ? 'y' : 'ies') : '') +
       '). ' + missing + ' without coordinates.';
+    var unchecked = trajectories.filter(function (track) { return track.esMjdAvailable === false; }).length;
+    if (unchecked) summary.textContent += ' ' + unchecked +
+      ' trajector' + (unchecked === 1 ? 'y' : 'ies') +
+      ' without an Elasticsearch MJD cross-check (backfill incomplete).';
     var legend = document.getElementById('sky-legend');
     ['ZTF', 'LSST'].forEach(function (survey) {
       if (!points.some(function (point) { return /^ZTF/.test(point.objectId) === (survey === 'ZTF'); }) &&

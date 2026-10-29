@@ -44,11 +44,12 @@ vm.runInNewContext(code,{window,document,Celestial,Set,Map,Number});
 const history=[{objectId:'123456',sources:[
   {sourceId:'90071992547409930',mjd:12,ra:1,dec:0},
   {sourceId:'90071992547409929',mjd:11,ra:359,dec:0},
-  {sourceId:'90071992547409931',mjd:13,ra:1.2,dec:0}]}];
+  {sourceId:'90071992547409931',mjd:13,ra:1.2,dec:0}],esMjdAvailable:false}];
 activeProjection=([ra])=>({359:[440,90],1:[10,92],1.2:[11,93],100:[200,60]})[ra];
 window.skyRender([{objectId:'ZTFname',ra:100,dec:0}],2,0,history);
 assert.match(summary.textContent,/4 sky positions/);
 assert.match(summary.textContent,/1 trajector/);
+assert.match(summary.textContent,/1 trajectory without an Elasticsearch MJD cross-check/);
 const lines=draws.filter(d=>d.line).map(d=>d.line);
 assert.ok(lines.length>=3,'seam-crossing history splits into visible segments instead of a canvas-wide line');
 assert.equal(mapCalls.length,2,'each chronological link is delegated to Celestial geoPath for active-projection clipping');

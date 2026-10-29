@@ -8,7 +8,7 @@
   var oldDispose = window.disposeGraphView;
   var MAX_OBJECTS = 500;
   var MAX_SS_OBJECTS = 20; // A history fetch makes several bounded upstream calls.
-  var MAX_POINTS = 4000;
+  var MAX_POINTS = 12000;
   function cancel() {
     sequence++;
     if (activeRequest) activeRequest.abort();
@@ -94,7 +94,8 @@
             !body.docs.length || body.docs.length > 500 || !body.docs.every(function (doc) {
               return doc && Object.keys(doc).length === 2 && typeof doc._id === 'string' &&
                 allowed.has(doc._id) && (request.path === '/radec/_mget') === doc._id.startsWith('ZTF') &&
-                Array.isArray(doc._source) && doc._source.length === 1 && doc._source[0] === 'location';
+                (request.path === '/ss_radec/_mget' ? doc._source === false :
+                  Array.isArray(doc._source) && doc._source.length === 1 && doc._source[0] === 'location');
             })) throw new Error('invalid activity');
         entries.push(request.path + ' ' + request.body);
       });
@@ -157,7 +158,9 @@
       return {sourceId:source.sourceId, mjd:source.mjd, ra:source.ra % 360, dec:source.dec};
     });
     sources.sort(function (a, b) { return a.mjd - b.mjd || a.sourceId.localeCompare(b.sourceId); });
-    return {objectId:id, sources:sources};
+    var trajectory = {objectId:id, sources:sources};
+    if (payload.esMjdAvailable === false) trajectory.esMjdAvailable = false;
+    return trajectory;
   }
   async function openIds(objectIdsToPlot, source) {
     var current = ++sequence;

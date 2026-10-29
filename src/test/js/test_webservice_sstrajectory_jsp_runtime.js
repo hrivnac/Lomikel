@@ -75,8 +75,10 @@ ${body}
           for (int k=0;k<4001;k++) tooMany.put(61001.0);
           source.put("mjd", tooMany);
         }
-        responseText = new JSONObject().put("docs", new JSONArray().put(new JSONObject()
-          .put("_id", id).put("found", mode[0] != 3).put("_source", source))).toString();
+        boolean absent = mode[0] == 3 || (mode[0] == 8 && requestPath.equals("/ss_mjd/_mget"));
+        JSONObject doc = new JSONObject().put("_id", id).put("found", !absent);
+        if (!absent) doc.put("_source", source);
+        responseText = new JSONObject().put("docs", new JSONArray().put(doc)).toString();
       }
       byte[] bytes = responseText.getBytes(StandardCharsets.UTF_8);
       exchange.sendResponseHeaders(200, bytes.length);
@@ -131,6 +133,11 @@ ${body}
       JSONObject repeated = run(id, 200);
       check(repeated.getJSONArray("sources").length() == 2 && repeated.getBoolean("esCoverageComplete"),
         "distinct source IDs with equal MJD and position must survive deduplicated ES coverage");
+      mode[0] = 8;
+      JSONObject unfilledMjd = run(id, 200);
+      check(unfilledMjd.getJSONArray("sources").length() == 2 &&
+        unfilledMjd.getBoolean("esCoverageComplete") && !unfilledMjd.getBoolean("esMjdAvailable"),
+        "SS positions and paired Fink sources must work while ss_mjd backfill is incomplete");
       System.out.println("SSTrajectory JSP: paired rows, exact request metadata, row and byte caps passed");
     } finally { server.stop(0); }
   }

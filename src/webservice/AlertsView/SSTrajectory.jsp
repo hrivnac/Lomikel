@@ -91,7 +91,7 @@
     }
 
   private static boolean coversEsHistory(JSONArray mjds, JSONArray locations, JSONArray sources) {
-    if (mjds.length() == 0 || locations.length() == 0 || sources.length() == 0) return false;
+    if (locations.length() == 0 || sources.length() == 0) return false;
     // Independently deduplicated ES arrays cannot prove source-row count.
     // Bound the comparison work as well as response bytes; on uncertainty the
     // client refuses to present a track as a verified history.
@@ -183,14 +183,15 @@
     JSONObject ids = new JSONObject().put("ids", new JSONArray().put(id));
     JSONObject mjdDocument = postJson(SS_MJD_MGET, ids, esRequests).getJSONArray("docs").getJSONObject(0);
     JSONObject radecDocument = postJson(SS_RADEC_MGET, ids, esRequests).getJSONArray("docs").getJSONObject(0);
-    if (!mjdDocument.optBoolean("found") || !radecDocument.optBoolean("found") ||
+    if (!radecDocument.optBoolean("found") ||
         !id.equals(mjdDocument.optString("_id")) || !id.equals(radecDocument.optString("_id"))) {
       response.setStatus(404);
-      out.print(new JSONObject().put("error", "SS object not found in both indexes")
+      out.print(new JSONObject().put("error", "SS object not found in position index")
         .put("finkRequests", finkRequests).put("esRequests", esRequests).toString());
       return;
       }
-    JSONArray mjds = asArray(mjdDocument.getJSONObject("_source").opt("mjd"));
+    boolean mjdAvailable = mjdDocument.optBoolean("found");
+    JSONArray mjds = mjdAvailable ? asArray(mjdDocument.getJSONObject("_source").opt("mjd")) : new JSONArray();
     JSONArray locations = asArray(radecDocument.getJSONObject("_source").opt("location"));
 
     JSONArray resolver = new JSONArray(postText(fixtureBase("fink.sstrajectory.apiUrl", API_BASE), "/api/v1/resolver",
@@ -240,6 +241,7 @@
     JSONArray sources = new JSONArray(ordered);
     out.print(new JSONObject().put("objectId", id).put("sources", sources)
       .put("esMjdCount", mjds.length()).put("esPositionCount", locations.length())
+      .put("esMjdAvailable", mjdAvailable)
       .put("esCoverageComplete", coversEsHistory(mjds, locations, sources))
       .put("finkRequests", finkRequests).put("esRequests", esRequests).toString());
     }
