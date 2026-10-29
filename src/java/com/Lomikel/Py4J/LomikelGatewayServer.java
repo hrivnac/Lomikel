@@ -56,7 +56,7 @@ public class LomikelGatewayServer {
     return new GatewayServer(new LomikelGatewayServer(),
                              port,
                              GatewayServer.DEFAULT_PYTHON_PORT,
-                             loopback,
+                             loopback, // InetAddress.getByName("0.0.0.0"),
                              loopback,
                              0,
                              0,
