@@ -80,14 +80,66 @@ function testControlsBeforeInitializationAndGroupsAfterRemoval() {
   context.clusterByGroups();
   assert.deepEqual(clustered, [], 'removed groups must not be clustered');
 }
-function testPopupUsesTextNodes() {
-  const {context} = setup();
-  const popup = {document:{title:'',body:element('body'),createElement:element,
+function popupWindow() {
+  return {document:{title:'',body:element('body'),createElement:element,
     createTextNode:text => ({tag:'#text',textContent:text})},focus() {}};
+}
+function testPopupTreatsUntrustedSeparatorsAsPlainText() {
+  const {context} = setup();
+  const popup = popupWindow();
   context.open = () => popup;
-  context.popup('<svg onload=alert(1)>','<img src=x onerror=alert(1)>');
-  assert.equal(popup.document.body.children.some(child => child.tag === 'img'), false);
-  assert.ok(JSON.stringify(popup.document.body.children).includes('<img src=x'));
+  context.popup('<svg onload=alert(1)>','first<br/>second<hr/><img src=x onerror=alert(1)>');
+  assert.deepEqual(popup.document.body.children.map(child => child.tag),['b','hr','pre','button']);
+  const description = popup.document.body.children[2];
+  assert.deepEqual(description.children.map(child => child.tag),['#text']);
+  assert.equal(description.children[0].textContent,
+    'first<br/>second<hr/><img src=x onerror=alert(1)>');
+}
+function testDescribeFormatsGraphsonRowsWithoutInterpretingGraphValues() {
+  const {context} = setup();
+  const windows=[];
+  context.open = () => {const w=popupWindow();windows.push(w);return w;};
+  const hostile='<img src=x onerror=alert(1)><br/><hr/>';
+  const fixture={result:{data:{'@value':[{'@type':'g:Map','@value':[
+    'name',{'@type':'g:List','@value':[{'@type':'g:String','@value':hostile}]},
+    'rank',{'@type':'g:List','@value':[{'@type':'g:Int32','@value':7}]}
+  ]}]}}};
+  const queries=[];
+  context.callGremlinValues=query => {queries.push(query);return context.parseValues(JSON.stringify(fixture));};
+  context.nodes.push({id:'123',title:'node '+hostile});
+  context.edges.push({id:'edge-1',title:'edge '+hostile});
+  context.describeNode('123');context.describeEdge('edge-1');
+  assert.deepEqual(queries,["g.V('123').valueMap()","g.E('edge-1').valueMap()"]);
+  for (const w of windows) {
+    const body=w.document.body.children;
+    assert.deepEqual(body.map(child => child.tag),['b','hr','pre','hr','pre','button']);
+    assert.deepEqual(body[2].children.map(child => child.tag),['#text','br','#text']);
+    assert.equal(body[2].children[0].textContent,'name: '+hostile);
+    assert.equal(body[2].children[2].textContent,'rank: 7');
+    assert.ok(body[4].children[0].textContent.includes(hostile));
+    assert.equal(JSON.stringify(body).includes('"tag":"img"'),false);
+  }
+}
+function testDescribeFallbackPreservesLiteralResponse() {
+  const {context} = setup();
+  const popup=popupWindow();context.open=() => popup;
+  context.callGremlinValues=() => 'raw <br/> text <hr/> <script>alert(1)</script>';
+  context.nodes.push({id:1,title:'fallback'});
+  context.describeNode(1);
+  const body=popup.document.body.children;
+  assert.deepEqual(body.map(child => child.tag),['b','hr','pre','hr','pre','button']);
+  assert.deepEqual(body[2].children.map(child => child.tag),['#text']);
+  assert.equal(body[2].children[0].textContent,'raw <br/> text <hr/> <script>alert(1)</script>');
+}
+function testActionsAreCommaSeparated() {
+  const {context,controls} = setup();
+  context.showGraphCommands({id:1,heading:'safe',actions:[
+    {name:'Show',target:'result',url:'Node.jsp?id=1'},
+    {name:'Table',target:'table',url:'Nodes.jsp?id=1'},
+    {name:'SkyView',target:'skyview',url:'d3/skyview.jsp'}]},false);
+  const actions=controls.commands.children.filter(child => child.tag === 'a' || child.tag === '#text');
+  assert.deepEqual(actions.map(child => child.tag === 'a' ? child.textContent : child.textContent),
+    ['Show', ', ', 'Table', ', ', 'SkyView']);
 }
 function testClusterTooltipEscapesHostileGroup() {
   const {context} = setup();
@@ -123,6 +175,9 @@ function testGraphIdsAreCheckedAtEveryQueryBoundary() {
   context.expand(123);
   context.describeNode(123);
   assert.equal(context.stylesheetValue({gremlin:'valueMap()'},123,new Map(),new Map(),false), 'ok');
+  assert.equal(queries.at(-1), 'g.V(123).valueMap()', 'numeric IDs remain numeric in stylesheet lookups');
+  assert.equal(context.stylesheetValue({gremlin:'valueMap()'},'123',new Map(),new Map(),false), 'ok');
+  assert.equal(queries.at(-1), "g.V('123').valueMap()", 'string IDs remain quoted in stylesheet lookups');
   context.fillEdges();
   assert.ok(queries.some(query => query.includes('.V(123).out()')));
   assert.ok(queries.some(query => query.includes('within(123)')));
@@ -145,6 +200,28 @@ function testDocumentedGraphsonIdentifiers() {
   assert.equal(context.validGraphId(parsed[1].outVid,false), true);
   assert.equal(context.validGraphId('1);drop();',false), false);
   assert.equal(context.validGraphId("4r44db');drop();//",true), false);
+}
+function testDefaultStylesheetUsesNumericVertexIdForPropertiesAndActions() {
+  const {context, controls} = setup();
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'../../webservice/StylesheetDefault.js'),'utf8'),context);
+  const queries=[];
+  context.callGremlinValues=query => {
+    queries.push(query);
+    if (query.includes('valueMap(')) return [{'@type':'g:Map','@value':[
+      'lbl',{'@type':'g:List','@value':['Object 123']}]}];
+    if (query.includes('Node.jsp?id=')) return 'Node.jsp?id=123';
+    if (query.includes('Nodes.jsp?id=')) return 'Nodes.jsp?id=123';
+    return '';
+  };
+  const graphson={result:{data:{'@value':[{'@type':'g:Vertex','@value':{
+    id:{'@type':'g:Int64','@value':123},label:'object',
+    properties:{lbl:[{'@value':{value:'Object 123'}}]}}}]}}};
+  context.show(context.parseGraph(JSON.stringify(graphson)));
+  context.network.listeners.click({nodes:[123],edges:[]});
+  assert.ok(queries.length >= 3);
+  assert.ok(queries.every(query => query.startsWith('g.V(123).')), 'default style must use the numeric vertex ID');
+  assert.equal(context.nodes[0].label, 'Object 123');
+  assert.ok(controls.commands.children.some(child => child.tag === 'a' && child.textContent === 'show'));
 }
 function testSentinelsReachTheirMatchingPanesOnly() {
   const {context, controls} = setup();
@@ -176,9 +253,11 @@ async function testInternalActionEncodesOnceAtRealLoader() {
 }
 async function main() {
 for (const test of [testGraphPropertyCannotExecute,testHostileGraphTextAndActionsRemainInert,
-  testGraphImageFilenameCannotEscapeImagesDirectory,testControlsBeforeInitializationAndGroupsAfterRemoval,testPopupUsesTextNodes,
+  testGraphImageFilenameCannotEscapeImagesDirectory,testControlsBeforeInitializationAndGroupsAfterRemoval,
+  testPopupTreatsUntrustedSeparatorsAsPlainText,testDescribeFormatsGraphsonRowsWithoutInterpretingGraphValues,
+  testDescribeFallbackPreservesLiteralResponse,testActionsAreCommaSeparated,
   testClusterTooltipEscapesHostileGroup,testGraphIdsAreCheckedAtEveryQueryBoundary,
-  testDocumentedGraphsonIdentifiers,
+  testDocumentedGraphsonIdentifiers,testDefaultStylesheetUsesNumericVertexIdForPropertiesAndActions,
   testSentinelsReachTheirMatchingPanesOnly,testInternalActionEncodesOnceAtRealLoader]) await test();
 console.log('GraphViewNew offline security tests passed');
 }
