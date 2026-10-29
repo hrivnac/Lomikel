@@ -21,6 +21,7 @@ function graphContext() {
     sleep: async () => {}, console, setTimeout
   });
   context.window = context;
+  context.server = '//offline-graph:8182';
   vm.runInContext(source, context, {filename: 'GraphView.js'});
   return {context, controls};
 }

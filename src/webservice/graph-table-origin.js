@@ -63,15 +63,29 @@
     return result;
   };
   window.graphTableServerForVertex = function (id) { return origins.get(String(id)) || null; };
+  window.graphTableServerForEdge = function (id) { return edgeOrigins.get(String(id)) || null; };
 
   window.callGremlinValues = function (request, explicitServer) {
-    // Legacy Nodes.jsp queries each visible vertex independently. For a graph
-    // assembled with Add to graph across servers, its implicit global server
-    // belongs only to the most recent load. Select the vertex's own server.
-    var match = typeof request === 'string' &&
-      request.match(/^[A-Za-z_][\w]*\.V\('([0-9]+)'\)\.valueMap\(\)\.next\(\)\.toString\(\)$/);
-    var origin = !explicitServer && match && origins.get(match[1]);
-    if (!origin) return originalValues.apply(this, arguments);
+    // Context panes (Node/Edge/Nodes/Edges/Venn), Describe, and stylesheet
+    // lookups all query one element at a time. Route that element's traversal
+    // to its own graph; the selected server belongs only to the last load.
+    if (explicitServer != null || typeof request !== 'string')
+      return originalValues.apply(this, arguments);
+    var match = request.match(/\b[A-Za-z_]\w*\.(V|E)\((?:'([A-Za-z0-9_-]+)'|"([A-Za-z0-9_-]+)"|([0-9]+))\)/);
+    if (!match) return originalValues.apply(this, arguments);
+    var id = match[2] || match[3] || match[4];
+    var owners = match[1] === 'V' ? origins : edgeOrigins;
+    var displayed = match[1] === 'V' ? window.nodes : window.edges;
+    var origin = owners.get(id);
+    if (!origin) {
+      // A displayed, unowned ID must never silently fall through to another
+      // graph. Newly received elements are not yet displayed during show().
+      if (displayed.some(function (item) { return String(item.id) === id; })) {
+        if (typeof window.feedbackLine === 'function') window.feedbackLine('Cannot query an element with unknown graph origin.');
+        return [];
+      }
+      return originalValues.apply(this, arguments);
+    }
     var activeServer = window.server;
     try { return originalValues.call(this, request, origin); }
     finally { window.server = activeServer; }

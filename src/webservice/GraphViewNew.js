@@ -512,6 +512,11 @@ function expandEdge(id) {
     return;
     }
   selectedEdge = edge;
+  var edgeSource = typeof window.graphTableServerForEdge === 'function' ? window.graphTableServerForEdge(id) : server;
+  if (!edgeSource) {
+    feedbackLine('Cannot expand an edge with unknown graph origin.');
+    return;
+  }
   if (document.getElementById('removeOld').checked) {
     var endpoints = new Set([edge.from, edge.to]);
     for (var i = nodes.length - 1; i >= 0; i--) {
@@ -521,15 +526,25 @@ function expandEdge(id) {
       if (edges[j].id !== id) edges.splice(j, 1);
       }
     }
-  expand(edge.from, true);
-  if (edge.to !== edge.from) expand(edge.to, true);
+  expand(edge.from, true, edgeSource);
+  if (edge.to !== edge.from) expand(edge.to, true, edgeSource);
   }
 
 // Expand one more level
-function expand(id, preserveExisting = false) {
+function expand(id, preserveExisting = false, edgeSource = null) {
   var literal = graphVertexLiteral(id);
   if (literal === null) {
     feedbackLine('Cannot expand a vertex with an unsupported ID.');
+    return;
+  }
+  var owner = typeof window.graphTableServerForVertex === 'function' ? window.graphTableServerForVertex(id) : server;
+  if (owner && edgeSource && owner !== edgeSource) {
+    feedbackLine('Cannot expand an edge with endpoints from different graph servers.');
+    return;
+  }
+  var source = owner || edgeSource;
+  if (!source) {
+    feedbackLine('Cannot expand a vertex with unknown graph origin.');
     return;
   }
   if (!document.getElementById('expandTo').checked && !document.getElementById('expandFrom').checked) {
@@ -543,18 +558,22 @@ function expand(id, preserveExisting = false) {
     edges.length = 0;
     nodes.push(vertex);
     }
-  if (document.getElementById('expandTo').checked) {
-    callGremlinGraph(gr + ".V(" + literal + ").out()");
-     }
-  if (document.getElementById('expandFrom').checked) {
-    callGremlinGraph(gr + ".V(" + literal + ").in()");
+  var selectedServer = server;
+  try {
+    if (document.getElementById('expandTo').checked) {
+      callGremlinGraph(gr + ".V(" + literal + ").out()", source);
+      }
+    if (document.getElementById('expandFrom').checked) {
+      callGremlinGraph(gr + ".V(" + literal + ").in()", source);
+      }
+    if (document.getElementById('expandTo').checked) {
+      callGremlinGraph(gr + ".V(" + literal + ").outE()", source);
+      }
+    if (document.getElementById('expandFrom').checked) {
+      callGremlinGraph(gr + ".V(" + literal + ").inE()", source);
+      }
     }
-  if (document.getElementById('expandTo').checked) {
-     callGremlinGraph(gr + ".V(" + literal + ").outE()");
-    }
-  if (document.getElementById('expandFrom').checked) {
-     callGremlinGraph(gr + ".V(" + literal + ").inE()");
-    }
+  finally { server = selectedServer; }
   }
 
 // Only GraphSON map structure creates description rows; graph strings remain text.
