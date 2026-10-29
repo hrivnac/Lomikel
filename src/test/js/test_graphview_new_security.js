@@ -167,6 +167,7 @@ function testGraphIdsAreCheckedAtEveryQueryBoundary() {
   context.describeNode(bad);
   context.describeEdge(badEdge);
   context.network = {};
+  context.server = '//offline-graph:8182';
   context.fillEdges();
   assert.deepEqual(queries, [], 'invalid graph IDs must never reach any Gremlin query');
   assert.equal(context.compromised, undefined);
