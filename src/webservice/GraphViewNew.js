@@ -20,12 +20,16 @@ var graphViewToken = {cancelled:false};
 // Support the known stylesheet expressions explicitly: neither graph values
 // nor stylesheet expressions become executable source in this controller.
 function graphText(value) { return value == null ? '' : String(value); }
-// GraphSON vertex IDs are numeric; JanusGraph relation IDs are alphanumeric with
-// hyphen/underscore separators. Check before embedding either in Gremlin source.
+// GraphSON IDs may be numeric or restricted string IDs. Never interpolate
+// arbitrary graph data into Gremlin source.
 function validGraphId(id, edge) {
   if (edge) return typeof id === 'string' && /^[A-Za-z0-9_-]+$/.test(id);
-  return (typeof id === 'number' && Number.isSafeInteger(id) && id >= 0) ||
-    (typeof id === 'string' && /^[0-9]+$/.test(id));
+  return (typeof id === 'number' && Number.isSafeInteger(id)) ||
+    (typeof id === 'string' && /^[A-Za-z0-9_-]+$/.test(id));
+}
+function graphVertexLiteral(id) {
+  if (!validGraphId(id, false)) return null;
+  return typeof id === 'number' ? String(id) : "'" + id + "'";
 }
 function graphStyleExpression(expression, title, eMap) {
   switch (expression) {
@@ -90,7 +94,8 @@ function showGraphCommands(item, edge) {
     pane.appendChild(button);
   });
   pane.appendChild(document.createElement('hr'));
-  (item.actions || []).forEach(function (action) {
+  (item.actions || []).forEach(function (action, index) {
+    if (index) pane.appendChild(document.createTextNode(', '));
     var link = document.createElement('a');
     link.textContent = action.name;
     if (action.target === 'external') {
@@ -330,6 +335,10 @@ function show(graph) {
   var c;
   var o;
   var u;
+  // With a label filter, resolve all visible vertices before deciding whether
+  // each edge has two displayed endpoints; preserve source order otherwise.
+  if (graph != null && filter) graph = graph.filter(function (item) { return item.type === 'vertex'; })
+    .concat(graph.filter(function (item) { return item.type !== 'vertex'; }));
   // loop over all elements (just redraw if no elements)
   if (graph != null) {
     for (var i = 0; i < graph.length; i++) {
@@ -397,6 +406,10 @@ function show(graph) {
         arrows       = stylesheetValue(stylesheetEdge.graphics.arrows,       id, eMap, pMap, true, title);
         value        = stylesheetValue(stylesheetEdge.graphics.value,        id, eMap, pMap, true, title);
         actions = graphActions(stylesheetEdge.actions, id, eMap, pMap, true, title);
+        // A label filter can hide a neighboring vertex. Do not retain an edge
+        // whose endpoint is absent from the displayed graph.
+        if (filter && (!findObjectByKey(nodes, 'id', inVid) ||
+                       !findObjectByKey(nodes, 'id', outVid))) continue;
         // Parallel relations may share endpoints; only a repeated relation ID is a duplicate.
         if (!findObjectByKey(edges, 'id', id)) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {
@@ -514,7 +527,11 @@ function expandEdge(id) {
 
 // Expand one more level
 function expand(id, preserveExisting = false) {
-  if (!validGraphId(id, false)) return;
+  var literal = graphVertexLiteral(id);
+  if (literal === null) {
+    feedbackLine('Cannot expand a vertex with an unsupported ID.');
+    return;
+  }
   if (!document.getElementById('expandTo').checked && !document.getElementById('expandFrom').checked) {
     feedbackLine('Select Children or Parents in Graph tools before expanding.');
     return;
@@ -527,28 +544,43 @@ function expand(id, preserveExisting = false) {
     nodes.push(vertex);
     }
   if (document.getElementById('expandTo').checked) {
-    callGremlinGraph(gr + ".V(" + id + ").out()");
+    callGremlinGraph(gr + ".V(" + literal + ").out()");
      }
   if (document.getElementById('expandFrom').checked) {
-    callGremlinGraph(gr + ".V(" + id + ").in()");
+    callGremlinGraph(gr + ".V(" + literal + ").in()");
     }
   if (document.getElementById('expandTo').checked) {
-     callGremlinGraph(gr + ".V(" + id + ").outE()");
+     callGremlinGraph(gr + ".V(" + literal + ").outE()");
     }
   if (document.getElementById('expandFrom').checked) {
-     callGremlinGraph(gr + ".V(" + id + ").inE()");
+     callGremlinGraph(gr + ".V(" + literal + ").inE()");
     }
   }
 
+// Only GraphSON map structure creates description rows; graph strings remain text.
+function graphDescriptionRows(values) {
+  if (!Array.isArray(values) || !values.length || !values[0] ||
+      values[0]['@type'] !== 'g:Map' || !Array.isArray(values[0]['@value'])) return null;
+  function plain(value) {
+    if (Array.isArray(value)) return value.map(plain).join(', ');
+    if (value && typeof value === 'object' && '@value' in value) return plain(value['@value']);
+    return graphText(value);
+  }
+  var entries = values[0]['@value'];
+  var rows = [];
+  for (var i = 0; i + 1 < entries.length; i += 2) {
+    rows.push(plain(entries[i]) + ': ' + plain(entries[i + 1]));
+  }
+  return rows;
+}
+
 // Describe selected node
 function describeNode(id) {
-  if (!validGraphId(id, false)) return;
+  var literal = graphVertexLiteral(id);
+  if (literal === null) return;
   var node = findObjectByKey(nodes, 'id', id);
   if (!node) return;
-  //popup(node.title, callGremlinValues("v=" + gr + ".V('" + id + "').next();com.Lomikel.Januser.Wertex.enhance(v).properties().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '').replace('[', '')") +
-  popup(node.title, callGremlinValues(gr + ".V('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '').replace('[', '')") +
-            "<hr/>" +
-            JSON.stringify(node));
+  popup(node.title, callGremlinValues(gr + '.V(' + literal + ').valueMap()'), JSON.stringify(node));
   }
 
 // Describe selected edge
@@ -556,9 +588,7 @@ function describeEdge(id) {
   if (!validGraphId(id, true)) return;
   var edge = findObjectByKey(edges, 'id', id);
   if (!edge) return;
-  popup(edge.title, callGremlinValues(gr + ".E('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") +
-            "<hr/>" +
-            JSON.stringify(edge));
+  popup(edge.title, callGremlinValues(gr + ".E('" + id + "').valueMap()"), JSON.stringify(edge));
   }
 
 // Remove selected node
@@ -652,19 +682,20 @@ function clusterExpand() {
 // Fill Edges
 function fillEdges() {
   if (!network) return;
-  if (!nodes.every(function (node) { return validGraphId(node.id, false); })) return;
-  visibleIds = [];
-  for (var i = 0; i < nodes.length; i++) {
-    visibleIds.push(nodes[i].id);
-    }
+  var visibleIds = nodes.map(function (node) { return graphVertexLiteral(node.id); });
+  if (visibleIds.includes(null)) {
+    feedbackLine('Cannot request edges for vertices with unsupported IDs.');
+    return;
+  }
   for (var i = 0; i < nodes.length; i++) {
     var selectedNode = nodes[i];
+    var literal = visibleIds[i];
     feedbackLine('Expanding ' + selectedNode.label);
     if (document.getElementById('expandTo').checked) {
-       callGremlinGraph(gr + ".V(" + selectedNode.id + ").outE().filter(inV().hasId(within(" + visibleIds + ")))");
+       callGremlinGraph(gr + ".V(" + literal + ").outE().filter(inV().hasId(within(" + visibleIds + ")))");
       }
     if (document.getElementById('expandFrom').checked) {
-       callGremlinGraph(gr + ".V(" + selectedNode.id + ").inE().filter(outV().hasId(within(" + visibleIds + ")))");
+       callGremlinGraph(gr + ".V(" + literal + ").inE().filter(outV().hasId(within(" + visibleIds + ")))");
       }
     }
   }
@@ -797,10 +828,9 @@ function filterObjectByKey(array, key, value) {
   }
 
 // Open popup window
-function popup(name, txt) {
+function popup(name, description, details) {
   var w = window.open('', '_blank', 'height=600,width=600,menubar=no,status=no,toolbar=no');
   if (!w) return false;
-  // document.write would parse graph-provided labels and valueMap responses as HTML.
   var doc = w.document;
   doc.title = graphText(name);
   var heading = doc.createElement('b');
@@ -808,8 +838,23 @@ function popup(name, txt) {
   doc.body.appendChild(heading);
   doc.body.appendChild(doc.createElement('hr'));
   var content = doc.createElement('pre');
-  content.textContent = graphText(txt);
+  var rows = graphDescriptionRows(description);
+  if (rows !== null) {
+    rows.forEach(function (row, index) {
+      if (index) content.appendChild(doc.createElement('br'));
+      content.appendChild(doc.createTextNode(row));
+    });
+  } else {
+    content.appendChild(doc.createTextNode(typeof description === 'string' ? description :
+      JSON.stringify(description) || ''));
+  }
   doc.body.appendChild(content);
+  if (details !== undefined) {
+    doc.body.appendChild(doc.createElement('hr'));
+    var detail = doc.createElement('pre');
+    detail.appendChild(doc.createTextNode(graphText(details)));
+    doc.body.appendChild(detail);
+  }
   var close = doc.createElement('button');
   close.textContent = 'close';
   close.addEventListener('click', function () { w.close(); });
@@ -833,7 +878,8 @@ function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
   if (nam == null) return '';
   if (nam.gremlin) {
-    val = validGraphId(id, ifEdge) ? callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin) : '';
+    var literal = ifEdge ? (validGraphId(id, true) ? "'" + id + "'" : null) : graphVertexLiteral(id);
+    val = literal === null ? '' : callGremlinValues(gr + '.' + set + '(' + literal + ').' + nam.gremlin);
     }
   else if (nam.js) {
     val = graphStyleExpression(nam.js, title, eMap);
