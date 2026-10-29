@@ -29,7 +29,9 @@
     if (ids.isEmpty()) return new JSONArray();
     JSONArray docs = new JSONArray();
     for (String id : ids) docs.put(new JSONObject().put("_id", id)
-      .put("_source", new JSONArray().put("location")));
+      // SS positions come from paired source rows in SSTrajectory.jsp, not this
+      // identity probe. Avoid transferring thousands of unused locations.
+      .put("_source", index.equals("ss_radec") ? (Object)false : new JSONArray().put("location")));
     byte[] body = new JSONObject().put("docs", docs).toString().getBytes(StandardCharsets.UTF_8);
     HttpURLConnection connection = (HttpURLConnection)new URL(esBase(survey) + "/" + index + "/_mget").openConnection();
     connection.setInstanceFollowRedirects(false);
@@ -118,7 +120,6 @@
       if (doc != null && doc.optBoolean("found") && requested.contains(doc.optString("_id", "")))
         ssIdentified.add(doc.getString("_id"));
     }
-    addPositions(solarDocs, requested, found, points);
     ArrayList<String> stationary = new ArrayList<String>();
     for (String id : lsst) if (!ssIdentified.contains(id)) stationary.add(id);
     addPositions(mget("lsst", "dia_radec", stationary, esRequests), requested, found, points);

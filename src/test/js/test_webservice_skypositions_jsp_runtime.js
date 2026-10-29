@@ -59,21 +59,26 @@ ${body}
       paths.add(index); bodies.add(sent);
       JSONArray docs = new JSONArray();
       for (Object raw : new JSONObject(sent).getJSONArray("docs")) {
-        String id = ((JSONObject)raw).getString("_id");
+        JSONObject requestDoc = (JSONObject)raw;
+        String id = requestDoc.getString("_id");
         JSONObject row = new JSONObject().put("_id", id);
         if (index.equals("/radec/_mget") ||
             (index.equals("/ss_radec/_mget") &&
-              (id.equals("1") || id.equals("2") || id.equals("4") || id.equals("5"))) ||
+              (id.equals("1") || id.equals("2") || id.equals("4") || id.equals("5") ||
+               id.equals("7") || id.matches("1[0-9]"))) ||
             (index.equals("/dia_radec/_mget") &&
               (id.equals("2") || id.equals("4") || id.equals("5") || id.equals("6")))) {
           Object location = new JSONObject().put("lon", id.equals("4") && index.equals("/ss_radec/_mget") ? 200 : 0)
             .put("lat", index.equals("/ss_radec/_mget") ? 20 : 10);
-          if (id.equals("5") && index.equals("/dia_radec/_mget")) {
+          if ((id.equals("5") && index.equals("/dia_radec/_mget")) ||
+              (id.equals("7") && index.equals("/ss_radec/_mget"))) {
             JSONArray oversized = new JSONArray();
             for (int p=0;p<4001;p++) oversized.put(location);
             location = oversized;
           }
-          row.put("found", true).put("_source", new JSONObject().put("location", location));
+          row.put("found", true);
+          if (!Boolean.FALSE.equals(requestDoc.opt("_source")))
+            row.put("_source", new JSONObject().put("location", location));
         }
         docs.put(row);
       }
@@ -95,8 +100,9 @@ ${body}
         check(!logged.getJSONObject(i).toString().contains("127.0.0.1"), "private host leaked");
       }
       check(logged.getJSONObject(1).getString("path").equals("/ss_radec/_mget") &&
-        new JSONObject(bodies.get(1)).getJSONArray("docs").getJSONObject(0).getString("_id").equals("1"),
-        "SS detection queries the requested numeric ID first");
+        new JSONObject(bodies.get(1)).getJSONArray("docs").getJSONObject(0).getString("_id").equals("1") &&
+        !new JSONObject(bodies.get(1)).getJSONArray("docs").getJSONObject(0).getBoolean("_source"),
+        "SS detection queries identity without loading unpaired position arrays");
       JSONObject second = run("2", 200);
       check(second.getJSONArray("esRequests").length() == 2, "SS detection must avoid DIA collision request");
       check(second.getJSONArray("ssObjectIds").length() == 1 &&
@@ -107,16 +113,26 @@ ${body}
           collisionPoints++;
           check(((JSONObject)raw).getDouble("dec") == 20, "SS coordinate must take precedence");
         }
-      check(collisionPoints == 1, "collision cannot duplicate DIA and SS point");
+      check(collisionPoints == 0, "SS positions must come from paired history, not the coordinate probe");
       check(paths.size() == 4, "logging triggered additional requests");
       JSONObject malformed = run("4", 200);
       check(malformed.getJSONArray("ssObjectIds").toString().contains("\\\"4\\\"") &&
         !malformed.getJSONArray("missing").toString().contains("\\\"4\\\""),
         "found SS with bad coordinates must not be misidentified as DIA");
-      check(malformed.getJSONArray("points").length() == 1, "malformed SS cannot inherit colliding DIA positions");
+      check(malformed.getJSONArray("points").length() == 1, "SS cannot inherit colliding DIA positions");
       JSONObject hugeCollision = run("5", 200);
-      check(hugeCollision.getJSONArray("points").length() == 2,
+      check(hugeCollision.getJSONArray("points").length() == 1,
         "discarded DIA collision points must not trip the retained-point cap");
+      JSONObject longSs = runIds(new JSONArray().put("7"), 200);
+      check(longSs.getJSONArray("ssObjectIds").toString().contains("\\\"7\\\"") &&
+        longSs.getJSONArray("points").length() == 0,
+        "long SS history must be identified without overflowing the coordinate snapshot");
+      JSONArray tenLongIds = new JSONArray();
+      for (int i=10;i<20;i++) tenLongIds.put(String.valueOf(i));
+      JSONObject longSet = runIds(tenLongIds, 200);
+      check(longSet.getJSONArray("ssObjectIds").length() == 10 &&
+        longSet.getJSONArray("points").length() == 0,
+        "a LongSS-sized set must pass only IDs to the paired-history loader");
       JSONObject ordinaryDia = run("6", 200);
       check(ordinaryDia.getJSONArray("ssObjectIds").length() == 0 &&
         ordinaryDia.getJSONArray("points").length() == 2 &&
@@ -125,10 +141,10 @@ ${body}
         "ordinary numeric DIA requires a not-found SS lookup followed by DIA lookup");
       int firstMixed = paths.size();
       JSONObject mixed = runIds(new JSONArray().put("ZTFabc").put("2").put("6"), 200);
-      check(mixed.getJSONArray("points").length() == 3 &&
+      check(mixed.getJSONArray("points").length() == 2 &&
         mixed.getJSONArray("ssObjectIds").length() == 1 &&
         mixed.getJSONArray("ssObjectIds").getString(0).equals("2"),
-        "mixed ZTF/SS/DIA returns one position each");
+        "mixed ZTF/SS/DIA returns only static positions; SS history is fetched separately");
       JSONArray mixedRequests = mixed.getJSONArray("esRequests");
       check(mixedRequests.length() == 3 &&
         new JSONObject(mixedRequests.getJSONObject(2).getString("body"))

@@ -15,6 +15,7 @@ assert.match(page, /id="sky-summary"[^>]*><%=errorMessage/);
 assert.match(page, /if \(errorMessage == null\).*skyview\.js/);
 assert.ok(page.indexOf('request.getInputStream()') < page.indexOf('new JSONArray(fields.get("points"))'),
   'bound the POST before parsing the points JSON');
-assert.match(page, /points\.length\(\)\s*>\s*4000/);
+assert.match(page, /MAX_POINTS\s*=\s*12000/);
+assert.match(page, /points\.length\(\)\s*>\s*MAX_POINTS/);
 assert.match(page, /URLDecoder\.decode/);
 console.log('SkyView JSP bounded POST contract passed');

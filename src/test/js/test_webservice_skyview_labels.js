@@ -75,5 +75,5 @@ Celestial.redraw(); // panning after the projection switch
 assert.deepEqual(draws.filter(d=>d.arc)[0].arc,[80,70],
   'point positions follow the panned sky in the new projection');
 assert.match(fs.readFileSync(path.join(root,'skyview.css'),'utf8'),/\.sky-hover\s*\{/);
-assert.match(fs.readFileSync(path.join(root,'skyview.jsp'),'utf8'),/skyview\.js\?v=ss-trajectory-1/);
+assert.match(fs.readFileSync(path.join(root,'skyview.jsp'),'utf8'),/skyview\.js\?v=longss-history-1/);
 console.log('SkyView draws IDs, distinct survey colors and point hover tooltips');
