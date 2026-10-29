@@ -78,7 +78,7 @@ public class ParquetReader {
     log.info("Loading " + fn);
     Path path = new Path(fn);
     if (_fs.isDirectory(path)) {
-      processDir(fn, "parquet");
+      processDir(fn, ext);
       return;
       }
     else if (!_fs.isFile(path)) {
@@ -349,9 +349,9 @@ public class ParquetReader {
     
   private Map<String, Set<String>> _props = new TreeMap<>();       
   
-  private static Configuration _conf;
+  private final Configuration _conf;
   
-  private static FileSystem _fs;
+  private final FileSystem _fs;
     
   /** Logging . */
   private static Logger log = LogManager.getLogger(ParquetReader.class);

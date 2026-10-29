@@ -62,6 +62,11 @@ public class ParquetReaderIntegrityTest {
     check(reader.ra.size() == 3, "nested group values not collected");
     reader.processFile(fileWithSchema(dir, "id-first.parquet", REVERSED_SCHEMA, "four"));
     check(reader.ids.equals(List.of("one", "two", "three", "four")), "ID-first row lost or duplicated: " + reader.ids);
+    java.nio.file.Path custom = Files.createDirectory(dir.resolve("custom-files"));
+    file(custom, "one.alerts", "custom");
+    reader.process(custom.toString(), "alerts");
+    check(reader.ids.equals(List.of("one", "two", "three", "four", "custom")),
+          "Directory traversal must honor the requested extension: " + reader.ids);
   }
   private static void strict() throws Exception {
     java.nio.file.Path dir = Files.createTempDirectory("parquet-strict-");
@@ -89,9 +94,19 @@ public class ParquetReaderIntegrityTest {
       throw new AssertionError("optional traversal hid a corrupt existing file");
     } catch (IOException | RuntimeException expected) { /* existing data remains strict */ }
   }
+  private static void instances() throws Exception {
+    Reader first = new Reader();
+    java.lang.reflect.Field configuration = ParquetReader.class.getDeclaredField("_conf");
+    configuration.setAccessible(true);
+    Object firstConfig = configuration.get(first);
+    Reader second = new Reader();
+    check(configuration.get(first) == firstConfig && configuration.get(second) != firstConfig,
+          "Constructing another reader must not replace the first reader's filesystem configuration");
+  }
   public static void main(String[] args) throws Exception {
     rows();
     strict();
+    instances();
     System.out.println("ParquetReaderIntegrityTest PASS");
   }
 }
