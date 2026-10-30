@@ -63,6 +63,82 @@ public class ESClient {
     log.info(answer);
     }
   
+  // Delete/clean index =========================================================
+
+  /** Delete an entire <em>ElasticSearch</em> index, including its mappings.
+    * The name must identify one ordinary index (no wildcards or aliases).
+    * Commit or discard pending bulk writes before deleting it.
+    * @param  idxName The exact index name.
+    * @throws LomikelException If the request fails or is not acknowledged. */
+  public void deleteIndex(String idxName) throws LomikelException {
+    checkIndexLifecycleName(idxName);
+    String answer = _httpClient.delete(_url + "/" + idxName, _auth);
+    try {
+      JSONObject result = new JSONObject(answer);
+      if (result.has("error") || !Boolean.TRUE.equals(result.opt("acknowledged"))) {
+        throw new LomikelException("Index deletion was not acknowledged for " + idxName);
+        }
+      }
+    catch (RuntimeException e) {
+      throw new LomikelException("Invalid index deletion response for " + idxName, e);
+      }
+    log.info("Deleted index " + idxName);
+    }
+
+  /** Remove every document from an index while retaining its mappings.
+    * The deletion completes synchronously and refreshes the index. Concurrent
+    * writers can add documents afterwards. Reject a partial deletion.
+    * @param  idxName The exact index name.
+    * @throws LomikelException If the request fails or any document remains
+    *                          undeleted in the reported batch. */
+  public void cleanIndex(String idxName) throws LomikelException {
+    checkIndexLifecycleName(idxName);
+    String query = new JSONObject().put("query", new JSONObject().put("match_all", new JSONObject())).toString();
+    String answer = _httpClient.postJSON(_url + "/" + idxName + "/_delete_by_query?refresh=true&wait_for_completion=true",
+                                         query, _auth, null);
+    try {
+      JSONObject result = new JSONObject(answer);
+      long total = result.getLong("total");
+      long deleted = result.getLong("deleted");
+      long conflicts = result.getLong("version_conflicts");
+      JSONArray failures = result.getJSONArray("failures");
+      if (result.has("error") || !Boolean.FALSE.equals(result.opt("timed_out")) ||
+          total < 0 || deleted < 0 || total != deleted || conflicts != 0 || failures.length() != 0) {
+        throw new LomikelException("Incomplete index cleaning for " + idxName);
+        }
+      log.info("Cleaned " + deleted + " documents from index " + idxName);
+      }
+    catch (RuntimeException e) {
+      throw new LomikelException("Invalid index cleaning response for " + idxName, e);
+      }
+    }
+
+  /** Keep destructive operations confined to one concrete index, not an alias.
+    * Elasticsearch's delete-by-query accepts aliases, including aliases that
+    * expand to multiple indices. Its index-info response is keyed by concrete
+    * index name, so require exactly the requested name before any mutation. */
+  private void checkIndexLifecycleName(String idxName) throws LomikelException {
+    if (idxName == null || idxName.length() > 255 ||
+        !idxName.matches("[a-z0-9][a-z0-9_.-]*")) {
+      throw new LomikelException("Invalid index name for destructive operation");
+      }
+    List<String> pending = _commands.get(idxName);
+    if (pending != null && !pending.isEmpty()) {
+      throw new LomikelException("Pending bulk writes for " + idxName + "; commit before changing the index");
+      }
+    String answer = _httpClient.get(_url + "/" + idxName, _auth);
+    try {
+      JSONObject indexes = new JSONObject(answer);
+      if (indexes.length() != 1 || !indexes.has(idxName)) {
+        throw new LomikelException("Not a single concrete index: " + idxName);
+        }
+      indexes.getJSONObject(idxName);
+      }
+    catch (RuntimeException e) {
+      throw new LomikelException("Invalid index lookup response for " + idxName, e);
+      }
+    }
+
   // Put value =================================================================  
     
   /** Insert new <em>ra,dec</em> <em>GeoPoint</em> entry into index.
