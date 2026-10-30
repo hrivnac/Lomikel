@@ -1189,7 +1189,7 @@
   <!-- Run ==================================================================-->
 
   <target name="start-FinkBrowser"
-          depends="war"
+          depends="init"
           description="Run local FinkBrowser server">
     <echo>Go to http://localhost:${jetty_port}/FinkBrowser/index.jsp</echo>
     <java jar="${jetty_runner}" fork="true">

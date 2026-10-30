@@ -108,7 +108,7 @@ public class PR extends ParquetReader {
 reader = new PR("hdfs://ccmaster1:8020");
 osizes = reader.sizes();
 if (delay == 0) {
-  reader.processOptionalDirStrict("/user/fink/archive/science/", "parquet");
+  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=03", "parquet");
   }
 else {
   aday = LocalDate.now()
@@ -116,8 +116,8 @@ else {
                   .format(DateTimeFormatter
                   .ofPattern("'year='yyyy'/month='MM'/day='dd"));
   reader.processOptionalDirStrict("/user/fink/archive/science/" + aday, "parquet");
-  reader.cleanup();
   }
+reader.cleanup();
   
 psizes = reader.sizes();
 log.info("Original sizes: " + osizes);

@@ -5,6 +5,7 @@ Requires Pillow: python -m pip install Pillow
 Example: python animate.py 21163615905265241 --max-frames 60
 The default includes every source (up to the safety limit), not an arbitrary API
 prefix. --max-frames samples the entire time span, including its endpoints.
+--kind [Difference|Science|Template]
 """
 
 from __future__ import annotations
