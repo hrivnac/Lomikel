@@ -73,21 +73,22 @@ public class PR extends ParquetReader {
       String key;
       if (props().containsKey("diaObject.diaObjectId")) {
         key = props().get("diaObject.diaObjectId").iterator().next();
-        esclient.updateDoubleArrayWithRetry("dia_mjd", "mjd", key, mjd, 10);
+        esclient.bufferDoubleArray("dia_mjd", "mjd", key, mjd);
         }
       else if (props().containsKey("ssSource.ssObjectId")) {
         key = props().get("ssSource.ssObjectId").iterator().next();
-        esclient.updateDoubleArrayWithRetry("ss_mjd", "mjd", key, mjd, 10);
+        esclient.bufferDoubleArray("ss_mjd", "mjd", key, mjd);
         }
       else {
         log.warn("no objectid");
         }
       props().clear();
-      timer.report();
+      if (timer.report()) esclient.flushBufferedDoubleArrays(10);
       }
     } 
     
   public void cleanup() {
+    esclient.flushBufferedDoubleArrays(10);
     }
     
   public String sizes() {

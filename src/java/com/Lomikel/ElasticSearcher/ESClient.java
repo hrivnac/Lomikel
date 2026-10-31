@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -70,7 +73,7 @@ public class ESClient {
     * Commit or discard pending bulk writes before deleting it.
     * @param  idxName The exact index name.
     * @throws LomikelException If the request fails or is not acknowledged. */
-  public void deleteIndex(String idxName) throws LomikelException {
+  public synchronized void deleteIndex(String idxName) throws LomikelException {
     checkIndexLifecycleName(idxName);
     String answer = _httpClient.delete(_url + "/" + idxName, _auth);
     try {
@@ -91,7 +94,7 @@ public class ESClient {
     * @param  idxName The exact index name.
     * @throws LomikelException If the request fails or any document remains
     *                          undeleted in the reported batch. */
-  public void cleanIndex(String idxName) throws LomikelException {
+  public synchronized void cleanIndex(String idxName) throws LomikelException {
     checkIndexLifecycleName(idxName);
     String query = new JSONObject().put("query", new JSONObject().put("match_all", new JSONObject())).toString();
     String answer = _httpClient.postJSON(_url + "/" + idxName + "/_delete_by_query?refresh=true&wait_for_completion=true",
@@ -125,6 +128,10 @@ public class ESClient {
     List<String> pending = _commands.get(idxName);
     if (pending != null && !pending.isEmpty()) {
       throw new LomikelException("Pending bulk writes for " + idxName + "; commit before changing the index");
+      }
+    for (BufferedDouble entry : _bufferedDoubles.values()) {
+      if (idxName.equals(entry.index))
+        throw new LomikelException("Pending buffered doubles for " + idxName + "; flush before changing the index");
       }
     String answer = _httpClient.get(_url + "/" + idxName, _auth);
     try {
@@ -602,6 +609,142 @@ public class ESClient {
     }
     
   // Update Array ==============================================================
+
+  /** Opt-in, per-client buffer of idempotent double-array updates. A successful
+    * bulk item is removed; an ambiguous response retains its items for replay.
+    * A single document update is capped at 64 KiB and a batch at 256 documents.
+    * Call flushBufferedDoubleArrays before observing final index sizes. */
+  public synchronized void bufferDoubleArray(String idxName, String fieldName,
+                                             String idxValue, double fieldValue) throws LomikelException {
+    if (idxName == null || !idxName.matches("[a-z0-9][a-z0-9_.-]*") ||
+        fieldName == null || fieldName.isEmpty() || idxValue == null ||
+        !Double.isFinite(fieldValue)) {
+      throw new IllegalArgumentException("Invalid buffered double-array update");
+      }
+    String key = new JSONArray().put(idxName).put(fieldName).put(idxValue).toString();
+    BufferedDouble entry = _bufferedDoubles.get(key);
+    if (entry != null && entry.values.contains(fieldValue)) return;
+    // Encode only the incoming number. The JSON line's fixed overhead is
+    // measured once per document; each subsequent value adds a comma and its
+    // ASCII JSON number. Never copy/serialize the growing set per admission.
+    String number = new JSONArray().put(fieldValue).toString();
+    int emptyBytes = entry == null ? bufferedLine(new BufferedDouble(idxName, fieldName, idxValue))
+                                     .getBytes(StandardCharsets.UTF_8).length : 0;
+    int delta = number.length() - 2 + (entry == null ? 0 : 1);
+    int base = entry == null ? emptyBytes : entry.bytes;
+    int candidateBytes = base + delta;
+    if (candidateBytes > MAX_BUFFERED_BYTES) {
+      // Rotate the full document before accepting the next value. A failed
+      // flush leaves the old chunk intact and does not accept the new value.
+      if (entry != null) emptyBytes = bufferedLine(new BufferedDouble(idxName, fieldName, idxValue))
+                                       .getBytes(StandardCharsets.UTF_8).length;
+      if (emptyBytes + number.length() - 2 > MAX_BUFFERED_BYTES)
+        throw new IllegalArgumentException("Single buffered document exceeds request byte limit");
+      flushBufferedDoubleArrays(10);
+      entry = null;
+      candidateBytes = emptyBytes + number.length() - 2;
+      }
+    int oldBytes = entry == null ? 0 : entry.bytes;
+    if (_bufferedDoubles.size() >= MAX_BUFFERED_DOCS && entry == null ||
+        _bufferedBytes - oldBytes + candidateBytes > MAX_BUFFERED_BYTES) {
+      flushBufferedDoubleArrays(10);
+      entry = null;
+      oldBytes = 0;
+      if (emptyBytes == 0) emptyBytes = bufferedLine(new BufferedDouble(idxName, fieldName, idxValue))
+                                         .getBytes(StandardCharsets.UTF_8).length;
+      candidateBytes = emptyBytes + number.length() - 2;
+      }
+    if (candidateBytes > MAX_BUFFERED_BYTES)
+      throw new IllegalArgumentException("Single buffered document exceeds request byte limit");
+    if (entry == null) entry = new BufferedDouble(idxName, fieldName, idxValue);
+    entry.values.add(fieldValue);
+    entry.bytes = candidateBytes;
+    _bufferedBytes += candidateBytes - oldBytes;
+    _bufferedDoubles.put(key, entry);
+    }
+
+  /** Flush queued updates through Elasticsearch _bulk. Only definite failed
+    * items are retried; unknown transport/response outcomes remain replayable.
+    * Existing array entries are checked by the Painless script before append. */
+  public synchronized void flushBufferedDoubleArrays(int attempts) throws LomikelException {
+    if (attempts <= 0) throw new IllegalArgumentException("Attempts must be positive");
+    for (int attempt = 0; attempt < attempts && !_bufferedDoubles.isEmpty(); attempt++) {
+      List<String> keys = new ArrayList<>(_bufferedDoubles.keySet());
+      StringBuilder body = new StringBuilder();
+      for (String key : keys) body.append(bufferedLine(_bufferedDoubles.get(key)));
+      String answer;
+      try {
+        answer = _httpClient.postNDJSON(_url + "/_bulk", body.toString(), _auth, null);
+        }
+      catch (LomikelException e) {
+        if (attempt + 1 == attempts) throw new LomikelException("Buffered bulk transport failed after retries", e);
+        continue;
+        }
+      // Validate the entire response before removing anything. On malformed or
+      // incomplete responses, replay is safe because the script is idempotent.
+      Set<String> succeeded = new LinkedHashSet<>();
+      try {
+        JSONObject response = new JSONObject(answer);
+        boolean errors = response.getBoolean("errors");
+        JSONArray items = response.getJSONArray("items");
+        if (items.length() != keys.size()) throw new IllegalArgumentException("Incomplete bulk items");
+        boolean failed = false;
+        for (int i = 0; i < items.length(); i++) {
+          BufferedDouble expected = _bufferedDoubles.get(keys.get(i));
+          JSONObject operation = items.getJSONObject(i);
+          if (operation.length() != 1) throw new IllegalArgumentException("Invalid bulk action");
+          JSONObject item = operation.getJSONObject("update");
+          if (!expected.id.equals(item.getString("_id")) ||
+              !expected.index.equals(item.getString("_index"))) throw new IllegalArgumentException("Mismatched bulk item");
+          Object statusValue = item.get("status");
+          if (!(statusValue instanceof Number) ||
+              ((Number) statusValue).doubleValue() != ((Number) statusValue).intValue())
+            throw new IllegalArgumentException("Invalid bulk status");
+          int status = ((Number) statusValue).intValue();
+          if (status >= 200 && status < 300 && !item.has("error")) {
+            String result = item.getString("result");
+            if (!result.equals("updated") && !result.equals("created") && !result.equals("noop"))
+              throw new IllegalArgumentException("Invalid bulk update result");
+            succeeded.add(keys.get(i));
+            }
+          else failed = true;
+          }
+        if (errors != failed) throw new IllegalArgumentException("Inconsistent bulk errors flag");
+        }
+      catch (RuntimeException e) {
+        throw new LomikelException("Invalid buffered bulk response; all items retained", e);
+        }
+      for (String key : succeeded) _bufferedBytes -= _bufferedDoubles.remove(key).bytes;
+      }
+    if (!_bufferedDoubles.isEmpty()) throw new LomikelException("Buffered double bulk failed after " + attempts +
+                                                        " attempts; pending documents=" + _bufferedDoubles.size());
+    }
+
+
+  private String bufferedLine(BufferedDouble entry) {
+    JSONObject metadata = new JSONObject().put("update", new JSONObject().put("_index", entry.index)
+                                                                  .put("_id", entry.id));
+    JSONObject script = new JSONObject().put("lang", "painless")
+        .put("source", "def a = ctx._source[params.field]; if (a == null) { a = new ArrayList(); ctx._source[params.field] = a; } boolean changed = false; for (def raw : params.values) { double v = (double) raw; if (!a.contains(v)) { a.add(v); changed = true; } } if (!changed) { ctx.op = 'noop'; }")
+        .put("params", new JSONObject().put("field", entry.field).put("values", new JSONArray(entry.values)));
+    JSONObject update = new JSONObject().put("scripted_upsert", true).put("script", script)
+                                       .put("upsert", new JSONObject());
+    return metadata.toString() + "\n" + update.toString() + "\n";
+    }
+
+  private static final int MAX_BUFFERED_DOCS = 256;
+  private static final int MAX_BUFFERED_BYTES = 65536;
+  private int _bufferedBytes;
+  private final Map<String, BufferedDouble> _bufferedDoubles = new LinkedHashMap<>();
+  private static class BufferedDouble {
+    final String index, field, id;
+    int bytes;
+    final LinkedHashSet<Double> values = new LinkedHashSet<>();
+    BufferedDouble(String index, String field, String id) {
+      this.index = index; this.field = field; this.id = id;
+      }
+
+    }
   
   /** Update values in double array index.
     * It is automatically commited.

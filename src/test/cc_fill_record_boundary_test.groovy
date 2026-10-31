@@ -22,6 +22,10 @@ class RecordingESClient extends ESClient {
                                              double mjd, int retries) {
     writes.add([index, field, id, mjd, retries])
   }
+  @Override void bufferDoubleArray(String index, String field, String id, double mjd) {
+    writes.add([index, field, id, mjd])
+  }
+  @Override void flushBufferedDoubleArrays(int retries) { /* no network */ }
   @Override void commitWithRetry(int retries) { /* no network */ }
 }
 
@@ -63,7 +67,8 @@ def rows = [
   [kind: 'none', id: null, ra: 999d, dec: 999d, mjd: 999d],
   [kind: 'dia', id: 'dia-two', ra: 78.25d, dec: 9.5d, mjd: 60004.75d]
 ]
-java.nio.file.Path temp = java.nio.file.Files.createTempDirectory('cc-fill-record-')
+java.nio.file.Path temp = java.nio.file.Files.createTempDirectory(
+    java.nio.file.Paths.get(System.getenv('TMPDIR')), 'cc-fill-record-')
 try {
   Path file = new Path(temp.resolve('rows.parquet').toUri())
   try (ParquetWriter<Group> writer = ExampleParquetWriter.builder(file).withType(schema).build()) {
@@ -86,9 +91,9 @@ try {
       ['dia_radec', 'location', 'dia-two', 78.25d, 9.5d]
     ],
     'fillES-mjd.groovy': [
-      ['dia_mjd', 'mjd', 'dia-one', 60001.25d, 10],
-      ['ss_mjd', 'mjd', 'ss-one', 60002.5d, 10],
-      ['dia_mjd', 'mjd', 'dia-two', 60004.75d, 10]
+      ['dia_mjd', 'mjd', 'dia-one', 60001.25d],
+      ['ss_mjd', 'mjd', 'ss-one', 60002.5d],
+      ['dia_mjd', 'mjd', 'dia-two', 60004.75d]
     ]
   ].each { name, expected ->
     // PR is defined in both scripts: isolate binary names in independent loaders.
@@ -99,6 +104,7 @@ try {
     esclient.accessible = true
     esclient.set(reader, recorder)
     reader.processFile(file)
+    reader.cleanup()
     assert recorder.writes == expected : "${name}: ${recorder.writes} != ${expected}"
     assert reader.props().isEmpty() : "${name}: properties retained after final row"
     println "${name} PASS: ${recorder.writes.size()} record-boundary writes"
