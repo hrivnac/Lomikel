@@ -66,14 +66,14 @@ try {
                                                        k.split("_")[0],
                                                        Double.valueOf(v.get("i:ra")),
                                                        Double.valueOf(v.get("i:dec")));
-                                  esclient.updateDoubleArrayWithRetry("mjd", 
-                                                                      "mjd",
-                                                                      k.split("_")[0],
-                                                                      Double.valueOf(v.get("i:jd")),
-                                                                      10);
+                                  esclient.bufferDoubleArray("mjd",
+                                                             "mjd",
+                                                             k.split("_")[0],
+                                                             Double.valueOf(v.get("i:jd")));
                            }                                                     
       if (timer.report()) {
         esclient.commitWithRetry(10);
+        esclient.flushBufferedDoubleArrays(10);
         }
       }
     else {
@@ -90,6 +90,7 @@ finally {
   }
 
 esclient.commitWithRetry(10);
+esclient.flushBufferedDoubleArrays(10);
 
 String psizes = sizes();
 log.info("Original sizes: " + osizes);
