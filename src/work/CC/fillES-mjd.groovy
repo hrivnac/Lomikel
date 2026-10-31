@@ -104,25 +104,7 @@ public class PR extends ParquetReader {
 reader = new PR("hdfs://ccmaster1:8020");
 osizes = reader.sizes();
 if (delay == 0) {
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=13", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=14", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=15", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=16", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=17", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=18", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=19", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=20", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=21", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=22", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=23", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=24", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=25", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=26", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=27", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=28", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=29", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=30", "parquet");
-  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=06/day=31", "parquet");
+  reader.processOptionalDirStrict("/user/fink/archive/science/year=2026/month=07", "parquet");
   }
 else {
   aday = LocalDate.now()
