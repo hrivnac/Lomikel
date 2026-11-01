@@ -103,5 +103,5 @@ for(const script of ['GraphView.js','GraphViewNew.js']) run(script);
 for(const script of ['GraphView.js','GraphViewNew.js']) exerciseActualTransport(script);
 for(const [page,script] of [['GraphView.jsp','GraphView.js'],['GraphViewNew.jsp','GraphViewNew.js']])
   assert.match(fs.readFileSync(path.join(root,page),'utf8'),
-    new RegExp(script.replace('.', '\\.')+'\\?v=mixed-context-1'));
+    new RegExp(script.replace('.', '\\.')+'\\?v=reciprocal-overlaps-1'));
 console.log('GraphView variants route all-edge requests only within their originating servers');

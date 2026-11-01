@@ -308,6 +308,19 @@ function parseValues(graphson) {
   }
 
 // Construct VIS graph
+function hideReciprocalOverlap(edge) {
+  if (edge.label !== 'overlaps' || edge.inVid === edge.outVid) return false;
+  // A returned relation may appear again through both inE() and outE().
+  if (edges.some(function (shown) { return shown.reciprocalId === edge.id; })) return true;
+  var opposite = edges.find(function (shown) {
+    return shown.overlapLabel === 'overlaps' && shown.from === edge.inVid &&
+      shown.to === edge.outVid && shown.reciprocalId == null;
+    });
+  if (!opposite) return false;
+  opposite.reciprocalId = edge.id;
+  return true;
+  }
+
 function show(graph) {
   var target;
   var l;
@@ -411,13 +424,13 @@ function show(graph) {
         if (filter && (!findObjectByKey(nodes, 'id', inVid) ||
                        !findObjectByKey(nodes, 'id', outVid))) continue;
         // Parallel relations may share endpoints; only a repeated relation ID is a duplicate.
-        if (!findObjectByKey(edges, 'id', id)) {
+        if (!findObjectByKey(edges, 'id', id) && !hideReciprocalOverlap(graph[i])) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {
             color = 'grey';
-            edges.push({id:id, from:outVid, to:inVid, value:value, color:{color:color, highlight:color, hover:color, inherit:false}, arrows:arrows, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), actions:actions});
+            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, color:{color:color, highlight:color, hover:color, inherit:false}, arrows:arrows, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), actions:actions});
             }
           else {
-            edges.push({id:id, from:outVid, to:inVid, value:value, arrows:arrows, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), actions:actions});
+            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, arrows:arrows, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), actions:actions});
             }
           }
         }

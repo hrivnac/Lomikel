@@ -40,7 +40,7 @@
 <script type="text/javascript" src="StylesheetDefault.js"></script>
 <script type="text/javascript" src="Stylesheet.js"></script>
 <script type="text/javascript" src="SurveyStylesheet.js?v=survey-colors-2"></script>
-<script type="text/javascript" src="GraphViewNew.js?v=mixed-context-1"></script>
+<script type="text/javascript" src="GraphViewNew.js?v=reciprocal-overlaps-1"></script>
 <script type="text/javascript" src="skyview-graph.js?v=longss-history-1"></script>
 <script type="text/javascript" src="lightcurve-graph.js?v=query-activity-1"></script>
 <script type="text/javascript" src="graph-table-origin.js?v=mixed-context-1"></script>
