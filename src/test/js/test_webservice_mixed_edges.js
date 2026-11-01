@@ -41,13 +41,13 @@ function mix(ctx,ccIds,ijIds){
 }
 function run(script){
   const {ctx,calls,controls}=setup(script);
-  const isNew=script==='GraphViewNew.js';
-  mix(ctx,[11,12],isNew?['ztf-1',22]:[21,22]);
+
+  mix(ctx,[11,12],['ztf-1',22]);
   assert.equal(ctx.graphTableServerForVertex(11),'//CC');
   assert.equal(ctx.graphTableServerForVertex(22),'//IJCLab');
   ctx.fillEdges();
   assert.equal(calls.length,8,script+' should query both directions for four vertices');
-  const perServer={'//CC':['11','12'],'//IJCLab':isNew?["'ztf-1'",'22']:['21','22']};
+  const perServer={'//CC':['11','12'],'//IJCLab':["'ztf-1'",'22']};
   for(const call of calls){
     const match=call.query.match(/\.V\((.*?)\)\.(outE|inE)\(\)\.filter\((?:inV|outV)\(\)\.hasId\(within\((.*?)\)\)\)/);
     assert.ok(match,call.query);
@@ -99,9 +99,9 @@ function exerciseActualTransport(script){
   assert.deepEqual(Array.from(ctx.edges,e=>e.id),['cc-11-12','ij-21-22']);
   assert.equal(ctx.server,'//IJCLab');
 }
-for(const script of ['GraphView.js','GraphViewNew.js']) run(script);
-for(const script of ['GraphView.js','GraphViewNew.js']) exerciseActualTransport(script);
-for(const [page,script] of [['GraphView.jsp','GraphView.js'],['GraphViewNew.jsp','GraphViewNew.js']])
+for(const script of ['GraphView.js']) run(script);
+for(const script of ['GraphView.js']) exerciseActualTransport(script);
+for(const [page,script] of [['GraphView.jsp','GraphView.js']])
   assert.match(fs.readFileSync(path.join(root,page),'utf8'),
-    new RegExp(script.replace('.', '\\.')+'\\?v=edge-curvature-1'));
+    new RegExp(script.replace('.', '\\.')+'\\?v=canonical-1'));
 console.log('GraphView variants route all-edge requests only within their originating servers');

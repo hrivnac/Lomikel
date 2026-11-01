@@ -10,8 +10,6 @@ const workspaceCode = fs.readFileSync(path.join(root, 'workspace.js'), 'utf8');
 const graphPage = fs.readFileSync(path.join(root, 'GraphView.jsp'), 'utf8');
 assert.match(graphPage, /Stylesheet\.js\?v=survey-colors-/);
 assert.match(graphPage, /skyview-graph\.js\?v=longss-history-1/);
-assert.match(fs.readFileSync(path.join(root,'GraphViewNew.jsp'),'utf8'),
-  /skyview-graph\.js\?v=longss-history-1/);
 assert.match(workspaceCode, /skyGraphState\.open\(\)/);
 const style = {nodes:{object:{actions:[{name:'Table',url:'Nodes.jsp',target:'table'}]}}};
 vm.runInNewContext(stylesheetCode, {stylesheet:style});

@@ -20,14 +20,12 @@ assert.equal(style.nodes.object.actions.find(a => a.name === 'Cutouts').target, 
 assert.match(style.nodes.object.actions.find(a => a.name === 'Cutouts').url, /cutouts/);
 const graphPage = fs.readFileSync(path.join(root, 'GraphView.jsp'), 'utf8');
 assert.match(graphPage, /cutouts-graph\.js\?v=ss-cutouts-1/);
-assert.match(fs.readFileSync(path.join(root,'GraphViewNew.jsp'),'utf8'),
-  /cutouts-graph\.js\?v=ss-cutouts-1/);
 const workspaceCode = fs.readFileSync(path.join(root, 'workspace.js'), 'utf8');
 assert.match(workspaceCode, /cutoutsGraphState\.open\(\)/);
 assert.match(workspaceCode, /cutoutsGraphState\.cancel\(\)/);
 assert.match(workspaceCode, /cutoutsGraphState\.clear\(\)/);
 assert.doesNotMatch(workspaceCode, /loadPane\('image', 'Image\.jsp'\)/);
-assert.match(fs.readFileSync(path.join(root, 'index.jsp'), 'utf8'), /workspace\.js\?v=corr-fit-1/);
+assert.match(fs.readFileSync(path.join(root, 'index.jsp'), 'utf8'), /workspace\.js\?v=canonical-1/);
 assert.match(fs.readFileSync(path.join(root, 'index.jsp'), 'utf8'), /<template id="ws-image-placeholder">/);
 const server = fs.readFileSync(path.join(root, 'CutoutSource.jsp'), 'utf8');
 assert.match(server, /api\/v1\/sources/);

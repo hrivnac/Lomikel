@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '../../webservice');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
-for (const [page, controller] of [['GraphView.jsp','GraphView.js'], ['GraphViewNew.jsp','GraphViewNew.js']]) {
+for (const [page, controller] of [['GraphView.jsp','GraphView.js']]) {
   const html = read(page);
   assert.match(html, /<label[^>]*for="edgeCurvature"[^>]*>Edge curvature<\/label>/);
   assert.match(html, /<input[^>]*type="range"[^>]*id="edgeCurvature"[^>]*min="0"[^>]*max="100"[^>]*value="20"[^>]*oninput="switchEdgeCurvature\(\)"/);

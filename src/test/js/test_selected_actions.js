@@ -36,15 +36,12 @@ function testInternalActionsDoNotNavigateToBase() {
   ]};
   ctx.show([{type:'vertex', id:7, label:'example', element:[]},
     {type:'edge', id:'e7', label:'overlaps', element:[], inVid:7, outVid:7}]);
-  for (const action of ctx.nodes[0].actions.matchAll(/<a\b[^>]+>/g)) {
-    assert.match(action[0], /return false/, 'Show and Table must cancel the # default navigation');
-  }
-  for (const action of ctx.edges[0].actions.matchAll(/<a\b[^>]+>/g)) {
-    assert.match(action[0], /return false/, 'Edge Show, Table and Venn must not leave the workspace');
-  }
-  assert.match(ctx.nodes[0].actions, /loadPane\("result", "Node.jsp\?id=7"\)/);
-  assert.match(ctx.nodes[0].actions, /loadPane\("table", "Nodes.jsp\?id=7"\)/);
-  assert.match(ctx.edges[0].actions, /loadPane\("plot", "Venn.jsp\?id=e7"\)/);
+  assert.deepEqual(Array.from(ctx.nodes[0].actions, a => [a.name, a.target, a.url]),
+    [['Show','result','Node.jsp?id=7'], ['Table','table','Nodes.jsp?id=7']]);
+  assert.deepEqual(Array.from(ctx.edges[0].actions, a => [a.name, a.target, a.url]),
+    [['Show','result','Edge.jsp?id=e7'], ['Table','table','Edges.jsp?id=e7'],
+     ['Venn','plot','Venn.jsp?id=e7']]);
+  assert.equal(typeof ctx.nodes[0].actions, 'object', 'actions are data, not HTML handlers');
 }
 
 function testPortalUsesObjectSurvey() {

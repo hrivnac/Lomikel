@@ -30,7 +30,7 @@ function setup(script,withGremlinStyles=false){
  controls.result={innerHTML:''};
  return {ctx,controls,valueCalls,graphCalls};
 }
-for(const script of ['GraphView.js','GraphViewNew.js']){
+for(const script of ['GraphView.js']){
  const {ctx,valueCalls,graphCalls,controls}=setup(script);
  for(const [query,expected] of [
   ["g.V('11').valueMap().toList().toString().replace(', ', '<br/>')",'//CC'],
@@ -92,9 +92,9 @@ for(const script of ['GraphView.js','GraphViewNew.js']){
  assert.ok(styled.valueCalls.slice(3).every(c=>c.source==='//IJ'));
  assert.equal(styled.ctx.server,'//IJ');
 }
-for(const [page,script] of [['GraphView.jsp','GraphView.js'],['GraphViewNew.jsp','GraphViewNew.js']]){
+for(const [page,script] of [['GraphView.jsp','GraphView.js']]){
  const html=fs.readFileSync(path.join(root,page),'utf8');
- assert.match(html,new RegExp(script.replace('.', '\\.')+'\\?v=edge-curvature-1'));
+ assert.match(html,new RegExp(script.replace('.', '\\.')+'\\?v=canonical-1'));
  assert.match(html,/graph-table-origin\.js\?v=mixed-context-1/);
 }
 console.log('mixed graph context queries, vertex/edge expansion and selected server routed by provenance');

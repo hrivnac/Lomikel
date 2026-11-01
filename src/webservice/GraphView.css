@@ -10,7 +10,7 @@ body.workspace .ws-graph-curvature input { flex:1; min-width:0; }
 body.workspace .ws-graph-curvature output { min-width:3em; text-align:right; }
 body.workspace #edgeCurvatureHint { display:block; font-size:11px; }
 
-input.button-remove {
+button.button-remove {
   background-image: url(images/Remove.png);
   background-color: transparent; /* make the button transparent */
   background-repeat: no-repeat;  /* make the background image appear only once */
@@ -21,8 +21,8 @@ input.button-remove {
   padding-left: 32px;     /* make text start to the right of the image */
   vertical-align: middle; /* align the text vertically centered */
   }
-  
-input.button-describe {
+
+button.button-describe {
   background-image: url(images/Describe.png);
   background-color: transparent; /* make the button transparent */
   background-repeat: no-repeat;  /* make the background image appear only once */
@@ -33,7 +33,7 @@ input.button-describe {
   padding-left: 32px;     /* make text start to the right of the image */
   vertical-align: middle; /* align the text vertically centered */
   }
-  
+
 input.button-aux {
   background-color: transparent; /* make the button transparent */
   background-repeat: no-repeat;  /* make the background image appear only once */

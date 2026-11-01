@@ -26,6 +26,101 @@ if (curvatureControl && options4Graph.edges && options4Graph.edges.smooth) {
   var curvatureValue = document.getElementById('edgeCurvatureValue');
   if (curvatureValue) curvatureValue.textContent = curvaturePercent + '%';
   }
+// Support the known stylesheet expressions explicitly: neither graph values
+// nor stylesheet expressions become executable source in this controller.
+function graphText(value) { return value == null ? '' : String(value); }
+// GraphSON IDs may be numeric or restricted string IDs. Never interpolate
+// arbitrary graph data into Gremlin source.
+function validGraphId(id, edge) {
+  if (edge) return typeof id === 'string' && /^[A-Za-z0-9_-]+$/.test(id);
+  return (typeof id === 'number' && Number.isSafeInteger(id)) ||
+    (typeof id === 'string' && /^[A-Za-z0-9_-]+$/.test(id));
+}
+function graphVertexLiteral(id) {
+  if (!validGraphId(id, false)) return null;
+  return typeof id === 'number' ? String(id) : "'" + id + "'";
+}
+function graphStyleExpression(expression, title, eMap) {
+  switch (expression) {
+    case "title.replace('site:', '') + '.png'":
+      return graphText(title).replace('site:', '') + '.png';
+    case 'title.replace("site:", "")':
+      return graphText(title).replace('site:', '');
+    case "finkSurveyStarImage(eMap.get('objectId'))":
+      return typeof finkSurveyStarImage === 'function' ? finkSurveyStarImage(eMap.get('objectId')) : '';
+    case "finkPortalUrl(eMap.get('objectId'))":
+      return typeof finkPortalUrl === 'function' ? finkPortalUrl(eMap.get('objectId')) : '';
+    default:
+      return '';
+  }
+}
+function escapeGraphHtml(value) {
+  return graphText(value).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function safeGraphAction(action, url) {
+  url = graphText(url).trim();
+  if (!url || /[\u0000-\u001f\u007f]/.test(url)) return null;
+  var external = action.target === 'external';
+  if (external) {
+    if (!/^https?:\/\//i.test(url)) return null;
+  } else {
+    if (!['result','table','plot','image','skyview','graph'].includes(action.target) ||
+        !((action.target === 'plot' && url === 'lightcurve') ||
+          (action.target === 'image' && url === 'cutouts') ||
+          /^(?!\/|\\|#|\?)[A-Za-z][\w./-]*\.jsp(?:\?[^#]*)?$/.test(url)) ||
+        url.split('?')[0].split('/').includes('..')) return null;
+  }
+  return {name:graphText(action.name), url:url, target:action.target};
+}
+function graphActions(styleActions, id, eMap, pMap, isEdge, title) {
+  if (!Array.isArray(styleActions)) return [];
+  return styleActions.map(function (action) {
+    if (!action || !action.url) return null;
+    return safeGraphAction(action, stylesheetValue(action.url, id, eMap, pMap, isEdge, title));
+  }).filter(Boolean);
+}
+function showGraphCommands(item, edge) {
+  var pane = document.getElementById('commands');
+  if (!pane || !item) return;
+  pane.replaceChildren();
+  var heading = document.createElement('b');
+  heading.textContent = graphText(item.heading);
+  pane.appendChild(heading);
+  var help = document.createElement('button');
+  help.textContent = '?';
+  help.addEventListener('click', function () { w2popup.load({url:'Help-Top.html',showMax:true}); });
+  pane.appendChild(help);
+  ['describe','remove'].forEach(function (verb) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.title = verb;
+    button.className = 'button-' + verb;
+    button.addEventListener('click', function () {
+      (edge ? (verb === 'describe' ? describeEdge : removeEdge) :
+        (verb === 'describe' ? describeNode : removeNode))(item.id);
+    });
+    pane.appendChild(button);
+  });
+  pane.appendChild(document.createElement('hr'));
+  (item.actions || []).forEach(function (action, index) {
+    if (index) pane.appendChild(document.createTextNode(', '));
+    var link = document.createElement('a');
+    link.textContent = action.name;
+    if (action.target === 'external') {
+      link.href = action.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    } else {
+      link.href = '#';
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+        loadPane(action.target, action.url);
+      });
+    }
+    pane.appendChild(link);
+  });
+}
 
 // Release vis physics/listeners before the workspace replaces its graph pane.
 function disposeGraphView() {
@@ -69,13 +164,13 @@ async function bootstrap(button, level = 0) {
                    token);
   showTab('graph');
   }
-  
+
 // Gremlin call
 function gcall(command, level = 0) {
   document.getElementById('bootstrap_command').value = command;
   bootstrap('text', level);
   }
- 
+
 // Append graph activity as text, not executable markup from commands or results.
 function feedbackLine(message) {
   if (typeof window.activityLogMessage === 'function') {
@@ -134,8 +229,8 @@ async function callGremlinGraph(request, newServer, level = 0, token = graphView
   http.open("GET", server + (server.includes("?") ? '&' : '?') + 'gremlin=' + encodeURIComponent(request), false);
   try { http.send(); }
   catch (error) { feedbackLine('Graph request failed: ' + error.message); }
-  }  
-  
+  }
+
 // Send request to Gremlin server giving JSON values
 // TBD: use POST
 // TBD: check rc
@@ -160,7 +255,7 @@ function callGremlinValues(request, newServer) {
     return '';
     }
   }
-  
+
 // Parse Graphson graph
 function parseGraph(graphson) {
   var g = JSON.parse(graphson).result.data['@value'];
@@ -215,12 +310,12 @@ function parseGraph(graphson) {
     }
   return graph;
   }
-  
+
 // Parse Graphson values
 function parseValues(graphson) {
   return JSON.parse(graphson).result.data['@value'];
   }
-   
+
 // Construct VIS graph
 function hideReciprocalOverlap(edge) {
   if (edge.label !== 'overlaps' || edge.inVid === edge.outVid) return false;
@@ -262,6 +357,10 @@ function show(graph) {
   var c;
   var o;
   var u;
+  // With a label filter, resolve all visible vertices before deciding whether
+  // each edge has two displayed endpoints; preserve source order otherwise.
+  if (graph != null && filter) graph = graph.filter(function (item) { return item.type === 'vertex'; })
+    .concat(graph.filter(function (item) { return item.type !== 'vertex'; }));
   // loop over all elements (just redraw if no elements)
   if (graph != null) {
     for (var i = 0; i < graph.length; i++) {
@@ -290,39 +389,26 @@ function show(graph) {
         if (Array.isArray(group)) { // TBD: ugly
           group = group[0];
           }
-        groups.push(group);
+
         value        = stylesheetValue(stylesheetNode.graphics.value,        id, eMap, pMap, false, title);
         shape        = stylesheetValue(stylesheetNode.graphics.shape,        id, eMap, pMap, false, title);
         borderDashes = stylesheetValue(stylesheetNode.graphics.borderDashes, id, eMap, pMap, false, title);
         borderWidth  = stylesheetValue(stylesheetNode.graphics.borderWidth,  id, eMap, pMap, false, title);
         borderWidth  = parseInt(borderWidth);
         if (shape === 'image') {
-          image        = stylesheetValue(stylesheetNode.graphics.image, id, eMap, pMap, false, title);
-          image = (image === '') ? '' : 'images/' + image;
+          image = stylesheetValue(stylesheetNode.graphics.image, id, eMap, pMap, false, title);
+          // Accept a plain PNG basename only; graph-supplied site names must not
+          // turn an image request into a traversal or authenticated JSP GET.
+          image = typeof image === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]*\.png$/.test(image) ?
+            'images/' + image : '';
           }
         else if (shape === 'box') {
           borderRadius = stylesheetValue(stylesheetNode.graphics.borderRadius, id, eMap, pMap, false, title);
           borderRadius = parseInt(borderRadius);
           }
-        actionsArray = stylesheetValue(stylesheetNode.actions, id, eMap, pMap, false, title);
-        actions = "";
-        for (var k = 0; k < actionsArray.length; k++) {
-          if (actionsArray[k].url) {
-            url = stylesheetValue(actionsArray[k].url, id, eMap, pMap, false, title);
-            if (url) {
-              url = encodeURI(url);
-              if (actionsArray[k].target == "external") {
-                actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "<sup><small>&#8599;</small></sup></a>";
-                }
-              else {
-                actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\"); return false;'>" + actionsArray[k].name + "</a>";
-                }
-              actions += " - ";
-              }
-            }
-          }
+        actions = graphActions(stylesheetNode.actions, id, eMap, pMap, false, title);
         if ((filter === '' || label.includes(filter)) && !findObjectByKey(nodes, 'id', id)) {
-          nodes.push({id:id, value:value, label:label, title:(title + "<br/>" + subtitle), group:group, actions:actions, shape:shape, image:image, shapeProperties:{borderRadius:borderRadius, borderDashes:borderDashes}, borderWidth:borderWidth, color:color});
+          nodes.push({id:id, value:value, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), group:graphText(group), actions:actions, shape:shape, image:image, shapeProperties:{borderRadius:borderRadius, borderDashes:borderDashes}, borderWidth:borderWidth, color:color});
           }
         //groups.push(group);
         }
@@ -341,29 +427,19 @@ function show(graph) {
         group        = stylesheetValue(stylesheetEdge.graphics.group,        id, eMap, pMap, true, title);
         arrows       = stylesheetValue(stylesheetEdge.graphics.arrows,       id, eMap, pMap, true, title);
         value        = stylesheetValue(stylesheetEdge.graphics.value,        id, eMap, pMap, true, title);
-        actionsArray = stylesheetValue(stylesheetEdge.actions,               id, eMap, pMap, true, title);
-        actions = "";
-        for (var k = 0; k < actionsArray.length; k++) {
-          url = stylesheetValue(actionsArray[k].url, id, eMap, pMap, true, title);
-          if (url) {
-            url = encodeURI(url);
-            if (actionsArray[k].target == "external") {
-              actions += "<a href='" + url + "' target='_blank'>" + actionsArray[k].name + "<sup><small>&#8599;</small></sup></a>";
-              }
-            else {
-              actions += "<a href='#' onclick='loadPane(\"" + actionsArray[k].target + "\", \"" + url + "\"); return false;'>" + actionsArray[k].name + "</a>";
-              }
-            actions += " - ";
-            }
-          }
+        actions = graphActions(stylesheetEdge.actions, id, eMap, pMap, true, title);
+        // A label filter can hide a neighboring vertex. Do not retain an edge
+        // whose endpoint is absent from the displayed graph.
+        if (filter && (!findObjectByKey(nodes, 'id', inVid) ||
+                       !findObjectByKey(nodes, 'id', outVid))) continue;
         // Parallel relations may share endpoints; only a repeated relation ID is a duplicate.
         if (!findObjectByKey(edges, 'id', id) && !hideReciprocalOverlap(graph[i])) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {
             color = 'grey';
-            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, color:{color:color, highlight:color, hover:color, inherit:false}, arrows:arrows, label:label, title:(title + "<br/>" + subtitle), actions:actions});
+            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, color:{color:color, highlight:color, hover:color, inherit:false}, arrows:arrows, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), actions:actions});
             }
           else {
-            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, arrows:arrows, label:label, title:(title + "<br/>" + subtitle), actions:actions});
+            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, arrows:arrows, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), actions:actions});
             }
           }
         }
@@ -408,21 +484,13 @@ function show(graph) {
         }
       else {
         selectedNode = findObjectByKey(nodes, 'id', params.nodes[0]);
-        title = selectedNode.title.split("<br/>")[0];
-        document.getElementById("commands").innerHTML = "<b><u>" + title + "</u></b>" + helpButton
-                                                                 + "&nbsp;<input type='button' onclick='describeNode(" + selectedNode.id + ")'  title='describe' class='button-describe'>"
-                                                                 + "&nbsp;<input type='button' onclick='removeNode("   + selectedNode.id + ")'  title='remove'   class='button-remove'><hr/>"
-                                                                 + selectedNode.actions;
+        showGraphCommands(selectedNode, false);
         }
       }
     else if (params.edges.length == 1) {
       selectedEdge = findObjectByKey(edges, 'id', params.edges[0]);
       if (selectedEdge) { // TBD: should test on cluster
-        title = selectedEdge.title.split("<br/>")[0];
-        document.getElementById("commands").innerHTML = "<b><u>" + title + "</u></b>" + helpButton
-                                                                 + "&nbsp;<input type='button' onclick='describeEdge(\"" + selectedEdge.id + "\")' title='describe' class='button-describe'>"
-                                                                 + "&nbsp;<input type='button' onclick='removeEdge(\""   + selectedEdge.id + "\")' title='remove'   class='button-remove'><hr/>"
-                                                                 + selectedEdge.actions;
+        showGraphCommands(selectedEdge, true);
         }
       }
     });
@@ -441,7 +509,7 @@ function show(graph) {
       }
     });
   }
-  
+
 // Expand each discovered vertex once per request, without chasing a growing array.
 function expandNodes(level = 1) {
   var visited = new Set();
@@ -470,7 +538,7 @@ function expandEdge(id) {
   if (!edgeSource) {
     feedbackLine('Cannot expand an edge with unknown graph origin.');
     return;
-    }
+  }
   if (document.getElementById('removeOld').checked) {
     var endpoints = new Set([edge.from, edge.to]);
     for (var i = nodes.length - 1; i >= 0; i--) {
@@ -486,22 +554,21 @@ function expandEdge(id) {
 
 // Expand one more level
 function expand(id, preserveExisting = false, edgeSource = null) {
-  var literal = typeof id === 'number' && Number.isSafeInteger(id) ? String(id) :
-    (typeof id === 'string' && /^[A-Za-z0-9_-]+$/.test(id) ? "'" + id + "'" : null);
+  var literal = graphVertexLiteral(id);
   if (literal === null) {
     feedbackLine('Cannot expand a vertex with an unsupported ID.');
     return;
-    }
+  }
   var owner = typeof window.graphTableServerForVertex === 'function' ? window.graphTableServerForVertex(id) : server;
   if (owner && edgeSource && owner !== edgeSource) {
     feedbackLine('Cannot expand an edge with endpoints from different graph servers.');
     return;
-    }
+  }
   var source = owner || edgeSource;
   if (!source) {
     feedbackLine('Cannot expand a vertex with unknown graph origin.');
     return;
-    }
+  }
   if (!document.getElementById('expandTo').checked && !document.getElementById('expandFrom').checked) {
     feedbackLine('Select Children or Parents in Graph tools before expanding.');
     return;
@@ -530,24 +597,41 @@ function expand(id, preserveExisting = false, edgeSource = null) {
     }
   finally { server = selectedServer; }
   }
-      
+
+// Only GraphSON map structure creates description rows; graph strings remain text.
+function graphDescriptionRows(values) {
+  if (!Array.isArray(values) || !values.length || !values[0] ||
+      values[0]['@type'] !== 'g:Map' || !Array.isArray(values[0]['@value'])) return null;
+  function plain(value) {
+    if (Array.isArray(value)) return value.map(plain).join(', ');
+    if (value && typeof value === 'object' && '@value' in value) return plain(value['@value']);
+    return graphText(value);
+  }
+  var entries = values[0]['@value'];
+  var rows = [];
+  for (var i = 0; i + 1 < entries.length; i += 2) {
+    rows.push(plain(entries[i]) + ': ' + plain(entries[i + 1]));
+  }
+  return rows;
+}
+
 // Describe selected node
 function describeNode(id) {
+  var literal = graphVertexLiteral(id);
+  if (literal === null) return;
   var node = findObjectByKey(nodes, 'id', id);
-  //popup(node.title, callGremlinValues("v=" + gr + ".V('" + id + "').next();com.Lomikel.Januser.Wertex.enhance(v).properties().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '').replace('[', '')") + 
-  popup(node.title, callGremlinValues(gr + ".V('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('vp[', '').replace('[', '')") + 
-            "<hr/>" +
-            JSON.stringify(node));
+  if (!node) return;
+  popup(node.title, callGremlinValues(gr + '.V(' + literal + ').valueMap()'), JSON.stringify(node));
   }
-    
+
 // Describe selected edge
 function describeEdge(id) {
+  if (!validGraphId(id, true)) return;
   var edge = findObjectByKey(edges, 'id', id);
-  popup(edge.title, callGremlinValues(gr + ".E('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") +
-            "<hr/>" +
-            JSON.stringify(edge));
+  if (!edge) return;
+  popup(edge.title, callGremlinValues(gr + ".E('" + id + "').valueMap()"), JSON.stringify(edge));
   }
-    
+
 // Remove selected node
 function removeNode(id, type) {
   removeObjectByKey(nodes, 'id', id);
@@ -556,15 +640,16 @@ function removeNode(id, type) {
     }
   show(null, null);
   }
-  
+
 // Remove selected edge
 function removeEdge(id) {
   removeObjectByKey(edges, 'id', id);
   show(null, null);
   }
-    
+
 // Apply Filter
 function applyFilter() {
+  if (!network || !document.getElementById('filter')) return;
   var filter = document.getElementById('filter').value.trim();
   if (filter) {
     filterObjectByKey(nodes, 'label', filter);
@@ -575,17 +660,19 @@ function applyFilter() {
     show(null, null);
     }
   }
-  
+
 // Cluser by Groups
 function clusterByGroups(resetData = true) {
+  if (!network) return;
   if (resetData) network.setData(data);
-  var uniqueGroups = new Set(groups);
+  var uniqueGroups = new Set(nodes.map(function (node) { return node.group; }));
   uniqueGroups.forEach(function (group) { clusterGroup(group); });
   }
-    
+
 // Cluser Group
 function clusterGroup(group) {
-  if (group.trim() != '') {
+  if (!network) return;
+  if (typeof group === 'string' && group.trim() != '') {
     clusterOptionsByData = {
       joinCondition: function(childOptions) {
         return childOptions.group == group;
@@ -601,7 +688,7 @@ function clusterGroup(group) {
         clusterOptions.title = 'contains ' + childNodes.length;
         return clusterOptions;
         },
-      clusterNodeProperties: {id:('cluster:' + group), type:'cluster', borderWidth:3, shape:'star', label:('cluster:' + group), title:('cluster:' + group)}
+      clusterNodeProperties: {id:('cluster:' + group), type:'cluster', borderWidth:3, shape:'star', label:('cluster:' + group), title:escapeGraphHtml('cluster:' + group)}
       };
     network.cluster(clusterOptionsByData);
     }
@@ -609,6 +696,7 @@ function clusterGroup(group) {
 
 // Cluste by Hubs
 function clusterByHubsize() {
+  if (!network) return;
   network.setData(data);
   var clusterOptionsByData = {
     processProperties: function(clusterOptions, childNodes) {
@@ -616,12 +704,13 @@ function clusterByHubsize() {
       return clusterOptions;
       },
     clusterNodeProperties: {borderWidth:3, shape:'box', color:'grey', font:{size:30}}
-    };        
+    };
   network.clusterByHubsize(undefined, clusterOptionsByData);
   }
 
 // Expand clusters
 function clusterExpand() {
+  if (!network) return;
   network.setData(data);
   var clusterOptionsByData = {
     joinCondition:function(childOptions) {
@@ -640,11 +729,12 @@ function fillEdges() {
   var snapshot = nodes.slice();
   var visibleIds = new Map();
   var entries = [];
+  // All endpoints of one relation must belong to the same source graph.
+  // Resolve every origin before issuing any request, so an unknown ID cannot
+  // silently be looked up on the last selected server in a mixed graph.
   for (var i = 0; i < snapshot.length; i++) {
-    var id = snapshot[i].id;
-    var literal = typeof id === 'number' && Number.isSafeInteger(id) ? String(id) :
-      (typeof id === 'string' && /^[A-Za-z0-9_-]+$/.test(id) ? "'" + id + "'" : null);
-    var source = originOf ? originOf(id) : selectedServer;
+    var literal = graphVertexLiteral(snapshot[i].id);
+    var source = originOf ? originOf(snapshot[i].id) : selectedServer;
     if (literal === null || !source) {
       feedbackLine('Cannot request edges for vertices with unknown origin or unsupported IDs.');
       return;
@@ -667,7 +757,7 @@ function fillEdges() {
     }
   finally { server = selectedServer; }
   }
-  
+
 // Cluster by Zoom
 function makeClusters(scale) {
   var clusterOptionsByData = {
@@ -716,15 +806,17 @@ function openClusters(scale) {
     network.stabilize();
     }
   }
-  
+
 // Switch physics on/off
 function switchPhysics() {
+  if (!network || !document.getElementById('physics')) return;
   options4Graph.physics.enabled = document.getElementById('physics').checked;
   network.setOptions(options4Graph);
   }
-  
+
 // Switch layout on/off
 function switchLayout() {
+  if (!network || !document.getElementById('glayout')) return;
   if (document.getElementById('glayout').checked) {
     var direction = "LR";
     if (document.getElementById('glayout_direction').checked) {
@@ -733,7 +825,7 @@ function switchLayout() {
     var method = "directed";
     if (document.getElementById('glayout_method').checked) {
       method = "hubsize";
-      }     
+      }
     network.setOptions({layout:{improvedLayout:true, hierarchical:{direction:direction, sortMethod:method}}});
     }
   else {
@@ -763,7 +855,7 @@ function findObjectByKey(array, key, value) {
     }
   return null;
   }
-  
+
 // Find in array
 function findObjectByKey(array, key1, value1, key2, value2) {
   for (var i = 0; i < array.length; i++) {
@@ -773,7 +865,7 @@ function findObjectByKey(array, key1, value1, key2, value2) {
     }
   return null;
   }
-  
+
 // Remove from array
 // TBD: should be possible without redrawing
 function removeObjectByKey(array, key, value) {
@@ -789,7 +881,7 @@ function removeObjectByKey(array, key, value) {
     array.push(newArray[i]);
     }
   }
-  
+
 // Remove from array
 // TBD: should be possible without redrawing
 function filterObjectByKey(array, key, value) {
@@ -805,25 +897,43 @@ function filterObjectByKey(array, key, value) {
     array.push(newArray[i]);
     }
   }
-  
+
 // Open popup window
-function popup(name, txt) {
-	w = window.open('', name, 'height=600, width=600, menubar=no, status=no, toolbar=no, titlebar=no');
-	var doc = w.document;
-	doc.write('<html><title>' + name + "</title><body>");
-  doc.write("<b>" + name + "</b>");
-	doc.write("<hr/><pre>");
-	doc.write(txt);
-	doc.write("</pre><hr/>");
-  doc.write("<input type='button' value='close' onclick='self.close()'>");
-	doc.write('</body></html>');
-	doc.close();
-	if (window.focus) {
-	  w.focus();
-	  }
-	return false;
+function popup(name, description, details) {
+  var w = window.open('', '_blank', 'height=600,width=600,menubar=no,status=no,toolbar=no');
+  if (!w) return false;
+  var doc = w.document;
+  doc.title = graphText(name);
+  var heading = doc.createElement('b');
+  heading.textContent = graphText(name);
+  doc.body.appendChild(heading);
+  doc.body.appendChild(doc.createElement('hr'));
+  var content = doc.createElement('pre');
+  var rows = graphDescriptionRows(description);
+  if (rows !== null) {
+    rows.forEach(function (row, index) {
+      if (index) content.appendChild(doc.createElement('br'));
+      content.appendChild(doc.createTextNode(row));
+    });
+  } else {
+    content.appendChild(doc.createTextNode(typeof description === 'string' ? description :
+      JSON.stringify(description) || ''));
   }
-    
+  doc.body.appendChild(content);
+  if (details !== undefined) {
+    doc.body.appendChild(doc.createElement('hr'));
+    var detail = doc.createElement('pre');
+    detail.appendChild(doc.createTextNode(graphText(details)));
+    doc.body.appendChild(detail);
+  }
+  var close = doc.createElement('button');
+  close.textContent = 'close';
+  close.addEventListener('click', function () { w.close(); });
+  doc.body.appendChild(close);
+  w.focus();
+  return false;
+  }
+
 // Call URL
 function callInfo(element, key) {
   var http = new XMLHttpRequest();
@@ -831,20 +941,19 @@ function callInfo(element, key) {
   http.send();
   return http.responseText;
   }
-  
+
 // Get stylesheet value
 // (title can be used by js)
 // TBD: handle default if undefined
 function stylesheetValue(nam, id, eMap, pMap, ifEdge, title) {
   var set = ifEdge ? 'E' : 'V';
-  for ([key, value] of pMap.entries()) {
-    eval(key + '=' + '"' + value + '"');
-    }
+  if (nam == null) return '';
   if (nam.gremlin) {
-    val = callGremlinValues(gr + '.' + set + '("' + id + '").' + nam.gremlin);
+    var literal = ifEdge ? (validGraphId(id, true) ? "'" + id + "'" : null) : graphVertexLiteral(id);
+    val = literal === null ? '' : callGremlinValues(gr + '.' + set + '(' + literal + ').' + nam.gremlin);
     }
   else if (nam.js) {
-    val = eval(nam.js);
+    val = graphStyleExpression(nam.js, title, eMap);
     }
   else if (eMap.has(nam)) {
     val = eMap.get(nam);
