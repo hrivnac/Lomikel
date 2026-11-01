@@ -94,7 +94,7 @@ for(const script of ['GraphView.js','GraphViewNew.js']){
 }
 for(const [page,script] of [['GraphView.jsp','GraphView.js'],['GraphViewNew.jsp','GraphViewNew.js']]){
  const html=fs.readFileSync(path.join(root,page),'utf8');
- assert.match(html,new RegExp(script.replace('.', '\\.')+'\\?v=mixed-context-1'));
+ assert.match(html,new RegExp(script.replace('.', '\\.')+'\\?v=edge-curvature-1'));
  assert.match(html,/graph-table-origin\.js\?v=mixed-context-1/);
 }
 console.log('mixed graph context queries, vertex/edge expansion and selected server routed by provenance');

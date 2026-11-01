@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page errorPage="ExceptionHandler.jsp" %>
-<link href="GraphView.css" rel="stylesheet" type="text/css">
+<link href="GraphView.css?v=edge-curvature-1" rel="stylesheet" type="text/css">
 <!-- Opt-in graph canvas: the same vis.js controller and action IDs as the root view. -->
 <div id="graph" class="ws-graph">
   <details id="manip" class="ws-graph-tools">
@@ -18,6 +18,9 @@
         <label><input type="checkbox" id="glayout" onclick="switchLayout()"> Hierarchical</label>
         <label><input type="checkbox" id="glayout_direction" onclick="switchLayout()"> Vertical</label>
         <label><input type="checkbox" id="glayout_method" onclick="switchLayout()"> Sort by hub size</label>
+        <label class="ws-graph-field" for="edgeCurvature">Edge curvature</label>
+        <span class="ws-graph-curvature"><input type="range" id="edgeCurvature" min="0" max="100" value="20" oninput="switchEdgeCurvature()" aria-describedby="edgeCurvatureHint edgeCurvatureValue"><output id="edgeCurvatureValue" for="edgeCurvature" aria-live="polite">20%</output></span>
+        <small id="edgeCurvatureHint">0% is straight; adjust the bend of graph edges.</small>
         <label class="ws-graph-field" for="filter">Filter labels</label>
         <span class="ws-graph-input"><input type="text" id="filter" title="Keep nodes whose labels contain this text"><button type="button" onclick="applyFilter()">Apply</button></span>
       </fieldset>
@@ -40,7 +43,7 @@
 <script type="text/javascript" src="StylesheetDefault.js"></script>
 <script type="text/javascript" src="Stylesheet.js"></script>
 <script type="text/javascript" src="SurveyStylesheet.js?v=survey-colors-2"></script>
-<script type="text/javascript" src="GraphView.js?v=reciprocal-overlaps-1"></script>
+<script type="text/javascript" src="GraphView.js?v=edge-curvature-1"></script>
 <script type="text/javascript" src="skyview-graph.js?v=longss-history-1"></script>
 <script type="text/javascript" src="lightcurve-graph.js?v=query-activity-1"></script>
 <script type="text/javascript" src="graph-table-origin.js?v=mixed-context-1"></script>
