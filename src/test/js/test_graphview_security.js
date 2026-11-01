@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const source = fs.readFileSync(path.join(__dirname, '../../webservice/GraphViewNew.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '../../webservice/GraphView.js'), 'utf8');
 function element(tag) {
   return {tag, children: [], attributes: {}, listeners: {}, textContent: '', value: '', checked: false,
     appendChild(child) { this.children.push(child); return child; },
@@ -22,7 +22,7 @@ function setup() {
       graphics:{title:'title',subtitle:'subtitle',label:'lbl',group:'group',value:'0',shape:'dot',
         borderDashes:[1,0],borderWidth:'1'},actions:[]}},edges:{}}, console});
   context.window = context;
-  vm.runInContext(source, context, {filename:'GraphViewNew.js'});
+  vm.runInContext(source, context, {filename:'GraphView.js'});
   return {context, controls};
 }
 function testGraphPropertyCannotExecute() {
@@ -260,6 +260,6 @@ for (const test of [testGraphPropertyCannotExecute,testHostileGraphTextAndAction
   testClusterTooltipEscapesHostileGroup,testGraphIdsAreCheckedAtEveryQueryBoundary,
   testDocumentedGraphsonIdentifiers,testDefaultStylesheetUsesNumericVertexIdForPropertiesAndActions,
   testSentinelsReachTheirMatchingPanesOnly,testInternalActionEncodesOnceAtRealLoader]) await test();
-console.log('GraphViewNew offline security tests passed');
+console.log('GraphView offline security tests passed');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

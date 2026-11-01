@@ -64,7 +64,7 @@ body.workspace { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font
 #layout .w2ui-tabs .w2ui-tab { color:#365c79; background:#e0ebf7; border:1px solid #c9d9ed;
   border-radius:6px 6px 0 0; margin-right:3px; }
 #layout .w2ui-tabs .w2ui-tab.active { background:#fff; color:#225887; border-bottom-color:#fff; font-weight:700; }
-/* The old GraphView.jsp sets #vis to a one-time viewport-derived pixel height. Its
+/* GraphView.jsp hosts #vis within a resizable panel. Its
    parent pane now owns that height so the canvas follows pane and window resizes. */
 #graph { display:flex; flex-direction:column; min-height:100%; height:100%; }
 #manip { flex:none; }

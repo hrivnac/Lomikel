@@ -130,6 +130,7 @@ function testFilteringVerticesRemovesOrphanEdges() {
   context.nodes.push({id: 1, label: 'keep'}, {id: 2, label: 'discard'}, {id: 3, label: 'keep too'});
   context.edges.push({id: 'ab', from: 1, to: 2}, {id: 'ac', from: 1, to: 3});
   context.show = () => {};
+  context.network = {}; // filtering is a rendered-graph action
   context.applyFilter();
   assert.deepEqual(Array.from(context.nodes, node => node.id), [1, 3]);
   assert.deepEqual(Array.from(context.edges, edge => edge.id), ['ac']);
@@ -228,7 +229,7 @@ function testFreshRenderAvoidsRedundantDataReset() {
 
 function testRepeatedGroupCreatesOneCluster() {
   const {context} = graphContext();
-  context.groups.push('sample', 'sample');
+  context.nodes.push({id:1, group:'sample'}, {id:2, group:'sample'});
   const names = [];
   context.network = {
     setData() {},

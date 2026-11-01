@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page errorPage="ExceptionHandler.jsp" %>
-<link href="GraphView.css?v=edge-curvature-1" rel="stylesheet" type="text/css">
-<!-- Opt-in graph canvas: the same vis.js controller and action IDs as the root view. -->
+<link href="GraphView.css?v=canonical-1" rel="stylesheet" type="text/css">
+<!-- Canonical graph canvas and controller. -->
 <div id="graph" class="ws-graph">
   <details id="manip" class="ws-graph-tools">
     <summary>Graph tools <span>Double-click to expand · click to inspect · drag to move</span></summary>
@@ -43,8 +43,13 @@
 <script type="text/javascript" src="StylesheetDefault.js"></script>
 <script type="text/javascript" src="Stylesheet.js"></script>
 <script type="text/javascript" src="SurveyStylesheet.js?v=survey-colors-2"></script>
-<script type="text/javascript" src="GraphView.js?v=edge-curvature-1"></script>
+<script type="text/javascript" src="GraphView.js?v=canonical-1"></script>
 <script type="text/javascript" src="skyview-graph.js?v=longss-history-1"></script>
 <script type="text/javascript" src="lightcurve-graph.js?v=query-activity-1"></script>
 <script type="text/javascript" src="graph-table-origin.js?v=mixed-context-1"></script>
 <script type="text/javascript" src="cutouts-graph.js?v=ss-cutouts-1"></script>
+<script>
+  // Signal only after the controller and its graph wrappers execute.
+  window.graphViewReady = document.getElementById('graph');
+  window.dispatchEvent(new Event('graphviewready'));
+</script>

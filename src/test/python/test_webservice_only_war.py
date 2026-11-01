@@ -34,13 +34,14 @@ class WebserviceOnlyWarTest(unittest.TestCase):
             self.assertNotIn('@NAME@', index)
 
     @unittest.skipUnless(WAR.exists(), 'Build with ant war first')
-    def test_war_includes_opt_in_graph_assets(self):
+    def test_war_includes_only_canonical_graph_assets(self):
         with zipfile.ZipFile(WAR) as archive:
             names = set(archive.namelist())
-            for name in ('GraphViewNew.jsp', 'GraphViewNew.js', 'GraphViewNew.css'):
-                self.assertIn(name, names)
-            self.assertIn('GraphViewNew.js', archive.read('GraphViewNew.jsp').decode())
-            self.assertIn('graphViewVariant', archive.read('index.jsp').decode())
+            for ext in ('jsp', 'js', 'css'):
+                self.assertIn('GraphView.' + ext, names)
+                self.assertNotIn('GraphViewNew.' + ext, names)
+            self.assertIn('GraphView.js', archive.read('GraphView.jsp').decode())
+            self.assertNotIn('graphViewVariant', archive.read('index.jsp').decode())
 
 
 if __name__ == '__main__':

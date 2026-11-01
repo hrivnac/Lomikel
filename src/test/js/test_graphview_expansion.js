@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const source = fs.readFileSync(path.join(__dirname, '../../webservice/GraphViewNew.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '../../webservice/GraphView.js'), 'utf8');
 function setup() {
   const ids = ['vis','select','filter','expandTo','expandFrom','removeOld','clusterize','zoom',
     'stabilize','add2graph','commands','feedback'];
@@ -22,7 +22,7 @@ function setup() {
       edges:{default:{properties:{},graphics:{title:'lbl',subtitle:'',label:'lbl',group:' ',value:'1',arrows:' '},actions:[]}}},
     setTimeout,showTab() {}});
   context.window=context;
-  vm.runInContext(source,context,{filename:'GraphViewNew.js'});
+  vm.runInContext(source,context,{filename:'GraphView.js'});
   return {context,controls,listeners};
 }
 const vertex=(id,label) => ({'@type':'g:Vertex','@value':{id:{'@value':id},label:'sample',
@@ -100,4 +100,4 @@ function testParentsOnly() {
 for(const test of [testStringIdDoubleClickExpandsConnectedVerticesAndEdges,
   testNumericIdMenusAndReplace,testNumericLookingStringIdStaysQuoted,
   testEdgeFirstFilteredGraphsonKeepsOnlyVisibleConnections,testParentsOnly]) test();
-console.log('GraphViewNew double-click expansion tests passed');
+console.log('GraphView double-click expansion tests passed');

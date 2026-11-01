@@ -1,5 +1,5 @@
 'use strict';
-// Show all edges through offline GraphSON transport, for both graph controllers.
+// Show all edges through offline GraphSON transport, for the canonical graph controller.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -90,5 +90,5 @@ async function exercise(script) {
     edge('ab1','overlaps',11,12),edge('ab2','overlaps',11,12)])));
   assert.deepEqual(ids(),['ba1','ab2'],script+': reverse-first pairing and reset retain unmatched parallel');
 }
-(async()=>{for(const script of ['GraphView.js','GraphViewNew.js']) await exercise(script);
+(async()=>{for(const script of ['GraphView.js']) await exercise(script);
   console.log('Reciprocal overlap GraphSON Show all edges tests passed');})().catch(error=>{console.error(error);process.exitCode=1;});

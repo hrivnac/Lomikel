@@ -15,7 +15,7 @@ assert.equal(actions[0].url,'lightcurve');
 assert.match(text('GraphView.jsp'),/lightcurve-graph\.js\?v=/);
 assert.match(text('workspace.js'),/lightcurveGraphState\.open\(\)/);
 assert.match(text('workspace.js'),/lightcurveGraphState\.cancel\(\)/);
-assert.match(text('index.jsp'),/workspace\.js\?v=corr-fit-/);
+assert.match(text('index.jsp'),/workspace\.js\?v=canonical-/);
 const posts=[];
 const queries=[];
 function node(tag){const classes=new Set();return {tag,children:[],style:{},

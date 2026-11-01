@@ -5,11 +5,11 @@ const path = require('node:path');
 const vm = require('node:vm');
 const base = path.join(__dirname, '../../webservice');
 const read = name => fs.readFileSync(path.join(base, name), 'utf8');
-const fragment = read('GraphViewNew.jsp');
+const fragment = read('GraphView.jsp');
 const scripts = Array.from(fragment.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g), match => ({
   src: /\bsrc="([^"]+)"/.exec(match[1])?.[1], body: match[2]
 }));
-assert.equal(scripts.filter(script => script.src?.split('?')[0] === 'GraphViewNew.js').length, 1);
+assert.equal(scripts.filter(script => script.src?.split('?')[0] === 'GraphView.js').length, 1);
 
 function scenario(profile, fragmentFirst) {
   let graph = {id: 'first'};
@@ -33,15 +33,15 @@ function scenario(profile, fragmentFirst) {
     $: {getScript(src, callback) { loads.push(src); if (callback) callback(); }}
   });
   context.window = context;
-  context.graphViewVariant = 'new';
+
   function runFragment() {
     let controllerShow;
     for (const script of scripts) {
       if (script.src) {
         const name = script.src.split('?')[0];
-        if (!['GraphViewNew.js', 'skyview-graph.js', 'lightcurve-graph.js'].includes(name)) continue;
+        if (!['GraphView.js', 'skyview-graph.js', 'lightcurve-graph.js'].includes(name)) continue;
         vm.runInContext(read(name), context, {filename:name});
-        if (name === 'GraphViewNew.js') {
+        if (name === 'GraphView.js') {
           controllerShow = context.show;
           context.bootstrap = (...args) => {
             assert.notEqual(context.show, controllerShow, 'sky wrapper must precede bootstrap');
@@ -49,20 +49,20 @@ function scenario(profile, fragmentFirst) {
             calls.push(['bootstrap', ...args]);
           };
         }
-      } else if (script.body.trim()) vm.runInContext(script.body, context, {filename:'GraphViewNew.jsp inline'});
+      } else if (script.body.trim()) vm.runInContext(script.body, context, {filename:'GraphView.jsp inline'});
     }
     assert.notEqual(context.show, controllerShow, 'fragment installed sky wrapper');
   }
   function runProfile() { vm.runInContext(read('profiles/' + profile + '.js'), context); }
   if (fragmentFirst) { runFragment(); runProfile(); }
   else {
-    context.graphViewNewReady = {id:'stale-fragment'};
+    context.graphViewReady = {id:'stale-fragment'};
     runProfile();
     assert.equal(calls.filter(call => call[0] === 'bootstrap').length, 0,
       'profile may not start the old or incomplete controller');
     runFragment();
   }
-  assert.deepEqual(loads, [], 'new mode never requests a second controller');
+  assert.deepEqual(loads, [], 'profile never requests a second controller');
   assert.deepEqual(calls.filter(call => call[0] === 'bootstrap').map(call => call.slice(1)),
     [['text', profile === 'local' ? 1 : 0]]);
   context.nodes.push({id: 42});
@@ -74,16 +74,13 @@ function scenario(profile, fragmentFirst) {
   assert.equal(context.nodes.length, 0, 'reset fragment has fresh state');
   assert.equal(calls.filter(call => call[0] === 'bootstrap').length, 1,
     'the initial profile bootstrap does not repeat on reset');
+  runProfile();
+  assert.equal(calls.filter(call => call[0] === 'bootstrap').length, 1,
+    'a repeated profile script cannot bootstrap twice');
 }
-for (const profile of ['local','ijclab']) {
+for (const profile of ['local','ijclab','cc']) {
   scenario(profile, true);
   scenario(profile, false);
-  const loads = [], boots = [];
-  const legacy = vm.createContext({window:{graphViewVariant:'legacy'},
-    loadPane() {}, bootstrap(...args) { boots.push(args); },
-    $: {getScript(src, callback) { loads.push(src); callback(); }}});
-  vm.runInContext(read('profiles/' + profile + '.js'), legacy);
-  assert.deepEqual(loads, ['GraphView.js'], 'legacy keeps its own controller load');
-  assert.deepEqual(boots, [['text', profile === 'local' ? 1 : 0]]);
+
 }
-console.log('GraphViewNew script-order tests passed');
+console.log('Canonical GraphView script-order tests passed');
