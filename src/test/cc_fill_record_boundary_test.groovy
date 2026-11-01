@@ -14,10 +14,11 @@ class RecordingESClient extends ESClient {
   @Override void putGeoPoint(String index, String field, String id, double ra, double dec) {
     writes.add([index, field, id, ra, dec])
   }
-  @Override void updateGeoPointArrayWithRetry(String index, String field, String id,
-                                               double ra, double dec, int retries) {
-    writes.add([index, field, id, ra, dec, retries])
+  @Override void bufferGeoPointArray(String index, String field, String id,
+                                      double ra, double dec) {
+    writes.add([index, field, id, ra, dec])
   }
+  @Override void flushBufferedGeoPointArrays(int retries) { /* no network */ }
   @Override void updateDoubleArrayWithRetry(String index, String field, String id,
                                              double mjd, int retries) {
     writes.add([index, field, id, mjd, retries])
@@ -87,7 +88,7 @@ try {
   [
     'fillES-radec.groovy': [
       ['dia_radec', 'location', 'dia-one', 12.5d, -5.25d],
-      ['ss_radec', 'location', 'ss-one', 34.5d, 6.75d, 10],
+      ['ss_radec', 'location', 'ss-one', 34.5d, 6.75d],
       ['dia_radec', 'location', 'dia-two', 78.25d, 9.5d]
     ],
     'fillES-mjd.groovy': [

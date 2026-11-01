@@ -133,6 +133,10 @@ public class ESClient {
       if (idxName.equals(entry.index))
         throw new LomikelException("Pending buffered doubles for " + idxName + "; flush before changing the index");
       }
+    for (BufferedGeo entry : _bufferedGeoPoints.values()) {
+      if (idxName.equals(entry.index))
+        throw new LomikelException("Pending buffered geo points for " + idxName + "; flush before changing the index");
+      }
     String answer = _httpClient.get(_url + "/" + idxName, _auth);
     try {
       JSONObject indexes = new JSONObject(answer);
@@ -609,6 +613,143 @@ public class ESClient {
     }
     
   // Update Array ==============================================================
+
+  /** Queue one coordinate in an opt-in, bounded, grouped scripted-upsert bulk.
+    * Call flushBufferedGeoPointArrays before observing final index sizes. */
+  public synchronized void bufferGeoPointArray(String idxName, String fieldName,
+                                               String idxValue, double ra, double dec) throws LomikelException {
+    double lon = ra - 180;
+    if (idxName == null || !idxName.matches("[a-z0-9][a-z0-9_.-]*") ||
+        fieldName == null || fieldName.isEmpty() || idxValue == null ||
+        !Double.isFinite(ra) || !Double.isFinite(dec) || !Double.isFinite(lon))
+      throw new IllegalArgumentException("Invalid buffered geo-point array update");
+    String key = new JSONArray().put(idxName).put(fieldName).put(idxValue).toString();
+    BufferedGeo entry = _bufferedGeoPoints.get(key);
+    GeoPoint point = new GeoPoint(dec, lon);
+    if (entry != null && entry.values.contains(point)) return;
+    String encoded = point.json.toString();
+    int emptyBytes = entry == null ? geoLine(new BufferedGeo(idxName, fieldName, idxValue))
+        .getBytes(StandardCharsets.UTF_8).length : 0;
+    int delta = encoded.getBytes(StandardCharsets.UTF_8).length + (entry == null ? 0 : 1);
+    int candidate = (entry == null ? emptyBytes : entry.bytes) + delta;
+    if (candidate > MAX_BUFFERED_BYTES) {
+      if (entry != null) emptyBytes = geoLine(new BufferedGeo(idxName, fieldName, idxValue))
+          .getBytes(StandardCharsets.UTF_8).length;
+      if (emptyBytes + encoded.getBytes(StandardCharsets.UTF_8).length > MAX_BUFFERED_BYTES)
+        throw new IllegalArgumentException("Single buffered document exceeds request byte limit");
+      flushBufferedGeoPointArrays(10);
+      entry = null;
+      candidate = emptyBytes + encoded.getBytes(StandardCharsets.UTF_8).length;
+      }
+    int oldBytes = entry == null ? 0 : entry.bytes;
+    if ((_bufferedGeoPoints.size() >= MAX_BUFFERED_DOCS && entry == null) ||
+        _bufferedGeoBytes - oldBytes + candidate > MAX_BUFFERED_BYTES) {
+      flushBufferedGeoPointArrays(10);
+      entry = null;
+      oldBytes = 0;
+      if (emptyBytes == 0) emptyBytes = geoLine(new BufferedGeo(idxName, fieldName, idxValue))
+          .getBytes(StandardCharsets.UTF_8).length;
+      candidate = emptyBytes + encoded.getBytes(StandardCharsets.UTF_8).length;
+      }
+    if (candidate > MAX_BUFFERED_BYTES)
+      throw new IllegalArgumentException("Single buffered document exceeds request byte limit");
+    if (entry == null) entry = new BufferedGeo(idxName, fieldName, idxValue);
+    entry.values.add(point);
+    entry.bytes = candidate;
+    _bufferedGeoBytes += candidate - oldBytes;
+    _bufferedGeoPoints.put(key, entry);
+    }
+
+  /** Remove only confirmed successful items; retain uncertain responses for replay. */
+  public synchronized void flushBufferedGeoPointArrays(int attempts) throws LomikelException {
+    if (attempts <= 0) throw new IllegalArgumentException("Attempts must be positive");
+    for (int attempt = 0; attempt < attempts && !_bufferedGeoPoints.isEmpty(); attempt++) {
+      List<String> keys = new ArrayList<>(_bufferedGeoPoints.keySet());
+      StringBuilder body = new StringBuilder();
+      for (String key : keys) body.append(geoLine(_bufferedGeoPoints.get(key)));
+      String answer;
+      try {
+        answer = _httpClient.postNDJSON(_url + "/_bulk", body.toString(), _auth, null);
+        }
+      catch (LomikelException e) {
+        if (attempt + 1 == attempts) throw new LomikelException("Buffered geo bulk transport failed after retries", e);
+        continue;
+        }
+      Set<String> succeeded = new LinkedHashSet<>();
+      try {
+        JSONObject response = new JSONObject(answer);
+        boolean errors = response.getBoolean("errors");
+        JSONArray items = response.getJSONArray("items");
+        if (items.length() != keys.size()) throw new IllegalArgumentException("Incomplete bulk items");
+        boolean failed = false;
+        for (int i = 0; i < items.length(); i++) {
+          BufferedGeo expected = _bufferedGeoPoints.get(keys.get(i));
+          JSONObject operation = items.getJSONObject(i);
+          if (operation.length() != 1) throw new IllegalArgumentException("Invalid bulk action");
+          JSONObject item = operation.getJSONObject("update");
+          if (!expected.id.equals(item.getString("_id")) ||
+              !expected.index.equals(item.getString("_index"))) throw new IllegalArgumentException("Mismatched bulk item");
+          Object statusValue = item.get("status");
+          if (!(statusValue instanceof Number) ||
+              ((Number) statusValue).doubleValue() != ((Number) statusValue).intValue())
+            throw new IllegalArgumentException("Invalid bulk status");
+          int status = ((Number) statusValue).intValue();
+          if (status >= 200 && status < 300 && !item.has("error")) {
+            String result = item.getString("result");
+            if (!result.equals("updated") && !result.equals("created") && !result.equals("noop"))
+              throw new IllegalArgumentException("Invalid bulk update result");
+            succeeded.add(keys.get(i));
+            }
+          else failed = true;
+          }
+        if (errors != failed) throw new IllegalArgumentException("Inconsistent bulk errors flag");
+        }
+      catch (RuntimeException e) {
+        throw new LomikelException("Invalid buffered geo bulk response; all items retained", e);
+        }
+      for (String key : succeeded) _bufferedGeoBytes -= _bufferedGeoPoints.remove(key).bytes;
+      }
+    if (!_bufferedGeoPoints.isEmpty()) throw new LomikelException("Buffered geo bulk failed after " + attempts +
+        " attempts; pending documents=" + _bufferedGeoPoints.size());
+    }
+
+  private String geoLine(BufferedGeo entry) {
+    JSONObject metadata = new JSONObject().put("update", new JSONObject().put("_index", entry.index)
+        .put("_id", entry.id));
+    JSONArray points = new JSONArray();
+    for (GeoPoint point : entry.values) points.put(point.json);
+    JSONObject script = new JSONObject().put("lang", "painless")
+        .put("source", "def a = ctx._source[params.field]; boolean changed = false; if (a == null) { a = new ArrayList(); ctx._source[params.field] = a; changed = true; } else if (!(a instanceof List)) { def old = a; a = new ArrayList(); a.add(old); ctx._source[params.field] = a; changed = true; } for (def v : params.values) { boolean found = false; for (def p : a) { if (p instanceof Map && p.lat instanceof Number && p.lon instanceof Number && ((Number)p.lat).doubleValue() == ((Number)v.lat).doubleValue() && ((Number)p.lon).doubleValue() == ((Number)v.lon).doubleValue()) { found = true; break; } } if (!found) { a.add(v); changed = true; } } if (!changed) { ctx.op = 'noop'; }")
+        .put("params", new JSONObject().put("field", entry.field).put("values", points));
+    JSONObject update = new JSONObject().put("scripted_upsert", true).put("script", script)
+        .put("upsert", new JSONObject());
+    return metadata.toString() + "\n" + update.toString() + "\n";
+    }
+
+  private int _bufferedGeoBytes;
+  private final Map<String, BufferedGeo> _bufferedGeoPoints = new LinkedHashMap<>();
+  private static class BufferedGeo {
+    final String index, field, id;
+    int bytes;
+    final LinkedHashSet<GeoPoint> values = new LinkedHashSet<>();
+    BufferedGeo(String index, String field, String id) {
+      this.index = index; this.field = field; this.id = id;
+      }
+    }
+  private static class GeoPoint {
+    final double lat, lon;
+    final JSONObject json;
+    GeoPoint(double lat, double lon) {
+      this.lat = lat; this.lon = lon;
+      json = new JSONObject().put("lat", lat).put("lon", lon);
+      }
+    @Override public int hashCode() { return 31 * Double.hashCode(lat) + Double.hashCode(lon); }
+    @Override public boolean equals(Object other) {
+      if (!(other instanceof GeoPoint)) return false;
+      GeoPoint p = (GeoPoint) other;
+      return Double.compare(lat, p.lat) == 0 && Double.compare(lon, p.lon) == 0;
+      }
+    }
 
   /** Opt-in, per-client buffer of idempotent double-array updates. A successful
     * bulk item is removed; an ambiguous response retains its items for replay.
