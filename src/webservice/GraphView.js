@@ -17,6 +17,15 @@ var container = document.getElementById('vis');
 var network;
 var gr = 'g';
 var graphViewToken = {cancelled:false};
+// The workspace may reload this pane while retaining the shared graph options.
+var curvatureControl = document.getElementById('edgeCurvature');
+if (curvatureControl && options4Graph.edges && options4Graph.edges.smooth) {
+  var curvaturePercent = options4Graph.edges.smooth.enabled === false ? 0 :
+                         Math.round(options4Graph.edges.smooth.roundness * 100);
+  curvatureControl.value = String(curvaturePercent);
+  var curvatureValue = document.getElementById('edgeCurvatureValue');
+  if (curvatureValue) curvatureValue.textContent = curvaturePercent + '%';
+  }
 
 // Release vis physics/listeners before the workspace replaces its graph pane.
 function disposeGraphView() {
@@ -730,6 +739,19 @@ function switchLayout() {
   else {
     network.setOptions({layout:{improvedLayout:true, hierarchical:false}});
     }
+  // vis disables edge smoothing while entering hierarchy; restore the selected curvature.
+  network.setOptions({edges:{smooth:options4Graph.edges.smooth}});
+  }
+
+// Update only edge drawing; preserve the graph and its current layout.
+function switchEdgeCurvature() {
+  var slider = document.getElementById('edgeCurvature');
+  if (!slider) return;
+  var percent = Number(slider.value);
+  var output = document.getElementById('edgeCurvatureValue');
+  if (output) output.textContent = percent + '%';
+  options4Graph.edges.smooth = {enabled:percent > 0, type:'curvedCW', roundness:percent / 100};
+  if (network) network.setOptions({edges:{smooth:options4Graph.edges.smooth}});
   }
 
 // Find in array

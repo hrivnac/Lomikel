@@ -40,9 +40,9 @@ var options4Graph = {
     },
   edges: {
     smooth: {
-      type:"dynamic",
-      forceDirection:"none",
-      roundness:0.5
+      enabled:true,
+      type:"curvedCW",
+      roundness:0.2
       },
     scaling: {
       customScalingFunction: function (min, max, total, value) {

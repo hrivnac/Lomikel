@@ -82,7 +82,7 @@
   <script src="knockout-3.2.0.js"></script>
   <script src="moment-2.25.2.js"></script>
   <script src="w2ui-1.5.rc1/w2ui-1.5.rc1.min.js"></script>
-  <script src="OptionsDefault.js"></script>
+  <script src="OptionsDefault.js?v=edge-curvature-1"></script>
   <script src="Options.js"></script>
   <script src="Tabs.js"></script>
   <script src="Sleep.js"></script>
