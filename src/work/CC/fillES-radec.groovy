@@ -79,7 +79,7 @@ public class PR extends ParquetReader {
       else if (props().containsKey("ssSource.ssObjectId")) {
         key = props().get("ssSource.ssObjectId").iterator().next();
         //esclient.putGeoPoint("ss_radec", "location", key, ra, dec);
-        esclient.updateGeoPointArrayWithRetry("ss_radec", "location", key, ra, dec, 10);
+        esclient.bufferGeoPointArray("ss_radec", "location", key, ra, dec);
         }
       else {
         log.warn("no objectid");
@@ -87,12 +87,14 @@ public class PR extends ParquetReader {
       props().clear();
       if (timer.report()) {
         esclient.commitWithRetry(10);
+        esclient.flushBufferedGeoPointArrays(10);
         }
       }
-    } 
-    
+    }
+
   public void cleanup() {
     esclient.commitWithRetry(10);
+    esclient.flushBufferedGeoPointArrays(10);
     }
     
   public String sizes() {
