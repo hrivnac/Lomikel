@@ -50,6 +50,10 @@ function graphStyleExpression(expression, title, eMap) {
       return typeof finkSurveyStarImage === 'function' ? finkSurveyStarImage(eMap.get('objectId')) : '';
     case "finkPortalUrl(eMap.get('objectId'))":
       return typeof finkPortalUrl === 'function' ? finkPortalUrl(eMap.get('objectId')) : '';
+    case "finkNeighborhoodUrl(eMap.get('objectId'))":
+      return typeof finkNeighborhoodUrl === 'function' ? finkNeighborhoodUrl(eMap.get('objectId')) : '';
+    case "finkLightCurveVisualizerUrl(eMap.get('objectId'))":
+      return typeof finkLightCurveVisualizerUrl === 'function' ? finkLightCurveVisualizerUrl(eMap.get('objectId')) : '';
     default:
       return '';
   }
@@ -111,6 +115,10 @@ function showGraphCommands(item, edge) {
       link.href = action.url;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
+      // The arrow (CSS ::after in panels.css) marks a jump to another window/service.
+      link.className = 'ws-external-link';
+      link.title = action.name + ' (opens in a new tab)';
+      link.setAttribute('aria-label', action.name + ' (opens in a new tab)');
     } else {
       link.href = '#';
       link.addEventListener('click', function (event) {

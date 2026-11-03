@@ -14,6 +14,18 @@ function initFinkObjectForm() {
     });
   }
 
+// Fink Browser opens this page as ?objectId=<LSST object ID>; fill the menu and load it.
+function loadRequestedObject() {
+  const input = document.getElementById("fink-object-id");
+  const search = (typeof window !== "undefined" && window.location && window.location.search) || "";
+  if (!input || !search) return;
+  const params = new URLSearchParams(search);
+  const requested = params.get("objectId") ?? params.get("diaObjectId");
+  if (!input || requested === null) return;
+  input.value = requested.trim();
+  loadFinkObject(requested);
+  }
+
 window.addEventListener("DOMContentLoaded", () => {
   initSliders();
   createSNIDButtons();
@@ -26,4 +38,5 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("resetRainbow").addEventListener("click", resetRainbow);
   resetRandom();
   plotLightCurves(demo);
+  loadRequestedObject();
   });

@@ -35,6 +35,9 @@
   background:#fff; border:1px dashed #b7d9c2; border-radius:6px; padding:8px; }
 #layout .ws-commands hr { margin:8px 0; }
 #layout .ws-commands button { margin:2px; }
+/* Small arrow at the top-right of links that leave for another window/service. */
+#layout .ws-commands a.ws-external-link::after { content:"\2197"; display:inline-block; font-size:.7em;
+  line-height:1; vertical-align:super; margin-left:1px; text-decoration:none; }
 #layout .ws-top button:focus-visible,
 #layout .ws-top select:focus-visible, #layout .ws-top input:focus-visible { outline:2px solid #287c62; outline-offset:2px; }
 @media(max-width:1100px) {
