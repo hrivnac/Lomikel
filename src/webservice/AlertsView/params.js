@@ -6,22 +6,57 @@ const classesZTF = {
   "Solar System candidate": "0,255,0",
   "Solar System MPC": "255,0,255"
   };
-// Current tags accepted by the public LSST tag-search REST endpoint.
-// Other portal tags can return HTTP 400 because they are unavailable through
-// this endpoint; re-check the allowlist before LSST polling is re-enabled.
-const classesLSSTTags = {
+// Colors also identify the subset currently supported by the public tag REST
+// endpoint. Other HBase tags remain in the shared list but are not polled there.
+const LSST_REST_TAG_COLORS = {
   "extragalactic_lt20mag_candidate": "255,255,127",
   "extragalactic_new_candidate": "127,255,255",
   "hostless_candidate": "255,127,127",
   "in_tns": "127,255,127",
   "sn_near_galaxy_candidate": "255,127,255"
   };
+const classesLSSTTags = Object.create(null);
+async function loadLsstTagTables() {
+  const controller = new AbortController();
+  let timeoutId;
+  const deadline = new Promise((_resolve, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new Error("Timed out loading LSST tag table list"));
+      }, 3000);
+    });
+  let text;
+  try {
+    text = await Promise.race([
+      fetch("LSSTTags.lst", {cache: "no-store", signal: controller.signal}).then(async response => {
+        if (!response.ok) throw new Error(`LSST tag list unavailable: HTTP ${response.status}`);
+        return response.text();
+        }),
+      deadline
+      ]);
+    }
+  finally {
+    clearTimeout(timeoutId);
+    }
+  const tables = text.replace(/\r?\n$/, "").split(/\r?\n/);
+  if (!tables.length || tables.some(table => !/^rubin\.tag_[a-z0-9_]+$/.test(table)) ||
+      new Set(tables).size !== tables.length) {
+    throw new Error("Invalid or repeated LSST tag table entry");
+    }
+  for (const table of tables) {
+    const name = table.slice("rubin.tag_".length);
+    classesLSSTTags[name] = Object.prototype.hasOwnProperty.call(LSST_REST_TAG_COLORS, name)
+      ? LSST_REST_TAG_COLORS[name] : "255,255,255";
+    classesLSST[name] = classesLSSTTags[name];
+    classes[name] = classesLSSTTags[name];
+    }
+  }
 const classesLSSTLatest = {
   "LSST DIA source": "255,127,127",
   "LSST SS source": "255,200,80"
   };
-const classesLSST = {...classesLSSTTags, ...classesLSSTLatest};
-const classes = {...classesZTF, ...classesLSST};
+const classesLSST = Object.assign(Object.create(null), classesLSSTTags, classesLSSTLatest);
+const classes = Object.assign(Object.create(null), classesZTF, classesLSST);
  
 let latestAlertsAvailable = false;
 let fetchPeriod = 10; // minutes; 0 loads once

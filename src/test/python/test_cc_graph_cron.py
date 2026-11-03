@@ -18,7 +18,7 @@ WORK = ROOT / "src/work/CC"
 
 
 class CcGraphCronTest(unittest.TestCase):
-    def run_stubbed(self, script, fail=True):
+    def run_stubbed(self, script, fail=True, tag_list_present=True):
         with tempfile.TemporaryDirectory(prefix="cc-graph-cron-") as directory:
             root = Path(directory)
             home = root / "home"
@@ -37,6 +37,12 @@ class CcGraphCronTest(unittest.TestCase):
             # Baseline scripts hard-code /tmp; redirect a *copy* so the test
             # cannot touch a real cron lock. Fixed scripts may use TMPDIR.
             text = (CRON / script).read_text().replace("/tmp/", str(root) + "/")
+            if script == "importTags.sh":
+                deployed_list = root / "LSSTTags.lst"
+                if tag_list_present:
+                    deployed_list.write_bytes((CRON / "LSSTTags.lst").read_bytes())
+                text = text.replace("/home/almalinux/Lomikel/src/sh/cron/CC/LSSTTags.lst",
+                                    str(deployed_list))
             test_script = root / script
             test_script.write_text(text)
             env = os.environ.copy()
@@ -55,6 +61,12 @@ class CcGraphCronTest(unittest.TestCase):
         self.assertEqual(result.returncode, 17, result.stdout + result.stderr)
         self.assertEqual(len(invocations), 1)
         self.assertTrue(any("stub java stderr" in log for log in logs), logs)
+
+    def test_import_refuses_missing_list_before_java(self):
+        result, _logs, invocations = self.run_stubbed("importTags.sh", tag_list_present=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(invocations, [])
+        self.assertIn("Missing or empty LSST tag table list", result.stderr)
 
     def test_process_failure_is_reported_and_logged(self):
         result, logs, invocations = self.run_stubbed("processTags.sh")
