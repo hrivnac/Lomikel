@@ -766,3 +766,84 @@ test("submitting the Fink form loads the exact text identifier", async () => {
   assert.equal(prevented, true);
   assert.equal(requested, "313761043604045880");
 });
+
+test("an object with no DIA history is reverse-resolved and read from /sso (Solar System)", async () => {
+  const SS = "21163637480633927";
+  const calls = [];
+  const plotted = [];
+  const status = {textContent: "", dataset: {}};
+  // Parse real JSON text: this ID exceeds 2^53, exactly like Fink's numeric /sso r:ssObjectId.
+  const ssoRows = JSON.parse("[" + ["g", "r", "i"].map((band, index) =>
+    `{"r:ssObjectId":${SS},"r:band":"${band}","r:midpointMjdTai":${61000 + index},"r:psfFlux":1000}`).join(",") + "]");
+  assert.notEqual(String(ssoRows[0]["r:ssObjectId"]), SS, "fixture must reproduce the JS rounding");
+  const context = loadScripts(["consts.js", "utils.js", "data.js"], {
+    activeSNID: null,
+    document: {getElementById: id => id === "status" ? status : null},
+    fetch: async (url, options) => {
+      const body = JSON.parse(options.body);
+      calls.push({url, body});
+      const reply = url.endsWith("/sources") ? []
+        : url.endsWith("/resolver") ? [{"r:ssObjectId": SS, "r:packed_primary_provisional_designation": "K07V06G"}]
+        : ssoRows;
+      return {ok: true, json: async () => reply};
+    },
+    plotLightCurves: curve => plotted.push(curve), resetRandom: () => {}, updateSNIDHighlight: () => {},
+  });
+
+  const loaded = await vm.runInContext(`loadFinkObject('${SS}')`, context);
+
+  assert.equal(loaded, true);
+  assert.deepEqual(calls.map(call => call.url.split("/").pop()), ["sources", "resolver", "sso"]);
+  assert.equal(calls[1].body.reverse, true);
+  assert.equal(calls[1].body.name_or_id, SS);
+  assert.equal(calls[2].body.n_or_d, "K07V06G", "/sso takes the designation, never the ssObjectId");
+  assert.equal(plotted.length, 1);
+  assert.match(status.textContent, /Solar System object 21163637480633927: 3 sources/);
+});
+
+test("Solar System rows of another object are rejected and an unresolved ID is not found", async () => {
+  const SS = "21163637480633927";
+  async function run(resolved, rows) {
+    const status = {textContent: "", dataset: {}};
+    const plotted = [];
+    const context = loadScripts(["consts.js", "utils.js", "data.js"], {
+      activeSNID: null,
+      document: {getElementById: id => id === "status" ? status : null},
+      fetch: async url => ({ok: true, json: async () => url.endsWith("/sources") ? []
+        : url.endsWith("/resolver") ? resolved : rows}),
+      plotLightCurves: curve => plotted.push(curve), resetRandom: () => {}, updateSNIDHighlight: () => {},
+    });
+    const loaded = await vm.runInContext(`loadFinkObject('${SS}')`, context);
+    return {loaded, plotted, status};
+  }
+  const designated = [{"r:ssObjectId": SS, "r:packed_primary_provisional_designation": "K07V06G"}];
+  const mixed = await run(designated, JSON.parse('[{"r:ssObjectId":21163615905265241,"r:band":"g","r:midpointMjdTai":1,"r:psfFlux":5}]'));
+  assert.equal(mixed.loaded, false);
+  assert.equal(mixed.plotted.length, 0);
+  assert.equal(mixed.status.dataset.state, "error");
+  const unresolved = await run([], []);
+  assert.equal(unresolved.loaded, false);
+  assert.equal(unresolved.plotted.length, 0);
+  const wrongId = await run([{"r:ssObjectId": "2", "r:packed_primary_provisional_designation": "X"}], []);
+  assert.equal(wrongId.loaded, false, "the resolver row must match the requested ID exactly");
+});
+
+test("?objectId= fills the menu and loads that object; no parameter keeps the demo", async () => {
+  const source = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const match = source.match(/function loadRequestedObject\(\) \{[\s\S]*?\n  \}\n/);
+  assert.ok(match, "loadRequestedObject exists");
+  for (const [search, expected] of [["?objectId=%20313761043604045880%20", "313761043604045880"],
+                                    ["?diaObjectId=170028500581351556", "170028500581351556"],
+                                    ["", null]]) {
+    const input = {value: ""};
+    const loads = [];
+    const context = vm.createContext({
+      URLSearchParams, document: {getElementById: id => id === "fink-object-id" ? input : null},
+      window: {location: {search}}, loadFinkObject: value => loads.push(value),
+    });
+    vm.runInContext(match[0] + "loadRequestedObject();", context);
+    assert.equal(input.value, expected === null ? "" : expected);
+    assert.deepEqual(loads.map(v => v.trim()), expected === null ? [] : [expected]);
+  }
+  assert.match(source, /plotLightCurves\(demo\);\s*loadRequestedObject\(\);/);
+});

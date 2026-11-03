@@ -32,3 +32,42 @@ if (stylesheet.nodes.object && !stylesheet.nodes.object.actions.some(function (a
     name: 'LightCurve', url: 'lightcurve', target: 'plot'
   });
 }
+
+// External-service links open another Fink Browser app (or the portal) in a new tab.
+// GraphView.js only accepts absolute http(s) URLs for target "external", so build them here.
+function finkSurveyOfObject(objectId) {
+  if (objectId == null) return '';
+  var id = String(objectId).trim();
+  if (/^ZTF[A-Za-z0-9_-]{1,80}$/.test(id)) return 'ZTF';
+  if (/^[0-9]{1,24}$/.test(id)) return 'LSST';
+  return '';
+}
+function finkAppUrl(page, params) {
+  if (typeof window === 'undefined' || !window.location) return '';
+  try {
+    var url = new URL(page, window.location.href);
+    Object.keys(params).forEach(function (key) { url.searchParams.set(key, params[key]); });
+    return /^https?:$/.test(url.protocol) ? url.href : '';
+  } catch (error) { return ''; }
+}
+// Classification neighborhood: fills the survey and object ID of its menu.
+function finkNeighborhoodUrl(objectId) {
+  var survey = finkSurveyOfObject(objectId);
+  return survey ? finkAppUrl('ClassificationView/index.html', {survey: survey, objectId: String(objectId).trim()}) : '';
+}
+// LSST Light Curve Visualizer: LSST objects only (an empty URL omits the action for ZTF).
+function finkLightCurveVisualizerUrl(objectId) {
+  return finkSurveyOfObject(objectId) === 'LSST' ?
+    finkAppUrl('LightCurveView/index.html', {objectId: String(objectId).trim()}) : '';
+}
+if (stylesheet.nodes.object) {
+  var externalActions = stylesheet.nodes.object.actions;
+  if (!externalActions.some(function (action) { return action.name === 'Classification neighborhood'; })) {
+    externalActions.push({name: 'Classification neighborhood',
+      url: {js: "finkNeighborhoodUrl(eMap.get('objectId'))"}, target: 'external'});
+  }
+  if (!externalActions.some(function (action) { return action.name === 'LSST Light Curve Visualizer'; })) {
+    externalActions.push({name: 'LSST Light Curve Visualizer',
+      url: {js: "finkLightCurveVisualizerUrl(eMap.get('objectId'))"}, target: 'external'});
+  }
+}
