@@ -1,6 +1,6 @@
 #!/usr/bin/bash -l
 set -eo pipefail
-TAGS_LIST=/home/almalinux/Lomikel/src/sh/cron/CC/LSSTTags.lst
+TAGS_LIST=~/Lomikel/src/sh/cron/CC/LSSTTags.lst
 if [[ ! -s "${TAGS_LIST}" ]]; then
   echo "Missing or empty LSST tag table list: ${TAGS_LIST}" >&2
   exit 1
@@ -14,7 +14,6 @@ if [[ -e ${LOCK} ]]; then
   fi
 PID=$$
 echo ${PID} > ${LOCK}
-trap '/bin/rm -f "${LOCK}"' EXIT
 
 exec > >(tee -a "${LOG}") 2>&1 || exit 1
 cd ~/Lomikel/ant
