@@ -1,3 +1,5 @@
+setenforce 0
+
 /etc/systemd/system/finkbrowser.service
 
 chcon -t bin_t /home/almalinux/Lomikel/src/sh/service/CC/finkbrowser.sh
