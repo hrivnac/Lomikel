@@ -77,8 +77,12 @@ assert.equal(other.prevented,false,'unrelated graph actions keep their legacy ro
 link.textContent='LightCurve';
 vm.runInNewContext(text('lightcurve-graph.js'),ctx);
 assert.equal(handlers.filter(item=>item.name==='click').length,1,'graph reload must not duplicate the click handler');
-assert.match(text('LightCurveData.jsp'),/api\.ztf\.fink-portal\.org\/api\/v1\/objects/);
-assert.match(text('LightCurveData.jsp'),/api\.lsst\.fink-portal\.org\/api\/v1\/sources/);
+assert.match(text('LightCurveData.jsp'),/api\.ztf\.fink-portal\.org/);
+assert.match(text('LightCurveData.jsp'),/\/api\/v1\/objects/);
+assert.match(text('LightCurveData.jsp'),/api\.lsst\.fink-portal\.org/);
+assert.match(text('LightCurveData.jsp'),/\/api\/v1\/sources/);
+assert.match(text('LightCurveData.jsp'),/\/api\/v1\/resolver/);
+assert.match(text('LightCurveData.jsp'),/\/api\/v1\/sso/);
 for (const logged of queries.slice(0,2)) {
  const [,body]=logged.query.split(' ');
  const upstream=JSON.parse(body);
