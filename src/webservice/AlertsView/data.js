@@ -73,7 +73,11 @@ async function fetchAlerts(survey) {
   updateStatusPanel();
   const latestMode = requestSettings.fetchStart === 0;
   const startdate = latestMode ? null : formatStartDateUtc(requestSettings.fetchStart);
-  const classMap = (survey === "LSST") ? classesLSSTTags : classesZTF;
+  // HBase has more tags than the public REST tag-search endpoint supports.
+  const classMap = (survey === "LSST")
+    ? Object.fromEntries(Object.entries(classesLSSTTags).filter(([name]) =>
+        Object.prototype.hasOwnProperty.call(LSST_REST_TAG_COLORS, name)))
+    : classesZTF;
   const requests = (survey === "LSST" && latestMode)
     ? [{classification: null, latestLsst: true, url: `LatestAlerts.jsp?n=${encodeURIComponent(requestSettings.nAlerts)}`}]
     : Object.keys(classMap).map(classification => {
@@ -228,14 +232,25 @@ function updateRuntimeModeUi(normalizedLatestQuery = false) {
   }
 
 async function initializeAlertsData() {
+  // Do not start LSST polling before the WAR's canonical tag list is loaded.
+  let tagsLoaded = false;
+  try {
+    await loadLsstTagTables();
+    tagsLoaded = true;
+    }
+  catch (error) {
+    console.error("Unable to load LSST tag tables", error);
+    }
   latestAlertsAvailable = await detectLatestAlertsSupport();
   fetchPeriod = latestAlertsAvailable ? 0 : 10;
   fetchStart = latestAlertsAvailable ? 0 : 48;
   fetchLSST = latestAlertsAvailable;
   getQueryParams();
+  if (!tagsLoaded) fetchLSST = false;
   updateRuntimeModeUi(normalizeStandaloneLatestQuery());
   if (!fetchLSST) {
-    surveyStatus.LSST = {state: "paused", count: 0, errors: [], updatedAt: null};
+    surveyStatus.LSST = {state: tagsLoaded ? "paused" : "error", count: 0,
+      errors: tagsLoaded ? [] : ["LSSTTags.lst could not be loaded"], updatedAt: null};
     }
   updateStatusPanel();
   const initialRefresh = refreshEnabledSurveys();

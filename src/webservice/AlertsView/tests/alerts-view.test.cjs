@@ -666,16 +666,17 @@ test("touch pointerleave keeps the tooltip available for a second tap", () => {
   assert.equal(tooltip.style.display, "flex");
 });
 
-async function loadData({failClasses = [], emptyClasses = [], search = "", jspMode = "available"} = {}) {
+async function loadData({failClasses = [], emptyClasses = [], search = "", jspMode = "available", tagListStatus = 200} = {}) {
   const requests = [];
   const probeRequests = [];
   const replacedUrls = [];
   const elements = new Map();
   const timerState = {callback: null, delay: null, cleared: []};
   let probeTimeoutCallback = null;
+  let activeTimeoutId = 0;
   const context = {
     AbortController, URLSearchParams,
-    clearTimeout() {},
+    clearTimeout(id) { if (id === activeTimeoutId) probeTimeoutCallback = null; },
     clearInterval(id) { timerState.cleared.push(id); },
     console: {error() {}, log() {}},
 
@@ -686,6 +687,17 @@ async function loadData({failClasses = [], emptyClasses = [], search = "", jspMo
       },
     },
     fetch: async (url, options = {}) => {
+      if (url === "LSSTTags.lst") {
+        if (tagListStatus === "timeout") {
+          return new Promise((_resolve, reject) => {
+            options.signal.addEventListener("abort", () => reject(new Error("aborted")));
+          });
+        }
+        return {ok: tagListStatus === 200, status: tagListStatus,
+          async text() {
+            return fs.readFileSync(path.join(alertsView, "../../sh/cron/CC/LSSTTags.lst"), "utf8");
+          }};
+      }
       if (String(url).startsWith("LatestAlerts.jsp?probe=1")) {
         probeRequests.push(url);
         if (jspMode === "timeout") {
@@ -737,8 +749,8 @@ async function loadData({failClasses = [], emptyClasses = [], search = "", jspMo
       }
       requests.push(url);
       const parsed = new URL(url);
-      const cls = parsed.searchParams.get("class");
-      if (!cls) throw new Error(`Unexpected non-ZTF request: ${url}`);
+      const cls = parsed.searchParams.get("class") || parsed.searchParams.get("tag");
+      if (!cls) throw new Error(`Unexpected tag or class request: ${url}`);
       if (failClasses.includes(cls)) {
         return {ok: false, status: 503, async json() { return []; }};
       }
@@ -762,9 +774,10 @@ async function loadData({failClasses = [], emptyClasses = [], search = "", jspMo
       return 1;
     },
     setTimeout(callback, delay) {
+      activeTimeoutId += 1;
       probeTimeoutCallback = callback;
       timerState.probeTimeoutDelay = delay;
-      return 2;
+      return activeTimeoutId;
     },
     window: {
       location: {search, pathname: "/AlertsView/", hash: ""},
@@ -779,7 +792,20 @@ async function loadData({failClasses = [], emptyClasses = [], search = "", jspMo
       {filename: file},
     );
   }
-  if (jspMode === "timeout") probeTimeoutCallback();
+  if (tagListStatus === "timeout") {
+    assert.equal(typeof probeTimeoutCallback, "function");
+    const tagTimeout = probeTimeoutCallback;
+    probeTimeoutCallback = null;
+    tagTimeout();
+  }
+  if (jspMode === "timeout") {
+    for (let attempt = 0; attempt < 10 && (activeTimeoutId < 2 || !probeTimeoutCallback); attempt++) {
+      await new Promise(resolve => setImmediate(resolve));
+    }
+    assert.ok(activeTimeoutId >= 2);
+    assert.equal(typeof probeTimeoutCallback, "function");
+    probeTimeoutCallback();
+  }
   await vm.runInContext("initialRefreshPromise", context);
   return {context, elements, probeRequests, requests, timerCallback: timerState.callback, timerState, replacedUrls};
 }
@@ -822,6 +848,26 @@ test("JSP capability enables default latest mode for both surveys", async () => 
   assert.equal(vm.runInContext("fetchLSST", context), true);
   assert.equal(vm.runInContext("surveyStatus.LSST.state", context), "ready");
   assert.equal(vm.runInContext("alertsPool.length", context), 6);
+});
+
+test("LSST classifications come from the packaged list, while polling uses REST-supported tags only", async () => {
+  const {context, requests} = await loadData({search: "?fetchStart=48&fetchLSST=true"});
+  const expected = fs.readFileSync(path.join(alertsView, "../../sh/cron/CC/LSSTTags.lst"), "utf8")
+    .trim().split("\n").map(line => line.slice("rubin.tag_".length));
+  assert.deepEqual([...vm.runInContext("Object.keys(classesLSSTTags)", context)], expected);
+  const lsstRequests = requests.filter(url => String(url).includes("api.lsst.fink-portal.org"));
+  assert.equal(lsstRequests.length, 5);
+  assert.equal(lsstRequests.every(url => expected.includes(new URL(url).searchParams.get("tag"))), true);
+});
+
+test("missing packaged list disables LSST polling and reports failure, but ZTF still refreshes", async () => {
+  for (const tagListStatus of [404, "timeout"]) {
+    const {context, requests} = await loadData({tagListStatus});
+    assert.equal(vm.runInContext("fetchLSST", context), false);
+    assert.equal(vm.runInContext("surveyStatus.LSST.state", context), "error");
+    assert.equal(requests.length, 5);
+    assert.equal(requests.every(url => url.includes("api.ztf.fink-portal.org")), true);
+  }
 });
 
 test("missing or unexecuted JSP selects standalone timed defaults", async () => {

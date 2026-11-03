@@ -812,6 +812,8 @@
     <replace file="../build/Apps.html" token="@VERSION@" value="${version}"/>
     <replace file="../build/Apps.html" token="@BUILD@" value="${TSTAMP} by ${user.name} for ${target}"/>
     <war destfile="../lib/FinkBrowser.war" webxml="../src/webservice/web.xml">
+      <!-- Package the importer's canonical list, not a second maintained copy. -->
+      <zipfileset file="../src/sh/cron/CC/LSSTTags.lst" prefix="AlertsView"/>
       <fileset dir="../src/webservice">
         <include name="**/*"/>
         <exclude name="index.jsp"/>
