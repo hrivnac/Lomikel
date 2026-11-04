@@ -69,10 +69,11 @@ function safeGraphAction(action, url) {
   if (external) {
     if (!/^https?:\/\//i.test(url)) return null;
   } else {
-    if (!['result','table','plot','image','skyview','graph'].includes(action.target) ||
+    if (!['result','table','plot','image','skyview','graph','tag'].includes(action.target) ||
         !((action.target === 'plot' && url === 'lightcurve') ||
+          (action.target === 'tag' && url === 'tag') ||
           (action.target === 'image' && url === 'cutouts') ||
-          /^(?!\/|\\|#|\?)[A-Za-z][\w./-]*\.jsp(?:\?[^#]*)?$/.test(url)) ||
+          (action.target !== 'tag' && /^(?!\/|\\|#|\?)[A-Za-z][\w./-]*\.jsp(?:\?[^#]*)?$/.test(url))) ||
         url.split('?')[0].split('/').includes('..')) return null;
   }
   return {name:graphText(action.name), url:url, target:action.target};

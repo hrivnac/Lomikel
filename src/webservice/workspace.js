@@ -51,6 +51,10 @@
   window.loadPane = function (pane, url, iframe, height, encoded) {
     var plotPane = pane === 'plot' && document.getElementById && document.getElementById('plot');
     if (plotPane) plotPane.classList.remove('ws-correlogram');
+    // "Tag" is an action, not a pane: it never reaches the legacy loader.
+    if (pane === 'tag') {
+      return url === 'tag' && window.tagGraphState ? window.tagGraphState.run() : false;
+    }
     if (pane === 'plot' && url === 'lightcurve' && window.lightcurveGraphState) {
       return window.lightcurveGraphState.open();
     }
