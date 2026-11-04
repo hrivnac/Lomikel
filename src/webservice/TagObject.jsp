@@ -21,7 +21,13 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Properties" %>
+<%@ page import="java.util.concurrent.Callable" %>
+<%@ page import="java.util.concurrent.ExecutorService" %>
+<%@ page import="java.util.concurrent.Executors" %>
+<%@ page import="java.util.concurrent.Future" %>
 <%@ page import="java.util.concurrent.TimeUnit" %>
+<%@ page import="java.util.concurrent.TimeoutException" %>
+<%@ page import="java.util.concurrent.ExecutionException" %>
 <%@ page import="java.util.concurrent.locks.ReentrantLock" %>
 <%@ page import="java.util.regex.Pattern" %>
 
@@ -107,27 +113,61 @@
       }
     }
 
+  // Opening a graph can block for minutes inside the HBase client (e.g. region servers unreachable although
+  // ZooKeeper answers). The open therefore runs on a daemon thread and the request waits only a bounded time;
+  // a still-running open is reused by later requests instead of starting another one.
+  private static final ExecutorService OPENER = Executors.newCachedThreadPool(new java.util.concurrent.ThreadFactory() {
+    public Thread newThread(Runnable r) { Thread t = new Thread(r, "TagObject-open"); t.setDaemon(true); return t; }
+    });
+  private static final Map<String, Future<Object[]>> OPENING = new HashMap<String, Future<Object[]>>();
+
+  private static long openTimeoutSeconds() {
+    try { return Long.parseLong(System.getProperty("fink.tag.open.timeout", "20")); }
+    catch (NumberFormatException e) { return 20; }
+    }
+
   // JanusClient opens a properties file, so the configuration goes through a private (owner-only) temporary
   // file that exists only while the graph is being opened.
-  private static FinkGremlinRecipiesG recipes(String survey, InputStream bundled) throws Exception {
-    FinkGremlinRecipiesG cached = RECIPES.get(survey);
-    if (cached != null) return cached;
-    Properties p = load(survey, bundled);
-    requireReachable(p);
+  private static Object[] open(final String survey, final Properties p) throws Exception {
     Path file = Files.createTempFile("fink-tag-" + survey + "-", ".properties",
                                      PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")));
     try {
       try (OutputStream stream = Files.newOutputStream(file)) { p.store(stream, null); }
       Init.initWS("TagObjectWS");
       JanusClient client = new JanusClient(file.toString());
-      FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(client);
-      CLIENTS.put(survey, client);
-      RECIPES.put(survey, gr);
-      return gr;
+      return new Object[] {client, new FinkGremlinRecipiesG(client)};
       }
     finally {
       Files.deleteIfExists(file);
       }
+    }
+
+  private static FinkGremlinRecipiesG recipes(final String survey, InputStream bundled) throws Exception {
+    FinkGremlinRecipiesG cached = RECIPES.get(survey);
+    if (cached != null) return cached;
+    Future<Object[]> opening = OPENING.get(survey);
+    if (opening == null) {
+      final Properties p = load(survey, bundled);
+      requireReachable(p);
+      opening = OPENER.submit(new Callable<Object[]>() { public Object[] call() throws Exception { return open(survey, p); } });
+      OPENING.put(survey, opening);
+      }
+    Object[] opened;
+    try {
+      opened = opening.get(openTimeoutSeconds(), TimeUnit.SECONDS);
+      }
+    catch (TimeoutException slow) {
+      throw new IllegalStateException("The " + survey + " graph did not open within " + openTimeoutSeconds() +
+                                      " s, HBase is probably not reachable from this server", slow);
+      }
+    catch (ExecutionException failed) {
+      OPENING.remove(survey);
+      throw new IllegalStateException("The " + survey + " graph could not be opened", failed.getCause());
+      }
+    OPENING.remove(survey);
+    CLIENTS.put(survey, (JanusClient)opened[0]);
+    RECIPES.put(survey, (FinkGremlinRecipiesG)opened[1]);
+    return (FinkGremlinRecipiesG)opened[1];
     }
 
   // A failed or interrupted operation may leave a broken graph/transaction: drop and reopen next time.
@@ -197,7 +237,8 @@
       application.log("TagObject: writable " + survey + " graph unavailable", unavailable);
       discard(survey);
       response.setStatus(503);
-      String why = String.valueOf(unavailable.getMessage()).contains("is not reachable from this server") ?
+      String why = (String.valueOf(unavailable.getMessage()).contains("is not reachable from this server") ||
+                    String.valueOf(unavailable.getMessage()).contains("did not open within")) ?
                    ": " + unavailable.getMessage().replaceAll("[^A-Za-z0-9 .:_-]", "") : " (see the server log)";
       out.print(new JSONObject().put("error", "Writable " + survey + " graph is not available" + why).toString());
       return;

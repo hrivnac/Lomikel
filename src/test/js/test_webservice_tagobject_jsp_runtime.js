@@ -98,6 +98,21 @@ ${body}
    check(System.currentTimeMillis()-started<5000,"unreachable HBase must fail fast");
    check(lastBody.contains("HBase 127.0.0.1:1 is not reachable from this server"),"clear reason");
    System.clearProperty("fink.tag.janus.LSST"); discard("LSST");
+   // 1c. HBase "reachable" at TCP level but never answering: the open is bounded instead of hanging.
+   try (java.net.ServerSocket hole=new java.net.ServerSocket(0)) {
+     Thread acceptor=new Thread(() -> { try { while (true) { java.net.Socket c=hole.accept(); } } catch (Exception e) { } }); acceptor.setDaemon(true); acceptor.start();
+     File silent=new File(bundledDir,"silent.properties");
+     try(FileWriter w=new FileWriter(silent)) { w.write("gremlin.graph=org.janusgraph.core.JanusGraphFactory\\nstorage.backend=hbase\\nstorage.hostname=127.0.0.1\\nstorage.port="+hole.getLocalPort()+"\\nstorage.read-only=false\\n"); }
+     System.setProperty("fink.tag.janus.LSST",silent.getPath()); System.setProperty("fink.tag.open.timeout","4");
+     long begun=System.currentTimeMillis();
+     check(post(lsst)==503,"silent HBase must be 503");
+     check(System.currentTimeMillis()-begun<9000,"silent HBase must be bounded");
+     check(lastBody.contains("did not open within 4 s"),"clear timeout reason");
+     long again=System.currentTimeMillis();
+     check(post(lsst)==503 && System.currentTimeMillis()-again<9000,"a second request reuses the pending open");
+     check(OPENING.size()==1,"only one open is ever pending");
+     }
+   OPENING.clear(); System.clearProperty("fink.tag.janus.LSST"); System.clearProperty("fink.tag.open.timeout"); discard("LSST");
    // 2. An object that is not in the survey graph is never created by Tag.
    check(post(lsst)==404,"unknown object must be 404");
    JanusClient lsstGraph=CLIENTS.get("LSST");
@@ -138,7 +153,7 @@ ${body}
   fs.writeFileSync(path.join(dir, 'TagObjectJspTest.java'), java);
   const classpath = [lomikel, orgJson, path.join(janus, '*')].join(path.delimiter);
   for (const [cmd, args] of [['javac', ['-nowarn', '-cp', classpath, 'TagObjectJspTest.java']],
-                             ['java', ['-cp', `${dir}${path.delimiter}${classpath}`, 'TagObjectJspTest', dir]]]) {
+                             ['java', ['-Djava.io.tmpdir=' + dir, '-cp', `${dir}${path.delimiter}${classpath}`, 'TagObjectJspTest', dir]]]) {
     const r = spawnSync(cmd, args, {cwd: dir, encoding: 'utf8', timeout: 180000});
     assert.equal(r.status, 0, `${cmd}: ${r.stdout}${r.stderr}`.slice(-4000));
     if (cmd === 'java') process.stdout.write(r.stdout.split('\n').filter(line => /^TagObject JSP/.test(line)).join('\n') + '\n');
