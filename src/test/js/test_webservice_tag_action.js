@@ -72,6 +72,7 @@ for (const id of ['ZTF20aachcvz', '313761043604045880', '20892028060578637']) {
 }
 
 // 4. tag-graph.js behaviour.
+const list = values => ({status: {code: 200}, result: {data: {'@type': 'g:List', '@value': values}}});
 function tagContext({confirmAnswer = true, origin = '//134.158.243.144:24445', id = '313761043604045880',
                      responder} = {}) {
   const messages = [];
@@ -86,9 +87,12 @@ function tagContext({confirmAnswer = true, origin = '//134.158.243.144:24445', i
     confirm: question => { messages.push('CONFIRM ' + question); return confirmAnswer; },
     fetch: async (target) => {
       requests.push(decodeURIComponent(target));
-      const reply = responder ? responder(requests.length, requests.at(-1)) :
-        (requests.length === 1 ? {status: {code: 200}, result: {data: {'@type': 'g:List', '@value': []}}}
-          : {status: {code: 200}, result: {data: {'@type': 'g:List', '@value': [{'@type': 'g:Int64', '@value': 1}]}}});
+      const target_ = requests.at(-1);
+      const kind = /storage\.read-only/.test(target_) ? 'probe' : /registerOCol/.test(target_) ? 'write' : 'verify';
+      const custom = responder ? await responder(kind, target_) : undefined;
+      const reply = custom !== undefined ? custom : (kind === 'probe' ? list(['false']) :
+        kind === 'write' ? list([]) : list([{'@type': 'g:Int64', '@value': 1}]));
+      if (reply instanceof Error) throw reply;
       return {ok: reply.http === undefined, status: reply.http || 200, json: async () => reply};
     }});
   context.window = context;
@@ -100,21 +104,23 @@ const CLS = 'com.astrolabsoftware.FinkBrowser.Januser.Classifier';
   // LSST object -> LSST classifier argument, the vertex's own server, fixed OCol name, empty instances/weights.
   let t = tagContext();
   assert.equal(await t.context.tagGraphState.run(), true);
-  assert.equal(t.requests.length, 2);
-  assert.equal(t.requests[0], `//134.158.243.144:24445?gremlin=gr.registerOCol(${CLS}.instance('TAG', 'LSST', ''), 'GraphBrowser', '313761043604045880', 1.0, '', '')`);
-  assert.match(t.requests[1], /^\/\/134\.158\.243\.144:24445\?gremlin=g\.V\(\)\.has\('lbl', 'OCol'\)\.has\('classifier', 'TAG'\)\.has\('cls', 'GraphBrowser'\)\.out\('deepcontains'\)\.has\('lbl', 'object'\)\.has\('objectId', '313761043604045880'\)\.count\(\)$/);
+  assert.equal(t.requests.length, 3);
+  assert.match(t.requests[0], /storage\.read-only/);
+  assert.equal(t.requests[1], `//134.158.243.144:24445?gremlin=gr.registerOCol(${CLS}.instance('TAG', 'LSST', ''), 'GraphBrowser', '313761043604045880', 1.0, '', '')`);
+  assert.match(t.requests[2], /^\/\/134\.158\.243\.144:24445\?gremlin=g\.V\(\)\.has\('lbl', 'OCol'\)\.has\('classifier', 'TAG'\)\.has\('cls', 'GraphBrowser'\)\.out\('deepcontains'\)\.has\('lbl', 'object'\)\.has\('objectId', '313761043604045880'\)\.count\(\)$/);
   assert.ok(t.messages.some(m => /CONFIRM Tag object 313761043604045880 as "GraphBrowser".*134\.158\.243\.144:24445/.test(m)));
   assert.ok(t.messages.some(m => /is now tagged "GraphBrowser" \(verified/.test(m)));
 
   // ZTF object on the ZTF graph server.
   t = tagContext({id: 'ZTF21aaxtctv', origin: '//157.136.253.253:24445'});
   assert.equal(await t.context.tagGraphState.run(), true);
-  assert.match(t.requests[0], /^\/\/157\.136\.253\.253:24445\?gremlin=gr\.registerOCol\(.*instance\('TAG', 'ZTF', ''\), 'GraphBrowser', 'ZTF21aaxtctv', 1\.0, '', ''\)$/);
+  assert.match(t.requests[1], /^\/\/157\.136\.253\.253:24445\?gremlin=gr\.registerOCol\(.*instance\('TAG', 'ZTF', ''\), 'GraphBrowser', 'ZTF21aaxtctv', 1\.0, '', ''\)$/);
 
   // Declined confirmation: no request at all.
   t = tagContext({confirmAnswer: false});
   assert.equal(await t.context.tagGraphState.run(), false);
-  assert.equal(t.requests.length, 0);
+  assert.equal(t.requests.length, 1, 'only the read-only probe was sent');
+  assert.equal(t.requests.some(r => /registerOCol/.test(r)), false);
 
   // Fail closed: unknown origin, hostile or missing object ID, nothing selected.
   for (const bad of [{origin: null}, {origin: 'javascript:alert(1)'}, {origin: '//evil.example/x?y=1'},
@@ -128,34 +134,44 @@ const CLS = 'com.astrolabsoftware.FinkBrowser.Januser.Classifier';
   assert.equal(t.requests.length, 0);
 
   // Server error: reported, sanitized, no verification query.
-  t = tagContext({responder: () => ({http: 500, message: 'No such property: gr\n\u0000boom'})});
+  t = tagContext({responder: kind => kind === 'write' ? {http: 500, message: 'No such property: gr\n\u0000boom'} : undefined});
   assert.equal(await t.context.tagGraphState.run(), false);
-  assert.equal(t.requests.length, 1);
+  assert.equal(t.requests.length, 2, 'probe and failed write, no verification');
   assert.ok(t.messages.some(m => /Tag failed for 313761043604045880: No such property: gr\s+boom/.test(m) && /repeating it is safe/.test(m)));
 
   // Write accepted but not found afterwards: not reported as success.
-  t = tagContext({responder: n => n === 1 ? {status: {code: 200}, result: {data: {'@value': []}}}
-    : {status: {code: 200}, result: {data: {'@value': [{'@value': 0}]}}}});
+  t = tagContext({responder: kind => kind === 'verify' ? list([{'@value': 0}]) : undefined});
   assert.equal(await t.context.tagGraphState.run(), false);
   assert.ok(t.messages.some(m => /not found in "GraphBrowser" afterwards/.test(m)));
 
   // One request at a time.
   let release;
-  t = tagContext({responder: n => n === 1 ? new Promise(r => { release = r; }) : null});
-  const original = t.context.fetch;
-  t.context.fetch = (target) => { t.requests.push(decodeURIComponent(target));
-    return t.requests.length === 1 ? new Promise(r => { release = () => r({ok: true, status: 200,
-      json: async () => ({status: {code: 200}, result: {data: {'@value': [{'@value': 1}]}}})}); })
-      : Promise.resolve({ok: true, status: 200, json: async () => ({status: {code: 200}, result: {data: {'@value': [{'@value': 1}]}}})}); };
+  t = tagContext({responder: kind => kind === 'probe' ? new Promise(r => { release = () => r(list(['false'])); }) : undefined});
   const first = t.context.tagGraphState.run();
   await new Promise(r => setImmediate(r));
   assert.equal(await t.context.tagGraphState.run(), false);
   assert.ok(t.messages.some(m => /still running/.test(m)));
   release();
   assert.equal(await first, true);
-  void original;
+
+  // Read-only database (the real situation on both Gremlin servers): refuse before asking or writing.
+  for (const flag of [['true'], [true], ['TRUE']]) {
+    t = tagContext({responder: kind => kind === 'probe' ? list(flag) : undefined});
+    assert.equal(await t.context.tagGraphState.run(), false);
+    assert.equal(t.requests.length, 1, 'only the read-only probe was sent');
+    assert.equal(t.messages.some(m => m.startsWith('CONFIRM')), false, 'no confirmation for an impossible write');
+    assert.ok(t.messages.some(m => /read-only \(storage\.read-only=true\).*nothing was written/.test(m)));
+  }
+  // An unreadable probe does not block a writable server.
+  t = tagContext({responder: kind => kind === 'probe' ? {http: 500, message: 'boom'} : undefined});
+  assert.equal(await t.context.tagGraphState.run(), true);
+
+  // A browser CORS/network failure (fetch TypeError) is explained instead of shown as a mystery.
+  t = tagContext({responder: kind => kind === 'write' ? new TypeError('Failed to fetch') : undefined});
+  assert.equal(await t.context.tagGraphState.run(), false);
+  assert.ok(t.messages.some(m => /blocked or lost the response \(a CORS error here usually hides a server-side rejection/.test(m)));
 
   // The page loads the script and the cache-busted action list.
-  assert.match(read('GraphView.jsp'), /tag-graph\.js\?v=tag-1/);
+  assert.match(read('GraphView.jsp'), /tag-graph\.js\?v=tag-2/);
   console.log('Tag action: sentinel action, fixed validated registerOCol on the vertex origin server, fail-closed checks');
 })().catch(error => { console.error(error); process.exit(1); });
