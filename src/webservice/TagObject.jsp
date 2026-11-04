@@ -14,6 +14,8 @@
 <%@ page import="java.nio.file.Files" %>
 <%@ page import="java.nio.file.Path" %>
 <%@ page import="java.nio.file.attribute.PosixFilePermissions" %>
+<%@ page import="java.net.InetSocketAddress" %>
+<%@ page import="java.net.Socket" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.util.HashMap" %>
@@ -83,12 +85,35 @@
     return p;
     }
 
+  // Opening a graph whose HBase or the index server cannot be reached blocks for minutes: probe them first.
+  private static void requireReachable(Properties p) throws Exception {
+    String[][] endpoints = {
+      {"HBase", p.getProperty("storage.hostname"), p.getProperty("storage.port", "2181")},
+      {"Index server", p.getProperty("index.search.hostname"), null}};
+    if (!"hbase".equalsIgnoreCase(String.valueOf(p.getProperty("storage.backend")).trim())) endpoints[0][1] = null;
+    for (String[] endpoint : endpoints) {
+      if (endpoint[1] == null || endpoint[1].trim().isEmpty()) continue;
+      String host = endpoint[1].split(",")[0].trim();
+      String port = endpoint[2];
+      int colon = host.lastIndexOf(':');
+      if (colon > 0) { port = host.substring(colon + 1); host = host.substring(0, colon); }
+      if (port == null) port = "9200";
+      try (Socket socket = new Socket()) {
+        socket.connect(new InetSocketAddress(host, Integer.parseInt(port.trim())), 3000);
+        }
+      catch (Exception e) {
+        throw new IllegalStateException(endpoint[0] + " " + host + ":" + port + " is not reachable from this server", e);
+        }
+      }
+    }
+
   // JanusClient opens a properties file, so the configuration goes through a private (owner-only) temporary
   // file that exists only while the graph is being opened.
   private static FinkGremlinRecipiesG recipes(String survey, InputStream bundled) throws Exception {
     FinkGremlinRecipiesG cached = RECIPES.get(survey);
     if (cached != null) return cached;
     Properties p = load(survey, bundled);
+    requireReachable(p);
     Path file = Files.createTempFile("fink-tag-" + survey + "-", ".properties",
                                      PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")));
     try {
@@ -172,7 +197,9 @@
       application.log("TagObject: writable " + survey + " graph unavailable", unavailable);
       discard(survey);
       response.setStatus(503);
-      out.print(new JSONObject().put("error", "Writable " + survey + " graph is not available (see the server log)").toString());
+      String why = String.valueOf(unavailable.getMessage()).contains("is not reachable from this server") ?
+                   ": " + unavailable.getMessage().replaceAll("[^A-Za-z0-9 .:_-]", "") : " (see the server log)";
+      out.print(new JSONObject().put("error", "Writable " + survey + " graph is not available" + why).toString());
       return;
       }
     application.log("TagObject: " + survey + " graph ready (" + (System.currentTimeMillis() - opened) + " ms)");
