@@ -239,7 +239,7 @@
       }
     });
     JSONArray sources = new JSONArray(ordered);
-    out.print(new JSONObject().put("objectId", id).put("sources", sources)
+    out.print(new JSONObject().put("objectId", id).put("designation", designation).put("sources", sources)
       .put("esMjdCount", mjds.length()).put("esPositionCount", locations.length())
       .put("esMjdAvailable", mjdAvailable)
       .put("esCoverageComplete", coversEsHistory(mjds, locations, sources))

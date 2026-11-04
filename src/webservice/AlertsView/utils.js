@@ -123,6 +123,12 @@ function getPortalUrl(alert) {
     };
   const origin = portalOrigins[alert.survey];
   if (!origin || alert.objectId === undefined || alert.objectId === null) return null;
+  // An SS source is identified by its ssObjectId, which the portal does not know ("not found");
+  // its page is addressed by designation. Without one there is no honest link.
+  if (alert.survey === "LSST" && alert.class === "LSST SS source") {
+    const designation = typeof alert.designation === "string" ? alert.designation.trim() : "";
+    return /^[A-Za-z0-9][A-Za-z0-9 ._()-]{0,63}$/.test(designation) ? origin + encodeURIComponent(designation) : null;
+    }
   return origin + encodeURIComponent(String(alert.objectId));
   }
   

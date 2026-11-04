@@ -1203,3 +1203,37 @@ test("the dynamic camera frames the whole SS trajectory, not only the alerts", (
   vm.runInContext("ssTrajectoryEnabled = false", context);
   assert.equal(vm.runInContext("getCameraBounds([])", context), null, "hidden trajectory no longer moves the camera");
 });
+
+test("Fink Portal links: DIA by object ID, SS by designation (the portal does not know ssObjectId)", () => {
+  const context = loadUtils();
+  const url = alert => vm.runInContext(`getPortalUrl(${JSON.stringify(alert)})`, context);
+  assert.equal(url({survey: "LSST", objectId: "170595944958525459", class: "LSST DIA source"}),
+    "https://lsst.fink-portal.org/170595944958525459");
+  assert.equal(url({survey: "ZTF", objectId: "ZTF21aaxtctv", class: "SN candidate"}),
+    "https://ztf.fink-portal.org/ZTF21aaxtctv");
+  const ss = {survey: "LSST", objectId: "20892028060578637", class: "LSST SS source"};
+  assert.equal(url({...ss, designation: "J90W03M"}), "https://lsst.fink-portal.org/J90W03M");
+  assert.equal(url({...ss, designation: "1990 WM3"}), "https://lsst.fink-portal.org/1990%20WM3");
+  assert.equal(url(ss), null, "never fall back to the unknown ssObjectId page");
+  for (const bad of ["../x", "a/b", "x#y", "<b>", ""]) assert.equal(url({...ss, designation: bad}), null, bad);
+});
+
+test("SS rows and tooltips link to the portal once the designation is known", () => {
+  const {context, elements} = loadAppForInteraction({withUtils: true, war: true});
+  context.alertsPool = [];
+  elements.get("btnAllAlerts").emit("click");
+  context.trajectory = {objectId: "20892028060578637", designation: "J90W03M", points: [
+    {sourceId: "a", mjd: 10, ra: 100, dec: 0}, {sourceId: "b", mjd: 20, ra: 101, dec: 0}]};
+  vm.runInContext('ssTrajectories.set(trajectory.objectId, trajectory); ssTrajectoryEnabled = true; renderRecentAlerts()', context);
+  const row = elements.get("recentAlerts").children[0];
+  const anchor = row.children.find(child => child.tagName === "A");
+  assert.equal(anchor.href, "https://lsst.fink-portal.org/J90W03M");
+  assert.equal(anchor.textContent, "LSST 20892028060578637");
+  context.ssAlert = {survey: "LSST", objectId: "20892028060578637", class: "LSST SS source",
+    designation: "J90W03M", jd: "MJD 10 · source a"};
+  vm.runInContext("showAlertTooltip({alert: ssAlert}, 10, 20)", context);
+  const link = elements.get("tooltip").children.find(child => child.tagName === "A");
+  assert.equal(link.href, "https://lsst.fink-portal.org/J90W03M");
+  const drawing = fs.readFileSync(path.join(alertsView, "drawing.js"), "utf8");
+  assert.match(drawing, /designation: trajectory\.designation/);
+});

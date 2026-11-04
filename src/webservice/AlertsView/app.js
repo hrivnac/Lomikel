@@ -142,7 +142,7 @@ function renderRecentAlerts() {
       .map(trajectory => ({alert: {
         survey: 'LSST', objectId: trajectory.objectId,
         class: 'LSST SS source', jd: trajectory.points[trajectory.points.length - 1].mjd,
-        isSsTrajectory: true
+        designation: trajectory.designation, isSsTrajectory: true
         }}));
     ssItems.sort((a, b) => b.alert.jd - a.alert.jd);
     visible.unshift(...ssItems);
@@ -153,12 +153,12 @@ function renderRecentAlerts() {
     if (alert.isSsTrajectory) item.className = 'ss-trajectory-item';
     const label = `${alert.survey} ${alert.objectId}`;
     // An SS ID is not a DIA object ID; don't create a misleading DIA portal link.
-    const link = alert.isSsTrajectory ? null : createAlertLink(alert, label);
+    const link = createAlertLink(alert, label);
     if (link) {
       item.append(link);
       if (focusedUrl === link.href) replacementFocus = link;
       }
-    else if (alert.isSsTrajectory) {
+    else if (alert.isSsTrajectory) { // no designation known: plain text, never a misleading DIA-style link
       const name = document.createElement('span');
       name.textContent = label;
       item.append(name);
@@ -356,7 +356,7 @@ function showAlertTooltip(flash, clientX, clientY) {
   heading.textContent = String(alert.objectId);
   const metadata = document.createElement('span');
   metadata.textContent = `${alert.survey} · ${alert.class} · ${alert.jd}`;
-  const link = alert.class === 'LSST SS source' ? null : createAlertLink(alert, "View on Fink");
+  const link = createAlertLink(alert, "View on Fink");
   tooltip.replaceChildren(heading, metadata, ...(link ? [link] : []));
   tooltip.style.display = 'flex';
   const box = tooltip.getBoundingClientRect();
