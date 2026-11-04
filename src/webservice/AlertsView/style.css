@@ -52,6 +52,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   display: block;
   touch-action: manipulation;
   }
+#sky.whole-sky { cursor: grab; }
+#sky.whole-sky.dragging { cursor: grabbing; }
 
 #logoWrap, #controls, #legend, #recentAlertsPanel, #infoContainer, #overview-container {
   position: absolute;

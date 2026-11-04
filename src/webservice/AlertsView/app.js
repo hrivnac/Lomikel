@@ -257,11 +257,8 @@ function getCameraBounds(visible) {
   }
 
 function updateCamera() {
-  if (camera.mode === "whole") {
-    camera.targetCenter = {ra: 180, dec: 0};
-    camera.targetZoom = 1;
-    return;
-    }
+  // Whole-sky mode is user-controlled (wheel zoom, drag); setCameraMode() resets it to the full sky.
+  if (camera.mode === "whole") return;
   const visible = getVisibleAlerts();
   const box = getCameraBounds(visible);
   if (!box) return;
@@ -288,6 +285,10 @@ function smoothCamera() {
   camera.currentCenter.ra = interpolateRa(camera.currentCenter.ra, camera.targetCenter.ra, amount);
   camera.currentCenter.dec = lerp(camera.currentCenter.dec, camera.targetCenter.dec, amount);
   const smoothZoom = lerp(camera.currentZoom, camera.targetZoom, amount);
+  if (camera.mode === "whole") {
+    camera.currentZoom = smoothZoom; // the user may zoom in on any part of the sky
+    return;
+    }
   const visibleZoom = getMaxZoomToKeepAlertsVisible([...getVisibleAlerts(), ...getSsTrajectoryCameraAnchors()], camera.currentCenter.ra);
   camera.currentZoom = Math.min(smoothZoom, visibleZoom);
   }
@@ -383,15 +384,84 @@ function keepTooltipOpen() {
   clearTimeout(tooltipTimeout);
   }
 
+// Whole-sky navigation with the mouse: wheel zooms about the pointer, dragging pans.
+const WHOLE_SKY_DRAG_THRESHOLD = 4; // screen pixels before a press becomes a drag
+let skyDrag = null;
+function canvasPoint(event) {
+  const bounds = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - bounds.left) * canvas.width / bounds.width,
+    y: (event.clientY - bounds.top) * canvas.height / bounds.height
+    };
+  }
+
+function setWholeSkyView(center, zoom) {
+  camera.currentCenter = {ra: center.ra, dec: center.dec};
+  camera.targetCenter = {ra: center.ra, dec: center.dec};
+  camera.currentZoom = zoom;
+  camera.targetZoom = zoom;
+  }
+
+function handleSkyWheel(event) {
+  if (camera.mode !== "whole") return;
+  event.preventDefault();
+  hideTooltip();
+  const {x, y} = canvasPoint(event);
+  const unit = event.deltaMode === 1 ? 33 : event.deltaMode === 2 ? 400 : 1;
+  const zoom = clampWholeSkyZoom(camera.currentZoom * Math.exp(-event.deltaY * unit * 0.0015));
+  if (zoom === camera.currentZoom) return;
+  const point = xyToRaDec(x, y);
+  const view = wholeSkyViewKeeping(point, x, y, zoom);
+  setWholeSkyView(view.center, view.zoom);
+  }
+
+function startSkyDrag(event) {
+  skyDrag = null;
+  if (camera.mode !== "whole" || event.button > 0 || event.pointerType === "touch") return;
+  const {x, y} = canvasPoint(event);
+  skyDrag = {pointerId: event.pointerId, startX: event.clientX, startY: event.clientY,
+             point: xyToRaDec(x, y), moved: false};
+  canvas.setPointerCapture?.(event.pointerId);
+  }
+
+function moveSkyDrag(event) {
+  if (!skyDrag || event.pointerId !== skyDrag.pointerId) return false;
+  if (!skyDrag.moved && Math.hypot(event.clientX - skyDrag.startX, event.clientY - skyDrag.startY) <
+      WHOLE_SKY_DRAG_THRESHOLD) return false;
+  if (!skyDrag.moved) {
+    skyDrag.moved = true;
+    hideTooltip();
+    canvas.classList?.add("dragging");
+    }
+  const {x, y} = canvasPoint(event);
+  const view = wholeSkyViewKeeping(skyDrag.point, x, y, camera.currentZoom);
+  setWholeSkyView(view.center, view.zoom);
+  return true;
+  }
+
+function endSkyDrag(event) {
+  if (!skyDrag || (event && event.pointerId !== skyDrag.pointerId)) return;
+  if (event) canvas.releasePointerCapture?.(event.pointerId);
+  canvas.classList?.remove("dragging");
+  skyDrag = null;
+  }
+
 function handleCanvasPointer(event) {
   const flash = findFlashAt(event.clientX, event.clientY);
   if (flash) showAlertTooltip(flash, event.clientX, event.clientY);
   else scheduleTooltipHide();
   }
 canvas.addEventListener('pointermove', event => {
+  if (moveSkyDrag(event) || skyDrag?.moved) return;
   if (event.pointerType === "mouse") handleCanvasPointer(event);
   });
-canvas.addEventListener('pointerdown', handleCanvasPointer);
+canvas.addEventListener('pointerdown', event => {
+  startSkyDrag(event);
+  handleCanvasPointer(event);
+  });
+canvas.addEventListener('pointerup', endSkyDrag);
+canvas.addEventListener('pointercancel', endSkyDrag);
+canvas.addEventListener('wheel', handleSkyWheel, {passive: false});
 canvas.addEventListener('pointerleave', event => {
   if (event.pointerType === "mouse") scheduleTooltipHide();
   });
@@ -405,6 +475,13 @@ const allAlertsButton = document.getElementById('btnAllAlerts');
 const ssTrajectoryButton = document.getElementById('btnSsTrajectory');
 function setCameraMode(mode) {
   camera.mode = mode === "whole" ? "whole" : "dynamic";
+  endSkyDrag();
+  // Choosing Whole sky (again) returns to the full sky; the camera eases there.
+  if (camera.mode === "whole") {
+    camera.targetCenter = {ra: 180, dec: 0};
+    camera.targetZoom = 1;
+    }
+  canvas.classList?.toggle("whole-sky", camera.mode === "whole");
   dynamicButton.setAttribute("aria-pressed", String(camera.mode === "dynamic"));
   wholeButton.setAttribute("aria-pressed", String(camera.mode === "whole"));
   }
