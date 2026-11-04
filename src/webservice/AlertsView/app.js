@@ -242,6 +242,20 @@ function getBoundingBox(activeFlashes) {
   return {raCenter: raBounds.center, raSpan: raBounds.span, minDec, maxDec};
   }
 
+// Frame the alerts and, when SS trajectories are shown, every whole trajectory.
+let combinedBoundsKey = null;
+let combinedBounds = null;
+function getCameraBounds(visible) {
+  const anchors = getSsTrajectoryCameraAnchors();
+  if (!anchors.length) return showAllAlerts ? loadedBounds : getBoundingBox(visible);
+  if (!showAllAlerts) return getBoundingBox([...visible, ...anchors]);
+  if (combinedBoundsKey?.anchors !== anchors || combinedBoundsKey?.loaded !== loadedBounds) {
+    combinedBounds = getBoundingBox([...loadedAlertMarkers, ...anchors]);
+    combinedBoundsKey = {anchors, loaded: loadedBounds};
+    }
+  return combinedBounds;
+  }
+
 function updateCamera() {
   if (camera.mode === "whole") {
     camera.targetCenter = {ra: 180, dec: 0};
@@ -249,7 +263,7 @@ function updateCamera() {
     return;
     }
   const visible = getVisibleAlerts();
-  const box = showAllAlerts ? loadedBounds : getBoundingBox(visible);
+  const box = getCameraBounds(visible);
   if (!box) return;
   camera.targetCenter.ra = box.raCenter;
   camera.targetCenter.dec = (box.minDec + box.maxDec) / 2;
@@ -274,7 +288,7 @@ function smoothCamera() {
   camera.currentCenter.ra = interpolateRa(camera.currentCenter.ra, camera.targetCenter.ra, amount);
   camera.currentCenter.dec = lerp(camera.currentCenter.dec, camera.targetCenter.dec, amount);
   const smoothZoom = lerp(camera.currentZoom, camera.targetZoom, amount);
-  const visibleZoom = getMaxZoomToKeepAlertsVisible(getVisibleAlerts(), camera.currentCenter.ra);
+  const visibleZoom = getMaxZoomToKeepAlertsVisible([...getVisibleAlerts(), ...getSsTrajectoryCameraAnchors()], camera.currentCenter.ra);
   camera.currentZoom = Math.min(smoothZoom, visibleZoom);
   }
 
