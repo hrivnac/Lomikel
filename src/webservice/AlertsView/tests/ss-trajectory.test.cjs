@@ -277,3 +277,17 @@ test("camera anchors cover the whole of every visible trajectory and vanish when
   assert.equal(Math.min(...decs), Math.min(...points.map(p => p.dec)));
   assert.equal(vm.runInContext("getSsTrajectoryCameraAnchors()", context), anchors, "memoized while unchanged");
 });
+
+test("SS trajectories keep a safe designation for the Fink Portal link", () => {
+  const context = loadTrajectory();
+  const make = designation => {
+    context.payload = {objectId: "20892028060578637", designation,
+      sources: [{sourceId: "1", mjd: 10, ra: 1, dec: 1}]};
+    return vm.runInContext("normalizeSsTrajectory(payload)", context).designation;
+  };
+  assert.equal(make("J90W03M"), "J90W03M");
+  assert.equal(make(" 1990 WM3 "), "1990 WM3");
+  for (const bad of [undefined, null, 5, "", "../x", "a/b", "x?y=1", "<script>", "a".repeat(80)]) {
+    assert.equal(make(bad), undefined, String(bad));
+  }
+});

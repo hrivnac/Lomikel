@@ -133,6 +133,8 @@ ${body}
       JSONObject repeated = run(id, 200);
       check(repeated.getJSONArray("sources").length() == 2 && repeated.getBoolean("esCoverageComplete"),
         "distinct source IDs with equal MJD and position must survive deduplicated ES coverage");
+      check("K26A00A".equals(repeated.getString("designation")),
+        "the resolved packed designation is returned so the portal can be linked");
       mode[0] = 8;
       JSONObject unfilledMjd = run(id, 200);
       check(unfilledMjd.getJSONArray("sources").length() == 2 &&

@@ -6,6 +6,10 @@ let ssTrajectoryEnabled = false;
 let ssTrajectoryController = null;
 let ssTrajectoryGeneration = 0;
 
+function isSsDesignation(value) {
+  return typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9 ._()-]{0,63}$/.test(value.trim());
+  }
+
 function normalizeSsTrajectory(payload) {
   if (!payload || !/^\d{1,64}$/.test(String(payload.objectId))) {
     throw new TypeError('Invalid SS object ID');
@@ -29,9 +33,12 @@ function normalizeSsTrajectory(payload) {
     points.push({sourceId: source.sourceId, mjd, ra: ra % 360, dec});
     }
   points.sort((a, b) => a.mjd - b.mjd || a.sourceId.localeCompare(b.sourceId));
-  return {objectId: String(payload.objectId),
+  const result = {objectId: String(payload.objectId),
           latestMjd: points.length ? points[points.length - 1].mjd : null,
           points};
+  // The Fink Portal addresses Solar System objects by designation, never by ssObjectId.
+  if (isSsDesignation(payload.designation)) result.designation = payload.designation.trim();
+  return result;
   }
 
 function matchesSsSource(marker, point) {

@@ -248,7 +248,7 @@ function drawSsTrajectories(primaryMarkers) {
       const latest = index === trajectory.points.length - 1;
       const marker = {
         alert: {survey: 'LSST', objectId: trajectory.objectId,
-          class: 'LSST SS source', ra: point.ra, dec: point.dec,
+          class: 'LSST SS source', designation: trajectory.designation, ra: point.ra, dec: point.dec,
           jd: `MJD ${point.mjd} · source ${point.sourceId}`},
         color,
         radius: ssStarRadius(ssNeighbourGap(screen, index), latest ? 7 : 4, latest ? 2.5 : 1.5)
