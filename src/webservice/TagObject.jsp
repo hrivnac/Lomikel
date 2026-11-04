@@ -164,6 +164,7 @@
       return;
       }
     FinkGremlinRecipiesG gr;
+    long opened = System.currentTimeMillis();
     try {
       gr = recipes(survey, application.getResourceAsStream("ZTF".equals(survey) ? BUNDLED_ZTF : BUNDLED_LSST));
       }
@@ -174,7 +175,9 @@
       out.print(new JSONObject().put("error", "Writable " + survey + " graph is not available (see the server log)").toString());
       return;
       }
+    application.log("TagObject: " + survey + " graph ready (" + (System.currentTimeMillis() - opened) + " ms)");
     try {
+      long t0 = System.currentTimeMillis();
       boolean exists = gr.g().V().has("lbl", "object").has("objectId", objectId).hasNext();
       if (!exists) {
         gr.commit(); // end the read transaction
@@ -182,11 +185,15 @@
         out.print(new JSONObject().put("error", "Object is not in the " + survey + " graph").toString());
         return;
         }
+      application.log("TagObject: " + objectId + " found in " + survey + " graph (" + (System.currentTimeMillis() - t0) + " ms)");
       boolean already = members(gr, objectId) > 0;
       gr.commit();
+      application.log("TagObject: " + objectId + " membership checked (" + (System.currentTimeMillis() - t0) + " ms), registering");
       gr.registerOCol(Classifier.instance("TAG", survey, ""), TAG, objectId, 1.0, "", "");
+      application.log("TagObject: " + objectId + " registered (" + (System.currentTimeMillis() - t0) + " ms), verifying");
       long verified = members(gr, objectId);
       gr.commit();
+      application.log("TagObject: " + objectId + " verified, members=" + verified + " (" + (System.currentTimeMillis() - t0) + " ms)");
       if (verified != 1) {
         response.setStatus(502);
         out.print(new JSONObject().put("error", "Tag was written but could not be verified").toString());

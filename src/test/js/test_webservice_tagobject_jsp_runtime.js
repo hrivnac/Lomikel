@@ -51,7 +51,7 @@ ${body}
  }
  static File bundledDir; static boolean bundleMissing=false;
  static class App { InputStream getResourceAsStream(String name) throws Exception { File f=new File(bundledDir,new File(name).getName()); return bundleMissing||!f.exists()?null:new FileInputStream(f); }
-   void log(String m, Throwable t) { lastLog=m; } }
+   void log(String m, Throwable t) { lastLog=m; }\n   void log(String m) { } }
  static String lastLog; static App application=new App();
  static String lastBody;
  static int run(Request request) throws Exception {
