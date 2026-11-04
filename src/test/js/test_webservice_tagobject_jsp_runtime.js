@@ -49,6 +49,10 @@ ${declaration}
  static void execute(Request request,Response response,PrintWriter out) throws Exception {
 ${body}
  }
+ static File bundledDir; static boolean bundleMissing=false;
+ static class App { InputStream getResourceAsStream(String name) throws Exception { File f=new File(bundledDir,new File(name).getName()); return bundleMissing||!f.exists()?null:new FileInputStream(f); }
+   void log(String m, Throwable t) { lastLog=m; } }
+ static String lastLog; static App application=new App();
  static String lastBody;
  static int run(Request request) throws Exception {
    Response response=new Response();
@@ -73,13 +77,17 @@ ${body}
  static void run(String[] args) throws Exception {
    File dir=new File(args[0]);
    String lsst="313761043604045880", ztf="ZTF21aaxtctv";
-   // 1. A read-only or missing configuration fails closed before anything is opened.
-   System.setProperty("fink.tag.janus.LSST",config(dir,"lsstRO",true));
-   check(post(lsst)==503,"read-only configuration must be refused");
-   System.setProperty("fink.tag.janus.LSST",new File(dir,"missing.properties").getPath());
-   check(post(lsst)==503,"missing configuration must be refused");
-   System.setProperty("fink.tag.janus.LSST",config(dir,"lsst",false));
-   System.setProperty("fink.tag.janus.ZTF",config(dir,"ztf",false));
+   // 1. Bundled configuration: a read-only or missing one fails closed before anything is opened.
+   bundledDir=new File(dir,"bundle"); bundledDir.mkdirs();
+   config(bundledDir,"CCRW",true);
+   check(post(lsst)==503 && lastLog!=null,"read-only bundled configuration must be refused");
+   bundleMissing=true;
+   check(post(lsst)==503,"missing bundled configuration must be refused");
+   bundleMissing=false;
+   config(bundledDir,"CCRW",false); config(bundledDir,"IJCLabRW",false);
+   check(recipes("LSST",application.getResourceAsStream("/WEB-INF/janus/CCRW.properties"))!=null,"bundled LSST configuration opens");
+   check(recipes("ZTF",application.getResourceAsStream("/WEB-INF/janus/IJCLabRW.properties"))!=null,"bundled ZTF configuration opens");
+   check(new File(System.getProperty("java.io.tmpdir")).listFiles((d,n)->n.startsWith("fink-tag-"))==null || new File(System.getProperty("java.io.tmpdir")).listFiles((d,n)->n.startsWith("fink-tag-")).length==0,"no temporary configuration file is left behind");
    // 2. An object that is not in the survey graph is never created by Tag.
    check(post(lsst)==404,"unknown object must be 404");
    JanusClient lsstGraph=CLIENTS.get("LSST");
