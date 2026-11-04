@@ -209,20 +209,51 @@ function drawSsTrajectorySegment(first, second, color) {
   ctx.restore();
   }
 
+// Distance in screen pixels, taking the horizontal sky wrap into account.
+function ssScreenGap(first, second) {
+  const period = canvas.width * camera.currentZoom;
+  let dx = second.x - first.x;
+  if (period > 0) dx -= Math.round(dx / period) * period;
+  return Math.hypot(dx, second.y - first.y);
+  }
+
+// Gap from a trajectory point to its nearest neighbour at a different position (Infinity if none).
+function ssNeighbourGap(screen, index) {
+  let best = Infinity;
+  for (const step of [-1, 1]) {
+    for (let j = index + step; j >= 0 && j < screen.length; j += step) {
+      const gap = ssScreenGap(screen[index], screen[j]);
+      if (gap >= 0.5) { best = Math.min(best, gap); break; }
+      }
+    }
+  return best;
+  }
+
+// A star may use at most a quarter of the gap to its neighbours, so the track stays visible
+// where sources are dense and stars grow back to their normal size as the view zooms in.
+const SS_STAR_GAP_FRACTION = 0.25;
+function ssStarRadius(gap, maximum, minimum) {
+  if (!Number.isFinite(gap)) return maximum;
+  return Math.max(minimum, Math.min(maximum, gap * SS_STAR_GAP_FRACTION));
+  }
+
 function drawSsTrajectories(primaryMarkers) {
   ssVisibleMarkers = [];
   for (const {trajectory, color, points} of getVisibleSsTrajectories(primaryMarkers)) {
     for (let i = 1; i < trajectory.points.length; i++) {
       drawSsTrajectorySegment(trajectory.points[i - 1], trajectory.points[i], color);
       }
+    const screen = trajectory.points.map(point => raDecToXY(point.ra, point.dec));
     for (const {point, index} of points) {
+      const latest = index === trajectory.points.length - 1;
       const marker = {
         alert: {survey: 'LSST', objectId: trajectory.objectId,
           class: 'LSST SS source', ra: point.ra, dec: point.dec,
           jd: `MJD ${point.mjd} · source ${point.sourceId}`},
-        color, radius: index === trajectory.points.length - 1 ? 7 : 4
+        color,
+        radius: ssStarRadius(ssNeighbourGap(screen, index), latest ? 7 : 4, latest ? 2.5 : 1.5)
         };
-      marker.pos = raDecToXY(point.ra, point.dec);
+      marker.pos = screen[index];
       marker.positions = getWrappedScreenPositions(marker.pos, marker.radius);
       for (const position of marker.positions) {
         drawStar(position.x, position.y, marker.radius, color, 0.85, 0, 10, false);

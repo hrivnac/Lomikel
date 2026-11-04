@@ -63,6 +63,37 @@ function getVisibleSsTrajectories(primaryMarkers) {
     });
   }
 
+// Representative pseudo-alerts so the camera frames each whole trajectory (thinned: at most
+// SS_CAMERA_POINTS per object, always keeping both ends and the dec/RA extremes).
+const SS_CAMERA_POINTS = 120;
+let ssCameraKey = null;
+let ssCameraAnchors = [];
+function getSsTrajectoryCameraAnchors() {
+  if (!ssTrajectoryEnabled || ssTrajectories.size === 0) return [];
+  const key = [...ssTrajectories].map(([id, trajectory]) => `${id}:${trajectory.points.length}`).join('|');
+  if (key === ssCameraKey) return ssCameraAnchors;
+  const anchors = [];
+  for (const trajectory of ssTrajectories.values()) {
+    const points = trajectory.points;
+    if (!points.length) continue;
+    const keep = new Set([0, points.length - 1]);
+    const stride = Math.max(1, Math.ceil(points.length / SS_CAMERA_POINTS));
+    for (let i = 0; i < points.length; i += stride) keep.add(i);
+    for (const field of ['dec', 'ra']) {
+      let low = 0, high = 0;
+      points.forEach((point, i) => {
+        if (point[field] < points[low][field]) low = i;
+        if (point[field] > points[high][field]) high = i;
+        });
+      keep.add(low).add(high);
+      }
+    for (const i of keep) anchors.push({alert: {ra: points[i].ra, dec: points[i].dec}});
+    }
+  ssCameraKey = key;
+  ssCameraAnchors = anchors;
+  return anchors;
+  }
+
 function updateSsTrajectoryStatus(message) {
   const status = document.getElementById('ssTrajectoryStatus');
   if (status) {

@@ -1184,3 +1184,22 @@ test("bundled stellar catalogue is compact and magnitude limited", () => {
     assert.equal(Number(mag) < 6, true);
   }
 });
+
+test("the dynamic camera frames the whole SS trajectory, not only the alerts", () => {
+  const {context} = loadAppForInteraction({withUtils: true, war: true});
+  context.alertsPool = [];
+  assert.equal(vm.runInContext("getCameraBounds([])", context), null, "nothing to frame");
+  context.trajectory = {objectId: "9", points: Array.from({length: 50}, (_, i) =>
+    ({sourceId: String(i), mjd: 10 + i, ra: 100 + i * 0.4, dec: -10 + i * 0.2}))};
+  vm.runInContext('ssTrajectories.set("9", trajectory); ssTrajectoryEnabled = true', context);
+  const box = vm.runInContext("getCameraBounds([])", context);
+  assert.equal(Math.abs(box.raCenter - 109.8) < 0.5, true);
+  assert.equal(box.minDec, -10);
+  assert.equal(Math.abs(box.maxDec - (-10 + 49 * 0.2)) < 1e-9, true);
+  context.alert = {alert: {ra: 200, dec: 30}};
+  const withAlert = vm.runInContext("getCameraBounds([alert])", context);
+  assert.equal(withAlert.maxDec, 30, "alerts and trajectory are framed together");
+  assert.equal(withAlert.minDec, -10);
+  vm.runInContext("ssTrajectoryEnabled = false", context);
+  assert.equal(vm.runInContext("getCameraBounds([])", context), null, "hidden trajectory no longer moves the camera");
+});
