@@ -803,7 +803,11 @@
     <copy file="../src/webservice/Apps.html" tofile="../build/Apps.html" overwrite="true"/>
     <copy file="../src/webservice/Servers-${target}.jsp" tofile="../build/Servers.jsp" overwrite="true"/>
     <copy file="../src/webservice/Graphs-${target}.jsp" tofile="../build/Graphs.jsp" overwrite="true"/>
-    <replace file="../build/index.jsp" token="@NAME@" value="${Finkbrowsername}"/>
+    <!-- "Fink Graph Browser (CC)": the site the WAR was built for; no suffix when the site is unset or unusual. -->
+    <condition property="Finkbrowsertitle" value="${Finkbrowsername} (${site})" else="${Finkbrowsername}">
+      <matches pattern="^[A-Za-z0-9_.-]+$" string="${site}"/>
+      </condition>
+    <replace file="../build/index.jsp" token="@NAME@" value="${Finkbrowsertitle}"/>
     <replace file="../build/index.jsp" token="@ICON@" value="${Finkbrowsericon}"/>
     <replace file="../build/index.jsp" token="@HOME@" value="${Finkbrowserurl}"/>
     <replace file="../build/index.jsp" token="@VERSION@" value="${version}"/>
