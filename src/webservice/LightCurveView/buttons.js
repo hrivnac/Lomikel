@@ -1,14 +1,5 @@
 function createSNIDButtons() {
   const container = document.getElementById("snid-buttons");
-  snid_selection.forEach(snid => {
-    const btn = document.createElement("button");
-    btn.textContent = snid;
-    btn.className = "snid-btn";
-    btn.dataset.snid = String(snid);
-    btn.onclick = () => loadSNID(snid);
-    container.appendChild(btn);
-  });
-  container.appendChild(document.createElement("hr"));
   demo_selection.forEach(snid => {
     const btn = document.createElement("button");
     btn.textContent = snid;

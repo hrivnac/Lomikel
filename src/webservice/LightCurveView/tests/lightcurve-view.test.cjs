@@ -149,9 +149,11 @@ test("projection preserves missing bands when available curves do not overlap", 
   assert.equal(result.endJD, null);
 });
 
-test("bundled light curves mark missing values distinctly from real magnitudes", () => {
+test("light curves with missing samples keep real magnitudes and drop missing ones in the projection", () => {
   const context = loadScripts(["consts.js", "utils.js"], {xTime: false});
-  context.input = JSON.parse(fs.readFileSync(path.join(root, "39702066.json"), "utf8"));
+  context.input = sixBands(band => band === "u" ?
+    {times: [61089.2576, 61100, 61115.1852], values: [21.5, null, 0]} :
+    {times: [], values: []});
   context.coefficients = {
     x: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 1])),
     y: Object.fromEntries(["Y", "z", "g", "i", "u", "r"].map(band => [band, 0])),
@@ -160,7 +162,7 @@ test("bundled light curves mark missing values distinctly from real magnitudes",
   const result = vm.runInContext("projectXY(normalizeLightcurve(input), coefficients)", context);
 
   assert.equal(result.startJD, 61089.2576);
-  assert.equal(result.endJD, 61115.1852);
+  assert.equal(result.endJD, 61115.1852, "a real zero magnitude is kept as the last sample");
 });
 
 test("Fink LSST sources become sorted six-band AB-magnitude light curves", () => {
@@ -313,35 +315,35 @@ test("selecting a generated demo hides a stale Fink Portal link", () => {
   assert.equal(portalLink.hidden, true);
 });
 
-test("the latest sample selection wins when fetches resolve out of order", async () => {
+test("the latest Fink object selection wins when fetches resolve out of order", async () => {
   const requests = new Map();
   const plotted = [];
-  const portalLink = {href: "https://lsst.fink-portal.org/313761043604045880", hidden: false};
+  const status = {textContent: "", dataset: {}};
+  const portalLink = {href: "", hidden: true};
   const context = loadScripts(["consts.js", "utils.js", "data.js"], {
     activeSNID: null,
     bandColors: {},
-    document: {getElementById: id => id === "fink-portal-link" ? portalLink : null},
-    fetch: url => {
+    document: {getElementById: id => id === "fink-portal-link" ? portalLink : (id === "status" ? status : null)},
+    fetch: (url, options) => {
       const request = deferred();
-      requests.set(url, request);
+      requests.set(JSON.parse(options.body).diaObjectId, request);
       return request.promise;
     },
     plotLightCurves: data => plotted.push(data),
     resetRandom: () => {},
     updateSNIDHighlight: () => {},
   });
-  const makeCurve = value => sixBands(() => ({times: [1, 2], values: [null, value]}));
+  const rows = flux => [{"r:band": "g", "r:midpointMjdTai": 61000, "r:psfFlux": flux}];
 
-  vm.runInContext("loadSNID(111); loadSNID(222);", context);
-  requests.get("222.json").resolve({ok: true, json: async () => makeCurve(22)});
+  vm.runInContext("loadFinkObject('111'); loadFinkObject('222');", context);
+  requests.get("222").resolve({ok: true, json: async () => rows(2000)});
   await new Promise(resolve => setImmediate(resolve));
-  requests.get("111.json").resolve({ok: true, json: async () => makeCurve(11)});
+  requests.get("111").resolve({ok: true, json: async () => rows(1000)});
   await new Promise(resolve => setImmediate(resolve));
 
-  assert.equal(context.activeSNID, "222");
-  assert.equal(vm.runInContext("lightcurve.Y.values[0]", context), 22);
-  assert.equal(plotted.at(-1).Y.values[0], 22);
-  assert.equal(portalLink.hidden, true);
+  assert.equal(context.activeSNID, "fink:222");
+  assert.equal(plotted.length, 1, "the stale response must not be plotted");
+  assert.equal(portalLink.href, "https://lsst.fink-portal.org/222");
 });
 
 test("the peak demo is a correlated astronomical brightness peak in all six bands", () => {
@@ -575,12 +577,10 @@ test("invalid saved presets are discarded without breaking initialization", () =
   }
 });
 
-test("a sample load failure is visible and does not replace the current curve", async () => {
+test("a Fink load failure is visible and does not replace the current curve", async () => {
   const status = {textContent: "", dataset: {}};
-  let consoleErrors = 0;
   const context = loadScripts(["consts.js", "utils.js", "data.js"], {
     activeSNID: "current",
-    console: {error: () => { consoleErrors += 1; }},
     document: {getElementById: id => id === "status" ? status : null},
     fetch: async () => ({ok: false, status: 404}),
     plotLightCurves: () => {}, resetRandom: () => {}, updateSNIDHighlight: () => {},
@@ -588,13 +588,12 @@ test("a sample load failure is visible and does not replace the current curve", 
   context.current = sixBands(() => ({times: [1], values: [20]}));
   vm.runInContext("lightcurve = current", context);
 
-  await vm.runInContext("loadSNID(404)", context);
+  await vm.runInContext("loadFinkObject('404')", context);
 
   assert.match(status.textContent, /failed/i);
   assert.equal(status.dataset.state, "error");
   assert.equal(context.activeSNID, "current");
   assert.equal(vm.runInContext("lightcurve.Y.values[0]", context), 20);
-  assert.equal(consoleErrors, 0);
 });
 
 test("the page exposes automatic exploratory projection diagnostics", () => {
@@ -846,4 +845,20 @@ test("?objectId= fills the menu and loads that object; no parameter keeps the de
     assert.deepEqual(loads.map(v => v.trim()), expected === null ? [] : [expected]);
   }
   assert.match(source, /plotLightCurves\(demo\);\s*loadRequestedObject\(\);/);
+});
+
+test("only the random, peak and periodic examples remain; no simulated-supernova samples are shipped", () => {
+  const container = {children: [], appendChild(child) { this.children.push(child); }};
+  const context = loadScripts(["params.js", "buttons.js"], {
+    activeSNID: null,
+    loadDemo: () => {},
+    document: {getElementById: id => id === "snid-buttons" ? container : null,
+      createElement: tag => ({tag, dataset: {}, classList: {add() {}, remove() {}}})},
+  });
+  vm.runInContext("createSNIDButtons()", context);
+  assert.deepEqual(container.children.map(child => child.textContent), ["random", "peak", "periodic"]);
+  assert.equal(vm.runInContext("typeof snid_selection", context), "undefined");
+  assert.equal(vm.runInContext("typeof loadSNID", loadScripts(["consts.js", "utils.js", "data.js"], {})), "undefined");
+  const stray = fs.readdirSync(root).filter(name => /^\d+\.json$/.test(name));
+  assert.deepEqual(stray, [], "simulated per-SNID JSON files are gone");
 });
