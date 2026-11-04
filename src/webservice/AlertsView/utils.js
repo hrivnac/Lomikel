@@ -39,6 +39,37 @@ function raDecToXY(ra, dec) {
     };
   }
 
+// Inverse of raDecToXY for a given view (defaults to the current camera).
+function xyToRaDec(x, y, center = camera.currentCenter, zoom = camera.currentZoom) {
+  const dx = (canvas.width / 2 - x) / (canvas.width * zoom);
+  const dy = (canvas.height / 2 - y) / (canvas.height * zoom);
+  return {
+    ra: normalizeRa(center.ra + dx * 360),
+    dec: Math.max(-90, Math.min(90, center.dec + dy * 180))
+    };
+  }
+
+// Whole-sky zoom limits and the view that keeps one sky point under one screen pixel.
+const WHOLE_SKY_MIN_ZOOM = 1;
+const WHOLE_SKY_MAX_ZOOM = 60;
+function clampWholeSkyZoom(zoom) {
+  return Math.max(WHOLE_SKY_MIN_ZOOM, Math.min(WHOLE_SKY_MAX_ZOOM, Number.isFinite(zoom) ? zoom : 1));
+  }
+
+function wholeSkyViewKeeping(point, x, y, zoom) {
+  const z = clampWholeSkyZoom(zoom);
+  // Never pan past the poles: at zoom z the view spans 180/z degrees of declination.
+  const decLimit = Math.max(0, 90 - 90 / z);
+  const dec = point.dec - (canvas.height / 2 - y) / (canvas.height * z) * 180;
+  return {
+    center: {
+      ra: normalizeRa(point.ra - (canvas.width / 2 - x) / (canvas.width * z) * 360),
+      dec: Math.max(-decLimit, Math.min(decLimit, dec))
+      },
+    zoom: z
+    };
+  }
+
 function forEachWrappedScreenPosition(position, padding, callback, data1, data2) {
   const period = canvas.width * camera.currentZoom;
   if (!(period > 0)) {

@@ -516,7 +516,7 @@ test("all-alert markers persist, refresh with the loaded pool, and remain intera
     camera.mode = "dynamic";
     updateCamera();
     const follow = {...camera.targetCenter, zoom: camera.targetZoom};
-    camera.mode = "whole";
+    setCameraMode("whole"); // Whole sky resets the view to the full sky
     updateCamera();
     const whole = {...camera.targetCenter, zoom: camera.targetZoom};
     markers.forEach(marker => marker.draw());
@@ -1236,4 +1236,103 @@ test("SS rows and tooltips link to the portal once the designation is known", ()
   assert.equal(link.href, "https://lsst.fink-portal.org/J90W03M");
   const drawing = fs.readFileSync(path.join(alertsView, "drawing.js"), "utf8");
   assert.match(drawing, /designation: trajectory\.designation/);
+});
+
+function loadWholeSky() {
+  const page = loadAppForInteraction({withUtils: true});
+  const {context, elements} = page;
+  const sky = elements.get("sky");
+  sky.width = 1200; sky.height = 600; // loadAppForInteraction sizes the canvas from the window
+  context.canvas = sky;
+  const run = code => vm.runInContext(code, context);
+  const wheel = (x, y, deltaY, deltaMode = 0) => {
+    const event = {clientX: x, clientY: y, deltaY, deltaMode, defaultPrevented: false,
+      preventDefault() { this.defaultPrevented = true; }};
+    sky.emit("wheel", event);
+    return event;
+  };
+  const pointer = (type, x, y, extra = {}) => sky.emit(type, {clientX: x, clientY: y, pointerId: 1,
+    pointerType: "mouse", button: 0, ...extra});
+  return {page, context, elements, sky, run, wheel, pointer};
+}
+
+test("Whole sky: wheel zooms about the pointer and keeps the sky point under it", () => {
+  const {elements, run, wheel} = loadWholeSky();
+  elements.get("btnWhole").emit("click");
+  run("camera.currentCenter = {ra: 180, dec: 0}; camera.currentZoom = 1;");
+  const before = run("xyToRaDec(900, 150)");
+  const event = wheel(900, 150, -300);
+  assert.equal(event.defaultPrevented, true);
+  const zoom = run("camera.currentZoom");
+  assert.equal(zoom > 1.5, true);
+  const after = run("xyToRaDec(900, 150)");
+  assert.equal(Math.abs(after.ra - before.ra) < 1e-9 || Math.abs(Math.abs(after.ra - before.ra) - 360) < 1e-9, true);
+  assert.equal(Math.abs(after.dec - before.dec) < 1e-9, true, "the point under the pointer did not move");
+  // target equals current: no easing back towards the old view
+  assert.equal(run("camera.targetZoom"), zoom);
+  wheel(900, 150, 100000);
+  assert.equal(run("camera.currentZoom"), 1, "cannot zoom out past the whole sky");
+  for (let i = 0; i < 40; i++) wheel(900, 150, -1000);
+  assert.equal(run("camera.currentZoom"), 60, "zoom-in is bounded");
+});
+
+test("Whole sky: wheel does nothing in Follow alerts mode and leaves the page scrollable", () => {
+  const {elements, run, wheel} = loadWholeSky();
+  elements.get("btnDynamic").emit("click");
+  const event = wheel(600, 300, -500);
+  assert.equal(event.defaultPrevented, false);
+  assert.equal(run("camera.currentZoom"), 1);
+});
+
+test("Whole sky: dragging pans, small clicks do not, and tooltips stay quiet while dragging", () => {
+  const {elements, run, pointer} = loadWholeSky();
+  elements.get("btnWhole").emit("click");
+  run("camera.currentCenter = {ra: 180, dec: 0}; camera.currentZoom = 4; camera.targetZoom = 4;");
+  const grabbed = run("xyToRaDec(600, 300)");
+  pointer("pointerdown", 600, 300);
+  pointer("pointermove", 601, 301);
+  assert.equal(run("camera.currentCenter.ra"), 180, "a 1 px jitter is a click, not a drag");
+  pointer("pointermove", 700, 340);
+  assert.equal(run("skyDrag.moved"), true);
+  const under = run("xyToRaDec(700, 340)");
+  assert.equal(Math.abs(under.ra - grabbed.ra) < 1e-9, true, "the grabbed sky point follows the pointer");
+  assert.equal(Math.abs(under.dec - grabbed.dec) < 1e-9, true);
+  assert.equal(run("camera.currentCenter.ra") > 180, true, "dragging right moves the sky right (RA grows leftwards, so the center RA grows)");
+  assert.equal(run("camera.targetCenter.ra"), run("camera.currentCenter.ra"));
+  assert.equal(elements.get("tooltip").style.display === "flex", false);
+  pointer("pointerup", 700, 340);
+  assert.equal(run("skyDrag"), null);
+  const released = run("camera.currentCenter.ra");
+  pointer("pointermove", 650, 300);
+  assert.equal(run("camera.currentCenter.ra"), released, "no panning after release");
+});
+
+test("Whole sky: panning stops at the poles and ignores touch and other buttons", () => {
+  const {elements, run, pointer} = loadWholeSky();
+  elements.get("btnWhole").emit("click");
+  run("camera.currentCenter = {ra: 180, dec: 0}; camera.currentZoom = 2; camera.targetZoom = 2;");
+  pointer("pointerdown", 600, 100);
+  pointer("pointermove", 600, 5000);
+  assert.equal(Math.abs(run("camera.currentCenter.dec")) <= 45 + 1e-9, true, "limit is 90 - 90/zoom");
+  pointer("pointerup", 600, 5000);
+  run("camera.currentCenter = {ra: 180, dec: 0}");
+  pointer("pointerdown", 600, 300, {pointerType: "touch"});
+  assert.equal(run("skyDrag"), null);
+  pointer("pointerdown", 600, 300, {button: 2});
+  assert.equal(run("skyDrag"), null);
+});
+
+test("Choosing Whole sky again returns to the full sky; the view survives dynamic ticks only in dynamic mode", () => {
+  const {elements, run, wheel} = loadWholeSky();
+  elements.get("btnWhole").emit("click");
+  wheel(300, 200, -800);
+  const zoomed = run("camera.currentZoom");
+  assert.equal(zoomed > 1, true);
+  run("updateCamera()");
+  assert.equal(run("camera.targetZoom"), zoomed, "whole-sky view is not overwritten each frame");
+  elements.get("btnWhole").emit("click");
+  assert.equal(run("camera.targetZoom"), 1);
+  assert.equal(run("camera.targetCenter.ra"), 180);
+  assert.equal(run("camera.targetCenter.dec"), 0);
+  assert.equal(elements.get("btnWhole").getAttribute("aria-pressed"), "true");
 });
