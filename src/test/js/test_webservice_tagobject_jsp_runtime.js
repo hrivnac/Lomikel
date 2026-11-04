@@ -51,7 +51,7 @@ ${body}
  }
  static File bundledDir; static boolean bundleMissing=false;
  static class App { InputStream getResourceAsStream(String name) throws Exception { File f=new File(bundledDir,new File(name).getName()); return bundleMissing||!f.exists()?null:new FileInputStream(f); }
-   void log(String m, Throwable t) { lastLog=m; } }
+   void log(String m, Throwable t) { lastLog=m; }\n   void log(String m) { } }
  static String lastLog; static App application=new App();
  static String lastBody;
  static int run(Request request) throws Exception {
@@ -88,6 +88,16 @@ ${body}
    check(recipes("LSST",application.getResourceAsStream("/WEB-INF/janus/CCRW.properties"))!=null,"bundled LSST configuration opens");
    check(recipes("ZTF",application.getResourceAsStream("/WEB-INF/janus/IJCLabRW.properties"))!=null,"bundled ZTF configuration opens");
    check(new File(System.getProperty("java.io.tmpdir")).listFiles((d,n)->n.startsWith("fink-tag-"))==null || new File(System.getProperty("java.io.tmpdir")).listFiles((d,n)->n.startsWith("fink-tag-")).length==0,"no temporary configuration file is left behind");
+   // 1b. Unreachable HBase fails fast with a clear message instead of hanging.
+   File unreachable=new File(bundledDir,"unreachable.properties");
+   try(FileWriter w=new FileWriter(unreachable)) { w.write("gremlin.graph=org.janusgraph.core.JanusGraphFactory\\nstorage.backend=hbase\\nstorage.hostname=127.0.0.1\\nstorage.port=1\\nstorage.read-only=false\\n"); }
+   discard("LSST");
+   System.setProperty("fink.tag.janus.LSST",unreachable.getPath());
+   long started=System.currentTimeMillis();
+   check(post(lsst)==503,"unreachable HBase must be 503");
+   check(System.currentTimeMillis()-started<5000,"unreachable HBase must fail fast");
+   check(lastBody.contains("HBase 127.0.0.1:1 is not reachable from this server"),"clear reason");
+   System.clearProperty("fink.tag.janus.LSST"); discard("LSST");
    // 2. An object that is not in the survey graph is never created by Tag.
    check(post(lsst)==404,"unknown object must be 404");
    JanusClient lsstGraph=CLIENTS.get("LSST");
