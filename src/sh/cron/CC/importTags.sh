@@ -41,3 +41,4 @@ for T in "${TAGS[@]}"; do
   done
 java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/processTags.groovy
 java -jar ~/Lomikel/lib/Lomikel-Janus-${version}.exe.jar -b -s ~/Lomikel/src/work/CC/cleanTags.groovy
+/bin/rm -f ${LOCK} 
