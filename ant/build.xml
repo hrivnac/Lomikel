@@ -814,6 +814,8 @@
     <war destfile="../lib/FinkBrowser.war" webxml="../src/webservice/web.xml">
       <!-- Package the importer's canonical list, not a second maintained copy. -->
       <zipfileset file="../src/sh/cron/CC/LSSTTags.lst" prefix="AlertsView"/>
+      <!-- Writable graph configurations for TagObject.jsp, so the WAR needs no local file. -->
+      <zipfileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="CCRW.properties,IJCLabRW.properties" prefix="WEB-INF/janus"/>
       <fileset dir="../src/webservice">
         <include name="**/*"/>
         <exclude name="index.jsp"/>

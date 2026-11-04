@@ -10,6 +10,10 @@
 <%@ page import="java.io.ByteArrayOutputStream" %>
 <%@ page import="java.io.FileInputStream" %>
 <%@ page import="java.io.InputStream" %>
+<%@ page import="java.io.OutputStream" %>
+<%@ page import="java.nio.file.Files" %>
+<%@ page import="java.nio.file.Path" %>
+<%@ page import="java.nio.file.attribute.PosixFilePermissions" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.util.HashMap" %>
@@ -26,8 +30,10 @@
   // server-side client, configured with the same writable properties as the cron jobs.
   private static final String TAG = "GraphBrowser";
   private static final Pattern OBJECT_ID = Pattern.compile("(?:ZTF[A-Za-z0-9_-]{1,80}|[0-9]{1,24})");
-  private static final String DEFAULT_LSST = "/opt/janusgraph-1/conf/gremlin-server/CCRW.properties";
-  private static final String DEFAULT_ZTF  = "/opt/janusgraph-1/conf/gremlin-server/IJCLabRW.properties";
+  // The writable graph configurations are packaged inside the WAR (WEB-INF/janus/*RW.properties, taken from
+  // src/sys/janusgraph/conf/gremlin-server), so the WAR does not depend on any local file.
+  private static final String BUNDLED_LSST = "/WEB-INF/janus/CCRW.properties";
+  private static final String BUNDLED_ZTF  = "/WEB-INF/janus/IJCLabRW.properties";
   // One writer at a time; clients are opened lazily and reused (a JanusGraph is expensive to open).
   private static final ReentrantLock WRITE_LOCK = new ReentrantLock();
   private static final Map<String, FinkGremlinRecipiesG> RECIPES = new HashMap<String, FinkGremlinRecipiesG>();
@@ -58,35 +64,45 @@
       }
     }
 
-  private static String propertiesFile(String survey) {
-    String normal = "ZTF".equals(survey) ? DEFAULT_ZTF : DEFAULT_LSST;
-    String configured = System.getProperty("fink.tag.janus." + survey);
-    return configured == null || configured.trim().isEmpty() ? normal : configured.trim();
-    }
-
-  // Refuse a configuration that is not an explicitly writable one.
-  private static void requireWritable(String file) throws Exception {
+  // Optional override (-Dfink.tag.janus.LSST=/path, -Dfink.tag.janus.ZTF=/path); normally the bundled copy is used.
+  private static Properties load(String survey, InputStream bundled) throws Exception {
     Properties p = new Properties();
-    try (FileInputStream stream = new FileInputStream(file)) {
-      p.load(stream);
+    String configured = System.getProperty("fink.tag.janus." + survey);
+    if (configured != null && !configured.trim().isEmpty()) {
+      try (FileInputStream stream = new FileInputStream(configured.trim())) { p.load(stream); }
       }
+    else {
+      if (bundled == null) throw new IllegalStateException("Bundled graph configuration is missing");
+      try (InputStream stream = bundled) { p.load(stream); }
+      }
+    // Refuse a configuration that is not an explicitly writable one.
     if (p.getProperty("storage.backend") == null ||
         "true".equalsIgnoreCase(p.getProperty("storage.read-only", "false").trim())) {
       throw new IllegalStateException("Graph configuration is not writable");
       }
+    return p;
     }
 
-  private static FinkGremlinRecipiesG recipes(String survey) throws Exception {
+  // JanusClient opens a properties file, so the configuration goes through a private (owner-only) temporary
+  // file that exists only while the graph is being opened.
+  private static FinkGremlinRecipiesG recipes(String survey, InputStream bundled) throws Exception {
     FinkGremlinRecipiesG cached = RECIPES.get(survey);
     if (cached != null) return cached;
-    String file = propertiesFile(survey);
-    requireWritable(file);
-    Init.initWS("TagObjectWS");
-    JanusClient client = new JanusClient(file);
-    FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(client);
-    CLIENTS.put(survey, client);
-    RECIPES.put(survey, gr);
-    return gr;
+    Properties p = load(survey, bundled);
+    Path file = Files.createTempFile("fink-tag-" + survey + "-", ".properties",
+                                     PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")));
+    try {
+      try (OutputStream stream = Files.newOutputStream(file)) { p.store(stream, null); }
+      Init.initWS("TagObjectWS");
+      JanusClient client = new JanusClient(file.toString());
+      FinkGremlinRecipiesG gr = new FinkGremlinRecipiesG(client);
+      CLIENTS.put(survey, client);
+      RECIPES.put(survey, gr);
+      return gr;
+      }
+    finally {
+      Files.deleteIfExists(file);
+      }
     }
 
   // A failed or interrupted operation may leave a broken graph/transaction: drop and reopen next time.
@@ -149,12 +165,13 @@
       }
     FinkGremlinRecipiesG gr;
     try {
-      gr = recipes(survey);
+      gr = recipes(survey, application.getResourceAsStream("ZTF".equals(survey) ? BUNDLED_ZTF : BUNDLED_LSST));
       }
     catch (Exception unavailable) {
+      application.log("TagObject: writable " + survey + " graph unavailable", unavailable);
       discard(survey);
       response.setStatus(503);
-      out.print(new JSONObject().put("error", "Writable " + survey + " graph is not available").toString());
+      out.print(new JSONObject().put("error", "Writable " + survey + " graph is not available (see the server log)").toString());
       return;
       }
     try {
@@ -179,6 +196,7 @@
         .put("survey", survey).put("alreadyTagged", already).put("members", verified).toString());
       }
     catch (Exception failure) {
+      application.log("TagObject: tagging " + objectId + " failed", failure);
       discard(survey);
       response.setStatus(502);
       out.print("{\"error\":\"Tagging failed; the tag may or may not have been written\"}");
