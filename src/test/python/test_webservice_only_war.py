@@ -20,6 +20,12 @@ class WebserviceOnlyWarTest(unittest.TestCase):
                      'ClassificationView/index.html'):
             self.assertTrue((ROOT / 'src/webservice' / name).is_file(), name)
 
+    def test_build_adds_the_site_to_the_browser_title(self):
+        build = (ROOT / 'ant/build.xml').read_text()
+        self.assertIn('property="Finkbrowsertitle" value="${Finkbrowsername} (${site})" else="${Finkbrowsername}"', build)
+        self.assertIn('token="@NAME@" value="${Finkbrowsertitle}"', build)
+        self.assertIn('pattern="^[A-Za-z0-9_.-]+$" string="${site}"', build, 'only plain site names reach the HTML')
+
     @unittest.skipUnless(WAR.exists(), 'Build with ant war first')
     def test_war_root_has_default_app_and_three_launchers(self):
         with zipfile.ZipFile(WAR) as archive:
