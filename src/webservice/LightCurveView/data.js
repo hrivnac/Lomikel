@@ -234,31 +234,6 @@ async function loadFinkObject(value) {
     }
   }
 
-async function loadSNID(snid) {
-  const generation = ++loadGeneration;
-  setLoadStatus(`Loading sample ${snid}…`, "loading");
-  try {
-    const response = await fetch(`${snid}.json`);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status || "error"}`);
-      }
-    const loaded = normalizeLightcurve(await response.json());
-    if (generation !== loadGeneration) return;
-    lightcurve = loaded;
-    resetRandom();
-    activeSNID = String(snid);
-    updateSNIDHighlight();
-    plotLightCurves(lightcurve);
-    setFinkPortalLink();
-    setLoadStatus(`Loaded sample ${snid}.`);
-    }
-  catch (error) {
-    if (generation === loadGeneration) {
-      setLoadStatus(`Failed to load sample ${snid}.`, "error");
-      }
-    }
-  }
-
 function loadDemo(kind) {
   loadGeneration++;
   lightcurve = generateDemoData(kind);
