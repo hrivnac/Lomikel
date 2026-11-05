@@ -1370,13 +1370,11 @@
       <group title="Januser"            packages="com.Lomikel.Januser*"/>
       <group title="ElasticSearcher"    packages="com.Lomikel.ElasticSearcher*"/>
       <group title="Livyser"            packages="com.Lomikel.Livyser*"/>
-      <group title="Graph"              packages="com.Lomikel.Graph*"/>
       <group title="Utils"              packages="com.Lomikel.Utils*"/>
       <group title="Sockets"            packages="com.Lomikel.Sockets*"/>
       <group title="Py4J"               packages="com.Lomikel.Py4J*"/>
       <group title="Groovy Server"      packages="com.Lomikel.GroovyServer*"/>
       <group title="GremlinPlugin"      packages="com.Lomikel.GremlinPlugin*"/>
-      <group title="GUI"                packages="com.Lomikel.GUI*"/>
       <group title="TinkerPopPatch"     packages="com.Lomikel.TinerPopPatch*"/>
       <group title="WebService"         packages="com.Lomikel.WebService*"/>
       <group title="Fink Avro"          packages="com.astrolabsoftware.FinkBrowsrr.Avro*"/>
