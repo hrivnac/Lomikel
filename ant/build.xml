@@ -803,6 +803,12 @@
     <copy file="../src/webservice/Apps.html" tofile="../build/Apps.html" overwrite="true"/>
     <copy file="../src/webservice/Servers-${target}.jsp" tofile="../build/Servers.jsp" overwrite="true"/>
     <copy file="../src/webservice/Graphs-${target}.jsp" tofile="../build/Graphs.jsp" overwrite="true"/>
+    <copy file="../src/webservice/TagRouting.properties" tofile="../build/TagRouting.properties" overwrite="true"/>
+    <!-- The site this WAR is built for decides which survey it tags itself (TagObject.jsp). -->
+    <condition property="Finkbrowsersite" value="${site}" else="">
+      <matches pattern="^[A-Za-z0-9_.-]+$" string="${site}"/>
+      </condition>
+    <replace file="../build/TagRouting.properties" token="@SITE@" value="${Finkbrowsersite}"/>
     <!-- "Fink Graph Browser (CC)": the site the WAR was built for; no suffix when the site is unset or unusual. -->
     <condition property="Finkbrowsertitle" value="${Finkbrowsername} (${site})" else="${Finkbrowsername}">
       <matches pattern="^[A-Za-z0-9_.-]+$" string="${site}"/>
@@ -820,6 +826,7 @@
       <zipfileset file="../src/sh/cron/CC/LSSTTags.lst" prefix="AlertsView"/>
       <!-- Writable graph configurations for TagObject.jsp, so the WAR needs no local file. -->
       <zipfileset dir="../src/sys/janusgraph/conf/gremlin-server" includes="CCRW.properties,IJCLabRW.properties" prefix="WEB-INF/janus"/>
+      <zipfileset file="../build/TagRouting.properties" prefix="WEB-INF"/>
       <fileset dir="../src/webservice">
         <include name="**/*"/>
         <exclude name="index.jsp"/>
@@ -828,6 +835,7 @@
         <exclude name="Servers-*.jsp"/>
         <exclude name="Graphs-*.jsp"/>
         <exclude name="web.xml"/>
+        <exclude name="TagRouting.properties"/>
         <exclude name="**/tests/**"/>
         <exclude name="**/*.cjs"/>
         <exclude name="**/*.md"/>

@@ -20,6 +20,18 @@ class WebserviceOnlyWarTest(unittest.TestCase):
                      'ClassificationView/index.html'):
             self.assertTrue((ROOT / 'src/webservice' / name).is_file(), name)
 
+    def test_build_packs_tag_routing_for_the_site(self):
+        build = (ROOT / 'ant/build.xml').read_text()
+        self.assertIn('<copy file="../src/webservice/TagRouting.properties" tofile="../build/TagRouting.properties"', build)
+        self.assertIn('<replace file="../build/TagRouting.properties" token="@SITE@" value="${Finkbrowsersite}"/>', build)
+        self.assertIn('<zipfileset file="../build/TagRouting.properties" prefix="WEB-INF"/>', build)
+        self.assertIn('<exclude name="TagRouting.properties"/>', build, 'the template is not served from the WAR root')
+        routing = (ROOT / 'src/webservice/TagRouting.properties').read_text()
+        for line in ('site=@SITE@', 'owner.LSST=CC', 'owner.ZTF=IJCLab',
+                     'url.CC=http://134.158.243.144:24450/FinkBrowser/TagObject.jsp',
+                     'url.IJCLab=http://157.136.253.253:24450/FinkBrowser/TagObject.jsp'):
+            self.assertIn(line, routing.splitlines())
+
     def test_build_adds_the_site_to_the_browser_title(self):
         build = (ROOT / 'ant/build.xml').read_text()
         self.assertIn('property="Finkbrowsertitle" value="${Finkbrowsername} (${site})" else="${Finkbrowsername}"', build)

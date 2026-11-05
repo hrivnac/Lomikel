@@ -21,6 +21,11 @@
 <%@ page import="java.net.InetSocketAddress" %>
 <%@ page import="java.net.Socket" %>
 <%@ page import="java.net.URI" %>
+<%@ page import="java.net.http.HttpClient" %>
+<%@ page import="java.net.http.HttpRequest" %>
+<%@ page import="java.net.http.HttpResponse" %>
+<%@ page import="java.net.http.HttpTimeoutException" %>
+<%@ page import="java.time.Duration" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.HashMap" %>
@@ -44,6 +49,10 @@
   // GET answers the configured tag names; POST writes. The Gremlin servers behind the browser are read-only,
   // so the write goes through this server-side client, configured with writable properties.
   // Tag names come from com/astrolabsoftware/FinkBrowser/Januser/TagNames.txt (in the Lomikel jar).
+  // Routing (WEB-INF/TagRouting.properties, filled by "ant war" from the build site): each survey has one owner
+  // site whose WAR writes it into its local graph (LSST -> CC, ZTF -> IJCLab). Any other WAR forwards the
+  // request server-to-server to the owner's TagObject.jsp and relays the answer; a forwarded request is never
+  // forwarded again. System properties fink.tag.site, fink.tag.owner.<survey>, fink.tag.url.<site> override it.
   private static final String TAG_NAMES = "TagNames.txt";
   private static final Pattern TAG_NAME = Pattern.compile("[A-Za-z0-9_.-]{1,64}");
   private static final int MAX_BODY = 8192;
@@ -218,6 +227,51 @@
     return value.isEmpty() ? null : value;
     }
 
+  private static final String ROUTING = "/WEB-INF/TagRouting.properties";
+  private static final String FORWARDED = "X-Fink-Tag-Forwarded";
+  private static final Pattern SITE = Pattern.compile("[A-Za-z0-9_.-]{1,40}");
+  private static final HttpClient FORWARDER = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5))
+                                                        .followRedirects(HttpClient.Redirect.NEVER).build();
+
+  private static Properties routing(InputStream bundled) {
+    Properties p = new Properties();
+    if (bundled != null) {
+      try (InputStream stream = bundled) { p.load(stream); }
+      catch (Exception ignored) { }
+      }
+    for (String key : new String[] {"site", "owner.LSST", "owner.ZTF", "url.CC", "url.IJCLab"}) {
+      String configured = System.getProperty("fink.tag." + key);
+      if (configured != null && !configured.trim().isEmpty()) p.setProperty(key, configured.trim());
+      }
+    for (String name : System.getProperties().stringPropertyNames()) {
+      if (name.startsWith("fink.tag.url.")) p.setProperty(name.substring("fink.tag.".length()), System.getProperty(name).trim());
+      }
+    return p;
+    }
+
+  // This WAR's site, or "" when unset/unusual (then it writes no survey itself).
+  private static String site(Properties p) {
+    String site = p.getProperty("site", "").trim();
+    return SITE.matcher(site).matches() ? site : "";
+    }
+
+  // The owner's TagObject.jsp, only as a plain http(s) URL.
+  private static URI ownerUrl(Properties p, String owner) {
+    String url = p.getProperty("url." + owner, "").trim();
+    try {
+      URI uri = new URI(url);
+      if (("http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) && uri.getHost() != null &&
+          uri.getUserInfo() == null && uri.getPath() != null && uri.getPath().endsWith("/TagObject.jsp")) return uri;
+      }
+    catch (Exception ignored) { }
+    return null;
+    }
+
+  private static long forwardTimeoutSeconds() {
+    try { return Long.parseLong(System.getProperty("fink.tag.forward.timeout", "80")); }
+    catch (NumberFormatException e) { return 80; }
+    }
+
   // Number of registrations (deepcontains edges) of the object in the TAG OCol.
   private static long entries(FinkGremlinRecipiesG gr, String tag, String objectId) {
     Object n = gr.g().V().has("lbl", "OCol").has("classifier", "TAG").has("flavor", "").has("cls", tag)
@@ -297,6 +351,69 @@
     return;
     }
   String survey = objectId.startsWith("ZTF") ? "ZTF" : "LSST";
+  Properties route = routing(application.getResourceAsStream(ROUTING));
+  String here = site(route);
+  String owner = route.getProperty("owner." + survey, "").trim();
+  if (!SITE.matcher(owner).matches()) {
+    response.setStatus(503);
+    out.print(new JSONObject().put("error", "No " + survey + " tagging service is configured").toString());
+    return;
+    }
+  if (!owner.equals(here)) {
+    if (request.getHeader(FORWARDED) != null) {
+      // Never forward twice: a misconfigured owner must not create a loop.
+      response.setStatus(421);
+      out.print(new JSONObject().put("error", "This server (" + (here.isEmpty() ? "no site" : here) + ") does not write " + survey + " tags").toString());
+      return;
+      }
+    URI target = ownerUrl(route, owner);
+    if (target == null) {
+      response.setStatus(503);
+      out.print(new JSONObject().put("error", "No URL is configured for the " + survey + " tagging service at " + owner).toString());
+      return;
+      }
+    JSONObject forward = new JSONObject().put("objectId", objectId).put("tag", tag).put("value", value);
+    if (author != null) forward.put("author", author);
+    if (annotation != null) forward.put("annotation", annotation);
+    if (ref != null) forward.put("ref", ref);
+    HttpResponse<byte[]> answer;
+    try {
+      answer = FORWARDER.send(HttpRequest.newBuilder(target).timeout(Duration.ofSeconds(forwardTimeoutSeconds()))
+                                         .header("Content-Type", "application/json").header("Accept", "application/json")
+                                         .header("X-Fink-Tag", "1").header(FORWARDED, here.isEmpty() ? "unknown" : here)
+                                         .POST(HttpRequest.BodyPublishers.ofString(forward.toString(), StandardCharsets.UTF_8)).build(),
+                              HttpResponse.BodyHandlers.ofByteArray());
+      }
+    catch (HttpTimeoutException slow) {
+      application.log("TagObject: " + survey + " tagging service at " + owner + " did not answer in time", slow);
+      response.setStatus(504);
+      out.print(new JSONObject().put("error", "The " + survey + " tagging service at " + owner +
+                                     " did not answer in time").toString());
+      return;
+      }
+    catch (Exception unreachable) {
+      application.log("TagObject: " + survey + " tagging service at " + owner + " is not reachable", unreachable);
+      response.setStatus(503);
+      out.print(new JSONObject().put("error", "The " + survey + " tagging service at " + owner + " (" + target.getHost() +
+                                     ") is not reachable from this server").toString());
+      return;
+      }
+    JSONObject relayed;
+    try {
+      if (answer.body().length > 65536) throw new IllegalArgumentException("Answer too large");
+      relayed = new JSONObject(new String(answer.body(), StandardCharsets.UTF_8));
+      }
+    catch (Exception garbled) {
+      response.setStatus(502);
+      out.print(new JSONObject().put("error", "Unexpected answer from the " + survey + " tagging service at " + owner).toString());
+      return;
+      }
+    int status = answer.statusCode();
+    response.setStatus(status >= 200 && status < 600 ? status : 502);
+    if (!relayed.has("site") && status == 200) relayed.put("site", owner);
+    out.print(relayed.toString());
+    return;
+    }
   boolean locked = false;
   try {
     locked = WRITE_LOCK.tryLock(15, TimeUnit.SECONDS);
@@ -347,7 +464,7 @@
         return;
         }
       out.print(new JSONObject().put("ok", true).put("objectId", objectId).put("tag", tag).put("survey", survey)
-        .put("value", value).put("entries", after).put("ocolCreated", created).toString());
+        .put("value", value).put("entries", after).put("ocolCreated", created).put("site", here).toString());
       }
     catch (Exception failure) {
       application.log("TagObject: tagging " + objectId + " failed", failure);

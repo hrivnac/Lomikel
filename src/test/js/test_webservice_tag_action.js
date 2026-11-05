@@ -251,6 +251,22 @@ function tagContext({id = '313761043604045880', names = TAG_NAMES, fill, respond
     assert.equal(await t.context.tagGraphState.run(), false);
     assert.ok(t.messages.some(m => pattern.test(m)), JSON.stringify(reply) + ' => ' + t.messages.join(' | '));
   }
+  // Answers relayed from the owner site's WAR name the writing server; 421/504 are explained.
+  {
+    const t = tagContext({id: 'ZTF17aaabadq', responder: sent => ({ok: true, objectId: sent.objectId, tag: sent.tag, survey: 'ZTF', entries: 2, site: 'IJCLab'})});
+    assert.equal(await t.context.tagGraphState.run(), true);
+    assert.ok(t.messages.some(m => m.includes(`is now tagged "${N1}" (1) in the ZTF graph by the IJCLab server (verified, 2 entries`)), t.messages.join(' | '));
+    const odd = tagContext({responder: sent => ({ok: true, objectId: sent.objectId, tag: sent.tag, survey: 'LSST', entries: 1, site: '<b>x</b>'})});
+    assert.equal(await odd.context.tagGraphState.run(), true);
+    assert.ok(odd.messages.some(m => /in the LSST graph \(verified, 1 entry/.test(m)), 'an unusual site name is not shown');
+  }
+  for (const [reply, pattern] of [[{http: 421, error: 'This server (CC) does not write ZTF tags'}, /does not write ZTF tags; nothing was written/],
+                                  [{http: 504, error: 'The ZTF tagging service at IJCLab did not answer in time'}, /did not answer in time\. The tag may or may not have been written/],
+                                  [{http: 503, error: 'The ZTF tagging service at IJCLab (157.136.253.253) is not reachable from this server'}, /is not reachable from this server; nothing was written/]]) {
+    const t = tagContext({responder: () => reply});
+    assert.equal(await t.context.tagGraphState.run(), false);
+    assert.ok(t.messages.some(m => pattern.test(m)), JSON.stringify(reply) + ' => ' + t.messages.join(' | '));
+  }
   // A network failure or a timeout after sending leaves the outcome unknown.
   {
     const t = tagContext({responder: () => new TypeError('Failed to fetch')});
