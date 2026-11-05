@@ -234,16 +234,23 @@ function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp']
     assert.equal(t.requests.length, 0);
   }
   // Server-side refusals are shown (sanitized); a mismatching reply is not trusted.
-  for (const [reply, pattern] of [[{http: 404, error: 'Object is not in the LSST graph'}, /Tag failed for 313761043604045880: Object is not in the LSST graph/],
-                                  [{http: 503, error: 'Writable LSST graph is not available'}, /Writable LSST graph is not available/],
-                                  [{http: 400, error: 'Unknown tag name'}, /Unknown tag name/],
-                                  [{http: 502, error: 'bad\n\u0000text'}, /bad\s+text/],
-                                  [{http: 500}, /HTTP 500/],
+  for (const [reply, pattern] of [[{http: 404, error: 'Object is not in the LSST graph'}, /Tag failed for 313761043604045880: Object is not in the LSST graph; nothing was written/],
+                                  [{http: 503, error: 'Writable LSST graph is not available'}, /Writable LSST graph is not available; nothing was written/],
+                                  [{http: 400, error: 'Unknown tag name'}, /Unknown tag name; nothing was written/],
+                                  [{http: 403, error: 'Cross-origin request refused'}, /Cross-origin request refused; nothing was written/],
+                                  [{http: 502, error: 'bad\n\u0000text'}, /bad\s+text\. The tag may or may not have been written/],
+                                  [{http: 500}, /HTTP 500\. The tag may or may not have been written/],
                                   [{ok: true, objectId: '999', tag: 'GraphBrowser', survey: 'LSST'}, /Unexpected tag response/],
                                   [{ok: true, objectId: '313761043604045880', tag: 'Temp', survey: 'LSST'}, /Unexpected tag response/]]) {
     const t = tagContext({responder: () => reply});
     assert.equal(await t.context.tagGraphState.run(), false);
     assert.ok(t.messages.some(m => pattern.test(m)), JSON.stringify(reply) + ' => ' + t.messages.join(' | '));
+  }
+  // A network failure or a timeout after sending leaves the outcome unknown.
+  {
+    const t = tagContext({responder: () => new TypeError('Failed to fetch')});
+    assert.equal(await t.context.tagGraphState.run(), false);
+    assert.ok(t.messages.some(m => /Failed to fetch\. The tag may or may not have been written/.test(m)), t.messages.join(' | '));
   }
   // One request (or open dialog) at a time.
   {

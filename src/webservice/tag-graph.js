@@ -31,7 +31,9 @@
       var body = null;
       try { body = await response.json(); } catch (error) { body = null; }
       if (!response.ok || !body) {
-        throw new Error(body && typeof body.error === 'string' ? clean(body.error) : 'HTTP ' + response.status);
+        var failure = new Error(body && typeof body.error === 'string' ? clean(body.error) : 'HTTP ' + response.status);
+        failure.status = response.status;
+        throw failure;
       }
       return body;
     } finally {
@@ -176,8 +178,10 @@
           ' for this object). A read-only graph server may need a few minutes to show it.');
       return true;
     } catch (error) {
+      // TagObject.jsp answers 4xx and 503 before any write; other failures leave the outcome unknown.
+      var refused = error && (error.status === 503 || (error.status >= 400 && error.status < 500));
       say('Tag failed for ' + objectId + ': ' + (error && error.name === 'AbortError' ? 'timed out' : clean((error && error.message) || 'unknown error')) +
-          '. The tag may or may not have been written.');
+          (refused ? '; nothing was written.' : '. The tag may or may not have been written.'));
       return false;
     } finally {
       busy = false;
