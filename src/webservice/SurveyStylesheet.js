@@ -6,6 +6,17 @@ function finkSurveyStarImage(objectId) {
   if (/^[0-9]{1,24}$/.test(id)) return 'Star-LSST.png';
   return 'Star.png';
 }
+// OCol vertices: the same icon recolored like the object stars, chosen by the OCol "survey" property;
+// other surveys (e.g. ANY for TAG collections) keep the original icon.
+function finkSurveyOColImage(survey) {
+  var name = survey == null ? '' : String(survey).trim();
+  if (name === 'ZTF') return 'StarsSources-ZTF.png';
+  if (name === 'LSST') return 'StarsSources-LSST.png';
+  return 'StarsSources.png';
+}
+if (stylesheet.nodes.OCol && stylesheet.nodes.OCol.graphics) {
+  stylesheet.nodes.OCol.graphics.image = {js:"finkSurveyOColImage(eMap.get('survey'))"};
+}
 // GraphView.js evaluates graphics.image for each vertex, then prefixes images/.
 if (stylesheet.nodes.object && stylesheet.nodes.object.graphics) {
   stylesheet.nodes.object.graphics.image = {js:"finkSurveyStarImage(eMap.get('objectId'))"};

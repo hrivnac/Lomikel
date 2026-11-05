@@ -48,6 +48,8 @@ function graphStyleExpression(expression, title, eMap) {
       return graphText(title).replace('site:', '');
     case "finkSurveyStarImage(eMap.get('objectId'))":
       return typeof finkSurveyStarImage === 'function' ? finkSurveyStarImage(eMap.get('objectId')) : '';
+    case "finkSurveyOColImage(eMap.get('survey'))":
+      return typeof finkSurveyOColImage === 'function' ? finkSurveyOColImage(eMap.get('survey')) : '';
     case "finkPortalUrl(eMap.get('objectId'))":
       return typeof finkPortalUrl === 'function' ? finkPortalUrl(eMap.get('objectId')) : '';
     case "finkNeighborhoodUrl(eMap.get('objectId'))":
