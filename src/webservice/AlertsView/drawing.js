@@ -123,7 +123,7 @@ function drawStars() {
       s.alpha += s.twinkleSpeed * (Math.random() < 0.5 ? 1 : -1);
       s.alpha = Math.max(0.3, Math.min(1, s.alpha));
       }
-    const radius = s.r * camera.currentZoom;
+    const radius = s.r; // screen pixels: stars keep their size while zooming, like the alert symbols
     forEachWrappedScreenPosition(pos, radius + 100, drawCatalogStarAt, s, radius);
     }
   }
