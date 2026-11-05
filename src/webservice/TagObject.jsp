@@ -6,10 +6,14 @@
 <%@ page import="com.Lomikel.Utils.Init" %>
 <%@ page import="com.astrolabsoftware.FinkBrowser.Januser.Classifier" %>
 <%@ page import="com.astrolabsoftware.FinkBrowser.Januser.FinkGremlinRecipiesG" %>
+<%@ page import="com.astrolabsoftware.FinkBrowser.Januser.TagClassifier" %>
+<%@ page import="org.json.JSONArray" %>
 <%@ page import="org.json.JSONObject" %>
 <%@ page import="java.io.ByteArrayOutputStream" %>
 <%@ page import="java.io.FileInputStream" %>
+<%@ page import="java.io.BufferedReader" %>
 <%@ page import="java.io.InputStream" %>
+<%@ page import="java.io.InputStreamReader" %>
 <%@ page import="java.io.OutputStream" %>
 <%@ page import="java.nio.file.Files" %>
 <%@ page import="java.nio.file.Path" %>
@@ -18,7 +22,9 @@
 <%@ page import="java.net.Socket" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Properties" %>
 <%@ page import="java.util.concurrent.Callable" %>
@@ -32,11 +38,18 @@
 <%@ page import="java.util.regex.Pattern" %>
 
 <%!
-  // "Tag" action of the Graph Browser: register one existing <em>object</em> in the TAG OCol
-  // "GraphBrowser" of the JanusGraph database of its survey (LSST -> CC, ZTF -> IJCLab).
-  // The Gremlin servers behind the browser are read-only, so the write goes through this
-  // server-side client, configured with the same writable properties as the cron jobs.
-  private static final String TAG = "GraphBrowser";
+  // "Tag" action of the Graph Browser: tag one existing <em>object</em> in a TAG OCol of the JanusGraph
+  // database of its survey (LSST -> CC, ZTF -> IJCLab) with
+  //   Classifier.instance('TAG', survey, '').classify(gr, oid, tag, value, author, annotation, ref)
+  // GET answers the configured tag names; POST writes. The Gremlin servers behind the browser are read-only,
+  // so the write goes through this server-side client, configured with writable properties.
+  // Tag names come from com/astrolabsoftware/FinkBrowser/Januser/TagNames.txt (in the Lomikel jar).
+  private static final String TAG_NAMES = "TagNames.txt";
+  private static final Pattern TAG_NAME = Pattern.compile("[A-Za-z0-9_.-]{1,64}");
+  private static final int MAX_BODY = 8192;
+  private static final int MAX_AUTHOR = 200;
+  private static final int MAX_ANNOTATION = 2000;
+  private static final int MAX_REF = 1000;
   private static final Pattern OBJECT_ID = Pattern.compile("(?:ZTF[A-Za-z0-9_-]{1,80}|[0-9]{1,24})");
   // The writable graph configurations are packaged inside the WAR (WEB-INF/janus/*RW.properties, taken from
   // src/sys/janusgraph/conf/gremlin-server), so the WAR does not depend on any local file.
@@ -179,19 +192,69 @@
       }
     }
 
-  private static long members(FinkGremlinRecipiesG gr, String objectId) {
-    Object n = gr.g().V().has("lbl", "OCol").has("classifier", "TAG").has("cls", TAG)
-                    .out("deepcontains").has("lbl", "object").has("objectId", objectId).count().next();
+  // Configured tag names, in file order; invalid lines are ignored.
+  private static List<String> tagNames() throws Exception {
+    List<String> names = new ArrayList<String>();
+    InputStream stream = TagClassifier.class.getResourceAsStream(TAG_NAMES);
+    if (stream == null) throw new IllegalStateException("Tag name configuration " + TAG_NAMES + " is missing");
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        int hash = line.indexOf('#');
+        String name = (hash < 0 ? line : line.substring(0, hash)).trim();
+        if (TAG_NAME.matcher(name).matches() && !names.contains(name)) names.add(name);
+        }
+      }
+    return names;
+    }
+
+  // Optional text field: null when absent or blank (the attribute is then not set), single-line, bounded.
+  private static String text(JSONObject body, String key, int max) {
+    if (!body.has(key) || body.isNull(key)) return null;
+    Object raw = body.get(key);
+    if (!(raw instanceof String)) throw new IllegalArgumentException("Invalid " + key);
+    String value = ((String)raw).replaceAll("[\\p{Cntrl}\\u2028\\u2029]", " ").trim();
+    if (value.length() > max) throw new IllegalArgumentException(key + " is too long");
+    return value.isEmpty() ? null : value;
+    }
+
+  // Number of registrations (deepcontains edges) of the object in the TAG OCol.
+  private static long entries(FinkGremlinRecipiesG gr, String tag, String objectId) {
+    Object n = gr.g().V().has("lbl", "OCol").has("classifier", "TAG").has("flavor", "").has("cls", tag)
+                    .outE("deepcontains").where(org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV()
+                    .has("lbl", "object").has("objectId", objectId)).count().next();
     return ((Number)n).longValue();
+    }
+
+  // TagClassifier.classify only writes into an existing OCol. Create a configured one on its first use,
+  // exactly as FinkGremlinRecipies.registerOCol looks it up (TAG classifier, survey ANY, empty flavor).
+  private static boolean ensureOCol(FinkGremlinRecipiesG gr, String tag) {
+    if (gr.g().V().has("lbl", "OCol").has("survey", "ANY").has("classifier", "TAG").has("flavor", "")
+                  .has("cls", tag).hasNext()) return false;
+    gr.g().addV("OCol").property("lbl", "OCol").property("survey", "ANY").property("classifier", "TAG")
+                       .property("flavor", "").property("cls", tag).iterate();
+    gr.commit();
+    return true;
     }
 %>
 
 <%
   response.setHeader("Cache-Control", "no-store");
   response.setHeader("X-Content-Type-Options", "nosniff");
+  if ("GET".equals(request.getMethod())) {
+    try {
+      out.print(new JSONObject().put("tags", new JSONArray(tagNames())).toString());
+      }
+    catch (Exception missing) {
+      application.log("TagObject: tag names unavailable", missing);
+      response.setStatus(503);
+      out.print("{\"error\":\"Tag names are not available\"}");
+      }
+    return;
+    }
   if (!"POST".equals(request.getMethod())) {
     response.setStatus(405);
-    out.print("{\"error\":\"POST required\"}");
+    out.print("{\"error\":\"GET or POST required\"}");
     return;
     }
   String contentType = request.getContentType();
@@ -206,17 +269,31 @@
     out.print("{\"error\":\"Invalid tag request\"}");
     return;
     }
-  String objectId;
+  String objectId, tag, author, annotation, ref;
+  double value;
   try {
-    if (request.getContentLengthLong() > 512) throw new IllegalArgumentException("Request too large");
+    if (request.getContentLengthLong() > MAX_BODY) throw new IllegalArgumentException("Request too large");
+    JSONObject body;
     try (InputStream stream = request.getInputStream()) {
-      objectId = new JSONObject(new String(readLimited(stream, 512), StandardCharsets.UTF_8)).getString("objectId");
+      body = new JSONObject(new String(readLimited(stream, MAX_BODY), StandardCharsets.UTF_8));
       }
+    objectId = body.getString("objectId");
     if (!OBJECT_ID.matcher(objectId).matches()) throw new IllegalArgumentException("Invalid object ID");
+    tag = body.optString("tag", "");
+    if (!TAG_NAME.matcher(tag).matches() || !tagNames().contains(tag)) throw new IllegalArgumentException("Unknown tag name");
+    Object rawValue = body.opt("value");
+    if (!(rawValue instanceof Number)) throw new IllegalArgumentException("Tag value must be a number");
+    value = ((Number)rawValue).doubleValue();
+    if (!Double.isFinite(value) || value < 0.0) throw new IllegalArgumentException("Tag value must be a finite number >= 0");
+    author     = text(body, "author",     MAX_AUTHOR);
+    annotation = text(body, "annotation", MAX_ANNOTATION);
+    ref        = text(body, "ref",        MAX_REF);
     }
   catch (Exception invalid) {
+    String reason = invalid instanceof IllegalArgumentException && invalid.getMessage() != null &&
+                    invalid.getMessage().matches("[A-Za-z0-9 >=.,_-]{1,80}") ? invalid.getMessage() : "Invalid tag request";
     response.setStatus(400);
-    out.print("{\"error\":\"Invalid object request\"}");
+    out.print(new JSONObject().put("error", reason).toString());
     return;
     }
   String survey = objectId.startsWith("ZTF") ? "ZTF" : "LSST";
@@ -254,21 +331,23 @@
         return;
         }
       application.log("TagObject: " + objectId + " found in " + survey + " graph (" + (System.currentTimeMillis() - t0) + " ms)");
-      boolean already = members(gr, objectId) > 0;
+      boolean created = ensureOCol(gr, tag);
+      long before = entries(gr, tag, objectId);
       gr.commit();
-      application.log("TagObject: " + objectId + " membership checked (" + (System.currentTimeMillis() - t0) + " ms), registering");
-      gr.registerOCol(Classifier.instance("TAG", survey, ""), TAG, objectId, 1.0, "", "");
-      application.log("TagObject: " + objectId + " registered (" + (System.currentTimeMillis() - t0) + " ms), verifying");
-      long verified = members(gr, objectId);
+      application.log("TagObject: " + objectId + " has " + before + " " + tag + " entries" + (created ? " (OCol created)" : "") +
+                      " (" + (System.currentTimeMillis() - t0) + " ms), tagging");
+      ((TagClassifier)Classifier.instance("TAG", survey, "")).classify(gr, objectId, tag, value, author, annotation, ref);
+      application.log("TagObject: " + objectId + " tagged (" + (System.currentTimeMillis() - t0) + " ms), verifying");
+      long after = entries(gr, tag, objectId);
       gr.commit();
-      application.log("TagObject: " + objectId + " verified, members=" + verified + " (" + (System.currentTimeMillis() - t0) + " ms)");
-      if (verified != 1) {
+      application.log("TagObject: " + objectId + " verified, entries=" + after + " (" + (System.currentTimeMillis() - t0) + " ms)");
+      if (after != before + 1) {
         response.setStatus(502);
-        out.print(new JSONObject().put("error", "Tag was written but could not be verified").toString());
+        out.print(new JSONObject().put("error", "Tag could not be verified").toString());
         return;
         }
-      out.print(new JSONObject().put("ok", true).put("objectId", objectId).put("tag", TAG)
-        .put("survey", survey).put("alreadyTagged", already).put("members", verified).toString());
+      out.print(new JSONObject().put("ok", true).put("objectId", objectId).put("tag", tag).put("survey", survey)
+        .put("value", value).put("entries", after).put("ocolCreated", created).toString());
       }
     catch (Exception failure) {
       application.log("TagObject: tagging " + objectId + " failed", failure);

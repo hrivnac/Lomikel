@@ -1,6 +1,6 @@
 'use strict';
 // "Tag" selection action: sentinel action on object vertices, safe routing through GraphView/workspace,
-// and tag-graph.js building one fixed, validated registerOCol call on the vertex's own graph server.
+// and tag-graph.js asking for the tag details and posting them to the WAR's TagObject.jsp.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -71,93 +71,206 @@ for (const id of ['ZTF20aachcvz', '313761043604045880', '20892028060578637']) {
   assert.ok(ws.indexOf("pane === 'tag'") < ws.indexOf('legacyLoadPane.call('), 'tag is handled before any legacy call');
 }
 
-// 4. tag-graph.js behaviour: one POST to the WAR's TagObject.jsp, never a write to a Gremlin server.
-function tagContext({confirmAnswer = true, id = '313761043604045880', responder} = {}) {
+// 4. tag-graph.js behaviour: GET the configured tag names, ask in a dialog, then one POST to the WAR's
+//    TagObject.jsp with the dialog values; never a write to a Gremlin server.
+function domElement(tag) {
+  const node = {tag, children: [], attributes: {}, listeners: {}, textContent: '', value: '', parentNode: null, open: false,
+    appendChild(child) { child.parentNode = this; this.children.push(child); return child; },
+    removeChild(child) { this.children = this.children.filter(c => c !== child); child.parentNode = null; },
+    setAttribute(k, v) { this.attributes[k] = String(v); }, addEventListener(k, fn) { this.listeners[k] = fn; },
+    focus() {}, showModal() { this.open = true; }, close() { this.open = false; if (this.listeners.close) this.listeners.close(); }};
+  return node;
+}
+function find(node, test) {
+  if (test(node)) return node;
+  for (const child of node.children || []) { const hit = find(child, test); if (hit) return hit; }
+  return null;
+}
+function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp'], fill, responder, getResponder} = {}) {
   const messages = [];
   const requests = [];
+  const dialogs = [];
   const selected = {id: 5};
+  const body = domElement('body');
   const context = vm.createContext({
     console, setTimeout, clearTimeout, AbortController,
     selectedNode: selected, nodes: [selected],
     skyGraphState: {getId: vertex => vertex === 5 ? id : null},
     feedbackLine: message => messages.push(message),
-    confirm: question => { messages.push('CONFIRM ' + question); return confirmAnswer; },
+    confirm: () => { throw new Error('window.confirm must not be used'); },
+    document: {createElement: domElement, body},
     fetch: async (target, options) => {
       requests.push({target, options});
-      const custom = responder ? await responder(requests.length) : undefined;
+      if (options.method === 'GET') {
+        const custom = getResponder ? await getResponder() : undefined;
+        if (custom instanceof Error) throw custom;
+        const reply = custom !== undefined ? custom : {tags: names};
+        return {ok: reply.http === undefined, status: reply.http || 200, json: async () => reply};
+      }
+      const sent = JSON.parse(options.body);
+      const custom = responder ? await responder(sent) : undefined;
       if (custom instanceof Error) throw custom;
       const reply = custom !== undefined ? custom : {ok: true, survey: id.startsWith('ZTF') ? 'ZTF' : 'LSST',
-        objectId: id, tag: 'GraphBrowser', alreadyTagged: false, members: 1};
+        objectId: sent.objectId, tag: sent.tag, value: sent.value, entries: 1, ocolCreated: false};
       return {ok: reply.http === undefined, status: reply.http || 200, json: async () => reply};
     }});
   context.window = context;
   vm.runInContext(read('tag-graph.js'), context, {filename: 'tag-graph.js'});
-  return {context, messages, requests, selected};
+  // Fill and submit (or cancel) the dialog as soon as it is shown.
+  const realAppend = body.appendChild.bind(body);
+  body.appendChild = child => {
+    realAppend(child);
+    if (child.tag === 'dialog') {
+      dialogs.push(child);
+      Promise.resolve().then(() => {
+        const field = name => find(child, n => n.attributes.name === name);
+        const action = fill ? fill(field, child) : 'submit';
+        if (action === 'cancel') find(child, n => n.textContent === 'Cancel').listeners.click();
+        else if (action === 'escape') child.listeners.cancel();
+        else if (action !== 'leave') find(child, n => n.tag === 'form').listeners.submit({preventDefault() {}});
+      });
+    }
+    return child;
+  };
+  return {context, messages, requests, dialogs, body};
 }
 (async () => {
-  // LSST and ZTF objects: one same-origin POST with the ID only, behind a confirmation.
-  for (const [id, survey] of [['313761043604045880', 'LSST'], ['20892028060578637', 'LSST'], ['ZTF21aaxtctv', 'ZTF']]) {
-    const t = tagContext({id});
+  // Dialog content: read-only object id, configured tag names, value 1.0, empty author/annotation/ref.
+  {
+    let seen;
+    const t = tagContext({fill: (field, dialog) => { seen = {
+      id: field('objectId'), tag: field('tag'), value: field('value').value,
+      options: field('tag').children.map(o => o.textContent), author: field('author').value,
+      annotation: field('annotation').value, ref: field('ref').value, open: dialog.open}; return 'cancel'; }});
+    assert.equal(await t.context.tagGraphState.run(), false);
+    await new Promise(r => setImmediate(r));
+    assert.equal(seen.id.value, '313761043604045880');
+    assert.equal(seen.id.attributes.readonly, 'readonly', 'object id is not modifiable');
+    assert.deepEqual(seen.options, ['GraphBrowser', 'Temp']);
+    assert.equal(seen.tag.value, 'GraphBrowser');
+    assert.equal(seen.value, '1.0');
+    assert.deepEqual([seen.author, seen.annotation, seen.ref], ['', '', '']);
+    assert.equal(seen.open, true, 'shown as a modal dialog');
+    assert.equal(t.requests.length, 1, 'only the GET of the tag names; nothing posted');
+    assert.equal(t.requests[0].target, 'TagObject.jsp');
+    assert.equal(t.requests[0].options.method, 'GET');
+    assert.ok(t.messages.some(m => /cancelled; nothing was written/.test(m)));
+    assert.equal(t.body.children.length, 0, 'the dialog is removed after closing');
+  }
+  // Escape closes without writing.
+  {
+    const t = tagContext({fill: () => 'escape'});
+    assert.equal(await t.context.tagGraphState.run(), false);
+    assert.equal(t.requests.filter(r => r.options.method === 'POST').length, 0);
+  }
+  // Submitted values reach TagObject.jsp exactly (LSST and ZTF objects).
+  for (const [id, survey] of [['313761043604045880', 'LSST'], ['20892028060578637', 'LSST'], ['ZTF17aaabadq', 'ZTF']]) {
+    const t = tagContext({id, fill: field => {
+      field('tag').value = 'GraphBrowser'; field('value').value = '0.5'; field('author').value = 'Julius.Hrivnac@cern.ch';
+      field('annotation').value = 'muj pokus'; field('ref').value = 'blablabla'; }});
     assert.equal(await t.context.tagGraphState.run(), true, id);
-    assert.equal(t.requests.length, 1);
-    const {target, options} = t.requests[0];
+    const posts = t.requests.filter(r => r.options.method === 'POST');
+    assert.equal(posts.length, 1);
+    const {target, options} = posts[0];
     assert.equal(target, 'TagObject.jsp', 'relative URL: the WAR that served the page');
-    assert.equal(options.method, 'POST');
     assert.equal(options.headers['X-Fink-Tag'], '1');
     assert.equal(options.headers['Content-Type'], 'application/json');
     assert.equal(options.credentials, 'same-origin');
-    assert.deepEqual(JSON.parse(options.body), {objectId: id}, 'only the validated ID is sent');
-    assert.ok(t.messages.some(m => m === `CONFIRM Tag object ${id} as "GraphBrowser" in the ${survey} graph database?`));
-    assert.ok(t.messages.some(m => /is now tagged "GraphBrowser" in the .* graph \(verified\)/.test(m)));
+    assert.deepEqual(JSON.parse(options.body), {objectId: id, tag: 'GraphBrowser', value: 0.5,
+      author: 'Julius.Hrivnac@cern.ch', annotation: 'muj pokus', ref: 'blablabla'});
+    assert.ok(t.messages.some(m => m.includes(`is now tagged "GraphBrowser" (0.5) in the ${survey} graph (verified, 1 entry`)));
   }
-  // Already tagged is reported as such.
-  let t = tagContext({responder: () => ({ok: true, survey: 'LSST', objectId: '313761043604045880', tag: 'GraphBrowser', alreadyTagged: true, members: 1})});
-  assert.equal(await t.context.tagGraphState.run(), true);
-  assert.ok(t.messages.some(m => /was already tagged "GraphBrowser"/.test(m)));
-
-  // Declined confirmation: no request.
-  t = tagContext({confirmAnswer: false});
-  assert.equal(await t.context.tagGraphState.run(), false);
-  assert.equal(t.requests.length, 0);
-
+  // The second configured name and defaults.
+  {
+    const t = tagContext({fill: field => { field('tag').value = 'Temp'; }});
+    assert.equal(await t.context.tagGraphState.run(), true);
+    const sent = JSON.parse(t.requests.find(r => r.options.method === 'POST').options.body);
+    assert.deepEqual(sent, {objectId: '313761043604045880', tag: 'Temp', value: 1, author: '', annotation: '', ref: ''});
+  }
+  // Invalid dialog values keep the dialog open with a message and post nothing.
+  for (const [setup, pattern] of [[f => { f('value').value = '-1'; }, /number >= 0/],
+                                  [f => { f('value').value = ''; }, /number >= 0/],
+                                  [f => { f('value').value = 'abc'; }, /number >= 0/],
+                                  [f => { f('tag').value = 'Other'; }, /configured tag names/],
+                                  [f => { f('author').value = 'x'.repeat(201); }, /author is longer than 200/],
+                                  [f => { f('annotation').value = 'x'.repeat(2001); }, /annotation is longer than 2000/],
+                                  [f => { f('ref').value = 'x'.repeat(1001); }, /ref is longer than 1000/]]) {
+    let dialogRef;
+    const t = tagContext({fill: (field, dialog) => { setup(field); dialogRef = dialog; return 'submit-then-cancel'; }});
+    const running = t.context.tagGraphState.run();
+    await new Promise(r => setImmediate(r));
+    const problem = find(dialogRef, n => n.attributes.class === 'tag-dialog-error');
+    assert.match(problem.textContent, pattern);
+    assert.equal(dialogRef.open, true, 'dialog stays open');
+    find(dialogRef, n => n.textContent === 'Cancel').listeners.click();
+    assert.equal(await running, false);
+    assert.equal(t.requests.filter(r => r.options.method === 'POST').length, 0);
+  }
+  // Control characters are flattened before sending.
+  {
+    const t = tagContext({fill: f => { f('annotation').value = 'a\nb\u0000c'; }});
+    assert.equal(await t.context.tagGraphState.run(), true);
+    assert.equal(JSON.parse(t.requests.find(r => r.options.method === 'POST').options.body).annotation, 'a b c');
+  }
+  // Tag names unavailable: no dialog, nothing written.
+  for (const [getReply, pattern] of [[{http: 503, error: 'Tag names are not available'}, /Tag names are not available/],
+                                     [{tags: []}, /no tag names are configured/],
+                                     [{tags: ['bad name', 5]}, /no tag names are configured/],
+                                     [new TypeError('Failed to fetch'), /Failed to fetch/]]) {
+    const t = tagContext({getResponder: () => getReply});
+    assert.equal(await t.context.tagGraphState.run(), false);
+    assert.equal(t.dialogs.length, 0);
+    assert.ok(t.messages.some(m => pattern.test(m) && /nothing was written/.test(m)), t.messages.join(' | '));
+  }
   // Hostile or missing object IDs and a non-live vertex never reach the network.
   for (const bad of ["1');g.V().drop();//", '', 'ZTF', "ZTF1'x", '12ab', '1'.repeat(30)]) {
-    t = tagContext({id: bad});
+    const t = tagContext({id: bad});
     assert.equal(await t.context.tagGraphState.run(), false, bad);
     assert.equal(t.requests.length, 0, bad);
   }
-  t = tagContext(); t.context.nodes.length = 0;
-  assert.equal(await t.context.tagGraphState.run(), false);
-  assert.equal(t.requests.length, 0);
-
+  {
+    const t = tagContext(); t.context.nodes.length = 0;
+    assert.equal(await t.context.tagGraphState.run(), false);
+    assert.equal(t.requests.length, 0);
+  }
   // Server-side refusals are shown (sanitized); a mismatching reply is not trusted.
-  for (const [reply, pattern] of [[{http: 404, error: 'Object is not in the LSST graph'}, /Tag failed for 313761043604045880: Object is not in the LSST graph.*repeating it is safe/],
+  for (const [reply, pattern] of [[{http: 404, error: 'Object is not in the LSST graph'}, /Tag failed for 313761043604045880: Object is not in the LSST graph/],
                                   [{http: 503, error: 'Writable LSST graph is not available'}, /Writable LSST graph is not available/],
+                                  [{http: 400, error: 'Unknown tag name'}, /Unknown tag name/],
                                   [{http: 502, error: 'bad\n\u0000text'}, /bad\s+text/],
                                   [{http: 500}, /HTTP 500/],
                                   [{ok: true, objectId: '999', tag: 'GraphBrowser', survey: 'LSST'}, /Unexpected tag response/],
-                                  [{ok: true, objectId: '313761043604045880', tag: 'Other', survey: 'LSST'}, /Unexpected tag response/]]) {
-    t = tagContext({responder: () => reply});
+                                  [{ok: true, objectId: '313761043604045880', tag: 'Temp', survey: 'LSST'}, /Unexpected tag response/]]) {
+    const t = tagContext({responder: () => reply});
     assert.equal(await t.context.tagGraphState.run(), false);
     assert.ok(t.messages.some(m => pattern.test(m)), JSON.stringify(reply) + ' => ' + t.messages.join(' | '));
   }
-  t = tagContext({responder: () => new TypeError('Failed to fetch')});
-  assert.equal(await t.context.tagGraphState.run(), false);
-  assert.ok(t.messages.some(m => /Failed to fetch.*repeating it is safe/.test(m)));
+  // One request (or open dialog) at a time.
+  {
+    let dialogRef;
+    const t = tagContext({fill: (f, d) => { dialogRef = d; return 'leave'; }});
+    const first = t.context.tagGraphState.run();
+    await new Promise(r => setImmediate(r));
+    assert.equal(await t.context.tagGraphState.run(), false, 'no second dialog while one is open');
+    assert.ok(t.messages.some(m => /still running/.test(m)));
+    find(dialogRef, n => n.tag === 'form').listeners.submit({preventDefault() {}});
+    assert.equal(await first, true);
+  }
+  {
+    let release;
+    const t = tagContext({responder: () => new Promise(resolve => { release = () => resolve(undefined); })});
+    const first = t.context.tagGraphState.run();
+    for (let i = 0; i < 5; i++) await new Promise(r => setImmediate(r));
+    assert.equal(await t.context.tagGraphState.run(), false);
+    release();
+    assert.equal(await first, true);
+  }
 
-  // One request at a time.
-  let release;
-  t = tagContext({responder: () => new Promise(resolve => { release = () => resolve(undefined); }).then(() => undefined)});
-  const first = t.context.tagGraphState.run();
-  await new Promise(r => setImmediate(r));
-  assert.equal(await t.context.tagGraphState.run(), false);
-  assert.ok(t.messages.some(m => /still running/.test(m)));
-  release();
-  assert.equal(await first, true);
-
-  // The client never talks to a Gremlin server or builds scripts any more.
+  // The client never talks to a Gremlin server.
   const client = read('tag-graph.js');
-  assert.doesNotMatch(client, /graphTableServerForVertex|\?gremlin=/);
-  assert.match(read('GraphView.jsp'), /tag-graph\.js\?v=tag-\d/);
-  console.log('Tag action: sentinel action, one validated POST to TagObject.jsp, fail-closed checks');
+  assert.doesNotMatch(client, /graphTableServerForVertex|\?gremlin=|window\.confirm/);
+  assert.match(read('GraphView.jsp'), /tag-graph\.js\?v=tag-dialog-\d/);
+  assert.match(read('index.jsp'), /workspace\.css\?v=tag-dialog-\d/);
+  assert.match(read('workspace.css'), /\.tag-dialog \{/);
+  console.log('Tag action: sentinel action, dialog with configured tag names and value/author/annotation/ref, one validated POST to TagObject.jsp');
 })().catch(error => { console.error(error); process.exit(1); });
