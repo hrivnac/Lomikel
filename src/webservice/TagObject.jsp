@@ -226,15 +226,12 @@
     return ((Number)n).longValue();
     }
 
-  // TagClassifier.classify only writes into an existing OCol. Create a configured one on its first use,
-  // exactly as FinkGremlinRecipies.registerOCol looks it up (TAG classifier, survey ANY, empty flavor).
-  private static boolean ensureOCol(FinkGremlinRecipiesG gr, String tag) {
-    if (gr.g().V().has("lbl", "OCol").has("survey", "ANY").has("classifier", "TAG").has("flavor", "")
-                  .has("cls", tag).hasNext()) return false;
-    gr.g().addV("OCol").property("lbl", "OCol").property("survey", "ANY").property("classifier", "TAG")
-                       .property("flavor", "").property("cls", tag).iterate();
-    gr.commit();
-    return true;
+  // Users only add tags to existing tag types: the TAG OCol must already exist, exactly as
+  // FinkGremlinRecipies.registerOCol looks it up (TAG classifier, survey ANY, empty flavor), so that
+  // TagClassifier.classify never creates an OCol.
+  private static boolean tagExists(FinkGremlinRecipiesG gr, String tag) {
+    return gr.g().V().has("lbl", "OCol").has("survey", "ANY").has("classifier", "TAG").has("flavor", "")
+                     .has("cls", tag).hasNext();
     }
 %>
 
@@ -331,10 +328,15 @@
         return;
         }
       application.log("TagObject: " + objectId + " found in " + survey + " graph (" + (System.currentTimeMillis() - t0) + " ms)");
-      boolean created = ensureOCol(gr, tag);
+      if (!tagExists(gr, tag)) {
+        gr.commit(); // end the read transaction
+        response.setStatus(404);
+        out.print(new JSONObject().put("error", "Tag " + tag + " does not exist in the " + survey + " graph").toString());
+        return;
+        }
       long before = entries(gr, tag, objectId);
       gr.commit();
-      application.log("TagObject: " + objectId + " has " + before + " " + tag + " entries" + (created ? " (OCol created)" : "") +
+      application.log("TagObject: " + objectId + " has " + before + " " + tag + " entries" +
                       " (" + (System.currentTimeMillis() - t0) + " ms), tagging");
       ((TagClassifier)Classifier.instance("TAG", survey, "")).classify(gr, objectId, tag, value, author, annotation, ref);
       application.log("TagObject: " + objectId + " tagged (" + (System.currentTimeMillis() - t0) + " ms), verifying");
@@ -347,7 +349,7 @@
         return;
         }
       out.print(new JSONObject().put("ok", true).put("objectId", objectId).put("tag", tag).put("survey", survey)
-        .put("value", value).put("entries", after).put("ocolCreated", created).toString());
+        .put("value", value).put("entries", after).toString());
       }
     catch (Exception failure) {
       application.log("TagObject: tagging " + objectId + " failed", failure);

@@ -111,7 +111,7 @@ function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp']
       const custom = responder ? await responder(sent) : undefined;
       if (custom instanceof Error) throw custom;
       const reply = custom !== undefined ? custom : {ok: true, survey: id.startsWith('ZTF') ? 'ZTF' : 'LSST',
-        objectId: sent.objectId, tag: sent.tag, value: sent.value, entries: 1, ocolCreated: false};
+        objectId: sent.objectId, tag: sent.tag, value: sent.value, entries: 1};
       return {ok: reply.http === undefined, status: reply.http || 200, json: async () => reply};
     }});
   context.window = context;
@@ -234,10 +234,11 @@ function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp']
     assert.equal(t.requests.length, 0);
   }
   // Server-side refusals are shown (sanitized); a mismatching reply is not trusted.
-  for (const [reply, pattern] of [[{http: 404, error: 'Object is not in the LSST graph'}, /Tag failed for 313761043604045880: Object is not in the LSST graph/],
+  for (const [reply, pattern] of [[{http: 404, error: 'Object is not in the LSST graph'}, /Tag failed for 313761043604045880: Object is not in the LSST graph; nothing was written/],
                                   [{http: 503, error: 'Writable LSST graph is not available'}, /Writable LSST graph is not available/],
                                   [{http: 400, error: 'Unknown tag name'}, /Unknown tag name/],
-                                  [{http: 502, error: 'bad\n\u0000text'}, /bad\s+text/],
+                                  [{http: 404, error: 'Tag Temp does not exist in the LSST graph'}, /Tag Temp does not exist in the LSST graph; nothing was written/],
+                                  [{http: 502, error: 'bad\n\u0000text'}, /bad\s+text\. The tag may or may not have been written/],
                                   [{http: 500}, /HTTP 500/],
                                   [{ok: true, objectId: '999', tag: 'GraphBrowser', survey: 'LSST'}, /Unexpected tag response/],
                                   [{ok: true, objectId: '313761043604045880', tag: 'Temp', survey: 'LSST'}, /Unexpected tag response/]]) {

@@ -80,9 +80,12 @@ ${body}
  static long ocolEdges(JanusClient c, String name) {
    return ((Number)c.g().V().has("lbl","OCol").has("cls",name).outE("deepcontains").count().next()).longValue();
  }
+ static void createTag(JanusClient c, String name) {
+   c.g().addV("OCol").property("lbl","OCol").property("survey","ANY").property("classifier","TAG").property("flavor","").property("cls",name).iterate(); c.commit();
+ }
  static long ocols(JanusClient c, String name) { return ((Number)c.g().V().has("lbl","OCol").has("cls",name).count().next()).longValue(); }
  public static void main(String[] args) throws Exception {
-   try { run(args); System.out.println("TagObject JSP: LSST/ZTF routing, configured tag names, classify() with value/author/annotation/ref, fail-closed configuration and request validation passed"); System.out.flush(); System.exit(0); }
+   try { run(args); System.out.println("TagObject JSP: LSST/ZTF routing, configured tag names, existing tag types only, classify() with value/author/annotation/ref, fail-closed configuration and request validation passed"); System.out.flush(); System.exit(0); }
    catch (Throwable t) { t.printStackTrace(); System.exit(1); }
  }
  static void run(String[] args) throws Exception {
@@ -133,10 +136,18 @@ ${body}
    check(run(names)==200 && new JSONObject(lastBody).getJSONArray("tags").toList().equals(java.util.Arrays.asList("GraphBrowser","Temp")),"GET lists TagNames.txt");
    // 4. Existing LSST object: classify() writes one edge with value, author, annotation and ref.
    lsstGraph.g().addV("object").property("lbl","object").property("objectId",lsst).iterate(); lsstGraph.commit();
+   // A tag type that does not exist is refused: the browser never creates OCols (nor through classify).
+   check(tag(lsst,"GraphBrowser",0.5,null,null,null)==404 && lastBody.contains("Tag GraphBrowser does not exist in the LSST graph"),"missing tag type refused");
+   check(ocols(lsstGraph,"GraphBrowser")==0 && ((Number)lsstGraph.g().E().count().next()).longValue()==0,"nothing created for a missing tag type");
+   // An OCol of that name but not matching registerOCol's lookup (no survey, as TagClassifier.createTag makes) is refused too.
+   lsstGraph.g().addV("OCol").property("lbl","OCol").property("classifier","TAG").property("flavor","").property("cls","GraphBrowser").iterate(); lsstGraph.commit();
+   check(tag(lsst,"GraphBrowser",0.5,null,null,null)==404 && ocols(lsstGraph,"GraphBrowser")==1,"OCol without survey refused, no duplicate created");
+   lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").drop().iterate(); lsstGraph.commit();
+   createTag(lsstGraph,"GraphBrowser");
    check(tag(lsst,"GraphBrowser",0.5,"Julius.Hrivnac@cern.ch","muj pokus","blablabla")==200,"tag existing object");
    JSONObject ok=new JSONObject(lastBody);
    check(ok.getBoolean("ok") && ok.getString("survey").equals("LSST") && ok.getString("tag").equals("GraphBrowser") &&
-         ok.getLong("entries")==1 && ok.getDouble("value")==0.5 && ok.getBoolean("ocolCreated"),"response shape");
+         ok.getLong("entries")==1 && ok.getDouble("value")==0.5 && !ok.has("ocolCreated"),"response shape");
    check(ocolEdges(lsstGraph)==1,"one deepcontains edge");
    Map<Object,Object> edge=lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").outE("deepcontains").valueMap().next();
    check(String.valueOf(edge.get("weight")).equals("0.5") && "Julius.Hrivnac@cern.ch".equals(edge.get("author")) &&
@@ -144,13 +155,15 @@ ${body}
    Map<Object,Object> ocol=lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").valueMap("classifier","survey","flavor").next();
    check(String.valueOf(ocol).contains("TAG") && String.valueOf(ocol).contains("ANY"),"TAG classifier, survey ANY: "+ocol);
    // A second tagging adds another entry (classify keeps earlier ones); no duplicate OCol; blank texts are not stored.
-   check(tag(lsst,"GraphBrowser",2,"","  ",null)==200 && new JSONObject(lastBody).getLong("entries")==2 && !new JSONObject(lastBody).getBoolean("ocolCreated"),"second entry");
+   check(tag(lsst,"GraphBrowser",2,"","  ",null)==200 && new JSONObject(lastBody).getLong("entries")==2,"second entry (duplicates are fine)");
    check(ocolEdges(lsstGraph)==2 && ocols(lsstGraph,"GraphBrowser")==1,"two entries, one OCol");
    check(lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").outE("deepcontains").has("weight",2.0).hasNext() &&
          !lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").outE("deepcontains").has("weight",2.0).has("author").hasNext() &&
          !lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").outE("deepcontains").has("weight",2.0).has("annotation").hasNext(),"blank texts are not stored");
-   // The other configured tag gets its own OCol on first use.
-   check(tag(lsst,"Temp",1.0,"me",null,"https://x.example/a?b=1")==200 && new JSONObject(lastBody).getBoolean("ocolCreated"),"Temp tag");
+   // The other configured tag, once it exists, is a separate OCol.
+   check(tag(lsst,"Temp",1.0,"me",null,"https://x.example/a?b=1")==404 && ocols(lsstGraph,"Temp")==0,"Temp not created");
+   createTag(lsstGraph,"Temp");
+   check(tag(lsst,"Temp",1.0,"me",null,"https://x.example/a?b=1")==200,"Temp tag");
    check(ocols(lsstGraph,"Temp")==1 && ocolEdges(lsstGraph,"Temp")==1 && ocolEdges(lsstGraph)==2,"Temp is separate");
    // Control characters are flattened; limits and types are enforced; nothing is written on refusal.
    check(tag(lsst,"Temp",1.0,"a\\u0001b\\nc",null,null)==200,"control characters accepted after flattening");
@@ -167,6 +180,7 @@ ${body}
    check(post(ztf)==404,"unknown ZTF object");
    JanusClient ztfGraph=CLIENTS.get("ZTF");
    ztfGraph.g().addV("object").property("lbl","object").property("objectId",ztf).iterate(); ztfGraph.commit();
+   createTag(ztfGraph,"GraphBrowser");
    check(post(ztf)==200 && new JSONObject(lastBody).getString("survey").equals("ZTF"),"tag ZTF object");
    check(ocolEdges(ztfGraph)==1,"ZTF graph tagged");
    check(ocolEdges(lsstGraph)==2 && ((Number)lsstGraph.g().V().has("objectId",ztf).count().next()).longValue()==0,"LSST graph untouched by the ZTF object");
