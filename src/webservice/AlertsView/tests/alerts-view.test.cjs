@@ -255,6 +255,24 @@ test("background stars repeat across the horizontal sky boundary", () => {
   assert.deepEqual(Array.from(arcs, point => point[0]), [0, 1200]);
 });
 
+test("background stars keep their screen size when zooming", () => {
+  const noop = () => {};
+  const radii = zoom => {
+    const arcs = [];
+    const context = loadDrawing({
+      prefersReducedMotion: true,
+      stars: [{ra: 180, dec: 0, r: 2, proper: "Center", alpha: 1, twinkleSpeed: 0},
+              {ra: 181, dec: 0.5, r: 0.8, proper: "Faint", alpha: 1, twinkleSpeed: 0}],
+      ctx: {arc: (x, y, r) => arcs.push(r), beginPath: noop, fill: noop, fillText: noop},
+      canvas: {width: 1200, height: 600},
+      camera: {currentCenter: {ra: 180, dec: 0}, currentZoom: zoom},
+    });
+    vm.runInContext("drawStars();", context);
+    return arcs;
+  };
+  for (const zoom of [1, 2, 8, 60]) assert.deepEqual(radii(zoom), [2, 0.8], `zoom ${zoom}`);
+});
+
 test("legend DOM is rebuilt only when the active classes change", () => {
   let replacements = 0;
   const legend = {
