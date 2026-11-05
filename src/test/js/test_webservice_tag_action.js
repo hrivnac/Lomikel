@@ -73,6 +73,11 @@ for (const id of ['ZTF20aachcvz', '313761043604045880', '20892028060578637']) {
 
 // 4. tag-graph.js behaviour: GET the configured tag names, ask in a dialog, then one POST to the WAR's
 //    TagObject.jsp with the dialog values; never a write to a Gremlin server.
+// Tag names change: take them from TagNames.txt (same rules as TagObject.jsp), never hard-code them.
+const TAG_NAMES = [...new Set(fs.readFileSync(path.resolve(__dirname, '../../java/com/astrolabsoftware/FinkBrowser/Januser/TagNames.txt'), 'utf8')
+  .split(/\r?\n/).map(line => line.replace(/#.*/, '').trim()).filter(name => /^[A-Za-z0-9_.-]{1,64}$/.test(name)))];
+assert.ok(TAG_NAMES.length >= 1, 'TagNames.txt must list at least one valid tag name');
+const N1 = TAG_NAMES[0], N2 = TAG_NAMES[TAG_NAMES.length - 1];
 function domElement(tag) {
   const node = {tag, children: [], attributes: {}, listeners: {}, textContent: '', value: '', parentNode: null, open: false,
     appendChild(child) { child.parentNode = this; this.children.push(child); return child; },
@@ -86,7 +91,7 @@ function find(node, test) {
   for (const child of node.children || []) { const hit = find(child, test); if (hit) return hit; }
   return null;
 }
-function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp'], fill, responder, getResponder} = {}) {
+function tagContext({id = '313761043604045880', names = TAG_NAMES, fill, responder, getResponder} = {}) {
   const messages = [];
   const requests = [];
   const dialogs = [];
@@ -146,8 +151,8 @@ function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp']
     await new Promise(r => setImmediate(r));
     assert.equal(seen.id.value, '313761043604045880');
     assert.equal(seen.id.attributes.readonly, 'readonly', 'object id is not modifiable');
-    assert.deepEqual(seen.options, ['GraphBrowser', 'Temp']);
-    assert.equal(seen.tag.value, 'GraphBrowser');
+    assert.deepEqual(seen.options, TAG_NAMES);
+    assert.equal(seen.tag.value, N1);
     assert.equal(seen.value, '1.0');
     assert.deepEqual([seen.author, seen.annotation, seen.ref], ['', '', '']);
     assert.equal(seen.open, true, 'shown as a modal dialog');
@@ -166,7 +171,7 @@ function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp']
   // Submitted values reach TagObject.jsp exactly (LSST and ZTF objects).
   for (const [id, survey] of [['313761043604045880', 'LSST'], ['20892028060578637', 'LSST'], ['ZTF17aaabadq', 'ZTF']]) {
     const t = tagContext({id, fill: field => {
-      field('tag').value = 'GraphBrowser'; field('value').value = '0.5'; field('author').value = 'Julius.Hrivnac@cern.ch';
+      field('tag').value = N1; field('value').value = '0.5'; field('author').value = 'Julius.Hrivnac@cern.ch';
       field('annotation').value = 'muj pokus'; field('ref').value = 'blablabla'; }});
     assert.equal(await t.context.tagGraphState.run(), true, id);
     const posts = t.requests.filter(r => r.options.method === 'POST');
@@ -176,22 +181,22 @@ function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp']
     assert.equal(options.headers['X-Fink-Tag'], '1');
     assert.equal(options.headers['Content-Type'], 'application/json');
     assert.equal(options.credentials, 'same-origin');
-    assert.deepEqual(JSON.parse(options.body), {objectId: id, tag: 'GraphBrowser', value: 0.5,
+    assert.deepEqual(JSON.parse(options.body), {objectId: id, tag: N1, value: 0.5,
       author: 'Julius.Hrivnac@cern.ch', annotation: 'muj pokus', ref: 'blablabla'});
-    assert.ok(t.messages.some(m => m.includes(`is now tagged "GraphBrowser" (0.5) in the ${survey} graph (verified, 1 entry`)));
+    assert.ok(t.messages.some(m => m.includes(`is now tagged "${N1}" (0.5) in the ${survey} graph (verified, 1 entry`)));
   }
   // The second configured name and defaults.
   {
-    const t = tagContext({fill: field => { field('tag').value = 'Temp'; }});
+    const t = tagContext({fill: field => { field('tag').value = N2; }});
     assert.equal(await t.context.tagGraphState.run(), true);
     const sent = JSON.parse(t.requests.find(r => r.options.method === 'POST').options.body);
-    assert.deepEqual(sent, {objectId: '313761043604045880', tag: 'Temp', value: 1, author: '', annotation: '', ref: ''});
+    assert.deepEqual(sent, {objectId: '313761043604045880', tag: N2, value: 1, author: '', annotation: '', ref: ''});
   }
   // Invalid dialog values keep the dialog open with a message and post nothing.
   for (const [setup, pattern] of [[f => { f('value').value = '-1'; }, /number >= 0/],
                                   [f => { f('value').value = ''; }, /number >= 0/],
                                   [f => { f('value').value = 'abc'; }, /number >= 0/],
-                                  [f => { f('tag').value = 'Other'; }, /configured tag names/],
+                                  [f => { f('tag').value = 'NotConfigured' + TAG_NAMES.join(''); }, /configured tag names/],
                                   [f => { f('author').value = 'x'.repeat(201); }, /author is longer than 200/],
                                   [f => { f('annotation').value = 'x'.repeat(2001); }, /annotation is longer than 2000/],
                                   [f => { f('ref').value = 'x'.repeat(1001); }, /ref is longer than 1000/]]) {
@@ -240,8 +245,8 @@ function tagContext({id = '313761043604045880', names = ['GraphBrowser', 'Temp']
                                   [{http: 403, error: 'Cross-origin request refused'}, /Cross-origin request refused; nothing was written/],
                                   [{http: 502, error: 'bad\n\u0000text'}, /bad\s+text\. The tag may or may not have been written/],
                                   [{http: 500}, /HTTP 500\. The tag may or may not have been written/],
-                                  [{ok: true, objectId: '999', tag: 'GraphBrowser', survey: 'LSST'}, /Unexpected tag response/],
-                                  [{ok: true, objectId: '313761043604045880', tag: 'Temp', survey: 'LSST'}, /Unexpected tag response/]]) {
+                                  [{ok: true, objectId: '999', tag: N1, survey: 'LSST'}, /Unexpected tag response/],
+                                  [{ok: true, objectId: '313761043604045880', tag: N1 + 'X', survey: 'LSST'}, /Unexpected tag response/]]) {
     const t = tagContext({responder: () => reply});
     assert.equal(await t.context.tagGraphState.run(), false);
     assert.ok(t.messages.some(m => pattern.test(m)), JSON.stringify(reply) + ' => ' + t.messages.join(' | '));

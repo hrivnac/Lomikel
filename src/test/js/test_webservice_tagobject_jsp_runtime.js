@@ -13,9 +13,13 @@ const page = fs.readFileSync(path.join(root, 'src/webservice/TagObject.jsp'), 'u
 // Static contract checks that never need the Java libraries.
 assert.match(page, /\(\(TagClassifier\)Classifier\.instance\("TAG", survey, ""\)\)\.classify\(gr, objectId, tag, value, author, annotation, ref\)/);
 assert.match(page, /getResourceAsStream\(TAG_NAMES\)/);
-const tagNames = fs.readFileSync(path.join(root, 'src/java/com/astrolabsoftware/FinkBrowser/Januser/TagNames.txt'), 'utf8')
-  .split('\n').map(line => line.replace(/#.*/, '').trim()).filter(Boolean);
-assert.deepEqual(tagNames, ['GraphBrowser', 'Temp']);
+// The tag names change: read them from TagNames.txt with the same rules as TagObject.jsp
+// ('#' comments, trimmed, [A-Za-z0-9_.-]{1,64}, duplicates ignored); never hard-code them.
+const tagNames = [...new Set(fs.readFileSync(path.join(root, 'src/java/com/astrolabsoftware/FinkBrowser/Januser/TagNames.txt'), 'utf8')
+  .split(/\r?\n/).map(line => line.replace(/#.*/, '').trim()).filter(name => /^[A-Za-z0-9_.-]{1,64}$/.test(name)))];
+assert.ok(tagNames.length >= 1, 'TagNames.txt must list at least one valid tag name');
+assert.match(page, /int hash = line\.indexOf\('#'\)/, 'TagObject.jsp strips # comments like this test');
+assert.match(page, /TAG_NAME = Pattern\.compile\("\[A-Za-z0-9_\.-\]\{1,64\}"\)/, 'TagObject.jsp validates names like this test');
 assert.match(page, /"POST"\.equals\(request\.getMethod\(\)\)/);
 assert.match(page, /X-Fink-Tag/);
 assert.doesNotMatch(page, /getParameter\(/, 'no query-string input is ever read');
@@ -63,7 +67,7 @@ ${body}
    execute(request,response,out); out.flush(); lastBody=writer.toString();
    return response.status;
  }
- static int post(String id) throws Exception { return tag(id, "GraphBrowser", 1.0, null, null, null); }
+ static int post(String id) throws Exception { return tag(id, T1, 1.0, null, null, null); }
  static int tag(String id, String name, Object value, String author, String annotation, String ref) throws Exception {
    JSONObject b=new JSONObject().put("objectId",id).put("tag",name);
    if (value!=null) b.put("value",value);
@@ -76,7 +80,7 @@ ${body}
    try(FileWriter w=new FileWriter(f)) { w.write("gremlin.graph=org.janusgraph.core.JanusGraphFactory\\nstorage.backend=inmemory\\nstorage.read-only="+readOnly+"\\n"); }
    return f.getPath();
  }
- static long ocolEdges(JanusClient c) { return ocolEdges(c,"GraphBrowser"); }
+ static long ocolEdges(JanusClient c) { return ocolEdges(c,T1); }
  static long ocolEdges(JanusClient c, String name) {
    return ((Number)c.g().V().has("lbl","OCol").has("cls",name).outE("deepcontains").count().next()).longValue();
  }
@@ -85,8 +89,13 @@ ${body}
    try { run(args); System.out.println("TagObject JSP: LSST/ZTF routing, configured tag names, classify() with value/author/annotation/ref, fail-closed configuration and request validation passed"); System.out.flush(); System.exit(0); }
    catch (Throwable t) { t.printStackTrace(); System.exit(1); }
  }
+ // Tag names come from TagNames.txt (passed by the Node driver), never from this test.
+ static List<String> TAGS; static String T1, T2, TV, UNKNOWN;
  static void run(String[] args) throws Exception {
    File dir=new File(args[0]);
+   TAGS=java.util.Arrays.asList(args[1].split(","));
+   T1=TAGS.get(0); T2=TAGS.size()>1?TAGS.get(1):null; TV=T2!=null?T2:T1;
+   UNKNOWN="NotConfigured"; while (TAGS.contains(UNKNOWN)) UNKNOWN+="X";
    String lsst="313761043604045880", ztf="ZTF21aaxtctv";
    // 1. Bundled configuration: a read-only or missing one fails closed before anything is opened.
    bundledDir=new File(dir,"bundle"); bundledDir.mkdirs();
@@ -130,58 +139,61 @@ ${body}
    check(lsstGraph!=null && ((Number)lsstGraph.g().V().count().next()).longValue()==0,"nothing was created");
    // 3. GET lists the configured tag names (no graph needed).
    Request names=new Request(""); names.method="GET";
-   check(run(names)==200 && new JSONObject(lastBody).getJSONArray("tags").toList().equals(java.util.Arrays.asList("GraphBrowser","Temp")),"GET lists TagNames.txt");
+   check(run(names)==200 && new JSONObject(lastBody).getJSONArray("tags").toList().equals(TAGS),"GET lists TagNames.txt");
    // 4. Existing LSST object: classify() writes one edge with value, author, annotation and ref.
    lsstGraph.g().addV("object").property("lbl","object").property("objectId",lsst).iterate(); lsstGraph.commit();
-   check(tag(lsst,"GraphBrowser",0.5,"Julius.Hrivnac@cern.ch","muj pokus","blablabla")==200,"tag existing object");
+   check(tag(lsst,T1,0.5,"Julius.Hrivnac@cern.ch","muj pokus","blablabla")==200,"tag existing object");
    JSONObject ok=new JSONObject(lastBody);
-   check(ok.getBoolean("ok") && ok.getString("survey").equals("LSST") && ok.getString("tag").equals("GraphBrowser") &&
+   check(ok.getBoolean("ok") && ok.getString("survey").equals("LSST") && ok.getString("tag").equals(T1) &&
          ok.getLong("entries")==1 && ok.getDouble("value")==0.5 && ok.getBoolean("ocolCreated"),"response shape");
    check(ocolEdges(lsstGraph)==1,"one deepcontains edge");
-   Map<Object,Object> edge=lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").outE("deepcontains").valueMap().next();
+   Map<Object,Object> edge=lsstGraph.g().V().has("lbl","OCol").has("cls",T1).outE("deepcontains").valueMap().next();
    check(String.valueOf(edge.get("weight")).equals("0.5") && "Julius.Hrivnac@cern.ch".equals(edge.get("author")) &&
          "muj pokus".equals(edge.get("annotation")) && "blablabla".equals(edge.get("ref")),"edge attributes: "+edge);
-   Map<Object,Object> ocol=lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").valueMap("classifier","survey","flavor").next();
+   Map<Object,Object> ocol=lsstGraph.g().V().has("lbl","OCol").has("cls",T1).valueMap("classifier","survey","flavor").next();
    check(String.valueOf(ocol).contains("TAG") && String.valueOf(ocol).contains("ANY"),"TAG classifier, survey ANY: "+ocol);
    // A second tagging adds another entry (classify keeps earlier ones); no duplicate OCol; blank texts are not stored.
-   check(tag(lsst,"GraphBrowser",2,"","  ",null)==200 && new JSONObject(lastBody).getLong("entries")==2 && !new JSONObject(lastBody).getBoolean("ocolCreated"),"second entry");
-   check(ocolEdges(lsstGraph)==2 && ocols(lsstGraph,"GraphBrowser")==1,"two entries, one OCol");
-   check(lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").outE("deepcontains").has("weight",2.0).hasNext() &&
-         !lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").outE("deepcontains").has("weight",2.0).has("author").hasNext() &&
-         !lsstGraph.g().V().has("lbl","OCol").has("cls","GraphBrowser").outE("deepcontains").has("weight",2.0).has("annotation").hasNext(),"blank texts are not stored");
-   // The other configured tag gets its own OCol on first use.
-   check(tag(lsst,"Temp",1.0,"me",null,"https://x.example/a?b=1")==200 && new JSONObject(lastBody).getBoolean("ocolCreated"),"Temp tag");
-   check(ocols(lsstGraph,"Temp")==1 && ocolEdges(lsstGraph,"Temp")==1 && ocolEdges(lsstGraph)==2,"Temp is separate");
+   check(tag(lsst,T1,2,"","  ",null)==200 && new JSONObject(lastBody).getLong("entries")==2 && !new JSONObject(lastBody).getBoolean("ocolCreated"),"second entry");
+   check(ocolEdges(lsstGraph)==2 && ocols(lsstGraph,T1)==1,"two entries, one OCol");
+   check(lsstGraph.g().V().has("lbl","OCol").has("cls",T1).outE("deepcontains").has("weight",2.0).hasNext() &&
+         !lsstGraph.g().V().has("lbl","OCol").has("cls",T1).outE("deepcontains").has("weight",2.0).has("author").hasNext() &&
+         !lsstGraph.g().V().has("lbl","OCol").has("cls",T1).outE("deepcontains").has("weight",2.0).has("annotation").hasNext(),"blank texts are not stored");
+   // A second configured tag (if any) gets its own OCol on first use.
+   if (T2 != null) {
+   check(tag(lsst,T2,1.0,"me",null,"https://x.example/a?b=1")==200 && new JSONObject(lastBody).getBoolean("ocolCreated"),"second tag");
+   check(ocols(lsstGraph,T2)==1 && ocolEdges(lsstGraph,T2)==1 && ocolEdges(lsstGraph)==2,"second tag is separate");
+   }
    // Control characters are flattened; limits and types are enforced; nothing is written on refusal.
-   check(tag(lsst,"Temp",1.0,"a\\u0001b\\nc",null,null)==200,"control characters accepted after flattening");
-   check(lsstGraph.g().V().has("lbl","OCol").has("cls","Temp").outE("deepcontains").has("author","a b c").hasNext(),"flattened author");
-   long tempBefore=ocolEdges(lsstGraph,"Temp");
-   Object[][] refused={{"Unknown",1.0,null,null,null,"Unknown tag name"},{"",1.0,null,null,null,"Unknown tag name"},{"GraphBrowser') .drop()",1.0,null,null,null,"Unknown tag name"},
-     {"Temp",-1.0,null,null,null,"finite number"},{"Temp","1.0",null,null,null,"must be a number"},{"Temp",null,null,null,null,"must be a number"},
-     {"Temp",1.0,"x".repeat(201),null,null,"author is too long"},{"Temp",1.0,null,"x".repeat(2001),null,"annotation is too long"},{"Temp",1.0,null,null,"x".repeat(1001),"ref is too long"}};
+   check(tag(lsst,TV,1.0,"a\\u0001b\\nc",null,null)==200,"control characters accepted after flattening");
+   check(lsstGraph.g().V().has("lbl","OCol").has("cls",TV).outE("deepcontains").has("author","a b c").hasNext(),"flattened author");
+   long tempBefore=ocolEdges(lsstGraph,TV);
+   Object[][] refused={{UNKNOWN,1.0,null,null,null,"Unknown tag name"},{"",1.0,null,null,null,"Unknown tag name"},{T1+"') .drop()",1.0,null,null,null,"Unknown tag name"},
+     {TV,-1.0,null,null,null,"finite number"},{TV,"1.0",null,null,null,"must be a number"},{TV,null,null,null,null,"must be a number"},
+     {TV,1.0,"x".repeat(201),null,null,"author is too long"},{TV,1.0,null,"x".repeat(2001),null,"annotation is too long"},{TV,1.0,null,null,"x".repeat(1001),"ref is too long"}};
    for (Object[] r : refused) check(tag(lsst,(String)r[0],r[1],(String)r[2],(String)r[3],(String)r[4])==400 && lastBody.contains((String)r[5]),"refused "+r[0]+" "+r[1]+" "+r[5]);
-   check(run(new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\"Temp\\",\\"value\\":1,\\"author\\":5}"))==400,"non-string author");
-   check(run(new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\"Temp\\",\\"value\\":1e999}"))==400,"infinite value");
-   check(ocolEdges(lsstGraph,"Temp")==tempBefore && ocols(lsstGraph,"Unknown")==0,"refusals wrote nothing");
+   check(run(new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\""+TV+"\\",\\"value\\":1,\\"author\\":5}"))==400,"non-string author");
+   check(run(new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\""+TV+"\\",\\"value\\":1e999}"))==400,"infinite value");
+   check(ocolEdges(lsstGraph,TV)==tempBefore && ocols(lsstGraph,UNKNOWN)==0,"refusals wrote nothing");
+   long lsstT1=ocolEdges(lsstGraph);
    // 5. A ZTF object is written to the ZTF graph only.
    check(post(ztf)==404,"unknown ZTF object");
    JanusClient ztfGraph=CLIENTS.get("ZTF");
    ztfGraph.g().addV("object").property("lbl","object").property("objectId",ztf).iterate(); ztfGraph.commit();
    check(post(ztf)==200 && new JSONObject(lastBody).getString("survey").equals("ZTF"),"tag ZTF object");
    check(ocolEdges(ztfGraph)==1,"ZTF graph tagged");
-   check(ocolEdges(lsstGraph)==2 && ((Number)lsstGraph.g().V().has("objectId",ztf).count().next()).longValue()==0,"LSST graph untouched by the ZTF object");
+   check(ocolEdges(lsstGraph)==lsstT1 && ((Number)lsstGraph.g().V().has("objectId",ztf).count().next()).longValue()==0,"LSST graph untouched by the ZTF object");
    // 6. Request validation.
    Request put=new Request("{}"); put.method="PUT"; check(run(put)==405,"PUT refused");
    long lsstBefore=ocolEdges(lsstGraph);
-   Request cross=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\"GraphBrowser\\",\\"value\\":1}"); cross.origin="https://evil.example"; check(run(cross)==403,"cross-origin refused");
-   Request sibling=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\"GraphBrowser\\",\\"value\\":1}"); sibling.origin="http://fink.example.evil.com"; check(run(sibling)==403,"look-alike origin refused");
-   Request same=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\"GraphBrowser\\",\\"value\\":1}"); same.origin="https://fink.example"; same.host="fink.example"; check(run(same)==200,"same origin accepted");
-   Request samePort=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\"GraphBrowser\\",\\"value\\":1}"); samePort.origin="http://localhost:8888"; samePort.host="localhost:8888"; check(run(samePort)==200,"same origin with port accepted");
-   Request noHeader=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\"GraphBrowser\\",\\"value\\":1}"); noHeader.tag=null; check(run(noHeader)==400,"custom header required");
+   Request cross=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\""+T1+"\\",\\"value\\":1}"); cross.origin="https://evil.example"; check(run(cross)==403,"cross-origin refused");
+   Request sibling=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\""+T1+"\\",\\"value\\":1}"); sibling.origin="http://fink.example.evil.com"; check(run(sibling)==403,"look-alike origin refused");
+   Request same=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\""+T1+"\\",\\"value\\":1}"); same.origin="https://fink.example"; same.host="fink.example"; check(run(same)==200,"same origin accepted");
+   Request samePort=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\""+T1+"\\",\\"value\\":1}"); samePort.origin="http://localhost:8888"; samePort.host="localhost:8888"; check(run(samePort)==200,"same origin with port accepted");
+   Request noHeader=new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\""+T1+"\\",\\"value\\":1}"); noHeader.tag=null; check(run(noHeader)==400,"custom header required");
    Request form=new Request("objectId="+lsst); form.contentType="application/x-www-form-urlencoded"; check(run(form)==400,"JSON content type required");
    for (String bad : new String[]{"", "ZTF", "12ab", "1');g.V().drop();//", "../../x", "ZTF1'x", "1".repeat(30), "313761043604045880 "}) check(post(bad)==400,"bad id "+bad);
    check(run(new Request("{broken"))==400,"malformed JSON");
-   check(run(new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\"Temp\\",\\"value\\":1,\\"annotation\\":\\""+"x".repeat(9000)+"\\"}"))==400,"oversized body");
+   check(run(new Request("{\\"objectId\\":\\""+lsst+"\\",\\"tag\\":\\""+TV+"\\",\\"value\\":1,\\"annotation\\":\\""+"x".repeat(9000)+"\\"}"))==400,"oversized body");
    check(ocolEdges(lsstGraph)==lsstBefore+2 && ocolEdges(ztfGraph)==1,"only the two accepted same-origin requests wrote");
    }
 }`;
@@ -191,7 +203,7 @@ ${body}
   fs.copyFileSync(path.join(root, 'src/java/com/astrolabsoftware/FinkBrowser/Januser/TagNames.txt'), path.join(res, 'TagNames.txt'));
   const classpath = [lomikel, orgJson, path.join(janus, '*')].join(path.delimiter);
   for (const [cmd, args] of [['javac', ['-nowarn', '-cp', classpath, 'TagObjectJspTest.java']],
-                             ['java', ['-Djava.io.tmpdir=' + dir, '-cp', `${dir}${path.delimiter}${path.join(dir, 'res')}${path.delimiter}${classpath}`, 'TagObjectJspTest', dir]]]) {
+                             ['java', ['-Djava.io.tmpdir=' + dir, '-cp', `${dir}${path.delimiter}${path.join(dir, 'res')}${path.delimiter}${classpath}`, 'TagObjectJspTest', dir, tagNames.join(',')]]]) {
     const r = spawnSync(cmd, args, {cwd: dir, encoding: 'utf8', timeout: 180000});
     assert.equal(r.status, 0, `${cmd}: ${r.stdout}${r.stderr}`.slice(-4000));
     if (cmd === 'java') process.stdout.write(r.stdout.split('\n').filter(line => /^TagObject JSP/.test(line)).join('\n') + '\n');
