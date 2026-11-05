@@ -1,3 +1,0 @@
-<%
-  PropertiesProcessor pp = new PropertiesProcessor();
-  %>

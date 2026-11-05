@@ -835,7 +835,7 @@
         <exclude name="**/*.py"/>
         <exclude name="LightCurveView/sn_lightcurves/**"/>
       </fileset>
-      <fileset dir="../extlib/ws">
+      <fileset dir="../extlib/webservice">
         <include name="**/*"/>
         <exclude name="js9-3.0-src/**/*"/>
         <exclude name="vis-network-8.3.2-src/**/*"/>
