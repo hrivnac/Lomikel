@@ -2,7 +2,7 @@
  *
  * A small dialog asks for the tag name (configured list from TagObject.jsp, i.e. TagNames.txt), the tag
  * value, author, annotation and reference. The WAR's TagObject.jsp then writes with its own writable
- * JanusGraph client (LSST -> CC graph, ZTF -> IJCLab graph):
+ * JanusGraph client (LSST -> CC graph, ZTF -> IJCLab graph), or forwards it to the WAR of the site that does:
  *   Classifier.instance('TAG', survey, '').classify(gr, oid, tag, value, author, annotation, ref)
  * Only a validated object ID and the dialog values are sent; the page decides the database from the ID. */
 (function () {
@@ -174,7 +174,8 @@
       }, TIMEOUT_MS);
       if (body.ok !== true || body.objectId !== objectId || body.tag !== tagRequest.tag) throw new Error('Unexpected tag response');
       say('Tag: ' + objectId + ' is now tagged "' + tagRequest.tag + '" (' + tagRequest.value + ') in the ' + body.survey +
-          ' graph (verified, ' + body.entries + (body.entries === 1 ? ' entry' : ' entries') +
+          ' graph' + (typeof body.site === 'string' && /^[A-Za-z0-9_.-]{1,40}$/.test(body.site) ? ' by the ' + body.site + ' server' : '') +
+          ' (verified, ' + body.entries + (body.entries === 1 ? ' entry' : ' entries') +
           ' for this object). A read-only graph server may need a few minutes to show it.');
       return true;
     } catch (error) {
