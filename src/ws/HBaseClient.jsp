@@ -1,3 +1,3 @@
 <%
-  HBaseClient h = new HBaseClient(hbase);
+  FinkHBaseClient h = new FinkHBaseClient(hbase);
   %>
