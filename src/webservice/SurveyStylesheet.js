@@ -60,7 +60,7 @@ function finkLightCurveVisualizerUrl(objectId) {
   return finkSurveyOfObject(objectId) === 'LSST' ?
     finkAppUrl('LightCurveView/index.html', {objectId: String(objectId).trim()}) : '';
 }
-// "Tag" registers the selected object in the TAG OCol "GraphBrowser" (see tag-graph.js). The static
+// "Tag" opens the tag dialog for the selected object and tags it in a TAG OCol (see tag-graph.js). The static
 // sentinel keeps object IDs out of the action URL; the ID is taken from the live vertex when clicked.
 if (stylesheet.nodes.object && !stylesheet.nodes.object.actions.some(function (action) { return action.name === 'Tag'; })) {
   stylesheet.nodes.object.actions.push({name: 'Tag', url: 'tag', target: 'tag'});

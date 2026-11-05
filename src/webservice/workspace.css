@@ -71,3 +71,19 @@ body.workspace { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font
 #vis { flex:1 1 auto; min-height:190px; height:auto !important; box-sizing:border-box; }
 @media(max-width:1100px) { .workspace-guide, .resize-hint { display:none; } }
 @media(max-height:630px) { .workspace-header { height:52px; } .workspace-footer { display:none; } }
+/* Graph Browser "Tag" dialog (tag-graph.js). */
+.tag-dialog { box-sizing:border-box; width:min(430px,92vw); border:1px solid #c9d8e0; border-radius:12px;
+  background:#fff; color:var(--ink); padding:20px 24px; box-shadow:0 16px 42px #18324a29; font-size:13px; }
+.tag-dialog::backdrop { background:#20364835; }
+.tag-dialog h2 { margin:0 0 14px; font-size:16px; }
+.tag-dialog-row { display:grid; grid-template-columns:96px 1fr; align-items:center; gap:10px; margin:7px 0; }
+.tag-dialog-row span { color:var(--muted); }
+.tag-dialog-row input, .tag-dialog-row select { box-sizing:border-box; width:100%; padding:5px 7px;
+  border:1px solid #adc1ce; border-radius:5px; font:inherit; color:var(--ink); background:#fff; }
+.tag-dialog-row input[readonly] { background:#f3f7f9; color:var(--muted); }
+.tag-dialog-error { min-height:1.2em; margin:8px 0 0; color:#a33; }
+.tag-dialog-buttons { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+.tag-dialog-buttons button { padding:7px 16px; border:1px solid #adc1ce; border-radius:6px; background:#f5f9fb;
+  color:var(--ink); cursor:pointer; }
+.tag-dialog-buttons button[type=submit] { background:#2f6f9f; border-color:#2f6f9f; color:#fff; }
+.tag-dialog button:focus-visible, .tag-dialog input:focus-visible, .tag-dialog select:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }

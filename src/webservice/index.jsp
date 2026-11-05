@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="jquery-ui-1.12.1/jquery-ui.min.css">
   <link rel="stylesheet" href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css">
   <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="workspace.css?v=standalone-apps-1">
+  <link rel="stylesheet" href="workspace.css?v=tag-dialog-1">
   <link rel="stylesheet" href="panels.css?v=ext-links-1">
   <link rel="stylesheet" href="graph.css?v=query-activity-1">
   <link rel="stylesheet" href="cutouts.css?v=survey-colors-1">

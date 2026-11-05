@@ -1,0 +1,5 @@
+# Tag names offered by the Fink Graph Browser "Tag" action (TagObject.jsp).
+# One name per line (letters, digits, '_', '.', '-'; at most 64 characters); '#' starts a comment.
+# Each name is a TAG OCol (classifier TAG, survey ANY, empty flavor); it is created on its first use.
+GraphBrowser
+Temp
