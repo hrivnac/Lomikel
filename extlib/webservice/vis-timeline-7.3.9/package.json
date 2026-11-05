@@ -112,7 +112,7 @@
     "rollup-plugin-css-porter": "1.0.2",
     "rollup-plugin-node-builtins": "2.1.2",
     "rollup-plugin-node-resolve": "5.2.0",
-    "rollup-plugin-postcss": "2.9.0",
+    "rollup-plugin-postcss": "4.0.2",
     "rollup-plugin-terser": "7.0.2",
     "rollup-plugin-typescript2": "0.27.2",
     "semantic-release": "17.1.1",
@@ -121,7 +121,7 @@
     "uglifycss": "0.0.29",
     "uuid": "7.0.3",
     "vis-data": "7.0.0",
-    "vis-dev-utils": "2.6.15",
+    "vis-dev-utils": "7.2.7",
     "vis-util": "4.3.4"
   },
   "collective": {
