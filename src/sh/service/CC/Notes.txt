@@ -8,7 +8,6 @@ systemctl restart finkbrowser
 systemctl enable finkbrowser
 journalctl -u finkbrowser -f
 
-
 /etc/systemd/system/finkgroovyserver.service
 
 chcon -t bin_t /home/almalinux/Lomikel/src/sh/service/CC/finkgroovyserver.sh
