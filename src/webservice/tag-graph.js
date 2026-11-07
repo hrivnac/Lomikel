@@ -21,7 +21,13 @@
   function surveyOf(objectId) { return objectId.indexOf('ZTF') === 0 ? 'ZTF' : 'LSST'; }
   function clean(message) { return String(message).replace(/[^\x20-\x7e]/g, ' ').trim().slice(0, 200); }
 
-  async function call(options, timeout) {
+  // Requests show Working in the header box; the open dialog does not.
+  function call(options, timeout) {
+    var work = send(options, timeout);
+    return window.wsBusy && typeof window.wsBusy.during === 'function' ? window.wsBusy.during(work) : work;
+  }
+
+  async function send(options, timeout) {
     var controller = typeof AbortController === 'function' ? new AbortController() : null;
     var timer = controller ? setTimeout(function () { controller.abort(); }, timeout) : null;
     try {

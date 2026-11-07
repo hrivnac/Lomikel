@@ -141,7 +141,19 @@
   // An iframe can change size when the w2ui divider moves without a reliable
   // inner-window resize event. Observe the actual flex chart dimensions too.
   if (root.ResizeObserver) new root.ResizeObserver(queueResize).observe(document.getElementById('lightcurve-chart'));
-  root.lightCurveLoad = async function (objectId) {
+  // Report the data request to the workspace's Ready/Working box (same origin).
+  function workspaceBusy() {
+    try {
+      var busy = root.parent !== root && root.parent.wsBusy;
+      return busy && typeof busy.during === 'function' ? busy : null;
+    } catch (error) { return null; }
+  }
+  root.lightCurveLoad = function (objectId) {
+    var work = loadLightCurve(objectId);
+    var busy = workspaceBusy();
+    return busy ? busy.during(work) : work;
+  };
+  async function loadLightCurve(objectId) {
     var current = ++sequence;
     if (controller) controller.abort();
     controller = new AbortController();
@@ -159,6 +171,6 @@
       if (current === sequence && !active.signal.aborted)
         document.getElementById('lightcurve-status').textContent = 'LightCurve: '+error.message;
     } finally { if (controller === active) controller = null; }
-  };
+  }
   root.addEventListener('pagehide',function () { sequence++; if (controller) controller.abort(); });
 })(window);

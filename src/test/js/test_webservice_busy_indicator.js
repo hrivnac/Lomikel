@@ -130,9 +130,9 @@ async function testTableWorksUntilItsOwnPaneLoadCompletes() {
   await tick(5);
   assert.deepEqual(state(t.el), READY, 'edge tables are tracked with the encoded URL');
 
-  await t.ctx.loadPane('result', 'Node.jsp?id=7');
-  assert.deepEqual(state(t.el), READY, 'Show and other panes are not tracked');
-  assert.deepEqual(loaded.at(-1), ['result', 'Node.jsp?id=7', 'Ready']);
+  await t.ctx.loadPane('result', 'Result.jsp');
+  assert.deepEqual(state(t.el), READY, 'other pages are not tracked');
+  assert.deepEqual(loaded.at(-1), ['result', 'Result.jsp', 'Ready']);
 }
 
 async function testOverlappingOperationsAndReevaluation() {
@@ -144,9 +144,10 @@ async function testOverlappingOperationsAndReevaluation() {
   t.ctx.callGremlinGraph = async function () {};
   vm.runInContext(source(), t.ctx);
   const first = t.ctx.bootstrap('text');
-  const second = t.ctx.fillEdges();
+  const second = t.ctx.fillEdges();  // the box is already red: runs at once
   t.flushFrames();
   await second;
+  await tick();
   assert.deepEqual(state(t.el), WORKING, 'still working while another operation runs');
   finishFirst();
   await first;
@@ -170,10 +171,10 @@ function testPagesIncludeTheIndicator() {
   const box = index.indexOf('id="busy-indicator"');
   assert.ok(box > 0 && box < index.indexOf('id="version-button"'), 'the box is left of Version');
   assert.match(index, /<span id="busy-indicator" class="ws-busy ws-busy-ready" role="status" aria-live="polite" aria-busy="false">Ready<\/span>/);
-  assert.ok(index.indexOf('busy.js?v=busy-1') > index.indexOf('workspace.js?v='), 'busy.js wraps the workspace loadPane');
+  assert.ok(index.indexOf('busy.js?v=busy-2') > index.indexOf('workspace.js?v='), 'busy.js wraps the workspace loadPane');
   const graph = fs.readFileSync(path.join(root, 'GraphView.jsp'), 'utf8');
-  assert.ok(graph.indexOf('busy.js?v=busy-1') > graph.indexOf('GraphView.js?v='), 'busy.js rewraps a reloaded controller');
-  assert.ok(graph.indexOf('busy.js?v=busy-1') < graph.indexOf('graphviewready'), 'profiles bootstrap through the wrapper');
+  assert.ok(graph.indexOf('busy.js?v=busy-2') > graph.indexOf('GraphView.js?v='), 'busy.js rewraps a reloaded controller');
+  assert.ok(graph.indexOf('busy.js?v=busy-2') < graph.indexOf('graphviewready'), 'profiles bootstrap through the wrapper');
   const css = fs.readFileSync(path.join(root, 'workspace.css'), 'utf8');
   assert.match(css, /\.ws-busy-ready\s*\{[^}]*background:#1e8e4e/);
   assert.match(css, /\.ws-busy-working\s*\{[^}]*background:#c62828/);
