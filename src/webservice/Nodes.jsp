@@ -74,7 +74,11 @@
       columnes = [];
       values   = [];
       for (t of txt.split(",")) {
-        [column, value] = t.trim().split(":");
+        t = t.trim();
+        // Only the first colon separates a property from its value; timestamps contain colons.
+        var separator = t.indexOf(":");
+        column = t.substring(0, separator);
+        value = t.substring(separator + 1);
         value = value.substring(1, value.length - 1);
         if (value.includes(";")) {
           valus = value.split(";");
