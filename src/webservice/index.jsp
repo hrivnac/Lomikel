@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="jquery-ui-1.12.1/jquery-ui.min.css">
   <link rel="stylesheet" href="w2ui-1.5.rc1/w2ui-1.5.rc1.min.css">
   <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="workspace.css?v=tag-dialog-1">
+  <link rel="stylesheet" href="workspace.css?v=busy-1">
   <link rel="stylesheet" href="panels.css?v=ext-links-1">
   <link rel="stylesheet" href="graph.css?v=query-activity-1">
   <link rel="stylesheet" href="cutouts.css?v=survey-colors-1">
@@ -54,6 +54,7 @@
       </div>
       <div class="workspace-tools">
         <span class="resize-hint"><i class="fas fa-arrows-alt" aria-hidden="true"></i> Drag dividers to resize</span>
+        <span id="busy-indicator" class="ws-busy ws-busy-ready" role="status" aria-live="polite" aria-busy="false">Ready</span>
         <button type="button" id="version-button" aria-haspopup="dialog" aria-controls="version-dialog">Version</button>
         <button type="button" id="reset-workspace" title="Clear graph, results and feedback">Reset workspace</button>
         <button type="button" id="restore-layout" title="Restore the default panel sizes without resetting data">Reset layout</button>
@@ -97,6 +98,7 @@
   </script>
   <script src="evolution-table.js?v=evolution-1"></script>
   <script src="workspace.js?v=canonical-2"></script>
+  <script src="busy.js?v=busy-1"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
