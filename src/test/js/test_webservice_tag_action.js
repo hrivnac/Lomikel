@@ -294,6 +294,24 @@ function tagContext({id = '313761043604045880', names = TAG_NAMES, fill, respond
     assert.equal(await first, true);
   }
 
+  // The Ready/Working box shows Working for the names request and the POST, never while the dialog waits.
+  {
+    const t = tagContext();
+    const tracked = [];
+    let pending = 0;
+    t.context.wsBusy = {during: work => {
+      pending++;
+      tracked.push({method: t.requests.at(-1) && t.requests.at(-1).options.method,
+                    dialogOpen: t.dialogs.some(d => d.open)});
+      const done = () => { pending--; };
+      work.then(done, done);
+      return work;
+    }};
+    assert.equal(await t.context.tagGraphState.run(), true);
+    await new Promise(r => setImmediate(r));
+    assert.deepEqual(tracked, [{method: 'GET', dialogOpen: false}, {method: 'POST', dialogOpen: false}]);
+    assert.equal(pending, 0, 'both requests finished');
+  }
   // The client never talks to a Gremlin server.
   const client = read('tag-graph.js');
   assert.doesNotMatch(client, /graphTableServerForVertex|\?gremlin=|window\.confirm/);
