@@ -298,7 +298,8 @@ function tagContext({id = '313761043604045880', names = TAG_NAMES, fill, respond
   const client = read('tag-graph.js');
   assert.doesNotMatch(client, /graphTableServerForVertex|\?gremlin=|window\.confirm/);
   assert.match(read('GraphView.jsp'), /tag-graph\.js\?v=tag-dialog-\d/);
-  assert.match(read('index.jsp'), /workspace\.css\?v=tag-dialog-\d/);
+  // The dialog styles live in workspace.css; any later version still contains them.
+  assert.match(read('index.jsp'), /workspace\.css\?v=(?:tag-dialog|busy)-\d/);
   assert.match(read('workspace.css'), /\.tag-dialog \{/);
   console.log('Tag action: sentinel action, dialog with configured tag names and value/author/annotation/ref, one validated POST to TagObject.jsp');
 })().catch(error => { console.error(error); process.exit(1); });

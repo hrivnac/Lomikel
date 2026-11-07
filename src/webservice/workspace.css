@@ -26,6 +26,10 @@ body.workspace { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font
 #reset-workspace { border-color:#91b7a4; color:#205c43; background:#f5fcf7; }
 #restore-layout:hover, #restore-layout:focus-visible, #version-button:hover, #version-button:focus-visible,
 #reset-workspace:hover, #reset-workspace:focus-visible { background:#e9f4fb; border-color:#4e8bb7; outline-offset:2px; }
+.ws-busy { display:inline-block; min-width:84px; box-sizing:border-box; border-radius:7px;
+  padding:7px 10px; color:#fff; font-weight:600; text-align:center; }
+.ws-busy-ready { background:#1e8e4e; }
+.ws-busy-working { background:#c62828; }
 .version-dialog { box-sizing:border-box; width:min(360px,90vw); border:1px solid #c9d8e0;
   border-radius:12px; background:#fff; color:var(--ink); padding:23px 27px;
   box-shadow:0 16px 42px #18324a29; }

@@ -49,6 +49,7 @@
 <script type="text/javascript" src="graph-table-origin.js?v=mixed-context-1"></script>
 <script type="text/javascript" src="cutouts-graph.js?v=ss-cutouts-1"></script>
 <script type="text/javascript" src="tag-graph.js?v=tag-dialog-3"></script>
+<script type="text/javascript" src="busy.js?v=busy-1"></script>
 <script>
   // Signal only after the controller and its graph wrappers execute.
   window.graphViewReady = document.getElementById('graph');
