@@ -12,6 +12,8 @@ var options4Graph = {
       springConstant:0.18
       },
     maxVelocity:100,
+    // vis stops when every node is slower than this (its default 0.1 is rarely reached).
+    minVelocity:1,
     solver:"forceAtlas2Based",
     timestep:0.25,
     stabilization: {
@@ -59,6 +61,11 @@ var options4Graph = {
     }
   };
   
+// Stop the graph physics this many seconds after it (re)started, even if some
+// graphs (e.g. with clustered groups) would keep moving or rotating forever.
+// Dragging a node restarts it. 0 = never stop.
+var graphMaxSimulationSeconds = 10;
+
 // Hist Options
 var options4Hist = {
   //sort: false,

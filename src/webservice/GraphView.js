@@ -133,9 +133,32 @@ function showGraphCommands(item, edge) {
   });
 }
 
+// Let the physics organize the graph, then stop it: vis-network simulates until
+// every node is slower than minVelocity, which some graphs never reach (they keep
+// rotating). Each (re)start - first display, dragging a node, Live physics, clustering -
+// gets graphMaxSimulationSeconds (OptionsDefault.js) before the simulation is stopped.
+var physicsLimitTimer = null;
+function clearPhysicsLimit() {
+  if (physicsLimitTimer !== null) clearTimeout(physicsLimitTimer);
+  physicsLimitTimer = null;
+  }
+function settleGraphPhysics(net) {
+  net.on('startStabilizing', function () {
+    clearPhysicsLimit();
+    var seconds = typeof graphMaxSimulationSeconds === 'number' ? graphMaxSimulationSeconds : 10;
+    if (!(seconds > 0) || (options4Graph.physics && options4Graph.physics.enabled === false)) return;
+    physicsLimitTimer = setTimeout(function () {
+      physicsLimitTimer = null;
+      if (network === net) net.stopSimulation();
+      }, seconds * 1000);
+    });
+  net.on('stabilized', clearPhysicsLimit);
+  }
+
 // Release vis physics/listeners before the workspace replaces its graph pane.
 function disposeGraphView() {
   graphViewToken.cancelled = true;
+  clearPhysicsLimit();
   if (network) network.destroy();
   network = null;
   clusters.length = 0;
@@ -464,10 +487,12 @@ function show(graph) {
       }
     network.destroy();
     }
+  clearPhysicsLimit();
   container = document.getElementById('vis');
   clusters.length = 0;
   lastClusterZoomLevel = previousView ? previousView.scale : 0;
   network = new vis.Network(container, data, options4Graph);
+  settleGraphPhysics(network);
   if (graph != null && document.getElementById('clusterize').checked === true) {
     clusterByGroups(false);
     }
