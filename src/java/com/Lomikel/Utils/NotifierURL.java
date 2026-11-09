@@ -38,6 +38,23 @@ public class NotifierURL {
                                                                               return thread;
                                                                               });
 
+  /** At most this long the JVM waits at exit for queued notifications. */
+  static final long EXIT_WAIT_MS = 10000;
+
+  static {
+    // The worker is a daemon, so a short program (e.g. a Groovy script ending right after
+    // notify()) would exit before anything is sent. Send what is queued before exit, bounded.
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      executor.shutdown();
+      try {
+        executor.awaitTermination(EXIT_WAIT_MS, TimeUnit.MILLISECONDS);
+        }
+      catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        }
+      }, "NotifierURL-exit"));
+    }
+
   /** Connect to monitorring Web page.
     * Non-blocking.
     * @param message The message to be send. */
@@ -78,7 +95,7 @@ public class NotifierURL {
       executor.execute(() -> notifyExecution(message, source, release, text));
       }
     catch (RejectedExecutionException e) {
-      log.debug("Notification queue full; dropping notification");
+      log.debug("Notification queue full or JVM exiting; dropping notification");
       }
     }
     

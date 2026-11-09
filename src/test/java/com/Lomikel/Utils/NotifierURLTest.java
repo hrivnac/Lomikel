@@ -101,8 +101,53 @@ public class NotifierURLTest {
       release.countDown();
     }
   }
+  /** A short program (e.g. a Groovy script) calls notify() and ends at once: the queued
+    * notification must still be sent before the JVM exits. Runs a child JVM against a local server. */
+  private static void sentBeforeExit() throws Exception {
+    childAgainst(300, 30, 1);
+  }
+  /** A hanging monitoring server must not keep a finished program alive for long. */
+  private static void exitBounded() throws Exception {
+    long before = System.nanoTime();
+    childAgainst(60000, 30, 0);
+    long seconds = TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - before);
+    check(seconds < 20, "program exit delayed too long by a hanging server: " + seconds + " s");
+  }
+  private static void childAgainst(long serverDelayMs, int childLimitS, int expectedHits) throws Exception {
+    com.sun.net.httpserver.HttpServer server = com.sun.net.httpserver.HttpServer.create(
+        new java.net.InetSocketAddress(java.net.InetAddress.getLoopbackAddress(), 0), 0);
+    server.setExecutor(java.util.concurrent.Executors.newCachedThreadPool(r -> { Thread t = new Thread(r); t.setDaemon(true); return t; }));
+    AtomicInteger hits = new AtomicInteger();
+    server.createContext("/", exchange -> {
+      try { Thread.sleep(serverDelayMs); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+      hits.incrementAndGet();
+      exchange.sendResponseHeaders(200, -1);
+      exchange.close();
+    });
+    server.start();
+    try {
+      String java = System.getProperty("java.home") + "/bin/java";
+      Process child = new ProcessBuilder(java, "-cp", System.getProperty("java.class.path"),
+                                         NotifierURLTest.class.getName(), "childNotifyAndExit",
+                                         "http://127.0.0.1:" + server.getAddress().getPort() + "/")
+                          .inheritIO().start();
+      check(child.waitFor(childLimitS, TimeUnit.SECONDS), "child JVM did not exit (notification blocks shutdown)");
+      check(child.exitValue() == 0, "child JVM failed");
+      check(hits.get() == expectedHits, "notification lost when the program ended right after notify(): " + hits.get());
+    } finally {
+      server.stop(0);
+    }
+  }
+  private static void childNotifyAndExit(String target) {
+    NotifierURL.connectionFactory = url -> (HttpURLConnection)new URL(target).openConnection();
+    NotifierURL.notify("aaa", "Lomikel", "test");
+    // main returns immediately, as a Groovy script does after its last statement
+  }
   public static void main(String[] args) throws Exception {
     switch (args[0]) {
+      case "sentBeforeExit": sentBeforeExit(); break;
+      case "exitBounded": exitBounded(); break;
+      case "childNotifyAndExit": childNotifyAndExit(args[1]); return;
       case "blockingCleanup": blockingCleanup(); break;
       case "failureCleanup": failureCleanup(); break;
       case "boundedAsync": boundedAsync(); break;
