@@ -292,7 +292,8 @@
     }
 %>
 
-<%
+<%        
+  Init.initWS("TagWS");
   response.setHeader("Cache-Control", "no-store");
   response.setHeader("X-Content-Type-Options", "nosniff");
   if ("GET".equals(request.getMethod())) {
