@@ -22,7 +22,7 @@ public class HBaseEvaluator extends GroovyEvaluator {
     super(schema);
     log.info("\tas HBaseEvaluator");
     setEvaluatorFunctions("com.Lomikel.HBaserNew.HBaseEvaluatorFunctions", "com/Lomikel/HBaserNew/HBaseEvaluatorFunctions.groovy");
-    setEvaluatorFunctions(null, "com/Lomikel/WebService/HBaseColumnsProcessor.groovy");
+    setEvaluatorFunctions(null, "com/Lomikel/HBaser/HBaseColumnsProcessor.groovy");
     }
 
   @Override
