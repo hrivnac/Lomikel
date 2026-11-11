@@ -2,6 +2,7 @@ package com.Lomikel.WebService;
 
 import com.Lomikel.DB.Schema;
 import com.Lomikel.HBaser.BinaryDataRepository;
+import com.Lomikel.HBaser.HBaseColumnsProcessor;
 
 // Java
 import java.util.Map;
