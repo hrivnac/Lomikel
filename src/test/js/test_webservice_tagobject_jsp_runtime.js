@@ -35,7 +35,11 @@ if (!lomikel || !fs.existsSync(janus) || !fs.existsSync(orgJson)) {
 }
 
 const declaration = page.match(/<%!([\s\S]*?)%>\s*\n\s*<%\s*\n/)[1];
-const body = page.slice(page.lastIndexOf('<%\n') + 3, page.lastIndexOf('%>'));
+// The request scriptlet is the last bare "<%" line; tolerate trailing blanks after "<%".
+const scriptlet = [...page.matchAll(/<%[ \t]*\r?\n/g)].at(-1);
+assert.ok(scriptlet, 'TagObject.jsp request scriptlet not found');
+const body = page.slice(scriptlet.index + scriptlet[0].length, page.lastIndexOf('%>'));
+assert.doesNotMatch(body, /<%[@!]/, 'extracted scriptlet must not contain JSP directives or declarations');
 const dir = fs.mkdtempSync(path.join(process.env.TMPDIR || path.join(os.homedir(), '.hermes/cache/scratch'), 'tag-jsp-'));
 try {
   const imports = [...page.matchAll(/<%@ page import="([^"]+)" %>/g)].map(m => `import ${m[1]};`).join('\n');
