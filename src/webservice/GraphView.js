@@ -60,6 +60,12 @@ function graphStyleExpression(expression, title, eMap) {
       return '';
   }
 }
+// vis-network renders a string title as plain text: join lines with "\n", never markup.
+function graphTooltip(title, subtitle) {
+  title = graphText(title);
+  subtitle = graphText(subtitle);
+  return subtitle.trim() ? title + '\n' + subtitle : title;
+}
 function escapeGraphHtml(value) {
   return graphText(value).replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -442,7 +448,7 @@ function show(graph) {
           }
         actions = graphActions(stylesheetNode.actions, id, eMap, pMap, false, title);
         if ((filter === '' || label.includes(filter)) && !findObjectByKey(nodes, 'id', id)) {
-          nodes.push({id:id, value:value, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), group:graphText(group), actions:actions, shape:shape, image:image, shapeProperties:{borderRadius:borderRadius, borderDashes:borderDashes}, borderWidth:borderWidth, color:color});
+          nodes.push({id:id, value:value, label:graphText(label), heading:graphText(title), title:graphTooltip(title, subtitle), group:graphText(group), actions:actions, shape:shape, image:image, shapeProperties:{borderRadius:borderRadius, borderDashes:borderDashes}, borderWidth:borderWidth, color:color});
           }
         //groups.push(group);
         }
@@ -470,10 +476,10 @@ function show(graph) {
         if (!findObjectByKey(edges, 'id', id) && !hideReciprocalOverlap(graph[i])) {
           if (findObjectByKey(nodes, 'id', inVid) && findObjectByKey(nodes, 'id', outVid) && findObjectByKey(nodes, 'id', inVid).group != findObjectByKey(nodes, 'id', outVid).group) {
             color = 'grey';
-            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, color:{color:color, highlight:color, hover:color, inherit:false}, arrows:arrows, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), actions:actions});
+            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, color:{color:color, highlight:color, hover:color, inherit:false}, arrows:arrows, label:graphText(label), heading:graphText(title), title:graphTooltip(title, subtitle), actions:actions});
             }
           else {
-            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, arrows:arrows, label:graphText(label), heading:graphText(title), title:(escapeGraphHtml(title) + "<br/>" + escapeGraphHtml(subtitle)), actions:actions});
+            edges.push({id:id, from:outVid, to:inVid, overlapLabel:l, value:value, arrows:arrows, label:graphText(label), heading:graphText(title), title:graphTooltip(title, subtitle), actions:actions});
             }
           }
         }
@@ -724,7 +730,7 @@ function clusterGroup(group) {
         clusterOptions.title = 'contains ' + childNodes.length;
         return clusterOptions;
         },
-      clusterNodeProperties: {id:('cluster:' + group), type:'cluster', borderWidth:3, shape:'star', label:('cluster:' + group), title:escapeGraphHtml('cluster:' + group)}
+      clusterNodeProperties: {id:('cluster:' + group), type:'cluster', borderWidth:3, shape:'star', label:('cluster:' + group), title:graphTooltip('cluster:' + group)}
       };
     network.cluster(clusterOptionsByData);
     }
@@ -939,9 +945,12 @@ function popup(name, description, details) {
   var w = window.open('', '_blank', 'height=600,width=600,menubar=no,status=no,toolbar=no');
   if (!w) return false;
   var doc = w.document;
-  doc.title = graphText(name);
+  doc.title = graphText(name).replace(/\s*\n\s*/g, ' ');
   var heading = doc.createElement('b');
-  heading.textContent = graphText(name);
+  graphText(name).split('\n').forEach(function (line, index) {
+    if (index) heading.appendChild(doc.createElement('br'));
+    heading.appendChild(doc.createTextNode(line));
+  });
   doc.body.appendChild(heading);
   doc.body.appendChild(doc.createElement('hr'));
   var content = doc.createElement('pre');

@@ -108,7 +108,7 @@ function testPhysicsSwitchedOffNeedsNoLimit() {
 }
 
 function testVersions() {
-  assert.match(fs.readFileSync(path.join(web, 'GraphView.jsp'), 'utf8'), /GraphView\.js\?v=canonical-5/);
+  assert.match(fs.readFileSync(path.join(web, 'GraphView.jsp'), 'utf8'), /GraphView\.js\?v=canonical-6/);
   assert.match(fs.readFileSync(path.join(web, 'index.jsp'), 'utf8'), /OptionsDefault\.js\?v=physics-settle-1/);
 }
 
