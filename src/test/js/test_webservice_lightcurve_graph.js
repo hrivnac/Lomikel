@@ -90,5 +90,5 @@ for (const logged of queries.slice(0,2)) {
    'reported columns must match the upstream JSP');
  assert.match(text('LightCurveData.jsp'),/\.put\("output-format", "json"\)/);
 }
-assert.match(text('d3/lightcurve.jsp'),/d3-v6\.0\.0\/d3\.js/);
+assert.match(text('d3/lightcurve.jsp'),/d3-v7\.9\.2\/d3\.min\.js/);
 console.log('per-object LightCurve action routes one live graph object to Plot');
