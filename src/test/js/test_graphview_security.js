@@ -44,7 +44,8 @@ function testHostileGraphTextAndActionsRemainInert() {
     {name:'bad',url:'Node.jsp',target:'" onclick="alert(1)'}];
   context.show([{type:'vertex',id:1,label:hostile,element:[{key:'title',value:hostile},
     {key:'lbl',value:hostile},{key:'subtitle',value:hostile},{key:'group',value:'sample'}]}]);
-  assert.ok(context.nodes[0].title.includes('&lt;img'), 'vis tooltip escapes markup');
+  // vis-network renders a string title with innerText: hostile markup stays literal text.
+  assert.equal(context.nodes[0].title, hostile + ':' + hostile + '\n' + hostile, 'vis tooltip is plain text');
   context.network.listeners.click({nodes:[1],edges:[]});
   const pane = controls.commands;
   assert.equal(pane.children.some(child => child.tag === 'img'), false);
@@ -148,7 +149,7 @@ function testClusterTooltipEscapesHostileGroup() {
   context.network = {setData() {},cluster(options) { clusters.push(options.clusterNodeProperties); }};
   context.clusterByGroups();
   assert.equal(clusters.length, 1);
-  assert.ok(clusters[0].title.includes('&lt;img'), 'vis cluster tooltip must not parse hostile group');
+  assert.equal(clusters[0].title, 'cluster:<img src=x onerror=alert(1)>', 'vis cluster tooltip is plain text');
 }
 function testGraphIdsAreCheckedAtEveryQueryBoundary() {
   const {context, controls} = setup();

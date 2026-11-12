@@ -5,7 +5,7 @@
 <script type="text/javascript">
   id = "<%=id%>";
   var edge = findObjectByKey(edges, 'id', id);
-  txt = "<b>" + edge.title + "</b>" +
+  txt = "<b>" + escapeGraphHtml(edge.title).replace(/\n/g, '<br/>') + "</b>" +
 	      "<hr/><pre>" +
 	      callGremlinValues(gr + ".E('" + id + "').valueMap().toList().toString().replace(', ', '<br/>').replace(']', '').replace('[', '')") +
 	      "</pre>";
