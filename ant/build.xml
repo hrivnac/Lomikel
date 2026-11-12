@@ -845,9 +845,6 @@
       </fileset>
       <fileset dir="../extlib/webservice">
         <include name="**/*"/>
-        <exclude name="js9-3.0-src/**/*"/>
-        <exclude name="vis-network-8.3.2-src/**/*"/>
-        <exclude name="vis-timeline-7.3.9-src/**/*"/>
       </fileset>
       <fileset dir="../build">
         <include name="index.jsp"/>
