@@ -50,7 +50,10 @@
   // HBase and other legacy plot routes keep their original handling.
   window.loadPane = function (pane, url, iframe, height, encoded) {
     var plotPane = pane === 'plot' && document.getElementById && document.getElementById('plot');
-    if (plotPane) plotPane.classList.remove('ws-correlogram');
+    if (plotPane) {
+      plotPane.classList.remove('ws-correlogram');
+      plotPane.classList.remove('ws-scatterplot');
+    }
     // "Tag" is an action, not a pane: it never reaches the legacy loader.
     if (pane === 'tag') {
       return url === 'tag' && window.tagGraphState ? window.tagGraphState.run() : false;
@@ -125,6 +128,11 @@
       } catch (error) {
         // Malformed legacy payloads should keep their original route and error handling.
       }
+    }
+    // Scatter and Evolution plots fill the Plot pane; their renderer sizes the chart to it.
+    if (pane === 'plot' && iframe && /^d3\/scatterplot\.jsp\?/.test(url)) {
+      if (plotPane) plotPane.classList.add('ws-scatterplot');
+      height = '100%';
     }
     if (pane === 'plot' && iframe && /^d3\/correlogram\.jsp\?/.test(url)) {
       var corrData = [];
