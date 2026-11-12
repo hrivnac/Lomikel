@@ -40,7 +40,7 @@ function scatterPlotInfoLines(p, hasX, xS, yS, zS, sS) {
   var xName = p.raw && p.raw.xField || (xS.trim().includes(' ') ? 'x' : xS.trim());
   var yName = p.raw && p.raw.yField || (yS && !yS.trim().includes(' ') ? yS.trim() : 'y');
   add(hasX ? xName : 'Time',
-      hasX ? p.x : d3.timeFormat('%d %b %Y %H:%M')(new Date(p.x)));
+      hasX ? p.x : d3.utcFormat('%d %b %Y %H:%M:%S')(new Date(p.x)));
   add(yName, p.y);
   if (zS && p.z !== null) add(zS.trim(), p.z);
   if (sS && p.g) add(sS.trim(), p.g);
@@ -121,13 +121,13 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
   var plot = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
   var domainX = d3.extent(points, function (p) { return p.x; });
   var x = hasX ? d3.scaleLinear().domain(domainX).nice().range([0, width]) :
-    d3.scaleTime().domain(domainX.map(function (v) { return new Date(v); })).nice().range([0, width]);
+    d3.scaleUtc().domain(domainX.map(function (v) { return new Date(v); })).nice().range([0, width]);
   var y = d3.scaleLinear().domain(d3.extent(points, function (p) { return p.y; })).nice().range([height, 0]);
   // Tick density follows the drawn size so labels do not collide in narrow or short panels.
   var xTicks = Math.max(2, Math.min(hasX ? 8 : 7, Math.floor(width / (hasX ? 80 : 95))));
   var yTicks = Math.max(3, Math.min(10, Math.floor(height / 55)));
   plot.append('g').attr('class', 'scatter-grid').call(d3.axisLeft(y).ticks(yTicks).tickSize(-width).tickFormat(''));
-  var xAxis = hasX ? d3.axisBottom(x).ticks(xTicks) : d3.axisBottom(x).ticks(xTicks).tickFormat(d3.timeFormat('%d %b %y'));
+  var xAxis = hasX ? d3.axisBottom(x).ticks(xTicks) : d3.axisBottom(x).ticks(xTicks).tickFormat(d3.utcFormat('%d %b %y'));
   plot.append('g').attr('class', 'scatter-axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
   plot.append('g').attr('class', 'scatter-axis').call(d3.axisLeft(y).ticks(yTicks));
   plot.append('text').attr('class', 'scatter-axis-title').attr('x', width / 2)

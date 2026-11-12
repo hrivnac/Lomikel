@@ -96,7 +96,7 @@
     window.width = window.innerWidth;
     window.visheight = 360;
   </script>
-  <script src="evolution-table.js?v=evolution-1"></script>
+  <script src="evolution-table.js?v=evolution-2"></script>
   <script src="workspace.js?v=canonical-3"></script>
   <script src="busy.js?v=busy-2"></script>
   <script>

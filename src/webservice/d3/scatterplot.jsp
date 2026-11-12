@@ -41,7 +41,7 @@
   %>
 
 <script src="../d3/actions.js?v=table-1" type="text/javascript"></script>
-<script src="scatterplot.js?v=fill-1" type="text/javascript"></script>
+<script src="scatterplot.js?v=utc-1" type="text/javascript"></script>
 
 <script type="text/javascript">
   showScatterPlot(<%=points.toString().replace("<", "\\u003c")%>,
