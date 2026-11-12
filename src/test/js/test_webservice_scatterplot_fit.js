@@ -59,6 +59,6 @@ assert.deepEqual({...corner}, {left: 12, top: 4});
 // Cache-busting of every changed asset.
 assert.match(read('index.jsp'), /workspace\.js\?v=canonical-3/);
 assert.match(read('index.jsp'), /graph\.css\?v=query-activity-2/);
-assert.match(read('d3/scatterplot.jsp'), /scatterplot\.js\?v=fill-1/);
+assert.match(read('d3/scatterplot.jsp'), /scatterplot\.js\?v=utc-1/);
 assert.match(read('d3/scatterplot.jsp'), /scatterplot\.css\?v=fill-1/);
 console.log('Scatter and Evolution plots fill the Plot panel');
