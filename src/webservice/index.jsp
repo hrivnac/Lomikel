@@ -20,8 +20,8 @@
   <!-- All existing fragment, script and image URLs resolve at the WAR root. -->
   <base href="<%= request.getContextPath() %>/">
   <link rel="icon" type="image" href="@ICON@">
-  <link rel="stylesheet" href="vis-network-8.3.2/styles/vis-network.min.css">
-  <link rel="stylesheet" href="vis-timeline-7.3.9/styles/vis-timeline-graph2d.min.css">
+  <link rel="stylesheet" href="vis-network-10.1.5/styles/vis-network.min.css">
+  <link rel="stylesheet" href="vis-timeline-8.5.6/styles/vis-timeline-graph2d.min.css">
   <link rel="stylesheet" href="bootstrap-4.4.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="fontawesome-free-5.13.0-web/css/all.css">
   <link rel="stylesheet" href="bootstrap-table-1.16.0/dist/bootstrap-table.min.css">
@@ -72,8 +72,8 @@
       <span>Graph, analysis and feedback retain the existing application actions.</span>
     </footer-->
   </div>
-  <script src="vis-network-8.3.2/standalone/umd/vis-network.min.js"></script>
-  <script src="vis-timeline-7.3.9/standalone/umd/vis-timeline-graph2d.min.js"></script>
+  <script src="vis-network-10.1.5/standalone/umd/vis-network.min.js"></script>
+  <script src="vis-timeline-8.5.6/standalone/umd/vis-timeline-graph2d.min.js"></script>
   <script src="jquery-3.5.1.min.js"></script>
   <script src="jquery-ui-1.12.1/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
