@@ -51,8 +51,43 @@ function scatterPlotSeriesDash(field, fields) {
   var index = fields.indexOf(field);
   return index <= 0 ? '' : ['3 2', '1 2', '5 2 1 2'][(index - 1) % 3];
 }
+// Chart size in pixels: the available area when filling the Plot frame, else the classic 700x470.
+function scatterPlotSize(fill, width, height) {
+  if (!fill || !(width > 0) || !(height > 0)) return {w: 700, h: 470};
+  return {w: Math.max(360, Math.round(width)), h: Math.max(260, Math.round(height))};
+}
+
+// Keep the tooltip inside the (clipped) plot area on every side, using its measured size.
+function scatterPlotTipPosition(at, container, tip) {
+  var width = tip.offsetWidth || 240, height = tip.offsetHeight || 0;
+  return {
+    left: Math.max(4, Math.min(at[0] + 12, container.clientWidth - width - 4)),
+    top: Math.max(4, Math.min(at[1] - 42, container.clientHeight - height - 4))
+  };
+}
+
+function scatterPlotFills() {
+  try { return window.self !== window.top; } catch (error) { return true; }
+}
+
 function showScatterPlot(data, name, xS, yS, zS, sS, url) {
   var root = d3.select('#scatter_area');
+  var fill = scatterPlotFills();
+  document.documentElement.classList.toggle('scatter-fill', fill);
+  var args = arguments;
+  if (fill && !showScatterPlot.resizeBound) {
+    // Redraw at the new size when the panel or divider is resized (not on every pixel).
+    showScatterPlot.resizeBound = true;
+    var timer = null, last = '';
+    window.addEventListener('resize', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        var size = window.innerWidth + 'x' + window.innerHeight;
+        if (size !== last) { last = size; showScatterPlot.apply(null, showScatterPlot.lastArgs); }
+      }, 120);
+    });
+  }
+  showScatterPlot.lastArgs = args;
   root.selectAll('*').remove();
   var hasX = Boolean(xS);
   var points = scatterPlotPrepare(data, hasX);
@@ -74,22 +109,27 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
     return;
   }
 
-  var w = 700, h = 470;
+  var svg = root.append('svg').attr('class', 'scatterplot');
+  var box = svg.node().getBoundingClientRect();
+  var size = scatterPlotSize(fill, box.width, box.height);
+  var w = size.w, h = size.h;
   var margin = {top: 24, right: 28, bottom: 62, left: 76};
   var width = w - margin.left - margin.right;
   var height = h - margin.top - margin.bottom;
-  var svg = root.append('svg').attr('class', 'scatterplot')
-    .attr('viewBox', '0 0 ' + w + ' ' + h).attr('role', 'img')
+  svg.attr('viewBox', '0 0 ' + w + ' ' + h).attr('role', 'img')
     .attr('aria-label', title + ': ' + points.length + ' plotted points');
   var plot = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
   var domainX = d3.extent(points, function (p) { return p.x; });
   var x = hasX ? d3.scaleLinear().domain(domainX).nice().range([0, width]) :
     d3.scaleTime().domain(domainX.map(function (v) { return new Date(v); })).nice().range([0, width]);
   var y = d3.scaleLinear().domain(d3.extent(points, function (p) { return p.y; })).nice().range([height, 0]);
-  plot.append('g').attr('class', 'scatter-grid').call(d3.axisLeft(y).tickSize(-width).tickFormat(''));
-  var xAxis = hasX ? d3.axisBottom(x).ticks(6) : d3.axisBottom(x).ticks(5).tickFormat(d3.timeFormat('%d %b %y'));
+  // Tick density follows the drawn size so labels do not collide in narrow or short panels.
+  var xTicks = Math.max(2, Math.min(hasX ? 8 : 7, Math.floor(width / (hasX ? 80 : 95))));
+  var yTicks = Math.max(3, Math.min(10, Math.floor(height / 55)));
+  plot.append('g').attr('class', 'scatter-grid').call(d3.axisLeft(y).ticks(yTicks).tickSize(-width).tickFormat(''));
+  var xAxis = hasX ? d3.axisBottom(x).ticks(xTicks) : d3.axisBottom(x).ticks(xTicks).tickFormat(d3.timeFormat('%d %b %y'));
   plot.append('g').attr('class', 'scatter-axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
-  plot.append('g').attr('class', 'scatter-axis').call(d3.axisLeft(y).ticks(6));
+  plot.append('g').attr('class', 'scatter-axis').call(d3.axisLeft(y).ticks(yTicks));
   plot.append('text').attr('class', 'scatter-axis-title').attr('x', width / 2)
     .attr('y', height + 48).attr('text-anchor', 'middle').text(hasX ? xS : 'Time');
   plot.append('text').attr('class', 'scatter-axis-title').attr('transform', 'rotate(-90)')
@@ -104,8 +144,9 @@ function showScatterPlot(data, name, xS, yS, zS, sS, url) {
   function info(p) { return scatterPlotInfoLines(p, hasX, xS, yS, zS, sS).join('\n'); }
   function showTip(event, p) {
     var position = d3.pointer(event, root.node());
-    tip.text(info(p)).style('left', Math.min(position[0] + 12, Math.max(8, root.node().clientWidth - 240)) + 'px')
-      .style('top', Math.max(4, position[1] - 42) + 'px').classed('is-visible', true);
+    tip.text(info(p));
+    var at = scatterPlotTipPosition(position, root.node(), tip.node());
+    tip.style('left', at.left + 'px').style('top', at.top + 'px').classed('is-visible', true);
   }
   function activate(p) {
     var message = (hasX ? 'Scatter Point:\n' : 'Evolution Point:\n') + info(p);

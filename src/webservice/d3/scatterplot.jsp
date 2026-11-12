@@ -9,7 +9,7 @@
 
 <%@ page errorPage="../ExceptionHandler.jsp" %>
 
-<link href="scatterplot.css?v=details-1" rel="stylesheet" type="text/css"/>
+<link href="scatterplot.css?v=fill-1" rel="stylesheet" type="text/css"/>
 <script src="../d3-v7.9.2/d3.min.js" type="text/javascript"></script>
 
 <div id="scatter_area"></div>
@@ -41,7 +41,7 @@
   %>
 
 <script src="../d3/actions.js?v=table-1" type="text/javascript"></script>
-<script src="scatterplot.js?v=evolution-1" type="text/javascript"></script>
+<script src="scatterplot.js?v=fill-1" type="text/javascript"></script>
 
 <script type="text/javascript">
   showScatterPlot(<%=points.toString().replace("<", "\\u003c")%>,

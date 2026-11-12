@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="workspace.css?v=busy-1">
   <link rel="stylesheet" href="panels.css?v=ext-links-1">
-  <link rel="stylesheet" href="graph.css?v=query-activity-1">
+  <link rel="stylesheet" href="graph.css?v=query-activity-2">
   <link rel="stylesheet" href="cutouts.css?v=survey-colors-1">
   <link rel="stylesheet" href="help.css?v=1">
 </head>
@@ -97,7 +97,7 @@
     window.visheight = 360;
   </script>
   <script src="evolution-table.js?v=evolution-1"></script>
-  <script src="workspace.js?v=canonical-2"></script>
+  <script src="workspace.js?v=canonical-3"></script>
   <script src="busy.js?v=busy-2"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
