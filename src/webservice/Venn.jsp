@@ -24,7 +24,7 @@
 <%! static Logger log = LogManager.getLogger(Venn_jsp.class); %>
 
 <link href="d3/venn.css?v=vertical-2" rel="stylesheet" type="text/css"/>
-<script src="d3-v6.0.0/d3.js"       type="text/javascript"></script>
+<script src="d3-v7.9.2/d3.min.js"       type="text/javascript"></script>
 <script src="venn-v.0.2.14/venn.js" type="text/javascript"></script>
 
 <%
