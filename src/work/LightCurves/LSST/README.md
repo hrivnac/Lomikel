@@ -108,6 +108,56 @@ Replace the graph endpoint with a trusted reachable service. The default is loop
 
 Run `python3 -m pytest --import-mode=importlib ../src/test/lsst_physical_eval/test_evaluate.py ../src/test/lsst_graph_labels/test_export_graph_labels.py -q` from `ant/` with NumPy, scikit-learn and pytest available.
 
+## Re-runnable evaluation against Fink tag classes (DIA)
+
+`run_tag_evaluation.sh` exports tagged DIA light curves from HBase (read-only), then trains and evaluates the light-curve classifier against configurable `rubin.tag_*` classes. It is the light-curve counterpart of `src/work/Clusters/LSST/run_tag_evaluation.sh` and uses the same split and metric code.
+
+All choices are in `tag_classes.json`: the learning classes, the HBase endpoint, sampling caps, curve windows, the bins × embedding × K grid and the evaluation split. To change the classes, edit the `classes` list and re-run; nothing is hard-coded. The default classes are the seven requested tags (early SN Ia candidate, extragalactic <20 mag candidate, extragalactic new candidate, extragalactic SVOM, M-dwarf flare, most likely SN, SN near galaxy candidate). Empty tables are reported and left out.
+
+```bash
+PYTHON=/path/to/venv/bin/python \
+  src/work/LightCurves/LSST/run_tag_evaluation.sh \
+  src/work/LightCurves/LSST/tag_classes.json run/lsst-lc-tag-eval/20261113
+# reuse an export with another config (classes must have been scanned by it):
+EXPORT=run/lsst-lc-tag-eval/20261113/export PYTHON=... \
+  src/work/LightCurves/LSST/run_tag_evaluation.sh my_config.json run/lsst-lc-tag-eval/other
+```
+
+Run it from the repository root after `ant exe` has built `lib/Lomikel-HBase-*.exe.jar`. Every run writes a fresh directory: `export/` (`curves.jsonl`, `labels.jsonl`, `summary.json`), `config.json`, logs and `eval/`. The `eval/` directory holds `report.md`, `metrics.json`, per-window CSV tables (per class, test predictions, grid), figures (confusion, K selection, embedding) and `model_<window>.json`. Apply a model to new curves with `evaluate_tags.py predict --model eval/model_full.json --input curves.jsonl --output predictions.jsonl`.
+
+**Export** (`export_tag_lightcurves.groovy`):
+- It lists all keys (`<midpointMjdTai>_<diaObjectId>`) of every configured tag table. It samples **objects** in seeded hash order, by default at most 1500 per class.
+- For each sampled object it reads the whole prefix `<diaObjectId mod 1000>_<diaObjectId>_` of `rubin.diaSource_static`: `psfFlux`, `psfFluxErr`, `band` and `midpointMjdTai`, with identity checks.
+- Curves longer than `max_points` (512, the `train_lightcurves.py` limit), counting observations recovered from tag rows, are excluded and counted, never truncated.
+- Tagged alerts that have no static row (for example night MJD 61094) are read from the tag row, a byte copy of the alert row. The same identity checks apply, and duplicates are removed by `diaSourceId`.
+- Tagged alerts found in neither place fail the export above `max_missing_fraction`.
+- Curves with fewer than `min_points` valid observations are excluded and counted. These are mostly objects of the large "new"/"most likely SN" tags with one or two detections.
+- `curves.jsonl` follows the `train_lightcurves.py` contract and carries no labels. Labels go to `labels.jsonl`: an object's classes are **every configured tag carried by any of its alerts**, with first and last tag MJDs.
+
+**Evaluation** (`evaluate_tags.py`):
+- Objects are split once into train/validation/test, stratified by the rarest tag, with no object in two splits.
+- Two curve windows are evaluated:
+  - `full`: all observations.
+  - `until_first_tag`: only observations up to the object's first configured tag, i.e. what was known when Fink first tagged it.
+- Features are `encode_features`. The model is the masked autoencoder of `train_lightcurves.py` followed by K-means. Each cluster stores the fraction of its training objects carrying each class.
+- Bins, embedding and K are chosen on validation. The model is then refitted on train+validation with the selected number of epochs and tested once.
+- Reported references are class priors, K-means on the binned features without the encoder, and a supervised random forest on the same features.
+- A class with too few objects in some split is not evaluated in that window, and the report says so.
+- The `until_first_tag` cutoff comes from the tags themselves (its last observation is the tagging alert). A deployed classifier does not know this cutoff, so this window measures association at tagging time, not a prospective forecast.
+- `predict` does not cut curves: a `model_until_first_tag.json` model expects input already cut the same way.
+- Two identical runs give identical metrics; the `model_id` can differ because multithreaded K-means centres differ at the 1e-16 level.
+
+Results on CC HBase (2026-11-13):
+- 4,171 objects (165,977 observations, 1,526 of them read from tag rows). Excluded: 1,338 short curves and 23 over 512 points. No tagged alert was missing.
+- `full` window (test objects): hit rate 0.80, macro F1 0.63. For comparison, the class prior gets 0.10, K-means without the encoder 0.59 and the random forest 0.71.
+- `until_first_tag` window: 2,578 objects, macro F1 0.60. Here K-means without the encoder does slightly better (0.62); the random forest gets 0.71.
+- Validation selects a single time bin (per-band mean flux, error and coverage plus duration and flux scale, i.e. no curve shape), embedding 128 and K=128–256. Larger K (512, 1024) and more bins score lower.
+- The tags are therefore mostly explained by per-band brightness, band coverage and duration, not by detailed curve shape. The autoencoder adds little over clustering the binned features directly.
+
+Tags are Fink filter memberships of single alerts propagated to the object, not physical ground truth. The sample is class-capped, short curves are excluded and HBase tables are read sequentially, so the numbers describe this design on unseen objects, not live-stream performance.
+
+Tests: `python3 -m pytest --import-mode=importlib src/test/lsst_lc_tag_eval -q` and `java -cp "$(ls lib/*.jar | tr '\n' ':')" groovy.ui.GroovyMain src/test/lsst_lc_tag_eval/test_export_groovy.groovy` from the repository root.
+
 ## Verification and scientific limitations
 
 Run from the repository root:

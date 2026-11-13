@@ -1,0 +1,38 @@
+{
+  "format": "lomikel-lsst-lc-tag-eval-config-v1",
+  "description": "Learning classes and parameters for the LSST DIA light-curve (autoencoder + K-means) tag evaluation. Edit the class list, caps and model grid, then re-run run_tag_evaluation.sh.",
+  "hbase": {
+    "host": "cchbase1.in2p3.fr",
+    "port": 2183,
+    "alert_table": "rubin.diaSource_static"
+  },
+  "classes": ["rubin.tag_early_snia_candidate", "rubin.tag_extragalactic_lt20mag_candidate", "rubin.tag_extragalactic_new_candidate", "rubin.tag_extragalactic_svom", "rubin.tag_mdwarf_flare", "rubin.tag_most_likely_sn", "rubin.tag_sn_near_galaxy_candidate"],
+  "sampling": {
+    "seed": 42,
+    "max_objects_per_class": 1500,
+    "max_scan_keys_per_class": 5000000,
+    "max_points": 512,
+    "min_points": 3,
+    "threads": 8,
+    "fallback_to_tag_row": true,
+    "max_missing_fraction": 0.05
+  },
+  "curve": {
+    "windows": ["full", "until_first_tag"],
+    "bins": [1, 2, 4, 8, 16]
+  },
+  "model": {
+    "embedding": [8, 16, 32, 64, 128],
+    "clusters": [16, 32, 64, 128, 256, 512, 1024],
+    "epochs": 200,
+    "seed": 42
+  },
+  "evaluation": {
+    "split_seed": 42,
+    "validation_fraction": 0.2,
+    "test_fraction": 0.2,
+    "selection_metric": "macro_f1",
+    "min_objects_per_split": 3,
+    "supervised_reference": true
+  }
+}
