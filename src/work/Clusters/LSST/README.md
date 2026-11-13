@@ -85,6 +85,108 @@ The evaluator consumes native `lomikel-lsst-ocol-known-ids-v1` JSONL directly an
 
 Offline tests from `ant/`: `python3 -m pytest --import-mode=importlib ../src/test/lsst_physical_eval/test_evaluate.py ../src/test/lsst_graph_labels/test_export_graph_labels.py -q` with NumPy, scikit-learn and pytest installed.
 
+## Re-train and evaluate against configurable LSST tag classes
+
+`tag_classes.json` contains the full list of learning classes, the HBase
+endpoint, sampling caps, measured features, PCA/K grid and evaluation split.
+Change the `classes` array to add/remove `rubin.tag_*` tables, then re-run the
+wrapper. The default seven classes are early SN Ia candidate, extragalactic
+<20 mag candidate, extragalactic new candidate, extragalactic SVOM, M-dwarf
+flare, most likely SN and SN near galaxy candidate. Empty tables are reported
+and omitted from fitting without changing the config. A `rubin.tag_*` entry is
+a **Fink filter tag on a source alert**, not an independent astrophysical
+ground-truth classification. Alerts may have several tags at once.
+
+The exporter reads all keys of each configured tag table, samples
+**objects** in seeded hash order (no more than 3 alerts per object and 4000
+per class by default), and fetches exactly those rows from the canonical
+`rubin.diaSource_static` alert table. It checks `r:diaObjectId` and
+`r:midpointMjdTai` against the tag key. Only allowlisted measured `r:`
+columns and `r:band` enter `alerts.jsonl`. A few sampled tagged alerts
+(about 10% of the SN-near-galaxy sample, from night MJD 61094) have no row in
+`rubin.diaSource_static`; with `sampling.fallback_to_tag_row` (default) their
+cells are read from the tag row, a byte copy of the alert row, after the same
+identity checks, and `summary.json` counts them per class. Anything still
+missing is counted per class and fails the export above
+`sampling.max_missing_fraction` (5%). The per-object cap applies within each
+class, so an object tagged by several classes can contribute more alerts in
+total; identities and all tag labels go
+into a separate `labels.jsonl`. There are no HBase or JanusGraph writes.
+The exporter records table sizes, missing alert rows, schema names and
+per-class sample sizes in `summary.json`; it fails before publishing a partial
+export on unexpected keys or inconsistent identity. The scan cap is explicit:
+if a table exceeds `sampling.max_scan_keys_per_class`, raise it intentionally
+rather than silently truncating. The fetch cap is
+`sampling.max_alerts_per_class` *per class*.
+
+From the repo root, after `ant war` has populated `lib/`:
+
+```bash
+PYTHON=/path/to/venv/bin/python \
+  src/work/Clusters/LSST/run_tag_evaluation.sh \
+  src/work/Clusters/LSST/tag_classes.json run/lsst-tag-eval/20261113
+```
+
+Python needs NumPy and scikit-learn; matplotlib is optional for PNG plots.
+For a rerun of the evaluator without another HBase scan, set `EXPORT` to an
+existing exported directory and choose a **fresh** output directory:
+
+```bash
+EXPORT=run/lsst-tag-eval/20261113/export PYTHON=/path/to/venv/bin/python \
+  src/work/Clusters/LSST/run_tag_evaluation.sh \
+  src/work/Clusters/LSST/tag_classes.json run/lsst-tag-eval/other-features
+```
+
+The output contains `export/{alerts.jsonl,labels.jsonl,summary.json}` and
+`eval/{report.md,metrics.json,model.json,test_per_class.csv,cluster_profiles.csv,
+tag_overlap.csv,test_contingency.csv}` and figures if matplotlib is installed.
+No input or model is committed. Do **not** change `classes` when reusing an
+export to claim a different dataset: the model can filter already-exported
+alerts, but it cannot resurrect a class that was never scanned.
+
+The evaluator separates objects into stratified train/validation/test sets
+(no object can leak across splits). It fits all transforms on training only:
+configured measurements (80% presence by default), signed `asinh`
+compression, median imputation, scaling, optional one-hot bands, and PCA.
+A seeded K-means grid is selected by validation macro F1, then the winner is
+refitted on train+validation and tested only once. Clusters carry the training
+fractions of each tag. Top-1 is right if the predicted tag belongs to the
+alert's tag set. Reported per-tag ranking metrics are ROC AUC and average
+precision; `lift` scores instead of raw fractions are optional in the config
+but are not calibrated probabilities. The class-prior baseline and supervised
+random forest reference are evaluated on the **same held-out objects**. The
+reference is for context; it is not used to tune the PCA+K-means model.
+
+`model.json` has format `lomikel-lsst-pca-kmeans-tags-v1` and is intentionally
+**separate** from the older unsupervised `lomikel-lsst-pca-kmeans-v1` format
+consumed by `classify_alert.groovy`. To run the learned tag-profile model on
+exported DIA alerts:
+
+```bash
+python3 src/work/Clusters/LSST/evaluate_tags.py predict \
+  --model run/lsst-tag-eval/20261113/eval/model.json \
+  --input run/lsst-tag-eval/20261113/export/alerts.jsonl \
+  --output run/lsst-tag-eval/20261113/predictions.jsonl
+```
+
+The training sample is deliberately **class-balanced and object-capped**.
+Thus tag fractions in clusters are associations **in this sampling design**,
+not real-world class probabilities. The test score estimates how well this
+same design generalises to previously unseen objects, *not* performance on
+untagged live-stream alerts. For operational use, also evaluate an unbiased
+representative stream and a later time window, and validate independent
+spectroscopic classifications. An unchanged tag table can still grow with
+future data; rerun the export to update the snapshot and model.
+
+Offline tests:
+
+```bash
+python3 -m pytest -q --import-mode=importlib -p no:cacheprovider \
+  src/test/lsst_tag_eval/test_evaluate_tags.py
+java -cp "$(ls lib/*.jar | tr '\n' ':')" groovy.ui.GroovyMain \
+  src/test/lsst_tag_eval/test_export_groovy.groovy
+```
+
 ## Verification and limitations
 
 Offline tests: `python3 -m pytest src/test/lsst_alert_clusters/test_train.py -q` and `groovy src/test/lsst_alert_clusters/test_groovy.groovy` from the repository root. The integration smoke used *only 25 rows per kind*, a narrow prefix, three clusters, and compared Groovy JSON-row inference with exact-key live HBase inference for one training row per kind. This checks plumbing and numerical agreement, **not predictive validity**, sample representativeness, optimal K, separation, stability, or astrophysical interpretation. Before using classes operationally, design a representative time/object-stratified training sample, hold out objects/time spans, evaluate cluster stability and meaningful associations, and calibrate outlier behavior. Model files from the smoke are deliberately kept outside the repository.

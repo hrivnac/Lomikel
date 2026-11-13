@@ -1,0 +1,37 @@
+{
+  "format": "lomikel-lsst-tag-eval-config-v1",
+  "description": "Learning classes and parameters for the LSST alert PCA+K-means tag evaluation. Edit the class list, caps and model grid, then re-run run_tag_evaluation.sh.",
+  "hbase": {
+    "host": "cchbase1.in2p3.fr",
+    "port": 2183,
+    "alert_table": "rubin.diaSource_static"
+  },
+  "classes": ["rubin.tag_early_snia_candidate", "rubin.tag_extragalactic_lt20mag_candidate", "rubin.tag_extragalactic_new_candidate", "rubin.tag_extragalactic_svom", "rubin.tag_mdwarf_flare", "rubin.tag_most_likely_sn", "rubin.tag_sn_near_galaxy_candidate"],
+  "sampling": {
+    "seed": 42,
+    "max_alerts_per_class": 4000,
+    "max_alerts_per_object": 3,
+    "max_scan_keys_per_class": 5000000,
+    "batch_size": 500,
+    "max_missing_fraction": 0.05,
+    "fallback_to_tag_row": true
+  },
+  "features": ["psfFlux", "psfFluxErr", "psfChi2", "apFlux", "apFluxErr", "scienceFlux", "scienceFluxErr", "templateFlux", "templateFluxErr", "snr", "extendedness", "ixx", "ixy", "iyy", "dipoleMeanFlux", "dipoleFluxDiff", "dipoleLength", "dipoleAngle", "dipoleChi2", "trailFlux", "trailLength", "trailAngle", "trailChi2"],
+  "band_onehot": true,
+  "transform": "asinh",
+  "min_presence": 0.8,
+  "model": {
+    "clusters": [16, 32, 64, 128, 256, 384, 512],
+    "components": 0.95,
+    "scores": "fraction",
+    "seed": 42
+  },
+  "evaluation": {
+    "split_seed": 42,
+    "validation_fraction": 0.2,
+    "test_fraction": 0.2,
+    "selection_metric": "macro_f1",
+    "min_objects_per_split": 3,
+    "supervised_reference": true
+  }
+}
