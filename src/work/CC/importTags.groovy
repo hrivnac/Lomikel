@@ -92,4 +92,4 @@ finally {
   client.close();
   }
 
-//NotifierURL.notifyExecution("importTags-LSST", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));
+NotifierURL.notifyExecution("importTags-LSST", "Lomikel", Info.release(), timer.info(cls + "[" + delay + "]: "));
