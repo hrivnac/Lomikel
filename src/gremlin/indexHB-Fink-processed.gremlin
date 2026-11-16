@@ -1,0 +1,89 @@
+// Add the HBase index on 'processed' to an existing Fink graph
+// (no REINDEX: run only when no vertex has 'processed' set)
+// ===========================================================
+//
+// Index byLblProcessed (lbl, processed) serves
+//   g.V().has('lbl', 'NewTag').has('processed', true)
+// used by cleanTags (GremlinRecipiesGT.dropV). Vertices without
+// 'processed' are not indexed, so the index stays small.
+//
+// Existing vertices are not indexed (no REINDEX): the index is complete
+// only because no vertex has 'processed' when it is created. Before running:
+//   - stop the NewTag jobs (importTags.sh, which runs processTags and
+//     cleanTags), so nothing sets 'processed' until the index is ENABLED;
+//   - make sure no NewTag has 'processed' (processed NewTags are dropped by
+//     processTags and cleanTags); the check below stops otherwise;
+//   - close stale JanusGraph instances: the index becomes REGISTERED only
+//     when every open instance has acknowledged it. List them with
+//     mgmt.getOpenInstances() and close only dead ones with
+//     mgmt.forceCloseInstance(id) (never a running Gremlin server).
+//
+// Run (from Lomikel/ant after sourcing setup.sh):
+//   gremlin_console_CC < ../src/gremlin/indexHB-Fink-processed.gremlin
+// The check reads every NewTag; to skip it:
+//   (echo 'skipCheck = true'; cat ../src/gremlin/indexHB-Fink-processed.gremlin) | gremlin_console_CC
+// The script can be rerun: it continues from the current index state.
+
+graph.tx().rollback()
+if (!binding.hasVariable('skipCheck')) { skipCheck = false }
+
+addProcessedIndex = { ->
+  def name = 'byLblProcessed'
+  def mgmt = graph.openManagement()
+  println('open instances: ' + mgmt.getOpenInstances())
+  if (!mgmt.containsGraphIndex(name)) {
+    mgmt.rollback()
+    if (!skipCheck) {
+      def left = graph.traversal().V().has('lbl', 'NewTag').has('processed').limit(1).count().next()
+      graph.tx().rollback()
+      if (left > 0) {
+        return 'STOPPED: some NewTags have processed set; drop them (cleanTags) and rerun'
+        }
+      }
+    mgmt = graph.openManagement()
+    def lbl       = mgmt.getPropertyKey('lbl')
+    def processed = mgmt.getPropertyKey('processed')
+    if (lbl == null || lbl.dataType() != String.class ||
+        processed == null || processed.dataType() != Boolean.class) {
+      mgmt.rollback()
+      return 'STOPPED: property keys lbl (String) and processed (Boolean) must exist'
+      }
+    mgmt.buildIndex(name, Vertex.class).addKey(lbl).addKey(processed).buildCompositeIndex()
+    mgmt.commit()
+    }
+  else {
+    mgmt.rollback()
+    }
+  mgmt = graph.openManagement()
+  def index  = mgmt.getGraphIndex(name)
+  def status = index.getIndexStatus(index.getFieldKeys()[0])
+  mgmt.rollback()
+  println(name + ': ' + status)
+  if (status == SchemaStatus.ENABLED) {
+    return name + ' is ENABLED'
+    }
+  if (status == SchemaStatus.INSTALLED) {
+    // Wait until every open instance knows the index
+    def reg = ManagementSystem.awaitGraphIndexStatus(graph, name)
+                              .status(SchemaStatus.REGISTERED)
+                              .timeout(10, java.time.temporal.ChronoUnit.MINUTES)
+                              .call()
+    if (!reg.getSucceeded()) {
+      return 'STOPPED: ' + name + ' not REGISTERED after 10 min (' + reg + '); close stale instances and rerun'
+      }
+    }
+  else if (status != SchemaStatus.REGISTERED) {
+    return 'STOPPED: unexpected status ' + status
+    }
+  // Enable without reindexing
+  mgmt = graph.openManagement()
+  mgmt.updateIndex(mgmt.getGraphIndex(name), SchemaAction.ENABLE_INDEX).get()
+  mgmt.commit()
+  def en = ManagementSystem.awaitGraphIndexStatus(graph, name)
+                           .status(SchemaStatus.ENABLED)
+                           .timeout(10, java.time.temporal.ChronoUnit.MINUTES)
+                           .call()
+  return en.getSucceeded() ? name + ' is ENABLED' : 'STOPPED: ' + name + ' not ENABLED yet (' + en + '); rerun'
+  }
+
+println(addProcessedIndex())

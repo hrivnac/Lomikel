@@ -9,6 +9,7 @@ mr = new org.janusgraph.hadoop.MapReduceIndexManagement(graph)
 mr.updateIndex(mgmt.getGraphIndex('byJd'   ), SchemaAction.REINDEX).get()
 mr.updateIndex(mgmt.getGraphIndex('byRaDec'), SchemaAction.REINDEX).get()
 mr.updateIndex(mgmt.getGraphIndex('byCls'),   SchemaAction.REINDEX).get()
+mr.updateIndex(mgmt.getGraphIndex('byLblProcessed'), SchemaAction.REINDEX).get()
 mgmt.getGraphIndexes(Vertex.class)
 mgmt.commit()
 
