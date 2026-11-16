@@ -112,6 +112,23 @@ final class JanuserGroovyRegressionTest {
              'boolean processed tags must be removed by the batch helper'
       assert source.V().has('lbl', 'NewTag').has('processed', false).count().next() == 1L :
              'cleanup must leave unprocessed tags untouched'
+      // An attribute filter is not index-backed: the label must be scanned once, not once per batch.
+      5.times { source.addV('NewTag').property('lbl', 'NewTag').property('processed', true).iterate() }
+      3.times { source.addV('NewTag').property('lbl', 'NewTag').property('processed', false).iterate() }
+      source.addV('other').property('lbl', 'other').property('processed', true).iterate()
+      source.tx().commit()
+      def scans = new CountFullScansStrategy()
+      def plainSource = source
+      recipes.source = source.withStrategies(scans)
+      recipes.commitCount = 0
+      recipes.dropV('NewTag', 2, 'processed', true)
+      recipes.source = plainSource
+      assert scans.count == 1 : "dropV with an attribute must scan the label once, scanned ${scans.count} times"
+      assert recipes.commitCount == 3 : 'dropV must still commit each batch of matched vertices'
+      assert source.V().has('lbl', 'NewTag').has('processed', true).count().next() == 0L
+      assert source.V().has('lbl', 'NewTag').has('processed', false).count().next() == 4L :
+             'cleanup must leave unprocessed tags untouched'
+      assert source.V().has('lbl', 'other').count().next() == 1L : 'other labels must survive'
       source.addV('legacy').property('lbl', 'legacy').property('state', 'done').iterate()
       source.tx().commit()
       recipes.dropV('legacy', 1, 'state', 'done')
@@ -444,6 +461,22 @@ final class JanuserGroovyRegressionTest {
       }
     def createHBaseDataLinkClient(String hostname, String port) { hbaseClient }
     def openDataLinkGraph(String backend, String hostname, String port, String table) { targetGraph }
+    }
+
+  /** Counts root traversals starting with an id-less (full) vertex scan. */
+  private static final class CountFullScansStrategy
+      extends AbstractTraversalStrategy<VerificationStrategy>
+      implements VerificationStrategy {
+    int count
+
+    @Override
+    void apply(Traversal.Admin<?, ?> traversal) {
+      def start = traversal.startStep
+      if (traversal.root && start instanceof org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep &&
+          start.returnsVertex() && start.ids.length == 0) {
+        count++
+        }
+      }
     }
 
   private static final class RejectHostLanguageFiltersStrategy

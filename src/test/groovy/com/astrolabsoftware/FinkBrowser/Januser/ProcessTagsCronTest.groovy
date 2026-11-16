@@ -11,6 +11,10 @@ final class ProcessTagsCronTest {
     def body = source.substring(source.indexOf('getOrCreateObject ='))
                      .split('// ----------------------------------------------------------\n//  mark processed NewTag vertices', 2)[0]
     [false, true].each { reverse -> run(imports + body, reverse) }
+    def dash = '// ----------------------------------------------------------\n'
+    def finish = source.substring(source.indexOf(dash + '//  mark processed NewTag vertices'))
+                       .split(dash + '//  generate correlations', 2)[0]
+    dropProcessed(imports + finish)
     println 'ProcessTagsCronTest: OK'
   }
 
@@ -58,6 +62,26 @@ final class ProcessTagsCronTest {
     }
     assert g.E().has('lbl', 'deepcontains').toList()
             .every { it.label() == it.property('lbl').value() }
+    graph.close()
+  }
+
+  /** Processed NewTags are dropped right after being marked; nothing else is touched. */
+  private static void dropProcessed(String source) {
+    def graph = TinkerGraph.open()
+    def g = graph.traversal()
+    def done = (1..5).collect { g.addV('NewTag').property('lbl', 'NewTag').property('cls', 'A').next() }
+    def pending = g.addV('NewTag').property('lbl', 'NewTag').property('cls', 'A').next()
+    def object = g.addV('object').property('lbl', 'object').next()
+    int commits = 0
+    def gr = new Expando(commit: { -> commits++ })
+    def binding = new Binding(g: g, gr: gr, logg: new Expando(info: { m -> }),
+                              jobImportDate: new Timestamp(0L),
+                              newTags: (done + [object]).collect { [tagId: it.id()] })
+    new GroovyShell(binding).evaluate(source)
+    assert !g.V(done*.id().toArray()).hasNext() : 'processed NewTags must be dropped by processTags'
+    assert g.V(pending.id()).has('lbl', 'NewTag').hasNext() : 'unprocessed NewTags must survive'
+    assert g.V(object.id()).has('lbl', 'object').hasNext() : 'only NewTag vertices may be dropped'
+    assert commits >= 2 : 'marking and dropping must be committed'
     graph.close()
   }
 

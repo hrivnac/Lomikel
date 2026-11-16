@@ -268,6 +268,18 @@ if (!processedTagIds.isEmpty()) {
                       .iterate()
   }
 gr.commit()
+
+// ----------------------------------------------------------
+//  drop processed NewTag vertices (cleanTags removes any left over)
+// ----------------------------------------------------------
+processedTagIds.collate(1000).each { batch ->
+  g.V(batch.toArray()).has('lbl', 'NewTag')
+                      .has('processed', true)
+                      .drop()
+                      .iterate()
+  gr.commit()
+  }
+logg.info("dropped ${processedTagIds.size()} processed NewTags")
 logg.info("done at ${jobImportDate}")
 
 // ----------------------------------------------------------

@@ -139,21 +139,28 @@ trait GremlinRecipiesGT {
     if (n <= 0) {
       throw new IllegalArgumentException('Batch size must be positive')
       }
+    if (attName != null) {
+      // The attribute is filtered after the label index, so every query walks
+      // all vertices of the label: select once, then drop by id in batches.
+      def ids = g().V().has('lbl', label)
+                       .has(attName, attValue)
+                       .id()
+                       .toList();
+      log.info('' + ids.size() + ' ' + label + 's to drop');
+      ids.collate(n).each { batch ->
+        g().V(batch.toArray()).has('lbl', label)
+                              .has(attName, attValue)
+                              .drop()
+                              .iterate();
+        commit();
+        }
+      return;
+      }
     while (true) {
-      def batch;
-      if (attName == null) {
-        batch = g().V().has('lbl', label)
-                   .limit(n)
-                   .id()
-                   .toList();
-        }
-      else {
-        batch = g().V().has('lbl', label)
-                   .has(attName, attValue)
-                   .limit(n)
-                   .id()
-                   .toList();
-        }
+      def batch = g().V().has('lbl', label)
+                         .limit(n)
+                         .id()
+                         .toList();
       if (batch.isEmpty()) {
         break;
         }
