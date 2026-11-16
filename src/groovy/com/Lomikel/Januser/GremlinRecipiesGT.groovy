@@ -157,7 +157,7 @@ trait GremlinRecipiesGT {
       if (batch.isEmpty()) {
         break;
         }
-      println('' + batch.size() + ' ' + label + 's to drop');
+      log.info('' + batch.size() + ' ' + label + 's to drop');
       g().V(batch.toArray()).drop().iterate();
       commit();
       }
@@ -193,7 +193,7 @@ trait GremlinRecipiesGT {
       if (batch.isEmpty()) {
         break;
         }
-      println('' + batch.size() + ' ' + label + 's to drop');
+      log.info('' + batch.size() + ' ' + label + 's to drop');
       g().E(batch.toArray()).drop().iterate();
       commit();
       }
