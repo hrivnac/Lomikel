@@ -42,7 +42,7 @@ client.connect(cls, null);
 jc = new JanusClient("/opt/janusgraph-1/conf/gremlin-server/CCRW.properties");
 gr = new FinkGremlinRecipiesG(jc);
   
-log.info("Importing NewTags for " + cls + " within last " + delay + " days");
+log.info("Importing NewTags for " + cls + " " + delay + " days old");
 
 timer.start();
 
