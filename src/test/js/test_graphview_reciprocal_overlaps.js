@@ -20,8 +20,10 @@ async function exercise(script) {
   const context = vm.createContext({console,setTimeout,showTab(){},
     document:{getElementById:id=>controls[id]||null,
       createTextNode:text=>({text}),createElement:tag=>({tag,appendChild(){},addEventListener(){}})},
-    vis:{Network:class {constructor(){this.listeners={};}on(n,cb){this.listeners[n]=cb;}
-      once(){}destroy(){}isCluster(){return false;}getScale(){return 1;}
+    vis:{Network:class {constructor(container,data){this.listeners={};this.clustered=false;
+      this.body={data:{edges:{removed:[],remove:ids=>{this.body.data.edges.removed.push(...ids);}}}};}
+      on(n,cb){this.listeners[n]=cb;} cluster(){this.clustered=true;}
+      once(){}destroy(){}isCluster(){return this.clustered;}getScale(){return 1;}
       getViewPosition(){return {x:0,y:0};}moveTo(){} }}, options4Graph:{},
     stylesheet:{nodes:{default:{properties:{},graphics:{title:'node',subtitle:'',label:'node',
       group:' ',value:'0',shape:'dot',borderWidth:'1',borderDashes:[1,0]},actions:[]}},
@@ -80,6 +82,32 @@ async function exercise(script) {
   assert.equal(calls.length,16,script+': repeated action retains complete query coverage');
   assert.deepEqual(ids(),['ab1','ab2','direct-ab','loop','ba3','direct-ba','ij-ab'],
     script+': replay does not add a suppressed reciprocal edge');
+  // Whole graph view-only action must remove every displayed loop, including
+  // those on OCol vertices and directed edges, without a Gremlin request.
+  const panel=fs.readFileSync(path.join(root,'GraphView.jsp'),'utf8');
+  assert.match(panel, /<fieldset><legend>Whole graph<\/legend>[\s\S]*?<button[^>]*onclick="hideSelfLoops\(\)"[^>]*>Hide self-loops<\/button>/);
+  const button=panel.match(/<button[^>]*onclick="(hideSelfLoops\(\))"[^>]*>Hide self-loops<\/button>/);
+  assert.ok(button,script+': button action is callable');
+  context.show([{type:'vertex',id:31,label:'OCol',element:[]}]);
+  context.edges.push({id:'ocol-loop',from:31,to:31,overlapLabel:'tag'});
+  context.edges.push({id:'direct-loop',from:21,to:21,overlapLabel:'tag'});
+  context.edges.push({id:'typed-different',from:11,to:'11',overlapLabel:'tag'});
+  const clusteredNetwork=context.network;
+  clusteredNetwork.cluster();
+  const requestCount=calls.length;
+  vm.runInContext(button[1],context); // exercise the button's actual inline action
+  assert.deepEqual(ids(),['ab1','ab2','direct-ab','ba3','direct-ba','ij-ab','typed-different'],
+    script+': hide loops of any label, preserve typed endpoint identities and other edges');
+  assert.equal(calls.length,requestCount,script+': no server operation');
+  assert.deepEqual(Array.from(context.nodes,n=>n.id),[11,12,21,22,31],script+': OCol and other nodes unchanged');
+  assert.equal(context.network,clusteredNetwork,script+': keep the same network');
+  assert.equal(context.network.isCluster(),true,script+': collapsed cluster stays collapsed');
+  assert.deepEqual(clusteredNetwork.body.data.edges.removed,['loop','ocol-loop','direct-loop']);
+  const currentNetwork=context.network;
+  context.hideSelfLoops();
+  assert.equal(context.network,currentNetwork,script+': no redraw when there are no loops');
+  assert.deepEqual(ids(),['ab1','ab2','direct-ab','ba3','direct-ba','ij-ab','typed-different'],
+    script+': repeated action is harmless');
   // Reset/replace must not keep pairing state from a previous graph.
   context.edges.length=0;context.nodes.length=0;
   context.server='//CC';context.show([vertex(11),vertex(12)]);

@@ -84,5 +84,5 @@ for (const page of ['Node.jsp', 'Edge.jsp']) {
   const jsp = fs.readFileSync(path.join(web, page), 'utf8');
   assert.match(jsp, /escapeGraphHtml\((node|edge)\.title\)\.replace\(\/\\n\/g, '<br\/>'\)/, `${page} escapes the plain-text title`);
 }
-assert.match(fs.readFileSync(path.join(web, 'GraphView.jsp'), 'utf8'), /GraphView\.js\?v=canonical-6/);
+assert.match(fs.readFileSync(path.join(web, 'GraphView.jsp'), 'utf8'), /GraphView\.js\?v=canonical-7/);
 console.log('Graph tooltips, cluster titles and Describe heading are plain text with line breaks');
