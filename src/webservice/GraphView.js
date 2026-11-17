@@ -683,6 +683,23 @@ function removeNode(id, type) {
   show(null, null);
   }
 
+// Hide displayed self-loops only; this never changes the database graph.
+// The pinned vis-network wraps array inputs in an internal DataSet. Update it
+// in place so collapsing a cluster, physics and camera position are preserved.
+function hideSelfLoops() {
+  var loopIds = edges.filter(function (edge) { return edge.from === edge.to; })
+                     .map(function (edge) { return edge.id; });
+  if (!loopIds.length) return;
+  for (var i = edges.length - 1; i >= 0; i--) {
+    if (edges[i].from === edges[i].to) edges.splice(i, 1);
+    }
+  if (network && network.body && network.body.data && network.body.data.edges &&
+      typeof network.body.data.edges.remove === 'function') {
+    network.body.data.edges.remove(loopIds);
+    }
+  else if (network) show(null, null);
+  }
+
 // Remove selected edge
 function removeEdge(id) {
   removeObjectByKey(edges, 'id', id);

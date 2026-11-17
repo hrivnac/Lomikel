@@ -33,6 +33,7 @@
           <button type="button" onclick="clusterByHubsize()">Cluster hubs</button>
           <button type="button" onclick="clusterExpand()">Open clusters</button>
           <button type="button" onclick="fillEdges()">Show all edges</button>
+          <button type="button" onclick="hideSelfLoops()" title="Remove edges whose endpoints are the same vertex from this view only">Hide self-loops</button>
         </div>
       </fieldset>
       <button class="ws-graph-help" type="button" onclick="w2popup.load({url:'Help-GraphView.html', showMax:true})" aria-label="Graph controls help" title="Graph controls help">?</button>
@@ -43,7 +44,7 @@
 <script type="text/javascript" src="StylesheetDefault.js"></script>
 <script type="text/javascript" src="Stylesheet.js"></script>
 <script type="text/javascript" src="SurveyStylesheet.js?v=survey-colors-5"></script>
-<script type="text/javascript" src="GraphView.js?v=canonical-6"></script>
+<script type="text/javascript" src="GraphView.js?v=canonical-7"></script>
 <script type="text/javascript" src="skyview-graph.js?v=longss-history-1"></script>
 <script type="text/javascript" src="lightcurve-graph.js?v=query-activity-1"></script>
 <script type="text/javascript" src="graph-table-origin.js?v=mixed-context-1"></script>
