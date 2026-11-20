@@ -11,7 +11,11 @@
   // the designation from Fink's exact reverse resolver, as in CutoutSource.jsp.
   private static final String ES_BASE = "http://134.158.243.139:24499";
   private static final String API_BASE = "https://api.lsst.fink-portal.org";
-  private static final String PORTAL = "https://lsst.fink-portal.org/";
+  private static final String PORTAL = "https://lsst.fink-portal.org";
+  // A Graph Browser opened from a Portal returns to it: the public Portal or a
+  // loopback development Portal (an origin only). Must match handoff.js.
+  private static final String ALLOWED_PORTAL =
+    "https://lsst\\.fink-portal\\.org|https?://(?:127\\.0\\.0\\.1|localhost|\\[::1\\])(?::[0-9]{1,5})?";
   private static byte[] readLimited(InputStream input, int max) throws Exception {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     byte[] block = new byte[4096];
@@ -90,11 +94,18 @@
     out.print("<!DOCTYPE html><title>Fink Portal link</title><p>Invalid LSST object ID.</p>");
     return;
   }
+  String portal = request.getParameter("portal");
+  if (portal == null || portal.isEmpty()) portal = PORTAL;
+  else if (!portal.matches(ALLOWED_PORTAL)) {
+    response.setStatus(400);
+    out.print("<!DOCTYPE html><title>Fink Portal link</title><p>Unexpected Fink Portal address.</p>");
+    return;
+  }
   try {
     String target = portalPath(id, upstreamBase("fink.portal.esUrl", ES_BASE),
                                upstreamBase("fink.portal.apiUrl", API_BASE));
     response.setStatus(302);
-    response.setHeader("Location", PORTAL + target);
+    response.setHeader("Location", portal + "/" + target);
   } catch (Exception error) {
     // The validated ID is digits only; no upstream text is echoed.
     response.setStatus(502);

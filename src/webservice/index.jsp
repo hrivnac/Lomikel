@@ -99,7 +99,7 @@
   <script src="evolution-table.js?v=evolution-2"></script>
   <script src="workspace.js?v=canonical-3"></script>
   <script src="busy.js?v=busy-2"></script>
-  <script src="handoff.js?v=portal-handoff-2"></script>
+  <script src="handoff.js?v=portal-handoff-3"></script>
   <script>
     // Keep the legacy public functions: graph actions and nested D3 frames call these.
     window.feedback = function (txt) {
