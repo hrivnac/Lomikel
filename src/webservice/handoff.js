@@ -1,9 +1,10 @@
 /* Fink Portal -> Graph Browser hand-off (version 1).
  *
  * A link such as index.jsp?profile=cc&handoff=v1&kind=dia&objectId=<id> opens one
- * LSST object with a bounded first-degree neighbourhood instead of the profile's
- * default graph. The URL carries only a validated kind and decimal object ID: the
- * graph server comes from the WAR's own server list (data-survey="LSST") and the
+ * LSST object, together with every OCol (classification collection) pointing to
+ * it, instead of the profile's default graph. The URL carries only a validated
+ * kind and decimal object ID: the graph server comes from the WAR's own server
+ * list (data-survey="LSST") and the
  * Gremlin text is built here from fixed templates. Invalid links are reported and
  * leave the ordinary workspace start unchanged; ordinary visits are not affected.
  */
@@ -12,7 +13,6 @@
   var VERSION = 'v1';
   var ALLOWED = ['handoff', 'kind', 'objectId', 'profile', 'style'];
   var KINDS = {dia: 'DIA', ss: 'Solar System'};
-  var NEIGHBOURS = 25;            // first-degree edges requested with the object
   var CONTROL_WAIT_MS = 60000;    // Top.jsp normally loads within a second
   var PORTAL = 'https://lsst.fink-portal.org/';
 
@@ -49,8 +49,10 @@
       kind: kind[0],
       objectId: id,
       exists: vertexStep(id) + '.count()',
-      graph: vertexStep(id) + '.limit(1).union(identity(), bothE().limit(' + NEIGHBOURS +
-             ').union(otherV(), identity()))'
+      // The object itself plus all OCol vertices pointing to it, each OCol
+      // vertex followed by its edge to the object.
+      graph: vertexStep(id) + ".limit(1).union(identity(), " +
+             "inE().where(outV().has('lbl', 'OCol')).union(outV(), identity()))"
     };
   }
 

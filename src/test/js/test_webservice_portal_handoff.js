@@ -11,8 +11,9 @@ const read = name => fs.readFileSync(path.join(base, name), 'utf8');
 const DIA = '313761043604045880';
 const SS = '20892028060578637';
 const EXISTS = id => "g.V().has('lbl', 'object').has('objectId', '" + id + "').count()";
+// The object itself plus every OCol pointing to it (each OCol vertex before its edge).
 const GRAPH = id => "g.V().has('lbl', 'object').has('objectId', '" + id + "').limit(1)" +
-  ".union(identity(), bothE().limit(25).union(otherV(), identity()))";
+  ".union(identity(), inE().where(outV().has('lbl', 'OCol')).union(outV(), identity()))";
 
 function element(id, extra = {}) {
   return Object.assign({id, value: '', checked: false, children: [], textContent: '',
@@ -205,7 +206,7 @@ async function testWaitsForActivityPane() {
 
 function testPackaging() {
   const index = read('index.jsp');
-  const handoff = index.indexOf('src="handoff.js?v=portal-handoff-1"');
+  const handoff = index.indexOf('src="handoff.js?v=portal-handoff-2"');
   assert.ok(handoff > index.indexOf('src="busy.js'), 'loaded after the workspace wrappers');
   assert.ok(handoff < index.indexOf("$.getScript('profiles/"), 'loaded before the profile can bootstrap');
   for (const site of ['CC', 'IJCLab', 'Local']) {
