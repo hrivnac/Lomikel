@@ -14,7 +14,24 @@
   var ALLOWED = ['handoff', 'kind', 'objectId', 'profile', 'style'];
   var KINDS = {dia: 'DIA', ss: 'Solar System'};
   var CONTROL_WAIT_MS = 60000;    // Top.jsp normally loads within a second
-  var PORTAL = 'https://lsst.fink-portal.org/';
+  var DEFAULT_PORTAL = 'https://lsst.fink-portal.org';
+
+  // The Portal that sent the object (its origin arrives as the referrer). Only the
+  // public Portal or a loopback development Portal is accepted; anything else keeps
+  // the default. Must match the portal check in PortalLink.jsp.
+  function portalOrigin(referrer) {
+    if (!referrer) return null;
+    var url;
+    try { url = new URL(referrer); } catch (error) { return null; }
+    if (url.username || url.password) return null;
+    if (url.origin === DEFAULT_PORTAL) return url.origin;
+    if (!/^https?:$/.test(url.protocol)) return null;
+    return ['127.0.0.1', 'localhost', '[::1]'].indexOf(url.hostname) >= 0 ? url.origin : null;
+  }
+
+  function portalBase() {
+    return (root.finkPortalOrigin || DEFAULT_PORTAL) + '/';
+  }
 
   function vertexStep(id) {
     return "g.V().has('lbl', 'object').has('objectId', '" + id + "')";
@@ -156,7 +173,7 @@
     }
     if (count === 0) {
       notice(describe(request) + ' is not yet available in the graph. Graph data are imported after the Portal data.',
-             request.kind === 'dia' ? {href: PORTAL + request.objectId, text: 'Open in Fink Portal'} : null);
+             request.kind === 'dia' ? {href: portalBase() + request.objectId, text: 'Open in Fink Portal'} : null);
       return;
     }
     ui.command.value = request.graph;
@@ -182,7 +199,12 @@
   if (!request) return;
   // A valid link takes over the profile's default start, exactly once:
   // Reset reloads the graph fragment but does not repeat the hand-off.
-  if (!request.error) root.graphViewProfileBooted = true;
+  if (!request.error) {
+    root.graphViewProfileBooted = true;
+    // "Fink Portal" actions (Stylesheet.js finkPortalUrl) return to the calling Portal.
+    var origin = portalOrigin(root.document.referrer);
+    if (origin && origin !== DEFAULT_PORTAL) root.finkPortalOrigin = origin;
+  }
   var started = false;
   function boot() {
     if (started || root.graphViewReady !== root.document.getElementById('graph')) return;

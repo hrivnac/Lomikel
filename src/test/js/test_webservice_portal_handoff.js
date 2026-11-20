@@ -24,7 +24,7 @@ function element(id, extra = {}) {
 }
 
 function environment({search = '', servers = [['//157.136.253.253:24445', 'ZTF'], ['//134.158.243.144:24445', 'LSST']],
-                      count = 1, controls = true, profile = 'cc', nodes = null} = {}) {
+                      count = 1, controls = true, profile = 'cc', nodes = null, referrer = ''} = {}) {
   const requests = {values: [], graph: [], bootstrap: [], selected: [], commands: [], feedback: [], tabs: []};
   const options = servers.map(([value, survey]) => ({value, survey}));
   const select = element('gremlin_server', {value: options.length ? options[0].value : '',
@@ -38,6 +38,7 @@ function environment({search = '', servers = [['//157.136.253.253:24445', 'ZTF']
     bootstrap_graph: element('bootstrap_graph'), select: element('select', {value: 'limit(10)'})};
   const listeners = {};
   const document = {
+    referrer,
     getElementById(id) { return controls || id === 'graph' ? els[id] || null : null; },
     createElement(tag) { return element(tag, {tagName: tag.toUpperCase()}); },
     createTextNode(text) { return {nodeType: 3, textContent: String(text)}; }
@@ -70,6 +71,7 @@ function environment({search = '', servers = [['//157.136.253.253:24445', 'ZTF']
   window.window = window;
   window.document = document;
   window.URLSearchParams = URLSearchParams;
+  window.URL = URL;
   window.Event = class { constructor(type) { this.type = type; } };
   window.Promise = Promise;
   const context = vm.createContext(window);
@@ -204,9 +206,35 @@ async function testWaitsForActivityPane() {
   assert.equal(env.requests.graph.length, 1);
 }
 
+async function testPortalOriginFromReferrer() {
+  // "Fink Portal" actions return to the Portal that sent the object, when it is an
+  // allowed Portal (the public one or a loopback development Portal).
+  const query = '?profile=cc&handoff=v1&kind=dia&objectId=' + DIA;
+  for (const [referrer, origin] of [
+    ['http://127.0.0.1:24470/', 'http://127.0.0.1:24470'],
+    ['http://localhost:24000/313761043604045880', 'http://localhost:24000'],
+    ['http://[::1]:8050/', 'http://[::1]:8050'],
+    ['https://lsst.fink-portal.org/', undefined],          // the default needs no override
+    ['https://evil.example/', undefined],
+    ['https://lsst.fink-portal.org.evil.example/', undefined],
+    ['http://user:pw@127.0.0.1:24470/', undefined],
+    ['javascript:alert(1)', undefined],
+    ['', undefined]]) {
+    const env = environment({search: query, referrer, count: 0});
+    await env.ready();
+    assert.equal(env.window.finkPortalOrigin, origin, 'referrer ' + JSON.stringify(referrer));
+    const link = env.els.commands.children.find(child => child.tagName === 'A');
+    assert.equal(link.href, (origin || 'https://lsst.fink-portal.org') + '/' + DIA,
+      'the missing-object link goes to the same Portal');
+  }
+  const plain = environment({search: '?profile=cc', referrer: 'http://127.0.0.1:24470/'});
+  await plain.ready();
+  assert.equal(plain.window.finkPortalOrigin, undefined, 'without a hand-off the default Portal is kept');
+}
+
 function testPackaging() {
   const index = read('index.jsp');
-  const handoff = index.indexOf('src="handoff.js?v=portal-handoff-2"');
+  const handoff = index.indexOf('src="handoff.js?v=portal-handoff-3"');
   assert.ok(handoff > index.indexOf('src="busy.js'), 'loaded after the workspace wrappers');
   assert.ok(handoff < index.indexOf("$.getScript('profiles/"), 'loaded before the profile can bootstrap');
   for (const site of ['CC', 'IJCLab', 'Local']) {
@@ -227,6 +255,7 @@ function testPackaging() {
   await testNoLsstServer();
   await testResetBeforeControlsCancels();
   await testWaitsForActivityPane();
+  await testPortalOriginFromReferrer();
   testPackaging();
   console.log('Fink Portal hand-off tests passed');
 })().catch(error => { console.error(error); process.exit(1); });

@@ -61,6 +61,14 @@ function testPortalUsesObjectSurvey() {
     const value = ctx.stylesheetValue(action.url, 7, new Map([['objectId',oid]]), new Map(), false);
     assert.equal(value, url);
   }
+  // Opened from a (development) Portal: return to that Portal, through the same redirect.
+  ctx.finkPortalOrigin = 'http://127.0.0.1:24470';
+  assert.equal(ctx.stylesheetValue(action.url, 7, new Map([['objectId','123456789']]), new Map(), false),
+    'https://fink.example/FinkBrowser/PortalLink.jsp?objectId=123456789&portal=http%3A%2F%2F127.0.0.1%3A24470');
+  assert.equal(ctx.stylesheetValue(action.url, 7, new Map([['objectId','ZTF20abcdef']]), new Map(), false),
+    'https://ztf.fink-portal.org/ZTF20abcdef',
+    'ZTF objects keep the ZTF Portal');
+  delete ctx.finkPortalOrigin;
   for (const bad of ['not-an-object', '0123', '12345678901234567890', '1e5'])
     assert.equal(ctx.stylesheetValue(action.url, 7, new Map([['objectId', bad]]),
       new Map(), false), '', bad + ' must not be linked to a wrong survey');

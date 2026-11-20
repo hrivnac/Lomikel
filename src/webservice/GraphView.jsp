@@ -42,7 +42,7 @@
   <div id="vis" role="region" tabindex="0" aria-label="Interactive graph: click a node or edge for actions, double-click a node to expand it"></div>
 </div>
 <script type="text/javascript" src="StylesheetDefault.js"></script>
-<script type="text/javascript" src="Stylesheet.js?v=portal-link-1"></script>
+<script type="text/javascript" src="Stylesheet.js?v=portal-link-2"></script>
 <script type="text/javascript" src="SurveyStylesheet.js?v=survey-colors-5"></script>
 <script type="text/javascript" src="GraphView.js?v=canonical-7"></script>
 <script type="text/javascript" src="skyview-graph.js?v=longss-history-1"></script>

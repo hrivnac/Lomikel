@@ -5,6 +5,8 @@ function storeData(fn, dataS) {
 // Object IDs identify the survey; portal pages are not REST API endpoints.
 // LSST DIA and Solar System IDs are both decimal, but the Portal addresses Solar
 // System objects by designation: PortalLink.jsp resolves the page and redirects.
+// After a hand-off from a Portal (handoff.js sets finkPortalOrigin) LSST links
+// return to that Portal; PortalLink.jsp re-checks the origin.
 function finkPortalUrl(objectId) {
   if (objectId == null) return '';
   var oid = String(objectId).trim();
@@ -13,6 +15,8 @@ function finkPortalUrl(objectId) {
   try {
     var url = new URL('PortalLink.jsp', window.location.href);
     url.searchParams.set('objectId', oid);
+    if (typeof window.finkPortalOrigin === 'string' && window.finkPortalOrigin)
+      url.searchParams.set('portal', window.finkPortalOrigin);
     return /^https?:$/.test(url.protocol) ? url.href : '';
   } catch (error) { return ''; }
   }
