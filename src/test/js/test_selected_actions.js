@@ -14,7 +14,8 @@ function fixture() {
   const ctx = vm.createContext({
     document:{getElementById:id=>controls[id]||null},
     vis:{Network:class {on(){} once(){} isCluster(){return false}}},
-    options4Graph:{}, stylesheet:{nodes:{},edges:{}}, console
+    options4Graph:{}, stylesheet:{nodes:{},edges:{}}, console, URL,
+    location:{href:'https://fink.example/FinkBrowser/index.jsp?profile=cc'}
   });
   ctx.window = ctx;
   vm.runInContext(graph, ctx);
@@ -51,15 +52,18 @@ function testPortalUsesObjectSurvey() {
   assert.ok(action);
   ctx.callGremlinValues = () => 'https://api.ztf.fink-portal.org/123456789';
   for (const [oid, url] of [
-    ['123456789', 'https://lsst.fink-portal.org/123456789'],
+    // LSST DIA and SS IDs are both decimal: PortalLink.jsp picks the Portal page
+    // (/<diaObjectId>, or /<packed designation> for Solar System objects).
+    ['123456789', 'https://fink.example/FinkBrowser/PortalLink.jsp?objectId=123456789'],
     ['ZTF20abcdef', 'https://ztf.fink-portal.org/ZTF20abcdef'],
     ['ZTF20 a&b', 'https://ztf.fink-portal.org/ZTF20%20a%26b']
   ]) {
     const value = ctx.stylesheetValue(action.url, 7, new Map([['objectId',oid]]), new Map(), false);
     assert.equal(value, url);
   }
-  assert.equal(ctx.stylesheetValue(action.url, 7, new Map([['objectId','not-an-object']]),
-    new Map(), false), '', 'unknown IDs must not be linked to a wrong survey');
+  for (const bad of ['not-an-object', '0123', '12345678901234567890', '1e5'])
+    assert.equal(ctx.stylesheetValue(action.url, 7, new Map([['objectId', bad]]),
+      new Map(), false), '', bad + ' must not be linked to a wrong survey');
 }
 
 testInternalActionsDoNotNavigateToBase();

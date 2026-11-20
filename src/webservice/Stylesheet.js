@@ -3,11 +3,18 @@ function storeData(fn, dataS) {
   }
 
 // Object IDs identify the survey; portal pages are not REST API endpoints.
+// LSST DIA and Solar System IDs are both decimal, but the Portal addresses Solar
+// System objects by designation: PortalLink.jsp resolves the page and redirects.
 function finkPortalUrl(objectId) {
   if (objectId == null) return '';
   var oid = String(objectId).trim();
-  var portal = oid.startsWith('ZTF') ? 'ztf' : /^[0-9]/.test(oid) ? 'lsst' : '';
-  return portal ? 'https://' + portal + '.fink-portal.org/' + encodeURIComponent(oid) : '';
+  if (oid.startsWith('ZTF')) return 'https://ztf.fink-portal.org/' + encodeURIComponent(oid);
+  if (!/^[1-9][0-9]{0,18}$/.test(oid) || typeof window === 'undefined' || !window.location) return '';
+  try {
+    var url = new URL('PortalLink.jsp', window.location.href);
+    url.searchParams.set('objectId', oid);
+    return /^https?:$/.test(url.protocol) ? url.href : '';
+  } catch (error) { return ''; }
   }
 
 stylesheet.nodes.AstroLabNet = {

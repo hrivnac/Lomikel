@@ -49,7 +49,10 @@ for (const [id, survey] of [[ZTF, 'ZTF'], [DIA, 'LSST'], [SS, 'LSST']]) {
   const byName = Object.fromEntries(links.map(l => [l.textContent, l]));
   assert.equal(byName['Classification neighborhood'].href,
     `${base}ClassificationView/index.html?survey=${survey}&objectId=${id}`, 'neighborhood menu is filled');
-  assert.ok(byName['Fink Portal'].href.startsWith(`https://${survey.toLowerCase()}.fink-portal.org/`));
+  // ZTF pages are addressed by objectId; LSST IDs go through PortalLink.jsp, which
+  // redirects DIA objects to /<diaObjectId> and Solar System objects to their designation.
+  assert.equal(byName['Fink Portal'].href, survey === 'ZTF' ? `https://ztf.fink-portal.org/${id}` :
+    `${base}PortalLink.jsp?objectId=${id}`);
   if (survey === 'LSST') {
     assert.equal(byName['LSST Light Curve Visualizer'].href,
       `${base}LightCurveView/index.html?objectId=${id}`, 'visualizer menu is filled (DIA and SS)');
