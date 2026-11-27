@@ -33,7 +33,7 @@
             <li><strong>Follow alerts</strong> moves the view toward currently animated alerts.</li>
             <li><strong>Whole sky</strong> shows the complete celestial sphere. There, scroll the mouse wheel to zoom about the pointer and drag with the mouse to move; choose <strong>Whole sky</strong> again to return to the full sky.</li>
             <li><strong>All alerts</strong> toggles persistent markers for every currently loaded alert. Whole sky and Follow alerts work in either mode.</li>
-            <li><strong>SS trajectory</strong> (WAR only) discovers up to the requested number of multi-point LSST Solar System objects in Elasticsearch, then obtains complete observation-level positions and MJDs via the Fink resolver and SSO API. Its most recent dated source uses the regular-size star; older sources use smaller stars and same-colour time-ordered lines. ES stores times and coordinates in separate arrays, which cannot safely be paired on their own. Switch it off to stop loading and hide the tracks.</li>
+            <li><strong>SS trajectory</strong> (WAR only, on by default) shows the history of each arriving LSST Solar System alert. The latest LSST alerts include the newest Solar System objects from Elasticsearch; for each one the complete observation-level positions and MJDs are obtained via the Fink resolver and SSO API (ES stores times and coordinates in separate arrays, which cannot safely be paired on their own). The alert is the regular star at its current source; older sources use smaller stars joined by same-colour time-ordered lines. In Follow alerts the history is shown while the alert flashes; with All alerts every loaded SS alert shows its history. Switch it off to hide the histories; SS alerts keep arriving.</li>
             <li>Five-pointed markers are ZTF alerts; ten-pointed markers are LSST alerts.</li>
             <li>Point to or tap a marker for details, including each SS position's MJD and source ID. With All alerts on, the list shows one latest-source entry per SS object; other alerts link to their portal pages.</li>
             <li>When server mode is available, a zero look-back window loads the latest ZTF classifications and LSST DIA alerts. Standalone mode requires a positive time window and never accesses Elasticsearch.</li>
@@ -96,8 +96,8 @@
     <script src="update.js"></script>
     <script src="data.js"></script>
     <script src="settings.js"></script>
-    <script src="trajectory.js?v=ss-links-1"></script>
+    <script src="trajectory.js?v=ss-alert-history-1"></script>
     <script src="drawing.js?v=star-size-1"></script>
-    <script src="app.js?v=whole-sky-nav-1"></script>
+    <script src="app.js?v=ss-alert-history-1"></script>
   </body>
 </html>

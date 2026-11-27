@@ -1,10 +1,18 @@
-// Elasticsearch selects SS objects, but its independently deduplicated MJD
-// and position arrays cannot define an observation-level chronology. The JSP
-// returns exact source IDs with paired MJD and sky coordinates from Fink REST.
+// SS alerts arrive with the latest LSST alerts (LatestAlerts.jsp lists the newest
+// ss_mjd objects). Elasticsearch's independently deduplicated MJD and position
+// arrays cannot define an observation-level chronology, so each arriving SS
+// object's history is loaded from SSTrajectory.jsp, which returns exact source
+// IDs with paired MJD and sky coordinates from Fink REST. The alert itself is
+// placed on the paired source matching its latest ES MJD; the SS trajectory
+// button only toggles drawing of the history.
 const ssTrajectories = new Map();
 let ssTrajectoryEnabled = false;
 let ssTrajectoryController = null;
 let ssTrajectoryGeneration = 0;
+let ssAlertCandidates = new Map();
+let ssHistoryLoaded = 0;
+let ssHistoryFailed = 0;
+const SS_MJD_TOLERANCE = 0.00001;
 
 function isSsDesignation(value) {
   return typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9 ._()-]{0,63}$/.test(value.trim());
@@ -52,13 +60,28 @@ function matchesSsSource(marker, point) {
     Math.abs(marker.alert.dec - point.dec) < 0.000001;
   }
 
-// Use one visibility rule for canvas markers and the All loaded alerts list.
+function isSsAlertOf(marker, trajectory) {
+  return marker.alert.survey === 'LSST' && marker.alert.class === 'LSST SS source' &&
+    String(marker.alert.objectId) === trajectory.objectId;
+  }
+
+// In Follow alerts mode a history is shown only while its SS alert flashes; with
+// All alerts every loaded SS alert shows its history.
+function isSsTrajectoryShown(trajectory, primaryMarkers) {
+  if (typeof showAllAlerts !== 'undefined' && !showAllAlerts) {
+    return primaryMarkers.some(marker => isSsAlertOf(marker, trajectory));
+    }
+  return true;
+  }
+
+// Use one visibility rule for canvas markers and the camera.
 function getVisibleSsTrajectories(primaryMarkers) {
   if (!ssTrajectoryEnabled) return [];
   const fallbackColor = classes['LSST SS source'] || '255,200,80';
-  return [...ssTrajectories.values()].map(trajectory => {
-    const matchingAlert = primaryMarkers.find(marker =>
-      trajectory.points.some(point => matchesSsSource(marker, point)));
+  return [...ssTrajectories.values()].filter(trajectory =>
+    isSsTrajectoryShown(trajectory, primaryMarkers)).map(trajectory => {
+    const matchingAlert = primaryMarkers.find(marker => isSsAlertOf(marker, trajectory)) ||
+      primaryMarkers.find(marker => trajectory.points.some(point => matchesSsSource(marker, point)));
     const lastAtPosition = new Map();
     const positionKey = point => `${point.ra.toFixed(7)}:${point.dec.toFixed(7)}`;
     trajectory.points.forEach((point, index) => lastAtPosition.set(positionKey(point), index));
@@ -75,12 +98,14 @@ function getVisibleSsTrajectories(primaryMarkers) {
 const SS_CAMERA_POINTS = 120;
 let ssCameraKey = null;
 let ssCameraAnchors = [];
-function getSsTrajectoryCameraAnchors() {
+function getSsTrajectoryCameraAnchors(primaryMarkers = []) {
   if (!ssTrajectoryEnabled || ssTrajectories.size === 0) return [];
-  const key = [...ssTrajectories].map(([id, trajectory]) => `${id}:${trajectory.points.length}`).join('|');
+  const shown = [...ssTrajectories.values()].filter(trajectory =>
+    isSsTrajectoryShown(trajectory, primaryMarkers));
+  const key = shown.map(trajectory => `${trajectory.objectId}:${trajectory.points.length}`).join('|');
   if (key === ssCameraKey) return ssCameraAnchors;
   const anchors = [];
-  for (const trajectory of ssTrajectories.values()) {
+  for (const trajectory of shown) {
     const points = trajectory.points;
     if (!points.length) continue;
     const keep = new Set([0, points.length - 1]);
@@ -117,23 +142,114 @@ async function ssTrajectoryJson(url, signal) {
   return response.json();
   }
 
-async function startSsTrajectoryLoad() {
-  if (ssTrajectoryController) return;
-  ssTrajectoryEnabled = true;
-  ssTrajectories.clear();
-  if (typeof showAllAlerts !== 'undefined' && showAllAlerts) renderRecentAlerts();
+function describeSsHistoryStatus() {
+  const total = ssAlertCandidates.size;
+  if (!total) return ssTrajectoryEnabled ? 'SS alerts: none in the latest LSST alerts' : '';
+  const loading = ssTrajectoryController ? ', loading…' : '';
+  const failed = ssHistoryFailed ? ` (${ssHistoryFailed} failed)` : '';
+  return `SS histories: ${ssHistoryLoaded}/${total}${failed}${loading}${ssTrajectoryEnabled ? '' : ' (hidden)'}`;
+  }
+
+function refreshSsViews() {
+  if (typeof rebuildAlertsPool === 'function') rebuildAlertsPool();
+  updateSsTrajectoryStatus(describeSsHistoryStatus());
+  }
+
+// Validate the SS objects of one latest-alerts response.
+function normalizeLatestSsPayload(payload) {
+  if (!payload || !Array.isArray(payload.ssMjdHits)) return [];
+  const positions = new Map();
+  for (const document of Array.isArray(payload.ssRadecDocs) ? payload.ssRadecDocs : []) {
+    const location = document && document.found && document._source && document._source.location;
+    // Only a single stored position is unambiguous without the paired history.
+    if (document && document._id != null && location && !Array.isArray(location) &&
+        Number.isFinite(location.lon) && Number.isFinite(location.lat) &&
+        location.lat >= -90 && location.lat <= 90) {
+      positions.set(String(document._id), {
+        ra: ((location.lon + 180) % 360 + 360) % 360, dec: location.lat});
+      }
+    }
+  const candidates = [];
+  const seen = new Set();
+  for (const hit of payload.ssMjdHits) {
+    if (!hit || hit._id == null || !hit._source) continue;
+    const objectId = String(hit._id);
+    if (!/^\d{1,64}$/.test(objectId) || seen.has(objectId)) continue;
+    const rawMjds = Array.isArray(hit._source.mjd) ? hit._source.mjd : [hit._source.mjd];
+    const mjds = rawMjds.filter(value => Number.isFinite(value) && value > 0);
+    if (!mjds.length) continue;
+    seen.add(objectId);
+    candidates.push({objectId, latestMjd: Math.max(...mjds), fallback: positions.get(objectId) || null});
+    }
+  return candidates;
+  }
+
+// The current source of an SS alert: the paired source at the alert's ES MJD,
+// else the most recent paired source.
+function currentSsPoint(trajectory, latestMjd) {
+  const points = trajectory.points;
+  for (let i = points.length - 1; i >= 0; i--) {
+    if (Math.abs(points[i].mjd - latestMjd) <= SS_MJD_TOLERANCE) return points[i];
+    }
+  return points[points.length - 1];
+  }
+
+// Pool rows (same shape as the other LSST rows) for the SS alerts that can be placed.
+function getSsAlertRows() {
+  const rows = [];
+  for (const candidate of ssAlertCandidates.values()) {
+    const trajectory = ssTrajectories.get(candidate.objectId);
+    const row = {"v:survey": "LSST", "v:classification": "LSST SS source",
+      "r:ssObjectId": candidate.objectId};
+    if (trajectory && trajectory.points.length) {
+      const point = currentSsPoint(trajectory, candidate.latestMjd);
+      Object.assign(row, {"r:diaSourceId": point.sourceId, "r:midpointMjdTai": point.mjd,
+        "r:ra": point.ra, "r:dec": point.dec});
+      if (trajectory.designation) row["v:designation"] = trajectory.designation;
+      }
+    else if (candidate.fallback) {
+      Object.assign(row, {"r:midpointMjdTai": candidate.latestMjd,
+        "r:ra": candidate.fallback.ra, "r:dec": candidate.fallback.dec});
+      }
+    else continue;
+    rows.push(row);
+    }
+  return rows;
+  }
+
+// Called with the SS objects of every successful latest-LSST refresh: newly
+// arrived (or newly observed) objects get their history; departed ones are dropped.
+function updateSsAlertCandidates(candidates) {
   const generation = ++ssTrajectoryGeneration;
+  ssTrajectoryController?.abort();
+  ssTrajectoryController = null;
+  const next = new Map();
+  for (const candidate of candidates) next.set(candidate.objectId, candidate);
+  for (const [id, trajectory] of ssTrajectories) {
+    const candidate = next.get(id);
+    // A newer detection than the cached history makes the cache stale.
+    if (!candidate || trajectory.latestMjd == null ||
+        trajectory.latestMjd < candidate.latestMjd - SS_MJD_TOLERANCE) {
+      ssTrajectories.delete(id);
+      }
+    }
+  ssAlertCandidates = next;
+  ssHistoryFailed = 0;
+  ssHistoryLoaded = [...next.keys()].filter(id => ssTrajectories.has(id)).length;
+  const missing = [...next.keys()].filter(id => !ssTrajectories.has(id));
+  if (!missing.length) {
+    updateSsTrajectoryStatus(describeSsHistoryStatus());
+    return Promise.resolve();
+    }
   const controller = new AbortController();
   ssTrajectoryController = controller;
-  let loaded = 0;
-  let failed = 0;
+  updateSsTrajectoryStatus(describeSsHistoryStatus());
+  return loadSsHistories(missing, generation, controller);
+  }
+
+async function loadSsHistories(ids, generation, controller) {
   try {
-    updateSsTrajectoryStatus('Loading SS trajectories…');
-    const limit = Math.max(1, Math.min(100, Number(nAlerts) || 10));
-    const listing = await ssTrajectoryJson(`SSTrajectory.jsp?list=1&n=${limit}`, controller.signal);
-    if (generation !== ssTrajectoryGeneration) return;
-    if (!listing || !Array.isArray(listing.ids)) throw new TypeError('Invalid SS object list');
-    const ids = [...new Set(listing.ids.map(String))].filter(id => /^\d{1,64}$/.test(id)).slice(0, limit);
+    // One at a time: SSTrajectory.jsp shares a few upstream slots.
     for (const id of ids) {
       if (generation !== ssTrajectoryGeneration) return;
       try {
@@ -141,37 +257,33 @@ async function startSsTrajectoryLoad() {
         if (generation !== ssTrajectoryGeneration) return;
         if (String(payload.objectId) !== id) throw new TypeError('SS object ID mismatch');
         const trajectory = normalizeSsTrajectory(payload);
-        if (trajectory.points.length) {
-          ssTrajectories.set(id, trajectory);
-          loaded++;
-          if (typeof showAllAlerts !== 'undefined' && showAllAlerts) renderRecentAlerts();
-          }
+        if (!trajectory.points.length) throw new TypeError('Empty SS history');
+        ssTrajectories.set(id, trajectory);
+        ssHistoryLoaded++;
         }
       catch (error) {
         if (generation !== ssTrajectoryGeneration || error.name === 'AbortError') return;
-        failed++;
-        console.error('Cannot load SS trajectory', id, error);
+        ssHistoryFailed++;
+        console.error('Cannot load SS history', id, error);
         }
-      updateSsTrajectoryStatus(`SS trajectories: ${loaded}/${ids.length}${failed ? ` (${failed} failed)` : ''}`);
-      }
-    }
-  catch (error) {
-    if (generation === ssTrajectoryGeneration && error.name !== 'AbortError') {
-      updateSsTrajectoryStatus(`SS trajectories unavailable: ${error.message}`);
-      console.error('Cannot load SS trajectories', error);
+      refreshSsViews();
       }
     }
   finally {
-    if (ssTrajectoryController === controller) ssTrajectoryController = null;
+    if (ssTrajectoryController === controller) {
+      ssTrajectoryController = null;
+      if (generation === ssTrajectoryGeneration) refreshSsViews();
+      }
     }
+  }
+
+// The SS trajectory button shows or hides the histories; SS alerts stay in the stream.
+function startSsTrajectoryLoad() {
+  ssTrajectoryEnabled = true;
+  updateSsTrajectoryStatus(describeSsHistoryStatus());
   }
 
 function stopSsTrajectoryLoad() {
   ssTrajectoryEnabled = false;
-  ssTrajectoryGeneration++;
-  ssTrajectoryController?.abort();
-  ssTrajectoryController = null;
-  ssTrajectories.clear();
-  if (typeof showAllAlerts !== 'undefined' && showAllAlerts) renderRecentAlerts();
-  updateSsTrajectoryStatus('SS trajectories hidden');
+  updateSsTrajectoryStatus(describeSsHistoryStatus() || 'SS trajectories hidden');
   }

@@ -412,26 +412,28 @@ test("view and help controls expose their state to keyboard and assistive techno
   assert.equal(elements.get("helpButton").getAttribute("aria-expanded"), "true");
 });
 
-test("SS trajectory is WAR-only, on-demand, and independent of sky controls", async () => {
+test("SS trajectory is WAR-only, on by default there, and only toggles drawing", async () => {
   const staticPage = loadAppForInteraction();
   await Promise.resolve();
   assert.equal(staticPage.elements.get("btnSsTrajectory").disabled, true);
   staticPage.elements.get("btnSsTrajectory").emit("click");
   assert.deepEqual(staticPage.context.fetchCalls, []);
+  assert.equal(vm.runInContext("ssTrajectoryEnabled", staticPage.context), false);
 
   const serverPage = loadAppForInteraction({war: true});
   await Promise.resolve();
   const {context, elements} = serverPage;
   assert.equal(elements.get("btnSsTrajectory").disabled, false);
-  assert.deepEqual(context.fetchCalls, []);
-  elements.get("btnSsTrajectory").emit("click");
-  await Promise.resolve();
-  assert.equal(context.fetchCalls[0], "SSTrajectory.jsp?list=1&n=3");
   assert.equal(elements.get("btnSsTrajectory").getAttribute("aria-pressed"), "true");
+  assert.equal(vm.runInContext("ssTrajectoryEnabled", context), true);
+  elements.get("btnSsTrajectory").emit("click");
+  assert.equal(elements.get("btnSsTrajectory").getAttribute("aria-pressed"), "false");
+  assert.equal(vm.runInContext("ssTrajectoryEnabled", context), false);
+  assert.deepEqual(context.fetchCalls, [], "the button never loads data itself");
   assert.equal(elements.get("btnDynamic").getAttribute("aria-pressed"), "true");
   assert.equal(elements.get("btnAllAlerts").getAttribute("aria-pressed"), "false");
   elements.get("btnSsTrajectory").emit("click");
-  assert.equal(elements.get("btnSsTrajectory").getAttribute("aria-pressed"), "false");
+  assert.equal(elements.get("btnSsTrajectory").getAttribute("aria-pressed"), "true");
 });
 
 test("All alerts is an independent toggle alongside both camera modes", () => {
@@ -454,23 +456,23 @@ test("All alerts is an independent toggle alongside both camera modes", () => {
   assert.equal(vm.runInContext("showAllAlerts", context), false);
 });
 
-test("All alerts lists only the latest SS source even when its marker overlaps a DIA alert", () => {
+test("All alerts lists one row per SS alert, also when its marker overlaps a DIA alert", () => {
   const {context, elements} = loadAppForInteraction({withUtils: true, war: true});
-  context.alertsPool = [{
-    "v:survey": "LSST", "r:diaObjectId": "0", "r:midpointMjdTai": 20,
-    "r:ra": 101, "r:dec": 0, "v:classification": "LSST DIA source",
-  }];
-  elements.get("btnAllAlerts").emit("click");
-  context.trajectory = {objectId: "21164706692739143", points: [
+  context.trajectory = {objectId: "21164706692739143", latestMjd: 20, points: [
     {sourceId: "old-source", mjd: 10, ra: 100, dec: 0},
     {sourceId: "new-source", mjd: 20, ra: 101, dec: 0},
   ]};
-  vm.runInContext('ssTrajectories.set(trajectory.objectId, trajectory); ssTrajectoryEnabled = true; renderRecentAlerts()', context);
+  vm.runInContext(`ssTrajectories.set(trajectory.objectId, trajectory);
+    ssAlertCandidates = new Map([[trajectory.objectId, {objectId: trajectory.objectId, latestMjd: 20, fallback: null}]]);
+    alertsPool = [{"v:survey": "LSST", "r:diaObjectId": "0", "r:midpointMjdTai": 20,
+      "r:ra": 101, "r:dec": 0, "v:classification": "LSST DIA source"}, ...getSsAlertRows()];`, context);
+  elements.get("btnAllAlerts").emit("click");
   const rows = () => elements.get("recentAlerts").children.map(item => item.children.map(child => child.textContent).join(""));
-  assert.deepEqual(rows(), ["LSST 21164706692739143 — SS", "LSST 0 — DIA"]);
-  assert.equal(elements.get("recentAlerts").children[0].children.some(child => child.tagName === "A"), false);
-  vm.runInContext('stopSsTrajectoryLoad()', context);
-  assert.deepEqual(rows(), ["LSST 0 — DIA"]);
+  assert.deepEqual(rows(), ["LSST 0 — DIA", "LSST 21164706692739143 — SS"]);
+  assert.equal(elements.get("recentAlerts").children[1].className, "ss-trajectory-item");
+  assert.equal(elements.get("recentAlerts").children[1].children.some(child => child.tagName === "A"), false);
+  vm.runInContext('stopSsTrajectoryLoad(); renderRecentAlerts()', context);
+  assert.deepEqual(rows(), ["LSST 0 — DIA", "LSST 21164706692739143 — SS"], "hiding histories keeps the SS alert");
 });
 
 test("list preserves ZTF and future LSST class names, while SS tooltips retain each MJD", () => {
@@ -491,11 +493,12 @@ test("list preserves ZTF and future LSST class names, while SS tooltips retain e
   }
 });
 
-test("All alerts grows as SS object responses arrive", async () => {
+test("All alerts grows as SS histories of arriving alerts load", async () => {
   const {context, elements} = loadAppForInteraction({withUtils: true, war: true});
   let releaseSecond;
+  const calls = [];
   context.fetch = async url => {
-    if (url.includes('list=1')) return {ok: true, json: async () => ({ids: ['123', '456']})};
+    calls.push(url);
     if (url.includes('id=123')) return {ok: true, json: async () => ({objectId: '123', sources: [
       {sourceId: '1', mjd: 10, ra: 100, dec: 0},
     ]})};
@@ -505,18 +508,18 @@ test("All alerts grows as SS object responses arrive", async () => {
       ]})});
     });
   };
+  vm.runInContext('function rebuildAlertsPool() { alertsPool = getSsAlertRows(); }', context);
   elements.get('btnAllAlerts').emit('click');
-  const pending = vm.runInContext('startSsTrajectoryLoad()', context);
+  const pending = vm.runInContext(`updateSsAlertCandidates([
+    {objectId: "456", latestMjd: 11, fallback: null}, {objectId: "123", latestMjd: 10, fallback: null}])`, context);
   for (let i = 0; i < 20 && !releaseSecond; i++) await new Promise(resolve => setImmediate(resolve));
+  const rows = () => (vm.runInContext('getVisibleAlerts()', context), elements.get('recentAlerts').children
+    .map(item => item.children.map(child => child.textContent).join('')));
+  assert.deepEqual(calls, ['SSTrajectory.jsp?id=456', 'SSTrajectory.jsp?id=123'].slice(0, calls.length));
   assert.equal(typeof releaseSecond, 'function');
-  const rows = () => elements.get('recentAlerts').children.map(item => item.children.map(child => child.textContent).join(''));
-  assert.equal(rows().length, 1);
-  assert.match(rows()[0], /LSST 123 — SS/);
   releaseSecond();
   await pending;
-  assert.equal(rows().length, 2);
-  assert.match(rows()[0], /LSST 456 — SS/);
-  assert.match(rows()[1], /LSST 123 — SS/);
+  assert.deepEqual(rows(), ['LSST 456 — SS', 'LSST 123 — SS']);
 });
 
 test("all-alert markers persist, refresh with the loaded pool, and remain interactive", () => {
@@ -684,7 +687,8 @@ test("touch pointerleave keeps the tooltip available for a second tap", () => {
   assert.equal(tooltip.style.display, "flex");
 });
 
-async function loadData({failClasses = [], emptyClasses = [], search = "", jspMode = "available", tagListStatus = 200} = {}) {
+async function loadData({failClasses = [], emptyClasses = [], search = "", jspMode = "available", tagListStatus = 200,
+                         withTrajectory = false, ss = null} = {}) {
   const requests = [];
   const probeRequests = [];
   const replacedUrls = [];
@@ -753,9 +757,16 @@ async function loadData({failClasses = [], emptyClasses = [], search = "", jspMo
                 found: true,
                 _source: {location: {lon: 133.1, lat: -24}},
               }],
+              ...(ss && ss.error ? {ssError: ss.error} : {}),
+              ...(ss && !ss.error ? {ssMjdHits: ss.hits(), ssRadecDocs: ss.radec ? ss.radec() : []} : {}),
             };
           },
         };
+      }
+      if (ss && String(url).startsWith("SSTrajectory.jsp")) {
+        requests.push(url);
+        const id = new URLSearchParams(String(url).split("?")[1]).get("id");
+        return {ok: true, status: 200, async json() { return {objectId: id, sources: ss.histories[id] || []}; }};
       }
       if (!String(url).startsWith("http")) {
         return {
@@ -803,7 +814,7 @@ async function loadData({failClasses = [], emptyClasses = [], search = "", jspMo
     },
   };
   vm.createContext(context);
-  for (const file of ["params.js", "utils.js", "update.js", "data.js"]) {
+  for (const file of ["params.js", "utils.js", "update.js", "data.js", ...(withTrajectory ? ["trajectory.js"] : [])]) {
     vm.runInContext(
       fs.readFileSync(path.join(alertsView, file), "utf8"),
       context,
@@ -827,6 +838,54 @@ async function loadData({failClasses = [], emptyClasses = [], search = "", jspMo
   await vm.runInContext("initialRefreshPromise", context);
   return {context, elements, probeRequests, requests, timerCallback: timerState.callback, timerState, replacedUrls};
 }
+
+test("arriving SS alerts join the pool at their current paired source and refreshes follow new arrivals", async () => {
+  const settle = async () => { for (let i = 0; i < 30; i++) await new Promise(resolve => setImmediate(resolve)); };
+  let hits = [{_id: "111", _source: {mjd: [61350.1, 61359.2]}}];
+  const ss = {
+    hits: () => hits,
+    radec: () => [{_id: "222", found: true, _source: {location: {lon: -170, lat: 5}}}],
+    histories: {
+      "111": [{sourceId: "11", mjd: 61350.1, ra: 10, dec: 1}, {sourceId: "12", mjd: 61359.2, ra: 11, dec: 1.5}],
+      "333": [{sourceId: "31", mjd: 61359.3, ra: 50, dec: -2}],
+    },
+  };
+  const {context, requests} = await loadData({withTrajectory: true, ss});
+  await settle();
+  const ssRows = () => JSON.parse(JSON.stringify(vm.runInContext(
+    'alertsPool.filter(row => row["v:classification"] === "LSST SS source")', context)));
+  assert.deepEqual(ssRows(), [{"v:survey": "LSST", "v:classification": "LSST SS source", "r:ssObjectId": "111",
+    "r:diaSourceId": "12", "r:midpointMjdTai": 61359.2, "r:ra": 11, "r:dec": 1.5}]);
+  assert.deepEqual(requests.filter(url => url.startsWith("SSTrajectory.jsp")), ["SSTrajectory.jsp?id=111"]);
+  assert.equal(requests.some(url => url.includes("list=1")), false, "no fixed SS object list any more");
+
+  // Next refresh: 111 is unchanged (cached), 333 arrives, 222 has one unambiguous ES position.
+  hits = [{_id: "333", _source: {mjd: 61359.3}}, {_id: "111", _source: {mjd: [61350.1, 61359.2]}},
+    {_id: "222", _source: {mjd: [61359.25]}}];
+  await vm.runInContext("refreshEnabledSurveys()", context);
+  await settle();
+  assert.deepEqual(requests.filter(url => url.startsWith("SSTrajectory.jsp")),
+    ["SSTrajectory.jsp?id=111", "SSTrajectory.jsp?id=333", "SSTrajectory.jsp?id=222"]);
+  assert.deepEqual(ssRows().map(row => [row["r:ssObjectId"], row["r:ra"], row["r:dec"]]),
+    [["333", 50, -2], ["111", 11, 1.5], ["222", 10, 5]]);
+
+  // Departed objects disappear; a newer detection of a cached object reloads its history.
+  hits = [{_id: "111", _source: {mjd: [61350.1, 61359.2, 61360.0]}}];
+  ss.histories["111"].push({sourceId: "13", mjd: 61360.0, ra: 12, dec: 2});
+  await vm.runInContext("refreshEnabledSurveys()", context);
+  await settle();
+  assert.equal(requests.filter(url => url === "SSTrajectory.jsp?id=111").length, 2);
+  assert.deepEqual(ssRows().map(row => [row["r:ssObjectId"], row["r:diaSourceId"]]), [["111", "13"]]);
+
+  // An SS-side failure keeps DIA alerts and the previous SS alerts, and is reported.
+  ss.error = "Cannot load latest LSST SS alerts";
+  await vm.runInContext("refreshEnabledSurveys()", context);
+  await settle();
+  assert.deepEqual(ssRows().map(row => row["r:ssObjectId"]), ["111"]);
+  assert.equal(vm.runInContext("surveyStatus.LSST.state", context), "partial");
+  assert.match(vm.runInContext("surveyStatus.LSST.errors.join()", context), /SS: Cannot load latest LSST SS alerts/);
+  assert.equal(vm.runInContext('alertsPool.some(row => row["r:diaObjectId"] === "lsst-dia-object")', context), true);
+});
 
 test("startup installs the refresh timer before waiting for network data", () => {
   const source = fs.readFileSync(path.join(alertsView, "data.js"), "utf8");
@@ -1057,10 +1116,12 @@ test("same-origin LSST latest endpoint uses fixed read-only Elasticsearch indexe
   const jsp = fs.readFileSync(endpointPath, "utf8");
 
   assert.match(jsp, /http:\/\/134\.158\.243\.139:24499/);
-  for (const pathSuffix of ["dia_mjd/_search", "dia_radec/_mget"]) {
+  for (const pathSuffix of ["dia_mjd/_search", "dia_radec/_mget", "ss_mjd/_search", "ss_radec/_mget"]) {
     assert.equal(jsp.includes(pathSuffix), true);
   }
-  assert.doesNotMatch(jsp, /ss_mjd|ss_radec/);
+  // SS objects are optional: their failure is reported without hiding DIA alerts.
+  assert.match(jsp, /catch \(Exception ssError\)[\s\S]*ssError/);
+  assert.doesNotMatch(jsp, /_update|_delete|_bulk|_doc\b/);
   assert.doesNotMatch(jsp, /SmallHttpClient/);
   assert.match(jsp, /HttpURLConnection/);
   assert.match(jsp, /setConnectTimeout\s*\(/);
@@ -1203,24 +1264,28 @@ test("bundled stellar catalogue is compact and magnitude limited", () => {
   }
 });
 
-test("the dynamic camera frames the whole SS trajectory, not only the alerts", () => {
+test("the dynamic camera frames the whole SS trajectory of a visible SS alert", () => {
   const {context} = loadAppForInteraction({withUtils: true, war: true});
   context.alertsPool = [];
   assert.equal(vm.runInContext("getCameraBounds([])", context), null, "nothing to frame");
   context.trajectory = {objectId: "9", points: Array.from({length: 50}, (_, i) =>
     ({sourceId: String(i), mjd: 10 + i, ra: 100 + i * 0.4, dec: -10 + i * 0.2}))};
   vm.runInContext('ssTrajectories.set("9", trajectory); ssTrajectoryEnabled = true', context);
-  const box = vm.runInContext("getCameraBounds([])", context);
+  assert.equal(vm.runInContext("getCameraBounds([])", context), null, "Follow: no flashing SS alert, no history");
+  context.ssFlash = {alert: {survey: "LSST", class: "LSST SS source", objectId: "9", sourceId: "49",
+    ra: 100 + 49 * 0.4, dec: -10 + 49 * 0.2}};
+  const box = vm.runInContext("getCameraBounds([ssFlash])", context);
   assert.equal(Math.abs(box.raCenter - 109.8) < 0.5, true);
   assert.equal(box.minDec, -10);
   assert.equal(Math.abs(box.maxDec - (-10 + 49 * 0.2)) < 1e-9, true);
   context.alert = {alert: {ra: 200, dec: 30}};
-  const withAlert = vm.runInContext("getCameraBounds([alert])", context);
+  const withAlert = vm.runInContext("getCameraBounds([ssFlash, alert])", context);
   assert.equal(withAlert.maxDec, 30, "alerts and trajectory are framed together");
   assert.equal(withAlert.minDec, -10);
   vm.runInContext("ssTrajectoryEnabled = false", context);
-  assert.equal(vm.runInContext("getCameraBounds([])", context), null, "hidden trajectory no longer moves the camera");
+  assert.equal(vm.runInContext("getCameraBounds([ssFlash])", context).minDec, ssFlashDec(context), "hidden history no longer moves the camera");
 });
+function ssFlashDec(context) { return context.ssFlash.alert.dec; }
 
 test("Fink Portal links: DIA by object ID, SS by designation (the portal does not know ssObjectId)", () => {
   const context = loadUtils();
@@ -1238,15 +1303,19 @@ test("Fink Portal links: DIA by object ID, SS by designation (the portal does no
 
 test("SS rows and tooltips link to the portal once the designation is known", () => {
   const {context, elements} = loadAppForInteraction({withUtils: true, war: true});
-  context.alertsPool = [];
-  elements.get("btnAllAlerts").emit("click");
-  context.trajectory = {objectId: "20892028060578637", designation: "J90W03M", points: [
+  context.trajectory = {objectId: "20892028060578637", designation: "J90W03M", latestMjd: 20, points: [
     {sourceId: "a", mjd: 10, ra: 100, dec: 0}, {sourceId: "b", mjd: 20, ra: 101, dec: 0}]};
-  vm.runInContext('ssTrajectories.set(trajectory.objectId, trajectory); ssTrajectoryEnabled = true; renderRecentAlerts()', context);
+  vm.runInContext(`ssTrajectories.set(trajectory.objectId, trajectory);
+    ssAlertCandidates = new Map([[trajectory.objectId, {objectId: trajectory.objectId, latestMjd: 20, fallback: null}]]);
+    alertsPool = getSsAlertRows();`, context);
+  elements.get("btnAllAlerts").emit("click");
   const row = elements.get("recentAlerts").children[0];
   const anchor = row.children.find(child => child.tagName === "A");
   assert.equal(anchor.href, "https://lsst.fink-portal.org/J90W03M");
   assert.equal(anchor.textContent, "LSST 20892028060578637");
+  const marker = vm.runInContext("getVisibleAlerts()[0].alert", context);
+  assert.equal(marker.sourceId, "b");
+  assert.equal(marker.designation, "J90W03M");
   context.ssAlert = {survey: "LSST", objectId: "20892028060578637", class: "LSST SS source",
     designation: "J90W03M", jd: "MJD 10 · source a"};
   vm.runInContext("showAlertTooltip({alert: ssAlert}, 10, 20)", context);

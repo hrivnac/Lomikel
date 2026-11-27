@@ -42,7 +42,9 @@ function normalizeLatestLsstPayload(payload) {
   }
 
 function rebuildAlertsPool() {
-  alertsPool = [...surveySnapshots.ZTF.values(), ...surveySnapshots.LSST.values()];
+  // SS alerts (trajectory.js) join once their position is known.
+  const ssRows = typeof getSsAlertRows === "function" ? getSsAlertRows() : [];
+  alertsPool = [...surveySnapshots.ZTF.values(), ...surveySnapshots.LSST.values(), ...ssRows];
   }
 
 function alertIdentity(survey, alert) {
@@ -69,6 +71,7 @@ async function fetchAlerts(survey) {
   const allAlerts = [];
   const errors = [];
   let successfulRequests = 0;
+  let ssCandidates = null;
   surveyStatus[survey] = {...surveyStatus[survey], state: "loading", errors: []};
   updateStatusPanel();
   const latestMode = requestSettings.fetchStart === 0;
@@ -101,6 +104,13 @@ async function fetchAlerts(survey) {
           }
         const payload = await response.json();
         const data = request.latestLsst ? normalizeLatestLsstPayload(payload) : payload;
+        if (request.latestLsst && payload && payload.ssError) {
+          // Keep the previous SS alerts; report the failure as a partial update.
+          errors.push(`SS: ${String(payload.ssError).slice(0, 200)}`);
+          }
+        else if (request.latestLsst && typeof normalizeLatestSsPayload === "function") {
+          ssCandidates = normalizeLatestSsPayload(payload);
+          }
         if (!Array.isArray(data)) {
           errors.push(`${request.classification || "latest"}: invalid response`);
           continue;
@@ -120,6 +130,8 @@ async function fetchAlerts(survey) {
     if (generation !== alertConfigGeneration) return false;
     const updatedAt = new Date();
     if (successfulRequests > 0) {
+      // Register arriving SS objects before the pool is rebuilt.
+      if (ssCandidates && typeof updateSsAlertCandidates === "function") updateSsAlertCandidates(ssCandidates);
       replaceSurveySnapshot(survey, allAlerts);
       const count = surveySnapshots[survey].size;
       const state = errors.length > 0 ? "partial" : (count > 0 ? "ready" : "empty");

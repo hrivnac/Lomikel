@@ -48,40 +48,105 @@ test("rejects a dated trajectory whose paired source rows do not cover Elasticse
   assert.throws(() => vm.runInContext('normalizeSsTrajectory(payload)', context), /coverage/i);
 });
 
-test("SS requests start only after activation and accumulate objects one response at a time", async () => {
+test("SS history requests start only for arriving SS alerts and accumulate one response at a time", async () => {
   const calls = [];
   let releaseSecond;
   const context = loadTrajectory({fetch: async (url) => {
     calls.push(url);
-    if (url.includes("list=1")) return {ok: true, json: async () => ({ids: ["123", "456"]})};
     if (url.includes("id=123")) return {ok: true, json: async () => ({objectId: "123", sources: [{sourceId: "1", mjd: 10, ra: 180, dec: 1}]})};
     return new Promise(resolve => { releaseSecond = () => resolve({ok: true, json: async () => ({objectId: "456", sources: [{sourceId: "2", mjd: 11, ra: 181, dec: 2}]})}); });
   }});
-  assert.equal(calls.length, 0);
-  const pending = vm.runInContext("startSsTrajectoryLoad()", context);
+  vm.runInContext("startSsTrajectoryLoad()", context);
+  assert.equal(calls.length, 0, "the button alone loads nothing");
+  const pending = vm.runInContext(`updateSsAlertCandidates([
+    {objectId: "123", latestMjd: 10, fallback: null}, {objectId: "456", latestMjd: 11, fallback: null}])`, context);
   assert.equal(context.status.hidden, false);
   for (let i = 0; i < 20 && !releaseSecond; i++) await new Promise(resolve => setImmediate(resolve));
   assert.equal(typeof releaseSecond, "function");
   assert.equal(vm.runInContext("ssTrajectories.size", context), 1);
+  assert.equal(vm.runInContext("getSsAlertRows().length", context), 1);
   releaseSecond();
   await pending;
   assert.equal(vm.runInContext("ssTrajectories.size", context), 2);
-  assert.deepEqual(calls, ["SSTrajectory.jsp?list=1&n=3", "SSTrajectory.jsp?id=123", "SSTrajectory.jsp?id=456"]);
+  assert.deepEqual(calls, ["SSTrajectory.jsp?id=123", "SSTrajectory.jsp?id=456"]);
+  assert.match(context.status.textContent, /SS histories: 2\/2/);
 });
 
-test("SS loading can be stopped and stale replies cannot repaint trajectories", async () => {
+test("a refresh replaces the SS alerts and stale history replies cannot repaint them", async () => {
   let release;
   const context = loadTrajectory({fetch: async (url) => {
-    if (url.includes("list=1")) return {ok: true, json: async () => ({ids: ["123"]})};
-    return new Promise(resolve => { release = () => resolve({ok: true, json: async () => ({objectId: "123", sources: [{sourceId: "1", mjd: 10, ra: 180, dec: 0}]})}); });
+    if (url.includes("id=123")) {
+      return new Promise(resolve => { release = () => resolve({ok: true, json: async () => ({objectId: "123", sources: [{sourceId: "1", mjd: 10, ra: 180, dec: 0}]})}); });
+    }
+    return {ok: true, json: async () => ({objectId: "789", sources: [{sourceId: "7", mjd: 30, ra: 20, dec: 0}]})};
   }});
-  const pending = vm.runInContext("startSsTrajectoryLoad()", context);
+  const first = vm.runInContext('updateSsAlertCandidates([{objectId: "123", latestMjd: 10, fallback: null}])', context);
   for (let i = 0; i < 20 && !release; i++) await new Promise(resolve => setImmediate(resolve));
-  vm.runInContext("stopSsTrajectoryLoad()", context);
+  const second = vm.runInContext('updateSsAlertCandidates([{objectId: "789", latestMjd: 30, fallback: null}])', context);
   release();
-  await pending;
-  assert.equal(vm.runInContext("ssTrajectories.size", context), 0);
-  assert.equal(vm.runInContext("ssTrajectoryEnabled", context), false);
+  await Promise.all([first, second]);
+  assert.deepEqual([...vm.runInContext("ssTrajectories.keys()", context)], ["789"]);
+  assert.deepEqual(JSON.parse(JSON.stringify(vm.runInContext("getSsAlertRows()", context))).map(row => row["r:ssObjectId"]), ["789"]);
+});
+
+test("latest SS payload yields validated objects; only a single ES position is used before the history", () => {
+  const context = loadTrajectory();
+  context.payload = {
+    ssMjdHits: [
+      {_id: "111", _source: {mjd: [61350.1, 61359.2]}},
+      {_id: "222", _source: {mjd: 61359.25}},
+      {_id: "333", _source: {mjd: [61359.3]}},
+      {_id: "not-numeric", _source: {mjd: [1]}},
+      {_id: "444", _source: {mjd: ["x"]}},
+      {_id: "111", _source: {mjd: [61359.2]}},
+    ],
+    ssRadecDocs: [
+      {_id: "222", found: true, _source: {location: {lon: -170, lat: 5}}},
+      {_id: "333", found: true, _source: {location: [{lon: 1, lat: 2}, {lon: 3, lat: 4}]}},
+    ],
+  };
+  const result = JSON.parse(JSON.stringify(vm.runInContext("normalizeLatestSsPayload(payload)", context)));
+  assert.deepEqual(result, [
+    {objectId: "111", latestMjd: 61359.2, fallback: null},
+    {objectId: "222", latestMjd: 61359.25, fallback: {ra: 10, dec: 5}},
+    {objectId: "333", latestMjd: 61359.3, fallback: null},
+  ]);
+  assert.deepEqual(JSON.parse(JSON.stringify(vm.runInContext("normalizeLatestSsPayload({mjdHits: []})", context))), [],
+    "older JSP responses without SS objects stay valid");
+});
+
+test("an SS alert sits on the paired source at its ES MJD, else on the latest paired source", () => {
+  const context = loadTrajectory();
+  vm.runInContext(`ssTrajectories.set("1", {objectId: "1", designation: "K25A01B", latestMjd: 30, points: [
+      {sourceId: "a", mjd: 10, ra: 1, dec: 1}, {sourceId: "b", mjd: 20, ra: 2, dec: 2}, {sourceId: "c", mjd: 30, ra: 3, dec: 3}]});
+    ssTrajectories.set("2", {objectId: "2", latestMjd: 5, points: [{sourceId: "z", mjd: 5, ra: 9, dec: 9}]});
+    ssAlertCandidates = new Map([
+      ["1", {objectId: "1", latestMjd: 20.000001, fallback: null}],
+      ["2", {objectId: "2", latestMjd: 99, fallback: null}],
+      ["3", {objectId: "3", latestMjd: 7, fallback: null}]]);`, context);
+  const rows = JSON.parse(JSON.stringify(vm.runInContext("getSsAlertRows()", context)));
+  assert.deepEqual(rows, [
+    {"v:survey": "LSST", "v:classification": "LSST SS source", "r:ssObjectId": "1", "r:diaSourceId": "b",
+      "r:midpointMjdTai": 20, "r:ra": 2, "r:dec": 2, "v:designation": "K25A01B"},
+    {"v:survey": "LSST", "v:classification": "LSST SS source", "r:ssObjectId": "2", "r:diaSourceId": "z",
+      "r:midpointMjdTai": 5, "r:ra": 9, "r:dec": 9},
+  ], "an object without history or unambiguous position is not placed");
+});
+
+test("Follow alerts shows a history only while its SS alert flashes; All alerts shows every loaded one", () => {
+  const context = loadTrajectory();
+  vm.runInContext(`ssTrajectoryEnabled = true; classes = {};
+    ssTrajectories.set("1", {objectId: "1", points: [{sourceId: "a", mjd: 1, ra: 1, dec: 1}, {sourceId: "b", mjd: 2, ra: 2, dec: 2}]});
+    ssTrajectories.set("2", {objectId: "2", points: [{sourceId: "c", mjd: 1, ra: 5, dec: 5}]});
+    var showAllAlerts = false;`, context);
+  context.flash = {alert: {survey: "LSST", class: "LSST SS source", objectId: "1", sourceId: "b", ra: 2, dec: 2}, color: "1,2,3"};
+  const follow = vm.runInContext("getVisibleSsTrajectories([flash])", context);
+  assert.deepEqual(Array.from(follow, item => item.trajectory.objectId), ["1"]);
+  assert.equal(follow[0].color, "1,2,3");
+  assert.deepEqual(Array.from(follow[0].points, item => item.point.sourceId), ["a"], "the current source is the flash itself");
+  assert.equal(vm.runInContext("getVisibleSsTrajectories([]).length", context), 0);
+  vm.runInContext("showAllAlerts = true", context);
+  assert.equal(vm.runInContext("getVisibleSsTrajectories([]).length", context), 2);
 });
 
 test("trajectory segments wrap at RA=0 and duplicate new-alert positions are not painted twice", () => {

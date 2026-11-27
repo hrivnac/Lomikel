@@ -17,6 +17,8 @@
   private static final String ES_BASE = "http://134.158.243.139:24499";
   private static final String DIA_MJD_SEARCH = "/dia_mjd/_search";
   private static final String DIA_RADEC_MGET = "/dia_radec/_mget";
+  private static final String SS_MJD_SEARCH = "/ss_mjd/_search";
+  private static final String SS_RADEC_MGET = "/ss_radec/_mget";
   private static final int ES_TIMEOUT_MS = 10000;
 
   private static JSONObject postJson(String path, JSONObject payload) throws Exception {
@@ -82,7 +84,29 @@
     JSONArray documents = ids.length() == 0
       ? new JSONArray()
       : postJson(DIA_RADEC_MGET, new JSONObject().put("ids", ids)).getJSONArray("docs");
-    out.print(new JSONObject().put("mjdHits", hits).put("radecDocs", documents).toString());
+    JSONObject result = new JSONObject().put("mjdHits", hits).put("radecDocs", documents);
+    // Newest Solar System objects; their positions come from paired histories
+    // (SSTrajectory.jsp). An SS failure must not hide the DIA alerts.
+    try {
+      JSONObject ssQuery = new JSONObject()
+        .put("size", limit)
+        .put("_source", new JSONArray().put("mjd"))
+        .put("sort", new JSONArray().put(new JSONObject().put(
+          "mjd", new JSONObject().put("order", "desc").put("mode", "max"))));
+      JSONArray ssHits = postJson(SS_MJD_SEARCH, ssQuery)
+        .getJSONObject("hits")
+        .getJSONArray("hits");
+      JSONArray ssIds = new JSONArray();
+      for (int i = 0; i < ssHits.length(); i++) ssIds.put(ssHits.getJSONObject(i).getString("_id"));
+      JSONArray ssDocuments = ssIds.length() == 0
+        ? new JSONArray()
+        : postJson(SS_RADEC_MGET, new JSONObject().put("ids", ssIds)).getJSONArray("docs");
+      result.put("ssMjdHits", ssHits).put("ssRadecDocs", ssDocuments);
+      }
+    catch (Exception ssError) {
+      result.put("ssError", "Cannot load latest LSST SS alerts");
+      }
+    out.print(result.toString());
     }
   catch (Exception error) {
     response.setStatus(502);
