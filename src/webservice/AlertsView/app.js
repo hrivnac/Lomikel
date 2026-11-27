@@ -135,22 +135,13 @@ function renderRecentAlerts() {
   const focused = document.activeElement;
   const focusedUrl = focused?.tagName === 'A' && list.contains(focused) ? focused.href : null;
   let replacementFocus = null;
+  // SS alerts are ordinary pool entries (one per SS object), so they are listed like the others.
   const visible = showAllAlerts ? loadedAlertMarkers.map(marker => ({alert: marker.alert})) : recentAlerts;
-  if (showAllAlerts && ssTrajectoryEnabled) {
-    const ssItems = [...ssTrajectories.values()]
-      .filter(trajectory => trajectory.points.length > 0)
-      .map(trajectory => ({alert: {
-        survey: 'LSST', objectId: trajectory.objectId,
-        class: 'LSST SS source', jd: trajectory.points[trajectory.points.length - 1].mjd,
-        designation: trajectory.designation, isSsTrajectory: true
-        }}));
-    ssItems.sort((a, b) => b.alert.jd - a.alert.jd);
-    visible.unshift(...ssItems);
-    }
   document.getElementById('recentAlertsHeading').textContent = showAllAlerts ? 'All loaded alerts' : 'Recent alerts';
   const items = visible.map(({alert}) => {
     const item = document.createElement('li');
-    if (alert.isSsTrajectory) item.className = 'ss-trajectory-item';
+    const isSs = alert.survey === 'LSST' && alert.class === 'LSST SS source';
+    if (isSs) item.className = 'ss-trajectory-item';
     const label = `${alert.survey} ${alert.objectId}`;
     // An SS ID is not a DIA object ID; don't create a misleading DIA portal link.
     const link = createAlertLink(alert, label);
@@ -158,7 +149,7 @@ function renderRecentAlerts() {
       item.append(link);
       if (focusedUrl === link.href) replacementFocus = link;
       }
-    else if (alert.isSsTrajectory) { // no designation known: plain text, never a misleading DIA-style link
+    else { // e.g. SS without a known designation: plain text, never a misleading DIA-style link
       const name = document.createElement('span');
       name.textContent = label;
       item.append(name);
@@ -196,9 +187,13 @@ function alertFromRow(pick) {
   const alert = {
     survey, ra: Number(rawRa), dec: Number(rawDec),
     class: pick['v:classification'],
-    objectId: survey === "LSST" ? pick['r:diaObjectId'] : pick['i:objectId'],
+    objectId: survey === "LSST" ? (pick['r:diaObjectId'] ?? pick['r:ssObjectId']) : pick['i:objectId'],
     jd: survey === "LSST" ? pick['r:midpointMjdTai'] : pick['i:jd']
     };
+  // SS alerts: the paired source identifies the current point of the history,
+  // the designation addresses the Fink Portal page.
+  if (survey === "LSST" && pick['r:diaSourceId'] != null) alert.sourceId = String(pick['r:diaSourceId']);
+  if (survey === "LSST" && typeof pick['v:designation'] === "string") alert.designation = pick['v:designation'];
   return rawRa != null && rawDec != null && String(rawRa).trim() !== '' &&
     String(rawDec).trim() !== '' && Number.isFinite(alert.ra) &&
     Number.isFinite(alert.dec) && alert.objectId != null && alert.objectId !== '' ? alert : null;
@@ -246,7 +241,7 @@ function getBoundingBox(activeFlashes) {
 let combinedBoundsKey = null;
 let combinedBounds = null;
 function getCameraBounds(visible) {
-  const anchors = getSsTrajectoryCameraAnchors();
+  const anchors = getSsTrajectoryCameraAnchors(visible);
   if (!anchors.length) return showAllAlerts ? loadedBounds : getBoundingBox(visible);
   if (!showAllAlerts) return getBoundingBox([...visible, ...anchors]);
   if (combinedBoundsKey?.anchors !== anchors || combinedBoundsKey?.loaded !== loadedBounds) {
@@ -289,7 +284,8 @@ function smoothCamera() {
     camera.currentZoom = smoothZoom; // the user may zoom in on any part of the sky
     return;
     }
-  const visibleZoom = getMaxZoomToKeepAlertsVisible([...getVisibleAlerts(), ...getSsTrajectoryCameraAnchors()], camera.currentCenter.ra);
+  const visible = getVisibleAlerts();
+  const visibleZoom = getMaxZoomToKeepAlertsVisible([...visible, ...getSsTrajectoryCameraAnchors(visible)], camera.currentCenter.ra);
   camera.currentZoom = Math.min(smoothZoom, visibleZoom);
   }
 
@@ -500,8 +496,11 @@ ssTrajectoryButton.disabled = true;
 initialRefreshPromise.then(() => {
   ssTrajectoryButton.disabled = !latestAlertsAvailable;
   ssTrajectoryButton.title = latestAlertsAvailable
-    ? 'Load recent LSST Solar System trajectories from Elasticsearch'
+    ? 'Show or hide the history of arriving LSST Solar System alerts'
     : 'Available only in the FinkBrowser WAR';
+  // In the WAR, arriving SS alerts show their history by default.
+  if (latestAlertsAvailable && !ssTrajectoryEnabled) startSsTrajectoryLoad();
+  ssTrajectoryButton.setAttribute('aria-pressed', String(ssTrajectoryEnabled));
   });
 ssTrajectoryButton.addEventListener('click', () => {
   if (ssTrajectoryButton.disabled) return;
