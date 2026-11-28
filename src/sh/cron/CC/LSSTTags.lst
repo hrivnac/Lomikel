@@ -12,3 +12,4 @@ rubin.tag_most_likely_sn
 rubin.tag_remove_unlikely_transients
 rubin.tag_sn_near_galaxy_candidate
 rubin.tag_uniform_sample
+rubin.tag_snia_in_tns
